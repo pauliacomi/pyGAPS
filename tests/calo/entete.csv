@@ -1,0 +1,44 @@
+Experience Automatique
+Experimentateur; paul
+Date;05/10/2017 12h53
+Gaz;C3H6
+Echantillon;MIL-100-NS
+Masse;0.2163;g
+Température de l'expérience;30;°C
+Commentaires;
+Calorimètre;Orange
+
+Numéro de Cellule;
+Volume du calo;0;cm3
+Volume total;0;cm3
+Temps de ligne de Base et d'équilibre;120;min
+Temps de mise sous vide;90;min
+
+-----------------------------------------------------
+Remplissage par petites doses
+Delta pression par petites doses;0.2;bar
+Temps de l'expérience dans le volume référenciel;15;min
+Temps de l'expérience dans l'adsorption;350;min
+Pression finale;0.8;bar
+
+-----------------------------------------------------
+Remplissage par moyennes doses
+Delta pression par moyennes doses;0.4;bar
+Temps de l'expérience dans le volume référenciel;15;min
+Temps de l'expérience dans l'adsorption;250;min
+Pression finale;2;bar
+
+-----------------------------------------------------
+Remplissage par grandes doses
+Delta pression par grandes doses;1.5;bar
+Temps de l'expérience dans le volume référenciel;15;min
+Temps de l'expérience dans l'adsorption;250;min
+Pression finale;7;bar
+
+-----------------------------------------------------
+Désorption
+Delta pression par désorption;3;bar
+Temps de l'expérience dans le volume référenciel;15;min
+Temps de l'expérience dans la desorption;150;min
+Pression finale;0.1;bar
+Sans dernière étape à partir du vide

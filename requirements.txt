@@ -1,0 +1,6 @@
+numpy>=1.11.1
+matplotlib
+pandas>=0.18.1
+scipy>=0.18.0
+pyiast
+coolprop>6.0
