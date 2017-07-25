@@ -7,16 +7,14 @@ import unittest
 #%%
 class DatabaseTestCase(unittest.TestCase):
     def setUp(self):
-        self.widget = Widget('The widget')
 
     def tearDown(self):
-        self.widget.dispose()
 
-    def test_default_widget_size(self):
-        self.assertEqual(self.widget.size(), (50,50),
+    def test_one(self):
+        self.assertEqual(, , 
                          'incorrect default size')
 
-    def test_widget_resize(self):
+    def test_two(self):
         self.widget.resize(100,150)
         self.assertEqual(self.widget.size(), (100,150),
                          'wrong size after resize')
