@@ -3,4 +3,4 @@ matplotlib
 pandas>=0.18.1
 scipy>=0.18.0
 pyiast
-coolprop>6.0
+coolprop>=6.0
