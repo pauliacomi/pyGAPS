@@ -7,7 +7,7 @@ import adsutils
 #       Excel import
 #
 #%%
-xl_folder =  expanduser(r"~\OneDrive\Documents\PhD Documents\Python\python adsorption\tests\isotherms\n2 phys 77")
+xl_folder =  expanduser(r"~\OneDrive\Documents\PhD Documents\Python\python adsorption\adsutils\tests\data isotherms")
 xl_paths = adsutils.xl_experiment_parser_paths(xl_folder)
 
 isotherms = []

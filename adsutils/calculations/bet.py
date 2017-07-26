@@ -8,12 +8,13 @@ __author__ = 'Paul A. Iacomi and Bastien Aillet'
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import scipy as sp
+import scipy.stats
 import adsutils
 
 
 AVOGADRO_NUMBER = 6.02214 * (10 ** 23)
 NITROGEN_CROSS_SECTION = 1.62 * (10 ** (-19))
+PROPANE_CROSS_SECTION = 3.9 * (10 ** (-19))
 
 
 def area_BET(isotherm, verbose=False):
@@ -48,11 +49,11 @@ def area_BET(isotherm, verbose=False):
     bet_points = adsorption.iloc[:(adsorption.loc[:, 'good'].values.argmax())]
 
 
-    slope, intercept, r, p, stderr = sp.stats.linregress(bet_points[isotherm.pressure_key], bet_points.BET)
+    slope, intercept, r, p, stderr = scipy.stats.linregress(bet_points[isotherm.pressure_key], bet_points.BET)
 
     C = (slope / intercept) + 1
     amount_monolayer = 1 / (intercept * C)
-    area = amount_monolayer * NITROGEN_CROSS_SECTION * AVOGADRO_NUMBER
+    area = amount_monolayer * PROPANE_CROSS_SECTION * AVOGADRO_NUMBER
 
     # TODO Implement all of roquerol's laws for BET
     # mono_capacity_real = 
@@ -66,7 +67,7 @@ def area_BET(isotherm, verbose=False):
         raise Warning("The C constant is negative")
     if r < 0.9:
         raise Warning("The correlation is not linear")
-    
+
 
     # PLOTTING
     if verbose:
