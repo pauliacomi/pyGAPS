@@ -1,1 +1,4 @@
-include README.md
+include *.md
+include adsutils/tests/data/calorimetry/*.csv
+include adsutils/tests/data/isotherms/*.xlsx
+include requirements.txt
