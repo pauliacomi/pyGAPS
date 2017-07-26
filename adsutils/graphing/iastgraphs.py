@@ -1,5 +1,12 @@
 #%%
-import xlwings as xw
+import os
+# chose an implementation, depending on os
+if os.name == 'nt': #sys.platform == 'win32':
+    import xlwings as xw
+else:
+    xw = None
+    raise Warning("xlwings functionality disabled on this platform ( % )" % os.name)
+
 import numpy as np
 import matplotlib.pyplot as plt
 

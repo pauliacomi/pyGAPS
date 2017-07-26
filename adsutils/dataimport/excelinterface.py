@@ -7,9 +7,15 @@ used, such as the parser file.
 
 import os
 import os.path
-import xlwings
+# chose an implementation, depending on os
+if os.name == 'nt': #sys.platform == 'win32':
+    import xlwings
+else:
+    xw = None
+    raise Warning("xlwings functionality disabled on this platform ( % )" % os.name)
 import pandas as pd
 import numpy as np
+
 
 def xl_experiment_parser(path):
     '''
@@ -19,6 +25,10 @@ def xl_experiment_parser(path):
     :param path: Path to the file being read
 
     '''
+
+    if xw == None:
+        raise Warning("xlwings functionality disabled on this platform ( % )" % os.name)
+        return
 
     # get excel workbook, sheet and range
     wb = xlwings.Book(path)

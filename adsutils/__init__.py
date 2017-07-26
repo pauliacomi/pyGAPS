@@ -11,7 +11,7 @@ if sys.version_info[0] != 3:
     sys.exit(1)
 
 # Let users know if they're missing any of our hard dependencies
-hard_dependencies = ("numpy", "pandas", "pyiast", "sqlite3", "xlwings", "CoolProp")
+hard_dependencies = ("numpy", "pandas", "pyiast", "sqlite3", "CoolProp")
 missing_dependencies = []
 
 for dependency in hard_dependencies:
