@@ -1,7 +1,12 @@
-numpy>=1.11.1
-matplotlib
-pandas>=0.18.1
-scipy>=0.18.0
-xlwings
+pytest
+pytest-cov
+
+numpy >= 1.11
+matplotlib >= 2.0
+pandas >= 0.18.1
+scipy >= 0.18.0
+
+xlwings; sys_platform == 'win32'
+
 pyiast
-coolprop>=6.0
+coolprop >= 6.0
