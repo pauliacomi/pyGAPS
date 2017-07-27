@@ -1,33 +1,83 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import print_function
+
 import sys
+import io
+import re
+from glob import glob
+from os.path import basename
+from os.path import dirname
+from os.path import join
+from os.path import splitext
+
+from setuptools import find_packages
 from setuptools import setup
+
 
 if sys.version_info[0] != 3:
     print("Requires Python 3.")
     sys.exit(1)
 
-def readme():
-    with open('README.rst') as f:
-        return f.read()
 
-setup(name='adsutils',
-      version='0.1',
-      description='Collection of utilities for adsorption',
-      url='',
-      download_url='',
-      packages=['adsutils'],
-      package_data={'adsutils.tests': ['data calorimetry/*.csv',
-                                       'data isotherms/*.xlxs'],
-                   },
-      install_requires=[
-          'numpy',
-          'scipy',
-          'pandas',
-          'matplotlib',
-          'pyiast',
-          'coolprop',
-          ],
-      keywords='chemistry adsorption isotherm utilities',
-      author='Paul A. Iacomi',
-      author_email='iacomi.paul@gmail.com',
-      license='MIT',
-      zip_safe=False)
+def read(*names, **kwargs):
+    return io.open(
+        join(dirname(__file__), *names),
+        encoding=kwargs.get('encoding', 'utf8')
+    ).read()
+
+
+setup(
+    name='adsorpy',
+    version='0.1.0',
+    license='MIT license',
+    description='An example package. Generated with cookiecutter-pylibrary.',
+    long_description='%s\n%s' % (
+        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
+        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
+    ),
+    author='Paul Iacomi',
+    author_email='iacomi.paul@gmail.com',
+    url='https://github.com/pauliacomi/adsorpy',
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
+    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    include_package_data=True,
+    zip_safe=False,
+    classifiers=[
+        # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: Unix',
+        'Operating System :: POSIX',
+        'Operating System :: Microsoft :: Windows',
+        'Programming Language :: Python :: 3.6',
+        #'Programming Language :: Python :: Implementation :: CPython',
+        #'Programming Language :: Python :: Implementation :: PyPy3',
+        'Topic :: Utilities',
+    ],
+    keywords=[
+        # eg: 'keyword1', 'keyword2', 'keyword3',
+    ],
+    install_requires=[
+        'numpy >= 1.11',
+        'scipy >= 0.18.0',
+        'pandas >= 0.18.1',
+        'matplotlib >= 2.0',
+        'pyiast',
+        'xlwings;platform_system=="Windows"',
+        'coolprop >= 6.0',
+    ],
+    extras_require={
+        # eg:
+        #   'rst': ['docutils>=0.11'],
+        #   ':python_version=="2.6"': ['argparse'],
+    },
+    entry_points={
+        'console_scripts': [
+            'adsorpy = adsorpy.cli:main',
+        ]
+    },
+)

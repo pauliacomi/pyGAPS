@@ -1,7 +1,12 @@
+[paths]
+source = src
+
 [run]
 branch = False
-source = __YOUR_PROJECT_FOLDER__
-omit = */tests/*
+source =
+    src
+    tests
+parallel = true
 
 [report]
 exclude_lines =
@@ -20,4 +25,6 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
 
-ignore_errors = True
+show_missing = true
+precision = 2
+omit = *migrations*
