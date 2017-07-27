@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use adsorpy in a project::
+To use adsutils in a project::
 
-	import adsorpy
+	import adsutils

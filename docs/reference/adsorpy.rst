@@ -1,9 +1,9 @@
-adsorpy
+adsutils
 =======
 
 .. testsetup::
 
-    from adsorpy import *
+    from adsutils import *
 
-.. automodule:: adsorpy
+.. automodule:: adsutils
     :members:

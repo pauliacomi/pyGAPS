@@ -24,7 +24,7 @@ def read(*names, **kwargs):
 
 
 setup(
-    name='adsorpy',
+    name='adsutils',
     version='0.1.0',
     license='MIT license',
     description='An example package. Generated with cookiecutter-pylibrary.',
@@ -34,7 +34,7 @@ setup(
     ),
     author='Paul Iacomi',
     author_email='iacomi.paul@gmail.com',
-    url='https://github.com/pauliacomi/adsorpy',
+    url='https://github.com/pauliacomi/adsutils',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
@@ -72,7 +72,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'adsorpy = adsorpy.cli:main',
+            'adsutils = adsutils.cli:main',
         ]
     },
 )
