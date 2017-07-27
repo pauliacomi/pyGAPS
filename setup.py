@@ -16,11 +16,6 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-if sys.version_info[0] != 3:
-    print("Requires Python 3.")
-    sys.exit(1)
-
-
 def read(*names, **kwargs):
     return io.open(
         join(dirname(__file__), *names),
