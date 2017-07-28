@@ -1,20 +1,21 @@
-#%%
+# %%
 
 """
-This module contains the excel interface for returning data in all formats 
+This module contains the excel interface for returning data in all formats
 used, such as the parser file.
 """
 
 import os
 import os.path
+import pandas
+import numpy
 # chose an implementation, depending on os
-if os.name == 'nt': #sys.platform == 'win32':
+if os.name == 'nt':  # sys.platform == 'win32':
     import xlwings
 else:
     xw = None
-    raise Warning("xlwings functionality disabled on this platform ( % )" % os.name)
-import pandas as pd
-import numpy as np
+    raise Warning(
+        "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
 
 def xl_experiment_parser(path):
@@ -26,8 +27,9 @@ def xl_experiment_parser(path):
 
     '''
 
-    if xw == None:
-        raise Warning("xlwings functionality disabled on this platform ( % )" % os.name)
+    if xw is None:
+        raise Warning(
+            "xlwings functionality disabled on this platform ( {0} )".format(os.name))
         return
 
     # get excel workbook, sheet and range
@@ -60,19 +62,22 @@ def xl_experiment_parser(path):
     sample_info['comment'] = sht.range('E2').value
 
     if sample_info["exp_type"] == "Isotherme":
-        experiment_data_arr = sht.range('A31').options(np.array, expand='table').value
+        experiment_data_arr = sht.range('A31').options(
+            numpy.array, expand='table').value
         columns = ["Pressure (bar)", "Loading (mmol/g)"]
     elif sample_info["exp_type"] == "Calorimetrie":
-        experiment_data_arr = sht.range('A41').options(np.array, expand='table').value
+        experiment_data_arr = sht.range('A41').options(
+            numpy.array, expand='table').value
         columns = ["Pressure (bar)", "Loading (mmol/g)", "Enthalpy (kJ/mol)"]
     else:
         raise Exception("Unknown data type")
 
-    experiment_data_df = pd.DataFrame(experiment_data_arr, columns=columns)
+    experiment_data_df = pandas.DataFrame(experiment_data_arr, columns=columns)
 
     xlwings.apps[0].quit()
 
     return experiment_data_df, sample_info
+
 
 def xl_experiment_parser_paths(folder):
     '''
@@ -93,4 +98,3 @@ def xl_experiment_parser_paths(folder):
                 paths.append(fullpath)
 
     return paths
-

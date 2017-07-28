@@ -1,4 +1,4 @@
-#%%
+# %%
 """
 This module contains the sql interface for data manipulation
 """
@@ -12,7 +12,8 @@ import numpy
 
 import adsutils
 
-#%%
+# %%
+
 
 def db_upload_sample(pth, sample, overwrite=False):
     """
@@ -24,7 +25,7 @@ def db_upload_sample(pth, sample, overwrite=False):
     if overwrite:
         sql_com = """
             UPDATE "samples"
-            SET 
+            SET
                 project = :project,
                 struct = :struct,
                 owner = :owner,
@@ -74,31 +75,30 @@ def db_upload_sample(pth, sample, overwrite=False):
             'family':       sample.family,
             'form':         sample.form,
             'comment':      sample.comment,
-            }
+        }
         )
 
         # Upload or modify data in sample_properties table
         if len(sample.properties) > 0:
             # Get id of modification
             sample_id = cursor.execute(
-                    """
+                """
                     SELECT id
                     FROM "samples"
                     WHERE
                         name = :name
                         AND
                         batch = :batch;
-                    """
-                    , {
-                        'name':        sample.name,
-                        'batch':       sample.batch,
-                    }
-                ).fetchone()[0]
+                    """, {
+                    'name':        sample.name,
+                    'batch':       sample.batch,
+                }
+            ).fetchone()[0]
 
             # Sql of update routine
             sql_update = """
                     UPDATE "sample_properties"
-                    SET 
+                    SET
                         type = :type,
                         value = :value
                     WHERE
@@ -124,8 +124,7 @@ def db_upload_sample(pth, sample, overwrite=False):
                     SELECT type
                     FROM "sample_properties"
                     WHERE sample_id = ?;
-                    """
-                    , (str(sample_id),)
+                    """, (str(sample_id),)
                 )
                 column = [elt[0] for elt in cursor.fetchall()]
 
@@ -140,7 +139,7 @@ def db_upload_sample(pth, sample, overwrite=False):
                         'sample_id':        sample_id,
                         'type':             prop,
                         'value':            sample.properties[prop]
-                        })
+                    })
 
             else:
                 for prop in sample.properties:
@@ -148,7 +147,7 @@ def db_upload_sample(pth, sample, overwrite=False):
                         'sample_id':        sample_id,
                         'type':             prop,
                         'value':            sample.properties[prop]
-                        })
+                    })
 
         # Commit the change
         db.commit()
@@ -172,8 +171,7 @@ def db_upload_sample(pth, sample, overwrite=False):
     return
 
 
-
-#%%
+# %%
 def db_get_samples(pth):
     """
     Gets all samples in sample table
@@ -209,7 +207,6 @@ def db_get_samples(pth):
 
             sample_infos.append(info)
 
-
         # Get the extra data from the sample_properties table
         for info in sample_infos:
             cursor.execute(
@@ -217,22 +214,21 @@ def db_get_samples(pth):
                 SELECT type, value
                 FROM "sample_properties"
                 WHERE sample_id = ?;
-                """
-                , (str(info['id']),)
+                """, (str(info['id']),)
             )
 
             info['properties'] = dict()
 
             for row in cursor:
-                prop = {row[0]:row[1]}
+                prop = {row[0]: row[1]}
                 info['properties'].update(prop)
 
             # Build sample objects
-            samples.append(adsutils.sample(info))
+            samples.append(adsutils.Sample(info))
 
         # Print success
         print("Selected", len(samples), "samples")
-        
+
     # Catch the exception
     except sqlite3.IntegrityError as e:
         # Roll back any change if something goes wrong
@@ -246,8 +242,7 @@ def db_get_samples(pth):
     return samples
 
 
-
-#%%
+# %%
 def db_upload_experiment(pth, isotherm, overwrite=False):
     """
     Uploads experiment to the database
@@ -260,20 +255,20 @@ def db_upload_experiment(pth, isotherm, overwrite=False):
         # get id of the experiment that needs to be overwritten
         sql_com = """
             UPDATE "experiments"
-            SET 
+            SET
                 date        = :date,
                 is_real     = :is_real,
-                exp_type    = :exp_type, 
-                sname       = :sname,      
-                sbatch      = :sbatch,     
-                t_act       = :t_act,      
-                t_exp       = :t_exp,      
-                machine     = :machine,    
-                gas         = :gas,        
-                user        = :user,       
-                lab         = :lab,        
-                project     = :project,    
-                comment     = :comment     
+                exp_type    = :exp_type,
+                sname       = :sname,
+                sbatch      = :sbatch,
+                t_act       = :t_act,
+                t_exp       = :t_exp,
+                machine     = :machine,
+                gas         = :gas,
+                user        = :user,
+                lab         = :lab,
+                project     = :project,
+                comment     = :comment
             WHERE
                 id = :id
             """
@@ -320,7 +315,7 @@ def db_upload_experiment(pth, isotherm, overwrite=False):
             'lab':      isotherm.lab,
             'project':  isotherm.project,
             'comment':  isotherm.comment
-            }
+        }
         if overwrite:
             upload_dict.update({'id': isotherm.id})
 
@@ -333,7 +328,6 @@ def db_upload_experiment(pth, isotherm, overwrite=False):
             exp_id = isotherm.id
         else:
             exp_id = cursor.lastrowid
-        
 
         # Build sql request
         if overwrite:
@@ -356,18 +350,21 @@ def db_upload_experiment(pth, isotherm, overwrite=False):
 
         # Insert data into experiment_data table
         cursor.execute(sql_com2,
-            {'exp_id': exp_id, 'dtype': 'pressure', 'data': isotherm.pressure_all().tobytes()}
-        )
+                       {'exp_id': exp_id, 'dtype': 'pressure',
+                           'data': isotherm.pressure_all().tobytes()}
+                       )
 
         cursor.execute(sql_com2,
-            {'exp_id': exp_id, 'dtype': 'loading', 'data': isotherm.loading_all().tobytes()}
-        )
+                       {'exp_id': exp_id, 'dtype': 'loading',
+                           'data': isotherm.loading_all().tobytes()}
+                       )
 
         enthalpy = isotherm.enthalpy_all()
         if enthalpy is not None:
             cursor.execute(sql_com2,
-            {'exp_id': exp_id, 'dtype': 'enthalpy', 'data': enthalpy.tobytes()}
-        )
+                           {'exp_id': exp_id, 'dtype': 'enthalpy',
+                               'data': enthalpy.tobytes()}
+                           )
 
         # Commit the change
         db.commit()
@@ -379,7 +376,7 @@ def db_upload_experiment(pth, isotherm, overwrite=False):
     except sqlite3.IntegrityError as e:
         # Roll back any change if something goes wrong
         db.rollback()
-        print("Error on isotherm:", "\n", 
+        print("Error on isotherm:", "\n",
               isotherm.exp_type,
               isotherm.name,
               isotherm.batch,
@@ -397,7 +394,7 @@ def db_upload_experiment(pth, isotherm, overwrite=False):
     return
 
 
-#%%
+# %%
 def db_delete_experiment(pth, isotherm):
     """
     Delete experiment to the database
@@ -406,7 +403,6 @@ def db_delete_experiment(pth, isotherm):
     # Build SQL request
     if isotherm.id is None or not isotherm.id:
         raise ValueError("Cannot delete an isotherm without an id")
-
 
     try:
         # Creates or opens a file called mydb with a SQLite3 DB
@@ -427,14 +423,14 @@ def db_delete_experiment(pth, isotherm):
         cursor.execute(sql_com2, {'exp_id': isotherm.id})
 
         # Delete experiment info in database
-            # get id of the experiment that needs to be overwritten
+        # get id of the experiment that needs to be overwritten
         sql_com = """
                     DELETE FROM "experiments"
                     WHERE
                         id = :id
                     """
 
-        cursor.execute(sql_com, {'id': isotherm.id })
+        cursor.execute(sql_com, {'id': isotherm.id})
 
         # Commit the change
         db.commit()
@@ -446,7 +442,7 @@ def db_delete_experiment(pth, isotherm):
     except sqlite3.IntegrityError as e:
         # Roll back any change if something goes wrong
         db.rollback()
-        print("Error on isotherm:", "\n", 
+        print("Error on isotherm:", "\n",
               isotherm.exp_type,
               isotherm.name,
               isotherm.batch,
@@ -463,7 +459,9 @@ def db_delete_experiment(pth, isotherm):
 
     return
 
-#%%
+# %%
+
+
 def db_get_experiments(pth, criteria):
     """
     Gets experiments with the selected criteria from the database
@@ -485,10 +483,9 @@ def db_get_experiments(pth, criteria):
         WHERE
         """
     criteria_str = " AND ".join(list(map(
-                                        lambda x: 
-                                            x[0] + " IS NULL" if x[1]=="" 
-                                            else x[0] + "=:" + x[0]
-                                        , criteria.items())))
+        lambda x:
+        x[0] + " IS NULL" if x[1] == ""
+        else x[0] + "=:" + x[0], criteria.items())))
     sql_com += criteria_str + ";"
 
     try:
@@ -533,8 +530,7 @@ def db_get_experiments(pth, criteria):
                 SELECT dtype, data
                 FROM "experiment_data"
                 WHERE exp_id = ?;
-                """
-                , (str(info['id']),)
+                """, (str(info['id']),)
             )
 
             columns = []
@@ -551,18 +547,18 @@ def db_get_experiments(pth, criteria):
                 if data_arr is None:
                     data_arr = numpy.expand_dims(numpy.array(raw), axis=1)
                 else:
-                    data_arr = numpy.hstack((data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
+                    data_arr = numpy.hstack(
+                        (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
 
             exp_datas.append(pandas.DataFrame(data_arr, columns=columns))
 
-
         # build isotherm objects
         isotherms = []
-        for x in list(map(list,zip(exp_datas, exp_infos))):
+        for x in list(map(list, zip(exp_datas, exp_infos))):
             isotherms.append(adsutils.PointIsotherm(x[0], x[1],
-                                        pressure_key="Pressure",
-                                        loading_key="Loading",
-                                        enthalpy_key="Enthalpy"))
+                                                    pressure_key="Pressure",
+                                                    loading_key="Loading",
+                                                    enthalpy_key="Enthalpy"))
 
         # Print success
         print("Selected", len(isotherms), "isotherms")
@@ -585,7 +581,9 @@ def db_get_experiments(pth, criteria):
 
     return
 
-#%%
+# %%
+
+
 def db_get_experiment_id(pth, criteria):
     """
     Gets the id of an experiment with the selected criteria from the database
@@ -605,7 +603,8 @@ def db_get_experiment_id(pth, criteria):
 
         WHERE
         """
-    criteria_str = " AND ".join(list(map(lambda x: x + "=:" + x, criteria.keys())))
+    criteria_str = " AND ".join(
+        list(map(lambda x: x + "=:" + x, criteria.keys())))
     sql_com += criteria_str + ";"
 
     try:
@@ -642,10 +641,7 @@ def db_get_experiment_id(pth, criteria):
     return
 
 
-
-
-
-#%%
+# %%
 def db_upload_experiment_calculated(pth, data, overwrite=False):
     """
     Uploads an experiment calculated value to be stored in the database
@@ -654,7 +650,7 @@ def db_upload_experiment_calculated(pth, data, overwrite=False):
     """
     # Build sql request
     if overwrite:
-        sql_com =   """
+        sql_com = """
                     UPDATE "experiment_calculated"
                     SET
                         henry_c     = :henry_c
@@ -683,7 +679,7 @@ def db_upload_experiment_calculated(pth, data, overwrite=False):
             'exp_id':         data['exp_id'],
             'henry_c':        data['henry_c'],
             'enth_init':      data['enth_init']
-            }
+        }
         )
 
         # Commit the change
@@ -707,8 +703,7 @@ def db_upload_experiment_calculated(pth, data, overwrite=False):
     return
 
 
-
-#%%
+# %%
 def db_get_gas(pth, name):
     """
     Gets specified gas
@@ -729,7 +724,7 @@ def db_get_gas(pth, name):
         cursor.execute('PRAGMA foreign_keys = ON')
 
         # Get all gasses from database
-        db_params = {"nick":name}
+        db_params = {"nick": name}
         cursor.execute(sql_com, db_params)
         if cursor.rowcount == 0:
             raise ValueError("No values found")
@@ -741,13 +736,13 @@ def db_get_gas(pth, name):
 
         gasparams = {}
 
-        gasparams["name"]           = r["nick"]
-        gasparams["mmass"]          = r["molar_mass"]
+        gasparams["name"] = r["nick"]
+        gasparams["mmass"] = r["molar_mass"]
         gasparams["polarizability"] = r["polarizability"]
-        gasparams["dipole"]         = r["dipole"]
-        gasparams["quadrupole"]     = r["quadrupole"]
+        gasparams["dipole"] = r["dipole"]
+        gasparams["quadrupole"] = r["quadrupole"]
 
-        reqgas = adsutils.gas(gasparams)
+        reqgas = adsutils.Gas(gasparams)
 
         return reqgas
 
@@ -769,7 +764,7 @@ def db_get_gas(pth, name):
 #
 # WARNING: deletes data
 
-#%%
+# %%
 def db_create_table_samples(pth):
     """
     Sample table reinitialisation
@@ -826,7 +821,9 @@ def db_create_table_samples(pth):
 
     return
 
-#%%
+# %%
+
+
 def db_create_table_experiments(pth):
     """
     Experiment table reinitialisation
@@ -888,7 +885,9 @@ def db_create_table_experiments(pth):
 
     return
 
-#%%
+# %%
+
+
 def db_create_table_experiment_data(pth):
     """
     Experiment data table reinitialisation

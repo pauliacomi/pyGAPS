@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 
 import adsutils
 
-def calc_initial_henry(isotherm, max_adjrms = 0.1, verbose=False):
+
+def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
     """
     Calculates a henry constant based on initial slope
 
@@ -25,7 +26,9 @@ def calc_initial_henry(isotherm, max_adjrms = 0.1, verbose=False):
     # if the initial pressure is not zero
     # add a zero point to the graph since the henry constant must have a zero intercept
     if selected_points.adsdata[isotherm.loading_key][0] != 0:
-        selected_points.adsdata = pandas.DataFrame(numpy.array([[0, 0, 0]]), columns=[isotherm.loading_key, isotherm.pressure_key, isotherm.enthalpy_key]).append(selected_points.adsdata, ignore_index=True)
+        selected_points.adsdata = pandas.DataFrame(numpy.array([[0, 0, 0]]), columns=[
+                                                   isotherm.loading_key, isotherm.pressure_key, isotherm.enthalpy_key]).append(
+                                                       selected_points.adsdata, ignore_index=True)
 
     adjrmsd = 1
     initial_rows = len(selected_points.adsdata.index)
@@ -54,7 +57,8 @@ def calc_initial_henry(isotherm, max_adjrms = 0.1, verbose=False):
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
         print("Final adjusted root mean square difference:", adjrmsd)
-        adsutils.plot_iso({isotherm,model_selected}, plot_type='isotherm', branch='ads', logarithmic=False, color=True)
+        adsutils.plot_iso({isotherm, model_selected}, plot_type='isotherm',
+                          branch='ads', logarithmic=False, color=True)
 
     # return the henry constant
     return model_isotherm.params["KH"]
@@ -91,7 +95,7 @@ def calc_initial_henry_virial(isotherm, verbose=False):
         print("Singular values:", full_info[3])
         print("Conditioning threshold:", full_info[4])
         xp = numpy.linspace(0, numpy.amax(loadings), 100)
-        _ = plt.plot(loadings, ln_n_over_p, '.', xp, virial_func(xp), '-')
+        plt.plot(loadings, ln_n_over_p, '.', xp, virial_func(xp), '-')
         plt.xlabel("Loading")
         plt.ylabel("ln(n/p)")
         plt.show()

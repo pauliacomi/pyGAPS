@@ -3,10 +3,11 @@ This module contains the gas class for easy manipulation
 """
 
 __author__ = 'Paul A. Iacomi'
-#%%
+# %%
 from CoolProp.CoolProp import PropsSI
 
-class gas:
+
+class Gas:
     '''
     Class which contains all info about a gas
     '''
@@ -39,7 +40,7 @@ class gas:
         return
 
 
-#%%
+# %%
 def saturation_pressure_at_temperature(temp, gas):
     """
     Uses an equation of state to determine the
@@ -52,4 +53,4 @@ def saturation_pressure_at_temperature(temp, gas):
     :return: pressure
     """
 
-    return PropsSI('P', 'T', temp, 'Q', 0, gas)/101325
+    return PropsSI('P', 'T', temp, 'Q', 0, gas) / 101325

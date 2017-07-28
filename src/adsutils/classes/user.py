@@ -5,7 +5,7 @@ This module contains the sample class for easy manipulation
 __author__ = 'Paul A. Iacomi'
 
 
-class user:
+class User:
     '''
     Class which contains the points from an adsorption isotherm and microcalorimetry
     '''
@@ -22,5 +22,3 @@ class user:
         self.lab = info['lab']
 
         return
-
-

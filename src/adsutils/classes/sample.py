@@ -5,7 +5,7 @@ This module contains the sample class for easy manipulation
 __author__ = 'Paul A. Iacomi'
 
 
-class sample:
+class Sample:
     '''
     Class which contains the points from an adsorption isotherm and microcalorimetry
     '''

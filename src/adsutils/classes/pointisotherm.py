@@ -5,28 +5,28 @@ This module contains the main class that describes an isotherm through discrete 
 __author__ = 'Paul A. Iacomi'
 
 import copy
-import numpy
 import pandas
 import pyiast
 
 import adsutils
 
-_LOADING_UNITS = {"mmol":0.001, "cm3 STP":4.461e-5}
-_PRESSURE_UNITS = {"bar":100000, "Pa":1, "atm":101325}
+_LOADING_UNITS = {"mmol": 0.001, "cm3 STP": 4.461e-5}
+_PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
 
 _MATERIAL_MODE = ["mass", "volume"]
 _PRESSURE_MODE = ["absolute", "relative"]
 
 _ADS_DES_CHECK = "des_check"
 
+
 class PointIsotherm:
     '''
     Class which contains the points from an adsorption isotherm and microcalorimetry
     '''
 
-    def __init__(self, data, info, loading_key=None, pressure_key=None, enthalpy_key=None, 
-                mode_adsorbent="mass", mode_pressure="absolute",
-                unit_loading="mmol", unit_pressure="bar"):
+    def __init__(self, data, info, loading_key=None, pressure_key=None, enthalpy_key=None,
+                 mode_adsorbent="mass", mode_pressure="absolute",
+                 unit_loading="mmol", unit_pressure="bar"):
         '''
         Instatiation of the class from a DataFrame so it can be easily referenced
 
@@ -59,7 +59,7 @@ class PointIsotherm:
         if mode_adsorbent not in _MATERIAL_MODE:
             raise Exception("Mode selected for adsorbent is not an option. See viable"
                             "modes in _MATERIAL_MODE")
-                            
+
         if mode_pressure not in _PRESSURE_MODE:
             raise Exception("Mode selected for pressure is not an option. See viable"
                             "modes in _PRESSURE_MODE")
@@ -75,7 +75,6 @@ class PointIsotherm:
         if unit_pressure not in _PRESSURE_UNITS:
             raise Exception("Unit selected for pressure is not an option. See viable"
                             "units in _PRESSURE_UNITS")
-
 
         #: Pandas DataFrame to store the data
         self.data = data
@@ -95,7 +94,6 @@ class PointIsotherm:
         self.unit_loading = unit_loading
         #: units for pressure
         self.unit_pressure = unit_pressure
-
 
         #: Add id of isotherm, this is used when loading from database
         self.id = info["id"]
@@ -129,8 +127,6 @@ class PointIsotherm:
         #: Figure out the adsorption and desorption branches
         self.data = self._splitdata(self.data)
 
-
-
     def _splitdata(self, data):
         '''
         Splits isotherm data into an adsorption and desorption part and adds a column to mark it
@@ -141,10 +137,8 @@ class PointIsotherm:
         return pandas.concat([data, increasing], axis=1)
 
 
-
 ##########################################################
 #   Conversion functions
-
 
     def convert_loading(self, unit_to):
         '''
@@ -166,7 +160,6 @@ class PointIsotherm:
 
         return
 
-
     def convert_pressure(self, unit_to):
         '''
         Converts the pressure values of the isotherm from one unit to another
@@ -187,7 +180,6 @@ class PointIsotherm:
 
         return
 
-
     def convert_pressure_mode(self, mode_pressure):
         '''
         Converts the pressure values of the isotherm from one unit to another
@@ -202,7 +194,7 @@ class PointIsotherm:
             return
 
         # TODO Make sure that if the division is made in the correct units, currently only bar
-        
+
         if mode_pressure == "absolute":
             self.data[self.pressure_key] = self.data[self.pressure_key].apply(
                 lambda x: x * adsutils.saturation_pressure_at_temperature(self.t_exp, self.gas))
@@ -213,7 +205,6 @@ class PointIsotherm:
         self.mode_pressure = mode_pressure
 
         return
-
 
     def convert_adsorbent_mode(self, mode_adsorbent):
         '''
@@ -231,14 +222,14 @@ class PointIsotherm:
 
         # Checks to see if sample exists in master list
         if not any(self.name == sample.name and self.batch == sample.batch
-                    for sample in adsutils.SAMPLE_LIST):
+                   for sample in adsutils.SAMPLE_LIST):
             raise Exception("Sample %s %s does not exist in sample list. "
                             "First populate adsutils.SAMPLE_LIST "
                             "with desired sample class"
                             % (self.name, self.batch))
 
-        sample = [sample for sample in adsutils.SAMPLE_LIST 
-                    if self.name == sample.name and self.batch == sample.batch]
+        sample = [sample for sample in adsutils.SAMPLE_LIST
+                  if self.name == sample.name and self.batch == sample.batch]
 
         if len(sample) > 1:
             raise Exception("More than one sample %s %s found in sample list. "
@@ -291,7 +282,7 @@ class PointIsotherm:
         print("\n")
         print("Experiment comments:", self.comment)
 
-        adsutils.plot_iso([self], plot_type='iso-enth', branch=["ads","des"],
+        adsutils.plot_iso([self], plot_type='iso-enth', branch=["ads", "des"],
                           logarithmic=logarithmic, color=True, fig_title=self.gas)
 
         return
@@ -299,7 +290,6 @@ class PointIsotherm:
 
 ###########################################################
 #   Modelling functions
-
 
     def get_model_isotherm(self, model):
         '''
@@ -317,9 +307,11 @@ class PointIsotherm:
 
         # Generate isotherm based on loading
         sym_loading = point_model_isotherm.adsdata().apply(
-            lambda x: model_isotherm.loading(x[point_model_isotherm.pressure_key]),
-            axis=1)                                         #yaxis - downwards
-        point_model_isotherm.adsdata()[point_model_isotherm.loading_key] = sym_loading
+            lambda x: model_isotherm.loading(
+                x[point_model_isotherm.pressure_key]),
+            axis=1)  # yaxis - downwards
+        point_model_isotherm.adsdata(
+        )[point_model_isotherm.loading_key] = sym_loading
 
         return point_model_isotherm
 
@@ -327,7 +319,6 @@ class PointIsotherm:
 ##########################################################
 #   Functions that return parts of the isotherm data
 
-    
     def adsdata(self):
         '''Returns adsorption part of data'''
         return self.data.loc[self.data[_ADS_DES_CHECK] == False]
@@ -335,7 +326,6 @@ class PointIsotherm:
     def desdata(self):
         '''Returns desorption part of data'''
         return self.data.loc[self.data[_ADS_DES_CHECK] == True]
-
 
     def has_ads(self):
         '''
@@ -346,7 +336,6 @@ class PointIsotherm:
         else:
             return True
 
-
     def has_des(self):
         '''
         Returns if the isotherm has an desorption branch
@@ -355,7 +344,6 @@ class PointIsotherm:
             return False
         else:
             return True
-
 
     def pressure_ads(self, max_range=None):
         '''
@@ -369,7 +357,6 @@ class PointIsotherm:
                 return ret
             else:
                 return [x for x in ret if x < max_range]
-
 
     def loading_ads(self, max_range=None):
         '''
@@ -413,8 +400,6 @@ class PointIsotherm:
             else:
                 return [x for x in ret if x < max_range]
 
-
-
     def loading_des(self, max_range=None):
         '''
         Returns desorption amount adsorbed points as an array
@@ -443,8 +428,6 @@ class PointIsotherm:
                     return [x for x in ret if x < max_range]
             else:
                 return None
-
-
 
     def pressure_all(self):
         '''

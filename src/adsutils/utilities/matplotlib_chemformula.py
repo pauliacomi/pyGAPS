@@ -1,4 +1,4 @@
-#%%
+# %%
 def convert_chemformula(string):
     "converts a string to a matplotlib parsable chemical formula"
 
@@ -26,4 +26,3 @@ def convert_chemformula(string):
     result += "$"
 
     return result
-    

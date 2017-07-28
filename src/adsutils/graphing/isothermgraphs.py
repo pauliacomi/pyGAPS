@@ -1,5 +1,4 @@
-#%%
-#isotherm graph
+# %%
 
 from adsutils.utilities.matplotlib_chemformula import convert_chemformula
 
@@ -9,12 +8,12 @@ from numpy import linspace
 from cycler import cycler
 
 
-
 # ! list of plot types
 _PLOT_TYPES = ["isotherm", "enthalpy", "iso-enth"]
 
 # ! list of branch types
 _BRANCH_TYPES = ["ads", "des"]
+
 
 def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
              xmaxrange=None, y_adsmaxrange=None, y_enthmaxrange=None,
@@ -31,7 +30,7 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
 
     """
 
-    ######## Initial checks
+    # Initial checks
     #
     # Check for isotherm units
     mode_adsorbent = isotherms[0].mode_adsorbent
@@ -52,7 +51,6 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
     if not all(isotherm.unit_loading == unit_loading for isotherm in isotherms):
         raise Exception("Units for loading do not match all isotherms")
 
-
     # Check for plot type validity
     if plot_type is None:
         raise Exception("Specify a plot type to graph"
@@ -63,8 +61,8 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
 
     if plot_type == 'enthalpy' or plot_type == 'iso-enth':
         if all(isotherm.enthalpy_all() is None for isotherm in isotherms):
-            raise Exception("None of the isotherms supplied have enthalpy data")
-
+            raise Exception(
+                "None of the isotherms supplied have enthalpy data")
 
     # Store which branches will be displayed
     if branch is None:
@@ -91,26 +89,23 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
     maxrange_enthalpy = None
     maxrange_loading = None
 
-
-    ######## Settings and graph generation
+    # Settings and graph generation
     #
     # Generate the graph iself
     fig, axes = plt.subplots(1, 1, figsize=(8, 8))
 
-
     # Build the name of the axes
     _TEXT_PRESSURE = r'Pressure'
     _TEXT_LOADING = r'Loading'
-    _TEXT_ENTHALPY = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'    
+    _TEXT_ENTHALPY = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
     if mode_pressure == "absolute":
-        _TEXT_PRESSURE = _TEXT_PRESSURE + ' ($'  + unit_pressure + '$)'
+        _TEXT_PRESSURE = _TEXT_PRESSURE + ' ($' + unit_pressure + '$)'
     elif mode_pressure == "relative":
         _TEXT_PRESSURE = "Relative " + _TEXT_PRESSURE
     if mode_adsorbent == "mass":
-        _TEXT_LOADING = _TEXT_LOADING  + ' ($'  + unit_loading + '\/g^{-1}$)'
+        _TEXT_LOADING = _TEXT_LOADING + ' ($' + unit_loading + r'\/g^{-1}$)'
     elif mode_adsorbent == "volume":
-        _TEXT_LOADING = _TEXT_LOADING  + ' ($'  + unit_loading + '\/cm^{-3}$)'
-
+        _TEXT_LOADING = _TEXT_LOADING + ' ($' + unit_loading + r'\/cm^{-3}$)'
 
     # Set the colours of the graph
     number_of_lines = 6
@@ -130,7 +125,6 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         pc_iso = (cy1 * cy5 * cy6)
         pc_enth = (cy4 * cy5 * cy6)
 
-
     # Set the type of the graph
     if plot_type == 'isotherm':
         axes.set_prop_cycle(pc_iso)
@@ -145,14 +139,15 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         maxrange_pressure = xmaxrange
 
     # Styles in the graph
-    title_style = dict(horizontalalignment='center', fontsize=25, fontdict={'family': 'monospace'})
-    label_style = dict(horizontalalignment='center', fontsize=20, fontdict={'family': 'monospace'})
+    title_style = dict(horizontalalignment='center',
+                       fontsize=25, fontdict={'family': 'monospace'})
+    label_style = dict(horizontalalignment='center',
+                       fontsize=20, fontdict={'family': 'monospace'})
     line_style = dict(linewidth=2, markersize=4)
     tick_style = dict(labelsize=17)
     legend_style = dict(handlelength=3, fontsize=15, loc='lower right')
     styles = dict(title_style=title_style, label_style=label_style,
                   line_style=line_style, tick_style=tick_style)
-
 
     # Put grid on plot
     axes.grid(True, zorder=5)
@@ -193,14 +188,14 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
 
             return " ".join(text)
 
-
     def isotherm_graph(axes, data_x, data_y, line_label, styles_dict):
         "Plot an isotherm graph, regular or logarithmic"
 
         # Labels and ticks
         axes.set_xlabel(_TEXT_PRESSURE, **styles_dict['label_style'])
         axes.set_ylabel(_TEXT_LOADING, **styles_dict['label_style'])
-        axes.tick_params(axis='both', which='major', **styles_dict['tick_style'])
+        axes.tick_params(axis='both', which='major',
+                         **styles_dict['tick_style'])
 
         # Generate a linestyle from the incoming dictionary
         line_style = styles_dict['line_style']
@@ -212,14 +207,14 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
 
         return line
 
-
     def enthalpy_adsorbed_graph(axes, data_x, data_y, line_label, styles_dict):
         "Plot an enthalpy graph, versus moles"
 
         # Labels and ticks
         axes.set_xlabel(_TEXT_LOADING, **styles_dict['label_style'])
         axes.set_ylabel(_TEXT_ENTHALPY, **styles_dict['label_style'])
-        axes.tick_params(axis='both', which='major', **styles_dict['tick_style'])
+        axes.tick_params(axis='both', which='major',
+                         **styles_dict['tick_style'])
         axes.set_ymargin(1)
 
         # Generate a linestyle from the incoming dictionary
@@ -231,7 +226,6 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         line, = axes.plot(data_x, data_y, label=line_label, **line_style)
 
         return line
-
 
     def graph_caller(axes, axes2, p_data, l_data, e_data, label, pl_type, styles):
         """
@@ -245,21 +239,25 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         if pl_type == 'isotherm' and p_data is not None and len(p_data) > 0:
             fl_data = l_data[:len(p_data)]
             max_y1 = max(fl_data)
-            line = isotherm_graph(axes, p_data, fl_data, label, styles_dict=styles)
+            line = isotherm_graph(axes, p_data, fl_data,
+                                  label, styles_dict=styles)
 
         elif pl_type == 'enthalpy' and e_data is not None and len(e_data) > 0:
             fe_data = e_data[:len(l_data)]
             max_y1 = max(fe_data)
-            line = enthalpy_adsorbed_graph(axes, l_data, fe_data, label, styles_dict=styles)
+            line = enthalpy_adsorbed_graph(
+                axes, l_data, fe_data, label, styles_dict=styles)
 
         elif pl_type == 'iso-enth' and p_data is not None and len(p_data) > 0:
             fl_data = l_data[:len(p_data)]
             max_y1 = max(fl_data)
-            line = isotherm_graph(axes, p_data, fl_data, label, styles_dict=styles)
+            line = isotherm_graph(axes, p_data, fl_data,
+                                  label, styles_dict=styles)
             if e_data is not None:
                 fe_data = e_data[:len(p_data)]
                 max_y2 = max(fe_data)
-                enthalpy_adsorbed_graph(axes2, p_data, fe_data, label + " dE", styles_dict=styles)
+                enthalpy_adsorbed_graph(
+                    axes2, p_data, fe_data, label + " dE", styles_dict=styles)
             else:
                 axes2.plot(0, 0)
 
@@ -279,10 +277,13 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
             if isotherm.has_ads():
                 line_label_ = line_label + ' ads'
                 lmax_y1, lmax_y2, line = graph_caller(axes, axes2,
-                                                isotherm.pressure_ads(maxrange_pressure),
-                                                isotherm.loading_ads(maxrange_loading),
-                                                isotherm.enthalpy_ads(maxrange_enthalpy),
-                                                line_label_, plot_type, styles)
+                                                      isotherm.pressure_ads(
+                                                          maxrange_pressure),
+                                                      isotherm.loading_ads(
+                                                          maxrange_loading),
+                                                      isotherm.enthalpy_ads(
+                                                          maxrange_enthalpy),
+                                                      line_label_, plot_type, styles)
                 max_y1 = max(max_y1, lmax_y1)
                 max_y2 = max(max_y2, lmax_y2)
                 color = line.get_color()
@@ -294,15 +295,17 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
                     styles['line_style']['c'] = color
                 line_label_ = line_label + ' des'
                 lmax_y1, lmax_y2, _ = graph_caller(axes, axes2,
-                                                isotherm.pressure_des(maxrange_pressure),
-                                                isotherm.loading_des(maxrange_loading),
-                                                isotherm.enthalpy_des(maxrange_enthalpy),
-                                                line_label_, plot_type, styles)
+                                                   isotherm.pressure_des(
+                                                       maxrange_pressure),
+                                                   isotherm.loading_des(
+                                                       maxrange_loading),
+                                                   isotherm.enthalpy_des(
+                                                       maxrange_enthalpy),
+                                                   line_label_, plot_type, styles)
                 max_y1 = max(max_y1, lmax_y1)
                 max_y2 = max(max_y2, lmax_y2)
                 del styles['line_style']['mfc']
                 del styles['line_style']['c']
-
 
     # Convert the exes into logarithmic if required
     if not logarithmic:
@@ -316,7 +319,7 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         if plot_type == 'enthalpy':
             pass
         else:
-            axes.set_ylim(ymin=0, ymax=max_y1*1.1)
+            axes.set_ylim(ymin=0, ymax=max_y1 * 1.1)
     else:
         if plot_type == 'enthalpy':
             pass
@@ -325,15 +328,14 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
 
     if y_enthmaxrange is None:
         if plot_type == 'enthalpy':
-            axes.set_ylim(ymin=0, ymax=max_y1*1.1)
+            axes.set_ylim(ymin=0, ymax=max_y1 * 1.1)
         elif plot_type == 'iso-enth':
-            axes2.set_ylim(ymin=0, ymax=max_y2*1.1)
+            axes2.set_ylim(ymin=0, ymax=max_y2 * 1.1)
     else:
         if plot_type == 'enthalpy':
             axes.set_ylim(ymin=0, ymax=y_enthmaxrange)
         elif plot_type == 'iso-enth':
             axes2.set_ylim(ymin=0, ymax=y_enthmaxrange)
-
 
     # Add the legend
     lines, labels = axes.get_legend_handles_labels()
@@ -342,7 +344,7 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         lines = lines + lines2
         labels = labels + labels2
 
-    if legend_bottom == True:
+    if legend_bottom:
         legend_style['bbox_to_anchor'] = (0.5, -0.1)
         legend_style['ncol'] = 2
         legend_style['loc'] = 'upper center'
@@ -355,10 +357,9 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
     plt.tight_layout()
 
     if save is True:
-        plt.savefig(path, bbox_extra_artists=(lgd,), bbox_inches='tight', transparent=False)
+        plt.savefig(path, bbox_extra_artists=(lgd,),
+                    bbox_inches='tight', transparent=False)
 
     plt.show()
 
     return
-
-
