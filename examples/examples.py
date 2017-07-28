@@ -1,13 +1,17 @@
-#%%
+# %%
 from os.path import expanduser
+import importlib
+import matplotlib.pyplot as plt
+import pandas as pd
 import adsutils
 
 #################################################################################
 #################################################################################
 #       Excel import
 #
-#%%
-xl_folder =  expanduser(r"~\OneDrive\Documents\PhD Documents\Python\python adsorption\adsutils\tests\data isotherms")
+# %%
+xl_folder = expanduser(
+    r"~\OneDrive\Documents\PhD Documents\Python\python adsorption\adsutils\tests\data isotherms")
 xl_paths = adsutils.xl_experiment_parser_paths(xl_folder)
 
 isotherms = []
@@ -25,13 +29,13 @@ for path in xl_paths:
 #################################################################################
 #       Isotherm display
 #
-#%%
+# %%
 
 isotherm = isotherms[0]
 isotherm.print_info()
-#%%
+# %%
 isotherm.adsdata
-#%%
+# %%
 isotherm.desdata
 
 
@@ -39,24 +43,25 @@ isotherm.desdata
 #################################################################################
 #       Database
 #
-#%%
-db_path = expanduser(r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
-#%%
+# %%
+db_path = expanduser(
+    r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
+# %%
 for isotherm in isotherms:
     adsutils.db_upload_experiment(db_path, isotherm)
 
-#%%
+# %%
 isotherms = []
 criteria = {
     'sname':        "MIL-100(Fe)",
-    #'sbatch':       "",
-    #'user':         "PI",
+    # 'sbatch':       "",
+    # 'user':         "PI",
     't_exp':        303,
-    #'t_act':        "",
-    #'machine':      "",
-    #'gas':          "C3H8",
-    #'exp_type':     "",
-    }
+    # 't_act':        "",
+    # 'machine':      "",
+    # 'gas':          "C3H8",
+    # 'exp_type':     "",
+}
 isotherms = adsutils.db_get_experiments(db_path, criteria)
 
 
@@ -64,8 +69,8 @@ isotherms = adsutils.db_get_experiments(db_path, criteria)
 #################################################################################
 # Isotherm plotting and comparison
 
-#%%
-#sel_isotherms = isotherms
+# %%
+# sel_isotherms = isotherms
 sel_isotherms = list(filter(lambda x: x.gas == "CO", isotherms))
 
 fig_title = sel_isotherms[0].name
@@ -92,8 +97,7 @@ adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch='ads',
                   logarithmic=True, color=True, fig_title=fig_title, legend_list=legend_list)
 
 
-
-#%%
+# %%
 def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max):
     """
     ## All selected isotherms on one isotherm graph, optional saving
@@ -133,7 +137,8 @@ def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max
 
 ########################
 
-#%%
+
+# %%
 sel_isotherms = []
 req_gas = ["CH4"]
 for gas in req_gas:
@@ -141,7 +146,7 @@ for gas in req_gas:
     plot_all_selected(sel_isotherms, False, None, None, None)
 
 
-#%%
+# %%
 sel_isotherms = []
 req_gas = ["CO2", "CO", "C2H6", "C3H6", "C3H8"]
 for gas in req_gas:
@@ -149,7 +154,7 @@ for gas in req_gas:
     plot_all_selected(sel_isotherms, False, None, None, None)
 
 
-#%%
+# %%
 sel_isotherms = []
 req_gas = ["KRICT01", "KRICT AlO Pellets"]
 for gas in req_gas:
@@ -157,7 +162,7 @@ for gas in req_gas:
 
 print(len(sel_isotherms))
 
-#%%
+# %%
 legend_list = ['batch', 'gas']
 
 enthalpy_max = 100
@@ -175,7 +180,7 @@ adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch='ads',
 #################################################################################
 # PyIAST isotherm modelling
 #
-#%%
+# %%
 isotherm = isotherms[8]
 modelH = isotherm.get_model_isotherm("Henry")
 modelH.name = "Henry"
@@ -184,21 +189,21 @@ modelL.name = "Langmuir"
 modelDL = isotherm.get_model_isotherm("DSLangmuir")
 modelDL.name = "DS Langmuir"
 
-adsutils.plot_iso({isotherm,modelH, modelL, modelDL}, plot_type='isotherm', branch='ads', logarithmic=False, color=True)
+adsutils.plot_iso({isotherm, modelH, modelL, modelDL},
+                  plot_type='isotherm', branch='ads', logarithmic=False, color=True)
 
 
 #################################################################################
 #################################################################################
 # Henrys constant calculations
 #
-#%%
+# %%
 
 isotherm = isotherms[2]
 adsutils.calc_initial_henry(isotherm, max_adjrms=0.01, verbose=True)
 
-#%%
+# %%
 
-import importlib
 importlib.reload(adsutils)
 importlib.reload(adsutils.isotherms.initial_henry)
 
@@ -206,12 +211,12 @@ isotherm = isotherms[48]
 print(isotherm.adsdata)
 adsutils.calc_initial_henry_virial(isotherm, verbose=True)
 
-#%%
+# %%
 henrys = []
 henrys_v = []
 gasnames = []
 gasvalues = []
-t_acts =[]
+t_acts = []
 
 for index, isotherm in enumerate(sel_isotherms):
     henry = adsutils.calc_initial_henry(isotherm, max_adjrms=0.01)
@@ -226,25 +231,23 @@ for index, isotherm in enumerate(sel_isotherms):
     print(index, gas.name, henry, henry_v)
 
 
-
-#%%
-import pandas as pd
-import matplotlib.pyplot as plt
-
-dfrm = pd.DataFrame({"gas" : gasnames, "henry" : henrys_v, "values" : gasvalues, "t_acts" : t_acts})
+dfrm = pd.DataFrame({"gas": gasnames, "henry": henrys_v,
+                     "values": gasvalues, "t_acts": t_acts})
 dfrm["t_acts"].value_counts()
 dfrm[dfrm["gas"] == "CO"]
 
-#%%
+# %%
 isotherms[62].print_info()
 
-#%%
+# %%
 
-dfrm = pd.DataFrame({"gas" : gasnames, "henry" : henrys, "values" : gasvalues, "t_acts" : t_acts})
-colors = {250:'red', 150:'blue'}
+dfrm = pd.DataFrame({"gas": gasnames, "henry": henrys,
+                     "values": gasvalues, "t_acts": t_acts})
+colors = {250: 'red', 150: 'blue'}
 
 fig, axes = plt.subplots(1, 1, figsize=(8, 8))
-axes.scatter(dfrm["values"], dfrm["henry"], marker='o', c=dfrm['t_acts'].apply(lambda x: colors[x]))
+axes.scatter(dfrm["values"], dfrm["henry"], marker='o',
+             c=dfrm['t_acts'].apply(lambda x: colors[x]))
 
 for label, x, y in zip(dfrm["gas"], dfrm["values"], dfrm["henry"]):
     axes.annotate(label,

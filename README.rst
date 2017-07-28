@@ -7,6 +7,8 @@ Overview
 .. list-table::
     :stub-columns: 1
 
+    * - status
+      - |docs|
     * - docs
       - |docs|
     * - tests
@@ -15,6 +17,10 @@ Overview
     * - package
       - | |version| |wheel| |supported-versions| |supported-implementations|
         | |commits-since|
+
+.. |docs| image:: http://www.repostatus.org/badges/latest/wip.svg
+    :target: http://www.repostatus.org/#wip
+    :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
 
 .. |docs| image:: https://readthedocs.org/projects/adsutils/badge/?style=flat
     :target: https://readthedocs.org/projects/adsutils
@@ -59,7 +65,7 @@ Overview
 
 .. end-badges
 
-An example package. Generated with cookiecutter-pylibrary.
+Work in progress
 
 * Free software: MIT license
 

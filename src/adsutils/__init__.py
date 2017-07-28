@@ -1,8 +1,13 @@
-'''
+# pylint: disable=W0614,W0401,W0611,W0622
+# flake8: noqa
+
+__author__ = 'Paul A. Iacomi'
+__docformat__ = 'restructuredtext'
+__doc__ = """
 This module has many functionalities for manipulating
 data from adsorption experiments
-'''
-__author__ = 'Paul A. Iacomi'
+"""
+
 
 # This code is written for Python 3.
 import sys
@@ -21,7 +26,8 @@ for dependency in hard_dependencies:
         missing_dependencies.append(dependency)
 
 if missing_dependencies:
-    raise ImportError("Missing required dependencies {0}".format(missing_dependencies))
+    raise ImportError(
+        "Missing required dependencies {0}".format(missing_dependencies))
 del hard_dependencies, dependency, missing_dependencies
 
 from adsutils.classes.pointisotherm import *

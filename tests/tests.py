@@ -1,36 +1,17 @@
-#%%
-import adsutils
+# %%
 import os
-import inspect
-import unittest
-
-#%%
-class DatabaseTestCase(unittest.TestCase):
-    def setUp(self):
-
-    def tearDown(self):
-
-    def test_one(self):
-        self.assertEqual(, , 
-                         'incorrect default size')
-
-    def test_two(self):
-        self.widget.resize(100,150)
-        self.assertEqual(self.widget.size(), (100,150),
-                         'wrong size after resize')
-
-
+import adsutils
 
 #################################################################################
 #       Excel import | dataimport/excelinterface.py
 #################################################################################
 #
-#%% Get test folder
+# %% Get test folder
 xl_folder = os.getcwd() + r'\tests\excel'
-#%% Find files
+# %% Find files
 xl_paths = adsutils.xl_experiment_parser_paths(xl_folder)
 print(xl_paths)
-#%% Import them
+# %% Import them
 isotherms = []
 
 for path in xl_paths:
@@ -45,24 +26,25 @@ for path in xl_paths:
 #       Database import | dataimport/sqlinterface.py
 #################################################################################
 #
-#%%
-db_path = os.path.expanduser(r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
+# %%
+db_path = os.path.expanduser(
+    r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
 
-#%%
+# %%
 isotherms = []
 criteria = {
     'sname':        "UiO-66(Zr)",
-    #'sbatch':       "",
-    #'user':         "",
+    # 'sbatch':       "",
+    # 'user':         "",
     't_exp':        303,
-    #'t_act':        "",
-    #'machine':      "",
+    # 't_act':        "",
+    # 'machine':      "",
     'gas':          "N2",
-    #'exp_type':     "",
-    }
+    # 'exp_type':     "",
+}
 isotherms = adsutils.db_get_experiments(db_path, criteria)
 
-#%%
+# %%
 samples = adsutils.db_get_samples(db_path)
 adsutils.SAMPLE_LIST = samples
 
@@ -71,10 +53,10 @@ adsutils.SAMPLE_LIST = samples
 #       Isotherm class | classes/pointisotherm.py
 #################################################################################
 #
-#%%
+# %%
 isotherm = isotherms[0]
 isotherm.print_info()
-#%%
+# %%
 print(isotherm.adsdata())
 print(isotherm.desdata())
 print(isotherm.has_ads())
@@ -100,7 +82,7 @@ for isotherm in isotherms:
 # Isotherm plotting and comparison
 #################################################################################
 #
-#%%
+# %%
 legend_list = ['name']
 
 enthalpy_max = None
@@ -138,7 +120,7 @@ adsutils.plot_iso(isotherms, plot_type='iso-enth', branch=['ads'],
 # PyIAST isotherm modelling
 #################################################################################
 #
-#%%
+# %%
 isotherm = isotherms[8]
 modelH = isotherm.get_model_isotherm("Henry")
 modelH.name = "Henry"
@@ -147,7 +129,8 @@ modelL.name = "Langmuir"
 modelDL = isotherm.get_model_isotherm("DSLangmuir")
 modelDL.name = "DS Langmuir"
 
-adsutils.plot_iso({isotherm,modelH, modelL, modelDL}, plot_type='isotherm', branch='ads', logarithmic=False, color=True)
+adsutils.plot_iso({isotherm, modelH, modelL, modelDL},
+                  plot_type='isotherm', branch='ads', logarithmic=False, color=True)
 
 
 #################################################################################

@@ -42,7 +42,7 @@ class gas:
 #%%
 def saturation_pressure_at_temperature(temp, gas):
     """
-    Uses an equation of state to determine the 
+    Uses an equation of state to determine the
     saturation pressure at a particular temperature
 
     Used mostly for absolute/relative pressure conversion
