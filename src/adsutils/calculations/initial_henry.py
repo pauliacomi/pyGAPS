@@ -5,10 +5,11 @@ This module calculates the initial henry constant based on an isotherm
 __author__ = 'Paul A. Iacomi'
 
 import copy
+
+import matplotlib.pyplot as plt
 import numpy
 import pandas
 import pyiast
-import matplotlib.pyplot as plt
 
 from ..graphing.isothermgraphs import plot_iso
 

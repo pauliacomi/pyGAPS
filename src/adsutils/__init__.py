@@ -6,6 +6,8 @@ __docformat__ = 'restructuredtext'
 __doc__ = """
 This module has many functionalities for manipulating
 data from adsorption experiments
+
+isort:skip_file
 """
 
 

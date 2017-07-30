@@ -7,12 +7,13 @@ __author__ = 'Paul A. Iacomi'
 
 import array
 import sqlite3
-import pandas
+
 import numpy
+import pandas
 
 from ..classes.gas import Gas
-from ..classes.sample import Sample
 from ..classes.pointisotherm import PointIsotherm
+from ..classes.sample import Sample
 
 # %%
 

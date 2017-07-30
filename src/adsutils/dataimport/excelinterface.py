@@ -7,8 +7,10 @@ used, such as the parser file.
 
 import os
 import os.path
-import pandas
+
 import numpy
+import pandas
+
 # chose an implementation, depending on os
 if os.name == 'nt':  # sys.platform == 'win32':
     import xlwings

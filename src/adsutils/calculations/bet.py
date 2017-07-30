@@ -4,10 +4,9 @@ This module calculates the BET surface area based on an isotherm
 
 __author__ = 'Paul A. Iacomi and Bastien Aillet'
 
+import matplotlib.pyplot as plt
 # %%
 import scipy.stats
-import matplotlib.pyplot as plt
-
 
 AVOGADRO_NUMBER = 6.02214 * (10 ** 23)
 NITROGEN_CROSS_SECTION = 1.62 * (10 ** (-19))

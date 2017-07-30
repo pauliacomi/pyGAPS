@@ -1,8 +1,9 @@
 
-# %%
-import adsutils
 import pandas
 import pytest
+
+# %%
+import adsutils
 
 
 @pytest.fixture(scope="class")

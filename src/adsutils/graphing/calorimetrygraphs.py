@@ -1,7 +1,8 @@
 # %%
-from bokeh.io import show, output_notebook
-from bokeh.plotting import figure
 import pandas
+from bokeh.io import output_notebook
+from bokeh.io import show
+from bokeh.plotting import figure
 
 
 def plot_calo(path):

@@ -1,8 +1,8 @@
 # %%
 import matplotlib.pyplot as plt
+from cycler import cycler
 from matplotlib import cm
 from numpy import linspace
-from cycler import cycler
 
 from ..utilities.matplotlib_chemformula import convert_chemformula
 

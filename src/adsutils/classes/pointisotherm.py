@@ -5,12 +5,13 @@ This module contains the main class that describes an isotherm through discrete 
 __author__ = 'Paul A. Iacomi'
 
 import copy
+
 import pandas
 import pyiast
 
 from . import SAMPLE_LIST
-from .gas import saturation_pressure_at_temperature
 from ..graphing.isothermgraphs import plot_iso
+from .gas import saturation_pressure_at_temperature
 
 _LOADING_UNITS = {"mmol": 0.001, "cm3 STP": 4.461e-5}
 _PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
