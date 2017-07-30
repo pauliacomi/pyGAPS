@@ -61,6 +61,7 @@ setup(
         'scipy >= 0.18.0',
         'pandas >= 0.18.1',
         'matplotlib >= 2.0',
+        'bokeh'
         'pyiast',
         'xlwings;platform_system=="Windows"',
         'coolprop >= 6.0',
