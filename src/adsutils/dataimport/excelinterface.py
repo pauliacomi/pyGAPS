@@ -13,8 +13,7 @@ import numpy
 if os.name == 'nt':  # sys.platform == 'win32':
     import xlwings
 else:
-    xw = None
-    raise Warning(
+    print(
         "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
 
@@ -27,7 +26,7 @@ def xl_experiment_parser(path):
 
     '''
 
-    if xw is None:
+    if xlwings is None:
         raise Warning(
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
         return
@@ -87,6 +86,11 @@ def xl_experiment_parser_paths(folder):
     :param folder: The folder where the function will look in
 
     '''
+
+    if xlwings is None:
+        raise Warning(
+            "xlwings functionality disabled on this platform ( {0} )".format(os.name))
+        return
 
     paths = []
 
