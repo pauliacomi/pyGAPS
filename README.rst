@@ -8,7 +8,7 @@ Overview
     :stub-columns: 1
 
     * - status
-      - |docs|
+      - |status|
     * - docs
       - |docs|
     * - tests
@@ -18,7 +18,7 @@ Overview
       - | |version| |wheel| |supported-versions| |supported-implementations|
         | |commits-since|
 
-.. |docs| image:: http://www.repostatus.org/badges/latest/wip.svg
+.. |status| image:: http://www.repostatus.org/badges/latest/wip.svg
     :target: http://www.repostatus.org/#wip
     :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
 
