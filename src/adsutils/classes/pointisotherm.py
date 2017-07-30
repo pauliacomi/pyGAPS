@@ -97,6 +97,8 @@ class PointIsotherm:
         #: units for pressure
         self.unit_pressure = unit_pressure
 
+        # TODO Pre-emptively check for these in a dictionary
+
         #: Add id of isotherm, this is used when loading from database
         self.id = info["id"]
         #: Isotherm physicality (real or simulation)
@@ -323,11 +325,11 @@ class PointIsotherm:
 
     def adsdata(self):
         '''Returns adsorption part of data'''
-        return self.data.loc[self.data[_ADS_DES_CHECK] == False]
+        return self.data.loc[~self.data[_ADS_DES_CHECK]]
 
     def desdata(self):
         '''Returns desorption part of data'''
-        return self.data.loc[self.data[_ADS_DES_CHECK] == True]
+        return self.data.loc[self.data[_ADS_DES_CHECK]]
 
     def has_ads(self):
         '''
