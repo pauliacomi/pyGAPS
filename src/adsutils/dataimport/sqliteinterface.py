@@ -12,7 +12,6 @@ import numpy
 
 from ..classes.gas import Gas
 from ..classes.sample import Sample
-from ..classes.user import User
 from ..classes.pointisotherm import PointIsotherm
 
 # %%
