@@ -7,8 +7,8 @@
 # import xlwings as xw
 
 
-# def plot_iast_vle():
-#     "Function to generate the selectivity graph"
+def plot_iast_vle():
+    "Function to generate the selectivity graph"
 
 #     # get excel workbook, sheet and range
 #     wb = xw.Book
@@ -57,4 +57,4 @@
 
 #     plt.show()
 
-#     return
+    return
