@@ -6,6 +6,7 @@ graft tests
 
 include .bumpversion.cfg
 include .coveragerc
+include .pylintrc
 include .cookiecutterrc
 include .editorconfig
 include .isort.cfg
