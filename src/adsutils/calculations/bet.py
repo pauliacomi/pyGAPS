@@ -5,8 +5,8 @@ This module calculates the BET surface area based on an isotherm
 __author__ = 'Paul A. Iacomi and Bastien Aillet'
 
 # %%
-import matplotlib.pyplot as plt
 import scipy.stats
+import matplotlib.pyplot as plt
 
 
 AVOGADRO_NUMBER = 6.02214 * (10 ** 23)
@@ -16,8 +16,8 @@ PROPANE_CROSS_SECTION = 3.9 * (10 ** (-19))
 
 def area_BET(isotherm, verbose=False):
     """
-    Fonction retournant le graphe de l'isotherm d'adsorption de
-    l'expérience du triflex en prenant le file en format CSV
+    Function returns the BET surface area of an isotherm object which
+    is passed to it.
     """
 
     if isotherm.mode_adsorbent != "mass":

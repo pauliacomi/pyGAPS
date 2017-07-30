@@ -1,12 +1,10 @@
 # %%
-
-from adsutils.utilities.matplotlib_chemformula import convert_chemformula
-
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from numpy import linspace
 from cycler import cycler
 
+from ..utilities.matplotlib_chemformula import convert_chemformula
 
 # ! list of plot types
 _PLOT_TYPES = ["isotherm", "enthalpy", "iso-enth"]

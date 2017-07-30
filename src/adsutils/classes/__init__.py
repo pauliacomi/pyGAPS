@@ -1,0 +1,3 @@
+
+SAMPLE_LIST = []
+GAS_LIST = []

@@ -10,7 +10,7 @@ import pandas
 import pyiast
 import matplotlib.pyplot as plt
 
-import adsutils
+from adsutils.classes.pointisotherm import PointIsotherm
 
 
 def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
@@ -27,7 +27,9 @@ def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
     # add a zero point to the graph since the henry constant must have a zero intercept
     if selected_points.adsdata[isotherm.loading_key][0] != 0:
         selected_points.adsdata = pandas.DataFrame(numpy.array([[0, 0, 0]]), columns=[
-                                                   isotherm.loading_key, isotherm.pressure_key, isotherm.enthalpy_key]).append(
+                                                   isotherm.loading_key,
+                                                   isotherm.pressure_key,
+                                                   isotherm.enthalpy_key]).append(
                                                        selected_points.adsdata, ignore_index=True)
 
     adjrmsd = 1
@@ -57,8 +59,8 @@ def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
         print("Final adjusted root mean square difference:", adjrmsd)
-        adsutils.plot_iso({isotherm, model_selected}, plot_type='isotherm',
-                          branch='ads', logarithmic=False, color=True)
+        adsutils.graphing.isothermgraphs.plot_iso({isotherm, model_selected}, plot_type='isotherm',
+                                                  branch='ads', logarithmic=False, color=True)
 
     # return the henry constant
     return model_isotherm.params["KH"]

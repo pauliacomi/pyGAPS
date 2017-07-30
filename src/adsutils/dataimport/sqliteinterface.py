@@ -10,7 +10,10 @@ import sqlite3
 import pandas
 import numpy
 
-import adsutils
+from ..classes.gas import Gas
+from ..classes.sample import Sample
+from ..classes.user import User
+from ..classes.pointisotherm import PointIsotherm
 
 # %%
 
@@ -224,7 +227,7 @@ def db_get_samples(pth):
                 info['properties'].update(prop)
 
             # Build sample objects
-            samples.append(adsutils.Sample(info))
+            samples.append(Sample(info))
 
         # Print success
         print("Selected", len(samples), "samples")
@@ -555,10 +558,10 @@ def db_get_experiments(pth, criteria):
         # build isotherm objects
         isotherms = []
         for x in list(map(list, zip(exp_datas, exp_infos))):
-            isotherms.append(adsutils.PointIsotherm(x[0], x[1],
-                                                    pressure_key="Pressure",
-                                                    loading_key="Loading",
-                                                    enthalpy_key="Enthalpy"))
+            isotherms.append(PointIsotherm(x[0], x[1],
+                                           pressure_key="Pressure",
+                                           loading_key="Loading",
+                                           enthalpy_key="Enthalpy"))
 
         # Print success
         print("Selected", len(isotherms), "isotherms")
@@ -742,7 +745,7 @@ def db_get_gas(pth, name):
         gasparams["dipole"] = r["dipole"]
         gasparams["quadrupole"] = r["quadrupole"]
 
-        reqgas = adsutils.Gas(gasparams)
+        reqgas = Gas(gasparams)
 
         return reqgas
 

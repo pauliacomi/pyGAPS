@@ -30,21 +30,4 @@ if missing_dependencies:
         "Missing required dependencies {0}".format(missing_dependencies))
 del hard_dependencies, dependency, missing_dependencies
 
-from adsutils.classes.pointisotherm import *
-from adsutils.classes.user import *
-from adsutils.classes.sample import *
-from adsutils.classes.gas import *
-
-from adsutils.calculations.initial_henry import *
-from adsutils.calculations.initial_enthalpy import *
-from adsutils.calculations.bet import *
-
-from adsutils.dataimport.excelinterface import *
-from adsutils.dataimport.csvinterface import *
-from adsutils.dataimport.sqliteinterface import *
-
-from adsutils.graphing.isothermgraphs import *
-
-
-SAMPLE_LIST = []
-GAS_LIST = []
+from adsutils.api import *

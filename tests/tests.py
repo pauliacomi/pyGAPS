@@ -2,6 +2,7 @@
 import os
 import adsutils
 
+
 #################################################################################
 #       Excel import | dataimport/excelinterface.py
 #################################################################################
@@ -9,7 +10,8 @@ import adsutils
 # %% Get test folder
 xl_folder = os.getcwd() + r'\tests\excel'
 # %% Find files
-xl_paths = adsutils.xl_experiment_parser_paths(xl_folder)
+xl_paths = adsutils.xl_experiment_parser_paths(
+    xl_folder)
 print(xl_paths)
 # %% Import them
 isotherms = []

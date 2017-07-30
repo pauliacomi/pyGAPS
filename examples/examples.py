@@ -2,7 +2,8 @@
 from os.path import expanduser
 import importlib
 import matplotlib.pyplot as plt
-import pandas as pd
+import pandas
+
 import adsutils
 
 #################################################################################
@@ -12,7 +13,8 @@ import adsutils
 # %%
 xl_folder = expanduser(
     r"~\OneDrive\Documents\PhD Documents\Python\python adsorption\adsutils\tests\data isotherms")
-xl_paths = adsutils.xl_experiment_parser_paths(xl_folder)
+xl_paths = adsutils.dataimport.excelinterface.xl_experiment_parser_paths(
+    xl_folder)
 
 isotherms = []
 
@@ -116,7 +118,9 @@ def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max
 
     adsutils.plot_iso(s_isotherms, plot_type='iso-enth', branch='ads', path=img_title,
                       logarithmic=False, color=True, save=save,
-                      y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
+                      y_enthmaxrange=enthalpy_max,
+                      y_adsmaxrange=loading_max,
+                      xmaxrange=pressure_max,
                       fig_title=fig_title, legend_list=legend_list, legend_bottom=True)
 
     fig_title = title + " log"
@@ -124,7 +128,9 @@ def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max
 
     adsutils.plot_iso(s_isotherms, plot_type='iso-enth', branch='ads', path=img_title,
                       logarithmic=True, color=True, save=save,
-                      y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
+                      y_enthmaxrange=enthalpy_max,
+                      y_adsmaxrange=loading_max,
+                      xmaxrange=pressure_max,
                       fig_title=fig_title, legend_list=legend_list, legend_bottom=True)
 
     fig_title = title + " enthalpy"
@@ -132,7 +138,9 @@ def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max
 
     adsutils.plot_iso(s_isotherms, plot_type='enthalpy', branch='ads', path=img_title,
                       logarithmic=False, color=True, save=save,
-                      y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=loading_max,
+                      y_enthmaxrange=enthalpy_max,
+                      y_adsmaxrange=loading_max,
+                      xmaxrange=loading_max,
                       fig_title=fig_title, legend_list=legend_list, legend_bottom=True)
 
 ########################
@@ -231,8 +239,8 @@ for index, isotherm in enumerate(sel_isotherms):
     print(index, gas.name, henry, henry_v)
 
 
-dfrm = pd.DataFrame({"gas": gasnames, "henry": henrys_v,
-                     "values": gasvalues, "t_acts": t_acts})
+dfrm = pandas.DataFrame({"gas": gasnames, "henry": henrys_v,
+                         "values": gasvalues, "t_acts": t_acts})
 dfrm["t_acts"].value_counts()
 dfrm[dfrm["gas"] == "CO"]
 
@@ -241,8 +249,8 @@ isotherms[62].print_info()
 
 # %%
 
-dfrm = pd.DataFrame({"gas": gasnames, "henry": henrys,
-                     "values": gasvalues, "t_acts": t_acts})
+dfrm = pandas.DataFrame({"gas": gasnames, "henry": henrys,
+                         "values": gasvalues, "t_acts": t_acts})
 colors = {250: 'red', 150: 'blue'}
 
 fig, axes = plt.subplots(1, 1, figsize=(8, 8))

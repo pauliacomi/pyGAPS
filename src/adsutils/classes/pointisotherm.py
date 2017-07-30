@@ -8,7 +8,9 @@ import copy
 import pandas
 import pyiast
 
-import adsutils
+from . import SAMPLE_LIST
+from .gas import saturation_pressure_at_temperature
+from ..graphing.isothermgraphs import plot_iso
 
 _LOADING_UNITS = {"mmol": 0.001, "cm3 STP": 4.461e-5}
 _PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
@@ -197,10 +199,10 @@ class PointIsotherm:
 
         if mode_pressure == "absolute":
             self.data[self.pressure_key] = self.data[self.pressure_key].apply(
-                lambda x: x * adsutils.saturation_pressure_at_temperature(self.t_exp, self.gas))
+                lambda x: x * saturation_pressure_at_temperature(self.t_exp, self.gas))
         elif mode_pressure == "relative":
             self.data[self.pressure_key] = self.data[self.pressure_key].apply(
-                lambda x: x / adsutils.saturation_pressure_at_temperature(self.t_exp, self.gas))
+                lambda x: x / saturation_pressure_at_temperature(self.t_exp, self.gas))
 
         self.mode_pressure = mode_pressure
 
@@ -222,13 +224,13 @@ class PointIsotherm:
 
         # Checks to see if sample exists in master list
         if not any(self.name == sample.name and self.batch == sample.batch
-                   for sample in adsutils.SAMPLE_LIST):
+                   for sample in SAMPLE_LIST):
             raise Exception("Sample %s %s does not exist in sample list. "
                             "First populate adsutils.SAMPLE_LIST "
                             "with desired sample class"
                             % (self.name, self.batch))
 
-        sample = [sample for sample in adsutils.SAMPLE_LIST
+        sample = [sample for sample in SAMPLE_LIST
                   if self.name == sample.name and self.batch == sample.batch]
 
         if len(sample) > 1:
@@ -282,8 +284,8 @@ class PointIsotherm:
         print("\n")
         print("Experiment comments:", self.comment)
 
-        adsutils.plot_iso([self], plot_type='iso-enth', branch=["ads", "des"],
-                          logarithmic=logarithmic, color=True, fig_title=self.gas)
+        plot_iso([self], plot_type='iso-enth', branch=["ads", "des"],
+                 logarithmic=logarithmic, color=True, fig_title=self.gas)
 
         return
 
