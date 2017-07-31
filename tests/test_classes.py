@@ -1,8 +1,10 @@
+"""
+This test module has tests relating to module classes
+"""
 
 import pandas
 import pytest
 
-# %%
 import adsutils
 
 

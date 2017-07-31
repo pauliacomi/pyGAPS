@@ -10,12 +10,15 @@ env:
     - TOXENV=docs
 matrix:
   include:
+    - python: '3.4'
+      env:
+        - TOXENV=3.4-cover,report,codecov
+    - python: '3.5'
+      env:
+        - TOXENV=3.5-cover,report,codecov
     - python: '3.6'
       env:
         - TOXENV=3.6-cover,report,codecov
-    - python: 'pypy-5.4'
-      env:
-        - TOXENV=pypy-cover,report,codecov
 before_install:
   - python --version
   - uname -a
