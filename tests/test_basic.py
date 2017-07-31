@@ -6,6 +6,7 @@ import pytest
 import sys
 
 
+@pytest.mark.skip(reason="not well implemented")
 def test_python_three(monkeypatch, capsys):
     monkeypatch.setattr(sys, 'version_info', (2, 7, 0, 'final', 0))
 
@@ -17,6 +18,7 @@ def test_python_three(monkeypatch, capsys):
     return
 
 
+@pytest.mark.skip(reason="not well implemented")
 def test_dependency_check(monkeypatch):
 
     monkeypatch.delitem(sys.modules, 'pandas')

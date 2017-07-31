@@ -1,11 +1,14 @@
 [paths]
-source = src
+source =
+    src/adsutils
+    */site-packages/adsutils
 
 [run]
 branch = False
 source =
     src
-    tests
+omit =
+    */tests/*
 parallel = true
 
 [report]
