@@ -15,6 +15,8 @@ from ..classes.gas import Gas
 from ..classes.pointisotherm import PointIsotherm
 from ..classes.sample import Sample
 
+# TODO Convert the try/finally to decorators and context managers
+# TODO rework for new isotherm form
 # %%
 
 

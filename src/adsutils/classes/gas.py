@@ -7,7 +7,7 @@ __author__ = 'Paul A. Iacomi'
 from CoolProp.CoolProp import PropsSI
 
 
-class Gas:
+class Gas(object):
     '''
     Class which contains all info about a gas
     '''

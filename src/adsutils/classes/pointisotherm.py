@@ -22,14 +22,20 @@ _PRESSURE_MODE = ["absolute", "relative"]
 _ADS_DES_CHECK = "des_check"
 
 
-class PointIsotherm:
+class PointIsotherm(object):
     '''
     Class which contains the points from an adsorption isotherm and microcalorimetry
     '''
 
-    def __init__(self, data, info, loading_key=None, pressure_key=None, enthalpy_key=None,
-                 mode_adsorbent="mass", mode_pressure="absolute",
-                 unit_loading="mmol", unit_pressure="bar"):
+    def __init__(self, isotherm_data,
+                 loading_key=None,
+                 pressure_key=None,
+                 other_keys=None,  # TODO make this general
+                 mode_adsorbent="mass",
+                 mode_pressure="absolute",
+                 unit_loading="mmol",
+                 unit_pressure="bar",
+                 **isotherm_parameters):
         '''
         Instatiation of the class from a DataFrame so it can be easily referenced
 
@@ -50,9 +56,16 @@ class PointIsotherm:
         '''
 
         # Checks
+        if any(k not in isotherm_parameters
+               for k in ('id', 'sample_name', 'sample_batch', 't_exp', 'gas')):
+            print(isotherm_parameters)
+            raise Exception(
+                "Isotherm MUST have the following information in the properties dictionary:"
+                "'id', 'sample_name', 'sample_batch', 't_exp', 'gas'")
+
         if None in [loading_key, pressure_key]:
             raise Exception(
-                "Pass loading_key, pressure_key as names of the loading,"
+                "Pass loading_key, pressure_key as sample_names of the loading,"
                 " pressure and enthalpy columns in the DataFrame, to the constructor.")
 
         if mode_adsorbent is None or mode_pressure is None:
@@ -80,14 +93,15 @@ class PointIsotherm:
                             "units in _PRESSURE_UNITS")
 
         #: Pandas DataFrame to store the data
-        self.data = data
+        self._data = isotherm_data
 
-        #: name of column in the dataframe that contains adsorbed amount
+        #: Name of column in the dataframe that contains adsorbed amount
         self.loading_key = loading_key
-        #: name of column in the dataframe that contains pressure
+        #: Name of column in the dataframe that contains pressure
         self.pressure_key = pressure_key
-        #: name of column in the dataframe that contains enthalpy points
-        self.enthalpy_key = enthalpy_key
+
+        #: List of column in the dataframe that contains other points
+        self.other_keys = other_keys
 
         #: mode for the adsorbent
         self.mode_adsorbent = mode_adsorbent
@@ -98,48 +112,53 @@ class PointIsotherm:
         #: units for pressure
         self.unit_pressure = unit_pressure
 
-        # TODO Pre-emptively check for these in a dictionary
-
-        #: Add id of isotherm, this is used when loading from database
-        self.id = info["id"]
-        #: Isotherm physicality (real or simulation)
-        self.is_real = info['is_real']
-        #: Isotherm type (exp/sym)
-        self.exp_type = info['exp_type']
-        #: Isotherm experiment date
-        self.date = info['date']
-        #: Isotherm sample name
-        self.name = info['name']
-        #: Isotherm sample batch
-        self.batch = info['batch']
-        #: Isotherm sample activation temperature
-        self.t_act = info['t_act']
+        #: Must-have properties of the isotherm
+        #: Add id of isotherm, this is used for uniqueness
+        self.id = isotherm_parameters.get('id')
+        #: Isotherm sample sample_name
+        self.sample_name = isotherm_parameters.get('sample_name')
+        #: Isotherm sample sample_batch
+        self.sample_batch = isotherm_parameters.get('sample_batch')
         #: Isotherm experimental temperature
-        self.t_exp = info['t_exp']
-        #: Isotherm machine used
-        self.machine = info['machine']
+        self.t_exp = isotherm_parameters.get('t_exp')
         #: Isotherm gas used
-        self.gas = info['gas']
-        #: Isotherm user
-        self.user = info['user']
+        self.gas = isotherm_parameters.get('gas')
+
+        #: Good-to-have properties of the isotherm
+        #: Isotherm experiment date
+        self.date = isotherm_parameters.get('date')
+        #: Isotherm sample activation temperature
+        self.t_act = isotherm_parameters.get('t_act')
         #: Isotherm lab
-        self.lab = info['lab']
-        #: Isotherm project
-        self.project = info['project']
+        self.lab = isotherm_parameters.get('lab')
         #: Isotherm comments
-        self.comment = info['comment']
+        self.comment = isotherm_parameters.get('comment')
+
+        # Other properties
+        #: Isotherm user
+        self.user = isotherm_parameters.get('user')
+        #: Isotherm project
+        self.project = isotherm_parameters.get('project')
+        #: Isotherm machine used
+        self.machine = isotherm_parameters.get('machine')
+        #: Isotherm physicality (real or simulation)
+        self.is_real = isotherm_parameters.get('is_real')
+        #: Isotherm type (calorimetry/isotherm)
+        self.exp_type = isotherm_parameters.get('exp_type')
+
+        self.other_properties = isotherm_parameters.get('other_properties')
 
         #: Figure out the adsorption and desorption branches
-        self.data = self._splitdata(self.data)
+        self._data = self._splitdata(self._data)
 
-    def _splitdata(self, data):
+    def _splitdata(self, _data):
         '''
         Splits isotherm data into an adsorption and desorption part and adds a column to mark it
         '''
-        increasing = data.loc[:, self.pressure_key].diff().fillna(0) < 0
+        increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
         increasing.rename(_ADS_DES_CHECK, inplace=True)
 
-        return pandas.concat([data, increasing], axis=1)
+        return pandas.concat([_data, increasing], axis=1)
 
 
 ##########################################################
@@ -158,7 +177,7 @@ class PointIsotherm:
             print("Unit is the same, no changes made")
             return
 
-        self.data[self.loading_key] = self.data[self.loading_key].apply(
+        self._data[self.loading_key] = self._data[self.loading_key].apply(
             lambda x: x * _LOADING_UNITS[self.unit_loading] / _LOADING_UNITS[unit_to])
 
         self.unit_loading = unit_to
@@ -178,7 +197,7 @@ class PointIsotherm:
             print("Unit is the same, no changes made")
             return
 
-        self.data[self.pressure_key] = self.data[self.pressure_key].apply(
+        self._data[self.pressure_key] = self._data[self.pressure_key].apply(
             lambda x: x * _PRESSURE_UNITS[self.unit_pressure] / _PRESSURE_UNITS[unit_to])
 
         self.unit_pressure = unit_to
@@ -201,10 +220,10 @@ class PointIsotherm:
         # TODO Make sure that if the division is made in the correct units, currently only bar
 
         if mode_pressure == "absolute":
-            self.data[self.pressure_key] = self.data[self.pressure_key].apply(
+            self._data[self.pressure_key] = self._data[self.pressure_key].apply(
                 lambda x: x * saturation_pressure_at_temperature(self.t_exp, self.gas))
         elif mode_pressure == "relative":
-            self.data[self.pressure_key] = self.data[self.pressure_key].apply(
+            self._data[self.pressure_key] = self._data[self.pressure_key].apply(
                 lambda x: x / saturation_pressure_at_temperature(self.t_exp, self.gas))
 
         self.mode_pressure = mode_pressure
@@ -226,20 +245,20 @@ class PointIsotherm:
             return
 
         # Checks to see if sample exists in master list
-        if not any(self.name == sample.name and self.batch == sample.batch
+        if not any(self.sample_name == sample.sample_name and self.sample_batch == sample.sample_batch
                    for sample in SAMPLE_LIST):
             raise Exception("Sample %s %s does not exist in sample list. "
                             "First populate adsutils.SAMPLE_LIST "
                             "with desired sample class"
-                            % (self.name, self.batch))
+                            % (self.sample_name, self.sample_batch))
 
         sample = [sample for sample in SAMPLE_LIST
-                  if self.name == sample.name and self.batch == sample.batch]
+                  if self.sample_name == sample.sample_name and self.sample_batch == sample.sample_batch]
 
         if len(sample) > 1:
             raise Exception("More than one sample %s %s found in sample list. "
-                            "Samples must be unique on (name + batch)"
-                            % (self.name, self.batch))
+                            "Samples must be unique on (sample_name + sample_batch)"
+                            % (self.sample_name, self.sample_batch))
 
         try:
             density = sample[0].properties["density"]
@@ -247,13 +266,13 @@ class PointIsotherm:
             raise Exception("The density entry was not found in the "
                             "sample.properties dictionary "
                             "for sample %s %s"
-                            % (self.name, self.batch))
+                            % (self.sample_name, self.sample_batch))
 
         if mode_adsorbent == "volume":
-            self.data[self.loading_key] = self.data[self.loading_key].apply(
+            self._data[self.loading_key] = self._data[self.loading_key].apply(
                 lambda x: x * density)
         elif mode_adsorbent == "mass":
-            self.data[self.loading_key] = self.data[self.loading_key].apply(
+            self._data[self.loading_key] = self._data[self.loading_key].apply(
                 lambda x: x / density)
 
         self.mode_adsorbent = mode_adsorbent
@@ -274,8 +293,8 @@ class PointIsotherm:
         else:
             print("Simulated isotherm")
 
-        print("Sample:", self.name)
-        print("Batch:", self.batch)
+        print("Sample:", self.sample_name)
+        print("sample_batch:", self.sample_batch)
         print("Experiment type:", self.exp_type)
         print("Gas used:", self.gas)
         print("Experiment date:", self.date)
@@ -287,7 +306,12 @@ class PointIsotherm:
         print("\n")
         print("Experiment comments:", self.comment)
 
-        plot_iso([self], plot_type='iso-enth', branch=["ads", "des"],
+        if 'enthalpy_key' in self.other_keys:
+            plot_type = 'iso-enth'
+        else:
+            plot_type = 'isotherm'
+
+        plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
                  logarithmic=logarithmic, color=True, fig_title=self.gas)
 
         return
@@ -324,13 +348,17 @@ class PointIsotherm:
 ##########################################################
 #   Functions that return parts of the isotherm data
 
+    def data(self):
+        '''Returns all data'''
+        return self._data.drop(_ADS_DES_CHECK, axis=1)
+
     def adsdata(self):
         '''Returns adsorption part of data'''
-        return self.data.loc[~self.data[_ADS_DES_CHECK]]
+        return self._data.loc[~self._data[_ADS_DES_CHECK]].drop(_ADS_DES_CHECK, axis=1)
 
     def desdata(self):
         '''Returns desorption part of data'''
-        return self.data.loc[self.data[_ADS_DES_CHECK]]
+        return self._data.loc[self._data[_ADS_DES_CHECK]].drop(_ADS_DES_CHECK, axis=1)
 
     def has_ads(self):
         '''
@@ -376,21 +404,20 @@ class PointIsotherm:
             else:
                 return [x for x in ret if x < max_range]
 
-    def enthalpy_ads(self, max_range=None):
+    def other_key_ads(self, key, max_range=None):
         '''
         Returns adsorption enthalpy points as an array
         '''
         if self.adsdata() is None:
             return None
+        elif key not in self.other_keys:
+            return None
         else:
-            if self.enthalpy_key in self.data.columns:
-                ret = self.adsdata().loc[:, self.enthalpy_key].values
-                if max_range is None:
-                    return ret
-                else:
-                    return [x for x in ret if x < max_range]
+            ret = self.adsdata().loc[:, self.other_keys.get(key)].values
+            if max_range is None:
+                return ret
             else:
-                return None
+                return [x for x in ret if x < max_range]
 
     def pressure_des(self, max_range=None):
         '''
@@ -418,39 +445,38 @@ class PointIsotherm:
             else:
                 return [x for x in ret if x < max_range]
 
-    def enthalpy_des(self, max_range=None):
+    def other_key_des(self, key, max_range=None):
         '''
-        Returns desorption enthalpy points as an array
+        Returns desorption key points as an array
         '''
         if self.desdata() is None:
             return None
+        elif key not in self.other_keys:
+            return None
         else:
-            if self.enthalpy_key in self.data.columns:
-                ret = self.desdata().loc[:, self.enthalpy_key].values
-                if max_range is None:
-                    return ret
-                else:
-                    return [x for x in ret if x < max_range]
+            ret = self.desdata().loc[:, self.other_keys.get(key)].values
+            if max_range is None:
+                return ret
             else:
-                return None
+                return [x for x in ret if x < max_range]
 
     def pressure_all(self):
         '''
         Returns all pressure points as an array
         '''
-        return self.data.loc[:, self.pressure_key].values
+        return self._data.loc[:, self.pressure_key].values
 
     def loading_all(self):
         '''
         Returns all amount adsorbed points as an array
         '''
-        return self.data.loc[:, self.loading_key].values
+        return self._data.loc[:, self.loading_key].values
 
-    def enthalpy_all(self):
+    def other_key_all(self):
         '''
         Returns all enthalpy points as an array
         '''
-        if self.enthalpy_key in self.data.columns:
-            return self.data.loc[:, self.enthalpy_key].values
+        if self.other_keys.get('enthalpy_key') in self._data.columns:
+            return self._data.loc[:, self.other_keys.get('enthalpy_key')].values
         else:
             return None
