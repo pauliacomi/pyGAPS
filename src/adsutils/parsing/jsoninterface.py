@@ -21,7 +21,7 @@ def isotherm_to_json(isotherm):
     raw_dict["t_exp"] = isotherm.t_exp
     raw_dict["gas"] = isotherm.gas
 
-    raw_dict["date"] = isotherm.date
+    raw_dict["date"] = str(isotherm.date)
     raw_dict["t_act"] = isotherm.t_act
     raw_dict["lab"] = isotherm.lab
     raw_dict["comment"] = isotherm.comment
@@ -71,6 +71,7 @@ def isotherm_from_json(json_isotherm):
         raw_dict["isotherm_data"], orient='index', dtype='float64')
 
     data.index = data.index.map(int)
+    data.sort_index(inplace=True)
 
     del raw_dict["isotherm_data"]
 
