@@ -9,7 +9,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy
 import pandas
-import pyiast
+from ..classes.modelisotherm import ModelIsotherm
 
 from ..graphing.isothermgraphs import plot_iso
 
@@ -38,10 +38,10 @@ def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
     rows_taken = initial_rows
 
     while rows_taken != 1:
-        model_isotherm = pyiast.ModelIsotherm(selected_points.adsdata.head(rows_taken),
-                                              loading_key=isotherm.loading_key,
-                                              pressure_key=isotherm.pressure_key,
-                                              model="Henry")
+        model_isotherm = ModelIsotherm(selected_points.adsdata.head(rows_taken),
+                                       loading_key=isotherm.loading_key,
+                                       pressure_key=isotherm.pressure_key,
+                                       model="Henry")
         adjrmsd = model_isotherm.rmse / numpy.ptp(isotherm.loading_ads())
 
         if adjrmsd > max_adjrms and rows_taken != 2:

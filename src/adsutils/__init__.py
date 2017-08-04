@@ -19,7 +19,7 @@ if sys.version_info[0] != 3:
 
 
 # Let users know if they're missing any of our hard dependencies
-hard_dependencies = ("numpy", "pandas", "pyiast", "sqlite3", "CoolProp")
+hard_dependencies = ("numpy", "pandas", "sqlite3", "CoolProp")
 missing_dependencies = []
 dependency = None
 

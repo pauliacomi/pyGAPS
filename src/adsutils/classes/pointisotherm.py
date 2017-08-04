@@ -7,11 +7,11 @@ __author__ = 'Paul A. Iacomi'
 import copy
 
 import pandas
-import pyiast
 
 from . import SAMPLE_LIST
 from ..graphing.isothermgraphs import plot_iso
 from .gas import saturation_pressure_at_temperature
+from .modelisotherm import ModelIsotherm
 
 _LOADING_UNITS = {"mmol": 0.001, "cm3 STP": 4.461e-5}
 _PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
@@ -326,10 +326,10 @@ class PointIsotherm(object):
 
         '''
 
-        model_isotherm = pyiast.ModelIsotherm(self.adsdata(),
-                                              loading_key=self.loading_key,
-                                              pressure_key=self.pressure_key,
-                                              model=model)
+        model_isotherm = ModelIsotherm(self.adsdata(),
+                                       loading_key=self.loading_key,
+                                       pressure_key=self.pressure_key,
+                                       model=model)
 
         point_model_isotherm = copy.deepcopy(self)
         point_model_isotherm.type = "sym"
