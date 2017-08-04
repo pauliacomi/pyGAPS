@@ -1,41 +1,28 @@
-import pandas
+import os
 import pytest
-import adsutils
+import adsutils.calculations
+
+# %%
 
 
-@pytest.fixture(scope="class")
-def basic_isotherm():
-    """
-    Creates an isotherm from model data
-    """
+HERE = os.path.dirname(__file__)
 
-    pressure_key = "Pressure"
-    loading_key = "Loading"
-    enthalpy_key = "Enthalpy"
 
-    df = pandas.DataFrame({
-        pressure_key: [1, 2, 3, 4, 5, 6, 4, 2],
-        loading_key: [1, 2, 3, 4, 5, 6, 4, 2],
-        enthalpy_key: [5, 5, 5, 5, 5, 5, 5, 5],
-    })
+@pytest.mark.parametrize('file, expected_bet', [
+    ('MCM-41 N2 77.json', 350),
+    ('NaY N2 77.json', 700),
+    ('SiO2 N2 77.json', 200),
+    ('Takeda 5A N2 77.json', 1075),
+    ('UiO-66(Zr) N2 77.json', 1250),
+])
+def test_BET(file, expected_bet):
 
-    info = {"id": 0,
-            "is_real": "True",
-            "exp_type": "Calorimetry",
-            "date": "",
-            "name": "TEST",
-            "batch": "TB",
-            "t_act": 100,
-            "t_exp": 100,
-            "machine": "M1",
-            "gas": "N2",
-            "user": "TU",
-            "lab": "TL",
-            "project": "TP",
-            "comment": ""
-            }
+    filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
-    isotherm = adsutils.PointIsotherm(
-        df, info, loading_key=loading_key, pressure_key=pressure_key, enthalpy_key=enthalpy_key)
+    with open(filepath, 'r') as text_file:
+        isotherm = adsutils.isotherm_from_json(text_file.read())
 
-    return isotherm
+    isotherm.convert_pressure_mode("relative")
+    bet_area = adsutils.calculations.area_BET(isotherm)
+
+    assert bet_area == pytest.approx(expected_bet, 25)
