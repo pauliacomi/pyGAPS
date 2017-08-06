@@ -2,8 +2,8 @@
 This test module has tests relating to parser classes
 """
 
-import pytest
 import json
+import pytest
 import adsutils
 
 
@@ -15,13 +15,14 @@ def basic_isotherm_json(isotherm_data):
     data = isotherm_data
 
     isotherm_dict = data.info
+    isotherm_dict.update({'id': 'dd4e578dbd07b6b02faa822ea36d20e5'})
 
     isotherm_data_dict = data.isotherm_df.to_dict(orient='index')
     isotherm_data_dict = {str(k): {p: str(t) for p, t in v.items()}
                           for k, v in isotherm_data_dict.items()}
     isotherm_dict["isotherm_data"] = isotherm_data_dict
 
-    return json.dumps(isotherm_dict)
+    return json.dumps(isotherm_dict, sort_keys=True)
 
 
 def test_isotherm_to_json(basic_isotherm, basic_isotherm_json):

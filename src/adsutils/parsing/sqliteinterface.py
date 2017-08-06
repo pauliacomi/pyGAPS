@@ -14,10 +14,63 @@ import pandas
 from ..classes.gas import Gas
 from ..classes.pointisotherm import PointIsotherm
 from ..classes.sample import Sample
+from ..utilities.sqlite_utilities import build_insert
+from ..utilities.sqlite_utilities import build_select
+from ..utilities.sqlite_utilities import build_update
+from ..utilities.sqlite_utilities import build_delete
 
-# TODO Convert the try/finally to decorators and context managers
-# TODO rework for new isotherm form
-# %%
+
+def db_get_samples(pth):
+    """
+    Gets all samples and their properties
+
+    The number of samples is usually small, so all can be loaded in memory at once
+    """
+
+    # Connect to database
+    with sqlite3.connect(pth) as db:
+
+        # Set row factory
+        db.row_factory = sqlite3.Row
+        # Get a cursor object
+        cursor = db.cursor()
+        cursor.execute('PRAGMA foreign_keys = ON')
+
+        # Execute the query
+        cursor.execute('''SELECT * FROM samples''')
+
+        samples = []
+
+        # Create the samples
+        for row in cursor:
+            if row is None:
+                continue
+
+            sample_params = dict(zip(row.keys(), row))
+
+            # Get the extra data from the sample_properties table
+            cur_inner = db.cursor()
+
+            cur_inner.execute(build_select(table='sample_properties',
+                                           to_select=['type', 'value'],
+                                           where=['sample_id']), {
+                'sample_id':        sample_params.get('id')
+            })
+
+            sample_params['properties'] = {
+                (row[0], row[1]) for row in cur_inner}
+
+            # Build sample objects
+            samples.append(Sample(sample_params))
+
+    # Close the db connection
+    if db:
+        db.close()
+
+    # Print success
+    print("Selected", len(samples), "samples")
+
+    return samples
 
 
 def db_upload_sample(pth, sample, overwrite=False):
@@ -27,444 +80,264 @@ def db_upload_sample(pth, sample, overwrite=False):
     Overwrite is done based on sample.name + sample.batch
     WARNING: Overwrite is done on ALL fields
     """
-    if overwrite:
-        sql_com = """
-            UPDATE "samples"
-            SET
-                project = :project,
-                struct = :struct,
-                owner = :owner,
-                family = :family,
-                contact = :contact,
-                form = :form,
-                source_lab = :source_lab,
-                comment = :comment
-            WHERE
-                name = :name
-                AND
-                batch = :batch
-            """
-    else:
-        sql_com = """
-            INSERT INTO "samples"(
-                name,       project,
-                batch,      struct,
-                owner,      family,
-                contact,    form,
-                source_lab, comment)
-            VALUES (
-                :name,       :project,
-                :batch,      :struct,
-                :owner,      :family,
-                :contact,    :form,
-                :source_lab, :comment)
-            """
 
+    # Connect to database
+    db = sqlite3.connect(pth)
     try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
-
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Upload or modify data in sample table
-        cursor.execute(sql_com, {
-            'name':         sample.name,
-            'batch':        sample.batch,
-            'owner':        sample.owner,
-            'contact':      sample.contact,
-            'source_lab':   sample.source_lab,
-            'project':      sample.project,
-            'struct':       sample.struct,
-            'family':       sample.family,
-            'form':         sample.form,
-            'comment':      sample.comment,
-        }
-        )
-
-        # Upload or modify data in sample_properties table
-        if len(sample.properties) > 0:
-            # Get id of modification
-            sample_id = cursor.execute(
-                """
-                    SELECT id
-                    FROM "samples"
-                    WHERE
-                        name = :name
-                        AND
-                        batch = :batch;
-                    """, {
-                    'name':        sample.name,
-                    'batch':       sample.batch,
-                }
-            ).fetchone()[0]
-
-            # Sql of update routine
-            sql_update = """
-                    UPDATE "sample_properties"
-                    SET
-                        type = :type,
-                        value = :value
-                    WHERE
-                        sample_id = :sample_id;
-                    """
-
-            # Sql of insert routine
-            sql_insert = """
-                    INSERT INTO "sample_properties"(
-                        sample_id,
-                        type,
-                        value )
-                    VALUES (
-                        :sample_id,
-                        :type,
-                        :value )
-                    """
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
 
             if overwrite:
-                # Find existing properties
-                cursor.execute(
-                    """
-                    SELECT type
-                    FROM "sample_properties"
-                    WHERE sample_id = ?;
-                    """, (str(sample_id),)
-                )
-                column = [elt[0] for elt in cursor.fetchall()]
-
-                for prop in sample.properties:
-                    if prop in column:
-                        sql_com = sql_update
-                    else:
-                        sql_com = sql_insert
-
-                    # Insert or update properties individually
-                    cursor.execute(sql_com, {
-                        'sample_id':        sample_id,
-                        'type':             prop,
-                        'value':            sample.properties[prop]
-                    })
-
+                sql_com = build_update(table="samples",
+                                       to_set=['project', 'struct', 'owner', 'type',
+                                               'contact', 'form', 'source_lab', 'comment'],
+                                       where=['name', 'batch'])
             else:
+                sql_com = build_insert(table="samples",
+                                       to_insert=['name', 'batch', 'project', 'struct', 'owner', 'type',
+                                                  'contact', 'form', 'source_lab', 'comment'])
+
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'name':         sample.name,
+                'batch':        sample.batch,
+                'owner':        sample.owner,
+                'contact':      sample.contact,
+                'source_lab':   sample.source_lab,
+                'project':      sample.project,
+                'struct':       sample.struct,
+                'type':         sample.type,
+                'form':         sample.form,
+                'comment':      sample.comment,
+            }
+            )
+
+            # Upload or modify data in sample_properties table
+            if len(sample.properties) > 0:
+                # Get id of sample
+                sample_id = cursor.execute(
+                    build_select(table='samples',
+                                 to_select=['id'],
+                                 where=['name', 'batch']), {
+                        'name':        sample.name,
+                        'batch':       sample.batch,
+                    }
+                ).fetchone()[0]
+
+                # Sql of update routine
+                sql_update = build_update(table='sample_properties',
+                                          to_set=['type', 'value'],
+                                          where=['sample_id'])
+                # Sql of insert routine
+                sql_insert = build_insert(table='sample_properties',
+                                          to_insert=['sample_id', 'type', 'value'])
+
+                updates = []
+
+                if overwrite:
+                    # Find existing properties
+                    cursor.execute(
+                        build_select(table='sample_properties',
+                                     to_select=['type'],
+                                     where=['sample_id']), {
+                            'sample_id':        sample_id,
+                        }
+                    )
+                    updates = [elt[0] for elt in cursor.fetchall()]
+
                 for prop in sample.properties:
-                    cursor.execute(sql_insert, {
+                    if prop in updates:
+                        sql_com_prop = sql_update
+                    else:
+                        sql_com_prop = sql_insert
+
+                    cursor.execute(sql_com_prop, {
                         'sample_id':        sample_id,
                         'type':             prop,
                         'value':            sample.properties[prop]
                     })
-
-        # Commit the change
-        db.commit()
 
         # Print success
         print("Sample uploaded", sample.name, sample.batch)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
         print("Error on sample:", "\n",
               sample.name,
               sample.batch,
               "\n", e)
-
-    finally:
-        # Close the db connection
-        db.close()
-
-    return
-
-
-# %%
-def db_get_samples(pth):
-    """
-    Gets all samples in sample table
-    """
-    try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
-
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM samples''')
-
-        samples = []
-        sample_infos = []
-        # Create the samples
-        for row in cursor:
-            # row[0] returns the first column in the query (name), row[1] returns email column.
-            info = {}
-            info['id'] = row[0]
-            info['name'] = row[1]
-            info['batch'] = row[2]
-            info['owner'] = row[3]
-            info['contact'] = row[4]
-            info['source_lab'] = row[5]
-            info['project'] = row[6]
-            info['struct'] = row[7]
-            info['family'] = row[8]
-            info['form'] = row[9]
-            info['comment'] = row[11]
-
-            sample_infos.append(info)
-
-        # Get the extra data from the sample_properties table
-        for info in sample_infos:
-            cursor.execute(
-                """
-                SELECT type, value
-                FROM "sample_properties"
-                WHERE sample_id = ?;
-                """, (str(info['id']),)
-            )
-
-            info['properties'] = dict()
-
-            for row in cursor:
-                prop = {row[0]: row[1]}
-                info['properties'].update(prop)
-
-            # Build sample objects
-            samples.append(Sample(info))
-
-        # Print success
-        print("Selected", len(samples), "samples")
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
         raise e
 
-    finally:
-        # Close the db connection
-        db.close()
-
-    return samples
-
-
-# %%
-def db_upload_experiment(pth, isotherm, overwrite=False):
-    """
-    Uploads experiment to the database
-    """
-
-    # Build SQL request
-    if overwrite:
-        if isotherm.id is None or not isotherm.id:
-            raise ValueError("Cannot overwrite an isotherm without an id")
-        # get id of the experiment that needs to be overwritten
-        sql_com = """
-            UPDATE "experiments"
-            SET
-                date        = :date,
-                is_real     = :is_real,
-                exp_type    = :exp_type,
-                sname       = :sname,
-                sbatch      = :sbatch,
-                t_act       = :t_act,
-                t_exp       = :t_exp,
-                machine     = :machine,
-                gas         = :gas,
-                user        = :user,
-                lab         = :lab,
-                project     = :project,
-                comment     = :comment
-            WHERE
-                id = :id
-            """
-    else:
-        sql_com = """
-            INSERT INTO "experiments"(
-                date,       is_real,
-                exp_type,   sname,
-                sbatch,     t_act,
-                t_exp,      machine,
-                gas,        user,
-                lab,        project,
-                comment)
-            VALUES (
-                :date,      :is_real,
-                :exp_type,  :sname,
-                :sbatch,    :t_act,
-                :t_exp,     :machine,
-                :gas,       :user,
-                :lab,       :project,
-                :comment)
-            """
-
-    try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
-
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Build upload dict
-        upload_dict = {
-            'date':     isotherm.date,
-            'is_real':  isotherm.is_real,
-            'exp_type': isotherm.exp_type,
-            'sname':    isotherm.name,
-            'sbatch':   isotherm.batch,
-            't_act':    isotherm.t_act,
-            't_exp':    isotherm.t_exp,
-            'machine':  isotherm.machine,
-            'gas':      isotherm.gas,
-            'user':     isotherm.user,
-            'lab':      isotherm.lab,
-            'project':  isotherm.project,
-            'comment':  isotherm.comment
-        }
-        if overwrite:
-            upload_dict.update({'id': isotherm.id})
-
-        # Upload experiment info to database
-        cursor.execute(sql_com, upload_dict)
-
-        # Now to upload data into experiment_data table
-        # Get id of insertion
-        if overwrite:
-            exp_id = isotherm.id
-        else:
-            exp_id = cursor.lastrowid
-
-        # Build sql request
-        if overwrite:
-            sql_com2 = """
-                       UPDATE "experiment_data"
-                       SET
-                           data   = :data
-                       WHERE
-                           exp_id = :exp_id
-                           AND
-                           dtype  = :dtype
-                       """
-        else:
-            sql_com2 = """
-                       INSERT INTO "experiment_data"
-                       (exp_id, dtype, data)
-                       VALUES
-                       (:exp_id, :dtype, :data)
-                       """
-
-        # Insert data into experiment_data table
-        cursor.execute(sql_com2,
-                       {'exp_id': exp_id, 'dtype': 'pressure',
-                           'data': isotherm.pressure_all().tobytes()}
-                       )
-
-        cursor.execute(sql_com2,
-                       {'exp_id': exp_id, 'dtype': 'loading',
-                           'data': isotherm.loading_all().tobytes()}
-                       )
-
-        enthalpy = isotherm.enthalpy_all()
-        if enthalpy is not None:
-            cursor.execute(sql_com2,
-                           {'exp_id': exp_id, 'dtype': 'enthalpy',
-                               'data': enthalpy.tobytes()}
-                           )
-
-        # Commit the change
-        db.commit()
-
-        # Print success
-        print("Success:", isotherm)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
-        print("Error on isotherm:", "\n",
-              isotherm.exp_type,
-              isotherm.name,
-              isotherm.batch,
-              isotherm.user,
-              isotherm.gas,
-              isotherm.machine,
-              isotherm.t_act,
-              isotherm.t_exp,
-              "\n", e)
-
-    finally:
-        # Close the db connection
+    # Close the db connection
+    if db:
         db.close()
 
     return
 
 
-# %%
-def db_delete_experiment(pth, isotherm):
+def db_upload_sample_type(pth, sample_type):
+    "Uploads a sample type"
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            sql_com = build_insert(table="sample_type",
+                                   to_insert=['nick', 'name'])
+
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'nick':         sample_type['nick'],
+                'name':         sample_type['name'],
+            }
+            )
+
+        # Print success
+        print("Sample type uploaded", sample_type)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on sample type:", "\n",
+              sample_type['type'],
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+
+def db_upload_sample_form(pth, sample_form):
+    "Uploads a sample form"
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            sql_com = build_insert(table="sample_forms",
+                                   to_insert=['nick', 'name', 'desc'])
+
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'nick':         sample_form['nick'],
+                'name':         sample_form['name'],
+                'desc':         sample_form.get('desc'),
+            }
+            )
+
+        # Print success
+        print("Sample form uploaded", sample_form)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on sample form:", "\n",
+              sample_form['nick'],
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+
+def db_upload_sample_property_type(pth, property_type, property_unit):
+    "Uploads a property type"
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            sql_com = build_insert(table="sample_properties_type",
+                                   to_insert=['type', 'unit'])
+
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'type':         property_type,
+                'unit':         property_unit,
+            }
+            )
+
+        # Print success
+        print("Property type uploaded", property_type)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on sample:", "\n",
+              property_type,
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+
+def db_delete_sample(pth, sample):
     """
     Delete experiment to the database
     """
 
-    # Build SQL request
-    if isotherm.id is None or not isotherm.id:
-        raise ValueError("Cannot delete an isotherm without an id")
-
+    # Connect to database
+    db = sqlite3.connect(pth)
     try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+            # Get id of sample
+            sample_id = cursor.execute(
+                build_select(table='samples',
+                             to_select=['id'],
+                             where=['name', 'batch']), {
+                    'name':        sample.name,
+                    'batch':       sample.batch,
+                }
+            ).fetchone()[0]
 
-        # Delete data from experiment_data table
-        # Build sql request
-        sql_com2 = """
-                    DELETE FROM "experiment_data"
-                    WHERE
-                        exp_id = :exp_id
-                    """
+            # Delete data from sample_properties table
+            # Build sql request
+            sql_com = build_delete(table='sample_properties',
+                                   where=['sample_id'])
 
-        cursor.execute(sql_com2, {'exp_id': isotherm.id})
+            cursor.execute(sql_com, {'sample_id': sample_id})
 
-        # Delete experiment info in database
-        # get id of the experiment that needs to be overwritten
-        sql_com = """
-                    DELETE FROM "experiments"
-                    WHERE
-                        id = :id
-                    """
+            # Delete sample info in samples table
+            sql_com = build_delete(table='samples',
+                                   where=['id'])
 
-        cursor.execute(sql_com, {'id': isotherm.id})
+            cursor.execute(sql_com, {'id': sample_id})
 
-        # Commit the change
-        db.commit()
-
-        # Print success
-        print("Success:", isotherm)
+            # Print success
+            print("Success", sample)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
-        print("Error on isotherm:", "\n",
-              isotherm.exp_type,
-              isotherm.name,
-              isotherm.batch,
-              isotherm.user,
-              isotherm.gas,
-              isotherm.machine,
-              isotherm.t_act,
-              isotherm.t_exp,
+        print("Error on sample:", "\n",
+              sample.name,
+              sample.batch,
               "\n", e)
+        raise e
 
-    finally:
-        # Close the db connection
+    # Close the db connection
+    if db:
         db.close()
 
     return
-
-# %%
 
 
 def db_get_experiments(pth, criteria):
@@ -472,81 +345,47 @@ def db_get_experiments(pth, criteria):
     Gets experiments with the selected criteria from the database
     """
 
-    # Build SQL request
-    sql_com = """
-        SELECT id,
-            date,       is_real,
-            exp_type,   sname,
-            sbatch,     t_act,
-            t_exp,      machine,
-            gas,        user,
-            lab,        project,
-            comment
+    # Connect to database
+    with sqlite3.connect(pth) as db:
 
-        FROM "experiments"
-
-        WHERE
-        """
-    criteria_str = " AND ".join(list(map(
-        lambda x:
-        x[0] + " IS NULL" if x[1] == ""
-        else x[0] + "=:" + x[0], criteria.items())))
-    sql_com += criteria_str + ";"
-
-    try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
-
+        # Set row factory
+        db.row_factory = sqlite3.Row
         # Get a cursor object
         cursor = db.cursor()
         cursor.execute('PRAGMA foreign_keys = ON')
 
+        # Build SQL request
+        sql_com = build_select(table='experiments',
+                               to_select=['id', 'date', 'is_real', 'exp_type',
+                                          'sample_name', 'sample_batch', 't_act',  't_exp', 'machine',
+                                          'gas', 'user', 'lab', 'project',  'comment'],
+                               where=criteria.keys())
+
         # Get experiment info from database
         cursor.execute(sql_com, criteria)
 
-        exp_infos = []
+        # Create the isotherms
+        isotherms = []
+
         for row in cursor:
-            info = {}
-            info['id'] = row[0]
-            info['date'] = row[1]
-            info['is_real'] = row[2]
-            info['exp_type'] = row[3]
-            info['name'] = row[4]
-            info['batch'] = row[5]
-            info['t_act'] = row[6]
-            info['t_exp'] = row[7]
-            info['machine'] = row[8]
-            info['gas'] = row[9]
-            info['user'] = row[10]
-            info['lab'] = row[11]
-            info['project'] = row[12]
-            info['comment'] = row[13]
-            exp_infos.append(info)
+            if row is None:
+                continue
+            exp_params = dict(zip(row.keys(), row))
 
-        if len(exp_infos) == 0:
-            print("No values found")
-            return
+            # Get the extra data from the experiment_data table
+            cur_inner = db.cursor()
 
-        # Get experiment data from database
-        exp_datas = []
-        for info in exp_infos:
-            cursor.execute(
-                """
-                SELECT dtype, data
-                FROM "experiment_data"
-                WHERE exp_id = ?;
-                """, (str(info['id']),)
-            )
+            cur_inner.execute(build_select(table='experiment_data',
+                                           to_select=['dtype', 'data'],
+                                           where=['exp_id']),
+                              {'exp_id': str(exp_params['id'])}
+                              )
 
+            # Generate the array for the pandas dataframe
             columns = []
             data_arr = None
-            for row in cursor:
-                if row[0] == 'pressure':
-                    columns.append("Pressure")
-                elif row[0] == 'loading':
-                    columns.append("Loading")
-                elif row[0] == 'enthalpy':
-                    columns.append("Enthalpy")
+            for row in cur_inner:
+                columns.append(row[0])
 
                 raw = array.array('d', row[1])
                 if data_arr is None:
@@ -555,98 +394,293 @@ def db_get_experiments(pth, criteria):
                     data_arr = numpy.hstack(
                         (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
 
-            exp_datas.append(pandas.DataFrame(data_arr, columns=columns))
+            exp_data = pandas.DataFrame(data_arr, columns=columns)
 
-        # build isotherm objects
-        isotherms = []
-        for x in list(map(list, zip(exp_datas, exp_infos))):
-            isotherms.append(PointIsotherm(x[0], x[1],
-                                           pressure_key="Pressure",
-                                           loading_key="Loading",
-                                           enthalpy_key="Enthalpy"))
+            # build isotherm object
+            isotherms.append(PointIsotherm(exp_data,
+                                           pressure_key="pressure",
+                                           loading_key="loading",
+                                           enthalpy_key="enthalpy",
+                                           ** exp_params))
+
+    # Close the db connection
+    if db:
+        db.close()
+
+    # Print success
+    print("Selected", len(isotherms), "isotherms")
+
+    return isotherms
+
+
+def db_upload_experiment(pth, isotherm, overwrite=None):
+    """
+    Uploads experiment to the database
+
+    Overwrite is the isotherm where the isotherm will be overwritten
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            # Build SQL request
+            if overwrite:
+                sql_com = build_update(table='experiments',
+                                       to_set=['date', 'is_real', 'exp_type', 'sample_name', 'sample_batch', 't_act',
+                                               't_exp', 'machine', 'gas', 'user', 'lab', 'project', 'comment'],
+                                       where=['id'])
+
+                # if the isotherm is to replace another one
+                # we put the id of the replaced isotherm
+                exp_id = overwrite.id
+            else:
+                sql_com = build_insert(table='experiments',
+                                       to_insert=['id', 'date', 'is_real', 'exp_type', 'sample_name', 'sample_batch', 't_act',
+                                                  't_exp', 'machine', 'gas', 'user', 'lab', 'project', 'comment'])
+
+                # otherwise, put the id of the new isotherm
+                exp_id = isotherm.id
+
+            # Build upload dict
+            upload_dict = {
+                'id':       exp_id,
+                'date':     isotherm.date,
+                'is_real':  isotherm.is_real,
+                'exp_type': isotherm.exp_type,
+                'sample_name':    isotherm.sample_name,
+                'sample_batch':   isotherm.sample_batch,
+                't_act':    isotherm.t_act,
+                't_exp':    isotherm.t_exp,
+                'machine':  isotherm.machine,
+                'gas':      isotherm.gas,
+                'user':     isotherm.user,
+                'lab':      isotherm.lab,
+                'project':  isotherm.project,
+                'comment':  isotherm.comment
+            }
+
+            # Upload experiment info to database
+            cursor.execute(sql_com, upload_dict)
+
+            # Now to upload data into experiment_data table
+            # Build sql requests
+            sql_update = build_update(table='experiment_data',
+                                      to_set=['data'],
+                                      where=['exp_id', 'dtype'])
+            sql_insert = build_insert(table='experiment_data',
+                                      to_insert=['exp_id', 'dtype', 'data'])
+
+            updates = []
+
+            if overwrite:
+                # Find existing properties
+                cursor.execute(
+                    build_select(table='experiment_data',
+                                 to_select=['dtype'],
+                                 where=['exp_id']), {
+                        'exp_id':        exp_id,
+                    }
+                )
+                updates = [elt[0] for elt in cursor.fetchall()]
+
+            # Update guaranted fields:
+            if overwrite:
+                sql_com_key = sql_update
+            else:
+                sql_com_key = sql_insert
+
+            cursor.execute(sql_com_key,
+                           {'exp_id': exp_id, 'dtype': 'pressure',
+                            'data': isotherm.pressure_all().tobytes()}
+                           )
+
+            cursor.execute(sql_com_key,
+                           {'exp_id': exp_id, 'dtype': 'loading',
+                            'data': isotherm.loading_all().tobytes()}
+                           )
+
+            # Update other fields:
+            for key in isotherm.other_keys:
+                if isotherm.other_keys.get(key) in updates:
+                    sql_com_key = sql_update
+                else:
+                    sql_com_key = sql_insert
+
+                cursor.execute(sql_com_key,
+                               {'exp_id': exp_id, 'dtype': 'enthalpy',
+                                'data': isotherm.other_key_all(key).tobytes()}
+                               )
 
         # Print success
-        print("Selected", len(isotherms), "isotherms")
-
-        return isotherms
+        print("Success:", isotherm)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
+        print("Error on isotherm:", "\n",
+              isotherm.exp_type,
+              isotherm.sample_name,
+              isotherm.sample_batch,
+              isotherm.user,
+              isotherm.gas,
+              isotherm.machine,
+              isotherm.t_act,
+              isotherm.t_exp,
+              "\n", e)
         raise e
 
-    # except ValueError as e:
-    #     print(e)
-    #     db.rollback()
-
-    finally:
-        # Close the db connection
+    # Close the db connection
+    if db:
         db.close()
 
     return
 
-# %%
 
+def db_upload_experiment_type(pth, experiment_type):
+    "Uploads a experiment type"
 
-def db_get_experiment_id(pth, criteria):
-    """
-    Gets the id of an experiment with the selected criteria from the database
-    """
-    # Build SQL request
-    sql_com = """
-        SELECT id,
-            date,       is_real,
-            exp_type,   sname,
-            sbatch,     t_act,
-            t_exp,      machine,
-            gas,        user,
-            lab,        project,
-            comment
-
-        FROM "experiments"
-
-        WHERE
-        """
-    criteria_str = " AND ".join(
-        list(map(lambda x: x + "=:" + x, criteria.keys())))
-    sql_com += criteria_str + ";"
-
+    # Connect to database
+    db = sqlite3.connect(pth)
     try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+            sql_com = build_insert(table="experiment_type",
+                                   to_insert=['nick', 'name'])
 
-        # Get experiment info from database
-        cursor.execute(sql_com, criteria)
-        if cursor.rowcount == 0:
-            raise ValueError("No values found")
-        elif cursor.rowcount > 1:
-            raise ValueError("Multiple isotherms with the same criteria")
-        else:
-            return cursor.lastrowid
+            # Upload or modify data in experiment table
+            cursor.execute(sql_com, {
+                'nick':         experiment_type['nick'],
+                'name':         experiment_type['name'],
+            }
+            )
+
+        # Print success
+        print("Experiment type uploaded", experiment_type['nick'])
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
+        print("Error on experiment type:", "\n",
+              experiment_type['nick'],
+              "\n", e)
         raise e
 
-    # except ValueError as e:
-    #     print(e)
-    #     db.rollback()
+    # Close the db connection
+    if db:
+        db.close()
 
-    finally:
-        # Close the db connection
+
+def db_upload_experiment_data_type(pth, data_type, data_unit):
+    "Uploads a data type"
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            sql_com = build_insert(table="experiment_data_type",
+                                   to_insert=['type', 'unit'])
+
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'type':         data_type,
+                'unit':         data_unit,
+            }
+            )
+
+        # Print success
+        print("Data type uploaded", data_type)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on sample:", "\n",
+              data_type,
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+
+def db_delete_experiment(pth, isotherm):
+    """
+    Delete experiment to the database
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            # Get id of experiment
+            isotherm_id = cursor.execute(
+                build_select(table='experiments',
+                             to_select=['id'],
+                             where=['date', 'is_real', 'exp_type', 'sample_name',
+                                    'sample_batch', 't_act', 't_exp', 'machine', 'gas', 'user']), {
+                    'date':          isotherm.date,
+                    'is_real':       isotherm.is_real,
+                    'exp_type':      isotherm.exp_type,
+                    'sample_name':         isotherm.sample_name,
+                    'sample_batch':        isotherm.sample_batch,
+                    't_act':         isotherm.t_act,
+                    't_exp':         isotherm.t_exp,
+                    'machine':       isotherm.machine,
+                    'gas':           isotherm.gas,
+                    'user':          isotherm.user,
+                }
+            ).fetchone()[0]
+
+            # Delete data from experiment_data table
+            # Build sql request
+            sql_com = build_delete(table='experiment_data',
+                                   where=['exp_id'])
+
+            cursor.execute(sql_com, {'exp_id': isotherm_id})
+
+            # Delete experiment info in experiments table
+            sql_com = build_delete(table='experiments',
+                                   where=['id'])
+
+            cursor.execute(sql_com, {'id': isotherm.id})
+
+            # Print success
+            print("Success:", isotherm)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on isotherm:", "\n",
+              isotherm.exp_type,
+              isotherm.name,
+              isotherm.batch,
+              isotherm.user,
+              isotherm.gas,
+              isotherm.machine,
+              isotherm.t_act,
+              isotherm.t_exp,
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
         db.close()
 
     return
 
 
-# %%
 def db_upload_experiment_calculated(pth, data, overwrite=False):
     """
     Uploads an experiment calculated value to be stored in the database
@@ -655,21 +689,13 @@ def db_upload_experiment_calculated(pth, data, overwrite=False):
     """
     # Build sql request
     if overwrite:
-        sql_com = """
-                    UPDATE "experiment_calculated"
-                    SET
-                        henry_c     = :henry_c
-                        enth_init   = :enth_init
-                    WHERE
-                        exp_id = :exp_id
-                    """
+        sql_com = build_update(table='experiment_calculated',
+                               to_set=['henry_c', 'enth_init'],
+                               where=['exp_id'])
+
     else:
-        sql_com = """
-                    INSERT INTO "experiment_calculated"
-                    (exp_id, henry_c, enth_init)
-                    VALUES
-                    (:exp_id, :henry_c, :enth_init)
-                    """
+        sql_com = build_insert(table='experiment_calculated',
+                               to_insert=['exp_id', 'henry_c', 'enth_init'])
 
     try:
         # Creates or opens a file called mydb with a SQLite3 DB
@@ -700,6 +726,7 @@ def db_upload_experiment_calculated(pth, data, overwrite=False):
         print("Error on id:", "\n",
               data['exp_id'],
               "\n", e)
+        raise e
 
     finally:
         # Close the db connection
@@ -708,232 +735,524 @@ def db_upload_experiment_calculated(pth, data, overwrite=False):
     return
 
 
-# %%
-def db_get_gas(pth, name):
+def db_get_gasses(pth):
     """
-    Gets specified gas
+    Gets all gasses and their properties
+
+    The number of gasses is usually small, so all can be loaded in memory at once
     """
 
-    # Build SQL request
-    sql_com = """
-        SELECT * FROM "gasses" WHERE nick=:nick
-        """
+    # Connect to database
+    with sqlite3.connect(pth) as db:
 
-    try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
+        # Set row factory
         db.row_factory = sqlite3.Row
-
         # Get a cursor object
         cursor = db.cursor()
         cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Get all gasses from database
-        db_params = {"nick": name}
-        cursor.execute(sql_com, db_params)
-        if cursor.rowcount == 0:
-            raise ValueError("No values found")
-        elif cursor.rowcount > 1:
-            raise ValueError("Too many values found")
+        # Get required gas from database
+        cursor.execute('''SELECT * FROM gasses''')
 
-        # Build gas object
-        r = cursor.fetchone()
+        gasses = []
 
-        gasparams = {}
+        # Create the samples
+        for row in cursor:
+            if row is None:
+                continue
 
-        gasparams["name"] = r["nick"]
-        gasparams["mmass"] = r["molar_mass"]
-        gasparams["polarizability"] = r["polarizability"]
-        gasparams["dipole"] = r["dipole"]
-        gasparams["quadrupole"] = r["quadrupole"]
+            gas_params = dict(zip(row.keys(), row))
 
-        reqgas = Gas(gasparams)
+            # Get the extra data from the gas_properties table
+            cur_inner = db.cursor()
 
-        return reqgas
+            cur_inner.execute(build_select(table='gas_properties',
+                                           to_select=['type', 'value'],
+                                           where=['gas_id']), {
+                'gas_id': gas_params.get('id')
+            })
+
+            gas_params['properties'] = {
+                (row[0], row[1]) for row in cur_inner}
+
+            # Build gas objects
+            gasses.append(Gas(gas_params))
+
+    # Close the db connection
+    if db:
+        db.close()
+
+    # Print success
+    print("Selected", len(gasses), "gasses")
+
+    return gasses
+
+
+def db_upload_gas(pth, gas, overwrite=False):
+    """
+    Uploads gasses to the database
+    If overwrite is set to true, the gas is overwritten
+    Overwrite is done based on gas.name
+    WARNING: Overwrite is done on ALL fields
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            if overwrite:
+                sql_com = build_update(table="gasses",
+                                       to_set=['formula'],
+                                       where=['nick'])
+            else:
+                sql_com = build_insert(table="gasses",
+                                       to_insert=['nick', 'formula'])
+
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'nick':         gas.name,
+                'formula':      gas.formula,
+            }
+            )
+
+            # Upload or modify data in sample_properties table
+            if len(gas.properties) > 0:
+                # Get id of gas
+                gas_id = cursor.execute(
+                    build_select(table='gasses',
+                                 to_select=['id'],
+                                 where=['nick']), {
+                        'nick':         gas.name,
+                        'formula':      gas.formula,
+                    }
+                ).fetchone()[0]
+
+                # Sql of update routine
+                sql_update = build_update(table='gas_properties',
+                                          to_set=['type', 'value'],
+                                          where=['gas_id'])
+                # Sql of insert routine
+                sql_insert = build_insert(table='gas_properties',
+                                          to_insert=['gas_id', 'type', 'value'])
+
+                updates = []
+
+                if overwrite:
+                    # Find existing properties
+                    cursor.execute(
+                        build_select(table='gas_properties',
+                                     to_select=['type'],
+                                     where=['gas_id']), {
+                            'gas_id':        gas_id,
+                        }
+                    )
+                    updates = [elt[0] for elt in cursor.fetchall()]
+
+                for prop in gas.properties:
+                    if prop in updates:
+                        sql_com_prop = sql_update
+                    else:
+                        sql_com_prop = sql_insert
+
+                    cursor.execute(sql_com_prop, {
+                        'gas_id':           gas_id,
+                        'type':             prop,
+                        'value':            gas.properties[prop]
+                    })
+
+        # Print success
+        print("Gas uploaded", gas.name)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
+        print("Error on sample:", "\n",
+              gas.name,
+              "\n", e)
         raise e
 
-    finally:
-        # Close the db connection
+    # Close the db connection
+    if db:
         db.close()
 
     return
 
 
-#####################################################################
-# Table creation and reinitialisation
-#
-# WARNING: deletes data
+def db_upload_gas_property_type(pth, property_type, property_unit):
+    "Uploads a property type"
 
-# %%
-def db_create_table_samples(pth):
-    """
-    Sample table reinitialisation
-    """
+    # Connect to database
+    db = sqlite3.connect(pth)
     try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+            sql_com = build_insert(table="gas_properties_type",
+                                   to_insert=['type', 'unit'])
 
-        # Check if table users does not exist and create it
-        cursor.executescript(
-            '''
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'type':         property_type,
+                'unit':         property_unit,
+            }
+            )
 
-            DROP TABLE IF EXISTS "samples";
-
-            CREATE TABLE "samples" (
-                `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `name`          TEXT        NOT NULL,
-                `batch`         TEXT        NOT NULL,
-                `owner`         TEXT        NOT NULL,
-                `contact`       TEXT        NOT NULL,
-                `source_lab`    TEXT        NOT NULL,
-                `project`       TEXT,
-                `struct`        TEXT,
-                `family`        TEXT        NOT NULL,
-                `form`          TEXT        NOT NULL,
-                `modifier`      TEXT,
-                `comment`       TEXT,
-
-                FOREIGN KEY(`owner`)        REFERENCES `contacts`(`nick`),
-                FOREIGN KEY(`contact`)      REFERENCES `contacts`(`nick`),
-                FOREIGN KEY(`source_lab`)   REFERENCES `labs`(`nick`),
-                FOREIGN KEY(`project`)      REFERENCES `projects`(`nick`),
-                FOREIGN KEY(`family`)       REFERENCES `material_family`(`nick`),
-                FOREIGN KEY(`form`)         REFERENCES `forms`(`nick`)
-                UNIQUE(name,batch));
-
-            ''')
+        # Print success
+        print("Property type uploaded", property_type)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
+        print("Error on sample:", "\n",
+              property_type,
+              "\n", e)
         raise e
 
-    finally:
-        # Close the db connection
+    # Close the db connection
+    if db:
         db.close()
 
-    print("Sample table created")
+
+def db_delete_gas(pth, gas):
+    """
+    Delete experiment to the database
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            # Get id of sample
+            gas_id = cursor.execute(
+                build_select(table='gasses',
+                             to_select=['id'],
+                             where=['nick']), {
+                    'nick':        gas.name,
+                }
+            ).fetchone()[0]
+
+            # Delete data from gas_properties table
+            # Build sql request
+            sql_com = build_delete(table='gas_properties',
+                                   where=['gas_id'])
+
+            cursor.execute(sql_com, {'gas_id': gas_id})
+
+            # Delete sample info in labs table
+            sql_com = build_delete(table='gasses',
+                                   where=['id'])
+
+            cursor.execute(sql_com, {'id': gas_id})
+
+            # Print success
+            print("Success", gas.name)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on sample:", "\n",
+              gas.name,
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
 
     return
 
-# %%
 
+def db_upload_contact(pth, contact_dict, overwrite=False):
+    """
+    Uploads cpmtact to the database
+    If overwrite is set to true, the contact is overwritten
+    WARNING: Overwrite is done on ALL fields
+    """
 
-def db_create_table_experiments(pth):
-    """
-    Experiment table reinitialisation
-    """
+    # Connect to database
+    db = sqlite3.connect(pth)
     try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+            if overwrite:
+                sql_com = build_update(table="contacts",
+                                       to_set=['name', 'email', 'phone',
+                                               'labID', 'type', 'permanent'],
+                                       where=['nick'])
+            else:
+                sql_com = build_insert(table="contacts",
+                                       to_insert=['nick', 'name', 'email', 'phone', 'labID', 'type', 'permanent'])
 
-        # Check if table users does not exist and create it
-        cursor.executescript(
-            '''
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'nick':          contact_dict.get('nick'),
+                'name':          contact_dict.get('name'),
+                'email':         contact_dict.get('email'),
+                'phone':         contact_dict.get('phone'),
+                'labID':         contact_dict.get('labID'),
+                'type':          contact_dict.get('type'),
+                'permanent':     contact_dict.get('permanent'),
+            }
+            )
 
-            DROP TABLE IF EXISTS "experiments";
-
-            CREATE TABLE "experiments" (
-
-            `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-            `date`          TEXT,
-            `is_real`       INTEGER     NOT NULL,
-            `exp_type`      TEXT        NOT NULL,
-            `sname`         TEXT        NOT NULL,
-            `sbatch`        TEXT        NOT NULL,
-            `t_act`         REAL        NOT NULL,
-            `t_exp`         REAL        NOT NULL,
-            `machine`       TEXT        NOT NULL,
-            `gas`           TEXT        NOT NULL,
-            `user`          TEXT        NOT NULL,
-            `lab`           TEXT        NOT NULL,
-            `project`       TEXT,
-            `comment`       TEXT,
-
-            FOREIGN KEY(`sname`,`sbatch`)   REFERENCES `samples`(`name`,`batch`),
-            FOREIGN KEY(`exp_type`)         REFERENCES `experiment_type`(`nick`),
-            FOREIGN KEY(`machine`)          REFERENCES `machines`(`nick`),
-            FOREIGN KEY(`user`)             REFERENCES `contacts`(`nick`),
-            FOREIGN KEY(`gas`)              REFERENCES `gasses`(`nick`),
-            FOREIGN KEY(`lab`)              REFERENCES `labs`(`nick`),
-            FOREIGN KEY(`project`)          REFERENCES `projects`(`nick`)
-            UNIQUE(date, is_real, exp_type, sname, sbatch, t_act, t_exp, machine, gas, user)
-            );
-
-            ''')
+        # Print success
+        print("Contact uploaded", contact_dict.get('nick'))
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
+        print("Error on contact:", "\n",
+              contact_dict.get('nick'),
+              "\n", e)
         raise e
 
-    finally:
-        # Close the db connection
+    # Close the db connection
+    if db:
         db.close()
-
-    print("Experiment table created")
 
     return
 
-# %%
 
+def db_delete_contact(pth, contact_nick):
+    """
+    Delete contact in the database
+    """
 
-def db_create_table_experiment_data(pth):
-    """
-    Experiment data table reinitialisation
-    """
+    # Connect to database
+    db = sqlite3.connect(pth)
     try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+            sql_com = build_delete(table='contacts',
+                                   where=['nick'])
 
-        # Check if table users does not exist and create it
-        cursor.executescript(
-            '''
+            cursor.execute(sql_com, {'nick': contact_nick})
 
-            DROP TABLE IF EXISTS "experiment_data";
-
-            CREATE TABLE "experiment_data" (
-
-            `id`        INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-            `exp_id`    INTEGER     NOT NULL,
-            `dtype`     TEXT        NOT NULL,
-            `data`      BLOB        NOT NULL,
-
-            FOREIGN KEY(`exp_id`)   REFERENCES `experiments`(`id`),
-            FOREIGN KEY(`dtype`)    REFERENCES `experiment_data_type`(`type`)
-            );
-
-            ''')
+            # Print success
+            print("Success", contact_nick)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
+        print("Error on sample:", "\n",
+              contact_nick,
+              "\n", e)
         raise e
 
-    finally:
-        # Close the db connection
+    # Close the db connection
+    if db:
         db.close()
 
-    print("Experiment data table created")
+    return
+
+
+def db_upload_lab(pth, lab_dict, overwrite=False):
+    """
+    Uploads lab to the database
+    If overwrite is set to true, the lab is overwritten
+    WARNING: Overwrite is done on ALL fields
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            if overwrite:
+                sql_com = build_update(table="labs",
+                                       to_set=['name', 'address'],
+                                       where=['nick'])
+            else:
+                sql_com = build_insert(table="labs",
+                                       to_insert=['nick', 'name', 'address'])
+
+            # Upload or modify data in labs table
+            cursor.execute(sql_com, {
+                'nick':         lab_dict.get('nick'),
+                'name':         lab_dict.get('name'),
+                'address':      lab_dict.get('address'),
+            }
+            )
+
+        # Print success
+        print("Lab uploaded", lab_dict.get('nick'))
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on lab:", "\n",
+              lab_dict.get('nick'),
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+    return
+
+
+def db_delete_lab(pth, lab_nick):
+    """
+    Delete lab in the database
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            sql_com = build_delete(table='labs',
+                                   where=['nick'])
+
+            cursor.execute(sql_com, {'nick': lab_nick})
+
+            # Print success
+            print("Success", lab_nick)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on lab:", "\n",
+              lab_nick,
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+    return
+
+
+def db_upload_machine(pth, machine_dict, overwrite=False):
+    """
+    Uploads machine to the database
+    If overwrite is set to true, the machine is overwritten
+    WARNING: Overwrite is done on ALL fields
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            if overwrite:
+                sql_com = build_update(table="machines",
+                                       to_set=['name', 'type'],
+                                       where=['nick'])
+            else:
+                sql_com = build_insert(table="machines",
+                                       to_insert=['nick', 'name', 'type'])
+
+            # Upload or modify data in machines table
+            cursor.execute(sql_com, {
+                'nick':         machine_dict.get('nick'),
+                'name':         machine_dict.get('name'),
+                'type':         machine_dict.get('type'),
+            }
+            )
+
+        # Print success
+        print("Machine uploaded", machine_dict.get('nick'))
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on machine:", "\n",
+              machine_dict.get('nick'),
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+    return
+
+
+def db_upload_machine_type(pth, machine_type):
+    "Uploads a machine type"
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            sql_com = build_insert(table="machine_type",
+                                   to_insert=['type'])
+
+            # Upload or modify data in sample table
+            cursor.execute(sql_com, {
+                'type':         machine_type,
+            }
+            )
+
+        # Print success
+        print("Machine type uploaded", machine_type)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on machine type:", "\n",
+              machine_type,
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+
+def db_delete_machine(pth, machine_nick):
+    """
+    Delete machine in the database
+    """
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            sql_com = build_delete(table='machines',
+                                   where=['nick'])
+
+            cursor.execute(sql_com, {'nick': machine_nick})
+
+            # Print success
+            print("Success", machine_nick)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on sample:", "\n",
+              machine_nick,
+              "\n", e)
+        raise e
+
+    # Close the db connection
+    if db:
+        db.close()
 
     return
