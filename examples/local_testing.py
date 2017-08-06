@@ -18,11 +18,10 @@ def reload_imports():
     importlib.reload(adsutils.classes.user)
     importlib.reload(adsutils.classes.pointisotherm)
     importlib.reload(adsutils.calculations.initial_henry)
-    importlib.reload(adsutils.calculations.initial_enthalpy)
     importlib.reload(adsutils.calculations.bet)
-    importlib.reload(adsutils.dataimport.csvinterface)
-    importlib.reload(adsutils.dataimport.excelinterface)
-    importlib.reload(adsutils.dataimport.sqliteinterface)
+    importlib.reload(adsutils.parsing.csvinterface)
+    importlib.reload(adsutils.parsing.excelinterface)
+    importlib.reload(adsutils.parsing.sqliteinterface)
     importlib.reload(adsutils.graphing.isothermgraphs)
 
     return

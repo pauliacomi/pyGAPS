@@ -29,14 +29,6 @@ class PointIsotherm(object):
     '''
     Class which contains the points from an adsorption isotherm and microcalorimetry
     '''
-    # TODO: make sure md5 hash happens at each point
-
-    def __setattr__(self, name, value):
-        object.__setattr__(self, name, value)
-        if hasattr(self, name):
-            pass
-        else:
-            pass
 
     def __init__(self, isotherm_data,
                  loading_key=None,
@@ -65,6 +57,8 @@ class PointIsotherm(object):
         :return: self
         :rtype: PointIsotherm
         '''
+        # Start construction process
+        self._instantiated = False
 
         # Checks
         if any(k not in isotherm_parameters
@@ -170,8 +164,39 @@ class PointIsotherm(object):
             sha_hasher = hashlib.md5(
                 adsutils.isotherm_to_json(self).encode('utf-8'))
             self.id = sha_hasher.hexdigest()
-        #: Figure out the adsorption and desorption branches
 
+        self._instantiated = True
+
+    def __setattr__(self, name, value):
+        """
+        We overlad the usual class setter to make sure that the id is always
+        representative of the data inside the isotherm
+
+        The '_instantiated' attribute gets set to true after isotherm __init__
+        From then afterwards, each call to modify the isotherm properties
+        recalculates the md5 hash.
+        This is done to ensure uniqueness and also to allow isotherm objects to
+        be easily compared to each other.
+        """
+        object.__setattr__(self, name, value)
+
+        if self._instantiated and name not in ['id', '_instantiated']:
+            # Generate the unique id using md5
+            self.id = None
+            md_hasher = hashlib.md5(
+                adsutils.isotherm_to_json(self).encode('utf-8'))
+            self.id = md_hasher.hexdigest()
+
+    def __eq__(self, other_isotherm):
+        """
+        We overload the equality operator of the isotherm. Since id's are unique and
+        representative of the data inside the isotherm, all we need to ensure equality
+        is to compare the two hashes of the isotherms.
+        """
+
+        return self.id == other_isotherm.id
+
+    #: Figure out the adsorption and desorption branches
     def _splitdata(self, _data):
         '''
         Splits isotherm data into an adsorption and desorption part and adds a column to mark it
