@@ -39,7 +39,7 @@ def isotherm_to_json(isotherm):
                           for k, v in isotherm_data_dict.items()}
 
     raw_dict["isotherm_data"] = isotherm_data_dict
-    json_isotherm = json.dumps(raw_dict)
+    json_isotherm = json.dumps(raw_dict, sort_keys=True)
 
     return json_isotherm
 
@@ -61,11 +61,11 @@ def isotherm_from_json(json_isotherm):
     unit_loading = 'mmol'
 
     # Build pandas dataframe of data
-    loading_key = "Loading"
-    pressure_key = "Pressure"
+    loading_key = "loading"
+    pressure_key = "pressure"
 
     other_key = "enthalpy_key"
-    other_keys = {other_key: "Enthalpy"}
+    other_keys = {other_key: "enthalpy"}
 
     data = pandas.DataFrame.from_dict(
         raw_dict["isotherm_data"], orient='index', dtype='float64')

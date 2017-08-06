@@ -5,8 +5,11 @@ This module contains the main class that describes an isotherm through discrete 
 __author__ = 'Paul A. Iacomi'
 
 import copy
+import hashlib
 
 import pandas
+
+import adsutils
 
 from . import SAMPLE_LIST
 from ..graphing.isothermgraphs import plot_iso
@@ -26,6 +29,14 @@ class PointIsotherm(object):
     '''
     Class which contains the points from an adsorption isotherm and microcalorimetry
     '''
+    # TODO: make sure md5 hash happens at each point
+
+    def __setattr__(self, name, value):
+        object.__setattr__(self, name, value)
+        if hasattr(self, name):
+            pass
+        else:
+            pass
 
     def __init__(self, isotherm_data,
                  loading_key=None,
@@ -57,11 +68,10 @@ class PointIsotherm(object):
 
         # Checks
         if any(k not in isotherm_parameters
-               for k in ('id', 'sample_name', 'sample_batch', 't_exp', 'gas')):
-            print(isotherm_parameters)
+                for k in ('sample_name', 'sample_batch', 't_exp', 'gas')):
             raise Exception(
                 "Isotherm MUST have the following information in the properties dictionary:"
-                "'id', 'sample_name', 'sample_batch', 't_exp', 'gas'")
+                "'sample_name', 'sample_batch', 't_exp', 'gas'")
 
         if None in [loading_key, pressure_key]:
             raise Exception(
@@ -113,8 +123,11 @@ class PointIsotherm(object):
         self.unit_pressure = unit_pressure
 
         #: Must-have properties of the isotherm
-        #: Add id of isotherm, this is used for uniqueness
-        self.id = isotherm_parameters.get('id')
+        if 'id' not in isotherm_parameters:
+            self.id = None
+        else:
+            self.id = isotherm_parameters.get('id')
+
         #: Isotherm sample sample_name
         self.sample_name = isotherm_parameters.get('sample_name')
         #: Isotherm sample sample_batch
@@ -148,8 +161,16 @@ class PointIsotherm(object):
 
         self.other_properties = isotherm_parameters.get('other_properties')
 
-        #: Figure out the adsorption and desorption branches
+        # Split the data in adsorption/desorption
         self._data = self._splitdata(self._data)
+
+        # Now that all data has been saved, generate the unique id if needed
+        if self.id is None:
+            # Generate the unique id using md5
+            sha_hasher = hashlib.md5(
+                adsutils.isotherm_to_json(self).encode('utf-8'))
+            self.id = sha_hasher.hexdigest()
+        #: Figure out the adsorption and desorption branches
 
     def _splitdata(self, _data):
         '''
@@ -472,11 +493,11 @@ class PointIsotherm(object):
         '''
         return self._data.loc[:, self.loading_key].values
 
-    def other_key_all(self):
+    def other_key_all(self, key):
         '''
         Returns all enthalpy points as an array
         '''
-        if self.other_keys.get('enthalpy_key') in self._data.columns:
-            return self._data.loc[:, self.other_keys.get('enthalpy_key')].values
+        if self.other_keys.get(key) in self._data.columns:
+            return self._data.loc[:, self.other_keys.get(key)].values
         else:
             return None

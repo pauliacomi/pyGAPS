@@ -25,9 +25,9 @@ class Sample(object):
         self.project = info['project']
         #: Sample structure
         self.struct = info['struct']
-        #: Sample family
-        self.family = info['family']
-        #: Sample form
+        #: Sample type (MOF/carbon/zeolite etc)
+        self.type = info['type']
+        #: Sample form (powder/ pellet etc)
         self.form = info['form']
         #: Sample comments
         self.comment = info['comment']
@@ -49,7 +49,7 @@ class Sample(object):
         print("Source Laboratory:", self.source_lab)
         print("Project:", self.project)
         print("Structure:", self.struct)
-        print("Family:", self.family)
+        print("Type:", self.type)
         print("Form:", self.form)
         print("Comments:", self.comment)
 

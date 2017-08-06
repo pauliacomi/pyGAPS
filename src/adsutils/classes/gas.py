@@ -14,15 +14,11 @@ class Gas(object):
 
     def __init__(self, info):
         #: Gas name
-        self.name = info['name']
-        #: Gas molar mass
-        self.mmass = info['mmass']
-        #: Gas polarizability
-        self.polarizability = info['polarizability']
-        #: Gas dipole moment
-        self.dipole = info['dipole']
-        #: Gas quadrupole moment
-        self.quadrupole = info['quadrupole']
+        self.name = info['nick']
+        #: Gas formula
+        self.formula = info['formula']
+        #: Gas properties
+        self.properties = info['properties']
 
         return
 
@@ -32,10 +28,10 @@ class Gas(object):
         '''
 
         print("Gas:", self.name)
-        print("Molar Mass:", self.mmass)
-        print("Polarizability:", self.polarizability)
-        print("Dipole Moment:", self.dipole)
-        print("Quadrupole Moment:", self.quadrupole)
+        print("Formula:", self.formula)
+
+        for prop in self.properties:
+            print(prop, self.properties.get(prop))
 
         return
 
