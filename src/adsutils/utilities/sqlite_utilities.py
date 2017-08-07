@@ -34,8 +34,9 @@ def build_select(table, to_select, where):
     sql_q = "SELECT "
     sql_q += ', '.join('{0}'.format(w) for w in to_select)
     sql_q += ' FROM \"' + table + '\"'
-    sql_q += ' WHERE '
-    sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
+    if len(where) > 0:
+        sql_q += ' WHERE '
+        sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
 
     # sql_q += ' AND '.join(list(map(lambda x:
     #                                x[0] + " IS NULL"

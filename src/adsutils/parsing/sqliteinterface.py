@@ -58,7 +58,7 @@ def db_get_samples(pth):
             })
 
             sample_params['properties'] = {
-                (row[0], row[1]) for row in cur_inner}
+                row[0]: row[1] for row in cur_inner}
 
             # Build sample objects
             samples.append(Sample(sample_params))
@@ -383,6 +383,7 @@ def db_get_experiments(pth, criteria):
 
             # Generate the array for the pandas dataframe
             columns = []
+            other_keys = {}
             data_arr = None
             for row in cur_inner:
                 columns.append(row[0])
@@ -394,13 +395,16 @@ def db_get_experiments(pth, criteria):
                     data_arr = numpy.hstack(
                         (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
 
+            if row[0] not in ('pressure', 'loading'):
+                other_keys.update({row[0]: row[0]})
+
             exp_data = pandas.DataFrame(data_arr, columns=columns)
 
             # build isotherm object
             isotherms.append(PointIsotherm(exp_data,
                                            pressure_key="pressure",
                                            loading_key="loading",
-                                           enthalpy_key="enthalpy",
+                                           other_keys=other_keys,
                                            ** exp_params))
 
     # Close the db connection
@@ -773,7 +777,7 @@ def db_get_gasses(pth):
             })
 
             gas_params['properties'] = {
-                (row[0], row[1]) for row in cur_inner}
+                row[0]: row[1] for row in cur_inner}
 
             # Build gas objects
             gasses.append(Gas(gas_params))
