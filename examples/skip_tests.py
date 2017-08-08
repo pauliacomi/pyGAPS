@@ -1,14 +1,16 @@
 # %%
 import os
-import adsutils
 
+import adsutils
+import adsutils.calculations
 
 #################################################################################
 #       Excel import | dataimport/excelinterface.py
 #################################################################################
 #
 # %% Get test folder
-xl_folder = os.getcwd() + r'\tests\excel'
+xl_folder = os.getcwd() + r'\tests\data\isotherms'
+print(xl_folder)
 # %% Find files
 xl_paths = adsutils.xl_experiment_parser_paths(
     xl_folder)
@@ -17,12 +19,13 @@ print(xl_paths)
 isotherms = []
 
 for path in xl_paths:
-    data, info = adsutils.xl_experiment_parser(path)
-    isotherm = adsutils.PointIsotherm(data, info,
-                                      pressure_key="Pressure (bar)",
-                                      loading_key="Loading (mmol/g)",
-                                      enthalpy_key="Enthalpy (kJ/mol)")
-    isotherms.append(isotherm)
+    isotherms.append(adsutils.xl_experiment_parser(path))
+
+# %%
+for isotherm in isotherms:
+    with open(isotherm.sample_name + ' ' + isotherm.sample_batch + '.json', "w") as text_file:
+        text_file.write(adsutils.isotherm_to_json(isotherm))
+
 
 #################################################################################
 #       Database import | dataimport/sqlinterface.py
@@ -139,3 +142,47 @@ adsutils.plot_iso({isotherm, modelH, modelL, modelDL},
 # Henrys constant calculations
 #################################################################################
 #
+
+# %%
+
+
+HERE = os.getcwd() + r'\tests'
+
+
+def test_BET(file):
+
+    filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+
+    with open(filepath, 'r') as text_file:
+        isotherm = adsutils.isotherm_from_json(text_file.read())
+
+    isotherm.convert_pressure_mode("relative")
+    bet_area = adsutils.calculations.area_BET(isotherm, verbose=True)
+
+    return
+
+
+test_BET('MCM-41 N2 77.json')
+test_BET('NaY N2 77.json')
+test_BET('SiO2 N2 77.json'),
+test_BET('Takeda 5A N2 77.json')
+test_BET('UiO-66(Zr) N2 77.json')
+
+
+# %%
+import pandas
+import os
+import adsutils
+import adsutils.calculations
+
+pressure_key = "pressure"
+loading_key = "loading"
+
+other_key = "enthalpy_key"
+other_keys = {other_key: "enthalpy"}
+
+isotherm_df = pandas.DataFrame({
+    pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
+    loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
+    other_keys[other_key]: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+})

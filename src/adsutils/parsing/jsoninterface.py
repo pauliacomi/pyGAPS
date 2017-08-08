@@ -93,60 +93,54 @@ def isotherm_from_json(json_isotherm):
     return isotherm
 
 
-def isotherm_from_json_nist(json_isotherm):
-    """
-    Converts a json isotherm format to a internal format
-    Structure is taken from the NIST format
-    """
+# def isotherm_from_json_nist(json_isotherm):
+#     """
+#     Converts a json isotherm format to a internal format
+#     Structure is taken from the NIST format
+#     """
 
-    # Parse isotherm in dictionary
-    raw_dict = json.loads(json_isotherm)
+#     # Parse isotherm in dictionary
+#     raw_dict = json.loads(json_isotherm)
 
-    # Build info dictionary for internal format
-    info_dict = dict()
+#     # Build info dictionary for internal format
+#     info_dict = dict()
 
-    info_dict["id"] = raw_dict["hashkey"]
-    info_dict["exp_type"] = raw_dict['isotherm_type']
-    info_dict["name"] = raw_dict["adsorbentMaterial"]
-    info_dict["batch"] = raw_dict["DOI"]
-    info_dict["gas"] = raw_dict["adsorbateGas"]
-    info_dict["t_exp"] = raw_dict["temperature"]
+#     info_dict["exp_type"] = raw_dict['isotherm_type']
+#     info_dict["name"] = raw_dict["adsorbentMaterial"]
+#     info_dict["batch"] = raw_dict["DOI"]
+#     info_dict["gas"] = raw_dict["adsorbateGas"]
+#     info_dict["t_exp"] = raw_dict["temperature"]
 
-    # TODO remove these
-    info_dict["is_real"] = None
-    info_dict["date"] = None
-    info_dict["t_act"] = None
-    info_dict["machine"] = None
-    info_dict["user"] = None
-    info_dict["lab"] = None
-    info_dict["project"] = None
-    info_dict["comment"] = None
+#     # Get modes and units
+#     mode_pressure = "absolute"  # raw_dict[""]
+#     mode_adsorbent = "mass"    # raw_dict["mass"]
+#     unit_pressure = raw_dict["pressureUnits"]
+#     unit_loading = "mmol"      # raw_dict["mmol"]
 
-    # Get modes and units
-    mode_pressure = "absolute"  # raw_dict[""]
-    mode_adsorbent = "mass"    # raw_dict["mass"]
-    unit_pressure = raw_dict["pressureUnits"]
-    unit_loading = "mmol"      # raw_dict["mmol"]
+#     # Build pandas dataframe of data
 
-    # Build pandas dataframe of data
-    loading_key = "Loading"
-    pressure_key = "Pressure"
-    enthalpy_key = None
+#     # Build pandas dataframe of data
+#     data = pandas.DataFrame.from_dict(
+#         raw_dict["isotherm_data"], orient='index', dtype='float64')
+#     del raw_dict["isotherm_data"]
 
-    # TODO check if this is done incrementally over points 0-x
-    data = pandas.DataFrame(
-        [[datapoint["adsorption"], datapoint["pressure"]]
-         for datapoint in raw_dict["isotherm_data"]],
-        columns=[loading_key, pressure_key])
+#     # convert index into int (seen as string)
+#     data.index = data.index.map(int)
 
-    isotherm = PointIsotherm(data,
-                             loading_key=loading_key,
-                             pressure_key=pressure_key,
-                             other_keys=other_keys,
-                             mode_adsorbent=mode_adsorbent,
-                             mode_pressure=mode_pressure,
-                             unit_loading=unit_loading,
-                             unit_pressure=unit_pressure,
-                             **raw_dict)
+#     # sort index, in case the json was not sorted
+#     data.sort_index(inplace=True)
 
-    return isotherm
+#     # set dataframe keys
+#     loading_key = "Loading"
+#     pressure_key = "Pressure"
+
+#     isotherm = PointIsotherm(data,
+#                              loading_key=loading_key,
+#                              pressure_key=pressure_key,
+#                              mode_adsorbent=mode_adsorbent,
+#                              mode_pressure=mode_pressure,
+#                              unit_loading=unit_loading,
+#                              unit_pressure=unit_pressure,
+#                              **raw_dict)
+
+#     return isotherm

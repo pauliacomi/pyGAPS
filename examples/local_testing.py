@@ -39,13 +39,13 @@ db_path = expanduser(
 # %%
 isotherms = []
 criteria = {
-    'sname':        "UiO-66(Zr)",
-    # 'sbatch':       "",
+    'sample_name':        "MIL-100(Fe)",
+    'sample_batch':       "KRICT01",
     # 'user':         "",
     't_exp':        303,
     # 't_act':        "",
     # 'machine':      "",
-    'gas':          "N2",
+    'gas':          "C3H8",
     # 'exp_type':     "",
 }
 isotherms = adsutils.db_get_experiments(db_path, criteria)
@@ -212,3 +212,28 @@ for isotherm in isotherms:
     print(isotherm.name)
     adsutils.area_BET(isotherm, verbose=True)
     isotherm.convert_pressure_mode("absolute")
+
+# %%
+isotherms[1].print_info()
+
+# %%
+adsutils.data.GAS_LIST = adsutils.db_get_gasses(db_path)
+adsutils.data.SAMPLE_LIST = adsutils.db_get_samples(db_path)
+# %%
+ads_gas_list = [gas for gas in adsutils.data.GAS_LIST if "N2" == gas.name]
+ads_gas_list[0].print_info()
+# %%
+print(adsutils.SAMPLE_LIST)
+print(adsutils.data.SAMPLE_LIST)
+
+
+# %%
+isotherms[1].convert_pressure_mode("relative")
+adsutils.area_BET(isotherms[1], verbose=True)
+isotherms[1].convert_pressure_mode("absolute")
+
+# %%
+isotherms[1].convert_adsorbent_mode("volume")
+isotherms[1].print_info()
+isotherms[1].convert_adsorbent_mode("mass")
+isotherms[1].print_info()

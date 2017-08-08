@@ -6,13 +6,10 @@ IAST functions in pyiast.py.
 __author__ = 'Cory M. Simon'
 __all__ = ["ModelIsotherm", "InterpolatorIsotherm",
            "plot_isotherm", "_MODELS", "_MODEL_PARAMS",
-           "_VERSION",
-           "LangmuirIsotherm", "SipsIsotherm", "QuadraticIsotherm"]
-# last line includes depreciated classes
+           "_VERSION"]
 
 import copy
 
-import matplotlib.pyplot as plt
 import numpy
 import pandas
 import scipy.optimize
@@ -23,17 +20,21 @@ _VERSION = "1.4"
 
 # ! list of models implemented in pyIAST
 _MODELS = ["Langmuir", "Quadratic", "BET", "Henry", "TemkinApprox",
-           "DSLangmuir"]
+           "DSLangmuir", "TSLangmuir"]
 
 # ! dictionary of parameters involved in each model
-_MODEL_PARAMS = {"Langmuir": {"M": numpy.nan, "K": numpy.nan},
-                 "Quadratic": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
-                 "BET": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
-                 "DSLangmuir": {"M1": numpy.nan, "K1": numpy.nan,
-                                "M2": numpy.nan, "K2": numpy.nan},
-                 "TemkinApprox": {"M": numpy.nan, "K": numpy.nan, "theta": numpy.nan},
-                 "Henry": {"KH": numpy.nan}
-                 }
+_MODEL_PARAMS = {
+    "Langmuir": {"M": numpy.nan, "K": numpy.nan},
+    "Quadratic": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
+    "BET": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
+    "DSLangmuir": {"M1": numpy.nan, "K1": numpy.nan,
+                   "M2": numpy.nan, "K2": numpy.nan},
+    "TSLangmuir": {"M1": numpy.nan, "K1": numpy.nan,
+                   "M2": numpy.nan, "K2": numpy.nan,
+                   "M3": numpy.nan, "K3": numpy.nan},
+    "TemkinApprox": {"M": numpy.nan, "K": numpy.nan, "theta": numpy.nan},
+    "Henry": {"KH": numpy.nan}
+}
 
 
 def get_default_guess_params(model, df, pressure_key, loading_key):
@@ -81,6 +82,11 @@ def get_default_guess_params(model, df, pressure_key, loading_key):
         return {"M1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
                 "M2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}
 
+    if model == "TSLangmuir":
+        return {"M1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
+                "M2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k,
+                "M3": 0.5 * saturation_loading, "K3": 0.6 * langmuir_k}
+
     if model == "Henry":
         return {"KH": saturation_loading * langmuir_k}
 
@@ -120,6 +126,12 @@ class ModelIsotherm:
     .. math::
 
         L(P) = M_1\\frac{K_1 P}{1+K_1 P} +  M_2\\frac{K_2 P}{1+K_2 P}
+
+    * Triple-site Langmuir (TSLangmuir) adsorption isotherm
+
+    .. math::
+
+        L(P) = M_1\\frac{K_1 P}{1+K_1 P} +  M_2\\frac{K_2 P}{1+K_2 P} + M_3\\frac{K_3 P}{1+K_3 P}
 
     * Asymptotic approximation to the Temkin Isotherm
     (see DOI: 10.1039/C3CP55039G)
@@ -234,6 +246,15 @@ class ModelIsotherm:
             return self.params["M1"] * k1p / (1.0 + k1p) + \
                 self.params["M2"] * k2p / (1.0 + k2p)
 
+        if self.model == "TSLangmuir":
+            # K_i P
+            k1p = self.params["K1"] * pressure
+            k2p = self.params["K2"] * pressure
+            k3p = self.params["K3"] * pressure
+            return self.params["M1"] * k1p / (1.0 + k1p) + \
+                self.params["M2"] * k2p / (1.0 + k2p) + \
+                self.params["M3"] * k3p / (1.0 + k3p)
+
         if self.model == "Henry":
             return self.params["KH"] * pressure
 
@@ -281,8 +302,8 @@ class ModelIsotherm:
             constructor""" % self.model)
 
         # assign params
-        for j in range(len(param_names)):
-            self.params[param_names[j]] = opt_res.x[j]
+        for index, _ in enumerate(param_names):
+            self.params[param_names[index]] = opt_res.x[index]
 
         self.rmse = numpy.sqrt(opt_res.fun / self.df.shape[0])
 
@@ -323,6 +344,14 @@ class ModelIsotherm:
                 1.0 + self.params["K1"] * pressure) +\
                 self.params["M2"] * numpy.log(
                 1.0 + self.params["K2"] * pressure)
+
+        if self.model == "TSLangmuir":
+            return self.params["M1"] * numpy.log(
+                1.0 + self.params["K1"] * pressure) +\
+                self.params["M2"] * numpy.log(
+                1.0 + self.params["K2"] * pressure) +\
+                self.params["M3"] * numpy.log(
+                1.0 + self.params["K3"] * pressure)
 
         if self.model == "Henry":
             return self.params["KH"] * pressure
@@ -506,94 +535,3 @@ class InterpolatorIsotherm:
                 numpy.log(pressure / pressures[n_points - 1])
 
             return area
-
-
-def plot_isotherm(isotherm, withfit=True, xlogscale=False,
-                  ylogscale=False, pressure=None):
-    """
-    Plot isotherm data and fit using Matplotlib.
-
-    :param isotherm: pyIAST isotherm object
-    :param withfit: Bool plot fit as well
-    :param pressure: numpy.array optional pressure array to pass for plotting
-    :param xlogscale: Bool log-scale on x-axis
-    :param ylogscale: Bool log-scale on y-axis
-    """
-
-    plt.figure()
-    if withfit:
-        # array of pressures to plot model
-        if pressure is None:
-            if xlogscale:
-                # do not include zero for log-scale
-                idx = isotherm.df[isotherm.pressure_key].values != 0.0
-                min_p = numpy.min(isotherm.df[isotherm.pressure_key].iloc[idx])
-                pressure = numpy.logspace(numpy.log(min_p), numpy.log(
-                    isotherm.df[isotherm.pressure_key].max()), 200)
-            else:
-                pressure = numpy.linspace(isotherm.df[isotherm.pressure_key].min(),
-                                          isotherm.df[isotherm.pressure_key].max(
-                ),
-                    200)
-        plt.plot(pressure, isotherm.loading(pressure))
-    plt.scatter(isotherm.df[isotherm.pressure_key], isotherm.df[
-        isotherm.loading_key])
-    if xlogscale:
-        plt.xscale("log")
-    if ylogscale:
-        plt.yscale("log")
-    plt.xlim(xmin=0.0)
-    plt.ylim(ymin=0.0)
-    plt.xlabel('Pressure')
-    plt.ylabel('Loading')
-    plt.show()
-
-
-###
-#   Tell user to switch to v1 if still using v0 classes.
-###
-DEPRECIATION_MESSAGE = """Depreciated. You are using an old version of pyIAST.
-    Run in the terminal:
-        pip install pyiast --upgrade
-    See new class ModelIsotherm in docs, where all analytical isotherm models
-    are now consolidated."""
-
-
-class LangmuirIsotherm:
-    """
-    Depreciated LangmuirIsotherm, consolidated into ModelIsotherm
-    """
-
-    def __init__(self, *args, **kwargs):
-        raise Exception(DEPRECIATION_MESSAGE)
-
-
-class BETIsotherm:
-    """
-    Depreciated BETIsotherm, consolidated into ModelIsotherm
-    """
-
-    def __init__(self, *args, **kwargs):
-        raise Exception(DEPRECIATION_MESSAGE)
-
-
-class QuadraticIsotherm:
-    """
-    Depreciated QuadraticIsotherm, consolidated into ModelIsotherm
-    """
-
-    def __init__(self, *args, **kwargs):
-        raise Exception(DEPRECIATION_MESSAGE)
-
-
-class SipsIsotherm:
-    """
-    Depreciated SipsIsotherm. We shouldn't use this anyway since it does not
-    obey Henry's law at low coverage.
-    """
-
-    def __init__(self, *args, **kwargs):
-        raise Exception("""This isotherm model actually cannot be used in IAST
-        calculations because it does not have a finite slope at the origin. See
-        O. Talu and A. L. Myers. Rigorous thermodynamic treatment of gas
-        adsorption. AIChE J. 1988.""")

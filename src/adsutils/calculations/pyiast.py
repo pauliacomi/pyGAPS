@@ -5,26 +5,8 @@ pure-component adsorption isotherm models from the `isotherms` module.
 __author__ = 'Cory M. Simon'
 
 # This code is written for Python 3.
-import sys
-
 import numpy as np
 import scipy.optimize
-
-# depreciated classes
-from ..classes.modelisotherm import _MODEL_PARAMS
-from ..classes.modelisotherm import _MODELS
-from ..classes.modelisotherm import _VERSION
-from ..classes.modelisotherm import BETIsotherm
-from ..classes.modelisotherm import InterpolatorIsotherm
-from ..classes.modelisotherm import LangmuirIsotherm
-from ..classes.modelisotherm import ModelIsotherm
-from ..classes.modelisotherm import QuadraticIsotherm
-from ..classes.modelisotherm import SipsIsotherm
-from ..classes.modelisotherm import plot_isotherm
-
-if sys.version_info[0] != 3:
-    print("pyIAST now requires Python 3.")
-    sys.exit(1)
 
 
 def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
@@ -39,20 +21,23 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
     Pass a list of pure-component adsorption isotherms `isotherms`.
 
-    :param partial_pressures: Array or list partial pressures of gas components,
+    ::
+
+     :param partial_pressures: Array or list partial pressures of gas components,
         e.g. [5.0, 10.0] (bar)
-    :param isotherms: list pure-component adsorption isotherms.
+     :param isotherms: list pure-component adsorption isotherms.
         e.g. [methane_isotherm, ethane_isotherm]
-    :param verboseflag: Bool print off a lot of information
-    :param warningoff: Bool when False, warnings will print when the IAST
+     :param verboseflag: Bool print off a lot of information
+     :param warningoff: Bool when False, warnings will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data
-    :param adsorbed_mole_fraction_guess: Array or List, starting guesses for
+     :param adsorbed_mole_fraction_guess: Array or List, starting guesses for
         adsorbed phase mole fractions that `pyiast.iast` solves for
 
-    :return: loadings: predicted uptakes of each component
-    :rtype: Array
+     :return: loadings: predicted uptakes of each component
+     :rtype: Array
     """
+
     partial_pressures = np.array(partial_pressures)
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:
@@ -78,7 +63,7 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
         :param adsorbed_mole_fractions: array mole fractions in the adsorbed
             phase; np.size(adsorbed_mole_fractions) = n_components - 1 because
-            \sum z_i = 1 asserted here automatically.
+            sum z_i = 1 asserted here automatically.
         :returns: spreading_pressure_diff: array spreading pressure difference
             between component i and i+1
         """
