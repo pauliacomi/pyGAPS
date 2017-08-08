@@ -10,12 +10,15 @@ from ..classes.pointisotherm import PointIsotherm
 def isotherm_to_json(isotherm):
     """
     Converts an isotherm object to a json structure
-    Structure is taken from the NIST format
+    Structure is inspired by the NIST format
     """
 
     raw_dict = dict()
 
+    # Isotherm id first
     raw_dict["id"] = isotherm.id
+
+    # Isotherm properties
     raw_dict["sample_name"] = isotherm.sample_name
     raw_dict["sample_batch"] = isotherm.sample_batch
     raw_dict["t_exp"] = isotherm.t_exp
@@ -34,11 +37,11 @@ def isotherm_to_json(isotherm):
 
     raw_dict["other_properties"] = isotherm.other_properties
 
+    # Isotherm data
     isotherm_data_dict = isotherm.data().to_dict(orient='index')
-    isotherm_data_dict = {str(k): {p: str(t) for p, t in v.items()}
-                          for k, v in isotherm_data_dict.items()}
+    raw_dict["isotherm_data"] = {str(k): {p: str(t) for p, t in v.items()}
+                                 for k, v in isotherm_data_dict.items()}
 
-    raw_dict["isotherm_data"] = isotherm_data_dict
     json_isotherm = json.dumps(raw_dict, sort_keys=True)
 
     return json_isotherm
@@ -53,28 +56,30 @@ def isotherm_from_json(json_isotherm):
     # Parse isotherm in dictionary
     raw_dict = json.loads(json_isotherm)
 
-    # TODO: store modes in json
-    # Set modes and units
+    # Set modes and units, since the json format always uses these
     mode_pressure = 'absolute'
     mode_adsorbent = 'mass'
     unit_pressure = 'bar'
     unit_loading = 'mmol'
 
     # Build pandas dataframe of data
-    loading_key = "loading"
-    pressure_key = "pressure"
-
-    other_key = "enthalpy_key"
-    other_keys = {other_key: "enthalpy"}
-
     data = pandas.DataFrame.from_dict(
         raw_dict["isotherm_data"], orient='index', dtype='float64')
-
-    data.index = data.index.map(int)
-    data.sort_index(inplace=True)
-
     del raw_dict["isotherm_data"]
 
+    # convert index into int (seen as string)
+    data.index = data.index.map(int)
+
+    # sort index, in case the json was not sorted
+    data.sort_index(inplace=True)
+
+    # set dataframe keys
+    loading_key = 'loading'
+    pressure_key = 'pressure'
+    other_keys = [column for column in data.columns.values if column not in [
+        'loading', 'pressure']]
+
+    # generate the isotherm
     isotherm = PointIsotherm(data,
                              loading_key=loading_key,
                              pressure_key=pressure_key,

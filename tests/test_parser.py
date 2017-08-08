@@ -8,14 +8,14 @@ import adsutils
 
 
 @pytest.fixture
-def basic_isotherm_json(isotherm_data):
+def basic_isotherm_json(isotherm_data, basic_isotherm):
     """
     Gives a json of the isotherm from model data
     """
     data = isotherm_data
 
     isotherm_dict = data.info
-    isotherm_dict.update({'id': 'dd4e578dbd07b6b02faa822ea36d20e5'})
+    isotherm_dict.update({'id': basic_isotherm.id})
 
     isotherm_data_dict = data.isotherm_df.to_dict(orient='index')
     isotherm_data_dict = {str(k): {p: str(t) for p, t in v.items()}
