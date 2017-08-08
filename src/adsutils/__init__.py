@@ -34,4 +34,5 @@ if missing_dependencies:
         "Missing required dependencies {0}".format(missing_dependencies))
 del hard_dependencies, dependency, missing_dependencies
 
+from adsutils.data import *
 from adsutils.api import *

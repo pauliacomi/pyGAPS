@@ -15,7 +15,9 @@ HERE = os.path.dirname(__file__)
     ('Takeda 5A N2 77.json', 1075),
     ('UiO-66(Zr) N2 77.json', 1250),
 ])
-def test_BET(file, expected_bet):
+def test_BET(file, expected_bet, basic_gas):
+
+    adsutils.data.GAS_LIST.append(basic_gas)
 
     filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 

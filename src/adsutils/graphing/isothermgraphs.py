@@ -162,13 +162,13 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         Builds a label for the legend depending on requested parameters
         """
         if list_ is None:
-            return isotherm.name + ' ' + convert_chemformula(isotherm.gas)
+            return isotherm.sample_name + ' ' + convert_chemformula(isotherm.gas)
         else:
             text = []
-            if 'name' in list_:
-                text.append(isotherm.name)
-            if 'batch' in list_:
-                text.append(isotherm.batch)
+            if 'sample_name' in list_:
+                text.append(isotherm.sample_name)
+            if 'sample_batch' in list_:
+                text.append(isotherm.sample_batch)
             if 'gas' in list_:
                 text.append(convert_chemformula(isotherm.gas))
             if 'type' in list_:
@@ -279,8 +279,8 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
                                                           maxrange_pressure),
                                                       isotherm.loading_ads(
                                                           maxrange_loading),
-                                                      isotherm.enthalpy_ads(
-                                                          maxrange_enthalpy),
+                                                      isotherm.other_key_ads("enthalpy",
+                                                                             maxrange_enthalpy),
                                                       line_label_, plot_type, styles)
                 max_y1 = max(max_y1, lmax_y1)
                 max_y2 = max(max_y2, lmax_y2)
@@ -297,8 +297,8 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
                                                        maxrange_pressure),
                                                    isotherm.loading_des(
                                                        maxrange_loading),
-                                                   isotherm.enthalpy_des(
-                                                       maxrange_enthalpy),
+                                                   isotherm.other_key_des("enthalpy",
+                                                                          maxrange_enthalpy),
                                                    line_label_, plot_type, styles)
                 max_y1 = max(max_y1, lmax_y1)
                 max_y2 = max(max_y2, lmax_y2)

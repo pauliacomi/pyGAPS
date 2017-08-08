@@ -5,12 +5,11 @@ This module calculates the BET surface area based on an isotherm
 __author__ = 'Paul A. Iacomi and Bastien Aillet'
 
 import matplotlib.pyplot as plt
-# %%
 import scipy.stats
 
+import adsutils.data as data
+
 AVOGADRO_NUMBER = 6.02214 * (10 ** 23)
-NITROGEN_CROSS_SECTION = 1.62 * (10 ** (-19))
-PROPANE_CROSS_SECTION = 3.9 * (10 ** (-19))
 
 
 def area_BET(isotherm, verbose=False):
@@ -18,7 +17,7 @@ def area_BET(isotherm, verbose=False):
     Function returns the BET surface area of an isotherm object which
     is passed to it.
     """
-
+    # Checks
     if isotherm.mode_adsorbent != "mass":
         raise Exception("The isotherm must be in per mass of adsorbent."
                         "First convert it using implicit functions")
@@ -28,6 +27,22 @@ def area_BET(isotherm, verbose=False):
     if isotherm.unit_loading != "mmol":
         raise Exception("The loading must be in mmol."
                         "First convert it using implicit functions")
+
+    # Check to see if gas exists in master list
+    ads_gas_list = [gas for gas in data.GAS_LIST if isotherm.gas == gas.name]
+
+    if len(ads_gas_list) == 0:
+        raise Exception("Gas {0} does not exist in list of gasses. "
+                        "First populate adsutils.GAS_LIST "
+                        "with required gas class".format(isotherm.gas))
+
+    ads_gas = ads_gas_list[0]
+
+    cross_section = ads_gas.properties.get("cross_sectional_area")
+    if cross_section is None:
+        raise Exception("Gas {0} does not have a property named "
+                        "cross_sectional_area. This must be available for BET "
+                        "calculation".format(isotherm.gas))
 
     # Read data in
     adsorption = isotherm.adsdata()
@@ -49,7 +64,7 @@ def area_BET(isotherm, verbose=False):
 
     C = (slope / intercept) + 1
     amount_monolayer = 1 / (intercept * C)
-    area = amount_monolayer * PROPANE_CROSS_SECTION * AVOGADRO_NUMBER
+    area = amount_monolayer * cross_section * (10**(-20)) * AVOGADRO_NUMBER
 
     # TODO Implement all of roquerol's laws for BET
     # mono_capacity_real =
@@ -101,7 +116,7 @@ def area_BET(isotherm, verbose=False):
                  marker='o', color='r', label='chosen points')
         ax2.plot(adsorption[isotherm.pressure_key], adsorption['roquerol'],
                  marker='', color='g', label='all points')
-        ax2.set_title("BET plot")
+        ax2.set_title("Roquerol plot")
         ax2.set_xlabel('p/p°')
         ax2.set_ylabel('(p/p°)/(n(1-(P/P°)))')
         ax2.legend(loc='best')

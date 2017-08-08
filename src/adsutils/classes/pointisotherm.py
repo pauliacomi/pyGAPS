@@ -11,7 +11,7 @@ import pandas
 
 import adsutils
 
-from . import SAMPLE_LIST
+import adsutils.data as data
 from ..graphing.isothermgraphs import plot_iso
 from .gas import saturation_pressure_at_temperature
 from .modelisotherm import ModelIsotherm
@@ -33,7 +33,7 @@ class PointIsotherm(object):
     def __init__(self, isotherm_data,
                  loading_key=None,
                  pressure_key=None,
-                 other_keys=None,  # TODO make this general
+                 other_keys=None,
                  mode_adsorbent="mass",
                  mode_pressure="absolute",
                  unit_loading="mmol",
@@ -46,7 +46,6 @@ class PointIsotherm(object):
         :param info: Dictionary containing all experiment parameters
         :param loading_key: String key for loading column in df
         :param pressure_key: String key for pressure column in df
-        :param enthalpy_key: String key for enthalpy column in df
 
         :param mode_adsorbent: Mode for the adsorbent considered: per mass or per volume
         :param mode_pressure: Mode for the pressure
@@ -291,19 +290,19 @@ class PointIsotherm(object):
             return
 
         # Checks to see if sample exists in master list
-        if not any(self.sample_name == sample.sample_name and self.sample_batch == sample.sample_batch
-                   for sample in SAMPLE_LIST):
+        if not any(self.sample_name == sample.name and self.sample_batch == sample.batch
+                   for sample in data.SAMPLE_LIST):
             raise Exception("Sample %s %s does not exist in sample list. "
                             "First populate adsutils.SAMPLE_LIST "
                             "with desired sample class"
                             % (self.sample_name, self.sample_batch))
 
-        sample = [sample for sample in SAMPLE_LIST
-                  if self.sample_name == sample.sample_name and self.sample_batch == sample.sample_batch]
+        sample = [sample for sample in data.SAMPLE_LIST
+                  if self.sample_name == sample.name and self.sample_batch == sample.batch]
 
         if len(sample) > 1:
             raise Exception("More than one sample %s %s found in sample list. "
-                            "Samples must be unique on (sample_name + sample_batch)"
+                            "Samples must be unique on (name + batch)"
                             % (self.sample_name, self.sample_batch))
 
         try:
@@ -352,7 +351,7 @@ class PointIsotherm(object):
         print("\n")
         print("Experiment comments:", self.comment)
 
-        if 'enthalpy_key' in self.other_keys:
+        if 'enthalpy' in self.other_keys:
             plot_type = 'iso-enth'
         else:
             plot_type = 'isotherm'
@@ -459,7 +458,7 @@ class PointIsotherm(object):
         elif key not in self.other_keys:
             return None
         else:
-            ret = self.adsdata().loc[:, self.other_keys.get(key)].values
+            ret = self.adsdata().loc[:, key].values
             if max_range is None:
                 return ret
             else:
@@ -500,7 +499,7 @@ class PointIsotherm(object):
         elif key not in self.other_keys:
             return None
         else:
-            ret = self.desdata().loc[:, self.other_keys.get(key)].values
+            ret = self.desdata().loc[:, key].values
             if max_range is None:
                 return ret
             else:
@@ -522,7 +521,7 @@ class PointIsotherm(object):
         '''
         Returns all enthalpy points as an array
         '''
-        if self.other_keys.get(key) in self._data.columns:
-            return self._data.loc[:, self.other_keys.get(key)].values
+        if key in self._data.columns:
+            return self._data.loc[:, key].values
         else:
             return None
