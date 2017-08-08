@@ -43,8 +43,6 @@ def db_get_samples(pth):
 
         # Create the samples
         for row in cursor:
-            if row is None:
-                continue
 
             sample_params = dict(zip(row.keys(), row))
 
@@ -204,7 +202,7 @@ def db_upload_sample_type(pth, sample_type):
     # Catch the exception
     except sqlite3.IntegrityError as e:
         print("Error on sample type:", "\n",
-              sample_type['type'],
+              sample_type['nick'],
               "\n", e)
         raise e
 
@@ -300,27 +298,31 @@ def db_delete_sample(pth, sample):
             cursor.execute('PRAGMA foreign_keys = ON')
 
             # Get id of sample
-            sample_id = cursor.execute(
+            sample_ids = cursor.execute(
                 build_select(table='samples',
                              to_select=['id'],
                              where=['name', 'batch']), {
                     'name':        sample.name,
                     'batch':       sample.batch,
                 }
-            ).fetchone()[0]
+            ).fetchone()
+
+            if sample_ids is None:
+                raise sqlite3.IntegrityError(
+                    "Sample to delete does not exist in database")
 
             # Delete data from sample_properties table
             # Build sql request
             sql_com = build_delete(table='sample_properties',
                                    where=['sample_id'])
 
-            cursor.execute(sql_com, {'sample_id': sample_id})
+            cursor.execute(sql_com, {'sample_id': sample_ids[0]})
 
             # Delete sample info in samples table
             sql_com = build_delete(table='samples',
                                    where=['id'])
 
-            cursor.execute(sql_com, {'id': sample_id})
+            cursor.execute(sql_com, {'id': sample_ids[0]})
 
             # Print success
             print("Success", sample)
@@ -368,8 +370,6 @@ def db_get_experiments(pth, criteria):
         isotherms = []
 
         for row in cursor:
-            if row is None:
-                continue
             exp_params = dict(zip(row.keys(), row))
 
             # Get the extra data from the experiment_data table
@@ -383,7 +383,7 @@ def db_get_experiments(pth, criteria):
 
             # Generate the array for the pandas dataframe
             columns = []
-            other_keys = {}
+            other_keys = []
             data_arr = None
             for row in cur_inner:
                 columns.append(row[0])
@@ -396,7 +396,7 @@ def db_get_experiments(pth, criteria):
                         (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
 
             if row[0] not in ('pressure', 'loading'):
-                other_keys.update({row[0]: row[0]})
+                other_keys.append(row[0])
 
             exp_data = pandas.DataFrame(data_arr, columns=columns)
 
@@ -432,91 +432,62 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
-            # Build SQL request
+            # First, if the goal was to overwrite an isotherm, must delete old data
             if overwrite:
-                sql_com = build_update(table='experiments',
-                                       to_set=['date', 'is_real', 'exp_type', 'sample_name', 'sample_batch', 't_act',
-                                               't_exp', 'machine', 'gas', 'user', 'lab', 'project', 'comment'],
-                                       where=['id'])
+                db_delete_experiment(pth, overwrite)
 
-                # if the isotherm is to replace another one
-                # we put the id of the replaced isotherm
-                exp_id = overwrite.id
-            else:
-                sql_com = build_insert(table='experiments',
-                                       to_insert=['id', 'date', 'is_real', 'exp_type', 'sample_name', 'sample_batch', 't_act',
-                                                  't_exp', 'machine', 'gas', 'user', 'lab', 'project', 'comment'])
-
-                # otherwise, put the id of the new isotherm
-                exp_id = isotherm.id
+            # Thenn, the sample is going to be inserted into the database
+            # Build SQL request
+            sql_com = build_insert(table='experiments',
+                                   to_insert=['id', 'date', 'is_real',
+                                              'exp_type', 'sample_name', 'sample_batch',
+                                              't_act', 't_exp', 'machine',
+                                              'gas', 'user', 'lab',
+                                              'project', 'comment'])
 
             # Build upload dict
             upload_dict = {
-                'id':       exp_id,
-                'date':     isotherm.date,
-                'is_real':  isotherm.is_real,
-                'exp_type': isotherm.exp_type,
-                'sample_name':    isotherm.sample_name,
-                'sample_batch':   isotherm.sample_batch,
-                't_act':    isotherm.t_act,
-                't_exp':    isotherm.t_exp,
-                'machine':  isotherm.machine,
-                'gas':      isotherm.gas,
-                'user':     isotherm.user,
-                'lab':      isotherm.lab,
-                'project':  isotherm.project,
-                'comment':  isotherm.comment
+                'id':               isotherm.id,
+                'date':             isotherm.date,
+                'is_real':          isotherm.is_real,
+                'exp_type':         isotherm.exp_type,
+                'sample_name':      isotherm.sample_name,
+                'sample_batch':     isotherm.sample_batch,
+                't_act':            isotherm.t_act,
+                't_exp':            isotherm.t_exp,
+                'machine':          isotherm.machine,
+                'gas':              isotherm.gas,
+                'user':             isotherm.user,
+                'lab':              isotherm.lab,
+                'project':          isotherm.project,
+                'comment':          isotherm.comment
             }
 
             # Upload experiment info to database
             cursor.execute(sql_com, upload_dict)
 
-            # Now to upload data into experiment_data table
-            # Build sql requests
-            sql_update = build_update(table='experiment_data',
-                                      to_set=['data'],
-                                      where=['exp_id', 'dtype'])
+            # Then, the isotherm data will be uploaded
+            # into the experiment_data table
+
+            # Build sql request
             sql_insert = build_insert(table='experiment_data',
                                       to_insert=['exp_id', 'dtype', 'data'])
 
-            updates = []
-
-            if overwrite:
-                # Find existing properties
-                cursor.execute(
-                    build_select(table='experiment_data',
-                                 to_select=['dtype'],
-                                 where=['exp_id']), {
-                        'exp_id':        exp_id,
-                    }
-                )
-                updates = [elt[0] for elt in cursor.fetchall()]
-
-            # Update guaranted fields:
-            if overwrite:
-                sql_com_key = sql_update
-            else:
-                sql_com_key = sql_insert
-
-            cursor.execute(sql_com_key,
-                           {'exp_id': exp_id, 'dtype': 'pressure',
+            # Insert standard data fields:
+            cursor.execute(sql_insert,
+                           {'exp_id': isotherm.id, 'dtype': 'pressure',
                             'data': isotherm.pressure_all().tobytes()}
                            )
 
-            cursor.execute(sql_com_key,
-                           {'exp_id': exp_id, 'dtype': 'loading',
+            cursor.execute(sql_insert,
+                           {'exp_id': isotherm.id, 'dtype': 'loading',
                             'data': isotherm.loading_all().tobytes()}
                            )
 
-            # Update other fields:
+            # Update or insert other fields:
             for key in isotherm.other_keys:
-                if isotherm.other_keys.get(key) in updates:
-                    sql_com_key = sql_update
-                else:
-                    sql_com_key = sql_insert
-
-                cursor.execute(sql_com_key,
-                               {'exp_id': exp_id, 'dtype': 'enthalpy',
+                cursor.execute(sql_insert,
+                               {'exp_id': isotherm.id, 'dtype': key,
                                 'data': isotherm.other_key_all(key).tobytes()}
                                )
 
@@ -629,37 +600,25 @@ def db_delete_experiment(pth, isotherm):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
-            # Get id of experiment
-            isotherm_id = cursor.execute(
+            # Check if sample exists
+            ids = cursor.execute(
                 build_select(table='experiments',
                              to_select=['id'],
-                             where=['date', 'is_real', 'exp_type', 'sample_name',
-                                    'sample_batch', 't_act', 't_exp', 'machine', 'gas', 'user']), {
-                    'date':          isotherm.date,
-                    'is_real':       isotherm.is_real,
-                    'exp_type':      isotherm.exp_type,
-                    'sample_name':         isotherm.sample_name,
-                    'sample_batch':        isotherm.sample_batch,
-                    't_act':         isotherm.t_act,
-                    't_exp':         isotherm.t_exp,
-                    'machine':       isotherm.machine,
-                    'gas':           isotherm.gas,
-                    'user':          isotherm.user,
-                }
-            ).fetchone()[0]
+                             where=['id']),
+                {'id':        isotherm.id}
+            ).fetchone()
+
+            if ids is None:
+                raise sqlite3.IntegrityError(
+                    "Experiment to delete does not exist in database")
 
             # Delete data from experiment_data table
-            # Build sql request
-            sql_com = build_delete(table='experiment_data',
-                                   where=['exp_id'])
-
-            cursor.execute(sql_com, {'exp_id': isotherm_id})
+            cursor.execute(build_delete(table='experiment_data',
+                                        where=['exp_id']), {'exp_id': isotherm.id})
 
             # Delete experiment info in experiments table
-            sql_com = build_delete(table='experiments',
-                                   where=['id'])
-
-            cursor.execute(sql_com, {'id': isotherm.id})
+            cursor.execute(build_delete(table='experiments',
+                                        where=['id']), {'id': isotherm.id})
 
             # Print success
             print("Success:", isotherm)
@@ -668,8 +627,8 @@ def db_delete_experiment(pth, isotherm):
     except sqlite3.IntegrityError as e:
         print("Error on isotherm:", "\n",
               isotherm.exp_type,
-              isotherm.name,
-              isotherm.batch,
+              isotherm.sample_name,
+              isotherm.sample_batch,
               isotherm.user,
               isotherm.gas,
               isotherm.machine,
@@ -760,10 +719,8 @@ def db_get_gasses(pth):
 
         gasses = []
 
-        # Create the samples
+        # Create the gasses
         for row in cursor:
-            if row is None:
-                continue
 
             gas_params = dict(zip(row.keys(), row))
 
@@ -934,14 +891,18 @@ def db_delete_gas(pth, gas):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
-            # Get id of sample
-            gas_id = cursor.execute(
+            # Get id of gas
+            ids = cursor.execute(
                 build_select(table='gasses',
                              to_select=['id'],
-                             where=['nick']), {
-                    'nick':        gas.name,
-                }
-            ).fetchone()[0]
+                             where=['nick']),
+                {'nick':        gas.name}
+            ).fetchone()
+
+            if ids is None:
+                raise sqlite3.IntegrityError(
+                    "Gas to delete does not exist in database")
+            gas_id = ids[0]
 
             # Delete data from gas_properties table
             # Build sql request
@@ -1039,6 +1000,18 @@ def db_delete_contact(pth, contact_nick):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
+            # Check if contact exists
+            ids = cursor.execute(
+                build_select(table='contacts',
+                             to_select=['nick'],
+                             where=['nick']),
+                {'nick':        contact_nick}
+            ).fetchone()
+
+            if ids is None:
+                raise sqlite3.IntegrityError(
+                    "Contact to delete does not exist in database")
+
             sql_com = build_delete(table='contacts',
                                    where=['nick'])
 
@@ -1121,6 +1094,18 @@ def db_delete_lab(pth, lab_nick):
             # Get a cursor object
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
+
+            # Check if lab exists
+            ids = cursor.execute(
+                build_select(table='labs',
+                             to_select=['nick'],
+                             where=['nick']),
+                {'nick':        lab_nick}
+            ).fetchone()
+
+            if ids is None:
+                raise sqlite3.IntegrityError(
+                    "Lab to delete does not exist in database")
 
             sql_com = build_delete(table='labs',
                                    where=['nick'])
@@ -1240,6 +1225,18 @@ def db_delete_machine(pth, machine_nick):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
+            # Check if machine exists
+            ids = cursor.execute(
+                build_select(table='machines',
+                             to_select=['nick'],
+                             where=['nick']),
+                {'nick':        machine_nick}
+            ).fetchone()
+
+            if ids is None:
+                raise sqlite3.IntegrityError(
+                    "Machine to delete does not exist in database")
+
             sql_com = build_delete(table='machines',
                                    where=['nick'])
 
@@ -1250,7 +1247,7 @@ def db_delete_machine(pth, machine_nick):
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
+        print("Error on machine:", "\n",
               machine_nick,
               "\n", e)
         raise e

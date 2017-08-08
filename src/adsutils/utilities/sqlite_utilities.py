@@ -1,4 +1,4 @@
-def build_update(table, to_set, where):
+def build_update(table, to_set, where, prefix=None):
     """
     builds an update request
     """
@@ -7,7 +7,10 @@ def build_update(table, to_set, where):
     sql_q += " SET "
     sql_q += ', '.join('{0} = :{0}'.format(w) for w in to_set)
     sql_q += ' WHERE '
-    sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
+    if prefix is not None:
+        sql_q += ' AND '.join('{0} = :{1}{0}'.format(w, prefix) for w in where)
+    else:
+        sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
 
     return sql_q
 

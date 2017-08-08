@@ -116,8 +116,7 @@ PRAGMA_EXPERIMENTS = """
                 FOREIGN KEY(`machine`)          REFERENCES `machines`(`nick`),
                 FOREIGN KEY(`user`)             REFERENCES `contacts`(`nick`),
                 FOREIGN KEY(`gas`)              REFERENCES `gasses`(`nick`),
-                FOREIGN KEY(`lab`)              REFERENCES `labs`(`nick`),
-                UNIQUE(date, is_real, exp_type, sample_name, sample_batch, t_act, t_exp, machine, gas, user)
+                FOREIGN KEY(`lab`)              REFERENCES `labs`(`nick`)
                 );
 """
 

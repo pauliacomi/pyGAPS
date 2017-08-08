@@ -38,13 +38,13 @@ def isotherm_data():
         pressure_key = "pressure"
         loading_key = "loading"
 
-        other_key = "enthalpy_key"
-        other_keys = {other_key: "enthalpy"}
+        other_key = "enthalpy"
+        other_keys = [other_key]
 
         isotherm_df = pandas.DataFrame({
             pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
             loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
-            other_keys[other_key]: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+            other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
         })
 
         info = {
@@ -136,11 +136,15 @@ def gas_data():
         'formula': 'N2',
 
         'properties': {
-            'molar_mass': 14,
-            'polarizability': 22.5,
-            'dipole': 14,
-            'quadrupole': 14,
-            'critical_t': 14,
+            'molar_mass': 28.0,
+            'cross_sectional_area': 0.162,
+            'polarizability': 17.4,
+            'dipole_moment': 0.0,
+            'quadrupole_moment': 1.52,
+            'criticalp_temperature': 126.2,
+            'criticalp_pressure': 34.0,
+            'criticalp_density': 11.2,
+            'triplep_temperature': 63.1,
         }
     }
 

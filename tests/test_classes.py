@@ -70,13 +70,13 @@ def test_isotherm_ret_funcs(isotherm_data, basic_isotherm):
     assert isotherm.adsdata().equals(pandas.DataFrame({
         data.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         data.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-        data.other_keys[data.other_key]: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+        data.other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
     }))
 
     assert isotherm.desdata().equals(pandas.DataFrame({
         data.pressure_key: [4.0, 2.0],
         data.loading_key: [4.0, 2.0],
-        data.other_keys[data.other_key]: [5.0, 5.0],
+        data.other_key: [5.0, 5.0],
     }, index=[6, 7]))
 
     assert set(isotherm.pressure_ads()) == set([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
