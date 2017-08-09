@@ -24,7 +24,7 @@ setup(
     name='adsutils',
     version='0.1.0',
     license='MIT license',
-    description='An example package. Generated with cookiecutter-pylibrary.',
+    description='',
     long_description='%s\n%s' % (
         re.compile('^.. start-badges.*^.. end-badges',
                    re.M | re.S).sub('', read('README.rst')),
@@ -54,8 +54,10 @@ setup(
     keywords=[
         # eg: 'keyword1', 'keyword2', 'keyword3',
     ],
+    setup_requires=[
+        'numpy >= 1.11'
+    ],
     install_requires=[
-        'numpy >= 1.11',
         'scipy >= 0.18.0',
         'pandas >= 0.18.1',
         'matplotlib >= 2.0',
