@@ -6,6 +6,7 @@ This module contains the sql commands to generate the sqlite database
 __author__ = 'Paul A. Iacomi'
 
 import sqlite3
+
 from .sqlite_db_pragmas import PRAGMAS
 
 #####################################################################

@@ -2,8 +2,10 @@
 Configuration file for pytest and commonly used fixtures
 """
 import sys
-import pytest
+
 import pandas
+import pytest
+
 import adsutils
 
 # Run only on windows

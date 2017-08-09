@@ -2,9 +2,10 @@
 This test module has tests relating to sqlite database utilities
 """
 
-import sqlite3
-import pytest
 import copy
+import sqlite3
+
+import pytest
 
 import adsutils
 from adsutils.utilities.sqlite_db_creator import db_create

@@ -2,8 +2,9 @@
 This test module has tests relating to classes
 """
 
-import pytest
 import pandas
+import pytest
+
 import adsutils
 
 

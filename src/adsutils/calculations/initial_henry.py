@@ -9,8 +9,8 @@ import copy
 import matplotlib.pyplot as plt
 import numpy
 import pandas
-from ..classes.modelisotherm import ModelIsotherm
 
+from ..classes.modelisotherm import ModelIsotherm
 from ..graphing.isothermgraphs import plot_iso
 
 

@@ -3,7 +3,9 @@ This test module has tests relating to parser classes
 """
 
 import json
+
 import pytest
+
 import adsutils
 
 

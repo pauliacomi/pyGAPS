@@ -3,7 +3,9 @@ Parsing to and from json file format for isotherms
 """
 
 import json
+
 import pandas
+
 from ..classes.pointisotherm import PointIsotherm
 
 

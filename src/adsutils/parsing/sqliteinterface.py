@@ -14,10 +14,10 @@ import pandas
 from ..classes.gas import Gas
 from ..classes.pointisotherm import PointIsotherm
 from ..classes.sample import Sample
+from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
 from ..utilities.sqlite_utilities import build_update
-from ..utilities.sqlite_utilities import build_delete
 
 
 def db_get_samples(pth):

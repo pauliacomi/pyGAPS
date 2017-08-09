@@ -10,6 +10,7 @@ import os.path
 
 import numpy
 import pandas
+
 from ..classes.pointisotherm import PointIsotherm
 
 # chose an implementation, depending on os

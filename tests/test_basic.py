@@ -2,8 +2,9 @@
 Basic tests regarding module import and functionality
 """
 
-import pytest
 import sys
+
+import pytest
 
 
 @pytest.mark.skip(reason="not well implemented")
