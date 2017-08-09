@@ -55,9 +55,9 @@ setup(
         # eg: 'keyword1', 'keyword2', 'keyword3',
     ],
     setup_requires=[
-        'numpy >= 1.11'
     ],
     install_requires=[
+        'numpy >= 1.11'
         'scipy >= 0.18.0',
         'pandas >= 0.18.1',
         'matplotlib >= 2.0',
