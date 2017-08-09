@@ -58,7 +58,7 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
                         "types in _PLOT_TYPES" % plot_type)
 
     if plot_type == 'enthalpy' or plot_type == 'iso-enth':
-        if all(isotherm.enthalpy_all() is None for isotherm in isotherms):
+        if all('enthalpy' not in isotherm.other_keys for isotherm in isotherms):
             raise Exception(
                 "None of the isotherms supplied have enthalpy data")
 

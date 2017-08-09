@@ -1,7 +1,10 @@
 # %%
 from os.path import expanduser
+
 import adsutils
-from .samplecomparisons import plot_all_selected, plot_individual_selected
+
+from .samplecomparisons import plot_all_selected
+from .samplecomparisons import plot_individual_selected
 
 # %%
 # Reload all imports from adsutils
@@ -237,3 +240,10 @@ isotherms[1].convert_adsorbent_mode("volume")
 isotherms[1].print_info()
 isotherms[1].convert_adsorbent_mode("mass")
 isotherms[1].print_info()
+
+
+# %%
+# Save as json
+for isotherm in isotherms:
+    with open(isotherm.sample_name + ' ' + isotherm.sample_batch + '.json', "w") as text_file:
+        text_file.write(adsutils.isotherm_to_json(isotherm))

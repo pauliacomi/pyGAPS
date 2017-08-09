@@ -1,1 +1,543 @@
-{"id": "", "sample_name": "Takeda 5A", "sample_batch": "Test", "t_exp": 77.0, "gas": "N2", "date": "None", "t_act": 200.0, "lab": "MADIREL", "comment": null, "user": "PI", "project": null, "machine": "Triflex", "is_real": true, "exp_type": "Isotherme", "other_properties": null, "isotherm_data": {"0": {"pressure": "1.94e-07", "loading": "0.510281"}, "1": {"pressure": "4.63e-07", "loading": "1.02256"}, "2": {"pressure": "1.09e-06", "loading": "1.54166"}, "3": {"pressure": "2.43e-06", "loading": "2.05975"}, "4": {"pressure": "5.08e-06", "loading": "2.58003"}, "5": {"pressure": "9.62e-06", "loading": "3.09167"}, "6": {"pressure": "1.7e-05", "loading": "3.60649"}, "7": {"pressure": "2.9e-05", "loading": "4.12025"}, "8": {"pressure": "4.74e-05", "loading": "4.63325"}, "9": {"pressure": "7.55e-05", "loading": "5.14278"}, "10": {"pressure": "0.00012", "loading": "5.65215"}, "11": {"pressure": "0.000195", "loading": "6.15738"}, "12": {"pressure": "0.00032579", "loading": "6.66319"}, "13": {"pressure": "0.000562142", "loading": "7.15274"}, "14": {"pressure": "0.000991284", "loading": "7.62057"}, "15": {"pressure": "0.00172004", "loading": "8.05205"}, "16": {"pressure": "0.002858", "loading": "8.44275"}, "17": {"pressure": "0.00443282", "loading": "8.78956"}, "18": {"pressure": "0.00638002", "loading": "9.08882"}, "19": {"pressure": "0.00838015", "loading": "9.32422"}, "20": {"pressure": "0.0109257", "loading": "9.5693"}, "21": {"pressure": "0.0136024", "loading": "9.79498"}, "22": {"pressure": "0.0166029", "loading": "9.9955"}, "23": {"pressure": "0.0198023", "loading": "10.1831"}, "24": {"pressure": "0.0231076", "loading": "10.3557"}, "25": {"pressure": "0.0265706", "loading": "10.5129"}, "26": {"pressure": "0.0301234", "loading": "10.6629"}, "27": {"pressure": "0.0337782", "loading": "10.8033"}, "28": {"pressure": "0.0374878", "loading": "10.9343"}, "29": {"pressure": "0.0413128", "loading": "11.06"}, "30": {"pressure": "0.045181", "loading": "11.1801"}, "31": {"pressure": "0.0491896", "loading": "11.2928"}, "32": {"pressure": "0.053244", "loading": "11.4013"}, "33": {"pressure": "0.0573775", "loading": "11.5028"}, "34": {"pressure": "0.0615085", "loading": "11.5983"}, "35": {"pressure": "0.0668139", "loading": "11.7107"}, "36": {"pressure": "0.0710978", "loading": "11.7963"}, "37": {"pressure": "0.0753812", "loading": "11.8788"}, "38": {"pressure": "0.0797448", "loading": "11.9577"}, "39": {"pressure": "0.0841428", "loading": "12.0313"}, "40": {"pressure": "0.0886393", "loading": "12.1002"}, "41": {"pressure": "0.0928553", "loading": "12.1613"}, "42": {"pressure": "0.0973831", "loading": "12.2246"}, "43": {"pressure": "0.102077", "loading": "12.2852"}, "44": {"pressure": "0.106652", "loading": "12.3437"}, "45": {"pressure": "0.111302", "loading": "12.4002"}, "46": {"pressure": "0.115961", "loading": "12.4529"}, "47": {"pressure": "0.120575", "loading": "12.5027"}, "48": {"pressure": "0.125155", "loading": "12.5475"}, "49": {"pressure": "0.129931", "loading": "12.5949"}, "50": {"pressure": "0.134605", "loading": "12.6388"}, "51": {"pressure": "0.139275", "loading": "12.681"}, "52": {"pressure": "0.144094", "loading": "12.7223"}, "53": {"pressure": "0.148759", "loading": "12.7607"}, "54": {"pressure": "0.153586", "loading": "12.7992"}, "55": {"pressure": "0.158473", "loading": "12.836"}, "56": {"pressure": "0.163243", "loading": "12.8696"}, "57": {"pressure": "0.168123", "loading": "12.9049"}, "58": {"pressure": "0.172985", "loading": "12.9384"}, "59": {"pressure": "0.177842", "loading": "12.9696"}, "60": {"pressure": "0.18277", "loading": "13.0023"}, "61": {"pressure": "0.18777", "loading": "13.0334"}, "62": {"pressure": "0.192603", "loading": "13.0629"}, "63": {"pressure": "0.197541", "loading": "13.0919"}, "64": {"pressure": "0.219403", "loading": "13.2158"}, "65": {"pressure": "0.248555", "loading": "13.3651"}, "66": {"pressure": "0.272923", "loading": "13.4841"}, "67": {"pressure": "0.299469", "loading": "13.6067"}, "68": {"pressure": "0.323898", "loading": "13.7151"}, "69": {"pressure": "0.348022", "loading": "13.8216"}, "70": {"pressure": "0.372716", "loading": "13.9263"}, "71": {"pressure": "0.398726", "loading": "14.0421"}, "72": {"pressure": "0.422563", "loading": "14.143"}, "73": {"pressure": "0.446685", "loading": "14.2464"}, "74": {"pressure": "0.473975", "loading": "14.3602"}, "75": {"pressure": "0.496609", "loading": "14.4518"}, "76": {"pressure": "0.523994", "loading": "14.5627"}, "77": {"pressure": "0.54922", "loading": "14.6608"}, "78": {"pressure": "0.573875", "loading": "14.7558"}, "79": {"pressure": "0.597943", "loading": "14.8492"}, "80": {"pressure": "0.623987", "loading": "14.9507"}, "81": {"pressure": "0.646932", "loading": "15.041"}, "82": {"pressure": "0.673945", "loading": "15.15"}, "83": {"pressure": "0.698989", "loading": "15.2549"}, "84": {"pressure": "0.724223", "loading": "15.3607"}, "85": {"pressure": "0.748952", "loading": "15.4721"}, "86": {"pressure": "0.77394", "loading": "15.5858"}, "87": {"pressure": "0.798968", "loading": "15.7056"}, "88": {"pressure": "0.82418", "loading": "15.8379"}, "89": {"pressure": "0.849088", "loading": "15.9799"}, "90": {"pressure": "0.873928", "loading": "16.1418"}, "91": {"pressure": "0.898863", "loading": "16.3459"}, "92": {"pressure": "0.923782", "loading": "16.644"}, "93": {"pressure": "0.947853", "loading": "17.1561"}, "94": {"pressure": "0.968827", "loading": "18.2209"}, "95": {"pressure": "0.986895", "loading": "21.5865"}, "96": {"pressure": "0.969869", "loading": "19.4276"}, "97": {"pressure": "0.944448", "loading": "17.4274"}, "98": {"pressure": "0.906065", "loading": "16.5296"}, "99": {"pressure": "0.874967", "loading": "16.2158"}, "100": {"pressure": "0.849186", "loading": "16.0344"}, "101": {"pressure": "0.821491", "loading": "15.8695"}, "102": {"pressure": "0.776042", "loading": "15.637"}, "103": {"pressure": "0.749606", "loading": "15.5158"}, "104": {"pressure": "0.7232", "loading": "15.397"}, "105": {"pressure": "0.698462", "loading": "15.2912"}, "106": {"pressure": "0.673423", "loading": "15.1899"}, "107": {"pressure": "0.648936", "loading": "15.0924"}, "108": {"pressure": "0.624467", "loading": "14.998"}, "109": {"pressure": "0.600217", "loading": "14.9039"}, "110": {"pressure": "0.573104", "loading": "14.7978"}, "111": {"pressure": "0.549187", "loading": "14.7014"}, "112": {"pressure": "0.52338", "loading": "14.5952"}, "113": {"pressure": "0.498744", "loading": "14.494"}, "114": {"pressure": "0.474335", "loading": "14.3845"}, "115": {"pressure": "0.448909", "loading": "14.2756"}, "116": {"pressure": "0.424139", "loading": "14.1674"}, "117": {"pressure": "0.399413", "loading": "14.0628"}, "118": {"pressure": "0.375143", "loading": "13.9567"}, "119": {"pressure": "0.349685", "loading": "13.8483"}, "120": {"pressure": "0.325263", "loading": "13.7393"}, "121": {"pressure": "0.299938", "loading": "13.6245"}, "122": {"pressure": "0.275045", "loading": "13.5068"}, "123": {"pressure": "0.250767", "loading": "13.3864"}, "124": {"pressure": "0.225979", "loading": "13.2595"}, "125": {"pressure": "0.201178", "loading": "13.1205"}, "126": {"pressure": "0.176766", "loading": "12.9696"}, "127": {"pressure": "0.152149", "loading": "12.7927"}, "128": {"pressure": "0.128012", "loading": "12.582"}, "129": {"pressure": "0.10586", "loading": "12.3371"}, "130": {"pressure": "0.0910233", "loading": "12.1382"}}}
+{
+    "comment": null,
+    "date": "None",
+    "exp_type": "Isotherme",
+    "gas": "N2",
+    "id": "c1115bb0d3295ef9003e59cc067a7e6f",
+    "is_real": true,
+    "isotherm_data": {
+        "0": {
+            "loading": "0.510281",
+            "pressure": "1.94e-07"
+        },
+        "1": {
+            "loading": "1.02256",
+            "pressure": "4.63e-07"
+        },
+        "10": {
+            "loading": "5.65215",
+            "pressure": "0.00012"
+        },
+        "100": {
+            "loading": "16.0344",
+            "pressure": "0.849186"
+        },
+        "101": {
+            "loading": "15.8695",
+            "pressure": "0.821491"
+        },
+        "102": {
+            "loading": "15.637",
+            "pressure": "0.776042"
+        },
+        "103": {
+            "loading": "15.5158",
+            "pressure": "0.749606"
+        },
+        "104": {
+            "loading": "15.397",
+            "pressure": "0.7232"
+        },
+        "105": {
+            "loading": "15.2912",
+            "pressure": "0.698462"
+        },
+        "106": {
+            "loading": "15.1899",
+            "pressure": "0.673423"
+        },
+        "107": {
+            "loading": "15.0924",
+            "pressure": "0.648936"
+        },
+        "108": {
+            "loading": "14.998",
+            "pressure": "0.624467"
+        },
+        "109": {
+            "loading": "14.9039",
+            "pressure": "0.600217"
+        },
+        "11": {
+            "loading": "6.15738",
+            "pressure": "0.000195"
+        },
+        "110": {
+            "loading": "14.7978",
+            "pressure": "0.573104"
+        },
+        "111": {
+            "loading": "14.7014",
+            "pressure": "0.549187"
+        },
+        "112": {
+            "loading": "14.5952",
+            "pressure": "0.52338"
+        },
+        "113": {
+            "loading": "14.494",
+            "pressure": "0.498744"
+        },
+        "114": {
+            "loading": "14.3845",
+            "pressure": "0.474335"
+        },
+        "115": {
+            "loading": "14.2756",
+            "pressure": "0.448909"
+        },
+        "116": {
+            "loading": "14.1674",
+            "pressure": "0.424139"
+        },
+        "117": {
+            "loading": "14.0628",
+            "pressure": "0.399413"
+        },
+        "118": {
+            "loading": "13.9567",
+            "pressure": "0.375143"
+        },
+        "119": {
+            "loading": "13.8483",
+            "pressure": "0.349685"
+        },
+        "12": {
+            "loading": "6.66319",
+            "pressure": "0.00032579"
+        },
+        "120": {
+            "loading": "13.7393",
+            "pressure": "0.325263"
+        },
+        "121": {
+            "loading": "13.6245",
+            "pressure": "0.299938"
+        },
+        "122": {
+            "loading": "13.5068",
+            "pressure": "0.275045"
+        },
+        "123": {
+            "loading": "13.3864",
+            "pressure": "0.250767"
+        },
+        "124": {
+            "loading": "13.2595",
+            "pressure": "0.225979"
+        },
+        "125": {
+            "loading": "13.1205",
+            "pressure": "0.201178"
+        },
+        "126": {
+            "loading": "12.9696",
+            "pressure": "0.176766"
+        },
+        "127": {
+            "loading": "12.7927",
+            "pressure": "0.152149"
+        },
+        "128": {
+            "loading": "12.582",
+            "pressure": "0.128012"
+        },
+        "129": {
+            "loading": "12.3371",
+            "pressure": "0.10586"
+        },
+        "13": {
+            "loading": "7.15274",
+            "pressure": "0.000562142"
+        },
+        "130": {
+            "loading": "12.1382",
+            "pressure": "0.0910233"
+        },
+        "14": {
+            "loading": "7.62057",
+            "pressure": "0.000991284"
+        },
+        "15": {
+            "loading": "8.05205",
+            "pressure": "0.00172004"
+        },
+        "16": {
+            "loading": "8.44275",
+            "pressure": "0.002858"
+        },
+        "17": {
+            "loading": "8.78956",
+            "pressure": "0.00443282"
+        },
+        "18": {
+            "loading": "9.08882",
+            "pressure": "0.00638002"
+        },
+        "19": {
+            "loading": "9.32422",
+            "pressure": "0.00838015"
+        },
+        "2": {
+            "loading": "1.54166",
+            "pressure": "1.09e-06"
+        },
+        "20": {
+            "loading": "9.5693",
+            "pressure": "0.0109257"
+        },
+        "21": {
+            "loading": "9.79498",
+            "pressure": "0.0136024"
+        },
+        "22": {
+            "loading": "9.9955",
+            "pressure": "0.0166029"
+        },
+        "23": {
+            "loading": "10.1831",
+            "pressure": "0.0198023"
+        },
+        "24": {
+            "loading": "10.3557",
+            "pressure": "0.0231076"
+        },
+        "25": {
+            "loading": "10.5129",
+            "pressure": "0.0265706"
+        },
+        "26": {
+            "loading": "10.6629",
+            "pressure": "0.0301234"
+        },
+        "27": {
+            "loading": "10.8033",
+            "pressure": "0.0337782"
+        },
+        "28": {
+            "loading": "10.9343",
+            "pressure": "0.0374878"
+        },
+        "29": {
+            "loading": "11.06",
+            "pressure": "0.0413128"
+        },
+        "3": {
+            "loading": "2.05975",
+            "pressure": "2.43e-06"
+        },
+        "30": {
+            "loading": "11.1801",
+            "pressure": "0.045181"
+        },
+        "31": {
+            "loading": "11.2928",
+            "pressure": "0.0491896"
+        },
+        "32": {
+            "loading": "11.4013",
+            "pressure": "0.053244"
+        },
+        "33": {
+            "loading": "11.5028",
+            "pressure": "0.0573775"
+        },
+        "34": {
+            "loading": "11.5983",
+            "pressure": "0.0615085"
+        },
+        "35": {
+            "loading": "11.7107",
+            "pressure": "0.0668139"
+        },
+        "36": {
+            "loading": "11.7963",
+            "pressure": "0.0710978"
+        },
+        "37": {
+            "loading": "11.8788",
+            "pressure": "0.0753812"
+        },
+        "38": {
+            "loading": "11.9577",
+            "pressure": "0.0797448"
+        },
+        "39": {
+            "loading": "12.0313",
+            "pressure": "0.0841428"
+        },
+        "4": {
+            "loading": "2.58003",
+            "pressure": "5.08e-06"
+        },
+        "40": {
+            "loading": "12.1002",
+            "pressure": "0.0886393"
+        },
+        "41": {
+            "loading": "12.1613",
+            "pressure": "0.0928553"
+        },
+        "42": {
+            "loading": "12.2246",
+            "pressure": "0.0973831"
+        },
+        "43": {
+            "loading": "12.2852",
+            "pressure": "0.102077"
+        },
+        "44": {
+            "loading": "12.3437",
+            "pressure": "0.106652"
+        },
+        "45": {
+            "loading": "12.4002",
+            "pressure": "0.111302"
+        },
+        "46": {
+            "loading": "12.4529",
+            "pressure": "0.115961"
+        },
+        "47": {
+            "loading": "12.5027",
+            "pressure": "0.120575"
+        },
+        "48": {
+            "loading": "12.5475",
+            "pressure": "0.125155"
+        },
+        "49": {
+            "loading": "12.5949",
+            "pressure": "0.129931"
+        },
+        "5": {
+            "loading": "3.09167",
+            "pressure": "9.62e-06"
+        },
+        "50": {
+            "loading": "12.6388",
+            "pressure": "0.134605"
+        },
+        "51": {
+            "loading": "12.681",
+            "pressure": "0.139275"
+        },
+        "52": {
+            "loading": "12.7223",
+            "pressure": "0.144094"
+        },
+        "53": {
+            "loading": "12.7607",
+            "pressure": "0.148759"
+        },
+        "54": {
+            "loading": "12.7992",
+            "pressure": "0.153586"
+        },
+        "55": {
+            "loading": "12.836",
+            "pressure": "0.158473"
+        },
+        "56": {
+            "loading": "12.8696",
+            "pressure": "0.163243"
+        },
+        "57": {
+            "loading": "12.9049",
+            "pressure": "0.168123"
+        },
+        "58": {
+            "loading": "12.9384",
+            "pressure": "0.172985"
+        },
+        "59": {
+            "loading": "12.9696",
+            "pressure": "0.177842"
+        },
+        "6": {
+            "loading": "3.60649",
+            "pressure": "1.7e-05"
+        },
+        "60": {
+            "loading": "13.0023",
+            "pressure": "0.18277"
+        },
+        "61": {
+            "loading": "13.0334",
+            "pressure": "0.18777"
+        },
+        "62": {
+            "loading": "13.0629",
+            "pressure": "0.192603"
+        },
+        "63": {
+            "loading": "13.0919",
+            "pressure": "0.197541"
+        },
+        "64": {
+            "loading": "13.2158",
+            "pressure": "0.219403"
+        },
+        "65": {
+            "loading": "13.3651",
+            "pressure": "0.248555"
+        },
+        "66": {
+            "loading": "13.4841",
+            "pressure": "0.272923"
+        },
+        "67": {
+            "loading": "13.6067",
+            "pressure": "0.299469"
+        },
+        "68": {
+            "loading": "13.7151",
+            "pressure": "0.323898"
+        },
+        "69": {
+            "loading": "13.8216",
+            "pressure": "0.348022"
+        },
+        "7": {
+            "loading": "4.12025",
+            "pressure": "2.9e-05"
+        },
+        "70": {
+            "loading": "13.9263",
+            "pressure": "0.372716"
+        },
+        "71": {
+            "loading": "14.0421",
+            "pressure": "0.398726"
+        },
+        "72": {
+            "loading": "14.143",
+            "pressure": "0.422563"
+        },
+        "73": {
+            "loading": "14.2464",
+            "pressure": "0.446685"
+        },
+        "74": {
+            "loading": "14.3602",
+            "pressure": "0.473975"
+        },
+        "75": {
+            "loading": "14.4518",
+            "pressure": "0.496609"
+        },
+        "76": {
+            "loading": "14.5627",
+            "pressure": "0.523994"
+        },
+        "77": {
+            "loading": "14.6608",
+            "pressure": "0.54922"
+        },
+        "78": {
+            "loading": "14.7558",
+            "pressure": "0.573875"
+        },
+        "79": {
+            "loading": "14.8492",
+            "pressure": "0.597943"
+        },
+        "8": {
+            "loading": "4.63325",
+            "pressure": "4.74e-05"
+        },
+        "80": {
+            "loading": "14.9507",
+            "pressure": "0.623987"
+        },
+        "81": {
+            "loading": "15.041",
+            "pressure": "0.646932"
+        },
+        "82": {
+            "loading": "15.15",
+            "pressure": "0.673945"
+        },
+        "83": {
+            "loading": "15.2549",
+            "pressure": "0.698989"
+        },
+        "84": {
+            "loading": "15.3607",
+            "pressure": "0.724223"
+        },
+        "85": {
+            "loading": "15.4721",
+            "pressure": "0.748952"
+        },
+        "86": {
+            "loading": "15.5858",
+            "pressure": "0.77394"
+        },
+        "87": {
+            "loading": "15.7056",
+            "pressure": "0.798968"
+        },
+        "88": {
+            "loading": "15.8379",
+            "pressure": "0.82418"
+        },
+        "89": {
+            "loading": "15.9799",
+            "pressure": "0.849088"
+        },
+        "9": {
+            "loading": "5.14278",
+            "pressure": "7.55e-05"
+        },
+        "90": {
+            "loading": "16.1418",
+            "pressure": "0.873928"
+        },
+        "91": {
+            "loading": "16.3459",
+            "pressure": "0.898863"
+        },
+        "92": {
+            "loading": "16.644",
+            "pressure": "0.923782"
+        },
+        "93": {
+            "loading": "17.1561",
+            "pressure": "0.947853"
+        },
+        "94": {
+            "loading": "18.2209",
+            "pressure": "0.968827"
+        },
+        "95": {
+            "loading": "21.5865",
+            "pressure": "0.986895"
+        },
+        "96": {
+            "loading": "19.4276",
+            "pressure": "0.969869"
+        },
+        "97": {
+            "loading": "17.4274",
+            "pressure": "0.944448"
+        },
+        "98": {
+            "loading": "16.5296",
+            "pressure": "0.906065"
+        },
+        "99": {
+            "loading": "16.2158",
+            "pressure": "0.874967"
+        }
+    },
+    "lab": "MADIREL",
+    "machine": "Triflex",
+    "other_properties": null,
+    "project": null,
+    "sample_batch": "Test",
+    "sample_name": "Takeda 5A",
+    "t_act": 200.0,
+    "t_exp": 77.0,
+    "user": "PI"
+}

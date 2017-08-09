@@ -11,8 +11,8 @@ from .classes.user import User
 from .graphing.iastgraphs import plot_iast_vle
 from .graphing.isothermgraphs import plot_iso
 from .parsing.csvinterface import samples_parser
-from .parsing.excelinterface import xl_experiment_parser
-from .parsing.excelinterface import xl_experiment_parser_paths
+from .parsing.excelinterface import isotherm_from_xl
+from .parsing.excelinterface import isotherm_to_xl
 from .parsing.jsoninterface import isotherm_from_json
 from .parsing.jsoninterface import isotherm_to_json
 from .parsing.sqliteinterface import db_delete_contact
@@ -38,3 +38,4 @@ from .parsing.sqliteinterface import db_upload_sample
 from .parsing.sqliteinterface import db_upload_sample_form
 from .parsing.sqliteinterface import db_upload_sample_property_type
 from .parsing.sqliteinterface import db_upload_sample_type
+from .utilities.folder_utilities import util_get_file_paths

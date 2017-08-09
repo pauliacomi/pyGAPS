@@ -1,6 +1,5 @@
-# %%
 """
-This module contains the sql commands to generate the sqlite database
+This module contains the functions that generate the sqlite database
 """
 
 __author__ = 'Paul A. Iacomi'
@@ -9,10 +8,6 @@ import sqlite3
 
 from .sqlite_db_pragmas import PRAGMAS
 
-#####################################################################
-# Table creation and/or reinitialisation
-#
-# WARNING: deletes data
 
 
 def db_create(pth):

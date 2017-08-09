@@ -6,7 +6,6 @@ used, such as the parser file.
 """
 
 import os
-import os.path
 
 import numpy
 import pandas
@@ -21,7 +20,7 @@ else:
         "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
 
-def xl_experiment_parser(path):
+def isotherm_from_xl(path):
     '''
 
     A function that will get the experiment and sample data from a parser file and return the isotherm object.
@@ -33,7 +32,6 @@ def xl_experiment_parser(path):
     if xlwings is None:
         raise Warning(
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
-        return
 
     # get excel workbook, sheet and range
     wb = xlwings.Book(path)
@@ -50,7 +48,6 @@ def xl_experiment_parser(path):
     if is_real == "Simulation":
         sample_info['is_real'] = False
 
-    sample_info['id'] = ""
     sample_info['date'] = sht.range('B3').value
     sample_info['sample_name'] = sht.range('B4').value
     sample_info['sample_batch'] = sht.range('B5').value
@@ -67,11 +64,11 @@ def xl_experiment_parser(path):
     if sample_info["exp_type"] == "Isotherme":
         experiment_data_arr = sht.range('A31').options(
             numpy.array, expand='table').value
-        columns = ["Pressure", "Loading"]
+        columns = ["pressure", "loading"]
     elif sample_info["exp_type"] == "Calorimetrie":
         experiment_data_arr = sht.range('A41').options(
             numpy.array, expand='table').value
-        columns = ["Pressure", "Loading", "Enthalpy"]
+        columns = ["pressure", "loading", "enthalpy"]
     else:
         raise Exception("Unknown data type")
 
@@ -79,11 +76,10 @@ def xl_experiment_parser(path):
 
     xlwings.apps[0].quit()
 
-    loading_key = "Loading"
-    pressure_key = "Pressure"
-
-    other_key = "enthalpy_key"
-    other_keys = {other_key: "Enthalpy"}
+    loading_key = "loading"
+    pressure_key = "pressure"
+    other_key = "enthalpy"
+    other_keys = [other_key]
 
     isotherm = PointIsotherm(
         experiment_data_df,
@@ -95,27 +91,17 @@ def xl_experiment_parser(path):
     return isotherm
 
 
-def xl_experiment_parser_paths(folder):
+def isotherm_to_xl(path):
     '''
 
-    A function that will get the experiment and sample data from a parser file.
+    A function that turns the isotherm into an excel file with the data and properties.
 
-    :param folder: The folder where the function will look in
+    :param path: Path to the file being written
 
     '''
 
     if xlwings is None:
         raise Warning(
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
-        return
 
-    paths = []
-
-    for root, _, files in os.walk(folder):
-        for f in files:
-            fullpath = os.path.join(root, f)
-            ext = os.path.splitext(fullpath)[-1].lower()
-            if ext == ".xlsx":
-                paths.append(fullpath)
-
-    return paths
+    return
