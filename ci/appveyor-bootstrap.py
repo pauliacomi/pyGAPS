@@ -19,8 +19,8 @@ GET_PIP_URL = "https://bootstrap.pypa.io/get-pip.py"
 GET_PIP_PATH = "C:\get-pip.py"
 URLS = {
     # NOTE: uncomment for python 2.7 tests
-    #("2.7", "64"): BASE_URL + "2.7.10/python-2.7.13.amd64.msi",
-    #("2.7", "32"): BASE_URL + "2.7.10/python-2.7.13.msi",
+    # ("2.7", "64"): BASE_URL + "2.7.10/python-2.7.13.amd64.msi",
+    # ("2.7", "32"): BASE_URL + "2.7.10/python-2.7.13.msi",
     # NOTE: no .msi installer for 3.3.6
     ("3.3", "64"): BASE_URL + "3.3.3/python-3.3.5.amd64.msi",
     ("3.3", "32"): BASE_URL + "3.3.3/python-3.3.5.msi",
@@ -34,8 +34,8 @@ URLS = {
 INSTALL_CMD = {
     # Commands are allowed to fail only if they are not the last command.  Eg: uninstall (/x) allowed to fail.
     # NOTE: uncomment for python 2.7 tests
-    #"2.7": [["msiexec.exe", "/L*+!", "install.log", "/qn", "/x", "{path}"],
-    #        ["msiexec.exe", "/L*+!", "install.log", "/qn", "/i", "{path}", "TARGETDIR={home}"]],
+    # "2.7": [["msiexec.exe", "/L*+!", "install.log", "/qn", "/x", "{path}"],
+    #         ["msiexec.exe", "/L*+!", "install.log", "/qn", "/i", "{path}", "TARGETDIR={home}"]],
     "3.3": [["msiexec.exe", "/L*+!", "install.log", "/qn", "/x", "{path}"],
             ["msiexec.exe", "/L*+!", "install.log", "/qn", "/i", "{path}", "TARGETDIR={home}"]],
     "3.4": [["msiexec.exe", "/L*+!", "install.log", "/qn", "/x", "{path}"],
@@ -118,4 +118,4 @@ if __name__ == "__main__":
                    environ['PYTHON_ARCH'], environ['PYTHON_HOME'])
     install_pip(environ['PYTHON_HOME'])
     install_packages(environ['PYTHON_HOME'],
-                     "setuptools", "wheel", "tox", "virtualenv")
+                     "setuptools>=36.2.7", "wheel", "tox", "virtualenv>=13.1.0")
