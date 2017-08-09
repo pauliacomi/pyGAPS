@@ -9,7 +9,6 @@ import sqlite3
 from .sqlite_db_pragmas import PRAGMAS
 
 
-
 def db_create(pth):
     """
     Creates the entire database
