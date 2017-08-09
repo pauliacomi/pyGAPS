@@ -5,8 +5,7 @@ IAST functions in pyiast.py.
 """
 __author__ = 'Cory M. Simon'
 __all__ = ["ModelIsotherm", "InterpolatorIsotherm",
-           "plot_isotherm", "_MODELS", "_MODEL_PARAMS",
-           "_VERSION"]
+           "_MODELS", "_MODEL_PARAMS", "_VERSION"]
 
 import copy
 
