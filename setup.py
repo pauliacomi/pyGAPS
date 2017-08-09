@@ -54,8 +54,7 @@ setup(
     keywords=[
         # eg: 'keyword1', 'keyword2', 'keyword3',
     ],
-    setup_requires=[
-    ],
+    # setup_requires=[],
     install_requires=[
         'numpy >= 1.11'
         'scipy >= 0.18.0',
