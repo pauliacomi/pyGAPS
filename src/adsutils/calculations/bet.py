@@ -92,11 +92,13 @@ def area_BET(isotherm, optimize=True, verbose=False):
     # PLOTTING
     if verbose:
 
-        print('The slope of the BET line: s =', round(slope, 3))
+        print("The slope of the BET line: s =", round(slope, 3))
         print("The intercept of the BET line: i =", round(intercept, 3))
         print("C =", int(round(c_const, 0)))
         print("Amount for a monolayer: n =",
               round(n_monolayer, 3), "mol/g")
+        print("Minimum pressure point chosen is {0} and maximum is {1}".format(
+            min_p_chosen, max_p_chosen))
         print("BET surface area: a =", int(round(bet_area, 0)), "m²/g")
 
         # Generate plot of isotherm
