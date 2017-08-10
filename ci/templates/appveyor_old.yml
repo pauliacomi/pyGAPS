@@ -9,58 +9,46 @@ matrix:
 environment:
   global:
     WITH_COMPILER: 'cmd /E:ON /V:ON /C .\ci\appveyor-with-compiler.cmd'
+  matrix:
+    - TOXENV: check
+      TOXPYTHON: C:\Python36\python.exe
+      PYTHON_HOME: C:\Python36
+      PYTHON_VERSION: '3.6'
+      PYTHON_ARCH: '32'
 
 {% for env, config in tox_environments|dictsort %}{{ '' }}{% if config.python.startswith('python') %}
-    - CONDA_ROOT: C:\\Miniconda3_64
+    - TOXENV: '{{ env }}{% if config.cover %},report,codecov{% endif %}'
+      TOXPYTHON: C:\{{ config.python.replace('.', '').capitalize() }}\python.exe
+      PYTHON_HOME: C:\{{ config.python.replace('.', '').capitalize() }}
       PYTHON_VERSION: '{{ config.python[-3:] }}'
       PYTHON_ARCH: '32'
-      CONDA_PY: '{{ config.python[-3:].replace('.', '') }}'
-    - CONDA_ROOT: C:\\Miniconda3_64
+    - TOXENV: '{{ env }}{% if config.cover %},report,codecov{% endif %}'
+      TOXPYTHON: C:\{{ config.python.replace('.', '').capitalize() }}-x64\python.exe
       {%- if config.python != 'python3.5' %}
 
       WINDOWS_SDK_VERSION: v7.{{ '1' if config.python[-3] == '3' else '0' }}
       {%- endif %}
 
+      PYTHON_HOME: C:\{{ config.python.replace('.', '').capitalize() }}-x64
       PYTHON_VERSION: '{{ config.python[-3:] }}'
       PYTHON_ARCH: '64'
-      CONDA_PY: '{{ config.python[-3:].replace('.', '') }}'
 
 {% endif %}{% endfor %}
-
-# We always use a 64-bit machine, but can build x86 distributions
-# with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
-platform:
-- x64
-
 init:
-  - ps: echo %PYTHON_VERSION% %MINICONDA%
+  - ps: echo $env:TOXENV
+  - ps: ls C:\Python*
 install:
-  - powershell .\ci\appveyor-bootstrap.ps1
-  - set PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%PATH%
-
-  # install our build environment
-  - cmd: conda config --set always_yes yes --set changeps1 no
-  - cmd: conda update -q conda
-
-  # this is now the downloaded conda
-  - cmd: conda info -a
-  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% numpy scipy pytest
-  - activate testenv
-  - pip install coverage
-
+  - python -u ci\appveyor-bootstrap.py
+  - '%PYTHON_HOME%\Scripts\virtualenv --version'
+  - '%PYTHON_HOME%\Scripts\easy_install --version'
+  - '%PYTHON_HOME%\Scripts\pip --version'
+  - '%PYTHON_HOME%\Scripts\tox --version'
 test_script:
-  # Now build the thing..
-  - '%WITH_COMPILER% pip install -ve .'
-  - pytest
-
-
-after_test:
-  # cleanup the environment
-  - deactivate
+  - '%WITH_COMPILER% %PYTHON_HOME%\Scripts\tox'
 
 on_failure:
   - ps: dir "env:"
-
+  - ps: get-content .tox\*\log\*
 artifacts:
   - path: dist\*
 

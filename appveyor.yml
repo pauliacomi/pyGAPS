@@ -2,66 +2,78 @@ version: '{branch}-{build}'
 build: false
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
+
+matrix:
+    fast_finish: true
+
 environment:
   global:
     WITH_COMPILER: 'cmd /E:ON /V:ON /C .\ci\appveyor-with-compiler.cmd'
-  matrix:
-    - TOXENV: check
-      TOXPYTHON: C:\Python36\python.exe
-      PYTHON_HOME: C:\Python36
-      PYTHON_VERSION: '3.6'
-      PYTHON_ARCH: '32'
 
-    - TOXENV: '3.4-cover,report,codecov'
-      TOXPYTHON: C:\Python34\python.exe
-      PYTHON_HOME: C:\Python34
+    - CONDA_ROOT: C:\\Miniconda3_64
       PYTHON_VERSION: '3.4'
       PYTHON_ARCH: '32'
-    - TOXENV: '3.4-cover,report,codecov'
-      TOXPYTHON: C:\Python34-x64\python.exe
+      CONDA_PY: '34'
+    - CONDA_ROOT: C:\\Miniconda3_64
       WINDOWS_SDK_VERSION: v7.1
-      PYTHON_HOME: C:\Python34-x64
       PYTHON_VERSION: '3.4'
       PYTHON_ARCH: '64'
+      CONDA_PY: '34'
 
-    - TOXENV: '3.5-cover,report,codecov'
-      TOXPYTHON: C:\Python35\python.exe
-      PYTHON_HOME: C:\Python35
+    - CONDA_ROOT: C:\\Miniconda3_64
       PYTHON_VERSION: '3.5'
       PYTHON_ARCH: '32'
-    - TOXENV: '3.5-cover,report,codecov'
-      TOXPYTHON: C:\Python35-x64\python.exe
-      PYTHON_HOME: C:\Python35-x64
+      CONDA_PY: '35'
+    - CONDA_ROOT: C:\\Miniconda3_64
       PYTHON_VERSION: '3.5'
       PYTHON_ARCH: '64'
+      CONDA_PY: '35'
 
-    - TOXENV: '3.6-cover,report,codecov'
-      TOXPYTHON: C:\Python36\python.exe
-      PYTHON_HOME: C:\Python36
+    - CONDA_ROOT: C:\\Miniconda3_64
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '32'
-    - TOXENV: '3.6-cover,report,codecov'
-      TOXPYTHON: C:\Python36-x64\python.exe
+      CONDA_PY: '36'
+    - CONDA_ROOT: C:\\Miniconda3_64
       WINDOWS_SDK_VERSION: v7.1
-      PYTHON_HOME: C:\Python36-x64
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '64'
+      CONDA_PY: '36'
+
+
+# We always use a 64-bit machine, but can build x86 distributions
+# with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
+platform:
+- x64
 
 init:
-  - ps: echo $env:TOXENV
-  - ps: ls C:\Python*
+  - ps: echo %PYTHON_VERSION% %MINICONDA%
 install:
-  - python -u ci\appveyor-bootstrap.py
-  - '%PYTHON_HOME%\Scripts\virtualenv --version'
-  - '%PYTHON_HOME%\Scripts\easy_install --version'
-  - '%PYTHON_HOME%\Scripts\pip --version'
-  - '%PYTHON_HOME%\Scripts\tox --version'
+  - powershell .\ci\appveyor-bootstrap.ps1
+  - set PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%PATH%
+
+  # install our build environment
+  - cmd: conda config --set always_yes yes --set changeps1 no
+  - cmd: conda update -q conda
+
+  # this is now the downloaded conda
+  - cmd: conda info -a
+  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% numpy scipy pytest
+  - activate testenv
+  - pip install coverage
+
 test_script:
-  - '%WITH_COMPILER% %PYTHON_HOME%\Scripts\tox'
+  # Now build the thing..
+  - '%WITH_COMPILER% pip install -ve .'
+  - pytest
+
+
+after_test:
+  # cleanup the environment
+  - deactivate
 
 on_failure:
   - ps: dir "env:"
-  - ps: get-content .tox\*\log\*
+
 artifacts:
   - path: dist\*
 
