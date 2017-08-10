@@ -23,3 +23,28 @@ for isotherm in isotherms:
 # Virial method
 for isotherm in isotherms:
     adsutils.calc_initial_henry_virial(isotherm, verbose=True)
+
+#################################################################################
+#################################################################################
+# BET surface area calculations
+#
+# %%
+# Get gasses
+
+db_path = os.path.expanduser(
+    r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
+adsutils.data.GAS_LIST = adsutils.db_get_gasses(db_path)
+
+# %%
+# Calculate BET
+for isotherm in isotherms:
+    print(isotherm.sample_name)
+    print(isotherm.gas)
+    isotherm.convert_pressure_mode("relative")
+    adsutils.area_BET(isotherm, verbose=True)
+    isotherm.convert_pressure_mode("absolute")
+
+# %%
+for isotherm in isotherms:
+    print(isotherm.sample_name)
+    print(isotherm.gas)
