@@ -12,11 +12,11 @@ environment:
 
   matrix:
 {% for env, config in tox_environments|dictsort %}{{ '' }}{% if config.python.startswith('python') %}
-    - CONDA_ROOT: 'C:\\Miniconda3_64'
+    - CONDA_ROOT: 'C:\Miniconda3_64'
       PYTHON_VERSION: '{{ config.python[-3:] }}'
       PYTHON_ARCH: '32'
       CONDA_PY: '{{ config.python[-3:].replace('.', '') }}'
-    - CONDA_ROOT: 'C:\\Miniconda3_64'
+    - CONDA_ROOT: 'C:\Miniconda3_64'
       {%- if config.python != 'python3.5' %}
 
       WINDOWS_SDK_VERSION: v7.{{ '1' if config.python[-3] == '3' else '0' }}
@@ -60,7 +60,6 @@ after_test:
   - deactivate
 
 on_failure:
-  - ps: dir "env:"
 
 artifacts:
   - path: dist\*
