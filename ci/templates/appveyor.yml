@@ -10,6 +10,7 @@ environment:
   global:
     WITH_COMPILER: 'cmd /E:ON /V:ON /C .\ci\appveyor-with-compiler.cmd'
 
+  matrix:
 {% for env, config in tox_environments|dictsort %}{{ '' }}{% if config.python.startswith('python') %}
     - CONDA_ROOT: 'C:\\Miniconda3_64'
       PYTHON_VERSION: '{{ config.python[-3:] }}'

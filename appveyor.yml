@@ -10,6 +10,7 @@ environment:
   global:
     WITH_COMPILER: 'cmd /E:ON /V:ON /C .\ci\appveyor-with-compiler.cmd'
 
+  matrix:
     - CONDA_ROOT: 'C:\\Miniconda3_64'
       PYTHON_VERSION: '3.4'
       PYTHON_ARCH: '32'
