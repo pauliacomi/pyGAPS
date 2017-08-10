@@ -5,9 +5,10 @@ This module calculates the BET surface area based on an isotherm
 __author__ = 'Paul A. Iacomi and Bastien Aillet'
 
 import warnings
+
 import matplotlib.pyplot as plt
-import scipy.stats
 import scipy.constants as constants
+import scipy.stats
 
 import adsutils.data as data
 
