@@ -1,5 +1,5 @@
 version: '{branch}-{build}'
-build: off
+build: false
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
 environment:

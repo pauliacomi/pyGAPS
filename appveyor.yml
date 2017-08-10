@@ -1,5 +1,5 @@
 version: '{branch}-{build}'
-build: off
+build: false
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
 environment:
@@ -11,6 +11,7 @@ environment:
       PYTHON_HOME: C:\Python36
       PYTHON_VERSION: '3.6'
       PYTHON_ARCH: '32'
+
     - TOXENV: '3.4-cover,report,codecov'
       TOXPYTHON: C:\Python34\python.exe
       PYTHON_HOME: C:\Python34
