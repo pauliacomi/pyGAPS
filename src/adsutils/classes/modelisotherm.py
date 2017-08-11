@@ -173,8 +173,8 @@ class ModelIsotherm:
             raise Exception("Specify a model to fit to the pure-component"
                             " isotherm data. e.g. model=\"Langmuir\"")
         if model not in _MODELS:
-            raise Exception("Model %s not an option in pyIAST. See viable"
-                            "models with pyiast._MODELS" % model)
+            raise Exception("Model {0} not an option in pyIAST. See viable"
+                            "models with pyiast._MODELS".format(model))
 
         #: Name of analytical model to fit to pure-component isotherm data
         #: adsorption isotherm

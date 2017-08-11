@@ -22,7 +22,7 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
 
     :param isotherms: an array of the isotherms to be plotted
     :param plot_type: the plot type, isotherm/enthalpies or combination
-    :param branch: the branch to disply, ads/des or a combination
+    :param branch: list with branches to disply, options: 'ads', 'des'
     :param logarithmic:whether the graph should be logarithmic in the x axis
     :param color: whether the graph should be coloured or grayscale
 
