@@ -58,7 +58,7 @@ install:
 
   # this is now the downloaded conda
   - cmd: conda info -a
-  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% setuptools pip numpy pandas scipy pytest matplotlib
+  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% setuptools pip pytest numpy pandas scipy matplotlib bokeh xlwings jinja2
   - activate testenv
   - pip install coverage
 
