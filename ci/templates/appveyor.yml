@@ -31,10 +31,10 @@ environment:
 # We always use a 64-bit machine, but can build x86 distributions
 # with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
 platform:
-- x64
+  - x64
 
 init:
-  - ps: echo %PYTHON_VERSION% %MINICONDA%
+  - echo %PYTHON_VERSION% %MINICONDA%
 install:
   - powershell .\ci\appveyor-bootstrap.ps1
   - set PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%PATH%
@@ -45,13 +45,14 @@ install:
 
   # this is now the downloaded conda
   - cmd: conda info -a
-  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% numpy scipy pytest
+  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% setuptools pip numpy pandas scipy pytest matplotlib
   - activate testenv
   - pip install coverage
 
-test_script:
-  # Now build the thing..
+  # Now build the module
   - '%WITH_COMPILER% pip install -ve .'
+
+test_script:
   - pytest
 
 
