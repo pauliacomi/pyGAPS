@@ -104,7 +104,17 @@ def area_BET(isotherm, verbose=False):
         roq_plot(adsorption, bet_points, isotherm.pressure_key,
                  p_monolayer, n_monolayer)
 
-    return bet_area
+    result_dict = {
+        'bet_area': bet_area,
+        'c_const': c_const,
+        'n_monolayer': n_monolayer,
+        'p_monolayer': p_monolayer,
+        'bet_slope': slope,
+        'bet_intercept': intercept,
+        'corr_coef': corr_coef,
+    }
+
+    return result_dict
 
 
 def roq_transform(loading, pressure):
@@ -135,6 +145,7 @@ def bet_parameters(slope, intercept, cross_section):
 
 
 def roq_plot(adsorption, bet_points, pressure_key, p_monolayer, n_monolayer):
+    """Draws the roquerol plot"""
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(adsorption[pressure_key], adsorption.roquerol,
@@ -151,6 +162,7 @@ def roq_plot(adsorption, bet_points, pressure_key, p_monolayer, n_monolayer):
 
 
 def bet_plot(adsorption, bet_points, pressure_key, p_monolayer, n_monolayer):
+    """Draws the bet plot"""
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(adsorption[pressure_key], adsorption.BET,

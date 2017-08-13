@@ -61,8 +61,8 @@ def t_plot(isotherm, thickness_model):
         thickness=t_model(adsorption[isotherm.loading_key]))
 
     # Get minimum and maximum pressure
-    min_p = 0.5
-    max_p = 0.8
+    min_p = 0.00
+    max_p = 0.99
 
     # select the maximum and minimum of the points
     t_points = adsorption.loc[adsorption[isotherm.pressure_key]

@@ -77,7 +77,7 @@ class TestBET(object):
             isotherm = adsutils.isotherm_from_json(text_file.read())
 
         isotherm.convert_pressure_mode("relative")
-        bet_area = adsutils.calculations.area_BET(isotherm)
+        bet_area = adsutils.calculations.area_BET(isotherm).get("bet_area")
 
         max_error = 0.1  # 10 percent
 
