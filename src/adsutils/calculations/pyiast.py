@@ -4,8 +4,8 @@ pure-component adsorption isotherm models from the `isotherms` module.
 """
 __author__ = 'Cory M. Simon'
 
-# This code is written for Python 3.
-import numpy as np
+
+import numpy
 import scipy.optimize
 
 
@@ -25,7 +25,7 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
      :param partial_pressures: Array or list partial pressures of gas components,
         e.g. [5.0, 10.0] (bar)
-     :param isotherms: list pure-component adsorption isotherms.
+     :param isotherms: list of model adsorption isotherms.
         e.g. [methane_isotherm, ethane_isotherm]
      :param verboseflag: Bool print off a lot of information
      :param warningoff: Bool when False, warnings will print when the IAST
@@ -38,12 +38,12 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
      :rtype: Array
     """
 
-    partial_pressures = np.array(partial_pressures)
+    partial_pressures = numpy.array(partial_pressures)
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:
         raise Exception("Pass list of pure component isotherms...")
 
-    if np.size(partial_pressures) != n_components:
+    if numpy.size(partial_pressures) != n_components:
         print("""Example use:\n
               IAST([0.5,0.5], [xe_isotherm, kr_isotherm], verboseflag=true)""")
         raise Exception("Length of partial pressures != length of array of"
@@ -57,22 +57,22 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
     # assert that the spreading pressures of each component are equal
     def spreading_pressure_differences(adsorbed_mole_fractions):
-        r"""
+        """
         Assert that spreading pressures of each component at fictitious pressure
         are equal.
 
         :param adsorbed_mole_fractions: array mole fractions in the adsorbed
-            phase; np.size(adsorbed_mole_fractions) = n_components - 1 because
+            phase; numpy.size(adsorbed_mole_fractions) = n_components - 1 because
             sum z_i = 1 asserted here automatically.
         :returns: spreading_pressure_diff: array spreading pressure difference
             between component i and i+1
         """
-        spreading_pressure_diff = np.zeros((n_components - 1,))
+        spreading_pressure_diff = numpy.zeros((n_components - 1,))
         for i in range(n_components - 1):
             if i == n_components - 2:
                 # automatically assert \sum z_i = 1
                 adsorbed_mole_fraction_n = 1.0 - \
-                    np.sum(adsorbed_mole_fractions)
+                    numpy.sum(adsorbed_mole_fractions)
                 spreading_pressure_diff[i] = isotherms[i].spreading_pressure(
                     partial_pressures[i] / adsorbed_mole_fractions[i]) - \
                     isotherms[i + 1].spreading_pressure(
@@ -93,14 +93,16 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
         # Default guess: pure-component loadings at these partial pressures.
         loading_guess = [isotherms[i].loading(partial_pressures[i]) for i in
                          range(n_components)]
-        loading_guess = np.array(loading_guess)
-        adsorbed_mole_fraction_guess = loading_guess / np.sum(loading_guess)
+        loading_guess = numpy.array(loading_guess)
+        adsorbed_mole_fraction_guess = loading_guess / numpy.sum(loading_guess)
     else:
-        np.testing.assert_almost_equal(1.0,
-                                       np.sum(adsorbed_mole_fraction_guess),
-                                       decimal=4)
+        numpy.testing.assert_almost_equal(1.0,
+                                          numpy.sum(
+                                              adsorbed_mole_fraction_guess),
+                                          decimal=4)
         # if list, convert to numpy array
-        adsorbed_mole_fraction_guess = np.array(adsorbed_mole_fraction_guess)
+        adsorbed_mole_fraction_guess = numpy.array(
+            adsorbed_mole_fraction_guess)
 
     res = scipy.optimize.root(
         spreading_pressure_differences, adsorbed_mole_fraction_guess[:-1],
@@ -116,11 +118,11 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
     adsorbed_mole_fractions = res.x
 
     # concatenate mole fraction of last component
-    adsorbed_mole_fractions = np.concatenate((adsorbed_mole_fractions,
-                                              np.array([1.0 - np.sum(adsorbed_mole_fractions)])))
+    adsorbed_mole_fractions = numpy.concatenate((adsorbed_mole_fractions,
+                                                 numpy.array([1.0 - numpy.sum(adsorbed_mole_fractions)])))
 
-    if (np.sum(adsorbed_mole_fractions < 0.0) != 0) | (
-            np.sum(adsorbed_mole_fractions > 1.0) != 0):
+    if (numpy.sum(adsorbed_mole_fractions < 0.0) != 0) | (
+            numpy.sum(adsorbed_mole_fractions > 1.0) != 0):
         raise Exception("""Adsorbed mole fraction not in [0,1]. Try a different
         starting guess for the adsorbed mole fractions by passing an array or
         list 'adsorbed_mole_fraction_guess' into this function.
@@ -191,18 +193,18 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
     :rtype: Array, Array
     """
     n_components = len(isotherms)  # number of components in the mixture
-    adsorbed_mole_fractions = np.array(adsorbed_mole_fractions)
+    adsorbed_mole_fractions = numpy.array(adsorbed_mole_fractions)
     if n_components == 1:
         raise Exception("Pass list of pure component isotherms...")
 
-    if np.size(adsorbed_mole_fractions) != n_components:
+    if numpy.size(adsorbed_mole_fractions) != n_components:
         print("""Example use:\n
               reverse_IAST([0.5,0.5], 1.0, [xe_isotherm, kr_isotherm],
               verboseflag=true)""")
         raise Exception("Length of desired adsorbed mole fractions != length of"
                         " array of isotherms...")
 
-    if np.sum(adsorbed_mole_fractions) != 1.0:
+    if numpy.sum(adsorbed_mole_fractions) != 1.0:
         raise Exception("Desired adsorbed mole fractions should sum to 1.0...")
 
     if verboseflag:
@@ -218,16 +220,16 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
         are equal.
 
         :param gas_mole_fractions: array mole fractions in bulk gas phase
-            np.size(y) = n_components - 1 because \sum y_i = 1 asserted here
+            numpy.size(y) = n_components - 1 because \sum y_i = 1 asserted here
             automatically.
         :returns: spreading_pressure_diff: array spreading pressure difference
             between component i and i+1
         """
-        spreading_pressure_diff = np.zeros((n_components - 1,))
+        spreading_pressure_diff = numpy.zeros((n_components - 1,))
         for i in range(n_components - 1):
             if i == n_components - 2:
                 # automatically assert \sum y_i = 1
-                gas_mole_fraction_n = 1.0 - np.sum(gas_mole_fractions)
+                gas_mole_fraction_n = 1.0 - numpy.sum(gas_mole_fractions)
                 spreading_pressure_diff[i] = isotherms[i].spreading_pressure(
                     total_pressure * gas_mole_fractions[i] /
                     adsorbed_mole_fractions[i]) - \
@@ -249,10 +251,10 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
         # Default guess: adsorbed mole fraction
         gas_mole_fraction_guess = adsorbed_mole_fractions
     else:
-        np.testing.assert_almost_equal(1.0, np.sum(gas_mole_fraction_guess),
-                                       decimal=4)
+        numpy.testing.assert_almost_equal(1.0, numpy.sum(gas_mole_fraction_guess),
+                                          decimal=4)
         # if list, convert to numpy array
-        gas_mole_fraction_guess = np.array(gas_mole_fraction_guess)
+        gas_mole_fraction_guess = numpy.array(gas_mole_fraction_guess)
 
     res = scipy.optimize.root(
         spreading_pressure_differences, gas_mole_fraction_guess[:-1],
@@ -268,12 +270,12 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
     gas_mole_fractions = res.x
 
     # concatenate mole fraction of last component
-    gas_mole_fractions = np.concatenate((gas_mole_fractions,
-                                         np.array([1.0 -
-                                                   np.sum(gas_mole_fractions)])))
+    gas_mole_fractions = numpy.concatenate((gas_mole_fractions,
+                                            numpy.array([1.0 -
+                                                         numpy.sum(gas_mole_fractions)])))
 
-    if (np.sum(gas_mole_fractions < 0.0) != 0) | (
-            np.sum(gas_mole_fractions > 1.0) != 0):
+    if (numpy.sum(gas_mole_fractions < 0.0) != 0) | (
+            numpy.sum(gas_mole_fractions > 1.0) != 0):
         raise Exception("""Gas phase mole fraction not in [0,1]. Try a different
         starting guess for the gas phase mole fractions by passing an array or
         list 'gas_mole_fraction_guess' into this function.
@@ -327,7 +329,7 @@ def print_selectivity(component_loadings, partial_pressures):
     :param component_loadings: numpy array of component loadings
     :param partial_pressures: partial pressures of components
     """
-    n_components = np.size(component_loadings)
+    n_components = numpy.size(component_loadings)
     for i in range(n_components):
         for j in range(i + 1, n_components):
             print("Selectivity for component %d over %d = %f" % (i, j,

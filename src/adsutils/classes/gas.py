@@ -6,6 +6,8 @@ __author__ = 'Paul A. Iacomi'
 # %%
 from CoolProp.CoolProp import PropsSI
 
+import adsutils.data as data
+
 
 class Gas(object):
     '''
@@ -46,7 +48,20 @@ def saturation_pressure_at_temperature(temp, gas):
 
     @param: temp - temperature where the pressure is desired in K
 
-    :return: pressure
+    :return: pressure in Pascal
     """
+    # See if gas exists in master list
+    ads_gas = next(
+        (x for x in data.GAS_LIST if gas == x.name), None)
+    if ads_gas is None:
+        raise Exception("Gas {0} does not exist in list of gasses. "
+                        "First populate adsutils.data.GAS_LIST "
+                        "with required gas class".format(gas))
 
-    return PropsSI('P', 'T', temp, 'Q', 0, gas) / 101325
+    gas_name = ads_gas.properties.get("common_name")
+    if gas_name is None:
+        raise Exception("Gas {0} does not have a property named "
+                        "common_name. This must be available for CoolProp "
+                        "interaction".format(gas))
+
+    return PropsSI('P', 'T', temp, 'Q', 0, gas_name)
