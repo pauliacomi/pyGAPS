@@ -1,8 +1,9 @@
 # %%
 from os.path import expanduser
 
-import adsutils
 import pandas
+
+import adsutils
 
 # %%
 # Reload all imports from adsutils

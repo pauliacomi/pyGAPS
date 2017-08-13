@@ -138,6 +138,7 @@ def gas_data():
         'formula': 'N2',
 
         'properties': {
+            'common_name': 'nitrogen',
             'molar_mass': 28.0,
             'cross_sectional_area': 0.162,
             'polarizability': 17.4,

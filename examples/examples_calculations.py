@@ -1,5 +1,6 @@
 # %%
 import os
+
 import adsutils
 
 json_path = os.path.join(os.getcwd(), 'tests', 'data', 'isotherms_json')

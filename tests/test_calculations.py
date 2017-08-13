@@ -19,12 +19,14 @@ class TestBET(object):
         """Test BET chacks"""
 
         isotherm = basic_isotherm
-        adsutils.data.GAS_LIST = []
+        gas = basic_gas
+        c_s_area = gas.properties.pop("cross_sectional_area")
 
         # Will raise a "isotherm not in relative pressure mode exception"
         with pytest.raises(Exception):
             adsutils.calculations.area_BET(isotherm)
 
+        adsutils.data.GAS_LIST.append(gas)
         isotherm.convert_pressure_mode("relative")
         isotherm.convert_loading("cm3 STP")
 
@@ -41,14 +43,11 @@ class TestBET(object):
             adsutils.calculations.area_BET(isotherm)
 
         isotherm.convert_adsorbent_mode("mass")
+        adsutils.data.GAS_LIST = []
 
         # Will raise a "gas not found exception"
         with pytest.raises(Exception):
             adsutils.calculations.area_BET(isotherm)
-
-        gas = basic_gas
-        c_s_area = gas.properties.pop("cross_sectional_area")
-        adsutils.data.GAS_LIST.append(gas)
 
         # Will raise a "gas has no cross sectional area"
         with pytest.raises(Exception):

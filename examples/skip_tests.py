@@ -1,6 +1,10 @@
 import os
-import adsutils
 
+# %%
+import pandas
+
+import adsutils
+import adsutils.calculations
 
 #################################################################################
 # Isotherm plotting and comparison
@@ -88,11 +92,6 @@ test_BET('Takeda 5A N2 77.json')
 test_BET('UiO-66(Zr) N2 77.json')
 
 
-# %%
-import pandas
-import os
-import adsutils
-import adsutils.calculations
 
 pressure_key = "pressure"
 loading_key = "loading"
