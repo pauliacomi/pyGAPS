@@ -75,4 +75,9 @@ def t_plot(isotherm, thickness_model):
     adsorbed_volume = intercept * molar_mass / liquid_density
     external_area = slope * molar_mass / liquid_density
 
-    return adsorbed_volume, external_area
+    result_dict = {
+        'adsorbed_volume': adsorbed_volume,
+        'external_area': external_area,
+    }
+
+    return result_dict
