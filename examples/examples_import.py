@@ -65,3 +65,53 @@ isotherms = []
 for filepath in json_file_paths:
     with open(filepath, 'r') as text_file:
         isotherms.append(adsutils.isotherm_from_json(text_file.read()))
+
+
+#################################################################################
+#       Example Selections and filtering
+#################################################################################
+# %%
+# Select all
+sel_isotherms = isotherms
+print("Selected:", len(sel_isotherms))
+
+# %%
+# Select by gas
+req_gas = ['C3H4']
+sel_isotherms = []
+for gas in req_gas:
+    sel_isotherms = list(filter(lambda x: x.gas == gas, isotherms))
+print("Selected:", len(sel_isotherms))
+
+# %%
+# Select multiple gasses
+req_gas = ["N2", "CO2", "CO", "CH4", "C2H6", "C3H6", "C3H8", "C4H10"]
+for gas in req_gas:
+    s2_isotherms = list(filter(lambda x: x.gas in gas, sel_isotherms))
+
+print("Selected:", len(sel_isotherms))
+
+# %%
+# Select by batch
+req_batch = []
+sel_isotherms = []
+for batch in req_batch:
+    sel_isotherms += list(filter(lambda x: x.batch in batch, isotherms))
+
+print("Selected:", len(sel_isotherms))
+
+# %%
+# Select multiple batches
+s2_isotherms = []
+req_batch = ["KRICT AlO Pellets", "KRICT01", "KRICT noF PVA Pellets"]
+for batch in req_batch:
+    s2_isotherms += list(filter(lambda x: x.batch in batch, isotherms))
+sel_isotherms = s2_isotherms
+print("Selected:", len(sel_isotherms))
+
+
+# %%
+# Select by user
+req_user = ["TU"]
+sel_isotherms = list(filter(lambda x: x.user in req_user, isotherms))
+print("Selected:", len(sel_isotherms))

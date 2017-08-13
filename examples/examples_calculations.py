@@ -48,3 +48,15 @@ for isotherm in isotherms:
 for isotherm in isotherms:
     print(isotherm.sample_name)
     print(isotherm.gas)
+
+
+#################################################################################
+#################################################################################
+# PyIAST isotherm modelling
+#
+# %%
+orig = isotherms[2]
+model = orig.get_model_isotherm("Henry")
+
+adsutils.plot_iso({orig, model}, plot_type='isotherm',
+                  branch='ads', logarithmic=False, color=True)

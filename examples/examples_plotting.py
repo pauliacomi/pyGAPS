@@ -39,22 +39,33 @@ enthalpy_max = None
 loading_max = None
 pressure_max = None
 
+
+fig_title = "Regular isotherms colour"
 adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
 
+fig_title = "Log isotherms colour"
 adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
+                  y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
+                  logarithmic=True, color=True, fig_title=fig_title, legend_list=legend_list)
+
+fig_title = "Log isotherms B/W"
+adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads', 'des'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=True, color=False, fig_title=fig_title, legend_list=legend_list)
 
+fig_title = "Regular enthalpy colour"
 adsutils.plot_iso(sel_isotherms, plot_type='enthalpy', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
 
+fig_title = "Regular isotherms colour"
 adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
 
+fig_title = "Regular isotherms colour"
 adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=True, color=True, fig_title=fig_title, legend_list=legend_list)
