@@ -32,7 +32,8 @@ def area_BET(isotherm, verbose=False):
                         "First convert it using implicit functions")
 
     # See if gas exists in master list
-    ads_gas = next((gas for gas in data.GAS_LIST if isotherm.gas == gas.name))
+    ads_gas = next(
+        (gas for gas in data.GAS_LIST if isotherm.gas == gas.name), None)
     if ads_gas is None:
         raise Exception("Gas {0} does not exist in list of gasses. "
                         "First populate adsutils.GAS_LIST "
