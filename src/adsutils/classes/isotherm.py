@@ -19,10 +19,10 @@ class Isotherm(object):
     def __init__(self,
                  loading_key,
                  pressure_key,
-                 mode_adsorbent,
-                 mode_pressure,
-                 unit_loading,
-                 unit_pressure,
+                 mode_adsorbent="mass",
+                 mode_pressure="absolute",
+                 unit_loading="mmol",
+                 unit_pressure="bar",
                  **isotherm_parameters):
 
         # Checks
@@ -80,43 +80,45 @@ class Isotherm(object):
         if 'id' not in isotherm_parameters:
             self.id = None
         else:
-            self.id = isotherm_parameters.get('id')
+            self.id = isotherm_parameters.pop('id', None)
 
         #: Isotherm sample sample_name
-        self.sample_name = isotherm_parameters.get('sample_name')
+        self.sample_name = isotherm_parameters.pop('sample_name', None)
         #: Isotherm sample sample_batch
-        self.sample_batch = isotherm_parameters.get('sample_batch')
+        self.sample_batch = isotherm_parameters.pop('sample_batch', None)
         #: Isotherm experimental temperature
-        self.t_exp = isotherm_parameters.get('t_exp')
+        self.t_exp = isotherm_parameters.pop('t_exp', None)
         #: Isotherm gas used
-        self.gas = isotherm_parameters.get('gas')
+        self.gas = isotherm_parameters.pop('gas', None)
 
         #: Good-to-have properties of the isotherm
         #: Isotherm experiment date
-        self.date = isotherm_parameters.get('date')
+        self.date = isotherm_parameters.pop('date', None)
         #: Isotherm sample activation temperature
-        self.t_act = isotherm_parameters.get('t_act')
+        self.t_act = isotherm_parameters.pop('t_act', None)
         #: Isotherm lab
-        self.lab = isotherm_parameters.get('lab')
+        self.lab = isotherm_parameters.pop('lab', None)
         #: Isotherm comments
-        self.comment = isotherm_parameters.get('comment')
+        self.comment = isotherm_parameters.pop('comment', None)
 
         # Other properties
         #: Isotherm user
-        self.user = isotherm_parameters.get('user')
+        self.user = isotherm_parameters.pop('user', None)
         #: Isotherm project
-        self.project = isotherm_parameters.get('project')
+        self.project = isotherm_parameters.pop('project', None)
         #: Isotherm machine used
-        self.machine = isotherm_parameters.get('machine')
+        self.machine = isotherm_parameters.pop('machine', None)
         #: Isotherm physicality (real or simulation)
-        self.is_real = isotherm_parameters.get('is_real')
+        self.is_real = isotherm_parameters.pop('is_real', None)
         #: Isotherm type (calorimetry/isotherm)
-        self.exp_type = isotherm_parameters.get('exp_type')
+        self.exp_type = isotherm_parameters.pop('exp_type', None)
 
-        self.other_properties = isotherm_parameters.get('other_properties')
+        # Save the rest of the properties as an extra dict
+        # now that the named properties were taken out of
+        self.other_properties = isotherm_parameters
 
 ###########################################################
-#   Info function
+#   Info functions
 
     def print_info(self):
         '''
@@ -142,3 +144,32 @@ class Isotherm(object):
         print("Isotherm comments:", self.comment)
 
         return
+
+    def get_parameters(self):
+        """Returns a dictionary with the isotherm parameters"""
+
+        # Get the named properties
+        parameters_dict = {
+            'id': self.id,
+
+            'sample_name': self.sample_name,
+            'sample_batch': self.sample_batch,
+            't_exp': self.t_exp,
+            'gas': self.gas,
+
+            'date': self.date,
+            't_act': self.t_act,
+            'lab': self.lab,
+            'comment': self.comment,
+
+            'user': self.user,
+            'project': self.project,
+            'machine': self.machine,
+            'is_real': self.is_real,
+            'exp_type': self.exp_type,
+        }
+
+        # Now add the rest
+        parameters_dict.update(self.other_properties)
+
+        return parameters_dict

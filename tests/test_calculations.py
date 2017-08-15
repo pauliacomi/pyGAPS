@@ -15,10 +15,10 @@ class TestBET(object):
     Tests everything related to BET surface area calculation
     """
 
-    def test_BET_checks(self, basic_isotherm, basic_gas, basic_sample):
+    def test_BET_checks(self, basic_pointisotherm, basic_gas, basic_sample):
         """Test BET chacks"""
 
-        isotherm = basic_isotherm
+        isotherm = basic_pointisotherm
         gas = basic_gas
         c_s_area = gas.properties.pop("cross_sectional_area")
 

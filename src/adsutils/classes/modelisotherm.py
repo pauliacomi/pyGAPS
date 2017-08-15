@@ -90,7 +90,7 @@ class ModelIsotherm(Isotherm):
 
     """
 
-    def __init__(self, df,
+    def __init__(self, data,
                  loading_key=None,
                  pressure_key=None,
                  model=None,
@@ -106,9 +106,9 @@ class ModelIsotherm(Isotherm):
         pure-component adsorption isotherm in the form of a Pandas DataFrame.
         The least squares data fitting is done here.
 
-        :param df: DataFrame pure-component adsorption isotherm data
-        :param loading_key: String key for loading column in df
-        :param pressure_key: String key for pressure column in df
+        :param data: DataFrame pure-component adsorption isotherm data
+        :param loading_key: String key for loading column in data
+        :param pressure_key: String key for pressure column in data
         :param param_guess: Dict starting guess for model parameters in the
             data fitting routine
         :param optimization_method: String method in SciPy minimization function
@@ -140,14 +140,11 @@ class ModelIsotherm(Isotherm):
         #: adsorption isotherm
         self.model = model
 
-        #: Pandas DataFrame on which isotherm was fit
-        self.df = df
-
         # ! root mean square error in fit
         self.rmse = numpy.nan
 
         # ! Dictionary of parameters as a starting point for data fitting
-        self.param_guess = get_default_guess_params(model, df, pressure_key,
+        self.param_guess = get_default_guess_params(model, data, pressure_key,
                                                     loading_key)
 
         # Override defaults if user provides param_guess dictionary
@@ -162,16 +159,33 @@ class ModelIsotherm(Isotherm):
         # initialize params as nan
         self.params = copy.deepcopy(_MODEL_PARAMS[model])
 
-        # fit model to isotherm data in self.df
-        self._fit(optimization_method)
+        # fit model to isotherm data
+        self._fit(data, optimization_method)
+
+    #: Construction from a parent class with the extra data needed
+    @classmethod
+    def from_isotherm(cls, isotherm, isotherm_data,
+                      model, param_guess=None,
+                      optimization_method="Nelder-Mead"):
+        return cls(isotherm_data,
+                   loading_key=isotherm.loading_key,
+                   pressure_key=isotherm.pressure_key,
+                   model=model,
+                   param_guess=param_guess,
+                   optimization_method=optimization_method,
+                   mode_adsorbent=isotherm.mode_adsorbent,
+                   mode_pressure=isotherm.mode_pressure,
+                   unit_loading=isotherm.unit_loading,
+                   unit_pressure=isotherm.unit_pressure,
+                   **isotherm.get_parameters())
 
     def loading(self, pressure):
         """
         Given stored model parameters, compute loading at pressure P.
 
-        :param pressure: Float or Array pressure (in corresponding units as df
+        :param pressure: Float or Array pressure (in corresponding units as data
             in instantiation)
-        :return: predicted loading at pressure P (in corresponding units as df
+        :return: predicted loading at pressure P (in corresponding units as data
             in instantiation) using fitted model params in `self.params`.
         :rtype: Float or Array
         """
@@ -217,7 +231,7 @@ class ModelIsotherm(Isotherm):
                                        self.params["theta"] * langmuir_fractional_loading ** 2 *
                                        langmuir_fractional_loading)
 
-    def _fit(self, optimization_method):
+    def _fit(self, data, optimization_method):
         """
         Fit model to data using nonlinear optimization with least squares loss
             function. Assigns params to self.
@@ -232,15 +246,15 @@ class ModelIsotherm(Isotherm):
 
         def residual_sum_of_squares(params_):
             """
-            Residual Sum of Squares between model and data in df
+            Residual Sum of Squares between model and data in data
             :param params_: Array of parameters
             """
             # change params to those in x
             for i in range(len(param_names)):
                 self.params[param_names[i]] = params_[i]
 
-            return numpy.sum((self.df[self.loading_key].values -
-                              self.loading(self.df[self.pressure_key].values)) ** 2)
+            return numpy.sum((data[self.loading_key].values -
+                              self.loading(data[self.pressure_key].values)) ** 2)
 
         # minimize RSS
         opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
@@ -257,7 +271,7 @@ class ModelIsotherm(Isotherm):
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        self.rmse = numpy.sqrt(opt_res.fun / self.df.shape[0])
+        self.rmse = numpy.sqrt(opt_res.fun / data.shape[0])
 
     def spreading_pressure(self, pressure):
         """
@@ -273,7 +287,7 @@ class ModelIsotherm(Isotherm):
         which is computed analytically, as a function of the model isotherm
         parameters.
 
-        :param pressure: float pressure (in corresponding units as df in
+        :param pressure: float pressure (in corresponding units as data in
             instantiation)
         :return: spreading pressure, :math:`\\Pi`
         :rtype: Float
@@ -325,7 +339,7 @@ class ModelIsotherm(Isotherm):
         print("RMSE = ", self.rmse)
 
 
-def get_default_guess_params(model, df, pressure_key, loading_key):
+def get_default_guess_params(model, data, pressure_key, loading_key):
     """
     Get dictionary of default parameters for starting guesses in data fitting
     routine.
@@ -338,15 +352,15 @@ def get_default_guess_params(model, df, pressure_key, loading_key):
     default guesses do not lead to a converged set of parameters.
 
     :param model: String name of analytical model
-    :param df: DataFrame adsorption isotherm data
-    :param pressure_key: String key for pressure column in df
-    :param loading_key: String key for loading column in df
+    :param data: DataFrame adsorption isotherm data
+    :param pressure_key: String key for pressure column in data
+    :param loading_key: String key for loading column in data
     """
     # guess saturation loading to 10% more than highest loading
-    saturation_loading = 1.1 * df[loading_key].max()
+    saturation_loading = 1.1 * data[loading_key].max()
     # guess Langmuir K using the guess for saturation loading and lowest
     #   pressure point (but not zero)
-    df_nonzero = df[df[loading_key] != 0.0]
+    df_nonzero = data[data[loading_key] != 0.0]
     idx_min = df_nonzero[loading_key].argmin()
     langmuir_k = df_nonzero[loading_key].loc[idx_min] / \
         df_nonzero[pressure_key].loc[idx_min] / (

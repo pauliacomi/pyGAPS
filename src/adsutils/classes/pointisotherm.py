@@ -21,9 +21,9 @@ _ADS_DES_CHECK = "des_check"
 
 
 class PointIsotherm(Isotherm):
-    '''
+    """
     Class which contains the points from an adsorption isotherm and microcalorimetry
-    '''
+    """
 
     def __init__(self, isotherm_data,
                  loading_key=None,
@@ -34,7 +34,7 @@ class PointIsotherm(Isotherm):
                  unit_loading="mmol",
                  unit_pressure="bar",
                  **isotherm_parameters):
-        '''
+        """
         Instatiation of the class from a DataFrame so it can be easily referenced
 
         :param data: DataFrame containing isotherm and enthalpy datapoints
@@ -50,7 +50,7 @@ class PointIsotherm(Isotherm):
 
         :return: self
         :rtype: PointIsotherm
-        '''
+        """
         # Start construction process
         self._instantiated = False
 
@@ -111,11 +111,28 @@ class PointIsotherm(Isotherm):
 
         return self.id == other_isotherm.id
 
+    #: Construction from a parent class with the extra data needed
+    @classmethod
+    def from_isotherm(cls, isotherm, isotherm_data, other_keys=None):
+        """
+        Constructs a point isotherm using a parent isotherm as the template for
+        all the parameters.
+        """
+        return cls(isotherm_data,
+                   loading_key=isotherm.loading_key,
+                   pressure_key=isotherm.pressure_key,
+                   other_keys=other_keys,
+                   mode_adsorbent=isotherm.mode_adsorbent,
+                   mode_pressure=isotherm.mode_pressure,
+                   unit_loading=isotherm.unit_loading,
+                   unit_pressure=isotherm.unit_pressure,
+                   **isotherm.get_parameters())
+
     #: Figure out the adsorption and desorption branches
     def _splitdata(self, _data):
-        '''
+        """
         Splits isotherm data into an adsorption and desorption part and adds a column to mark it
-        '''
+        """
         increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
         increasing.rename(_ADS_DES_CHECK, inplace=True)
 
@@ -126,9 +143,9 @@ class PointIsotherm(Isotherm):
 #   Conversion functions
 
     def convert_loading(self, unit_to):
-        '''
+        """
         Converts the loading of the isotherm from one unit to another
-        '''
+        """
 
         if unit_to not in self._LOADING_UNITS:
             raise Exception("Unit selected for loading is not an option. See viable"
@@ -146,9 +163,9 @@ class PointIsotherm(Isotherm):
         return
 
     def convert_pressure(self, unit_to):
-        '''
+        """
         Converts the pressure values of the isotherm from one unit to another
-        '''
+        """
 
         if unit_to not in self._PRESSURE_UNITS:
             raise Exception("Unit selected for loading is not an option. See viable"
@@ -166,9 +183,9 @@ class PointIsotherm(Isotherm):
         return
 
     def convert_pressure_mode(self, mode_pressure):
-        '''
+        """
         Converts the pressure values of the isotherm from one unit to another
-        '''
+        """
 
         if mode_pressure not in self._PRESSURE_MODE:
             raise Exception("Mode selected for pressure is not an option. See viable"
@@ -194,9 +211,9 @@ class PointIsotherm(Isotherm):
         return
 
     def convert_adsorbent_mode(self, mode_adsorbent):
-        '''
+        """
         Converts the pressure values of the isotherm from one unit to another
-        '''
+        """
 
         # Syntax checks
         if mode_adsorbent not in self._MATERIAL_MODE:
@@ -246,9 +263,9 @@ class PointIsotherm(Isotherm):
 #   Info function
 
     def print_info(self, logarithmic=False):
-        '''
+        """
         Prints a short summary of all the isotherm parameters and a graph
-        '''
+        """
 
         if 'enthalpy' in self.other_keys:
             plot_type = 'iso-enth'
@@ -265,10 +282,10 @@ class PointIsotherm(Isotherm):
 #   Modelling functions
 
     def get_model_isotherm(self, model):
-        '''
+        """
         Returns a modelled isotherm based on the point isotherm
 
-        '''
+        """
 
         model_isotherm = ModelIsotherm(self.adsdata(),
                                        loading_key=self.loading_key,
@@ -293,39 +310,39 @@ class PointIsotherm(Isotherm):
 #   Functions that return parts of the isotherm data
 
     def data(self):
-        '''Returns all data'''
+        """Returns all data"""
         return self._data.drop(_ADS_DES_CHECK, axis=1)
 
     def adsdata(self):
-        '''Returns adsorption part of data'''
+        """Returns adsorption part of data"""
         return self._data.loc[~self._data[_ADS_DES_CHECK]].drop(_ADS_DES_CHECK, axis=1)
 
     def desdata(self):
-        '''Returns desorption part of data'''
+        """Returns desorption part of data"""
         return self._data.loc[self._data[_ADS_DES_CHECK]].drop(_ADS_DES_CHECK, axis=1)
 
     def has_ads(self):
-        '''
+        """
         Returns if the isotherm has an adsorption branch
-        '''
+        """
         if self.adsdata() is None:
             return False
         else:
             return True
 
     def has_des(self):
-        '''
+        """
         Returns if the isotherm has an desorption branch
-        '''
+        """
         if self.desdata() is None:
             return False
         else:
             return True
 
     def pressure_ads(self, max_range=None):
-        '''
+        """
         Returns adsorption pressure points as an array
-        '''
+        """
         if self.adsdata() is None:
             return None
         else:
@@ -336,9 +353,9 @@ class PointIsotherm(Isotherm):
                 return [x for x in ret if x < max_range]
 
     def loading_ads(self, max_range=None):
-        '''
+        """
         Returns adsorption amount adsorbed points as an array
-        '''
+        """
         if self.adsdata() is None:
             return None
         else:
@@ -349,9 +366,9 @@ class PointIsotherm(Isotherm):
                 return [x for x in ret if x < max_range]
 
     def other_key_ads(self, key, max_range=None):
-        '''
+        """
         Returns adsorption enthalpy points as an array
-        '''
+        """
         if self.adsdata() is None:
             return None
         elif key not in self.other_keys:
@@ -364,9 +381,9 @@ class PointIsotherm(Isotherm):
                 return [x for x in ret if x < max_range]
 
     def pressure_des(self, max_range=None):
-        '''
+        """
         Returns desorption pressure points as an array
-        '''
+        """
         if self.desdata() is None:
             return None
         else:
@@ -377,9 +394,9 @@ class PointIsotherm(Isotherm):
                 return [x for x in ret if x < max_range]
 
     def loading_des(self, max_range=None):
-        '''
+        """
         Returns desorption amount adsorbed points as an array
-        '''
+        """
         if self.desdata() is None:
             return None
         else:
@@ -390,9 +407,9 @@ class PointIsotherm(Isotherm):
                 return [x for x in ret if x < max_range]
 
     def other_key_des(self, key, max_range=None):
-        '''
+        """
         Returns desorption key points as an array
-        '''
+        """
         if self.desdata() is None:
             return None
         elif key not in self.other_keys:
@@ -405,21 +422,21 @@ class PointIsotherm(Isotherm):
                 return [x for x in ret if x < max_range]
 
     def pressure_all(self):
-        '''
+        """
         Returns all pressure points as an array
-        '''
+        """
         return self._data.loc[:, self.pressure_key].values
 
     def loading_all(self):
-        '''
+        """
         Returns all amount adsorbed points as an array
-        '''
+        """
         return self._data.loc[:, self.loading_key].values
 
     def other_key_all(self, key):
-        '''
+        """
         Returns all enthalpy points as an array
-        '''
+        """
         if key in self._data.columns:
             return self._data.loc[:, key].values
         else:

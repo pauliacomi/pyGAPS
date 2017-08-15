@@ -15,29 +15,8 @@ def isotherm_to_json(isotherm):
     Structure is inspired by the NIST format
     """
 
-    raw_dict = dict()
-
-    # Isotherm id first
-    raw_dict["id"] = isotherm.id
-
     # Isotherm properties
-    raw_dict["sample_name"] = isotherm.sample_name
-    raw_dict["sample_batch"] = isotherm.sample_batch
-    raw_dict["t_exp"] = isotherm.t_exp
-    raw_dict["gas"] = isotherm.gas
-
-    raw_dict["date"] = str(isotherm.date)
-    raw_dict["t_act"] = isotherm.t_act
-    raw_dict["lab"] = isotherm.lab
-    raw_dict["comment"] = isotherm.comment
-
-    raw_dict["user"] = isotherm.user
-    raw_dict["project"] = isotherm.project
-    raw_dict["machine"] = isotherm.machine
-    raw_dict["is_real"] = isotherm.is_real
-    raw_dict["exp_type"] = isotherm.exp_type
-
-    raw_dict["other_properties"] = isotherm.other_properties
+    raw_dict = isotherm.get_parameters()
 
     # Isotherm data
     isotherm_data_dict = isotherm.data().to_dict(orient='index')

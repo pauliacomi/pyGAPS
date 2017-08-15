@@ -179,10 +179,10 @@ class TestDatabase(object):
 
         return
 
-    def test_experiment(self, db_file, basic_isotherm):
+    def test_experiment(self, db_file, basic_pointisotherm):
         "Tests functions related to experiments table, then inserts a test experiment"
 
-        isotherm = basic_isotherm
+        isotherm = basic_pointisotherm
 
         # Test experiment_type table
         adsutils.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,

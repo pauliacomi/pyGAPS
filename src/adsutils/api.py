@@ -6,8 +6,9 @@ from .calculations.initial_henry import calc_initial_henry
 from .calculations.initial_henry import calc_initial_henry_virial
 from .classes.gas import Gas
 from .classes.pointisotherm import PointIsotherm
+from .classes.modelisotherm import ModelIsotherm
+from .classes.interpolatorisotherm import InterpolatorIsotherm
 from .classes.sample import Sample
-from .classes.user import User
 from .graphing.iastgraphs import plot_iast_vle
 from .graphing.isothermgraphs import plot_iso
 from .parsing.csvinterface import samples_parser

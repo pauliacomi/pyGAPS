@@ -7,32 +7,43 @@ __author__ = 'Paul A. Iacomi'
 
 class Sample(object):
     '''
-    Class which contains the points from an adsorption isotherm and microcalorimetry
+    Class which describes a material
     '''
 
-    def __init__(self, info):
-        #: Sample MOF name
-        self.name = info['name']
+    def __init__(self, sample_info):
+
+        # TODO Should make the sample unique using
+        # some sort of convention id
+
+        # Required sample parameters cheks
+        if any(k not in sample_info
+                for k in ('name', 'batch')):
+            raise Exception(
+                "Sample class MUST have the following information in the properties dictionary: 'name', 'batch'")
+
+        #: Sample name
+        self.name = sample_info['name']
         #: Sample batch
-        self.batch = info['batch']
+        self.batch = sample_info['batch']
+
         #: Sample owner nickname
-        self.owner = info['owner']
+        self.owner = sample_info['owner']
         #: Sample contact nickname
-        self.contact = info['contact']
+        self.contact = sample_info['contact']
         #: Sample source laboratory
-        self.source_lab = info['source_lab']
+        self.source_lab = sample_info['source_lab']
         #: Sample project
-        self.project = info['project']
+        self.project = sample_info['project']
         #: Sample structure
-        self.struct = info['struct']
+        self.struct = sample_info['struct']
         #: Sample type (MOF/carbon/zeolite etc)
-        self.type = info['type']
+        self.type = sample_info['type']
         #: Sample form (powder/ pellet etc)
-        self.form = info['form']
+        self.form = sample_info['form']
         #: Sample comments
-        self.comment = info['comment']
+        self.comment = sample_info['comment']
         #: Sample properties
-        self.properties = info['properties']
+        self.properties = sample_info['properties']
 
         return
 
@@ -52,5 +63,8 @@ class Sample(object):
         print("Type:", self.type)
         print("Form:", self.form)
         print("Comments:", self.comment)
+
+        for prop in self.properties:
+            print(prop, self.properties.get(prop))
 
         return
