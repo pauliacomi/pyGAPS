@@ -123,8 +123,7 @@ def basic_modelisotherm(isotherm_data, basic_isotherm):
     isotherm = adsutils.ModelIsotherm.from_isotherm(
         basic_isotherm,
         isotherm_data,
-        model,
-        other_keys=other_keys)
+        model)
 
     return isotherm
 
