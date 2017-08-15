@@ -4,6 +4,8 @@ This module contains the sample class for easy manipulation
 
 __author__ = 'Paul A. Iacomi'
 
+import adsutils.data as data
+
 
 class Sample(object):
     '''
@@ -68,3 +70,32 @@ class Sample(object):
             print(prop, self.properties.get(prop))
 
         return
+
+
+def sample_property(sample_name, sample_batch, prop):
+    """
+    Returns a property of a sample class, checking if
+    the sample list from memory has been filled first
+    """
+    # Checks to see if sample exists in master list
+    sample = next(
+        (sample for sample in data.SAMPLE_LIST
+            if sample_name == sample.name
+            and
+            sample_batch == sample.batch),
+        None)
+
+    if sample is None:
+        raise Exception("Sample {0}{1} does not exist in list of samples. "
+                        "First populate adsutils.SAMPLE_LIST "
+                        "with required sample class".format(
+                            sample_name, sample_batch))
+
+    req_prop = sample.properties.get(prop)
+    if req_prop is None:
+        raise Exception("The {0} entry was not found in the "
+                        "sample.properties dictionary "
+                        "for sample {1} {2}".format(
+                            prop, sample_name, sample_batch))
+
+    return req_prop

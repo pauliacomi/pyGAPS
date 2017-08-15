@@ -10,7 +10,7 @@ class Isotherm(object):
     Class which contains the general data for an isotherm, real or model
     '''
 
-    _LOADING_UNITS = {"mmol": 0.001, "cm3 STP": 4.461e-5}
+    _LOADING_UNITS = {"mol": 1, "mmol": 0.001, "cm3 STP": 4.461e-5}
     _PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
 
     _MATERIAL_MODE = ["mass", "volume"]

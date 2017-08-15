@@ -387,7 +387,7 @@ def get_default_guess_params(model, data, pressure_key, loading_key):
     if model == "TSLangmuir":
         return {"M1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
                 "M2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k,
-                "M3": 0.5 * saturation_loading, "K3": 0.6 * langmuir_k}
+                "M3": 0.5 * saturation_loading, "K3": 0.8 * langmuir_k}
 
     if model == "Henry":
         return {"KH": saturation_loading * langmuir_k}

@@ -31,12 +31,14 @@ def pytest_runtest_setup(item):
 
 # Global fixtures
 @pytest.fixture(scope='function')
-def isotherm_data():
+def isotherm_parameters():
     """
-    Creates a dictionary with all data for an model isotherm
+    Creates a dictionary with all parameters for an model isotherm
     """
 
-    isotherm_data = {
+    isotherm_parameters = {
+        'id': None,
+
         'sample_name': 'TEST',
         'sample_batch': 'TB',
         't_exp': 100,
@@ -60,11 +62,28 @@ def isotherm_data():
         'test_parameter': 'parameter'
     }
 
+    return isotherm_parameters
+
+
+@pytest.fixture(scope='function')
+def isotherm_data(basic_isotherm):
+    """
+    Creates a dataframe with all data for an model isotherm
+    """
+
+    other_key = "enthalpy"
+
+    isotherm_data = pandas.DataFrame({
+        basic_isotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
+        basic_isotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
+        other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+    })
+
     return isotherm_data
 
 
 @pytest.fixture(scope='function')
-def basic_isotherm(isotherm_data):
+def basic_isotherm(isotherm_parameters):
     """
     Creates an basic isotherm from model data
     """
@@ -74,28 +93,37 @@ def basic_isotherm(isotherm_data):
     isotherm = adsutils.classes.isotherm.Isotherm(
         loading_key=loading_key,
         pressure_key=pressure_key,
-        **isotherm_data)
+        **isotherm_parameters)
 
     return isotherm
 
 
 @pytest.fixture(scope='function')
-def basic_pointisotherm(basic_isotherm):
+def basic_pointisotherm(isotherm_data, basic_isotherm):
     """
     Creates an isotherm from model data
     """
     other_key = "enthalpy"
     other_keys = [other_key]
 
-    isotherm_data = pandas.DataFrame({
-        basic_isotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
-        basic_isotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
-        other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
-    })
-
     isotherm = adsutils.PointIsotherm.from_isotherm(
         basic_isotherm,
         isotherm_data,
+        other_keys=other_keys)
+
+    return isotherm
+
+
+def basic_modelisotherm(isotherm_data, basic_isotherm):
+    """
+    Creates an isotherm from model data
+    """
+    model = "Langmuir"
+
+    isotherm = adsutils.ModelIsotherm.from_isotherm(
+        basic_isotherm,
+        isotherm_data,
+        model,
         other_keys=other_keys)
 
     return isotherm
@@ -119,7 +147,7 @@ def sample_data():
         'comment': 'test comment',
 
         'properties': {
-                'density': 22.5,
+                'density': 22.5,  # g/cm3
                 'poresize': 14,
         }
     }

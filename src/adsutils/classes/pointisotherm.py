@@ -10,12 +10,12 @@ import hashlib
 import pandas
 
 import adsutils
-import adsutils.data as data
 
 from ..graphing.isothermgraphs import plot_iso
 from .gas import saturation_pressure_at_temperature
 from .isotherm import Isotherm
 from .modelisotherm import ModelIsotherm
+from .sample import sample_property
 
 _ADS_DES_CHECK = "des_check"
 
@@ -196,15 +196,14 @@ class PointIsotherm(Isotherm):
             return
 
         if mode_pressure == "absolute":
-            self._data[self.pressure_key] = self._data[self.pressure_key].apply(
-                lambda x: x *
-                saturation_pressure_at_temperature(self.t_exp, self.gas)
-                / self._PRESSURE_UNITS[self.unit_pressure])
+            sign = 1
         elif mode_pressure == "relative":
-            self._data[self.pressure_key] = self._data[self.pressure_key].apply(
-                lambda x: x /
-                saturation_pressure_at_temperature(self.t_exp, self.gas)
-                * self._PRESSURE_UNITS[self.unit_pressure])
+            sign = -1
+
+        self._data[self.pressure_key] = self._data[self.pressure_key].apply(
+            lambda x: x *
+            (saturation_pressure_at_temperature(self.t_exp, self.gas)
+             / self._PRESSURE_UNITS[self.unit_pressure]) ** sign)
 
         self.mode_pressure = mode_pressure
 
@@ -224,36 +223,14 @@ class PointIsotherm(Isotherm):
             print("Mode is the same, no changes made")
             return
 
-        # Checks to see if sample exists in master list
-        if not any(self.sample_name == sample.name and self.sample_batch == sample.batch
-                   for sample in data.SAMPLE_LIST):
-            raise Exception("Sample %s %s does not exist in sample list. "
-                            "First populate adsutils.SAMPLE_LIST "
-                            "with desired sample class"
-                            % (self.sample_name, self.sample_batch))
+        if mode_adsorbent == 'volume':
+            sign = 1
+        elif mode_adsorbent == 'mass':
+            sign = -1
 
-        sample = [sample for sample in data.SAMPLE_LIST
-                  if self.sample_name == sample.name and self.sample_batch == sample.batch]
-
-        if len(sample) > 1:
-            raise Exception("More than one sample %s %s found in sample list. "
-                            "Samples must be unique on (name + batch)"
-                            % (self.sample_name, self.sample_batch))
-
-        try:
-            density = sample[0].properties["density"]
-        except:
-            raise Exception("The density entry was not found in the "
-                            "sample.properties dictionary "
-                            "for sample %s %s"
-                            % (self.sample_name, self.sample_batch))
-
-        if mode_adsorbent == "volume":
-            self._data[self.loading_key] = self._data[self.loading_key].apply(
-                lambda x: x * density)
-        elif mode_adsorbent == "mass":
-            self._data[self.loading_key] = self._data[self.loading_key].apply(
-                lambda x: x / density)
+        self._data[self.loading_key] = self._data[self.loading_key].apply(
+            lambda x: x * (sample_property(
+                self.sample_name, self.sample_batch, 'density'))**sign)
 
         self.mode_adsorbent = mode_adsorbent
 
@@ -266,6 +243,8 @@ class PointIsotherm(Isotherm):
         """
         Prints a short summary of all the isotherm parameters and a graph
         """
+
+        Isotherm.print_info(self)
 
         if 'enthalpy' in self.other_keys:
             plot_type = 'iso-enth'
