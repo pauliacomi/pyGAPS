@@ -28,7 +28,12 @@ def isotherm_to_json(isotherm):
     return json_isotherm
 
 
-def isotherm_from_json(json_isotherm):
+def isotherm_from_json(json_isotherm,
+                       mode_pressure='absolute',
+                       mode_adsorbent='mass',
+                       unit_pressure='bar',
+                       unit_loading='mmol',
+                       ):
     """
     Converts a json isotherm format to a internal format
     Structure is inspired by the NIST format
@@ -36,12 +41,6 @@ def isotherm_from_json(json_isotherm):
 
     # Parse isotherm in dictionary
     raw_dict = json.loads(json_isotherm)
-
-    # Set modes and units, since the json format always uses these
-    mode_pressure = 'absolute'
-    mode_adsorbent = 'mass'
-    unit_pressure = 'bar'
-    unit_loading = 'mmol'
 
     # Build pandas dataframe of data
     data = pandas.DataFrame.from_dict(

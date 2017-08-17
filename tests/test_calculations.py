@@ -73,12 +73,66 @@ class TestBET(object):
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
-            isotherm = adsutils.isotherm_from_json(text_file.read())
+            isotherm = adsutils.isotherm_from_json(
+                text_file.read(), mode_pressure='relative')
 
-        isotherm.convert_pressure_mode("relative")
         bet_area = adsutils.calculations.area_BET(isotherm).get("bet_area")
 
         max_error = 0.1  # 10 percent
 
         assert (bet_area < expected_bet * (1 + max_error)
                 ) and (bet_area > expected_bet * (1 - max_error))
+
+
+class TestTPlot(object):
+    """
+    Tests everything related to tplot calculation
+    """
+    @pytest.mark.parametrize('file', [
+        ('MCM-41 N2 77.json'),
+        ('NaY N2 77.json'),
+        ('SiO2 N2 77.json'),
+        ('Takeda 5A N2 77.json'),
+        ('UiO-66(Zr) N2 77.json'),
+    ])
+    def test_tplot(self, file, basic_gas):
+        """Test BET calculation with several model isotherms"""
+        adsutils.data.GAS_LIST.append(basic_gas)
+
+        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+
+        with open(filepath, 'r') as text_file:
+            isotherm = adsutils.isotherm_from_json(
+                text_file.read(), mode_pressure='relative')
+
+        result_dict = adsutils.calculations.tplot.t_plot(
+            isotherm, 'Halsey')
+
+        max_error = 0.1  # 10 percent
+
+
+class TestPSD(object):
+    """
+    Tests everything related to pore size dist calculation
+    """
+    @pytest.mark.parametrize('file', [
+        ('MCM-41 N2 77.json'),
+        ('NaY N2 77.json'),
+        ('SiO2 N2 77.json'),
+        ('Takeda 5A N2 77.json'),
+        ('UiO-66(Zr) N2 77.json'),
+    ])
+    def test_psd(self, file, basic_gas):
+        """Test BET calculation with several model isotherms"""
+        adsutils.data.GAS_LIST.append(basic_gas)
+
+        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+
+        with open(filepath, 'r') as text_file:
+            isotherm = adsutils.isotherm_from_json(
+                text_file.read(), mode_pressure='relative')
+
+        result_dict = adsutils.calculations.psd.pore_size_distribution(
+            isotherm, 'BJH', branch='desorption', t_model='Halsey')
+
+        max_error = 0.1  # 10 percent

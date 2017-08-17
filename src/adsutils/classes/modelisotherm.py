@@ -179,6 +179,21 @@ class ModelIsotherm(Isotherm):
                    unit_pressure=isotherm.unit_pressure,
                    **isotherm.get_parameters())
 
+    @classmethod
+    def from_pointisotherm(cls, isotherm, model, param_guess=None,
+                           optimization_method="Nelder-Mead"):
+        return cls(isotherm.data(),
+                   loading_key=isotherm.loading_key,
+                   pressure_key=isotherm.pressure_key,
+                   model=model,
+                   param_guess=param_guess,
+                   optimization_method=optimization_method,
+                   mode_adsorbent=isotherm.mode_adsorbent,
+                   mode_pressure=isotherm.mode_pressure,
+                   unit_loading=isotherm.unit_loading,
+                   unit_pressure=isotherm.unit_pressure,
+                   **isotherm.get_parameters())
+
     def loading(self, pressure):
         """
         Given stored model parameters, compute loading at pressure P.

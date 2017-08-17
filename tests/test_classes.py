@@ -129,13 +129,13 @@ class TestPointIsotherm(object):
         assert isotherm.has_ads()
         assert isotherm.has_des()
 
-        assert isotherm.adsdata().equals(pandas.DataFrame({
+        assert isotherm.data_ads().equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
         }))
 
-        assert isotherm.desdata().equals(pandas.DataFrame({
+        assert isotherm.data_des().equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [4.0, 2.0],
             basic_pointisotherm.loading_key: [4.0, 2.0],
             other_key: [5.0, 5.0],

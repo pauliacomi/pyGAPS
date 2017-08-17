@@ -3,6 +3,8 @@ This module calculates the thickness curves based on an isotherm
 """
 import math
 
+_THICKNESS_MODELS = ["Halsey", "Harkins/Jura"]
+
 
 def thickness_halsey(pressure):
     """Function for the Halsey thickness curve"""

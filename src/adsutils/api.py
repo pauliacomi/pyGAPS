@@ -2,6 +2,9 @@
 # flake8: noqa
 
 from .calculations.bet import area_BET
+from .calculations.bet import area_BET_raw
+from .calculations.tplot import t_plot
+from .calculations.tplot import t_plot_raw
 from .calculations.initial_henry import calc_initial_henry
 from .calculations.initial_henry import calc_initial_henry_virial
 from .classes.gas import Gas

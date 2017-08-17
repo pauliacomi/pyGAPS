@@ -257,34 +257,6 @@ class PointIsotherm(Isotherm):
         return
 
 
-###########################################################
-#   Modelling functions
-
-    def get_model_isotherm(self, model):
-        """
-        Returns a modelled isotherm based on the point isotherm
-
-        """
-
-        model_isotherm = ModelIsotherm(self.adsdata(),
-                                       loading_key=self.loading_key,
-                                       pressure_key=self.pressure_key,
-                                       model=model)
-
-        point_model_isotherm = copy.deepcopy(self)
-        point_model_isotherm.type = "sym"
-
-        # Generate isotherm based on loading
-        sym_loading = point_model_isotherm.adsdata().apply(
-            lambda x: model_isotherm.loading(
-                x[point_model_isotherm.pressure_key]),
-            axis=1)  # yaxis - downwards
-        point_model_isotherm.adsdata(
-        )[point_model_isotherm.loading_key] = sym_loading
-
-        return point_model_isotherm
-
-
 ##########################################################
 #   Functions that return parts of the isotherm data
 
@@ -292,19 +264,138 @@ class PointIsotherm(Isotherm):
         """Returns all data"""
         return self._data.drop(_ADS_DES_CHECK, axis=1)
 
-    def adsdata(self):
+    def data_ads(self):
         """Returns adsorption part of data"""
-        return self._data.loc[~self._data[_ADS_DES_CHECK]].drop(_ADS_DES_CHECK, axis=1)
+        return self.data().loc[~self._data[_ADS_DES_CHECK]]
 
-    def desdata(self):
+    def data_des(self):
         """Returns desorption part of data"""
-        return self._data.loc[self._data[_ADS_DES_CHECK]].drop(_ADS_DES_CHECK, axis=1)
+        return self.data().loc[self._data[_ADS_DES_CHECK]]
+
+    def pressure_ads(self, unit=None, max_range=None):
+        """
+        Returns adsorption pressure points as an array
+        """
+        if self.has_ads():
+            ret = self.data_ads().loc[:, self.pressure_key].values
+
+            # Convert in required unit
+            if unit is not None:
+                if unit not in self._PRESSURE_UNITS:
+                    raise Exception("Unit selected for pressure is not an option. "
+                                    "See viable models in self._PRESSURE_UNITS")
+                ret = ret * \
+                    self._PRESSURE_UNITS[self.unit_pressure] / \
+                    self._PRESSURE_UNITS[unit]
+
+            if max_range is None:
+                return ret
+            else:
+                return [x for x in ret if x < max_range]
+        else:
+            return None
+
+    def loading_ads(self, unit=None, max_range=None):
+        """
+        Returns adsorption amount adsorbed points as an array
+        """
+        if self.has_ads():
+            ret = self.data_ads().loc[:, self.loading_key].values
+
+            # Convert in required unit
+            if unit is not None:
+                if unit not in self._LOADING_UNITS:
+                    raise Exception("Unit selected for loading is not an option. "
+                                    "See viable models in self._LOADING_UNITS")
+                ret = ret * \
+                    self._LOADING_UNITS[self.unit_loading] / \
+                    self._LOADING_UNITS[unit]
+
+            if max_range is None:
+                return ret
+            else:
+                return [x for x in ret if x < max_range]
+        else:
+            return None
+
+    def other_key_ads(self, key, max_range=None):
+        """
+        Returns adsorption enthalpy points as an array
+        """
+        if self.has_ads() and key in self.other_keys:
+            ret = self.data_ads().loc[:, key].values
+            if max_range is None:
+                return ret
+            else:
+                return [x for x in ret if x < max_range]
+        else:
+            return None
+
+    def pressure_des(self, max_range=None):
+        """
+        Returns desorption pressure points as an array
+        """
+        if self.has_des():
+            ret = self.data_des().loc[:, self.pressure_key].values
+            if max_range is None:
+                return ret
+            else:
+                return [x for x in ret if x < max_range]
+        else:
+            return None
+
+    def loading_des(self, max_range=None):
+        """
+        Returns desorption amount adsorbed points as an array
+        """
+        if self.has_des():
+            ret = self.data_des().loc[:, self.loading_key].values
+            if max_range is None:
+                return ret
+            else:
+                return [x for x in ret if x < max_range]
+        else:
+            return None
+
+    def other_key_des(self, key, max_range=None):
+        """
+        Returns desorption key points as an array
+        """
+        if self.has_des() and key in self.other_keys:
+            ret = self.data_des().loc[:, key].values
+            if max_range is None:
+                return ret
+            else:
+                return [x for x in ret if x < max_range]
+        else:
+            return None
+
+    def pressure_all(self):
+        """
+        Returns all pressure points as an array
+        """
+        return self.data().loc[:, self.pressure_key].values
+
+    def loading_all(self):
+        """
+        Returns all amount adsorbed points as an array
+        """
+        return self.data().loc[:, self.loading_key].values
+
+    def other_key_all(self, key):
+        """
+        Returns all enthalpy points as an array
+        """
+        if key in self.other_keys:
+            return self.data().loc[:, key].values
+        else:
+            return None
 
     def has_ads(self):
         """
         Returns if the isotherm has an adsorption branch
         """
-        if self.adsdata() is None:
+        if self.data_ads() is None:
             return False
         else:
             return True
@@ -313,110 +404,7 @@ class PointIsotherm(Isotherm):
         """
         Returns if the isotherm has an desorption branch
         """
-        if self.desdata() is None:
+        if self.data_des() is None:
             return False
         else:
             return True
-
-    def pressure_ads(self, max_range=None):
-        """
-        Returns adsorption pressure points as an array
-        """
-        if self.adsdata() is None:
-            return None
-        else:
-            ret = self.adsdata().loc[:, self.pressure_key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-
-    def loading_ads(self, max_range=None):
-        """
-        Returns adsorption amount adsorbed points as an array
-        """
-        if self.adsdata() is None:
-            return None
-        else:
-            ret = self.adsdata().loc[:, self.loading_key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-
-    def other_key_ads(self, key, max_range=None):
-        """
-        Returns adsorption enthalpy points as an array
-        """
-        if self.adsdata() is None:
-            return None
-        elif key not in self.other_keys:
-            return None
-        else:
-            ret = self.adsdata().loc[:, key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-
-    def pressure_des(self, max_range=None):
-        """
-        Returns desorption pressure points as an array
-        """
-        if self.desdata() is None:
-            return None
-        else:
-            ret = self.desdata().loc[:, self.pressure_key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-
-    def loading_des(self, max_range=None):
-        """
-        Returns desorption amount adsorbed points as an array
-        """
-        if self.desdata() is None:
-            return None
-        else:
-            ret = self.desdata().loc[:, self.loading_key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-
-    def other_key_des(self, key, max_range=None):
-        """
-        Returns desorption key points as an array
-        """
-        if self.desdata() is None:
-            return None
-        elif key not in self.other_keys:
-            return None
-        else:
-            ret = self.desdata().loc[:, key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-
-    def pressure_all(self):
-        """
-        Returns all pressure points as an array
-        """
-        return self._data.loc[:, self.pressure_key].values
-
-    def loading_all(self):
-        """
-        Returns all amount adsorbed points as an array
-        """
-        return self._data.loc[:, self.loading_key].values
-
-    def other_key_all(self, key):
-        """
-        Returns all enthalpy points as an array
-        """
-        if key in self._data.columns:
-            return self._data.loc[:, key].values
-        else:
-            return None
