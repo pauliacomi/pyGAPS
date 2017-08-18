@@ -11,8 +11,8 @@ for filepath in json_file_paths:
         isotherms.append(adsutils.isotherm_from_json(text_file.read()))
 
 #################################################################################
-#################################################################################
 # Henrys constant calculations
+#################################################################################
 #
 # %%
 # Regular method
@@ -26,8 +26,8 @@ for isotherm in isotherms:
     adsutils.calc_initial_henry_virial(isotherm, verbose=True)
 
 #################################################################################
-#################################################################################
 # BET surface area calculations
+#################################################################################
 #
 # %%
 # Get gasses
@@ -50,6 +50,24 @@ for isotherm in isotherms:
     print(isotherm.sample_name)
     print(isotherm.gas)
 
+#################################################################################
+# t-plot calculations
+#################################################################################
+#
+# %%
+# Get gasses
+db_path = os.path.expanduser(
+    r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
+adsutils.data.GAS_LIST = adsutils.db_get_gasses(db_path)
+
+# %%
+# Calculate t-plot
+for isotherm in isotherms:
+    print(isotherm.sample_name)
+    print(isotherm.gas)
+    isotherm.convert_pressure_mode("relative")
+    adsutils.t_plot(isotherm, 'Halsey', verbose=True)
+    isotherm.convert_pressure_mode("absolute")
 
 #################################################################################
 #################################################################################

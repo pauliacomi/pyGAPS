@@ -69,7 +69,7 @@ def area_BET(isotherm, verbose=False):
         print("Amount for a monolayer: n =",
               round(n_monolayer, 3), "mol/g")
         print("Minimum pressure point chosen is {0} and maximum is {1}".format(
-            round(pressure[minimum], 3), round(pressure[maximum]), 3))
+            round(pressure[minimum], 3), round(pressure[maximum], 3)))
         print("BET surface area: a =", int(round(bet_area, 0)), "m²/g")
 
         # Generate plot of isotherm

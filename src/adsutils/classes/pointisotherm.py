@@ -331,12 +331,22 @@ class PointIsotherm(Isotherm):
         else:
             return None
 
-    def pressure_des(self, max_range=None):
+    def pressure_des(self, unit=None, max_range=None):
         """
         Returns desorption pressure points as an array
         """
         if self.has_des():
             ret = self.data_des().loc[:, self.pressure_key].values
+
+            # Convert in required unit
+            if unit is not None:
+                if unit not in self._PRESSURE_UNITS:
+                    raise Exception("Unit selected for pressure is not an option. "
+                                    "See viable models in self._PRESSURE_UNITS")
+                ret = ret * \
+                    self._PRESSURE_UNITS[self.unit_pressure] / \
+                    self._PRESSURE_UNITS[unit]
+
             if max_range is None:
                 return ret
             else:
@@ -344,12 +354,22 @@ class PointIsotherm(Isotherm):
         else:
             return None
 
-    def loading_des(self, max_range=None):
+    def loading_des(self, unit=None, max_range=None):
         """
         Returns desorption amount adsorbed points as an array
         """
         if self.has_des():
             ret = self.data_des().loc[:, self.loading_key].values
+
+            # Convert in required unit
+            if unit is not None:
+                if unit not in self._LOADING_UNITS:
+                    raise Exception("Unit selected for loading is not an option. "
+                                    "See viable models in self._LOADING_UNITS")
+                ret = ret * \
+                    self._LOADING_UNITS[self.unit_loading] / \
+                    self._LOADING_UNITS[unit]
+
             if max_range is None:
                 return ret
             else:

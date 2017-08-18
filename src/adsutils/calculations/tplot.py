@@ -82,7 +82,7 @@ def t_plot_raw(loading, pressure, thickness_model, molar_mass, liquid_density, v
     Calculates the external surface area and adsorbed volume using the t-plot method
     """
 
-    # Generate the thickness model columns
+    # Generate the thickness curve for the pressure points
     thickness_curve = list(map(thickness_model, pressure))
 
     # Get minimum and maximum pressure
