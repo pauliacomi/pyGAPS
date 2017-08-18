@@ -105,7 +105,7 @@ class TestTPlot(object):
             isotherm = adsutils.isotherm_from_json(
                 text_file.read(), mode_pressure='relative')
 
-        result_dict = adsutils.calculations.tplot.t_plot(
+        result_dict = adsutils.t_plot(
             isotherm, 'Halsey')
 
         max_error = 0.1  # 10 percent
@@ -132,7 +132,8 @@ class TestPSD(object):
             isotherm = adsutils.isotherm_from_json(
                 text_file.read(), mode_pressure='relative')
 
-        result_dict = adsutils.calculations.psd.pore_size_distribution(
-            isotherm, 'BJH', branch='desorption', t_model='Halsey')
+        result_dict = adsutils.pore_size_distribution(
+            isotherm, 'BJH', branch='desorption', thickness_model='Halsey',
+            verbose=True)
 
         max_error = 0.1  # 10 percent
