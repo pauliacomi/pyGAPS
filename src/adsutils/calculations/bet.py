@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 import scipy.constants as constants
 import scipy.stats
 
-import adsutils.data as data
-
+from ..classes.gas import Gas
 from ..graphing.isothermgraphs import plot_iso
 
 
@@ -28,19 +27,9 @@ def area_BET(isotherm, verbose=False):
         raise Exception("The isotherm must be in relative pressure mode."
                         "First convert it using implicit functions")
 
-    # See if gas exists in master list
-    ads_gas = next(
-        (gas for gas in data.GAS_LIST if isotherm.gas == gas.name), None)
-    if ads_gas is None:
-        raise Exception("Gas {0} does not exist in list of gasses. "
-                        "First populate adsutils.GAS_LIST "
-                        "with required gas class".format(isotherm.gas))
-
-    cross_section = ads_gas.properties.get("cross_sectional_area")
-    if cross_section is None:
-        raise Exception("Gas {0} does not have a property named "
-                        "cross_sectional_area. This must be available for BET "
-                        "calculation".format(isotherm.gas))
+    # get gas properties
+    ads_gas = Gas.from_list(isotherm.gas)
+    cross_section = ads_gas.get_prop("cross_sectional_area")
 
     # Read data in
     loading = isotherm.loading_ads(unit='mol')

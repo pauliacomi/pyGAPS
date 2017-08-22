@@ -117,8 +117,8 @@ class Isotherm(object):
         # now that the named properties were taken out of
         self.other_properties = isotherm_parameters
 
-###########################################################
-#   Info functions
+    ###########################################################
+    #   Info functions
 
     def print_info(self):
         '''
@@ -145,7 +145,7 @@ class Isotherm(object):
 
         return
 
-    def get_parameters(self):
+    def to_dict(self):
         """Returns a dictionary with the isotherm parameters"""
 
         # Get the named properties

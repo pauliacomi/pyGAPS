@@ -4,7 +4,6 @@ This module contains the main class that describes an isotherm through discrete 
 
 __author__ = 'Paul A. Iacomi'
 
-import copy
 import hashlib
 
 import pandas
@@ -12,10 +11,9 @@ import pandas
 import adsutils
 
 from ..graphing.isothermgraphs import plot_iso
-from .gas import saturation_pressure_at_temperature
+from .gas import Gas
+from .sample import Sample
 from .isotherm import Isotherm
-from .modelisotherm import ModelIsotherm
-from .sample import sample_property
 
 _ADS_DES_CHECK = "des_check"
 
@@ -126,7 +124,7 @@ class PointIsotherm(Isotherm):
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
                    unit_pressure=isotherm.unit_pressure,
-                   **isotherm.get_parameters())
+                   **isotherm.to_dict())
 
     #: Figure out the adsorption and desorption branches
     def _splitdata(self, _data):
@@ -202,7 +200,7 @@ class PointIsotherm(Isotherm):
 
         self._data[self.pressure_key] = self._data[self.pressure_key].apply(
             lambda x: x *
-            (saturation_pressure_at_temperature(self.t_exp, self.gas)
+            (Gas.from_list(self.gas).saturation_pressure(self.t_exp)
              / self._PRESSURE_UNITS[self.unit_pressure]) ** sign)
 
         self.mode_pressure = mode_pressure
@@ -229,8 +227,7 @@ class PointIsotherm(Isotherm):
             sign = -1
 
         self._data[self.loading_key] = self._data[self.loading_key].apply(
-            lambda x: x * (sample_property(
-                self.sample_name, self.sample_batch, 'density'))**sign)
+            lambda x: x * (Sample.from_list(self.sample_name, self.sample_batch).get_prop('density'))**sign)
 
         self.mode_adsorbent = mode_adsorbent
 

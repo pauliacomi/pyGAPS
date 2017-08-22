@@ -177,7 +177,7 @@ class ModelIsotherm(Isotherm):
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
                    unit_pressure=isotherm.unit_pressure,
-                   **isotherm.get_parameters())
+                   **isotherm.to_dict())
 
     @classmethod
     def from_pointisotherm(cls, isotherm, model, param_guess=None,
@@ -192,7 +192,7 @@ class ModelIsotherm(Isotherm):
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
                    unit_pressure=isotherm.unit_pressure,
-                   **isotherm.get_parameters())
+                   **isotherm.to_dict())
 
     def loading(self, pressure):
         """

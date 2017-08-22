@@ -16,7 +16,7 @@ def isotherm_to_json(isotherm):
     """
 
     # Isotherm properties
-    raw_dict = isotherm.get_parameters()
+    raw_dict = isotherm.to_dict()
 
     # Isotherm data
     isotherm_data_dict = isotherm.data().to_dict(orient='index')

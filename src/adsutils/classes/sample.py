@@ -49,6 +49,42 @@ class Sample(object):
 
         return
 
+    @classmethod
+    def from_list(cls, sample_name, sample_batch):
+        """
+        Gets the sample from the master list using its name
+        Raises an exception if it does not exist
+        """
+        # Checks to see if sample exists in master list
+        sample = next(
+            (sample for sample in data.SAMPLE_LIST
+                if sample_name == sample.name
+                and
+                sample_batch == sample.batch),
+            None)
+
+        if sample is None:
+            raise Exception("Sample {0}{1} does not exist in list of samples. "
+                            "First populate adsutils.SAMPLE_LIST "
+                            "with required sample class".format(
+                                sample_name, sample_batch))
+
+        return sample
+
+    def get_prop(self, prop):
+        """
+        Returns a property of a sample class
+        """
+
+        req_prop = self.properties.get(prop)
+        if req_prop is None:
+            raise Exception("The {0} entry was not found in the "
+                            "sample.properties dictionary "
+                            "for sample {1} {2}".format(
+                                prop, self.name, self.batch))
+
+        return req_prop
+
     def print_info(self):
         '''
         Prints a short summary of all the sample parameters
@@ -70,32 +106,3 @@ class Sample(object):
             print(prop, self.properties.get(prop))
 
         return
-
-
-def sample_property(sample_name, sample_batch, prop):
-    """
-    Returns a property of a sample class, checking if
-    the sample list from memory has been filled first
-    """
-    # Checks to see if sample exists in master list
-    sample = next(
-        (sample for sample in data.SAMPLE_LIST
-            if sample_name == sample.name
-            and
-            sample_batch == sample.batch),
-        None)
-
-    if sample is None:
-        raise Exception("Sample {0}{1} does not exist in list of samples. "
-                        "First populate adsutils.SAMPLE_LIST "
-                        "with required sample class".format(
-                            sample_name, sample_batch))
-
-    req_prop = sample.properties.get(prop)
-    if req_prop is None:
-        raise Exception("The {0} entry was not found in the "
-                        "sample.properties dictionary "
-                        "for sample {1} {2}".format(
-                            prop, sample_name, sample_batch))
-
-    return req_prop
