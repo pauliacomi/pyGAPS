@@ -2,11 +2,13 @@
 This module contains the main class that describes an isotherm through discrete points
 """
 
-__author__ = 'Paul A. Iacomi'
+__author__ = 'Paul A. Iacomi and Cory M. Simon'
 
 import hashlib
 
+import numpy
 import pandas
+from scipy.interpolate import interp1d
 
 import adsutils
 
@@ -70,6 +72,18 @@ class PointIsotherm(Isotherm):
 
         # Split the data in adsorption/desorption
         self._data = self._splitdata(self._data)
+
+        #: value of loading to assume beyond highest pressure in the data
+        self.fill_value = None
+
+        # Generate the interpolator object
+        if self.fill_value is None:
+            self.interp1d = interp1d(self._data[pressure_key],
+                                     self._data[loading_key])
+        else:
+            self.interp1d = interp1d(self._data[pressure_key],
+                                     self._data[loading_key],
+                                     fill_value=self.fill_value, bounds_error=False)
 
         # Now that all data has been saved, generate the unique id if needed
         if self.id is None:
@@ -425,3 +439,108 @@ class PointIsotherm(Isotherm):
             return False
         else:
             return True
+
+
+##########################################################
+#   Functions that interpolate values of the isotherm data
+
+    def loading_at(self, pressure):
+        """
+        Linearly interpolate isotherm to compute loading at pressure P.
+
+        :param pressure: float pressure (in corresponding units as data in
+            instantiation)
+        :return: predicted loading at pressure P (in corresponding units as data
+            in instantiation)
+        :rtype: Float or Array
+        """
+
+        return self.interp1d(pressure)
+
+    def spreading_pressure(self, pressure):
+        """
+        Calculate reduced spreading pressure at a bulk gas pressure P.
+        (see Tarafder eqn 4)
+
+        Use numerical quadrature on isotherm data points to compute the reduced
+        spreading pressure via the integral:
+
+        .. math::
+
+            \\Pi(p) = \\int_0^p \\frac{q(\\hat{p})}{ \\hat{p}} d\\hat{p}.
+
+        In this integral, the isotherm :math:`q(\\hat{p})` is represented by a
+        linear interpolation of the data.
+
+        See C. Simon, B. Smit, M. Haranczyk. pyIAST: Ideal Adsorbed Solution
+        Theory (IAST) Python Package. Computer Physics Communications.
+
+        :param pressure: float pressure (in corresponding units as data in
+            instantiation)
+        :return: spreading pressure, :math:`\\Pi`
+        :rtype: Float
+        """
+        # throw exception if interpolating outside the range.
+        if (self.fill_value is None) & \
+                (pressure > self._data[self.pressure_key].max()):
+            raise Exception("""To compute the spreading pressure at this bulk
+            gas pressure, we would need to extrapolate the isotherm since this
+            pressure is outside the range of the highest pressure in your
+            pure-component isotherm data, %f.
+
+            At present, your InterpolatorIsotherm object is set to throw an
+            exception when this occurs, as we do not have data outside this
+            pressure range to characterize the isotherm at higher pressures.
+
+            Option 1: fit an analytical model to extrapolate the isotherm
+            Option 2: pass a `fill_value` to the construction of the
+                InterpolatorIsotherm object. Then, InterpolatorIsotherm will
+                assume that the uptake beyond pressure %f is equal to
+                `fill_value`. This is reasonable if your isotherm data exhibits
+                a plateau at the highest pressures.
+            Option 3: Go back to the lab or computer to collect isotherm data
+                at higher pressures. (Extrapolation can be dangerous!)"""
+                            % (self._data[self.pressure_key].max(),
+                               self._data[self.pressure_key].max()))
+
+        # Get all data points that are at nonzero pressures
+        pressures = self._data[self.pressure_key].values[
+            self._data[self.pressure_key].values != 0.0]
+        loadings = self._data[self.loading_key].values[
+            self._data[self.pressure_key].values != 0.0]
+
+        # approximate loading up to first pressure point with Henry's law
+        # loading = henry_const * P
+        # henry_const is the initial slope in the adsorption isotherm
+        henry_const = loadings[0] / pressures[0]
+
+        # get how many of the points are less than pressure P
+        n_points = numpy.sum(pressures < pressure)
+
+        if n_points == 0:
+            # if this pressure is between 0 and first pressure point...
+            # \int_0^P henry_const P /P dP = henry_const * P ...
+            return henry_const * pressure
+        else:
+            # P > first pressure point
+            area = loadings[0]  # area of first segment \int_0^P_1 n(P)/P dP
+
+            # get area between P_1 and P_k, where P_k < P < P_{k+1}
+            for i in range(n_points - 1):
+                # linear interpolation of isotherm data
+                slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] -
+                                                           pressures[i])
+                intercept = loadings[i] - slope * pressures[i]
+                # add area of this segment
+                area += slope * (pressures[i + 1] - pressures[i]) + intercept * \
+                    numpy.log(pressures[i + 1] / pressures[i])
+
+            # finally, area of last segment
+            slope = (self.loading_at(pressure) - loadings[n_points - 1]) / (
+                pressure - pressures[n_points - 1])
+            intercept = loadings[n_points - 1] - \
+                slope * pressures[n_points - 1]
+            area += slope * (pressure - pressures[n_points - 1]) + intercept * \
+                numpy.log(pressure / pressures[n_points - 1])
+
+            return area

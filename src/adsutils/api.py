@@ -3,7 +3,6 @@
 
 from .classes.gas import Gas
 from .classes.sample import Sample
-from .classes.interpolatorisotherm import InterpolatorIsotherm
 from .classes.modelisotherm import ModelIsotherm
 from .classes.pointisotherm import PointIsotherm
 from .calculations.bet import area_BET
