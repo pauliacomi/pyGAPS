@@ -21,21 +21,20 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
     Pass a list of pure-component adsorption isotherms `isotherms`.
 
-    ::
-
-     :param partial_pressures: Array or list partial pressures of gas components,
+    :param partial_pressures: Array or list partial pressures of gas components,
         e.g. [5.0, 10.0] (bar)
-     :param isotherms: list of model adsorption isotherms.
+    :param isotherms: list of model adsorption isotherms.
         e.g. [methane_isotherm, ethane_isotherm]
-     :param verboseflag: Bool print off a lot of information
-     :param warningoff: Bool when False, warnings will print when the IAST
+    :param verboseflag: Bool print off a lot of information
+    :param warningoff: Bool when False, warnings will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data
-     :param adsorbed_mole_fraction_guess: Array or List, starting guesses for
+    :param adsorbed_mole_fraction_guess: Array or List, starting guesses for
         adsorbed phase mole fractions that `pyiast.iast` solves for
 
-     :return: loadings: predicted uptakes of each component
-     :rtype: Array
+    :return: loadings: predicted uptakes of each component
+    :rtype: Array
+
     """
 
     partial_pressures = numpy.array(partial_pressures)
@@ -188,9 +187,10 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
         gas phase mole fractions that `pyiast.reverse_iast` solves for
 
     :return: gas_mole_fractions, loadings: bulk gas mole fractions that yield
-    desired adsorbed mole fractions `adsorbed_mole_fractions` at
-    `total_pressure`, adsorbed component loadings according to reverse IAST
+        desired adsorbed mole fractions `adsorbed_mole_fractions` at
+        `total_pressure`, adsorbed component loadings according to reverse IAST
     :rtype: Array, Array
+
     """
     n_components = len(isotherms)  # number of components in the mixture
     adsorbed_mole_fractions = numpy.array(adsorbed_mole_fractions)

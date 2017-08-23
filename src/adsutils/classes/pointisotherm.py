@@ -17,8 +17,6 @@ from .gas import Gas
 from .sample import Sample
 from .isotherm import Isotherm
 
-_ADS_DES_CHECK = "des_check"
-
 
 class PointIsotherm(Isotherm):
     """
@@ -96,7 +94,7 @@ class PointIsotherm(Isotherm):
 
     def __setattr__(self, name, value):
         """
-        We overlad the usual class setter to make sure that the id is always
+        We overload the usual class setter to make sure that the id is always
         representative of the data inside the isotherm
 
         The '_instantiated' attribute gets set to true after isotherm __init__
@@ -146,7 +144,7 @@ class PointIsotherm(Isotherm):
         Splits isotherm data into an adsorption and desorption part and adds a column to mark it
         """
         increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
-        increasing.rename(_ADS_DES_CHECK, inplace=True)
+        increasing.rename('check', inplace=True)
 
         return pandas.concat([_data, increasing], axis=1)
 
@@ -273,15 +271,15 @@ class PointIsotherm(Isotherm):
 
     def data(self):
         """Returns all data"""
-        return self._data.drop(_ADS_DES_CHECK, axis=1)
+        return self._data.drop('check', axis=1)
 
     def data_ads(self):
         """Returns adsorption part of data"""
-        return self.data().loc[~self._data[_ADS_DES_CHECK]]
+        return self.data().loc[~self._data['check']]
 
     def data_des(self):
         """Returns desorption part of data"""
-        return self.data().loc[self._data[_ADS_DES_CHECK]]
+        return self.data().loc[self._data['check']]
 
     def pressure_ads(self, unit=None, max_range=None):
         """

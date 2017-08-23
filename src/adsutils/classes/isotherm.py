@@ -32,7 +32,7 @@ class Isotherm(object):
                 " pressure columns in the DataFrame, to the constructor.")
 
         if any(k not in isotherm_parameters
-                for k in ('sample_name', 'sample_batch', 't_exp', 'gas')):
+               for k in ('sample_name', 'sample_batch', 't_exp', 'gas')):
             raise Exception(
                 "Isotherm MUST have the following information in the properties dictionary:"
                 "'sample_name', 'sample_batch', 't_exp', 'gas'")

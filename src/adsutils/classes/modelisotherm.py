@@ -73,7 +73,7 @@ class ModelIsotherm(Isotherm):
         L(P) = M_1\\frac{K_1 P}{1+K_1 P} +  M_2\\frac{K_2 P}{1+K_2 P} + M_3\\frac{K_3 P}{1+K_3 P}
 
     * Asymptotic approximation to the Temkin Isotherm
-    (see DOI: 10.1039/C3CP55039G)
+      (see DOI: 10.1039/C3CP55039G)
 
     .. math::
 
@@ -87,6 +87,7 @@ class ModelIsotherm(Isotherm):
     .. math::
 
         L(P) = K_H P
+
 
     """
 
