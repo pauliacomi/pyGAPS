@@ -65,8 +65,19 @@ print(json_file_paths)
 isotherms = []
 for filepath in json_file_paths:
     with open(filepath, 'r') as text_file:
-        isotherms.append(adsutils.isotherm_from_json(text_file.read()))
+        isotherms.append(adsutils.isotherm_from_json(
+            text_file.read(), mode_pressure='relative'))
 
+#################################################################################
+#       Json export | dataimport/jsoninterface.py
+#################################################################################
+
+# %%
+for isotherm in isotherms:
+    filename = ' '.join(
+        [isotherm.sample_name, isotherm.gas, str(isotherm.t_exp)]) + '.json'
+    with open(filename, mode='w') as f:
+        f.write(adsutils.isotherm_to_json(isotherm))
 
 #################################################################################
 #       Example Selections and filtering

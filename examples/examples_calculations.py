@@ -8,7 +8,8 @@ json_file_paths = adsutils.util_get_file_paths(json_path, '.json')
 isotherms = []
 for filepath in json_file_paths:
     with open(filepath, 'r') as text_file:
-        isotherms.append(adsutils.isotherm_from_json(text_file.read()))
+        isotherms.append(adsutils.isotherm_from_json(
+            text_file.read()))
 
 #################################################################################
 # Henrys constant calculations
