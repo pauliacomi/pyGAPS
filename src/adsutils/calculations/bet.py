@@ -11,7 +11,6 @@ import scipy.constants as constants
 import scipy.stats
 
 from ..classes.gas import Gas
-from ..graphing.isothermgraphs import plot_iso
 
 
 def area_BET(isotherm, verbose=False):
@@ -24,8 +23,7 @@ def area_BET(isotherm, verbose=False):
         raise Exception("The isotherm must be in per mass of adsorbent."
                         "First convert it using implicit functions")
     if isotherm.mode_pressure != "relative":
-        raise Exception("The isotherm must be in relative pressure mode."
-                        "First convert it using implicit functions")
+        isotherm.convert_pressure_mode('relative')
 
     # get gas properties
     ads_gas = Gas.from_list(isotherm.gas)
@@ -61,10 +59,6 @@ def area_BET(isotherm, verbose=False):
             round(pressure[minimum], 3), round(pressure[maximum], 3)))
         print("BET surface area: a =", int(round(bet_area, 0)), "m²/g")
 
-        # Generate plot of isotherm
-        plot_iso([isotherm], plot_type='isotherm',
-                 branch=['ads'])
-
         # Generate plot of the BET points chosen
         bet_plot(pressure,
                  bet_transform(loading, pressure),
@@ -84,8 +78,8 @@ def area_BET_raw(loading, pressure, cross_section):
     """
     Raw function to calculate BET area
 
-    pressure: array of pressures
-    loading: array of loadings
+    pressure: array of pressures, relative
+    loading: array of loadings in mol/g
     """
     if len(pressure) != len(loading):
         raise Exception("The length of the pressure and loading arrays"
