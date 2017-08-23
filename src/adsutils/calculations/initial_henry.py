@@ -8,6 +8,7 @@ __author__ = 'Paul A. Iacomi'
 
 import matplotlib.pyplot as plt
 import numpy
+
 # import pandas
 
 # from ..classes.modelisotherm import ModelIsotherm

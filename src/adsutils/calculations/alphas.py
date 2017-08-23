@@ -5,13 +5,14 @@ This module calculates the alpha-s based on an isotherm
 __author__ = 'Paul A. Iacomi'
 
 import warnings
+
 import matplotlib.pyplot as plt
 
 from ..classes.gas import Gas
 from .bet import area_BET
+from .tplot import find_linear_sections
 from .tplot import plot_tp
 from .tplot import t_plot_parameters
-from .tplot import find_linear_sections
 
 
 def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure=0.4, limits=None, verbose=False):

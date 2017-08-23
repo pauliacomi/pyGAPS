@@ -144,7 +144,8 @@ class Sample(object):
         Returns a dictionary of the sample class
         Is the same dictionary that was used to create it
 
-        :returns: dictionary
+        :returns: dictionary of all parameters
+        :rtype: dict
         """
 
         parameters_dict = {

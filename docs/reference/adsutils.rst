@@ -38,7 +38,7 @@ Isotherm analysis
 -----------------
 
 .. automodule:: adsutils.calculations.bet
-    :members:
+    :members: area_BET, area_BET_raw
 
 .. automodule:: adsutils.calculations.tplot
     :members:

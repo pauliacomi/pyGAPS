@@ -14,8 +14,8 @@ import adsutils
 
 from ..graphing.isothermgraphs import plot_iso
 from .gas import Gas
-from .sample import Sample
 from .isotherm import Isotherm
+from .sample import Sample
 
 
 class PointIsotherm(Isotherm):
@@ -33,21 +33,36 @@ class PointIsotherm(Isotherm):
                  unit_pressure="bar",
                  **isotherm_parameters):
         """
-        Instatiation of the class from a DataFrame so it can be easily referenced
+        Instantiation is done by passing a dictionary with the parameters,
+        as well as the info about units, modes and data columns.
+        The info dictionary must contain an entry for 'sample_name',  'sample_batch', 'gas' and 't_exp'
 
-        :param data: DataFrame containing isotherm and enthalpy datapoints
-        :param info: Dictionary containing all experiment parameters
-        :param loading_key: String key for loading column in df
-        :param pressure_key: String key for pressure column in df
+        :param isotherm_data: DataFrame containing isotherm datapoints
+        :param loading_key: column of the pandas DataFrame where the           loading is stored
+        :param pressure_key: column of the pandas DataFrame where the           pressure is stored
+        :param pressure_key: iterable of the other pandas DataFrame columns
+            in the data
+        :param mode_adsorbent: whether the adsorption is read in terms
+            of either 'per volume' or 'per mass'
+        :param mode_pressure: the pressure mode, either absolute pressures
+            or relative in the form of p/p0
+        :param unit_loading: unit of loading
+        :param unit_pressure: unit of pressure
+        :param isotherm_parameters: dictionary of the form::
 
-        :param mode_adsorbent: Mode for the adsorbent considered: per mass or per volume
-        :param mode_pressure: Mode for the pressure
+            isotherm_params = {
+                'sample_name' : 'Zeolite-1',
+                'sample_batch' : '1234',
+                'gas' : 'N2',
+                't_exp' : 200,
 
-        :param unit_loading: Unit for the amount of gas loaded
-        :param unit_pressure: Unit for the pressure
+                'user' : 'John Doe',
+                properties : {
+                    'doi' : '10.0000/'
+                    'x' : 'y'
+                }
+            }
 
-        :return: self
-        :rtype: PointIsotherm
         """
         # Start construction process
         self._instantiated = False
@@ -121,7 +136,7 @@ class PointIsotherm(Isotherm):
 
         return self.id == other_isotherm.id
 
-    #: Construction from a parent class with the extra data needed
+    # Construction from a parent class with the extra data needed
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data, other_keys=None):
         """
@@ -138,7 +153,7 @@ class PointIsotherm(Isotherm):
                    unit_pressure=isotherm.unit_pressure,
                    **isotherm.to_dict())
 
-    #: Figure out the adsorption and desorption branches
+    # Figure out the adsorption and desorption branches
     def _splitdata(self, _data):
         """
         Splits isotherm data into an adsorption and desorption part and adds a column to mark it
@@ -253,7 +268,7 @@ class PointIsotherm(Isotherm):
         Prints a short summary of all the isotherm parameters and a graph
         """
 
-        Isotherm.print_info(self)
+        print(self)
 
         if 'enthalpy' in self.other_keys:
             plot_type = 'iso-enth'

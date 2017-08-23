@@ -24,6 +24,35 @@ class Isotherm(object):
                  unit_loading="mmol",
                  unit_pressure="bar",
                  **isotherm_parameters):
+        """
+        Instantiation is done by passing a dictionary with the parameters,
+        as well as the info about units, modes and data columns.
+        The info dictionary must contain an entry for 'sample_name',  'sample_batch', 'gas' and 't_exp'
+
+        :param loading_key: column of the pandas DataFrame where the           loading is stored
+        :param pressure_key: column of the pandas DataFrame where the           pressure is stored
+        :param mode_adsorbent: whether the adsorption is read in terms
+            of either 'per volume' or 'per mass'
+        :param mode_pressure: the pressure mode, either absolute pressures
+            or relative in the form of p/p0
+        :param unit_loading: unit of loading
+        :param unit_pressure: unit of pressure
+        :param isotherm_parameters: dictionary of the form::
+
+            isotherm_params = {
+                'sample_name' : 'Zeolite-1',
+                'sample_batch' : '1234',
+                'gas' : 'N2',
+                't_exp' : 200,
+
+                'user' : 'John Doe',
+                properties : {
+                    'doi' : '10.0000/'
+                    'x' : 'y'
+                }
+            }
+
+        """
 
         # Checks
         if None in [loading_key, pressure_key]:
@@ -61,7 +90,7 @@ class Isotherm(object):
             raise Exception("Unit selected for pressure is not an option. See viable"
                             "units in _PRESSURE_UNITS")
 
-        #: Save column names
+        # Save column names
         #: Name of column in the dataframe that contains adsorbed amount
         self.loading_key = loading_key
         #: Name of column in the dataframe that contains pressure
@@ -91,7 +120,7 @@ class Isotherm(object):
         #: Isotherm gas used
         self.gas = isotherm_parameters.pop('gas', None)
 
-        #: Good-to-have properties of the isotherm
+        # Good-to-have properties of the isotherm
         #: Isotherm experiment date
         self.date = isotherm_parameters.pop('date', None)
         #: Isotherm sample activation temperature
@@ -115,38 +144,44 @@ class Isotherm(object):
 
         # Save the rest of the properties as an extra dict
         # now that the named properties were taken out of
+        #: Other properties of the isotherm
         self.other_properties = isotherm_parameters
 
     ###########################################################
     #   Info functions
 
-    def print_info(self):
+    def __str__(self):
         '''
         Prints a short summary of all the isotherm parameters
         '''
+        string = ""
 
         if self.is_real:
-            print("Experimental isotherm")
+            string += ("Experimental isotherm" + '\n')
         else:
-            print("Simulated isotherm")
+            string += ("Simulated isotherm" + '\n')
 
-        print("Material:", self.sample_name)
-        print("Sample Batch:", self.sample_batch)
-        print("Isotherm type:", self.exp_type)
-        print("Gas used:", self.gas)
-        print("Isotherm date:", self.date)
-        print("Machine:", self.machine)
-        print("User:", self.user)
-        print("Activation temperature:", self.t_act, "°C")
-        print("Isotherm temperature:", self.t_exp, "K")
+        string += ("Material:" + self.sample_name + '\n')
+        string += ("Sample Batch:" + self.sample_batch + '\n')
+        string += ("Isotherm type:" + self.exp_type + '\n')
+        string += ("Gas used:" + self.gas + '\n')
+        string += ("Isotherm date:" + self.date + '\n')
+        string += ("Machine:" + self.machine + '\n')
+        string += ("User:" + self.user + '\n')
+        string += ("Activation temperature:" + self.t_act + "°C" + '\n')
+        string += ("Isotherm temperature:" + self.t_exp + "K" + '\n')
+        string += ("Isotherm comments:" + self.comment + '\n')
 
-        print("\n")
-        print("Isotherm comments:", self.comment)
-
-        return
+        return string
 
     def to_dict(self):
-        """Returns a dictionary with the isotherm parameters"""
+        """
+        Returns a dictionary of the isotherm class
+        Is the same dictionary that was used to create it
+
+        :returns: dictionary of all parameters
+        :rtype: dict
+        """
 
         # Get the named properties
         parameters_dict = {

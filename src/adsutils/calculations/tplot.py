@@ -4,12 +4,12 @@ This module calculates the t-plot based on an isotherm
 
 __author__ = 'Paul A. Iacomi'
 
-from itertools import groupby
 import warnings
-import scipy
-import numpy
+from itertools import groupby
 
 import matplotlib.pyplot as plt
+import numpy
+import scipy
 
 from ..classes.gas import Gas
 from .thickness_curves import _THICKNESS_MODELS

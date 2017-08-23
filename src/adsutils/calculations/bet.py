@@ -78,8 +78,13 @@ def area_BET_raw(loading, pressure, cross_section):
     """
     Raw function to calculate BET area
 
-    pressure: array of pressures, relative
-    loading: array of loadings in mol/g
+    :param pressure: array of pressures, relative
+    :param loading: array of loadings, in mol/g
+    :param cross_section: adsorbed cross-section of the molecule of the
+        adsorbate, in nm
+
+    :returns:
+    :rtype: dict
     """
     if len(pressure) != len(loading):
         raise Exception("The length of the pressure and loading arrays"

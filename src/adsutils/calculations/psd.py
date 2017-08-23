@@ -6,13 +6,11 @@ __author__ = 'Paul A. Iacomi'
 
 from functools import partial
 
+import matplotlib.pyplot as plt
 import numpy
 import scipy.constants
 
-import matplotlib.pyplot as plt
-
 from ..classes.gas import Gas
-
 from .thickness_curves import _THICKNESS_MODELS
 from .thickness_curves import thickness_halsey
 from .thickness_curves import thickness_harkins_jura
@@ -26,11 +24,13 @@ def pore_size_distribution(isotherm, branch, psd_model, thickness_model, pore_ge
     Calculates the pore size distribution using a 'classical' model
 
     According to Roquerol, in adopting this approach, it is assumed that:
+
         - the Kelvin equation is applicable over the pore range (mesopores)
         - the meniscus curvature is controlled be the pore size and shape nad
         - the pores are rigid and of well defined shape
         - the filling/emptying of each pore does not depend on its location
         - the adsorption on the pore walls is not different from surface adsorption
+
     """
 
     # Function parameter checks
@@ -121,13 +121,14 @@ def psd_bjh_raw(loading, pressure, pore_geometry, thickness_model, kelvin_model,
     """
     Calculates the pore size distribution using the BJH method
 
-    loading: in mmol/g
-    pressure: relative
-    pore_geometry: 'sphere', 'cylinder' or 'slit'
-    thickness_model: a callable which returns the thickenss of the adsorbed layer at a pressure p
-    kelvin_model: a callable which returns the critical kelvin radius at a pressure p
-    liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    gas_molar_mass: in g/mol
+    :param loading: in mmol/g
+    :param pressure: relative
+    :param pore_geometry: 'sphere', 'cylinder' or 'slit'
+    :param thickness_model: a callable which returns the thickenss of the adsorbed layer
+        at a pressure p
+    :param kelvin_model: a callable which returns the critical kelvin radius at a pressure p
+    :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
+    :param gas_molar_mass: in g/mol
 
     """
     # Checks
@@ -184,13 +185,15 @@ def psd_dollimore_heal_raw(loading, pressure, pore_geometry, thickness_model, ke
     """
     Calculates the pore size distribution using the Dollimore-Heal method
 
-    loading: in mmol/g
-    pressure: relative
-    pore_geometry: 'sphere', 'cylinder' or 'slit'
-    thickness_model: a callable which returns the thickenss of the adsorbed layer at a pressure p
-    kelvin_model: a callable which returns the critical kelvin radius at a pressure p
-    liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    gas_molar_mass: in g/mol
+    :param loading: in mmol/g
+    :param pressure: relative
+    :param pore_geometry: 'sphere', 'cylinder' or 'slit'
+    :param thickness_model: a callable which returns the thickenss of the adsorbed layer
+        at a pressure p
+    :param kelvin_model: a callable which returns the critical kelvin radius at a pressure p
+    :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
+    :param gas_molar_mass: in g/mol
+
     """
     # Checks
     if len(pressure) != len(loading):
@@ -272,16 +275,17 @@ def kelvin_geometry(branch, geometry):
 
 def kelvin_radius_std(pressure, meniscus_geometry, temperature, liquid_density, gas_molar_mass, gas_surface_tension):
     """
-    Calculates the kelvin radius of the pore
+    Calculates the kelvin radius of the pore, using the standard
+    form of the kelvin equation.
 
-    pressure: relative, unitless
-    branch: 'adsorption' or 'desorption'
-    temperature: in kelvin
-    liquid_density: g/cm3
-    gas_molar_mass: g/mol
-    gas_surface_tension: in mN/m
+    :param pressure: relative, unitless
+    :param branch: 'adsorption' or 'desorption'
+    :param temperature: in kelvin
+    :param liquid_density: g/cm3
+    :param gas_molar_mass: g/mol
+    :param gas_surface_tension: in mN/m
 
-    return radius(nm)
+    :returns: radius(nm)
 
     """
 
