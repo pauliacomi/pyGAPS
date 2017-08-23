@@ -3,176 +3,176 @@
     "date": "None",
     "exp_type": "Isotherme",
     "gas": "N2",
-    "id": "c2c688b3e96ee035dd9fcbb3f8db831f",
+    "id": "9f1858649bf327fd4428d93f211a076e",
     "is_real": true,
     "isotherm_data": {
         "0": {
             "loading": "0.371655",
-            "pressure": "0.000489"
+            "pressure": "0.000475074614516"
         },
         "1": {
             "loading": "0.821323",
-            "pressure": "0.0119"
+            "pressure": "0.011561120476"
         },
         "10": {
             "loading": "2.32456",
-            "pressure": "0.206736"
+            "pressure": "0.200848722917"
         },
         "11": {
             "loading": "2.53923",
-            "pressure": "0.249101"
+            "pressure": "0.242007283335"
         },
         "12": {
             "loading": "2.77795",
-            "pressure": "0.299445"
+            "pressure": "0.290917623607"
         },
         "13": {
             "loading": "3.01332",
-            "pressure": "0.3509"
+            "pressure": "0.340907325631"
         },
         "14": {
             "loading": "3.22973",
-            "pressure": "0.399373"
+            "pressure": "0.387999946878"
         },
         "15": {
             "loading": "3.45328",
-            "pressure": "0.44903"
+            "pressure": "0.436242851035"
         },
         "16": {
             "loading": "3.68896",
-            "pressure": "0.499196"
+            "pressure": "0.484980260262"
         },
         "17": {
             "loading": "3.93742",
-            "pressure": "0.549133"
+            "pressure": "0.533495190784"
         },
         "18": {
             "loading": "4.20986",
-            "pressure": "0.598668"
+            "pressure": "0.581619569168"
         },
         "19": {
             "loading": "4.51602",
-            "pressure": "0.648335"
+            "pressure": "0.629872188553"
         },
         "2": {
             "loading": "1.07758",
-            "pressure": "0.0302"
+            "pressure": "0.029339986418"
         },
         "20": {
             "loading": "4.87488",
-            "pressure": "0.697612"
+            "pressure": "0.677745914073"
         },
         "21": {
             "loading": "5.31204",
-            "pressure": "0.747278"
+            "pressure": "0.725997561936"
         },
         "22": {
             "loading": "5.85073",
-            "pressure": "0.795759"
+            "pressure": "0.773097955364"
         },
         "23": {
             "loading": "6.57638",
-            "pressure": "0.843392"
+            "pressure": "0.819374497518"
         },
         "24": {
             "loading": "7.82132",
-            "pressure": "0.895853"
+            "pressure": "0.870341551407"
         },
         "25": {
             "loading": "10.3607",
-            "pressure": "0.948205"
+            "pressure": "0.92120270932"
         },
         "26": {
             "loading": "15.6075",
-            "pressure": "0.984496"
+            "pressure": "0.956460240681"
         },
         "27": {
             "loading": "7.89445",
-            "pressure": "0.891913"
+            "pressure": "0.866513751855"
         },
         "28": {
             "loading": "6.55876",
-            "pressure": "0.845316"
+            "pressure": "0.821243707248"
         },
         "29": {
             "loading": "5.53256",
-            "pressure": "0.783277"
+            "pressure": "0.760971408659"
         },
         "3": {
             "loading": "1.28481",
-            "pressure": "0.0505"
+            "pressure": "0.0490618978181"
         },
         "30": {
             "loading": "5.0366",
-            "pressure": "0.739657"
+            "pressure": "0.718593587217"
         },
         "31": {
             "loading": "4.58233",
-            "pressure": "0.688121"
+            "pressure": "0.668525191852"
         },
         "32": {
             "loading": "4.21054",
-            "pressure": "0.634996"
+            "pressure": "0.61691304687"
         },
         "33": {
             "loading": "3.89948",
-            "pressure": "0.582211"
+            "pressure": "0.565631219616"
         },
         "34": {
             "loading": "3.63349",
-            "pressure": "0.530283"
+            "pressure": "0.515181987341"
         },
         "35": {
             "loading": "3.39735",
-            "pressure": "0.479232"
+            "pressure": "0.465584780499"
         },
         "36": {
             "loading": "3.17811",
-            "pressure": "0.428662"
+            "pressure": "0.41645487609"
         },
         "37": {
             "loading": "2.96882",
-            "pressure": "0.378328"
+            "pressure": "0.367554251044"
         },
         "38": {
             "loading": "2.76132",
-            "pressure": "0.328406"
+            "pressure": "0.319053893364"
         },
         "39": {
             "loading": "2.55194",
-            "pressure": "0.278605"
+            "pressure": "0.270671089933"
         },
         "4": {
             "loading": "1.4659",
-            "pressure": "0.0715"
+            "pressure": "0.0694638751287"
         },
         "40": {
             "loading": "2.33214",
-            "pressure": "0.229231"
+            "pressure": "0.222703126708"
         },
         "41": {
             "loading": "2.13614",
-            "pressure": "0.188244"
+            "pressure": "0.182883324611"
         },
         "5": {
             "loading": "1.63128",
-            "pressure": "0.093"
+            "pressure": "0.0903516138037"
         },
         "6": {
             "loading": "1.78418",
-            "pressure": "0.115"
+            "pressure": "0.111725113843"
         },
         "7": {
             "loading": "1.92694",
-            "pressure": "0.137"
+            "pressure": "0.133098613883"
         },
         "8": {
             "loading": "2.06276",
-            "pressure": "0.16"
+            "pressure": "0.155443636652"
         },
         "9": {
             "loading": "2.19717",
-            "pressure": "0.183019"
+            "pressure": "0.177807118352"
         }
     },
     "lab": "MADIREL",
@@ -182,6 +182,6 @@
     "sample_batch": "Test",
     "sample_name": "SiO2",
     "t_act": 150.0,
-    "t_exp": 77.0,
+    "t_exp": 77.355,
     "user": "PI"
 }
