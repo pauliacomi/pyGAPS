@@ -175,15 +175,19 @@ def gas_data():
 
         'properties': {
             'common_name': 'nitrogen',
-            'molar_mass': 28.0,
+            'molar_mass': 28.01348,
             'cross_sectional_area': 0.162,
             'polarizability': 17.4,
             'dipole_moment': 0.0,
             'quadrupole_moment': 1.52,
-            'criticalp_temperature': 126.2,
+            'criticalp_temperature': 77.355,
             'criticalp_pressure': 34.0,
             'criticalp_density': 11.2,
             'triplep_temperature': 63.1,
+            # properties for 1atm/77k
+            'liquid_density': 0.806,
+            'surface_tension': 8.8796,
+            'saturation_pressure': 101325,
         }
     }
 

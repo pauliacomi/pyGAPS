@@ -8,6 +8,54 @@ import pytest
 import adsutils
 
 
+class TestGas(object):
+    """
+    Tests the gas class
+    """
+
+    def test_gas_created(self, gas_data, basic_gas):
+        "Checks gas can be created from test data"
+
+        assert gas_data == basic_gas.to_dict()
+
+    def test_gas_retreived_list(self, gas_data, basic_gas):
+        "Checks gas can be retrieved from master list"
+        adsutils.data.GAS_LIST.append(basic_gas)
+        uploaded_gas = adsutils.Gas.from_list(gas_data.get('nick'))
+
+        assert gas_data == uploaded_gas.to_dict()
+
+    def test_gas_get_properties(self, gas_data, basic_gas):
+        "Checks if properties of a gas can be located"
+
+        assert basic_gas.get_prop(
+            'common_name') == gas_data['properties'].get('common_name')
+        assert basic_gas.common_name(
+        ) == gas_data['properties'].get('common_name')
+
+        name = basic_gas.properties.pop('common_name')
+        with pytest.raises(Exception):
+            basic_gas.common_name()
+        basic_gas.properties['common_name'] = name
+
+    @pytest.mark.parametrize('calculated', [True, False])
+    def test_gas_named_props(self, gas_data, basic_gas, calculated):
+        temp = 77.355
+        assert basic_gas.molar_mass(calculated) == pytest.approx(
+            gas_data['properties'].get('molar_mass'), 0.001)
+        assert basic_gas.saturation_pressure(temp, calculated) == pytest.approx(
+            gas_data['properties'].get('saturation_pressure'), 0.001)
+        assert basic_gas.surface_tension(temp, calculated) == pytest.approx(
+            gas_data['properties'].get('surface_tension'), 0.001)
+        assert basic_gas.liquid_density(temp, calculated) == pytest.approx(
+            gas_data['properties'].get('liquid_density'), 0.001)
+
+    def test_gas_print(self, basic_gas):
+        """Checks the printing is done"""
+
+        basic_gas.print_info()
+
+
 class TestIsotherm(object):
     """
     Tests the parent isotherm object
@@ -95,7 +143,7 @@ class TestIsotherm(object):
     def test_isotherm_get_parameters(self, isotherm_parameters, basic_isotherm):
         "Checks isotherm returns the same dict as was used to create it"
 
-        assert isotherm_parameters == basic_isotherm.get_parameters()
+        assert isotherm_parameters == basic_isotherm.to_dict()
 
     def test_isotherm_print_parameters(self, basic_isotherm):
         "Checks isotherm can print its own info"

@@ -15,7 +15,7 @@ def basic_isotherm_json(isotherm_data, basic_pointisotherm):
     Gives a json of the isotherm from model data
     """
 
-    isotherm_dict = basic_pointisotherm.get_parameters()
+    isotherm_dict = basic_pointisotherm.to_dict()
     isotherm_dict.update({'id': basic_pointisotherm.id})
 
     isotherm_data_dict = basic_pointisotherm.data().to_dict(orient='index')
