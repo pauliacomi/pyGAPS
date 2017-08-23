@@ -158,7 +158,6 @@ class TestPSD(object):
         isotherm.convert_pressure_mode('relative')
 
         result_dict = adsutils.pore_size_distribution(
-            isotherm, psd_model=method, branch='desorption', thickness_model='Halsey',
-            verbose=True)
+            isotherm, psd_model=method, branch='desorption', thickness_model='Halsey')
 
         max_error = 0.1  # 10 percent
