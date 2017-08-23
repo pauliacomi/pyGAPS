@@ -4,14 +4,14 @@ This module calculates the initial henry constant based on an isotherm
 
 __author__ = 'Paul A. Iacomi'
 
-import copy
+# import copy
 
 import matplotlib.pyplot as plt
 import numpy
-import pandas
+# import pandas
 
-from ..classes.modelisotherm import ModelIsotherm
-from ..graphing.isothermgraphs import plot_iso
+# from ..classes.modelisotherm import ModelIsotherm
+# from ..graphing.isothermgraphs import plot_iso
 
 
 def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
