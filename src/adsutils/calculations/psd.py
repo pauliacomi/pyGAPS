@@ -200,11 +200,11 @@ def psd_dollimore_heal_raw(loading, pressure, pore_geometry, thickness_model, ke
         raise Exception("The length of the pressure and loading arrays"
                         " do not match")
 
-    # Geometry factors
-    if pore_geometry == 'cylinder':
-        factor = 2
-    elif pore_geometry == 'sphere':
-        factor = 3
+    # # Geometry factors
+    # if pore_geometry == 'cylinder':
+    #     factor = 2
+    # elif pore_geometry == 'sphere':
+    #     factor = 3
 
     # Calculate the adsorbed volume of liquid and diff
     volume_adsorbed = loading * gas_molar_mass / liquid_density * 1000

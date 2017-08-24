@@ -53,7 +53,7 @@ class TestGas(object):
     def test_gas_print(self, basic_gas):
         """Checks the printing is done"""
 
-        print(gas)
+        print(basic_gas)
 
 
 class TestIsotherm(object):
