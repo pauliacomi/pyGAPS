@@ -325,7 +325,7 @@ def db_delete_sample(pth, sample):
             cursor.execute(sql_com, {'id': sample_ids[0]})
 
             # Print success
-            print("Success", sample)
+            print("Success", sample.name, sample.batch)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:

@@ -168,8 +168,8 @@ class Isotherm(object):
         string += ("Isotherm date:" + self.date + '\n')
         string += ("Machine:" + self.machine + '\n')
         string += ("User:" + self.user + '\n')
-        string += ("Activation temperature:" + self.t_act + "°C" + '\n')
-        string += ("Isotherm temperature:" + self.t_exp + "K" + '\n')
+        string += ("Activation temperature:" + str(self.t_act) + "°C" + '\n')
+        string += ("Isotherm temperature:" + str(self.t_exp) + "K" + '\n')
         string += ("Isotherm comments:" + self.comment + '\n')
 
         return string

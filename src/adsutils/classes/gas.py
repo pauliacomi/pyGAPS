@@ -111,7 +111,7 @@ class Gas(object):
         string += ("Formula:" + self.formula + '\n')
 
         for prop in self.properties:
-            string += (prop + ':' + self.properties.get(prop) + '\n')
+            string += (prop + ':' + str(self.properties.get(prop)) + '\n')
 
         return string
 

@@ -53,7 +53,7 @@ class TestGas(object):
     def test_gas_print(self, basic_gas):
         """Checks the printing is done"""
 
-        basic_gas.print_info()
+        print(gas)
 
 
 class TestIsotherm(object):
@@ -148,7 +148,7 @@ class TestIsotherm(object):
     def test_isotherm_print_parameters(self, basic_isotherm):
         "Checks isotherm can print its own info"
 
-        return basic_isotherm.print_info()
+        print(basic_isotherm)
 
 
 class TestPointIsotherm(object):
@@ -289,7 +289,7 @@ class TestPointIsotherm(object):
     def test_isotherm_print_parameters(self, basic_isotherm):
         "Checks isotherm can print its own info"
 
-        return basic_isotherm.print_info()
+        print(basic_isotherm)
 
 
 class TestModelIsotherm(object):

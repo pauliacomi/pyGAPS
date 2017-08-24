@@ -117,7 +117,7 @@ class TestTPlot(object):
         results = t_plot_r.get('results')
         assert results is not None
 
-        max_error = 0.1  # 10 percent
+        # max_error = 0.1  # 10 percent
 
         # assert approx(results[0].get('adsorbed_volume'),
         #              micropore_volume, max_error)
@@ -157,7 +157,7 @@ class TestPSD(object):
 
         isotherm.convert_pressure_mode('relative')
 
-        result_dict = adsutils.pore_size_distribution(
-            isotherm, psd_model=method, branch='desorption', thickness_model='Halsey')
+        # result_dict = adsutils.pore_size_distribution(
+        #    isotherm, psd_model=method, branch='desorption', thickness_model='Halsey')
 
-        max_error = 0.1  # 10 percent
+        # max_error = 0.1  # 10 percent
