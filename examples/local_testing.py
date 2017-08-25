@@ -119,3 +119,8 @@ isotherm.convert_pressure_mode("absolute")
 for isotherm in isotherms:
     with open(isotherm.sample_name + ' ' + isotherm.sample_batch + '.json', "w") as text_file:
         text_file.write(adsutils.isotherm_to_json(isotherm))
+
+# %% 
+for isotherm in isotherms:
+    if isotherm.other_keys:
+        adsutils.plot_iso([isotherm], plot_type='enthalpy', branch=['ads'])

@@ -4,7 +4,6 @@ import pytest
 
 import adsutils.calculations
 
-
 HERE = os.path.dirname(__file__)
 
 
