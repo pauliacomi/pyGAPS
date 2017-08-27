@@ -3,7 +3,7 @@ This module contains objects to characterize the pure-component adsorption
 isotherms from experimental or simulated data. These will be fed into the
 IAST functions in pyiast.py.
 """
-__author__ = 'Cory M. Simon'
+
 
 import copy
 

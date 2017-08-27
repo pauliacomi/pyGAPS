@@ -1,8 +1,6 @@
 """
-This module contains the adsorbent class
+This module contains the adsorbate class
 """
-
-__author__ = 'Paul A. Iacomi'
 
 from CoolProp.CoolProp import PropsSI
 
@@ -62,12 +60,15 @@ class Adsorbate(object):
         Instantiation is done by passing a dictionary with the parameters.
         The info dictionary must contain an entry for 'nick'.
 
-        :param info: dictionary of the form::
+        Parameters
+        ----------
+        info : dict
+            dictionary of the form::
 
             adsorbate_info = {
                 'nick' : 'nitrogen',
                 'formula' : 'N2',
-                properties : {
+                'properties' : {
                     'x' : 'y'
                     'z' : 't'
                 }
@@ -87,9 +88,20 @@ class Adsorbate(object):
         """
         Gets the adsorbate from the master list using its name
 
-        :param adsorbate_name: the name of the adsorbate to search
-        :returns: instance of class
-        :raises: ``Exception`` if it does not exist
+        Parameters
+        ----------
+        adsorbate_name : str
+            the name of the adsorbate to search
+
+        Returns
+        -------
+        Adsorbate
+            instance of class
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist or cannot be calculated
         """
         # See if adsorbate exists in master list
         adsorbate = next(
@@ -120,8 +132,10 @@ class Adsorbate(object):
         Returns a dictionary of the adsorbate class
         Is the same dictionary that was used to create it
 
-        :returns: dictionary of all parameters
-        :rtype: dict
+        Returns
+        -------
+        dict
+            dictionary of all parameters
         """
 
         parameters_dict = {
@@ -136,9 +150,20 @@ class Adsorbate(object):
         """
         Returns a property from the 'properties' dictionary
 
-        :param prop: Property name desired
-        :returns: Value of property in the properties dict
-        :raises: ``Exception`` if it does not exist
+        Parameters
+        ----------
+        prop : str
+            property name desired
+
+        Returns
+        -------
+        str/float
+            Value of property in the properties dict
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist
         """
 
         req_prop = self.properties.get(prop)
@@ -152,8 +177,15 @@ class Adsorbate(object):
         """
         Gets the common name of the adsorbate from the properties dict
 
-        :returns: Value of common_name in the properties dict
-        :raises: ``Exception`` if it does not exist
+        Returns
+        -------
+        str
+            Value of common_name in the properties dict
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist
         """
         c_name = self.properties.get("common_name")
         if c_name is None:
@@ -166,11 +198,21 @@ class Adsorbate(object):
         """
         Returns the molar mass of the adsorbate
 
-        :param calculate: bool, whether to calculate the property
-                          or look it up in the properties dictionary
-                          default - True
-        :returns: molar mass in g/mol
-        :raises: ``Exception`` if it does not exist or cannot be calculated
+        Parameters
+        ----------
+        calculate : bool, optional
+            whether to calculate the property or look it up in the properties
+            dictionary, default - True
+
+        Returns
+        -------
+        float
+            molar mass in g/mol
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist or cannot be calculated
 
         """
         mol_m = self.properties.get("molar_mass")
@@ -181,15 +223,26 @@ class Adsorbate(object):
 
     def saturation_pressure(self, temp, calculate=True):
         """
-        Uses an equation of state to determine the`
+        Uses an equation of state to determine the
         saturation pressure at a particular temperature
 
-        :param temp: temperature at which the pressure is desired in K
-        :param calculate: bool, whether to calculate the property
-                    or look it up in the properties dictionary
-                    default - True
-        :return: pressure in Pascal
-        :raises: ``Exception`` if it does not exist or cannot be calculated
+        Parameters
+        ----------
+        temp : float
+            temperature at which the pressure is desired in K
+        calculate : bool, optional
+            whether to calculate the property or look it up in the properties
+            dictionary, default - True
+
+        Returns
+        -------
+        float
+            pressure in Pascal
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist or cannot be calculated
 
         """
         sat_p = self.properties.get("saturation_pressure")
@@ -203,12 +256,23 @@ class Adsorbate(object):
         Uses an equation of state to determine the
         surface tension at a particular temperature
 
-        :param temp: temperature at which the surface_tension is desired in K
-        :param calculate: bool, whether to calculate the property
-                    or look it up in the properties dictionary
-                    default - True
-        :return: surface tension in mN/m
-        :raises: ``Exception`` if it does not exist or cannot be calculated
+        Parameters
+        ----------
+        temp : float
+            temperature at which the surface_tension is desired in K
+        calculate : bool, optional
+            whether to calculate the property or look it up in the properties
+            dictionary, default - True
+
+        Returns
+        -------
+        float
+            surface tension in mN/m
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist or cannot be calculated
 
         """
         surf_t = self.properties.get("surface_tension")
@@ -222,12 +286,23 @@ class Adsorbate(object):
         Uses an equation of state to determine the
         liquid density at a particular temperature
 
-        :param temp: temperature at which the liquid density is desired in K
-        :param calculate: bool, whether to calculate the property
-                    or look it up in the properties dictionary
-                    default - True
-        :return: density in g/cm3
-        :raises: ``Exception`` if it does not exist or cannot be calculated
+        Parameters
+        ----------
+        temp : float
+            temperature at which the liquid density is desired in K
+        calculate : bool, optional
+            whether to calculate the property or look it up in the properties
+            dictionary, default - True
+
+        Returns
+        -------
+        float
+            density in g/cm3
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist or cannot be calculated
 
         """
         liq_d = self.properties.get("liquid_density")

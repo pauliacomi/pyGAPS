@@ -2,7 +2,6 @@
 This module contains the main class that describes an isotherm through discrete points
 """
 
-__author__ = 'Paul A. Iacomi and Cory M. Simon'
 
 import hashlib
 
@@ -37,27 +36,34 @@ class PointIsotherm(Isotherm):
         as well as the info about units, modes and data columns.
         The info dictionary must contain an entry for 'sample_name',  'sample_batch', 'gas' and 't_exp'
 
-        :param isotherm_data: DataFrame containing isotherm datapoints
-        :param loading_key: column of the pandas DataFrame where the           loading is stored
-        :param pressure_key: column of the pandas DataFrame where the           pressure is stored
-        :param pressure_key: iterable of the other pandas DataFrame columns
-            in the data
-        :param mode_adsorbent: whether the adsorption is read in terms
-            of either 'per volume' or 'per mass'
-        :param mode_pressure: the pressure mode, either absolute pressures
-            or relative in the form of p/p0
-        :param unit_loading: unit of loading
-        :param unit_pressure: unit of pressure
-        :param isotherm_parameters: dictionary of the form::
+        Parameters
+        ----------
+        loading_key : str
+            column of the pandas DataFrame where the loading is stored
+        pressure_key : str
+            column of the pandas DataFrame where the pressure is stored
+        other_keys : iterable
+            other pandas DataFrame columns with data
+        mode_adsorbent : str, optional
+            whether the adsorption is read in terms of either 'per volume'
+            or 'per mass'
+        mode_pressure : str, optional
+            the pressure mode, either absolute pressures or relative in
+            the form of p/p0
+        unit_loading : str, optional
+            unit of loading
+        unit_pressure : str, optional
+            unit of pressure
+        isotherm_parameters:
+            dictionary of the form::
 
             isotherm_params = {
                 'sample_name' : 'Zeolite-1',
                 'sample_batch' : '1234',
                 'gas' : 'N2',
                 't_exp' : 200,
-
                 'user' : 'John Doe',
-                properties : {
+                'properties' : {
                     'doi' : '10.0000/'
                     'x' : 'y'
                 }

@@ -7,10 +7,10 @@
 Classes
 =======
 
-Gas
----
+Adsorbate
+---------
 
-.. automodule:: adsutils.classes.gas
+.. automodule:: adsutils.classes.adsorbate
     :members:
 
 Sample
@@ -80,4 +80,17 @@ Graphs and plotting
 ===================
 
 .. automodule:: adsutils.graphing.isothermgraphs
+    :members:
+
+Other utilities
+===============
+.. automodule:: adsutils.utilities.folder_utilities
+    :members:
+.. automodule:: adsutils.utilities.string_utilities
+    :members:
+.. automodule:: adsutils.utilities.sqlite_utilities
+    :members:
+.. automodule:: adsutils.utilities.sqlite_db_creator
+    :members:
+.. automodule:: adsutils.utilities.sqlite_db_pragmas
     :members:

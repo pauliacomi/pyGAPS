@@ -2,7 +2,6 @@
 This module contains the functions that generate the sqlite database
 """
 
-__author__ = 'Paul A. Iacomi'
 
 import sqlite3
 
@@ -12,6 +11,12 @@ from .sqlite_db_pragmas import PRAGMAS
 def db_create(pth):
     """
     Creates the entire database
+
+    Parameters
+    ----------
+    pth : str
+        path where the database is created
+
     """
     for pragma in PRAGMAS:
         db_execute_general(pth, pragma)
@@ -20,7 +25,15 @@ def db_create(pth):
 
 def db_execute_general(pth, statement):
     """
-    A general form of the table creation routine
+    A general function that executes SQL statements
+
+    Parameters
+    ----------
+    pth : str
+        path where the database is located
+    statement : str
+        SQL statement to execute
+
     """
 
     # Attempt to connect

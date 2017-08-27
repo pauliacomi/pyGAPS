@@ -2,8 +2,6 @@
 This module contains the main class that describes an isotherm
 """
 
-__author__ = 'Paul A. Iacomi'
-
 
 class Isotherm(object):
     '''
@@ -29,24 +27,32 @@ class Isotherm(object):
         as well as the info about units, modes and data columns.
         The info dictionary must contain an entry for 'sample_name',  'sample_batch', 'gas' and 't_exp'
 
-        :param loading_key: column of the pandas DataFrame where the           loading is stored
-        :param pressure_key: column of the pandas DataFrame where the           pressure is stored
-        :param mode_adsorbent: whether the adsorption is read in terms
-            of either 'per volume' or 'per mass'
-        :param mode_pressure: the pressure mode, either absolute pressures
-            or relative in the form of p/p0
-        :param unit_loading: unit of loading
-        :param unit_pressure: unit of pressure
-        :param isotherm_parameters: dictionary of the form::
+        Parameters
+        ----------
+        loading_key : str
+            column of the pandas DataFrame where the loading is stored
+        pressure_key : str
+            column of the pandas DataFrame where the pressure is stored
+        mode_adsorbent : str, optional
+            whether the adsorption is read in terms of either 'per volume'
+            or 'per mass'
+        mode_pressure : str, optional
+            the pressure mode, either absolute pressures or relative in
+            the form of p/p0
+        unit_loading : str, optional
+            unit of loading
+        unit_pressure : str, optional
+            unit of pressure
+        isotherm_parameters:
+            dictionary of the form::
 
             isotherm_params = {
                 'sample_name' : 'Zeolite-1',
                 'sample_batch' : '1234',
                 'gas' : 'N2',
                 't_exp' : 200,
-
                 'user' : 'John Doe',
-                properties : {
+                'properties' : {
                     'doi' : '10.0000/'
                     'x' : 'y'
                 }
@@ -179,8 +185,10 @@ class Isotherm(object):
         Returns a dictionary of the isotherm class
         Is the same dictionary that was used to create it
 
-        :returns: dictionary of all parameters
-        :rtype: dict
+        Returns
+        -------
+        dict
+            dictionary of all parameters
         """
 
         # Get the named properties

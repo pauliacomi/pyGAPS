@@ -1,10 +1,13 @@
-# %%
+"""
+This module contains the functions for plotting and comparing isotherms
+"""
+
 import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib import cm
 from numpy import linspace
 
-from ..utilities.matplotlib_chemformula import convert_chemformula
+from ..utilities.string_utilities import convert_chemformula
 
 # ! list of plot types
 _PLOT_TYPES = ["isotherm", "enthalpy", "iso-enth"]
@@ -18,14 +21,39 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
              legend_list=None, fig_title=None, legend_bottom=False,
              save=False, path=None):
     """
-    Plots the isotherm graphs requested
+    Plots the isotherm(s) provided on a single graph
 
-    :param isotherms: an array of the isotherms to be plotted
-    :param plot_type: the plot type, isotherm/enthalpies or combination
-    :param branch: list with branches to disply, options: 'ads', 'des'
-    :param logarithmic: whether the graph should be logarithmic in the x axis
-    :param color: whether the graph should be coloured or grayscale
+    Parameters
+    ----------
+    isotherms: list
+        an iterable of the isotherms to be plotted
+    plot_type: str
+        the plot type, isotherm/enthalpies or combination
+    branch: str
+        list with branches to disply, options: 'ads', 'des'
+    logarithmic: bool
+        whether the graph should be logarithmic in the x axis
+    color: bool
+        whether the graph should be coloured or grayscale
+    xmaxrange: float
+        maximum range for pressure on x axis
+    y_adsmaxrange: float
+        maximum range for loading on y axis
+    y_enthmaxrange: float
+        maximum range for enthalpy on y axis
+    legend_list: iterable
+        the components of the legend which are displayed
+    fig_title: str
+        title of the graph
+    legend_bottom: bool
+        whether the legend should be at the bottom or at the side
+    save: bool
+        whether to save the graph
+    path: str
+        the path where the graph will be saved
 
+    Returns
+    -------
     """
 
     # Initial checks

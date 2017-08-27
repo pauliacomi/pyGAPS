@@ -7,9 +7,19 @@ import os.path
 
 def util_get_file_paths(folder, extension=None):
     '''
-    A function that will get the paths of the files requested as a list.
+    Gets the paths of the files with the requested extension as a list.
 
-    :param folder: The folder where the function will look in
+    Parameters
+    ----------
+    folder : str
+        folder where the function will look in, recursively
+    extension : str
+        the extension of the files to look for
+
+    Returns
+    -------
+    list
+        paths of each file
 
     '''
     if extension is None:
@@ -18,8 +28,8 @@ def util_get_file_paths(folder, extension=None):
     paths = []
 
     for root, _, files in os.walk(folder):
-        for f in files:
-            fullpath = os.path.join(root, f)
+        for file in files:
+            fullpath = os.path.join(root, file)
             ext = os.path.splitext(fullpath)[-1].lower()
             if ext == extension:
                 paths.append(fullpath)

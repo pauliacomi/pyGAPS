@@ -1,6 +1,27 @@
+"""
+This module contains general functions for SQL query building
+"""
+
+
 def build_update(table, to_set, where, prefix=None):
     """
-    builds an update request
+    Builds an update request
+
+    Parameters
+    ----------
+    table : str
+        table where query will be directed
+    to_set: iterable
+        the list of columns to update
+    where: iterable
+        the list of conditions to constrain the query
+    prefix: str, optional
+        the prefix to introduce to the second part of the constraint
+
+    Returns
+    -------
+    str
+        built query
     """
 
     sql_q = 'UPDATE \"' + table + '\"'
@@ -17,7 +38,19 @@ def build_update(table, to_set, where, prefix=None):
 
 def build_insert(table, to_insert):
     """
-    builds an insert request
+    Builds an insert request
+
+    Parameters
+    ----------
+    table : str
+        table where query will be directed
+    to_insert: iterable
+        the list of columns where the values will be inserted
+
+    Returns
+    -------
+    str
+        built query
     """
 
     sql_q = 'INSERT INTO \"' + table + '\" ('
@@ -31,7 +64,21 @@ def build_insert(table, to_insert):
 
 def build_select(table, to_select, where):
     """
-    builds an select request
+    Builds an select request
+
+    Parameters
+    ----------
+    table : str
+        table where query will be directed
+    to_set: iterable
+        the list of columns to select
+    where: iterable
+        the list of conditions to constrain the query
+
+    Returns
+    -------
+    str
+        built query
     """
 
     sql_q = "SELECT "
@@ -41,18 +88,24 @@ def build_select(table, to_select, where):
         sql_q += ' WHERE '
         sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
 
-    # sql_q += ' AND '.join(list(map(lambda x:
-    #                                x[0] + " IS NULL"
-    #                                if x[1] == ""
-    #                                else x[0] + "=:" + x[0],
-    #                                where.items())))
-
     return sql_q
 
 
 def build_delete(table, where):
     """
-    builds a delete request
+    Builds a delete request
+
+    Parameters
+    ----------
+    table : str
+        table where query will be directed
+    where: iterable
+        the list of conditions to constrain the query
+
+    Returns
+    -------
+    str
+        built query
     """
 
     sql_q = "DELETE "

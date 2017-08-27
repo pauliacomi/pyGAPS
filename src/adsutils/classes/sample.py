@@ -2,8 +2,6 @@
 This module contains the experimental sample class
 """
 
-__author__ = 'Paul A. Iacomi'
-
 import adsutils.data as data
 
 
@@ -42,14 +40,17 @@ class Sample(object):
         Instantiation is done by passing a dictionary with the parameters.
         The info dictionary must contain an entry for 'name' and 'batch'.
 
-        :param info: dictionary of the form::
+        Parameters
+        ----------
+        info : dict
+            dictionary of the form::
 
             adsorbent_info = {
                 'name' : 'Zeolite-1',
                 'batch' : '1234',
 
                 'owner' : 'John Doe',
-                properties : {
+                'properties' : {
                     'density' : 1.5
                     'x' : 'y'
                 }
@@ -96,10 +97,22 @@ class Sample(object):
         """
         Gets the sample from the master list using its name
 
-        :param sample_name: the name of the gas to search
-        :param sample_batch: the batch of the gas to search
-        :returns: instance of class
-        :raises: ``Exception`` if it does not exist
+        Parameters
+        ----------
+        sample_name : str
+            the name of the material to search
+        sample_batch : str
+            the batch of the material to search
+
+        Returns
+        -------
+        Sample
+            instance of class
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist or cannot be calculated
         """
         # Checks to see if sample exists in master list
         sample = next(
@@ -144,8 +157,10 @@ class Sample(object):
         Returns a dictionary of the sample class
         Is the same dictionary that was used to create it
 
-        :returns: dictionary of all parameters
-        :rtype: dict
+        Returns
+        -------
+        dict
+            dictionary of all parameters
         """
 
         parameters_dict = {
@@ -168,9 +183,20 @@ class Sample(object):
         """
         Returns a property from the 'properties' dictionary
 
-        :param prop: property name desired
-        :returns: value of property in the properties dict
-        :raises: ``Exception`` if it does not exist
+        Parameters
+        ----------
+        prop : str
+            property name desired
+
+        Returns
+        -------
+        str/float
+            Value of property in the properties dict
+
+        Raises
+        ------
+        ``Exception``
+            if it does not exist
         """
 
         req_prop = self.properties.get(prop)

@@ -1,6 +1,22 @@
-# %%
+"""
+This module contains general functions for string transformations
+"""
+
+
 def convert_chemformula(string):
-    "converts a string to a matplotlib parsable chemical formula"
+    """
+    Converts a chemical formula string to a matplotlib parsable format (latex)
+
+    Parameters
+    ----------
+    string : str
+        string to process
+
+    Returns
+    -------
+    str
+        processed string
+    """
 
     inner = []
     # Iterate through the string, adding non-numbers to the no_digits list

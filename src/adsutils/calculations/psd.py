@@ -34,7 +34,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
     :param psd_model: the pore size distribution model to use
     :param pore_geometry: the geometry of the adsorbent pores
     :param verbose: prints out extra information on the calculation and graphs the results
-    :param **model_parameters: use this to override specific settings for each model
+    :param model_parameters: use this to override specific settings for each model
 
     Calculates the pore size distribution using a 'classical' model which attempts to
     describe the adsorption in a pore as a combination of a statistical thickness and
@@ -148,7 +148,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
     :param psd_model: the pore size distribution model to use
     :param pore_geometry: the geometry of the adsorbent pores
     :param verbose: prints out extra information on the calculation and graphs the results
-    :param **model_parameters: use this to override specific settings for each model
+    :param model_parameters: use this to override specific settings for each model
 
     Calculates the pore size distribution using a 'classical' model which attempts to
     describe the adsorption in a pore of specific width w at a relative pressure p/p0

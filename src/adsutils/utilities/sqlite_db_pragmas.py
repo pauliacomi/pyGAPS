@@ -1,9 +1,7 @@
-# %%
 """
 This module contains the sql pragmas to generate the sqlite database
 """
 
-__author__ = 'Paul A. Iacomi'
 
 # Pragmas relating to samples
 PRAGMA_SAMPLE_TYPE = """

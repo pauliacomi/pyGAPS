@@ -1,3 +1,7 @@
+"""
+This module contains the functions for plotting calculation-specific graphs
+"""
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
