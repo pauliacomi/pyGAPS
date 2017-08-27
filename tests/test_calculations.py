@@ -144,8 +144,8 @@ class TestPSD(object):
         #        ('Takeda 5A N2 77.355.json'),
         #        ('UiO-66(Zr) N2 77.355.json'),
     ])
-    def test_psd(self, file, basic_gas, method):
-        """Test BET calculation with several model isotherms"""
+    def test_psd_meso(self, file, basic_gas, method):
+        """Test psd calculation with several model isotherms"""
         adsutils.data.GAS_LIST.append(basic_gas)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
@@ -156,7 +156,31 @@ class TestPSD(object):
 
         isotherm.convert_pressure_mode('relative')
 
-        # result_dict = adsutils.pore_size_distribution(
-        #    isotherm, psd_model=method, branch='desorption', thickness_model='Halsey')
+        result_dict = adsutils.mesopore_size_distribution(
+            isotherm, psd_model=method, branch='desorption', thickness_model='Halsey', verbose=True)
+
+        # max_error = 0.1  # 10 percent
+
+    @pytest.mark.parametrize('method', [
+        'HK',
+    ])
+    @pytest.mark.parametrize('file', [
+        ('Takeda 5A N2 77.355.json'),
+        ('UiO-66(Zr) N2 77.355.json'),
+    ])
+    def test_psd_micro(self, file, basic_gas, method):
+        """Test psd calculation with several model isotherms"""
+        adsutils.data.GAS_LIST.append(basic_gas)
+
+        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+
+        with open(filepath, 'r') as text_file:
+            isotherm = adsutils.isotherm_from_json(
+                text_file.read())
+
+        isotherm.convert_pressure_mode('relative')
+
+        result_dict = adsutils.micropore_size_distribution(
+            isotherm, psd_model=method, pore_geometry='slit', verbose=True)
 
         # max_error = 0.1  # 10 percent

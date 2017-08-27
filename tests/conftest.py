@@ -177,7 +177,9 @@ def gas_data():
             'common_name': 'nitrogen',
             'molar_mass': 28.01348,
             'cross_sectional_area': 0.162,
-            'polarizability': 17.4,
+            'molecular_diameter': 0.3,
+            'polarizability': 1.76E-30,
+            'magnetic_susceptibility': 3.6E-35,
             'dipole_moment': 0.0,
             'quadrupole_moment': 1.52,
             'criticalp_temperature': 77.355,
@@ -186,6 +188,7 @@ def gas_data():
             'triplep_temperature': 63.1,
             # properties for 1atm/ 77k
             'liquid_density': 0.806,
+            'surface_density': 6.71e18,
             'surface_tension': 8.8796,
             'saturation_pressure': 101325,
         }

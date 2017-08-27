@@ -85,10 +85,10 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
                         "Available models are {}".format(_THICKNESS_MODELS))
 
     # Get required adsorbate properties
-    ads_gas = Gas.from_list(isotherm.gas)
-    molar_mass = ads_gas.molar_mass()
-    liquid_density = ads_gas.liquid_density(isotherm.t_exp)
-    surface_tension = ads_gas.surface_tension(isotherm.t_exp)
+    adsorbate = Gas.from_list(isotherm.gas)
+    molar_mass = adsorbate.molar_mass()
+    liquid_density = adsorbate.liquid_density(isotherm.t_exp)
+    surface_tension = adsorbate.surface_tension(isotherm.t_exp)
 
     # Read data in, depending on branch requested
     if branch == 'adsorption':
@@ -114,8 +114,8 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
                       meniscus_geometry=m_geometry,
                       temperature=isotherm.t_exp,
                       liquid_density=liquid_density,
-                      gas_molar_mass=molar_mass,
-                      gas_surface_tension=surface_tension)
+                      adsorbate_molar_mass=molar_mass,
+                      adsorbate_surface_tension=surface_tension)
 
     # Call specified pore size distribution function
     if psd_model == 'BJH':
@@ -222,7 +222,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist)
+        psd_plot(pore_widths, pore_dist, log=False, xmax=2)
 
     return result_dict
 
