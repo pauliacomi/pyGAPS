@@ -131,7 +131,7 @@ class TestAlphaSPlot(object):
 
 class TestPSD(object):
     """
-    Tests everything related to pore size dist calculation
+    Tests everything related to pore size distribution calculation
     """
     @pytest.mark.parametrize('method', [
         'BJH',

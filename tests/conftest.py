@@ -184,7 +184,7 @@ def gas_data():
             'criticalp_pressure': 34.0,
             'criticalp_density': 11.2,
             'triplep_temperature': 63.1,
-            # properties for 1atm/77k
+            # properties for 1atm/ 77k
             'liquid_density': 0.806,
             'surface_tension': 8.8796,
             'saturation_pressure': 101325,

@@ -12,9 +12,9 @@ import numpy
 import scipy
 
 from ..classes.gas import Gas
-from .thickness_curves import _THICKNESS_MODELS
-from .thickness_curves import thickness_halsey
-from .thickness_curves import thickness_harkins_jura
+from .thickness_models import _THICKNESS_MODELS
+from .thickness_models import thickness_halsey
+from .thickness_models import thickness_harkins_jura
 
 
 def t_plot(isotherm, thickness_model, limits=None, verbose=False):

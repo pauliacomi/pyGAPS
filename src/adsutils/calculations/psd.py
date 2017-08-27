@@ -1,35 +1,52 @@
 """
-This module calculates the pore size distribution based on an isotherm
+Calculation of the pore size distribution based on an isotherm
 """
-
-__author__ = 'Paul A. Iacomi'
 
 from functools import partial
 
-import matplotlib.pyplot as plt
-import numpy
-import scipy.constants
 
 from ..classes.gas import Gas
-from .thickness_curves import _THICKNESS_MODELS
-from .thickness_curves import thickness_halsey
-from .thickness_curves import thickness_harkins_jura
+from ..graphing.psdgraph import psd_plot
+from .kelvin_models import meniscus_geometry
+from .kelvin_models import kelvin_radius_std
+from .thickness_models import _THICKNESS_MODELS
+from .thickness_models import thickness_halsey
+from .thickness_models import thickness_harkins_jura
+from .adsorbent_models import _ADSORBENT_MODELS
+from .adsorbent_models import PROPERTIES_CARBON
+from .adsorbent_models import PROPERTIES_OXIDE_ION
+from .psd_mesoporous import psd_bjh
+from .psd_mesoporous import psd_dollimore_heal
+from .psd_microporous import psd_horvath_kawazoe
+from .psd_dft import psd_dft_kernel_fit
 
-_PSD_MODELS = ['BJH', 'DH']
-_PORE_GEOMETRIES = ['cylinder', 'sphere', 'slit']
+
+_MESO_PSD_MODELS = ['BJH', 'DH', 'HK']
+_MICRO_PSD_MODELS = ['HK']
+_PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
-def pore_size_distribution(isotherm, branch, psd_model, thickness_model, pore_geometry='cylinder', verbose=False):
+def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using a 'classical' model
+    Calculates the pore size distribution using a 'classical' model, applicable to mesopores
 
-    According to Roquerol, in adopting this approach, it is assumed that:
+    :param isotherm: the isotherm of which the pore size distribution will be calculated
+    :param psd_model: the pore size distribution model to use
+    :param pore_geometry: the geometry of the adsorbent pores
+    :param verbose: prints out extra information on the calculation and graphs the results
+    :param **model_parameters: use this to override specific settings for each model
 
-        - the Kelvin equation is applicable over the pore range (mesopores)
-        - the meniscus curvature is controlled be the pore size and shape nad
-        - the pores are rigid and of well defined shape
-        - the filling/emptying of each pore does not depend on its location
-        - the adsorption on the pore walls is not different from surface adsorption
+    Calculates the pore size distribution using a 'classical' model which attempts to
+    describe the adsorption in a pore as a combination of a statistical thickness and
+    a condensation/evaporation behaviour described by surface tension
+
+    Currently, the methods provided are:
+
+        - the BJH or Barrett, Joyner and Halenda method
+        - the DH or Dollimore-Heal method, an extension of the BJH method
+
+    A common gotcha of data processing is: "garbage in = garbage out". Only use methods
+    when you are aware of their limitations and shortcomings.
 
     """
 
@@ -41,26 +58,33 @@ def pore_size_distribution(isotherm, branch, psd_model, thickness_model, pore_ge
         raise Exception("The isotherm must be in relative pressure mode."
                         "First convert it using implicit functions")
 
-    if branch not in ['adsorption', 'desorption']:
-        raise Exception("Branch {} not an option for psd.".format(branch),
-                        "Select either 'adsorption' or 'desorption'")
     if psd_model is None:
         raise Exception("Specify a model to generate the pore size"
                         " distribution e.g. psd_model=\"BJH\"")
-    if psd_model not in _PSD_MODELS:
+    if psd_model not in _MESO_PSD_MODELS:
         raise Exception("Model {} not an option for psd.".format(psd_model),
-                        "Available models are {}".format(_PSD_MODELS))
-    if thickness_model is None:
-        raise Exception("Specify a model to generate the thickness curve"
-                        " e.g. thickness_model=\"Halsey\"")
-    if thickness_model not in _THICKNESS_MODELS:
-        raise Exception("Model {} not an option for pore size distribution.".format(thickness_model),
-                        "Available models are {}".format(_THICKNESS_MODELS))
+                        "Available models are {}".format(_MESO_PSD_MODELS))
     if pore_geometry not in _PORE_GEOMETRIES:
         raise Exception("Geometry {} not an option for pore size distribution.".format(pore_geometry),
                         "Available geometries are {}".format(_PORE_GEOMETRIES))
 
-    # Get adsorbate properties
+    branch = model_parameters.get('branch')
+    if branch is None:
+        raise Exception("Specify the isotherm part to select for the calculation"
+                        "'branch'= either 'adsorption' or 'desorption'")
+    if branch not in ['adsorption', 'desorption']:
+        raise Exception("Branch {} not an option for psd.".format(branch),
+                        "Select either 'adsorption' or 'desorption'")
+
+    if 'thickness_model' in model_parameters:
+        thickness_model = model_parameters.get('thickness_model')
+    else:
+        thickness_model = 'Harkins/Jura'
+    if thickness_model not in _THICKNESS_MODELS:
+        raise Exception("Model {} not an option for pore size distribution.".format(thickness_model),
+                        "Available models are {}".format(_THICKNESS_MODELS))
+
+    # Get required adsorbate properties
     ads_gas = Gas.from_list(isotherm.gas)
     molar_mass = ads_gas.molar_mass()
     liquid_density = ads_gas.liquid_density(isotherm.t_exp)
@@ -85,9 +109,9 @@ def pore_size_distribution(isotherm, branch, psd_model, thickness_model, pore_ge
         t_model = thickness_harkins_jura
 
     # Kelvin model definitions
-    meniscus_geometry = kelvin_geometry(branch, pore_geometry)
+    m_geometry = meniscus_geometry(branch, pore_geometry)
     k_model = partial(kelvin_radius_std,
-                      meniscus_geometry=meniscus_geometry,
+                      meniscus_geometry=m_geometry,
                       temperature=isotherm.t_exp,
                       liquid_density=liquid_density,
                       gas_molar_mass=molar_mass,
@@ -95,12 +119,12 @@ def pore_size_distribution(isotherm, branch, psd_model, thickness_model, pore_ge
 
     # Call specified pore size distribution function
     if psd_model == 'BJH':
-        pore_widths, pore_dist = psd_bjh_raw(
+        pore_widths, pore_dist = psd_bjh(
             loading, pressure, pore_geometry,
             t_model, k_model,
             liquid_density, molar_mass)
     elif psd_model == 'DH':
-        pore_widths, pore_dist = psd_dollimore_heal_raw(
+        pore_widths, pore_dist = psd_dollimore_heal(
             loading, pressure, pore_geometry,
             t_model, k_model,
             liquid_density, molar_mass)
@@ -111,210 +135,112 @@ def pore_size_distribution(isotherm, branch, psd_model, thickness_model, pore_ge
     }
 
     if verbose:
-        fig = plt.figure()
-        psd_plot(fig, pore_widths, pore_dist)
+        psd_plot(pore_widths, pore_dist)
 
     return result_dict
 
 
-def psd_bjh_raw(loading, pressure, pore_geometry, thickness_model, kelvin_model, liquid_density, gas_molar_mass):
+def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using the BJH method
+    Calculates the microporous size distribution using a 'classical' model
 
-    :param loading: in mmol/g
-    :param pressure: relative
-    :param pore_geometry: 'sphere', 'cylinder' or 'slit'
-    :param thickness_model: a callable which returns the thickenss of the adsorbed layer
-        at a pressure p
-    :param kelvin_model: a callable which returns the critical kelvin radius at a pressure p
-    :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    :param gas_molar_mass: in g/mol
+    :param isotherm: the isotherm of which the pore size distribution will be calculated
+    :param psd_model: the pore size distribution model to use
+    :param pore_geometry: the geometry of the adsorbent pores
+    :param verbose: prints out extra information on the calculation and graphs the results
+    :param **model_parameters: use this to override specific settings for each model
 
-    """
-    # Checks
-    if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays"
-                        " do not match")
+    Calculates the pore size distribution using a 'classical' model which attempts to
+    describe the adsorption in a pore of specific width w at a relative pressure p/p0
+    as a single function :math:`p/p0 = f(w)`. This function uses properties of the
+    adsorbent and adsorbate as a way of determining the pore size distribution.
 
-    # Calculate the adsorbed volume of liquid and diff
-    volume_adsorbed = loading * gas_molar_mass / liquid_density * 1000
-    d_volume = -numpy.diff(volume_adsorbed)
+    Currently, the methods provided are:
 
-    # Generate the thickness curve, average and diff
-    thickness_curve = list(map(thickness_model, pressure))
-    avg_thickness = numpy.add(thickness_curve[:-1], thickness_curve[1:]) / 2
-    d_thickness = -numpy.diff(thickness_curve)
+        - the HL, of Horvath-Kawazoe method
 
-    # Generate the Kelvin pore radii and average
-    kelvin_radius = list(map(kelvin_model, pressure))
-    avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
-
-    # Critical pore radii as a combination of the adsorbed
-    # layer thickness and kelvin pore radius, with average and diff
-    pore_radii = numpy.add(thickness_curve, kelvin_radius)
-    avg_pore_radii = numpy.add(avg_thickness, avg_k_radius)
-    d_pore_radii = -numpy.diff(pore_radii)
-
-    # Now we can iteratively calculate the pore size distribution
-    d_area = 0
-    sum_d_area = 0
-    sum_d_area_div_r = 0
-    pore_volumes = []
-
-    for i, _ in enumerate(avg_pore_radii):
-
-        Q_var = (avg_pore_radii[i] / avg_k_radius[i])**2
-        D_var = d_thickness[i] * sum_d_area
-        E_var = d_thickness[i] * avg_thickness[i] * sum_d_area_div_r
-
-        pore_volume = (d_volume[i] - D_var + E_var) * Q_var
-
-        d_area = 2 * pore_volume / avg_pore_radii[i]
-        sum_d_area += d_area
-        sum_d_area_div_r += d_area / avg_pore_radii[i]
-
-        pore_volumes.append(pore_volume)
-
-    pore_widths = 2 * avg_pore_radii
-    pore_dist = (pore_volumes / (2 * d_pore_radii)) / 1e6
-
-    return pore_widths, pore_dist
-
-
-def psd_dollimore_heal_raw(loading, pressure, pore_geometry, thickness_model, kelvin_model, liquid_density, gas_molar_mass):
-    """
-    Calculates the pore size distribution using the Dollimore-Heal method
-
-    :param loading: in mmol/g
-    :param pressure: relative
-    :param pore_geometry: 'sphere', 'cylinder' or 'slit'
-    :param thickness_model: a callable which returns the thickenss of the adsorbed layer
-        at a pressure p
-    :param kelvin_model: a callable which returns the critical kelvin radius at a pressure p
-    :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    :param gas_molar_mass: in g/mol
-
-    """
-    # Checks
-    if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays"
-                        " do not match")
-
-    # # Geometry factors
-    # if pore_geometry == 'cylinder':
-    #     factor = 2
-    # elif pore_geometry == 'sphere':
-    #     factor = 3
-
-    # Calculate the adsorbed volume of liquid and diff
-    volume_adsorbed = loading * gas_molar_mass / liquid_density * 1000
-    d_volume = -numpy.diff(volume_adsorbed)
-
-    # Generate the thickness curve, average and diff
-    thickness_curve = list(map(thickness_model, pressure))
-    avg_thickness = numpy.add(thickness_curve[:-1], thickness_curve[1:]) / 2
-    d_thickness = -numpy.diff(thickness_curve)
-
-    # Generate the Kelvin pore radii and average
-    kelvin_radius = list(map(kelvin_model, pressure))
-    avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
-
-    # Critical pore radii as a combination of the adsorbed
-    # layer thickness and kelvin pore radius, with average and diff
-    pore_radii = numpy.add(thickness_curve, kelvin_radius)
-    avg_pore_radii = numpy.add(avg_thickness, avg_k_radius)
-    d_pore_radii = -numpy.diff(pore_radii)
-
-    # Now we can iteratively calculate the pore size distribution
-    d_area = 0
-    length = 0
-    sum_d_area = 0
-    sum_length = 0
-    pore_volumes = []
-
-    for i, _ in enumerate(avg_pore_radii):
-
-        Q_var = (avg_pore_radii[i] / (avg_k_radius[i] + d_thickness[i]))**2
-        D_var = d_thickness[i] * sum_d_area
-        E_var = 2 * scipy.constants.pi * \
-            d_thickness[i] * avg_thickness[i] * sum_length
-
-        pore_volume = (d_volume[i] - D_var + E_var) * Q_var
-
-        d_area = 2 * pore_volume / avg_pore_radii[i]
-        length = d_area / (2 * scipy.constants.pi * avg_pore_radii[i])
-        sum_d_area += d_area
-        sum_length += length
-
-        pore_volumes.append(pore_volume)
-
-    pore_widths = 2 * avg_pore_radii
-    pore_dist = (pore_volumes / (2 * d_pore_radii)) / 1e6
-
-    return pore_widths, pore_dist
-
-
-def kelvin_geometry(branch, geometry):
-    if branch == 'adsorption':
-        if geometry == 'cylinder':
-            kelvin_geometry = 'cylinder'
-        elif geometry == 'sphere':
-            kelvin_geometry = 'sphere'
-        elif geometry == 'slit':
-            kelvin_geometry = 'cylinder'
-    if branch == 'desorption':
-        if geometry == 'cylinder':
-            kelvin_geometry = 'sphere'
-        elif geometry == 'sphere':
-            kelvin_geometry = 'sphere'
-        elif geometry == 'slit':
-            kelvin_geometry = 'slit'
-
-    return kelvin_geometry
-
-
-def kelvin_radius_std(pressure, meniscus_geometry, temperature, liquid_density, gas_molar_mass, gas_surface_tension):
-    """
-    Calculates the kelvin radius of the pore, using the standard
-    form of the kelvin equation.
-
-    :param pressure: relative, unitless
-    :param branch: 'adsorption' or 'desorption'
-    :param temperature: in kelvin
-    :param liquid_density: g/cm3
-    :param gas_molar_mass: g/mol
-    :param gas_surface_tension: in mN/m
-
-    :returns: radius(nm)
+    A common gotcha of data processing is: "garbage in = garbage out". Only use methods
+    when you are aware of their limitations and shortcomings.
 
     """
 
-    if meniscus_geometry == 'cylinder':
-        geometry_factor = 1.0
-    elif meniscus_geometry == 'sphere':
-        geometry_factor = 2.0
-    elif meniscus_geometry == 'slit':
-        geometry_factor = 0.5
+    # Function parameter checks
+    if isotherm.mode_adsorbent != "mass":
+        raise Exception("The isotherm must be in per mass of adsorbent."
+                        "First convert it using implicit functions")
+    if isotherm.mode_pressure != "relative":
+        raise Exception("The isotherm must be in relative pressure mode."
+                        "First convert it using implicit functions")
 
-    gas_molar_density = gas_molar_mass / liquid_density
+    if psd_model is None:
+        raise Exception("Specify a model to generate the pore size"
+                        " distribution e.g. psd_model=\"BJH\"")
+    if psd_model not in _MICRO_PSD_MODELS:
+        raise Exception("Model {} not an option for psd.".format(psd_model),
+                        "Available models are {}".format(_MICRO_PSD_MODELS))
+    if pore_geometry not in _PORE_GEOMETRIES:
+        raise Exception("Geometry {} not an option for pore size distribution.".format(pore_geometry),
+                        "Available geometries are {}".format(_PORE_GEOMETRIES))
 
-    coefficient = (geometry_factor * gas_surface_tension *
-                   gas_molar_density) / (scipy.constants.gas_constant * temperature)
+    if 'adsorbent_model' in model_parameters:
+        adsorbent_model = model_parameters.get('adsorbent_model')
+    else:
+        adsorbent_model = 'Carbon(HK)'
+    if adsorbent_model not in _ADSORBENT_MODELS:
+        raise Exception("Model {} not an option for pore size distribution.".format(adsorbent_model),
+                        "Available models are {}".format(_ADSORBENT_MODELS))
 
-    radius = - coefficient / numpy.log(pressure)
+    # Get adsorbate properties
+    ads_gas = Gas.from_list(isotherm.gas)
+    adsorbate_properties = dict(
+        molecular_diameter=ads_gas.get_prop('molecular_diameter'),
+        polarizability=ads_gas.get_prop('polarizability'),
+        magnetic_susceptibility=ads_gas.get_prop('magnetic_susceptibility'),
+        surface_density=ads_gas.get_prop('surface_density'),
+    )
 
-    return radius
+    # Read data in
+    loading = isotherm.loading_ads(unit='mmol')
+    pressure = isotherm.pressure_ads()
+    maximum_adsorbed = isotherm.loading_at(0.9)
+
+    # Adsorbent model definitions
+    if adsorbent_model == 'Carbon(HK)':
+        adsorbent_properties = PROPERTIES_CARBON
+    elif adsorbent_model == 'OxideIon(SF)':
+        adsorbent_properties = PROPERTIES_OXIDE_ION
+
+    # Call specified pore size distribution function
+    if psd_model == 'HK':
+        pore_widths, pore_dist = psd_horvath_kawazoe(
+            loading, pressure, isotherm.t_exp, pore_geometry,
+            maximum_adsorbed, adsorbate_properties, adsorbent_properties)
+
+    result_dict = {
+        'pore_widths': pore_widths,
+        'pore_distribution': pore_dist,
+    }
+
+    if verbose:
+        psd_plot(pore_widths, pore_dist)
+
+    return result_dict
 
 
-def psd_plot(fig, pore_radii, pore_dist):
-    """Draws the pore size distribution plot"""
-    ax1 = fig.add_subplot(111)
-    ax1.plot(pore_radii, pore_dist,
-             marker='', color='g', label='distribution')
-    ax1.set_xscale('log')
-    ax1.set_title("PSD plot")
-    ax1.set_xlabel('Pore width (A)')
-    ax1.set_ylabel('Pore size')
-    ax1.legend(loc='best')
-    ax1.set_ylim(ymin=0)
-    plt.show()
+def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_parameters):
+
+    # Read data in
+    loading = isotherm.loading_ads(unit='mmol')
+    pressure = isotherm.pressure_ads()
+
+    pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)
+
+    result_dict = {
+        'pore_widths': pore_widths,
+        'pore_distribution': pore_dist,
+    }
+
+    if verbose:
+        psd_plot(pore_widths, pore_dist)
+
+    return result_dict
