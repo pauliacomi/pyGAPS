@@ -11,7 +11,7 @@ import sqlite3
 import numpy
 import pandas
 
-from ..classes.gas import Gas
+from ..classes.adsorbate import Adsorbate
 from ..classes.pointisotherm import PointIsotherm
 from ..classes.sample import Sample
 from ..utilities.sqlite_utilities import build_delete
@@ -737,7 +737,7 @@ def db_get_gasses(pth):
                 row[0]: row[1] for row in cur_inner}
 
             # Build gas objects
-            gasses.append(Gas(gas_params))
+            gasses.append(Adsorbate(gas_params))
 
     # Close the db connection
     if db:

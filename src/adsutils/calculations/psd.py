@@ -5,7 +5,7 @@ Calculation of the pore size distribution based on an isotherm
 from functools import partial
 
 
-from ..classes.gas import Gas
+from ..classes.adsorbate import Adsorbate
 from ..graphing.psdgraph import psd_plot
 from .kelvin_models import meniscus_geometry
 from .kelvin_models import kelvin_radius_std
@@ -85,7 +85,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
                         "Available models are {}".format(_THICKNESS_MODELS))
 
     # Get required adsorbate properties
-    adsorbate = Gas.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.gas)
     molar_mass = adsorbate.molar_mass()
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
     surface_tension = adsorbate.surface_tension(isotherm.t_exp)
@@ -191,12 +191,12 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
                         "Available models are {}".format(_ADSORBENT_MODELS))
 
     # Get adsorbate properties
-    ads_gas = Gas.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.gas)
     adsorbate_properties = dict(
-        molecular_diameter=ads_gas.get_prop('molecular_diameter'),
-        polarizability=ads_gas.get_prop('polarizability'),
-        magnetic_susceptibility=ads_gas.get_prop('magnetic_susceptibility'),
-        surface_density=ads_gas.get_prop('surface_density'),
+        molecular_diameter=adsorbate.get_prop('molecular_diameter'),
+        polarizability=adsorbate.get_prop('polarizability'),
+        magnetic_susceptibility=adsorbate.get_prop('magnetic_susceptibility'),
+        surface_density=adsorbate.get_prop('surface_density'),
     )
 
     # Read data in

@@ -8,7 +8,7 @@ import warnings
 
 import matplotlib.pyplot as plt
 
-from ..classes.gas import Gas
+from ..classes.adsorbate import Adsorbate
 from .bet import area_BET
 from .tplot import find_linear_sections
 from .tplot import plot_tp
@@ -44,9 +44,9 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
         reference_area = area_BET(reference_isotherm).get('bet_area')
 
     # Get adsorbate properties
-    ads_gas = Gas.from_list(isotherm.gas)
-    molar_mass = ads_gas.molar_mass()
-    liquid_density = ads_gas.liquid_density(isotherm.t_exp)
+    adsorbate = Adsorbate.from_list(isotherm.gas)
+    molar_mass = adsorbate.molar_mass()
+    liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
     # Read data in
     loading = isotherm.loading_ads(unit='mol')

@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy
 import scipy
 
-from ..classes.gas import Gas
+from ..classes.adsorbate import Adsorbate
 from .thickness_models import _THICKNESS_MODELS
 from .thickness_models import thickness_halsey
 from .thickness_models import thickness_harkins_jura
@@ -37,9 +37,9 @@ def t_plot(isotherm, thickness_model, limits=None, verbose=False):
                         "Available models are {}".format(_THICKNESS_MODELS))
 
     # Get adsorbate properties
-    ads_gas = Gas.from_list(isotherm.gas)
-    molar_mass = ads_gas.molar_mass()
-    liquid_density = ads_gas.liquid_density(isotherm.t_exp)
+    adsorbate = Adsorbate.from_list(isotherm.gas)
+    molar_mass = adsorbate.molar_mass()
+    liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
     # Read data in
     loading = isotherm.loading_ads(unit='mol')
@@ -82,7 +82,7 @@ def t_plot(isotherm, thickness_model, limits=None, verbose=False):
     return result_dict
 
 
-def t_plot_raw(loading, pressure, thickness_model, liquid_density, molar_mass, limits=None):
+def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_molar_mass, limits=None):
     """
     Calculates the external surface area and adsorbed volume using the t-plot method
 
@@ -90,7 +90,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, molar_mass, l
     pressure: relative
     thickness_model: a callable which returns the thickenss of the adsorbed layer at a pressure p
     liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    gas_molar_mass: in g/mol
+    adsorbate_molar_mass: in g/mol
     """
 
     if len(pressure) != len(loading):
@@ -107,7 +107,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, molar_mass, l
         section = (thickness_curve > limits[0]) & (thickness_curve < limits[1])
         results.append(t_plot_parameters(thickness_curve,
                                          section, loading,
-                                         molar_mass, liquid_density))
+                                         adsorbate_molar_mass, liquid_density))
 
     # If not, attempt to find limits manually
     else:
@@ -119,7 +119,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, molar_mass, l
         for section in linear_sections:
             params = t_plot_parameters(thickness_curve,
                                        section, loading,
-                                       molar_mass, liquid_density)
+                                       adsorbate_molar_mass, liquid_density)
             if params is not None:
                 results.append(params)
 

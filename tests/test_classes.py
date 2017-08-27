@@ -10,50 +10,51 @@ import adsutils
 
 class TestGas(object):
     """
-    Tests the gas class
+    Tests the adsorbate class
     """
 
-    def test_gas_created(self, gas_data, basic_gas):
-        "Checks gas can be created from test data"
+    def test_adsorbate_created(self, adsorbate_data, basic_adsorbate):
+        "Checks adsorbate can be created from test data"
 
-        assert gas_data == basic_gas.to_dict()
+        assert adsorbate_data == basic_adsorbate.to_dict()
 
-    def test_gas_retreived_list(self, gas_data, basic_gas):
-        "Checks gas can be retrieved from master list"
-        adsutils.data.GAS_LIST.append(basic_gas)
-        uploaded_gas = adsutils.Gas.from_list(gas_data.get('nick'))
+    def test_adsorbate_retreived_list(self, adsorbate_data, basic_adsorbate):
+        "Checks adsorbate can be retrieved from master list"
+        adsutils.data.GAS_LIST.append(basic_adsorbate)
+        uploaded_adsorbate = adsutils.Adsorbate.from_list(
+            adsorbate_data.get('nick'))
 
-        assert gas_data == uploaded_gas.to_dict()
+        assert adsorbate_data == uploaded_adsorbate.to_dict()
 
-    def test_gas_get_properties(self, gas_data, basic_gas):
-        "Checks if properties of a gas can be located"
+    def test_adsorbate_get_properties(self, adsorbate_data, basic_adsorbate):
+        "Checks if properties of a adsorbate can be located"
 
-        assert basic_gas.get_prop(
-            'common_name') == gas_data['properties'].get('common_name')
-        assert basic_gas.common_name(
-        ) == gas_data['properties'].get('common_name')
+        assert basic_adsorbate.get_prop(
+            'common_name') == adsorbate_data['properties'].get('common_name')
+        assert basic_adsorbate.common_name(
+        ) == adsorbate_data['properties'].get('common_name')
 
-        name = basic_gas.properties.pop('common_name')
+        name = basic_adsorbate.properties.pop('common_name')
         with pytest.raises(Exception):
-            basic_gas.common_name()
-        basic_gas.properties['common_name'] = name
+            basic_adsorbate.common_name()
+        basic_adsorbate.properties['common_name'] = name
 
     @pytest.mark.parametrize('calculated', [True, False])
-    def test_gas_named_props(self, gas_data, basic_gas, calculated):
+    def test_adsorbate_named_props(self, adsorbate_data, basic_adsorbate, calculated):
         temp = 77.355
-        assert basic_gas.molar_mass(calculated) == pytest.approx(
-            gas_data['properties'].get('molar_mass'), 0.001)
-        assert basic_gas.saturation_pressure(temp, calculated) == pytest.approx(
-            gas_data['properties'].get('saturation_pressure'), 0.001)
-        assert basic_gas.surface_tension(temp, calculated) == pytest.approx(
-            gas_data['properties'].get('surface_tension'), 0.001)
-        assert basic_gas.liquid_density(temp, calculated) == pytest.approx(
-            gas_data['properties'].get('liquid_density'), 0.001)
+        assert basic_adsorbate.molar_mass(calculated) == pytest.approx(
+            adsorbate_data['properties'].get('molar_mass'), 0.001)
+        assert basic_adsorbate.saturation_pressure(temp, calculated) == pytest.approx(
+            adsorbate_data['properties'].get('saturation_pressure'), 0.001)
+        assert basic_adsorbate.surface_tension(temp, calculated) == pytest.approx(
+            adsorbate_data['properties'].get('surface_tension'), 0.001)
+        assert basic_adsorbate.liquid_density(temp, calculated) == pytest.approx(
+            adsorbate_data['properties'].get('liquid_density'), 0.001)
 
-    def test_gas_print(self, basic_gas):
+    def test_adsorbate_print(self, basic_adsorbate):
         """Checks the printing is done"""
 
-        print(basic_gas)
+        print(basic_adsorbate)
 
 
 class TestIsotherm(object):
@@ -269,12 +270,12 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_pressure_mode(self, basic_pointisotherm, basic_gas,
+    def test_isotherm_convert_pressure_mode(self, basic_pointisotherm, basic_adsorbate,
                                             isotherm_data, mode, multiplier):
         """Checks that the pressure mode conversion function work as expected"""
 
         # Add sample to list
-        adsutils.data.GAS_LIST.append(basic_gas)
+        adsutils.data.GAS_LIST.append(basic_adsorbate)
 
         # Do the conversion
         basic_pointisotherm.convert_pressure_mode(mode)

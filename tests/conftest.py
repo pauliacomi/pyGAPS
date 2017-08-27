@@ -165,11 +165,11 @@ def basic_sample(sample_data):
 
 
 @pytest.fixture(scope='session')
-def gas_data():
+def adsorbate_data():
     """
-    Creates an dict with all data for an model gas
+    Creates an dict with all data for an model adsorbate
     """
-    gas_data = {
+    adsorbate_data = {
         'nick': 'N2',
         'formula': 'N2',
 
@@ -194,14 +194,14 @@ def gas_data():
         }
     }
 
-    return gas_data
+    return adsorbate_data
 
 
 @pytest.fixture(scope='function')
-def basic_gas(gas_data):
+def basic_adsorbate(adsorbate_data):
     """
     Creates an sample from model data
     """
-    gas = adsutils.Gas(gas_data)
+    adsorbate = adsutils.Adsorbate(adsorbate_data)
 
-    return gas
+    return adsorbate

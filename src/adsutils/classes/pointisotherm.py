@@ -13,7 +13,7 @@ from scipy.interpolate import interp1d
 import adsutils
 
 from ..graphing.isothermgraphs import plot_iso
-from .gas import Gas
+from .adsorbate import Adsorbate
 from .isotherm import Isotherm
 from .sample import Sample
 
@@ -227,7 +227,7 @@ class PointIsotherm(Isotherm):
 
         self._data[self.pressure_key] = self._data[self.pressure_key].apply(
             lambda x: x *
-            (Gas.from_list(self.gas).saturation_pressure(self.t_exp)
+            (Adsorbate.from_list(self.gas).saturation_pressure(self.t_exp)
              / self._PRESSURE_UNITS[self.unit_pressure]) ** sign)
 
         self.mode_pressure = mode_pressure
@@ -472,7 +472,7 @@ class PointIsotherm(Isotherm):
 
     def spreading_pressure(self, pressure):
         """
-        Calculate reduced spreading pressure at a bulk gas pressure P.
+        Calculate reduced spreading pressure at a bulk adsorbate pressure P.
         (see Tarafder eqn 4)
 
         Use numerical quadrature on isotherm data points to compute the reduced
@@ -497,7 +497,7 @@ class PointIsotherm(Isotherm):
         if (self.fill_value is None) & \
                 (pressure > self._data[self.pressure_key].max()):
             raise Exception("""To compute the spreading pressure at this bulk
-            gas pressure, we would need to extrapolate the isotherm since this
+            adsorbate pressure, we would need to extrapolate the isotherm since this
             pressure is outside the range of the highest pressure in your
             pure-component isotherm data, %f.
 

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import scipy.constants as constants
 import scipy.stats
 
-from ..classes.gas import Gas
+from ..classes.adsorbate import Adsorbate
 
 
 def area_BET(isotherm, verbose=False):
@@ -25,9 +25,9 @@ def area_BET(isotherm, verbose=False):
     if isotherm.mode_pressure != "relative":
         isotherm.convert_pressure_mode('relative')
 
-    # get gas properties
-    ads_gas = Gas.from_list(isotherm.gas)
-    cross_section = ads_gas.get_prop("cross_sectional_area")
+    # get adsorbate properties
+    adsorbate = Adsorbate.from_list(isotherm.gas)
+    cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in
     loading = isotherm.loading_ads(unit='mol')

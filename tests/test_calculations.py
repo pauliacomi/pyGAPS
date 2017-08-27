@@ -17,18 +17,18 @@ class TestBET(object):
     Tests everything related to BET surface area calculation
     """
 
-    def test_BET_checks(self, basic_pointisotherm, basic_gas, basic_sample):
+    def test_BET_checks(self, basic_pointisotherm, basic_adsorbate, basic_sample):
         """Test BET chacks"""
 
         isotherm = basic_pointisotherm
-        gas = basic_gas
-        c_s_area = gas.properties.pop("cross_sectional_area")
+        adsorbate = basic_adsorbate
+        c_s_area = adsorbate.properties.pop("cross_sectional_area")
 
         # Will raise a "isotherm not in relative pressure mode exception"
         with pytest.raises(Exception):
             adsutils.area_BET(isotherm)
 
-        adsutils.data.GAS_LIST.append(gas)
+        adsutils.data.GAS_LIST.append(adsorbate)
         isotherm.convert_pressure_mode("relative")
         isotherm.convert_loading("cm3 STP")
 
@@ -47,17 +47,17 @@ class TestBET(object):
         isotherm.convert_adsorbent_mode("mass")
         adsutils.data.GAS_LIST = []
 
-        # Will raise a "gas not found exception"
+        # Will raise a "adsorbate not found exception"
         with pytest.raises(Exception):
             adsutils.area_BET(isotherm)
 
-        # Will raise a "gas has no cross sectional area"
+        # Will raise a "adsorbate has no cross sectional area"
         with pytest.raises(Exception):
             adsutils.area_BET(isotherm)
 
-        gas.properties["cross_sectional_area"] = c_s_area
+        adsorbate.properties["cross_sectional_area"] = c_s_area
         adsutils.data.GAS_LIST = []
-        adsutils.data.GAS_LIST.append(gas)
+        adsutils.data.GAS_LIST.append(adsorbate)
 
         return
 
@@ -68,9 +68,9 @@ class TestBET(object):
         ('Takeda 5A N2 77.355.json', 1075.0),
         ('UiO-66(Zr) N2 77.355.json', 1250.0),
     ])
-    def test_BET(self, file, expected_bet, basic_gas):
+    def test_BET(self, file, expected_bet, basic_adsorbate):
         """Test BET calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_gas)
+        adsutils.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
@@ -98,9 +98,9 @@ class TestTPlot(object):
         ('Takeda 5A N2 77.355.json', 85, 0),
         ('UiO-66(Zr) N2 77.355.json', 3.5, 0.13),
     ])
-    def test_tplot(self, file, basic_gas, area, micropore_volume):
+    def test_tplot(self, file, basic_adsorbate, area, micropore_volume):
         """Test BET calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_gas)
+        adsutils.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
@@ -144,9 +144,9 @@ class TestPSD(object):
         #        ('Takeda 5A N2 77.355.json'),
         #        ('UiO-66(Zr) N2 77.355.json'),
     ])
-    def test_psd_meso(self, file, basic_gas, method):
+    def test_psd_meso(self, file, basic_adsorbate, method):
         """Test psd calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_gas)
+        adsutils.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
@@ -168,9 +168,9 @@ class TestPSD(object):
         ('Takeda 5A N2 77.355.json'),
         ('UiO-66(Zr) N2 77.355.json'),
     ])
-    def test_psd_micro(self, file, basic_gas, method):
+    def test_psd_micro(self, file, basic_adsorbate, method):
         """Test psd calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_gas)
+        adsutils.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 

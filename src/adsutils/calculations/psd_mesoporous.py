@@ -9,7 +9,7 @@ import scipy
 
 def psd_bjh(loading, pressure, pore_geometry,
             thickness_model, condensation_model,
-            liquid_density, gas_molar_mass):
+            liquid_density, adsorbate_molar_mass):
     """
     Calculates the pore size distribution using the BJH method
 
@@ -20,7 +20,7 @@ def psd_bjh(loading, pressure, pore_geometry,
         at a pressure p
     :param condensation_model: a callable which returns the critical kelvin radius at a pressure p
     :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    :param gas_molar_mass: in g/mol
+    :param adsorbate_molar_mass: in g/mol
 
     :returns: pore widths, pore distribution
     :rtype: arrays
@@ -64,7 +64,7 @@ def psd_bjh(loading, pressure, pore_geometry,
         raise Exception('Not implemented')
 
     # Calculate the adsorbed volume of liquid and diff
-    volume_adsorbed = loading * gas_molar_mass / liquid_density * 1000
+    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density * 1000
     d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
@@ -110,7 +110,7 @@ def psd_bjh(loading, pressure, pore_geometry,
 
 def psd_dollimore_heal(loading, pressure, pore_geometry,
                        thickness_model, condensation_model,
-                       liquid_density, gas_molar_mass):
+                       liquid_density, adsorbate_molar_mass):
     """
     Calculates the pore size distribution using the Dollimore-Heal method
 
@@ -121,7 +121,7 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
         at a pressure p
     :param condensation_model: a callable which returns the critical kelvin radius at a pressure p
     :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    :param gas_molar_mass: in g/mol
+    :param adsorbate_molar_mass: in g/mol
 
     :returns: pore widths, pore distribution
     :rtype: arrays
@@ -169,7 +169,7 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
         raise Exception('Not implemented')
 
     # Calculate the adsorbed volume of liquid and diff
-    volume_adsorbed = loading * gas_molar_mass / liquid_density * 1000
+    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density * 1000
     d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff

@@ -9,7 +9,7 @@ from CoolProp.CoolProp import PropsSI
 import adsutils.data as data
 
 
-class Gas(object):
+class Adsorbate(object):
     '''
     This class acts as a unified descriptor for an adsorbate.
 
@@ -31,7 +31,7 @@ class Gas(object):
             }
         }
 
-        my_adsorbate = Gas(adsorbate_info)
+        my_adsorbate = Adsorbate(adsorbate_info)
 
     The members of the properties dictionary are left at the discretion
     of the user, to keep the class extensible. There are, however, some
@@ -73,41 +73,41 @@ class Gas(object):
                 }
             }
         """
-        #: Gas name
+        #: Adsorbate name
         self.name = info.get('nick')
-        #: Gas formula
+        #: Adsorbate formula
         self.formula = info.get('formula')
-        #: Gas properties
+        #: Adsorbate properties
         self.properties = info.get('properties')
 
         return
 
     @classmethod
-    def from_list(cls, gas_name):
+    def from_list(cls, adsorbate_name):
         """
         Gets the adsorbate from the master list using its name
 
-        :param gas_name: the name of the gas to search
+        :param adsorbate_name: the name of the adsorbate to search
         :returns: instance of class
         :raises: ``Exception`` if it does not exist
         """
-        # See if gas exists in master list
-        ads_gas = next(
-            (x for x in data.GAS_LIST if gas_name == x.name), None)
-        if ads_gas is None:
-            raise Exception("Gas {0} does not exist in list of gasses. "
+        # See if adsorbate exists in master list
+        adsorbate = next(
+            (x for x in data.GAS_LIST if adsorbate_name == x.name), None)
+        if adsorbate is None:
+            raise Exception("Adsorbate {0} does not exist in list of gasses. "
                             "First populate adsutils.data.GAS_LIST "
-                            "with required gas class".format(gas_name))
+                            "with required adsorbate class".format(adsorbate_name))
 
-        return ads_gas
+        return adsorbate
 
     def __str__(self):
         '''
-        Prints a short summary of all the gas parameters
+        Prints a short summary of all the adsorbate parameters
         '''
         string = ""
 
-        string += ("Gas: " + self.name + '\n')
+        string += ("Adsorbate: " + self.name + '\n')
         string += ("Formula:" + self.formula + '\n')
 
         for prop in self.properties:
@@ -117,7 +117,7 @@ class Gas(object):
 
     def to_dict(self):
         """
-        Returns a dictionary of the gas class
+        Returns a dictionary of the adsorbate class
         Is the same dictionary that was used to create it
 
         :returns: dictionary of all parameters
@@ -143,21 +143,21 @@ class Gas(object):
 
         req_prop = self.properties.get(prop)
         if req_prop is None:
-            raise Exception("Gas {0} does not have a property named "
+            raise Exception("Adsorbate {0} does not have a property named "
                             "{1}.".format(self.name, prop))
 
         return req_prop
 
     def common_name(self):
         """
-        Gets the common name of the gas from the properties dict
+        Gets the common name of the adsorbate from the properties dict
 
         :returns: Value of common_name in the properties dict
         :raises: ``Exception`` if it does not exist
         """
         c_name = self.properties.get("common_name")
         if c_name is None:
-            raise Exception("Gas {0} does not have a property named "
+            raise Exception("Adsorbate {0} does not have a property named "
                             "common_name. This must be available for CoolProp "
                             "interaction".format(self.name))
         return c_name

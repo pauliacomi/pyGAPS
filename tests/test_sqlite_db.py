@@ -101,11 +101,11 @@ class TestDatabase(object):
 
         return
 
-    def test_gasses(self, db_file, gas_data):
+    def test_gasses(self, db_file, adsorbate_data):
         "Tests functions related to gasses table, then inserts a test gas"
 
         test_duplicate = True
-        for prop in gas_data["properties"]:
+        for prop in adsorbate_data["properties"]:
             adsutils.db_upload_gas_property_type(db_file, prop, "test unit")
             if test_duplicate:
                 test_duplicate = False
@@ -114,21 +114,22 @@ class TestDatabase(object):
                         db_file, prop, "test unit")
 
         # Start testing samples table
-        basic_gas = adsutils.Gas(gas_data)
+        basic_adsorbate = adsutils.Adsorbate(adsorbate_data)
         assert len(adsutils.db_get_gasses(db_file)) == 0
 
-        adsutils.db_upload_gas(db_file, basic_gas)
+        adsutils.db_upload_gas(db_file, basic_adsorbate)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_gas(db_file, basic_gas)
+            adsutils.db_upload_gas(db_file, basic_adsorbate)
 
-        basic_gas.formula = "New Formula"
-        adsutils.db_upload_gas(db_file, basic_gas, overwrite=True)
-        assert adsutils.db_get_gasses(db_file)[0].formula == basic_gas.formula
+        basic_adsorbate.formula = "New Formula"
+        adsutils.db_upload_gas(db_file, basic_adsorbate, overwrite=True)
+        assert adsutils.db_get_gasses(
+            db_file)[0].formula == basic_adsorbate.formula
 
-        adsutils.db_delete_gas(db_file, basic_gas)
+        adsutils.db_delete_gas(db_file, basic_adsorbate)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_delete_gas(db_file, basic_gas)
-        adsutils.db_upload_gas(db_file, basic_gas)
+            adsutils.db_delete_gas(db_file, basic_adsorbate)
+        adsutils.db_upload_gas(db_file, basic_adsorbate)
 
         return
 
