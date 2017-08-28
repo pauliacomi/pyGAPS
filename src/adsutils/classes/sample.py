@@ -11,7 +11,10 @@ class Sample(object):
     Its purpose is to store properties such as adsorbent name,
     and batch.
 
-    To initially construct the class, use a dictionary::
+    Parameters
+    ----------
+    info : dict
+        To initially construct the class, use a dictionary of the form::
 
         adsorbent_info = {
             'name' : 'Zeolite-1',
@@ -24,9 +27,11 @@ class Sample(object):
             }
         }
 
-        my_sample = Sample(adsorbent_info)
+        The info dictionary must contain an entry for 'name' and 'batch'.
 
-    The info dictionary must contain an entry for 'name' and 'batch'.
+    Notes
+    -----
+
     The members of the properties dictionary are left at the discretion
     of the user. There are, however, some unique properties which are used
     by calculations in other modules:
@@ -38,24 +43,6 @@ class Sample(object):
     def __init__(self, sample_info):
         """
         Instantiation is done by passing a dictionary with the parameters.
-        The info dictionary must contain an entry for 'name' and 'batch'.
-
-        Parameters
-        ----------
-        info : dict
-            dictionary of the form::
-
-            adsorbent_info = {
-                'name' : 'Zeolite-1',
-                'batch' : '1234',
-
-                'owner' : 'John Doe',
-                'properties' : {
-                    'density' : 1.5
-                    'x' : 'y'
-                }
-            }
-
         """
         # TODO Should make the sample unique using
         # some sort of convention id

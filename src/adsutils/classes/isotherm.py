@@ -4,47 +4,28 @@ This module contains the main class that describes an isotherm
 
 
 class Isotherm(object):
-    '''
+    """
     Class which contains the general data for an isotherm, real or model
-    '''
 
-    _LOADING_UNITS = {"mol": 1, "mmol": 0.001, "cm3 STP": 4.461e-5}
-    _PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
+    The isotherm class is the parent class that both PointIsotherm and
+    ModelIsotherm inherit. It is designed to contain the information about
+    an isotherm, such as material, adsorbate, data units etc., but without
+    any of the data itself.
 
-    _MATERIAL_MODE = ["mass", "volume"]
-    _PRESSURE_MODE = ["absolute", "relative"]
-
-    def __init__(self,
-                 loading_key,
-                 pressure_key,
-                 mode_adsorbent="mass",
-                 mode_pressure="absolute",
-                 unit_loading="mmol",
-                 unit_pressure="bar",
-                 **isotherm_parameters):
-        """
-        Instantiation is done by passing a dictionary with the parameters,
-        as well as the info about units, modes and data columns.
-        The info dictionary must contain an entry for 'sample_name',  'sample_batch', 'gas' and 't_exp'
-
-        Parameters
-        ----------
-        loading_key : str
-            column of the pandas DataFrame where the loading is stored
-        pressure_key : str
-            column of the pandas DataFrame where the pressure is stored
-        mode_adsorbent : str, optional
-            whether the adsorption is read in terms of either 'per volume'
-            or 'per mass'
-        mode_pressure : str, optional
-            the pressure mode, either absolute pressures or relative in
-            the form of p/p0
-        unit_loading : str, optional
-            unit of loading
-        unit_pressure : str, optional
-            unit of pressure
-        isotherm_parameters:
-            dictionary of the form::
+    Parameters
+    ----------
+    mode_adsorbent : str, optional
+        whether the adsorption is read in terms of either 'per volume'
+        or 'per mass'
+    mode_pressure : str, optional
+        the pressure mode, either absolute pressures or relative in
+        the form of p/p0
+    unit_loading : str, optional
+        unit of loading
+    unit_pressure : str, optional
+        unit of pressure
+    isotherm_parameters:
+        dictionary of the form::
 
             isotherm_params = {
                 'sample_name' : 'Zeolite-1',
@@ -58,14 +39,39 @@ class Isotherm(object):
                 }
             }
 
+        The info dictionary must contain an entry for 'sample_name',
+        'sample_batch', 'gas' and 't_exp'
+
+    Notes
+    -----
+
+    The class is also used to prevent duplication of code within the child
+    classes, by calling the common inherited function before any other specific
+    implementation additions.
+
+    The minimum arguments required to instantiate the class are
+    'sample_name', 'sample_batch', 't_exp', 'gas'. Pass these values in
+    the ``**isotherm_parameters`` dictionary
+    """
+
+    _LOADING_UNITS = {"mol": 1, "mmol": 0.001, "cm3 STP": 4.461e-5}
+    _PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
+
+    _MATERIAL_MODE = ["mass", "volume"]
+    _PRESSURE_MODE = ["absolute", "relative"]
+
+    def __init__(self,
+                 mode_adsorbent="mass",
+                 mode_pressure="absolute",
+                 unit_loading="mmol",
+                 unit_pressure="bar",
+                 **isotherm_parameters):
+        """
+        Instantiation is done by passing a dictionary with the parameters,
+        as well as the info about units, modes and data columns.
         """
 
         # Checks
-        if None in [loading_key, pressure_key]:
-            raise Exception(
-                "Pass loading_key and pressure_key, the names of the loading and"
-                " pressure columns in the DataFrame, to the constructor.")
-
         if any(k not in isotherm_parameters
                for k in ('sample_name', 'sample_batch', 't_exp', 'gas')):
             raise Exception(
@@ -96,12 +102,6 @@ class Isotherm(object):
             raise Exception("Unit selected for pressure is not an option. See viable"
                             "units in _PRESSURE_UNITS")
 
-        # Save column names
-        #: Name of column in the dataframe that contains adsorbed amount
-        self.loading_key = loading_key
-        #: Name of column in the dataframe that contains pressure
-        self.pressure_key = pressure_key
-
         #: mode for the adsorbent
         self.mode_adsorbent = mode_adsorbent
         #: mode for the pressure
@@ -111,15 +111,15 @@ class Isotherm(object):
         #: units for pressure
         self.unit_pressure = unit_pressure
 
-        #: Must-have properties of the isotherm
+        # Must-have properties of the isotherm
         if 'id' not in isotherm_parameters:
             self.id = None
         else:
             self.id = isotherm_parameters.pop('id', None)
 
-        #: Isotherm sample sample_name
+        #: Isotherm material name
         self.sample_name = isotherm_parameters.pop('sample_name', None)
-        #: Isotherm sample sample_batch
+        #: Isotherm material batch
         self.sample_batch = isotherm_parameters.pop('sample_batch', None)
         #: Isotherm experimental temperature
         self.t_exp = isotherm_parameters.pop('t_exp', None)

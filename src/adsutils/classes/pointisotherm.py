@@ -19,43 +19,40 @@ from .sample import Sample
 
 class PointIsotherm(Isotherm):
     """
-    Class which contains the points from an adsorption isotherm and microcalorimetry
-    """
+    Class which contains the points from an adsorption isotherm
 
-    def __init__(self, isotherm_data,
-                 loading_key=None,
-                 pressure_key=None,
-                 other_keys=None,
-                 mode_adsorbent="mass",
-                 mode_pressure="absolute",
-                 unit_loading="mmol",
-                 unit_pressure="bar",
-                 **isotherm_parameters):
-        """
-        Instantiation is done by passing a dictionary with the parameters,
-        as well as the info about units, modes and data columns.
-        The info dictionary must contain an entry for 'sample_name',  'sample_batch', 'gas' and 't_exp'
+    This class is designed to be a complete description of a discrete isotherm.
+    It extends the Isotherm class, which contains all the description of the
+    isotherm parameters, but also holds the datapoints recorded during an experiment
+    or simulation.
 
-        Parameters
-        ----------
-        loading_key : str
-            column of the pandas DataFrame where the loading is stored
-        pressure_key : str
-            column of the pandas DataFrame where the pressure is stored
-        other_keys : iterable
-            other pandas DataFrame columns with data
-        mode_adsorbent : str, optional
-            whether the adsorption is read in terms of either 'per volume'
-            or 'per mass'
-        mode_pressure : str, optional
-            the pressure mode, either absolute pressures or relative in
-            the form of p/p0
-        unit_loading : str, optional
-            unit of loading
-        unit_pressure : str, optional
-            unit of pressure
-        isotherm_parameters:
-            dictionary of the form::
+    The minimum arguments required to instantiate the class, besides those required for
+    the parent Isotherm, are isotherm_data, as the pandas dataframe containing the
+    discrete points, as well as string keys for the columns of the dataframe which have
+    the loading and the pressure data.
+
+    Parameters
+    ----------
+    isotherm_data : DataFrame
+        pure-component adsorption isotherm data
+    loading_key : str
+        column of the pandas DataFrame where the loading is stored
+    pressure_key : str
+        column of the pandas DataFrame where the pressure is stored
+    other_keys : iterable
+        other pandas DataFrame columns with data
+    mode_adsorbent : str, optional
+        whether the adsorption is read in terms of either 'per volume'
+        or 'per mass'
+    mode_pressure : str, optional
+        the pressure mode, either absolute pressures or relative in
+        the form of p/p0
+    unit_loading : str, optional
+        unit of loading
+    unit_pressure : str, optional
+        unit of pressure
+    isotherm_parameters:
+        dictionary of the form::
 
             isotherm_params = {
                 'sample_name' : 'Zeolite-1',
@@ -69,21 +66,56 @@ class PointIsotherm(Isotherm):
                 }
             }
 
+        The info dictionary must contain an entry for 'sample_name',  'sample_batch',
+        'gas' and 't_exp'
+
+    Notes
+    -----
+
+    """
+
+##########################################################
+#   Instantiation and classmethods
+
+    def __init__(self, isotherm_data,
+                 loading_key=None,
+                 pressure_key=None,
+                 other_keys=None,
+                 mode_adsorbent="mass",
+                 mode_pressure="absolute",
+                 unit_loading="mmol",
+                 unit_pressure="bar",
+                 **isotherm_parameters):
         """
+        Instantiation is done by passing the discrete data as a pandas
+        DataFrame, the column keys as string  as well as the parameters
+        required by parent class
+        """
+
         # Start construction process
         self._instantiated = False
 
         # Run base class constructor
         Isotherm.__init__(self,
-                          loading_key,
-                          pressure_key,
                           mode_adsorbent,
                           mode_pressure,
                           unit_loading,
                           unit_pressure,
                           **isotherm_parameters)
 
-        #: Pandas DataFrame to store the data
+        if None in [loading_key, pressure_key]:
+            raise Exception(
+                "Pass loading_key and pressure_key, the names of the loading and"
+                " pressure columns in the DataFrame, to the constructor.")
+
+        # Save column names
+        #: Name of column in the dataframe that contains adsorbed amount
+        self.loading_key = loading_key
+
+        #: Name of column in the dataframe that contains pressure
+        self.pressure_key = pressure_key
+
+        #: Pandas DataFrame that stores the data
         self._data = isotherm_data
 
         #: List of column in the dataframe that contains other points
@@ -113,6 +145,69 @@ class PointIsotherm(Isotherm):
 
         self._instantiated = True
 
+    @classmethod
+    def from_isotherm(cls, isotherm, isotherm_data,
+                      loading_key, pressure_key, other_keys=None):
+        """
+        Constructs a point isotherm using a parent isotherm as the template for
+        all the parameters.
+
+        Parameters
+        ----------
+        isotherm : Isotherm
+            an instance of the Isotherm parent class
+        isotherm_data : DataFrame
+            pure-component adsorption isotherm data
+        loading_key : str
+            column of the pandas DataFrame where the loading is stored
+        pressure_key : str
+            column of the pandas DataFrame where the pressure is stored
+        """
+        return cls(isotherm_data,
+                   loading_key=loading_key,
+                   pressure_key=pressure_key,
+                   other_keys=other_keys,
+                   mode_adsorbent=isotherm.mode_adsorbent,
+                   mode_pressure=isotherm.mode_pressure,
+                   unit_loading=isotherm.unit_loading,
+                   unit_pressure=isotherm.unit_pressure,
+                   **isotherm.to_dict())
+
+    @classmethod
+    def from_json(cls, json_string,
+                  mode_adsorbent="mass",
+                  mode_pressure="absolute",
+                  unit_loading="mmol",
+                  unit_pressure="bar",):
+        """
+        Constructs a PointIsotherm from a standard json-represented isotherm.
+        This function is just a wrapper around the more powerful .isotherm_from_json
+        function
+
+        Parameters
+        ----------
+        json_string : str
+            a json standard isotherm representation
+        mode_adsorbent : str, optional
+            whether the adsorption is read in terms of either 'per volume'
+            or 'per mass'
+        mode_pressure : str, optional
+            the pressure mode, either absolute pressures or relative in
+            the form of p/p0
+        unit_loading : str, optional
+            unit of loading
+        unit_pressure : str, optional
+            unit of pressure
+        """
+        return adsutils.isotherm_from_json(json_string,
+                                           mode_adsorbent=mode_adsorbent,
+                                           mode_pressure=mode_pressure,
+                                           unit_loading=unit_loading,
+                                           unit_pressure=unit_pressure)
+
+##########################################################
+#   Overloaded and private functions
+
     def __setattr__(self, name, value):
         """
         We overload the usual class setter to make sure that the id is always
@@ -135,34 +230,18 @@ class PointIsotherm(Isotherm):
 
     def __eq__(self, other_isotherm):
         """
-        We overload the equality operator of the isotherm. Since id's are unique and
+        We overload the equality operator of the isotherm. Since id's should be unique and
         representative of the data inside the isotherm, all we need to ensure equality
         is to compare the two hashes of the isotherms.
         """
 
         return self.id == other_isotherm.id
 
-    # Construction from a parent class with the extra data needed
-    @classmethod
-    def from_isotherm(cls, isotherm, isotherm_data, other_keys=None):
-        """
-        Constructs a point isotherm using a parent isotherm as the template for
-        all the parameters.
-        """
-        return cls(isotherm_data,
-                   loading_key=isotherm.loading_key,
-                   pressure_key=isotherm.pressure_key,
-                   other_keys=other_keys,
-                   mode_adsorbent=isotherm.mode_adsorbent,
-                   mode_pressure=isotherm.mode_pressure,
-                   unit_loading=isotherm.unit_loading,
-                   unit_pressure=isotherm.unit_pressure,
-                   **isotherm.to_dict())
-
     # Figure out the adsorption and desorption branches
     def _splitdata(self, _data):
         """
-        Splits isotherm data into an adsorption and desorption part and adds a column to mark it
+        Splits isotherm data into an adsorption and desorption part and
+        adds a column to mark the transition between the two
         """
         increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
         increasing.rename('check', inplace=True)
@@ -196,6 +275,11 @@ class PointIsotherm(Isotherm):
     def convert_pressure(self, unit_to):
         """
         Converts the pressure values of the isotherm from one unit to another
+
+        Parameters
+        ----------
+        unit_to : str
+            the unit into which the data will be converted into
         """
 
         if unit_to not in self._PRESSURE_UNITS:
@@ -466,12 +550,15 @@ class PointIsotherm(Isotherm):
     def loading_at(self, pressure):
         """
         Linearly interpolate isotherm to compute loading at pressure P.
+        Parameters
+        ----------
+        pressure : float
+            pressure at which to compute loading
 
-        :param pressure: float pressure (in corresponding units as data in
-            instantiation)
-        :return: predicted loading at pressure P (in corresponding units as data
-            in instantiation)
-        :rtype: Float or Array
+        Returns
+        -------
+        float
+            predicted loading at pressure P
         """
 
         return self.interp1d(pressure)
@@ -494,10 +581,15 @@ class PointIsotherm(Isotherm):
         See C. Simon, B. Smit, M. Haranczyk. pyIAST: Ideal Adsorbed Solution
         Theory (IAST) Python Package. Computer Physics Communications.
 
-        :param pressure: float pressure (in corresponding units as data in
-            instantiation)
-        :return: spreading pressure, :math:`\\Pi`
-        :rtype: Float
+        Parameters
+        ----------
+        pressure : float
+            pressure (in corresponding units as data in instantiation)
+
+        Returns
+        -------
+        float
+            spreading pressure, :math:`\\Pi`
         """
         # throw exception if interpolating outside the range.
         if (self.fill_value is None) & \

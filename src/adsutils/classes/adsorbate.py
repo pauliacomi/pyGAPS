@@ -18,7 +18,10 @@ class Adsorbate(object):
     The properties can be either calculated through a wrapper over
     CoolProp or supplied in the initial sample dictionary
 
-    To initially construct the class, use a dictionary::
+    Parameters
+    ----------
+    info : dict
+        To initially construct the class, use a dictionary of the form::
 
         adsorbate_info = {
             'nick' : 'nitrogen',
@@ -29,7 +32,10 @@ class Adsorbate(object):
             }
         }
 
-        my_adsorbate = Adsorbate(adsorbate_info)
+        The info dictionary must contain an entry for 'nick'.
+
+    Notes
+    -----
 
     The members of the properties dictionary are left at the discretion
     of the user, to keep the class extensible. There are, however, some
@@ -58,21 +64,6 @@ class Adsorbate(object):
     def __init__(self, info):
         """
         Instantiation is done by passing a dictionary with the parameters.
-        The info dictionary must contain an entry for 'nick'.
-
-        Parameters
-        ----------
-        info : dict
-            dictionary of the form::
-
-            adsorbate_info = {
-                'nick' : 'nitrogen',
-                'formula' : 'N2',
-                'properties' : {
-                    'x' : 'y'
-                    'z' : 't'
-                }
-            }
         """
         #: Adsorbate name
         self.name = info.get('nick')

@@ -1,7 +1,6 @@
 """
-This module contains objects to characterize the pure-component adsorption
-isotherms from experimental or simulated data. These will be fed into the
-IAST functions in pyiast.py.
+This module contains objects to model pure-component adsorption
+isotherms from experimental or simulated data.
 """
 
 
@@ -12,10 +11,10 @@ import scipy.optimize
 
 from .isotherm import Isotherm
 
-# ! version
+# version of pyIAST
 _VERSION = "1.4"
 
-# ! list of models implemented in pyIAST
+# ! list of models implemented
 _MODELS = ["Langmuir", "Quadratic", "BET", "Henry", "TemkinApprox",
            "DSLangmuir", "TSLangmuir"]
 
@@ -38,6 +37,53 @@ class ModelIsotherm(Isotherm):
     """
     Class to characterize pure-component isotherm data with an analytical model.
     Data fitting is done during instantiation.
+
+    A `ModelIsotherm` class is instantiated by passing it the
+    pure-component adsorption isotherm in the form of a Pandas DataFrame.
+
+    Parameters
+    ----------
+    isotherm_data : DataFrame
+        pure-component adsorption isotherm data
+    loading_key : str
+        column of the pandas DataFrame where the loading is stored
+    pressure_key : str
+        column of the pandas DataFrame where the pressure is stored
+    model : str
+        the model to be used to describe the isotherm
+    param_guess : dict
+        starting guess for model parameters in the data fitting routine
+    optimization_method : str
+        method in SciPy minimization function to use in fitting model to data.
+        See `here
+        <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`_.
+    mode_adsorbent : str, optional
+        whether the adsorption is read in terms of either 'per volume'
+        or 'per mass'
+    mode_pressure : str, optional
+        the pressure mode, either absolute pressures or relative in
+        the form of p/p0
+    unit_loading : str, optional
+        unit of loading
+    unit_pressure : str, optional
+        unit of pressure
+    isotherm_parameters:
+        dictionary of the form::
+
+            isotherm_params = {
+                'sample_name' : 'Zeolite-1',
+                'sample_batch' : '1234',
+                'gas' : 'N2',
+                't_exp' : 200,
+                'user' : 'John Doe',
+                'properties' : {
+                    'doi' : '10.0000/'
+                    'x' : 'y'
+                }
+            }
+
+    Notes
+    -----
 
     Models supported are as follows. Here, :math:`L` is the gas uptake,
     :math:`P` is pressure (fugacity technically).
@@ -88,8 +134,10 @@ class ModelIsotherm(Isotherm):
 
         L(P) = K_H P
 
-
     """
+
+##########################################################
+#   Instantiation and classmethods
 
     def __init__(self, data,
                  loading_key=None,
@@ -103,21 +151,9 @@ class ModelIsotherm(Isotherm):
                  unit_pressure="bar",
                  **isotherm_parameters):
         """
-        Instantiation. A `ModelIsotherm` class is instantiated by passing it the
-        pure-component adsorption isotherm in the form of a Pandas DataFrame.
-        The least squares data fitting is done here.
-
-        :param data: DataFrame pure-component adsorption isotherm data
-        :param loading_key: String key for loading column in data
-        :param pressure_key: String key for pressure column in data
-        :param param_guess: Dict starting guess for model parameters in the
-            data fitting routine
-        :param optimization_method: String method in SciPy minimization function
-            to use in fitting model to data.
-            See [here](http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize).
-
-        :return: self
-        :rtype: ModelIsotherm
+        Instantiation is done by passing the data to be fitted, model to be
+        used and fitting method as well as the parameters required by parent
+        class
         """
         # Checks
         if model is None:
@@ -161,16 +197,38 @@ class ModelIsotherm(Isotherm):
         self.params = copy.deepcopy(_MODEL_PARAMS[model])
 
         # fit model to isotherm data
-        self._fit(data, optimization_method)
+        self._fit(data[loading_key].values,
+                  data[pressure_key].values, optimization_method)
 
-    #: Construction from a parent class with the extra data needed
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
+                      loading_key, pressure_key,
                       model, param_guess=None,
                       optimization_method="Nelder-Mead"):
+        """
+        Constructs a ModelIsotherm using a parent isotherm as the template for
+        all the parameters.
+
+        Parameters
+        ----------
+        isotherm : Isotherm
+            an instance of the Isotherm parent class
+        isotherm_data : DataFrame
+            pure-component adsorption isotherm data
+        loading_key : str
+            column of the pandas DataFrame where the loading is stored
+        pressure_key : str
+            column of the pandas DataFrame where the pressure is stored
+        model : str
+            the model to be used to describe the isotherm
+        param_guess : dict
+            starting guess for model parameters in the data fitting routine
+        optimization_method : str
+            method in SciPy minimization function to use in fitting model to data.
+        """
         return cls(isotherm_data,
-                   loading_key=isotherm.loading_key,
-                   pressure_key=isotherm.pressure_key,
+                   loading_key=loading_key,
+                   pressure_key=pressure_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_method=optimization_method,
@@ -183,6 +241,21 @@ class ModelIsotherm(Isotherm):
     @classmethod
     def from_pointisotherm(cls, isotherm, model, param_guess=None,
                            optimization_method="Nelder-Mead"):
+        """
+        Constructs a ModelIsotherm using a the data from a PointIsotherm
+        and all its parameters.
+
+        Parameters
+        ----------
+        isotherm : PointIsotherm
+            an instance of the PointIsotherm parent class to model
+        model : str
+            the model to be used to describe the isotherm
+        param_guess : dict
+            starting guess for model parameters in the data fitting routine
+        optimization_method : str
+            method in SciPy minimization function to use in fitting model to data.
+        """
         return cls(isotherm.data(),
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
@@ -195,15 +268,72 @@ class ModelIsotherm(Isotherm):
                    unit_pressure=isotherm.unit_pressure,
                    **isotherm.to_dict())
 
+##########################################################
+#   Overloaded and private functions
+
+    def _fit(self, loading, pressure, optimization_method):
+        """
+        Fit model to data using nonlinear optimization with least squares loss
+        function. Assigns parameters to self
+
+        Parameters
+        ----------
+        loading : ndarray
+            the loading for each point
+        pressure : ndarray
+            the pressures of each point
+        optimization_method : str
+            method in SciPy minimization function to use in fitting model to data.
+        """
+        # parameter names (cannot rely on order in Dict)
+        param_names = [param for param in self.params.keys()]
+        # guess
+        guess = numpy.array([self.param_guess[param] for param in param_names])
+
+        def residual_sum_of_squares(params_):
+            """
+            Residual Sum of Squares between model and data in data
+            """
+            # change params to those in x
+            for i, _ in enumerate(param_names):
+                self.params[param_names[i]] = params_[i]
+
+            return numpy.sum((loading - self.loading(pressure) ** 2))
+
+        # minimize RSS
+        opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
+                                          method=optimization_method)
+        if not opt_res.success:
+            print(opt_res.message)
+            print("\n\tDefault starting guess for parameters:", self.param_guess)
+            raise Exception("""Minimization of RSS for %s isotherm fitting
+            failed. Try a different starting point in the nonlinear optimization
+            by passing a dictionary of parameter guesses, param_guess, to the
+            constructor""" % self.model)
+
+        # assign params
+        for index, _ in enumerate(param_names):
+            self.params[param_names[index]] = opt_res.x[index]
+
+        self.rmse = numpy.sqrt(opt_res.fun / len(pressure))
+
+##########################################################
+#   Methods
+
     def loading(self, pressure):
         """
         Given stored model parameters, compute loading at pressure P.
 
-        :param pressure: Float or Array pressure (in corresponding units as data
-            in instantiation)
-        :return: predicted loading at pressure P (in corresponding units as data
-            in instantiation) using fitted model params in `self.params`.
-        :rtype: Float or Array
+        Parameters
+        ----------
+        pressure : float/array
+            pressure (in corresponding units as data in instantiation)
+
+        Returns
+        -------
+        float/array
+            predicted loading at pressure P (in corresponding units as data
+            in instantiation) using fitted model params in `self.params`
         """
         if self.model == "Langmuir":
             return self.params["M"] * self.params["K"] * pressure / \
@@ -247,48 +377,6 @@ class ModelIsotherm(Isotherm):
                                        self.params["theta"] * langmuir_fractional_loading ** 2 *
                                        langmuir_fractional_loading)
 
-    def _fit(self, data, optimization_method):
-        """
-        Fit model to data using nonlinear optimization with least squares loss
-            function. Assigns params to self.
-
-        :param K_guess: float guess Langmuir constant (units: 1/pressure)
-        :param M_guess: float guess saturation loading (units: loading)
-        """
-        # parameter names (cannot rely on order in Dict)
-        param_names = [param for param in self.params.keys()]
-        # guess
-        guess = numpy.array([self.param_guess[param] for param in param_names])
-
-        def residual_sum_of_squares(params_):
-            """
-            Residual Sum of Squares between model and data in data
-            :param params_: Array of parameters
-            """
-            # change params to those in x
-            for i in range(len(param_names)):
-                self.params[param_names[i]] = params_[i]
-
-            return numpy.sum((data[self.loading_key].values -
-                              self.loading(data[self.pressure_key].values)) ** 2)
-
-        # minimize RSS
-        opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
-                                          method=optimization_method)
-        if not opt_res.success:
-            print(opt_res.message)
-            print("\n\tDefault starting guess for parameters:", self.param_guess)
-            raise Exception("""Minimization of RSS for %s isotherm fitting
-            failed. Try a different starting point in the nonlinear optimization
-            by passing a dictionary of parameter guesses, param_guess, to the
-            constructor""" % self.model)
-
-        # assign params
-        for index, _ in enumerate(param_names):
-            self.params[param_names[index]] = opt_res.x[index]
-
-        self.rmse = numpy.sqrt(opt_res.fun / data.shape[0])
-
     def spreading_pressure(self, pressure):
         """
         Calculate reduced spreading pressure at a bulk gas pressure P.
@@ -303,10 +391,15 @@ class ModelIsotherm(Isotherm):
         which is computed analytically, as a function of the model isotherm
         parameters.
 
-        :param pressure: float pressure (in corresponding units as data in
-            instantiation)
-        :return: spreading pressure, :math:`\\Pi`
-        :rtype: Float
+        Parameters
+        ----------
+        pressure : float
+            pressure (in corresponding units as data in instantiation)
+
+        Returns
+        -------
+        float
+            spreading pressure, :math:`\\Pi`
         """
         if self.model == "Langmuir":
             return self.params["M"] * numpy.log(1.0 + self.params["K"] * pressure)
@@ -367,10 +460,21 @@ def get_default_guess_params(model, data, pressure_key, loading_key):
     Reminder: pass your own guess via `param_guess` in instantiation if these
     default guesses do not lead to a converged set of parameters.
 
-    :param model: String name of analytical model
-    :param data: DataFrame adsorption isotherm data
-    :param pressure_key: String key for pressure column in data
-    :param loading_key: String key for loading column in data
+    Parameters
+    ----------
+    model: str
+        name of analytical model
+    data: DataFrame
+        adsorption isotherm data
+    pressure_key: str
+        key for pressure column in data
+    loading_key: str
+        key for loading column in data
+
+    Returns
+    -------
+    dict
+        initial parameter guesses for particular model
     """
     # guess saturation loading to 10% more than highest loading
     saturation_loading = 1.1 * data[loading_key].max()
