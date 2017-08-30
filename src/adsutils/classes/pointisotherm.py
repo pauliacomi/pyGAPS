@@ -355,7 +355,12 @@ class PointIsotherm(Isotherm):
 
     def print_info(self, logarithmic=False):
         """
-        Prints a short summary of all the isotherm parameters and a graph
+        Prints a short summary of all the isotherm parameters and a graph of the isotherm
+
+        Parameters
+        ----------
+        logarithmic : bool, optional
+            Specifies if the graph printed is logarithmic or not
         """
 
         print(self)

@@ -442,6 +442,8 @@ class ModelIsotherm(Isotherm):
         Prints a short summary of all the isotherm parameters
         '''
 
+        print(self)
+
         print("%s identified model parameters:" % self.model)
         for param, val in self.params.items():
             print("\t%s = %f" % (param, val))

@@ -167,16 +167,16 @@ class Isotherm(object):
         else:
             string += ("Simulated isotherm" + '\n')
 
-        string += ("Material:" + self.sample_name + '\n')
-        string += ("Sample Batch:" + self.sample_batch + '\n')
-        string += ("Isotherm type:" + self.exp_type + '\n')
-        string += ("Gas used:" + self.gas + '\n')
-        string += ("Isotherm date:" + self.date + '\n')
-        string += ("Machine:" + self.machine + '\n')
-        string += ("User:" + self.user + '\n')
+        string += ("Material:" + str(self.sample_name) + '\n')
+        string += ("Sample Batch:" + str(self.sample_batch) + '\n')
+        string += ("Isotherm type:" + str(self.exp_type) + '\n')
+        string += ("Gas used:" + str(self.gas) + '\n')
+        string += ("Isotherm date:" + str(self.date) + '\n')
+        string += ("Machine:" + str(self.machine) + '\n')
+        string += ("User:" + str(self.user) + '\n')
         string += ("Activation temperature:" + str(self.t_act) + "°C" + '\n')
         string += ("Isotherm temperature:" + str(self.t_exp) + "K" + '\n')
-        string += ("Isotherm comments:" + self.comment + '\n')
+        string += ("Isotherm comments:" + str(self.comment) + '\n')
 
         return string
 
