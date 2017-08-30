@@ -13,18 +13,33 @@ def psd_bjh(loading, pressure, pore_geometry,
     """
     Calculates the pore size distribution using the BJH method
 
-    :param loading: in mmol/g
-    :param pressure: relative
-    :param pore_geometry: 'sphere', 'cylinder' or 'slit'
-    :param thickness_model: a callable which returns the thickenss of the adsorbed layer
+    Parameters
+    ----------
+    loading : array
+        adsorbed amount in mmol/g
+    pressure : array
+        relative pressure
+    pore_geometry : str
+        the geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'
+    thickness_model : callable
+        function which returns the thickenss of the adsorbed layer
         at a pressure p
-    :param condensation_model: a callable which returns the critical kelvin radius at a pressure p
-    :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    :param adsorbate_molar_mass: in g/mol
+    condensation_model : callable
+        function which returns the critical kelvin radius at a pressure p
+    liquid_density : float
+        density of the adsorbate in the adsorbed state, in g/cm3
+    adsorbate_molar_mass : float
+        molar mass of the adsorbate in g/mol
 
-    :returns: pore widths, pore distribution
-    :rtype: arrays
+    Returns
+    -------
+    pore widths : array
+        widths of the pores
+    pore_dist : array
+        amount of each pore width
 
+    Notes
+    -----
     **Description:**
 
     The BJH or Barrett, Joyner and Halenda method for calculation of pore size distribution
@@ -114,18 +129,33 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     """
     Calculates the pore size distribution using the Dollimore-Heal method
 
-    :param loading: in mmol/g
-    :param pressure: relative
-    :param pore_geometry: 'sphere', 'cylinder' or 'slit'
-    :param thickness_model: a callable which returns the thickenss of the adsorbed layer
+    Parameters
+    ----------
+    loading : array
+        adsorbed amount in mmol/g
+    pressure : array
+        relative pressure
+    pore_geometry : str
+        the geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'
+    thickness_model : callable
+        function which returns the thickenss of the adsorbed layer
         at a pressure p
-    :param condensation_model: a callable which returns the critical kelvin radius at a pressure p
-    :param liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    :param adsorbate_molar_mass: in g/mol
+    condensation_model : callable
+        function which returns the critical kelvin radius at a pressure p
+    liquid_density : float
+        density of the adsorbate in the adsorbed state, in g/cm3
+    adsorbate_molar_mass : float
+        molar mass of the adsorbate in g/mol
 
-    :returns: pore widths, pore distribution
-    :rtype: arrays
+    Returns
+    -------
+    pore widths : array
+        widths of the pores
+    pore_dist : array
+        amount of each pore width
 
+    Notes
+    -----
     **Description:**
 
     The DH or Dollimore-Heal method of calculation of pore size distribution is an
