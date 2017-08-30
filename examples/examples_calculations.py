@@ -70,6 +70,19 @@ for isotherm in isotherms:
     adsutils.t_plot(isotherm, 'Halsey', verbose=True)
     isotherm.convert_pressure_mode("absolute")
 
+# Pore size distribution
+#################################################################################
+#%%
+
+path = r"src/adsutils/calculations/kernels/dft - N2 - carbon.csv"
+
+for isotherm in isotherms:
+    print(isotherm.sample_name)
+    print(isotherm.gas)
+    isotherm.convert_pressure_mode("relative")
+    adsutils.dft_size_distribution(isotherm, path, verbose=True)
+
+
 #################################################################################
 #################################################################################
 # PyIAST isotherm modelling
