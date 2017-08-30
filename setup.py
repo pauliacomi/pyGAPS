@@ -21,7 +21,7 @@ def read(*names, **kwargs):
 
 
 setup(
-    name='adsutils',
+    name='pygaps',
     version='0.1.0',
     license='MIT license',
     description='',
@@ -32,7 +32,7 @@ setup(
     ),
     author='Paul Iacomi',
     author_email='iacomi.paul@gmail.com',
-    url='https://github.com/pauliacomi/adsutils',
+    url='https://github.com/pauliacomi/pygaps',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],

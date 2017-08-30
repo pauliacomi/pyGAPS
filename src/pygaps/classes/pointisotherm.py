@@ -9,7 +9,7 @@ import numpy
 import pandas
 from scipy.interpolate import interp1d
 
-import adsutils
+import pygaps
 
 from ..graphing.isothermgraphs import plot_iso
 from .adsorbate import Adsorbate
@@ -140,7 +140,7 @@ class PointIsotherm(Isotherm):
         if self.id is None:
             # Generate the unique id using md5
             sha_hasher = hashlib.md5(
-                adsutils.isotherm_to_json(self).encode('utf-8'))
+                pygaps.isotherm_to_json(self).encode('utf-8'))
             self.id = sha_hasher.hexdigest()
 
         self._instantiated = True
@@ -199,7 +199,7 @@ class PointIsotherm(Isotherm):
         unit_pressure : str, optional
             unit of pressure
         """
-        return adsutils.isotherm_from_json(json_string,
+        return pygaps.isotherm_from_json(json_string,
                                            mode_adsorbent=mode_adsorbent,
                                            mode_pressure=mode_pressure,
                                            unit_loading=unit_loading,
@@ -225,7 +225,7 @@ class PointIsotherm(Isotherm):
             # Generate the unique id using md5
             self.id = None
             md_hasher = hashlib.md5(
-                adsutils.isotherm_to_json(self).encode('utf-8'))
+                pygaps.isotherm_to_json(self).encode('utf-8'))
             self.id = md_hasher.hexdigest()
 
     def __eq__(self, other_isotherm):

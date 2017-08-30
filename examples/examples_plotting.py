@@ -1,14 +1,14 @@
 # %%
 import os
 
-import adsutils
+import pygaps
 
 json_path = os.path.join(os.getcwd(), 'tests', 'data', 'isotherms_json')
-json_file_paths = adsutils.util_get_file_paths(json_path, '.json')
+json_file_paths = pygaps.util_get_file_paths(json_path, '.json')
 isotherms = []
 for filepath in json_file_paths:
     with open(filepath, 'r') as text_file:
-        isotherms.append(adsutils.isotherm_from_json(text_file.read()))
+        isotherms.append(pygaps.isotherm_from_json(text_file.read()))
 
 #################################################################################
 #################################################################################
@@ -42,32 +42,32 @@ pressure_max = None
 
 
 fig_title = "Regular isotherms colour"
-adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
 
 fig_title = "Log isotherms colour"
-adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=True, color=True, fig_title=fig_title, legend_list=legend_list)
 
 fig_title = "Log isotherms B/W"
-adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads', 'des'],
+pygaps.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads', 'des'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=True, color=False, fig_title=fig_title, legend_list=legend_list)
 
 fig_title = "Regular enthalpy colour"
-adsutils.plot_iso(sel_isotherms, plot_type='enthalpy', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='enthalpy', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
 
 fig_title = "Regular isotherms colour"
-adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
 
 fig_title = "Regular isotherms colour"
-adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=True, color=True, fig_title=fig_title, legend_list=legend_list)
 
@@ -85,7 +85,7 @@ modelL.name = "Langmuir"
 modelDL = isotherm.get_model_isotherm("DSLangmuir")
 modelDL.name = "DS Langmuir"
 
-adsutils.plot_iso([isotherm, modelH, modelL, modelDL],
+pygaps.plot_iso([isotherm, modelH, modelL, modelDL],
                   plot_type='isotherm', branch=['ads'], logarithmic=False, color=True)
 
 # %%

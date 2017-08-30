@@ -6,7 +6,7 @@ import sys
 import pandas
 import pytest
 
-import adsutils
+import pygaps
 
 # Run only on windows
 windows = pytest.mark.skipif(
@@ -90,7 +90,7 @@ def basic_isotherm(isotherm_parameters):
     pressure_key = "pressure"
     loading_key = "loading"
 
-    isotherm = adsutils.classes.isotherm.Isotherm(
+    isotherm = pygaps.classes.isotherm.Isotherm(
         loading_key=loading_key,
         pressure_key=pressure_key,
         **isotherm_parameters)
@@ -106,7 +106,7 @@ def basic_pointisotherm(isotherm_data, basic_isotherm):
     other_key = "enthalpy"
     other_keys = [other_key]
 
-    isotherm = adsutils.PointIsotherm.from_isotherm(
+    isotherm = pygaps.PointIsotherm.from_isotherm(
         basic_isotherm,
         isotherm_data,
         other_keys=other_keys)
@@ -120,7 +120,7 @@ def basic_modelisotherm(isotherm_data, basic_isotherm):
     """
     model = "Langmuir"
 
-    isotherm = adsutils.ModelIsotherm.from_isotherm(
+    isotherm = pygaps.ModelIsotherm.from_isotherm(
         basic_isotherm,
         isotherm_data,
         model)
@@ -159,7 +159,7 @@ def basic_sample(sample_data):
     """
     Creates an sample from model data
     """
-    sample = adsutils.Sample(sample_data)
+    sample = pygaps.Sample(sample_data)
 
     return sample
 
@@ -202,6 +202,6 @@ def basic_adsorbate(adsorbate_data):
     """
     Creates an sample from model data
     """
-    adsorbate = adsutils.Adsorbate(adsorbate_data)
+    adsorbate = pygaps.Adsorbate(adsorbate_data)
 
     return adsorbate

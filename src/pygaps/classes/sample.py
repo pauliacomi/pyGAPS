@@ -2,7 +2,7 @@
 This module contains the experimental sample class
 """
 
-import adsutils.data as data
+import pygaps.data as data
 
 
 class Sample(object):
@@ -111,7 +111,7 @@ class Sample(object):
 
         if sample is None:
             raise Exception("Sample {0}{1} does not exist in list of samples. "
-                            "First populate adsutils.SAMPLE_LIST "
+                            "First populate pygaps.SAMPLE_LIST "
                             "with required sample class".format(
                                 sample_name, sample_batch))
 

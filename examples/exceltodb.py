@@ -3,14 +3,14 @@ from os.path import expanduser
 
 import pandas
 
-import adsutils
+import pygaps
 
 #################################################################################
 #################################################################################
 #       Database sanitisation
 #
 # %% Get all samples and generate a list of isotherms
-samples = adsutils.db_get_samples(db_path)
+samples = pygaps.db_get_samples(db_path)
 names = []
 for index, sample in enumerate(samples):
     names.append(sample.name)
@@ -26,7 +26,7 @@ for sample in data["name"]:
         sname=sample
     )
     print(sample)
-    isotherms += adsutils.db_get_experiments(db_path, criteria)
+    isotherms += pygaps.db_get_experiments(db_path, criteria)
 
 
 # %% Sanitising database of 0 initial points for loading
@@ -35,7 +35,7 @@ for index, isotherm in enumerate(isotherms):
     if data[isotherm.loading_key][0] == 0:
         isotherm.data.drop(isotherm.data.index[0], inplace=True)
         isotherm.data.reset_index(drop=True, inplace=True)
-        adsutils.db_upload_experiment(db_path, isotherm, overwrite=True)
+        pygaps.db_upload_experiment(db_path, isotherm, overwrite=True)
 
 print("finished")
 
@@ -48,7 +48,7 @@ for index, isotherm in enumerate(isotherms):
             data[isotherm.loading_key][0]
         isotherm.data.drop(isotherm.data.index[0], inplace=True)
         isotherm.data.reset_index(drop=True, inplace=True)
-        adsutils.db_upload_experiment(db_path, isotherm, overwrite=True)
+        pygaps.db_upload_experiment(db_path, isotherm, overwrite=True)
 
 # %% Sanitising database of negative initial points for pressure
 for index, isotherm in enumerate(isotherms):
@@ -57,7 +57,7 @@ for index, isotherm in enumerate(isotherms):
         print(index)
         data.loc[:, isotherm.pressure_key] = data[isotherm.pressure_key] - \
             data[isotherm.pressure_key][0] + 0.001
-        adsutils.db_upload_experiment(db_path, isotherm, overwrite=True)
+        pygaps.db_upload_experiment(db_path, isotherm, overwrite=True)
 
 
 #################################################################################
@@ -66,10 +66,10 @@ for index, isotherm in enumerate(isotherms):
 #
 # %%
 smp_path = r'C:\Users\pauli\OneDrive\Documents\PhD Documents\Data processing\Database\Sample Overview.csv'
-samples = adsutils.samples_parser(smp_path)
+samples = pygaps.samples_parser(smp_path)
 for sample in samples:
-    adsutils.db_upload_sample(db_path, sample)
+    pygaps.db_upload_sample(db_path, sample)
 # %%
 db_path = r'C:\Users\pauli\OneDrive\Documents\PhD Documents\Data processing\Database\local.db'
 for isotherm in isotherms:
-    adsutils.db_upload_experiment(db_path, isotherm)
+    pygaps.db_upload_experiment(db_path, isotherm)

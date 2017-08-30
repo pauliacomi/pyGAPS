@@ -5,7 +5,7 @@ This test module has tests relating to classes
 import pandas
 import pytest
 
-import adsutils
+import pygaps
 
 
 class TestGas(object):
@@ -20,8 +20,8 @@ class TestGas(object):
 
     def test_adsorbate_retreived_list(self, adsorbate_data, basic_adsorbate):
         "Checks adsorbate can be retrieved from master list"
-        adsutils.data.GAS_LIST.append(basic_adsorbate)
-        uploaded_adsorbate = adsutils.Adsorbate.from_list(
+        pygaps.data.GAS_LIST.append(basic_adsorbate)
+        uploaded_adsorbate = pygaps.Adsorbate.from_list(
             adsorbate_data.get('nick'))
 
         assert adsorbate_data == uploaded_adsorbate.to_dict()
@@ -79,7 +79,7 @@ class TestIsotherm(object):
         del keys[missing_key]
 
         with pytest.raises(Exception):
-            adsutils.classes.isotherm.Isotherm(
+            pygaps.classes.isotherm.Isotherm(
                 loading_key=keys.get('loading_key'),
                 pressure_key=keys.get('pressure_key'),
                 **isotherm_parameters)
@@ -98,7 +98,7 @@ class TestIsotherm(object):
         del data[missing_param]
 
         with pytest.raises(Exception):
-            adsutils.classes.isotherm.Isotherm(
+            pygaps.classes.isotherm.Isotherm(
                 loading_key=loading_key,
                 pressure_key=pressure_key,
                 **data)
@@ -130,7 +130,7 @@ class TestIsotherm(object):
         props[prop] = set_to
 
         with pytest.raises(Exception):
-            adsutils.classes.isotherm.Isotherm(
+            pygaps.classes.isotherm.Isotherm(
                 loading_key=loading_key,
                 pressure_key=pressure_key,
                 mode_adsorbent=props.get('mode_adsorbent'),
@@ -252,7 +252,7 @@ class TestPointIsotherm(object):
         """Checks that the loading mode conversion function work as expected"""
 
         # Add sample to list
-        adsutils.data.SAMPLE_LIST.append(basic_sample)
+        pygaps.data.SAMPLE_LIST.append(basic_sample)
 
         # Do the conversion
         basic_pointisotherm.convert_adsorbent_mode(mode)
@@ -275,7 +275,7 @@ class TestPointIsotherm(object):
         """Checks that the pressure mode conversion function work as expected"""
 
         # Add sample to list
-        adsutils.data.GAS_LIST.append(basic_adsorbate)
+        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         # Do the conversion
         basic_pointisotherm.convert_pressure_mode(mode)
@@ -312,7 +312,7 @@ class TestModelIsotherm(object):
 
         isotherm_data['loading'] = data
 
-        adsutils.ModelIsotherm.from_isotherm(
+        pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
             isotherm_data[:6],
             model)

@@ -45,7 +45,7 @@ print(len(exps))
 
 isotherms = []
 for raw_iso in exps:
-    isotherms.append(adsutils.isotherm_from_json(raw_iso))
+    isotherms.append(pygaps.isotherm_from_json(raw_iso))
 
 
 # %%

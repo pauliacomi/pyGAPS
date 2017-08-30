@@ -4,7 +4,7 @@ This module contains the adsorbate class
 
 from CoolProp.CoolProp import PropsSI
 
-import adsutils.data as data
+import pygaps.data as data
 
 
 class Adsorbate(object):
@@ -99,7 +99,7 @@ class Adsorbate(object):
             (x for x in data.GAS_LIST if adsorbate_name == x.name), None)
         if adsorbate is None:
             raise Exception("Adsorbate {0} does not exist in list of gasses. "
-                            "First populate adsutils.data.GAS_LIST "
+                            "First populate pygaps.data.GAS_LIST "
                             "with required adsorbate class".format(adsorbate_name))
 
         return adsorbate

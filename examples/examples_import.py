@@ -1,7 +1,7 @@
 # %%
 import os
 
-import adsutils
+import pygaps
 
 xl_path = os.path.join(os.getcwd(), 'tests', 'data', 'isotherms')
 json_path = os.path.join(os.getcwd(), 'tests', 'data', 'isotherms_json')
@@ -17,11 +17,11 @@ db_path = os.path.expanduser(
 print(xl_path)
 
 # Find files
-xl_file_paths = adsutils.util_get_file_paths(xl_path, '.xlsx')
+xl_file_paths = pygaps.util_get_file_paths(xl_path, '.xlsx')
 print(xl_file_paths)
 
 # Import them
-isotherms = [adsutils.isotherm_from_xl(path) for path in xl_file_paths]
+isotherms = [pygaps.isotherm_from_xl(path) for path in xl_file_paths]
 
 
 #################################################################################
@@ -40,15 +40,15 @@ criteria = {
     'gas':          "N2",
     # 'exp_type':     "",
 }
-isotherms = adsutils.db_get_experiments(db_path, criteria)
+isotherms = pygaps.db_get_experiments(db_path, criteria)
 
 # %%
 # Samples
-adsutils.data.SAMPLE_LIST = adsutils.db_get_samples(db_path)
+pygaps.data.SAMPLE_LIST = pygaps.db_get_samples(db_path)
 
 # %%
 # Gasses
-adsutils.data.GAS_LIST = adsutils.db_get_gasses(db_path)
+pygaps.data.GAS_LIST = pygaps.db_get_gasses(db_path)
 
 #################################################################################
 #       Json import | dataimport/jsoninterface.py
@@ -58,14 +58,14 @@ adsutils.data.GAS_LIST = adsutils.db_get_gasses(db_path)
 print(json_path)
 
 # Find files
-json_file_paths = adsutils.util_get_file_paths(json_path, '.json')
+json_file_paths = pygaps.util_get_file_paths(json_path, '.json')
 print(json_file_paths)
 
 # Import them
 isotherms = []
 for filepath in json_file_paths:
     with open(filepath, 'r') as text_file:
-        isotherms.append(adsutils.isotherm_from_json(
+        isotherms.append(pygaps.isotherm_from_json(
             text_file.read(), mode_pressure='relative'))
 
 #################################################################################
@@ -77,7 +77,7 @@ for isotherm in isotherms:
     filename = ' '.join(
         [isotherm.sample_name, isotherm.gas, str(isotherm.t_exp)]) + '.json'
     with open(filename, mode='w') as f:
-        f.write(adsutils.isotherm_to_json(isotherm))
+        f.write(pygaps.isotherm_to_json(isotherm))
 
 #################################################################################
 #       Example Selections and filtering

@@ -37,16 +37,20 @@ def download_latest_artifacts(account_project, build_id):
     if build_id is None:
         url = "https://ci.appveyor.com/api/projects/{}".format(account_project)
     else:
-        url = "https://ci.appveyor.com/api/projects/{}/build/{}".format(account_project, build_id)
+        url = "https://ci.appveyor.com/api/projects/{}/build/{}".format(
+            account_project, build_id)
     build = requests.get(url, headers=make_auth_headers()).json()
     jobs = build['build']['jobs']
-    print(u"Build {0[build][version]}, {1} jobs: {0[build][message]}".format(build, len(jobs)))
+    print(u"Build {0[build][version]}, {1} jobs: {0[build][message]}".format(
+        build, len(jobs)))
 
     for job in jobs:
         name = job['name']
-        print(u"  {0}: {1[status]}, {1[artifactsCount]} artifacts".format(name, job))
+        print(
+            u"  {0}: {1[status]}, {1[artifactsCount]} artifacts".format(name, job))
 
-        url = "https://ci.appveyor.com/api/buildjobs/{}/artifacts".format(job['jobId'])
+        url = "https://ci.appveyor.com/api/buildjobs/{}/artifacts".format(
+            job['jobId'])
         response = requests.get(url, headers=make_auth_headers())
         artifacts = response.json()
 
@@ -55,7 +59,8 @@ def download_latest_artifacts(account_project, build_id):
             filename = artifact['fileName']
             print(u"    {0}, {1} bytes".format(filename, artifact['size']))
 
-            url = "https://ci.appveyor.com/api/buildjobs/{}/artifacts/{}".format(job['jobId'], filename)
+            url = "https://ci.appveyor.com/api/buildjobs/{}/artifacts/{}".format(
+                job['jobId'], filename)
             download_url(url, filename, make_auth_headers())
 
             if is_zip:
@@ -92,10 +97,11 @@ def unpack_zipfile(filename):
             z.extract(name)
 
 
-parser = argparse.ArgumentParser(description='Download artifacts from AppVeyor.')
+parser = argparse.ArgumentParser(
+    description='Download artifacts from AppVeyor.')
 parser.add_argument('--id',
                     metavar='PROJECT_ID',
-                    default='pauliacomi/adsutils',
+                    default='pauliacomi/pygaps',
                     help='Project ID in AppVeyor.')
 parser.add_argument('build',
                     nargs='?',

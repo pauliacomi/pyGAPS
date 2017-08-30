@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use adsutils in a project::
+To use pygaps in a project::
 
-	import adsutils
+	import pygaps

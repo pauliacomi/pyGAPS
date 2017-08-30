@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-import adsutils.calculations
+import pygaps.calculations
 
 HERE = os.path.dirname(__file__)
 
@@ -26,38 +26,38 @@ class TestBET(object):
 
         # Will raise a "isotherm not in relative pressure mode exception"
         with pytest.raises(Exception):
-            adsutils.area_BET(isotherm)
+            pygaps.area_BET(isotherm)
 
-        adsutils.data.GAS_LIST.append(adsorbate)
+        pygaps.data.GAS_LIST.append(adsorbate)
         isotherm.convert_pressure_mode("relative")
         isotherm.convert_loading("cm3 STP")
 
         # Will raise a "isotherm loading not in mmol exception"
         with pytest.raises(Exception):
-            adsutils.area_BET(isotherm)
+            pygaps.area_BET(isotherm)
 
-        adsutils.data.SAMPLE_LIST.append(basic_sample)
+        pygaps.data.SAMPLE_LIST.append(basic_sample)
         isotherm.convert_loading("mmol")
         isotherm.convert_adsorbent_mode("volume")
 
         # Will raise a "isotherm loading not in volume mode exception"
         with pytest.raises(Exception):
-            adsutils.area_BET(isotherm)
+            pygaps.area_BET(isotherm)
 
         isotherm.convert_adsorbent_mode("mass")
-        adsutils.data.GAS_LIST = []
+        pygaps.data.GAS_LIST = []
 
         # Will raise a "adsorbate not found exception"
         with pytest.raises(Exception):
-            adsutils.area_BET(isotherm)
+            pygaps.area_BET(isotherm)
 
         # Will raise a "adsorbate has no cross sectional area"
         with pytest.raises(Exception):
-            adsutils.area_BET(isotherm)
+            pygaps.area_BET(isotherm)
 
         adsorbate.properties["cross_sectional_area"] = c_s_area
-        adsutils.data.GAS_LIST = []
-        adsutils.data.GAS_LIST.append(adsorbate)
+        pygaps.data.GAS_LIST = []
+        pygaps.data.GAS_LIST.append(adsorbate)
 
         return
 
@@ -70,17 +70,17 @@ class TestBET(object):
     ])
     def test_BET(self, file, expected_bet, basic_adsorbate):
         """Test BET calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_adsorbate)
+        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
-            isotherm = adsutils.isotherm_from_json(
+            isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
         isotherm.convert_pressure_mode('relative')
 
-        bet_area = adsutils.area_BET(isotherm).get("bet_area")
+        bet_area = pygaps.area_BET(isotherm).get("bet_area")
 
         max_error = 0.1  # 10 percent
 
@@ -100,17 +100,17 @@ class TestTPlot(object):
     ])
     def test_tplot(self, file, basic_adsorbate, area, micropore_volume):
         """Test BET calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_adsorbate)
+        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
-            isotherm = adsutils.isotherm_from_json(
+            isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
         isotherm.convert_pressure_mode('relative')
 
-        t_plot_r = adsutils.t_plot(
+        t_plot_r = pygaps.t_plot(
             isotherm, 'Halsey')
 
         results = t_plot_r.get('results')
@@ -146,17 +146,17 @@ class TestPSD(object):
     ])
     def test_psd_meso(self, file, basic_adsorbate, method):
         """Test psd calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_adsorbate)
+        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
-            isotherm = adsutils.isotherm_from_json(
+            isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
         isotherm.convert_pressure_mode('relative')
 
-        result_dict = adsutils.mesopore_size_distribution(
+        result_dict = pygaps.mesopore_size_distribution(
             isotherm, psd_model=method, branch='desorption', thickness_model='Halsey', verbose=True)
 
         # max_error = 0.1  # 10 percent
@@ -170,17 +170,17 @@ class TestPSD(object):
     ])
     def test_psd_micro(self, file, basic_adsorbate, method):
         """Test psd calculation with several model isotherms"""
-        adsutils.data.GAS_LIST.append(basic_adsorbate)
+        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
-            isotherm = adsutils.isotherm_from_json(
+            isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
         isotherm.convert_pressure_mode('relative')
 
-        result_dict = adsutils.micropore_size_distribution(
+        result_dict = pygaps.micropore_size_distribution(
             isotherm, psd_model=method, pore_geometry='slit', verbose=True)
 
         # max_error = 0.1  # 10 percent

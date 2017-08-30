@@ -3,10 +3,10 @@ from os.path import expanduser
 
 import pandas
 
-import adsutils
+import pygaps
 
 # %%
-# Reload all imports from adsutils
+# Reload all imports from pygaps
 #
 
 
@@ -14,19 +14,19 @@ def reload_imports():
     "reload everything"
 
     import importlib
-    importlib.reload(adsutils)
-    importlib.reload(adsutils.classes.sample)
-    importlib.reload(adsutils.classes.gas)
-    importlib.reload(adsutils.classes.isotherm)
-    importlib.reload(adsutils.classes.pointisotherm)
-    importlib.reload(adsutils.classes.modelisotherm)
-    importlib.reload(adsutils.classes.interpolatorisotherm)
-    importlib.reload(adsutils.calculations.initial_henry)
-    importlib.reload(adsutils.calculations.bet)
-    importlib.reload(adsutils.parsing.csvinterface)
-    importlib.reload(adsutils.parsing.excelinterface)
-    importlib.reload(adsutils.parsing.sqliteinterface)
-    importlib.reload(adsutils.graphing.isothermgraphs)
+    importlib.reload(pygaps)
+    importlib.reload(pygaps.classes.sample)
+    importlib.reload(pygaps.classes.gas)
+    importlib.reload(pygaps.classes.isotherm)
+    importlib.reload(pygaps.classes.pointisotherm)
+    importlib.reload(pygaps.classes.modelisotherm)
+    importlib.reload(pygaps.classes.interpolatorisotherm)
+    importlib.reload(pygaps.calculations.initial_henry)
+    importlib.reload(pygaps.calculations.bet)
+    importlib.reload(pygaps.parsing.csvinterface)
+    importlib.reload(pygaps.parsing.excelinterface)
+    importlib.reload(pygaps.parsing.sqliteinterface)
+    importlib.reload(pygaps.graphing.isothermgraphs)
 
     return
 
@@ -52,11 +52,11 @@ criteria = {
     # 'gas':          "C3H8",
     # 'exp_type':     "",
 }
-isotherms = adsutils.db_get_experiments(db_path, criteria)
+isotherms = pygaps.db_get_experiments(db_path, criteria)
 
 # %%
-adsutils.data.SAMPLE_LIST = adsutils.db_get_samples(db_path)
-adsutils.data.GAS_LIST = adsutils.db_get_gasses(db_path)
+pygaps.data.SAMPLE_LIST = pygaps.db_get_samples(db_path)
+pygaps.data.GAS_LIST = pygaps.db_get_gasses(db_path)
 
 #################################################################################
 # BET calcs
@@ -73,7 +73,7 @@ for index, isotherm in enumerate(isotherms):
         continue
     complete.append(index)
     try:
-        result = adsutils.area_BET(isotherm)
+        result = pygaps.area_BET(isotherm)
         result.update({'sample': isotherm.sample_name + isotherm.sample_batch,
                        'gas': isotherm.gas})
         bet_areas.update({index: result})
@@ -106,7 +106,7 @@ df
 
 # %%
 isotherm.convert_pressure_mode("relative")
-adsutils.area_BET(isotherms[1], verbose=True)
+pygaps.area_BET(isotherms[1], verbose=True)
 isotherm.convert_pressure_mode("absolute")
 
 
@@ -118,9 +118,9 @@ isotherm.convert_pressure_mode("absolute")
 # Save as json
 for isotherm in isotherms:
     with open(isotherm.sample_name + ' ' + isotherm.sample_batch + '.json', "w") as text_file:
-        text_file.write(adsutils.isotherm_to_json(isotherm))
+        text_file.write(pygaps.isotherm_to_json(isotherm))
 
 # %% 
 for isotherm in isotherms:
     if isotherm.other_keys:
-        adsutils.plot_iso([isotherm], plot_type='enthalpy', branch=['ads'])
+        pygaps.plot_iso([isotherm], plot_type='enthalpy', branch=['ads'])

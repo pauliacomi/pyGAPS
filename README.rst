@@ -22,45 +22,45 @@ Overview
     :target: http://www.repostatus.org/#wip
     :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
 
-.. |docs| image:: https://readthedocs.org/projects/adsutils/badge/?style=flat
-    :target: https://readthedocs.org/projects/adsutils
+.. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
+    :target: https://readthedocs.org/projects/pygaps
     :alt: Documentation Status
 
-.. |travis| image:: https://travis-ci.org/pauliacomi/adsutils.svg?branch=master
+.. |travis| image:: https://travis-ci.org/pauliacomi/pygaps.svg?branch=master
     :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/pauliacomi/adsutils
+    :target: https://travis-ci.org/pauliacomi/pygaps
 
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/pauliacomi/adsutils?branch=master&svg=true
+.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/pauliacomi/pygaps?branch=master&svg=true
     :alt: AppVeyor Build Status
-    :target: https://ci.appveyor.com/project/pauliacomi/adsutils
+    :target: https://ci.appveyor.com/project/pauliacomi/pygaps
 
-.. |requires| image:: https://requires.io/github/pauliacomi/adsutils/requirements.svg?branch=master
+.. |requires| image:: https://requires.io/github/pauliacomi/pygaps/requirements.svg?branch=master
     :alt: Requirements Status
-    :target: https://requires.io/github/pauliacomi/adsutils/requirements/?branch=master
+    :target: https://requires.io/github/pauliacomi/pygaps/requirements/?branch=master
 
-.. |codecov| image:: https://codecov.io/github/pauliacomi/adsutils/coverage.svg?branch=master
+.. |codecov| image:: https://codecov.io/github/pauliacomi/pygaps/coverage.svg?branch=master
     :alt: Coverage Status
-    :target: https://codecov.io/github/pauliacomi/adsutils
+    :target: https://codecov.io/github/pauliacomi/pygaps
 
-.. |version| image:: https://img.shields.io/pypi/v/adsutils.svg
+.. |version| image:: https://img.shields.io/pypi/v/pygaps.svg
     :alt: PyPI Package latest release
-    :target: https://pypi.python.org/pypi/adsutils
+    :target: https://pypi.python.org/pypi/pygaps
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/adsutils/v0.1.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v0.1.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/adsutils/compare/v0.1.0...master
+    :target: https://github.com/pauliacomi/pygaps/compare/v0.1.0...master
 
-.. |wheel| image:: https://img.shields.io/pypi/wheel/adsutils.svg
+.. |wheel| image:: https://img.shields.io/pypi/wheel/pygaps.svg
     :alt: PyPI Wheel
-    :target: https://pypi.python.org/pypi/adsutils
+    :target: https://pypi.python.org/pypi/pygaps
 
-.. |supported-versions| image:: https://img.shields.io/pypi/pyversions/adsutils.svg
+.. |supported-versions| image:: https://img.shields.io/pypi/pyversions/pygaps.svg
     :alt: Supported versions
-    :target: https://pypi.python.org/pypi/adsutils
+    :target: https://pypi.python.org/pypi/pygaps
 
-.. |supported-implementations| image:: https://img.shields.io/pypi/implementation/adsutils.svg
+.. |supported-implementations| image:: https://img.shields.io/pypi/implementation/pygaps.svg
     :alt: Supported implementations
-    :target: https://pypi.python.org/pypi/adsutils
+    :target: https://pypi.python.org/pypi/pygaps
 
 
 .. end-badges
@@ -74,12 +74,12 @@ Installation
 
 ::
 
-    pip install adsutils
+    pip install pygaps
 
 Documentation
 =============
 
-https://adsutils.readthedocs.io/
+https://pygaps.readthedocs.io/
 
 Development
 ===========

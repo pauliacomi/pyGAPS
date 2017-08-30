@@ -1,4 +1,4 @@
-import adsutils.utilities as utilities
+import pygaps.utilities as utilities
 
 
 def test_matplotlib_chemformula():

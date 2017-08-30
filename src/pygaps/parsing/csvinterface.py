@@ -4,7 +4,7 @@ This module contains the csv interface for returning data such as sample names
 
 import pandas
 
-import adsutils
+import pygaps
 
 
 def samples_parser(csv_path):
@@ -15,7 +15,7 @@ def samples_parser(csv_path):
     samples = []
 
     for row in samples_dict:
-        sample = adsutils.Sample(samples_dict[row])
+        sample = pygaps.Sample(samples_dict[row])
         samples.append(sample)
 
     return samples

@@ -1,7 +1,7 @@
 # %%
 from os.path import expanduser
 
-import adsutils
+import pygaps
 
 #################################################################################
 #       Database import
@@ -20,7 +20,7 @@ criteria = {
     # 'gas':          "N2",
     # 'exp_type':     "",
 }
-isotherms = adsutils.db_get_experiments(db_path, criteria)
+isotherms = pygaps.db_get_experiments(db_path, criteria)
 sel_isotherms = isotherms
 
 #################################################################################
@@ -41,19 +41,19 @@ enthalpy_max = 60
 loading_max = None
 pressure_max = None
 
-adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
-adsutils.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='isotherm', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=True, color=True, fig_title=fig_title, legend_list=legend_list)
-adsutils.plot_iso(sel_isotherms, plot_type='enthalpy', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='enthalpy', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
-adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=False, color=True, fig_title=fig_title, legend_list=legend_list)
-adsutils.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
+pygaps.plot_iso(sel_isotherms, plot_type='iso-enth', branch=['ads'],
                   y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                   logarithmic=True, color=True, fig_title=fig_title, legend_list=legend_list)
 
@@ -85,7 +85,7 @@ def plot_individual_selected(s_isotherms, save=False, save_folder=None):
         fig_title = title
         img_title = save_folder + "\\" + iso.name + ' ' + fig_title + '.png'
 
-        adsutils.plot_iso({iso},
+        pygaps.plot_iso({iso},
                           plot_type='iso-enth',
                           branch=['ads', 'des'],
                           path=fig_title,
@@ -98,7 +98,7 @@ def plot_individual_selected(s_isotherms, save=False, save_folder=None):
         fig_title = title + " log"
         img_title = save_folder + "\\" + iso.name + ' ' + fig_title + '.png'
 
-        adsutils.plot_iso({iso}, plot_type='iso-enth', branch=['ads', 'des'], path=fig_title,
+        pygaps.plot_iso({iso}, plot_type='iso-enth', branch=['ads', 'des'], path=fig_title,
                           logarithmic=True, color=True, save=save,
                           y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                           fig_title=fig_title, legend_list=legend_list)
@@ -106,7 +106,7 @@ def plot_individual_selected(s_isotherms, save=False, save_folder=None):
         fig_title = title + " enthalpy"
         img_title = save_folder + "\\" + iso.name + ' ' + fig_title + '.png'
 
-        adsutils.plot_iso({iso}, plot_type='enthalpy', branch=['ads', 'des'], path=fig_title,
+        pygaps.plot_iso({iso}, plot_type='enthalpy', branch=['ads', 'des'], path=fig_title,
                           logarithmic=False, color=True, save=save,
                           y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                           fig_title=fig_title, legend_list=legend_list)
@@ -127,7 +127,7 @@ def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max
     fig_title = title
     img_title = save_folder + "\\" + title + ' isotherms.png'
 
-    adsutils.plot_iso(s_isotherms, plot_type='iso-enth', branch=['ads', 'des'], path=img_title,
+    pygaps.plot_iso(s_isotherms, plot_type='iso-enth', branch=['ads', 'des'], path=img_title,
                       logarithmic=False, color=True, save=save,
                       y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                       fig_title=fig_title, legend_list=legend_list, legend_bottom=True)
@@ -135,7 +135,7 @@ def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max
     fig_title = title + " log"
     img_title = save_folder + "\\" + title + ' log isotherms.png'
 
-    adsutils.plot_iso(s_isotherms, plot_type='iso-enth', branch=['ads', 'des'], path=img_title,
+    pygaps.plot_iso(s_isotherms, plot_type='iso-enth', branch=['ads', 'des'], path=img_title,
                       logarithmic=True, color=True, save=save,
                       y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=pressure_max,
                       fig_title=fig_title, legend_list=legend_list, legend_bottom=True)
@@ -143,7 +143,7 @@ def plot_all_selected(s_isotherms, save, enthalpy_max, loading_max, pressure_max
     fig_title = title + " enthalpy"
     img_title = save_folder + "\\" + title + ' enthalpy.png'
 
-    adsutils.plot_iso(s_isotherms, plot_type='enthalpy', branch=['ads', 'des'], path=img_title,
+    pygaps.plot_iso(s_isotherms, plot_type='enthalpy', branch=['ads', 'des'], path=img_title,
                       logarithmic=False, color=True, save=save,
                       y_enthmaxrange=enthalpy_max, y_adsmaxrange=loading_max, xmaxrange=loading_max,
                       fig_title=fig_title, legend_list=legend_list, legend_bottom=True)

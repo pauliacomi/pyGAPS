@@ -1,12 +1,12 @@
 # %%
 import os
 
-import adsutils
+import pygaps
 
 db_path = os.path.expanduser(
     r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
 
-isotherms = adsutils.db_get_experiments(db_path, {})
+isotherms = pygaps.db_get_experiments(db_path, {})
 
 #################################################################################
 #       Modes and units

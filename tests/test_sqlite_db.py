@@ -7,9 +7,9 @@ import sqlite3
 
 import pytest
 
-import adsutils
-from adsutils.utilities.sqlite_db_creator import db_create
-from adsutils.utilities.sqlite_db_creator import db_execute_general
+import pygaps
+from pygaps.utilities.sqlite_db_creator import db_create
+from pygaps.utilities.sqlite_db_creator import db_execute_general
 
 
 @pytest.fixture(scope='session')
@@ -37,21 +37,21 @@ class TestDatabase(object):
             'name': 'Test Machine',
             'type': 'TestType',
         }
-        adsutils.db_upload_machine_type(db_file, machine_dict["type"])
+        pygaps.db_upload_machine_type(db_file, machine_dict["type"])
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_machine_type(db_file, machine_dict["type"])
+            pygaps.db_upload_machine_type(db_file, machine_dict["type"])
 
-        adsutils.db_upload_machine(db_file, machine_dict)
+        pygaps.db_upload_machine(db_file, machine_dict)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_machine(db_file, machine_dict)
+            pygaps.db_upload_machine(db_file, machine_dict)
 
-        adsutils.db_upload_machine(db_file, machine_dict, overwrite=True)
+        pygaps.db_upload_machine(db_file, machine_dict, overwrite=True)
 
-        adsutils.db_delete_machine(db_file, machine_dict["nick"])
+        pygaps.db_delete_machine(db_file, machine_dict["nick"])
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_delete_machine(db_file, machine_dict["nick"])
+            pygaps.db_delete_machine(db_file, machine_dict["nick"])
 
-        adsutils.db_upload_machine(db_file, machine_dict)
+        pygaps.db_upload_machine(db_file, machine_dict)
 
         return
 
@@ -63,16 +63,16 @@ class TestDatabase(object):
             'email': 'test@email.com',
             'address': 'Test Address',
         }
-        adsutils.db_upload_lab(db_file, lab_dict)
+        pygaps.db_upload_lab(db_file, lab_dict)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_lab(db_file, lab_dict)
+            pygaps.db_upload_lab(db_file, lab_dict)
 
-        adsutils.db_upload_lab(db_file, lab_dict, overwrite=True)
+        pygaps.db_upload_lab(db_file, lab_dict, overwrite=True)
 
-        adsutils.db_delete_lab(db_file, lab_dict["nick"])
+        pygaps.db_delete_lab(db_file, lab_dict["nick"])
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_delete_lab(db_file, lab_dict["nick"])
-        adsutils.db_upload_lab(db_file, lab_dict)
+            pygaps.db_delete_lab(db_file, lab_dict["nick"])
+        pygaps.db_upload_lab(db_file, lab_dict)
 
         return
 
@@ -87,17 +87,17 @@ class TestDatabase(object):
             'type': 'Test Address',
             'permanent': True,
         }
-        adsutils.db_upload_contact(db_file, contact_dict)
+        pygaps.db_upload_contact(db_file, contact_dict)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_contact(db_file, contact_dict)
+            pygaps.db_upload_contact(db_file, contact_dict)
 
-        adsutils.db_upload_contact(db_file, contact_dict, overwrite=True)
+        pygaps.db_upload_contact(db_file, contact_dict, overwrite=True)
 
-        adsutils.db_delete_contact(db_file, contact_dict["nick"])
+        pygaps.db_delete_contact(db_file, contact_dict["nick"])
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_delete_contact(db_file, contact_dict["nick"])
+            pygaps.db_delete_contact(db_file, contact_dict["nick"])
 
-        adsutils.db_upload_contact(db_file, contact_dict)
+        pygaps.db_upload_contact(db_file, contact_dict)
 
         return
 
@@ -106,30 +106,30 @@ class TestDatabase(object):
 
         test_duplicate = True
         for prop in adsorbate_data["properties"]:
-            adsutils.db_upload_gas_property_type(db_file, prop, "test unit")
+            pygaps.db_upload_gas_property_type(db_file, prop, "test unit")
             if test_duplicate:
                 test_duplicate = False
                 with pytest.raises(sqlite3.IntegrityError):
-                    adsutils.db_upload_gas_property_type(
+                    pygaps.db_upload_gas_property_type(
                         db_file, prop, "test unit")
 
         # Start testing samples table
-        basic_adsorbate = adsutils.Adsorbate(adsorbate_data)
-        assert len(adsutils.db_get_gasses(db_file)) == 0
+        basic_adsorbate = pygaps.Adsorbate(adsorbate_data)
+        assert len(pygaps.db_get_gasses(db_file)) == 0
 
-        adsutils.db_upload_gas(db_file, basic_adsorbate)
+        pygaps.db_upload_gas(db_file, basic_adsorbate)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_gas(db_file, basic_adsorbate)
+            pygaps.db_upload_gas(db_file, basic_adsorbate)
 
         basic_adsorbate.formula = "New Formula"
-        adsutils.db_upload_gas(db_file, basic_adsorbate, overwrite=True)
-        assert adsutils.db_get_gasses(
+        pygaps.db_upload_gas(db_file, basic_adsorbate, overwrite=True)
+        assert pygaps.db_get_gasses(
             db_file)[0].formula == basic_adsorbate.formula
 
-        adsutils.db_delete_gas(db_file, basic_adsorbate)
+        pygaps.db_delete_gas(db_file, basic_adsorbate)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_delete_gas(db_file, basic_adsorbate)
-        adsutils.db_upload_gas(db_file, basic_adsorbate)
+            pygaps.db_delete_gas(db_file, basic_adsorbate)
+        pygaps.db_upload_gas(db_file, basic_adsorbate)
 
         return
 
@@ -137,46 +137,46 @@ class TestDatabase(object):
         "Tests functions related to samples table, then inserts a test sample"
 
         # Test sample_form table
-        adsutils.db_upload_sample_form(db_file, {'nick': sample_data['form'],
+        pygaps.db_upload_sample_form(db_file, {'nick': sample_data['form'],
                                                  'name': 'test name'})
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_sample_form(db_file, {'nick': sample_data['form'],
+            pygaps.db_upload_sample_form(db_file, {'nick': sample_data['form'],
                                                      'name': 'test name'})
 
         # Test sample_type table
-        adsutils.db_upload_sample_type(db_file, {'nick': sample_data['type'],
+        pygaps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
                                                  'name': 'test name'})
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_sample_type(db_file, {'nick': sample_data['type'],
+            pygaps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
                                                      'name': 'test name'})
 
         # Test sample_property_type table
         test_error = True
         for prop in sample_data["properties"]:
-            adsutils.db_upload_sample_property_type(db_file, prop, "test unit")
+            pygaps.db_upload_sample_property_type(db_file, prop, "test unit")
             if test_error:
                 with pytest.raises(sqlite3.IntegrityError):
                     test_error = False
-                    adsutils.db_upload_sample_property_type(
+                    pygaps.db_upload_sample_property_type(
                         db_file, prop, "test unit")
 
         # Start testing samples table
-        basic_sample = adsutils.Sample(sample_data)
-        assert len(adsutils.db_get_samples(db_file)) == 0
+        basic_sample = pygaps.Sample(sample_data)
+        assert len(pygaps.db_get_samples(db_file)) == 0
 
-        adsutils.db_upload_sample(db_file, basic_sample)
+        pygaps.db_upload_sample(db_file, basic_sample)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_sample(db_file, basic_sample)
+            pygaps.db_upload_sample(db_file, basic_sample)
 
         basic_sample.comment = 'New comment'
-        adsutils.db_upload_sample(db_file, basic_sample, overwrite=True)
-        assert adsutils.db_get_samples(
+        pygaps.db_upload_sample(db_file, basic_sample, overwrite=True)
+        assert pygaps.db_get_samples(
             db_file)[0].comment == basic_sample.comment
 
-        adsutils.db_delete_sample(db_file, basic_sample)
+        pygaps.db_delete_sample(db_file, basic_sample)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_delete_sample(db_file, basic_sample)
-        adsutils.db_upload_sample(db_file, basic_sample)
+            pygaps.db_delete_sample(db_file, basic_sample)
+        pygaps.db_upload_sample(db_file, basic_sample)
 
         return
 
@@ -186,42 +186,42 @@ class TestDatabase(object):
         isotherm = basic_pointisotherm
 
         # Test experiment_type table
-        adsutils.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
+        pygaps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
                                                      'name': 'test type'})
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
+            pygaps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
                                                          'name': 'test type'})
 
         # Test experiment_data_type table
-        adsutils.db_upload_experiment_data_type(
+        pygaps.db_upload_experiment_data_type(
             db_file, isotherm.loading_key, "test unit")
-        adsutils.db_upload_experiment_data_type(
+        pygaps.db_upload_experiment_data_type(
             db_file, isotherm.pressure_key, "test unit")
         for key in isotherm.other_keys:
-            adsutils.db_upload_experiment_data_type(
+            pygaps.db_upload_experiment_data_type(
                 db_file, key, "test unit")
 
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_experiment_data_type(
+            pygaps.db_upload_experiment_data_type(
                 db_file, isotherm.loading_key, "test unit")
 
         # Start testing experiments table
-        assert len(adsutils.db_get_experiments(db_file, {})) == 0
+        assert len(pygaps.db_get_experiments(db_file, {})) == 0
 
-        adsutils.db_upload_experiment(db_file, isotherm)
+        pygaps.db_upload_experiment(db_file, isotherm)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_upload_experiment(db_file, isotherm)
+            pygaps.db_upload_experiment(db_file, isotherm)
         replace_isotherm = copy.deepcopy(isotherm)
         replace_isotherm.comment = 'New comment'
-        adsutils.db_upload_experiment(
+        pygaps.db_upload_experiment(
             db_file, replace_isotherm, overwrite=isotherm)
-        assert adsutils.db_get_experiments(
+        assert pygaps.db_get_experiments(
             db_file, {'id': replace_isotherm.id})[0].comment == replace_isotherm.comment
 
-        adsutils.db_delete_experiment(db_file, replace_isotherm)
+        pygaps.db_delete_experiment(db_file, replace_isotherm)
         with pytest.raises(sqlite3.IntegrityError):
-            adsutils.db_delete_experiment(db_file, isotherm)
+            pygaps.db_delete_experiment(db_file, isotherm)
 
-        adsutils.db_upload_experiment(db_file, isotherm)
+        pygaps.db_upload_experiment(db_file, isotherm)
 
         return

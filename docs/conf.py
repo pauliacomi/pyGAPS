@@ -23,7 +23,7 @@ if os.getenv('SPELLCHECK'):
 
 source_suffix = '.rst'
 master_doc = 'index'
-project = 'adsutils'
+project = 'pygaps'
 year = '2017'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
@@ -32,8 +32,8 @@ version = release = '0.1.0'
 pygments_style = 'trac'
 templates_path = ['.']
 extlinks = {
-    'issue': ('https://github.com/pauliacomi/adsutils/issues/%s', '#'),
-    'pr': ('https://github.com/pauliacomi/adsutils/pull/%s', 'PR #'),
+    'issue': ('https://github.com/pauliacomi/pygaps/issues/%s', '#'),
+    'pr': ('https://github.com/pauliacomi/pygaps/pull/%s', 'PR #'),
 }
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
