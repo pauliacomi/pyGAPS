@@ -13,25 +13,43 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     """
     Calculates the pore size distribution using the Horvath-Kawazoe method
 
-    :param loading: in mmol/g
-    :param pressure: relative
-    :param temperature: in K
-    :param pore_geometry: 'sphere', 'cylinder' or 'slit'
-    :param maximum_adsorbed: the amount of adsorbate filling the micropores
-    :param adsorbate_properties: dictionary of properties for the adsorbate in the form of::
-        adsorbate_properties = dict(
-            molecular_diameter=0,           # nm
-            polarizability=0,               # m3
-            magnetic_susceptibility=0,      # m3
-            surface_density=0,              # molecules/m2
-        )
-    :param adsorbent_properties: dictionary of properties for the adsorbate in the same form
-        A list of common models can be found in .calculations.adsorbent_parameters
+    Parameters
+    ----------
+    loading : array
+        adsorbed amount in mmol/g
+    pressure : array
+        relative pressure
+    temperature : float
+        temperature of the experiment, in K
+    pore_geometry : str
+        the geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'
+    maximum_adsorbed : float
+        the amount of adsorbate filling the micropores
+    adsorbate_properties : dict
+        properties for the adsorbate in the form of::
+            adsorbate_properties = dict(
+                molecular_diameter=0,           # nm
+                polarizability=0,               # m3
+                magnetic_susceptibility=0,      # m3
+                surface_density=0,              # molecules/m2
+            )
+    adsorbent_properties : dict
+        properties for the adsorbate in the same form
+        as 'adsorbate_properties'. A list of common models
+        can be found in .calculations.adsorbent_parameters
 
-    :returns: pore widths, pore distribution
-    :rtype: arrays
+    Returns
+    -------
+    pore widths : array
+        the widths of the pore
+    pore_dist : array
+        the distributions of each width
+
+    Notes
+    -----
 
     **Description:**
+    The H-K method [1]_
 
     The assumptions made by using the H-K method are:
         - pore is uniform and of infinite extent
@@ -80,6 +98,12 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     The term :math:`T \\Delta S^{tr}(w/w_{\\infty})` is negligible such that
     The amount adsorbed in the pores is the amount at p/p0 = 0.9
+
+
+    References
+    ----------
+    .. [1] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
+    Carbon-dioxide Adsorpton Isoterms, 86
 
     """
 

@@ -2,7 +2,6 @@
 This module calculates the alpha-s based on an isotherm
 """
 
-__author__ = 'Paul A. Iacomi'
 
 import warnings
 
@@ -18,6 +17,20 @@ from .tplot import t_plot_parameters
 def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure=0.4, limits=None, verbose=False):
     """
     Calculates the external surface area and adsorbed volume using the alpha s method
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Notes
+    -----
+    [1]_
+
+    References
+    ----------
+    .. [1] D.Atkinson, A.I.McLeod, K.S.W.Sing, J.Chim.Phys., 81,791(1984)
     """
 
     # Function parameter checks

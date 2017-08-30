@@ -2,21 +2,50 @@
 This module calculates the BET surface area based on an isotherm
 """
 
-__author__ = 'Paul A. Iacomi and Bastien Aillet'
 
 import warnings
 
-import matplotlib.pyplot as plt
 import scipy.constants as constants
 import scipy.stats
 
 from ..classes.adsorbate import Adsorbate
+from ..graphing.calcgraph import bet_plot
+from ..graphing.calcgraph import roq_plot
 
 
 def area_BET(isotherm, verbose=False):
     """
     Function returns the BET surface area of an isotherm object which
     is passed to it.
+
+    Parameters
+    ----------
+    isotherm : PointIsotherm
+        The isotherm on which to calculate the BET surface area
+    verbose : bool
+        Prints extra information and graphs with the calculation
+
+    Returns
+    -------
+    result_dict : dictionary
+        A dictionary of results with the following components
+
+        - 'bet_area': bet_area,
+        - 'c_const': c_const,
+        - 'n_monolayer': n_monolayer,
+        - 'p_monolayer': p_monolayer,
+        - 'bet_slope': slope,
+        - 'bet_intercept': intercept,
+        - 'corr_coef': corr_coef,
+
+    Notes
+    -----
+    The BET theory [1]_ is
+
+    References
+    ----------
+    .. [1] “Adsorption of Gases in Multimolecular Layers”, Stephen Brunauer,
+    P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
     """
     # Checks
     if isotherm.mode_adsorbent != "mass":
@@ -47,7 +76,6 @@ def area_BET(isotherm, verbose=False):
         'corr_coef': corr_coef,
     }
 
-    # PLOTTING
     if verbose:
 
         print("The slope of the BET line: s =", round(slope, 3))
@@ -63,13 +91,15 @@ def area_BET(isotherm, verbose=False):
         bet_plot(pressure,
                  bet_transform(loading, pressure),
                  minimum, maximum,
-                 p_monolayer, n_monolayer)
+                 p_monolayer, n_monolayer,
+                 roq_transform(n_monolayer, p_monolayer))
 
         # Generate plot of the Roquerol points chosen
         roq_plot(pressure,
                  roq_transform(loading, pressure),
                  minimum, maximum,
-                 p_monolayer, n_monolayer)
+                 p_monolayer, n_monolayer,
+                 bet_transform(n_monolayer, p_monolayer))
 
     return result_dict
 
@@ -78,13 +108,36 @@ def area_BET_raw(loading, pressure, cross_section):
     """
     Raw function to calculate BET area
 
-    :param pressure: array of pressures, relative
-    :param loading: array of loadings, in mol/g
-    :param cross_section: adsorbed cross-section of the molecule of the
-        adsorbate, in nm
+    Parameters
+    ----------
+    loading : array
+        loadings, in mol/g
+    pressure : array
+        pressures, relative
+    cross_section : float
+        adsorbed cross-section of the molecule of the adsorbate, in nm
 
-    :returns:
-    :rtype: dict
+    Returns
+    -------
+    bet_area : float
+        calculated BET surface area
+    c_const : float
+        C constant from the BET equation
+    n_monolayer : float
+        adsorbed quantity in the statistical monolayer
+    p_monolayer : float
+        pressure at the statistical monolayer
+    slope : float
+        calculated slope of the BET plot
+    intercept : float
+        calculated intercept of the BET plot
+    minimum : float
+        miminum loading of the point taken for the linear region
+    maximum : float
+        maximum loading of the point taken for the linear region
+    corr_coef : float
+        correlation coefficient of the straight line in the BET plot
+
     """
     if len(pressure) != len(loading):
         raise Exception("The length of the pressure and loading arrays"
@@ -153,40 +206,3 @@ def bet_parameters(slope, intercept, cross_section):
     p_monolayer = 1 / (scipy.sqrt(c_const) + 1)
     bet_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
     return n_monolayer, p_monolayer, c_const, bet_area
-
-
-def roq_plot(pressure, roq_points, minimum, maximum, p_monolayer, n_monolayer):
-    """Draws the roquerol plot"""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(pressure, roq_points,
-             marker='', color='g', label='all points')
-    ax1.plot(pressure[minimum:maximum], roq_points[minimum:maximum],
-             marker='o', linestyle='', color='r', label='chosen points')
-    ax1.plot(p_monolayer, roq_transform(n_monolayer, p_monolayer),
-             marker='x', linestyle='', color='black', label='monolayer point')
-    ax1.set_title("Roquerol plot")
-    ax1.set_xlabel('p/p°')
-    ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
-    ax1.legend(loc='best')
-    plt.show()
-
-
-def bet_plot(pressure, bet_points, minimum, maximum, p_monolayer, n_monolayer):
-    """Draws the bet plot"""
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(pressure, bet_points,
-             marker='', color='g', label='all points')
-    ax1.plot(pressure[minimum:maximum], bet_points[minimum:maximum],
-             marker='o', linestyle='', color='r', label='chosen points')
-    ax1.plot(p_monolayer, bet_transform(n_monolayer, p_monolayer),
-             marker='x', linestyle='', color='black', label='monolayer point')
-    ax1.set_ylim(ymin=0, ymax=bet_points[maximum] * 1.2)
-    ax1.set_xlim(
-        xmin=0, xmax=pressure[maximum] * 1.2)
-    ax1.set_title("BET plot")
-    ax1.set_xlabel('p/p°')
-    ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
-    ax1.legend(loc='best')
-    plt.show()

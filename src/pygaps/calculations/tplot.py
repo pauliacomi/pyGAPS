@@ -20,6 +20,21 @@ from .thickness_models import thickness_harkins_jura
 def t_plot(isotherm, thickness_model, limits=None, verbose=False):
     """
     Calculates the external surface area and adsorbed volume using the t-plot method
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    Notes
+    -----
+    [1]_
+
+    References
+    ----------
+    .. [1] “Studies on Pore Systems in Catalysts V. The t Method”,
+    B. C. Lippens and J. H. de Boer, J. Catalysis, 4, 319 (1965)
     """
 
     # Function parameter checks

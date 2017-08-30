@@ -42,7 +42,7 @@ def psd_bjh(loading, pressure, pore_geometry,
     -----
     **Description:**
 
-    The BJH or Barrett, Joyner and Halenda method for calculation of pore size distribution
+    The BJH or Barrett, Joyner and Halenda [1]_ method for calculation of pore size distribution
     is based on a classical description of the adsorbate behaviour in the adsorbent pores.
     Under this method, the adsorbate is adsorbing on the pore walls in a predictable way,
     and decreasing the apparent pore volume until condensation takes place, filling the
@@ -65,6 +65,11 @@ def psd_bjh(loading, pressure, pore_geometry,
         - only pore sized upwards of 2.5 nm can be considered accurately predicted
         - the pores are considered open-ended and non-intersecting
 
+    References
+    ----------
+    .. [1] “The Determination of Pore Volume and Area Distributions in Porous Substances.
+    I. Computations from Nitrogen Isotherms”, Elliott P. Barrett, Leslie G. Joyner and
+    Paul P. Halenda, J. Amer. Chem. Soc., 73, 373 (1951)
     """
     # Paramter checks
     if len(pressure) != len(loading):
@@ -158,7 +163,7 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     -----
     **Description:**
 
-    The DH or Dollimore-Heal method of calculation of pore size distribution is an
+    The DH or Dollimore-Heal method [1]_ of calculation of pore size distribution is an
     extension of the BJH method, which takes into account the geometry of the pores
     by introducing a length component.
 
@@ -185,6 +190,10 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
         - only pore sized upwards of 2.5 nm can be considered accurately predicted
         - the pores are considered open-ended and non-intersecting
 
+    References
+    ----------
+    .. [1] D. Dollimore and G. R. Heal, J. Applied Chem. 14, 109 (1964);
+    J. Colloid Interfasce Sci. 33, 508 (1970)
     """
     # Checks
     if len(pressure) != len(loading):
