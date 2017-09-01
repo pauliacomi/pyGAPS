@@ -2,7 +2,6 @@
 This module calculates the BET surface area based on an isotherm
 """
 
-
 import warnings
 
 import scipy.constants as constants
@@ -21,31 +20,93 @@ def area_BET(isotherm, verbose=False):
     Parameters
     ----------
     isotherm : PointIsotherm
-        The isotherm on which to calculate the BET surface area
+        The isotherm of which to calculate the BET surface area
     verbose : bool
-        Prints extra information and graphs with the calculation
+        Prints extra information and plots graphs of the calculation
 
     Returns
     -------
-    result_dict : dictionary
+    result_dict : dict
         A dictionary of results with the following components
 
-        - 'bet_area': bet_area,
-        - 'c_const': c_const,
-        - 'n_monolayer': n_monolayer,
-        - 'p_monolayer': p_monolayer,
-        - 'bet_slope': slope,
-        - 'bet_intercept': intercept,
-        - 'corr_coef': corr_coef,
+        - ``bet_area``: calculated BET surface area
+        - ``c_const``: the C constant in the BET equation
+        - ``n_monolayer``: the amount adsorbed at the statistical monolayer location
+        - ``p_monolayer``: the pressure at which the statistical monolayer is chosen
+        - ``bet_slope``: slope of the BET plot
+        - ``bet_intercept``: intercept of the BET plot
+        - ``corr_coef``: correlation coefficient of the linear region in the BET plot
 
     Notes
     -----
-    The BET theory [1]_ is
+    *Description:*
+
+    The BET surface area [#]_ is one of the first standardised methods to calculate the
+    surface area of a porous material. It is generally applied on isotherms obtained
+    through N2 adsorption at 77K, although other adsorbates (Ar, Kr) have been used.
+
+    It assumes that the adsorption happens on the surface of the material in
+    incremental layersm according to the BET theory. Even if the adsorbent is porous,
+    the initial amount adsorbed (usually between 0.05 - 0.4 :math:`p/p_0`) can be
+    modelled through the BET equation:
+
+    .. math::
+
+        \\frac{p/p_0}{n_{ads} (1-p/p_0)} = \\frac{1}{n_{m} C} + \\frac{C - 1}{n_{m} C}(p/p_0)
+
+    Therefore, if we plot the isotherm points as :math:`\\frac{p/p_0}{n_{ads}(1-p/p_0)}` versus
+    :math:`p/p_0`, a linear region can usually be found. The slope and intercept of this line
+    can then be used to calculate :math:`n_{m}`, the amount adsorbed at the statistical
+    monolayer, as well as C, the BET constant.
+
+    .. math::
+
+        n_{m} = \\frac{1}{s+i}
+
+        C = \\frac{s}{i} + 1
+
+    The surface area can then be calculated by using the moles adsorbed at the statistical
+    monolayer. If the specific area taken by one of the adsorbate molecules on the surface
+    is known, it is inserted in the following equation together with Avogadro's number:
+
+    .. math::
+
+        a(BET) = n_m A_N \\sigma
+
+
+    *Limitations:*
+
+    While a standard for surface area determinations, the BET area should be used with care,
+    as there are many assumptions made in the calculation. To augment the validity of the BET
+    method, Roquerol [#]_ proposed several checks to ensure that the BET region selected is valid
+
+        * The BET constant (C) obtained should be positive
+        * In the corresponding Roquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
+          with respect to :math:`p/p_0`, the points chosen for BET analysis should be
+          strictly increasing
+        * The loading at the statistical monolayer should be situated within the
+          limits of the BET region
+
+    This module implements all these checks.
+
+    With all the checks, the BET surface area should still be interpreted carefully. The following
+    assumptions should are implicitly made in this approach:
+
+        * Adsorption takes place on the pore surface. Microporous materials which have pores
+          in similar size as the molecule adsorbed cannot have a realistic surface area
+        * The cross-sectional area of the molecule on the surface cannot be guaranteed
+          For example, nitrogen has been know to adopt a different conformation on the
+          surface of some materials, due to inter-molecular forces, which effectively
+          lowers its cross-sectional area.
+        * No account is made for adsorbate-adsorbent interaction in BET theory
 
     References
     ----------
-    .. [1] “Adsorption of Gases in Multimolecular Layers”, Stephen Brunauer,
-    P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
+    .. [#] “Adsorption of Gases in Multimolecular Layers”, Stephen Brunauer,
+       P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
+    .. [#] "Adsorption by Powders & Porous Solids", F. Roquerol, J Roquerol
+       and K. Sing, Academic Press, 1999
+
     """
     # Checks
     if isotherm.mode_adsorbent != "mass":
@@ -63,7 +124,8 @@ def area_BET(isotherm, verbose=False):
     pressure = isotherm.pressure_ads()
 
     # use the bet function
-    bet_area, c_const, n_monolayer, p_monolayer, slope, intercept, minimum, maximum, corr_coef = area_BET_raw(
+    (bet_area, c_const, n_monolayer, p_monolayer, slope,
+     intercept, minimum, maximum, corr_coef) = area_BET_raw(
         loading, pressure, cross_section)
 
     result_dict = {
@@ -106,7 +168,9 @@ def area_BET(isotherm, verbose=False):
 
 def area_BET_raw(loading, pressure, cross_section):
     """
-    Raw function to calculate BET area
+    This is a 'bare-bones' function to calculate BET surface area which is
+    designed as a low-level alternative to the main function.
+    Designed for advanced use, its parameters have to be manually specified.
 
     Parameters
     ----------
@@ -178,7 +242,8 @@ def area_BET_raw(loading, pressure, cross_section):
     if (loading[minimum] > n_monolayer) or (loading[maximum] < n_monolayer):
         warnings.warn("The monolayer point is not within the BET region")
 
-    return bet_area, c_const, n_monolayer, p_monolayer, slope, intercept, minimum, maximum, corr_coef
+    return (bet_area, c_const, n_monolayer, p_monolayer,
+            slope, intercept, minimum, maximum, corr_coef)
 
 
 def roq_transform(loading, pressure):

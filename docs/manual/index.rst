@@ -1,0 +1,7 @@
+Manual
+======
+
+.. toctree::
+    :glob:
+
+    manual

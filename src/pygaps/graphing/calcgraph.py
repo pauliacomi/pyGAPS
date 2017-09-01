@@ -43,6 +43,41 @@ def bet_plot(pressure, bet_points, minimum, maximum, p_monolayer, n_monolayer, b
     plt.show()
 
 
+def plot_tp(fig, thickness_curve, loading, results, alpha_s=False):
+    """Draws the t-plot"""
+    ax1 = fig.add_subplot(111)
+    if alpha_s:
+        label1 = 'alpha s'
+        label2 = 'alpha s (V/V_0.4)'
+    else:
+        label1 = 't transform'
+        label2 = 'layer thickness (nm)'
+    ax1.plot(thickness_curve, loading,
+             marker='', color='g', label=label1)
+
+    for result in results:
+        # plot chosen points
+        ax1.plot(thickness_curve[result.get('section')], loading[result.get('section')],
+                 marker='.', linestyle='')
+
+        # plot line
+        min_lim = 0
+        max_lim = max(thickness_curve[result.get('section')]) * 1.2
+        x_lim = [min_lim, max_lim]
+        y_lim = [result.get('slope') * min_lim + result.get('intercept'),
+                 result.get('slope') * max_lim + result.get('intercept')]
+
+        ax1.plot(x_lim, y_lim, linestyle='--', color='black')
+
+    ax1.set_title("t-plot")
+    ax1.set_xlim(xmin=0)
+    ax1.set_ylim(ymin=0)
+    ax1.set_xlabel(label2)
+    ax1.set_ylabel('amount adsorbed (mmol/g)')
+    ax1.legend(loc='best')
+    plt.show()
+
+
 def psd_plot(pore_radii, pore_dist, log=True, xmax=None):
     """Draws the pore size distribution plot"""
     fig = plt.figure()

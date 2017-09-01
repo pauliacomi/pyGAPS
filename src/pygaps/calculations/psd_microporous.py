@@ -27,12 +27,14 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         the amount of adsorbate filling the micropores
     adsorbate_properties : dict
         properties for the adsorbate in the form of::
+
             adsorbate_properties = dict(
                 molecular_diameter=0,           # nm
                 polarizability=0,               # m3
                 magnetic_susceptibility=0,      # m3
                 surface_density=0,              # molecules/m2
             )
+
     adsorbent_properties : dict
         properties for the adsorbate in the same form
         as 'adsorbate_properties'. A list of common models
@@ -49,7 +51,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     -----
 
     **Description:**
-    The H-K method [1]_
+    The H-K method [#]_
 
     The assumptions made by using the H-K method are:
         - pore is uniform and of infinite extent
@@ -80,12 +82,14 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     * :math:`N_A` -- avogadro's number
     * :math:`n_a` -- number of molecules of adsorbent
     * :math:`A_a` -- the Lennard-Jones potential constant of the adsorbent molecule defined as
-    .. math::
-        A_a = \\frac{6mc^2\\alpha_a\\alpha_A}{\\alpha_a/\\varkappa_a + \\alpha_A/\\varkappa_A}
+
+        .. math::
+            A_a = \\frac{6mc^2\\alpha_a\\alpha_A}{\\alpha_a/\\varkappa_a + \\alpha_A/\\varkappa_A}
 
     * :math:`A_A` -- the Lennard-Jones potential constant of the adsorbate molecule defined as
-    .. math::
-        A_a = \\frac{3mc^2\\alpha_A\\varkappa_A}{2}
+
+        .. math::
+            A_a = \\frac{3mc^2\\alpha_A\\varkappa_A}{2}
 
     * :math:`m` -- mass of an electron
     * :math:`c` -- speed of light in vacuum
@@ -102,8 +106,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     References
     ----------
-    .. [1] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
-    Carbon-dioxide Adsorpton Isoterms, 86
+    .. [#] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
+       Carbon-dioxide Adsorpton Isoterms, 86
 
     """
 

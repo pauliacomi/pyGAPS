@@ -7,7 +7,8 @@ Contents
 
    readme
    installation
-   usage
+   quickstart
+   manual/index
    reference/index
    contributing
    authors

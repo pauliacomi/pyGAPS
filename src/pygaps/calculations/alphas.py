@@ -8,6 +8,7 @@ import warnings
 import matplotlib.pyplot as plt
 
 from ..classes.adsorbate import Adsorbate
+from ..graphing.calcgraph import plot_tp
 from .bet import area_BET
 from .tplot import find_linear_sections
 from .tplot import plot_tp
@@ -20,17 +21,32 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
 
     Parameters
     ----------
+    isotherm : PointIsotherm
+        the isotherm of which to calculate the alpha-s plot parameters
+    reference_isotherm : PointIsotherm
+        the isotherm to use as reference
+    reference_area : str, optional
+        area of the reference material
+        if not specified, the BET method is used to calculate it
+    reducing_pressure : float, optional
+        p/p0 value at which the loading is reduced
+        default is 0.4 as it is the closing point for the nitrogen
+        hysteresis loop
+    limits : [:obj:`float`, :obj:`float`], optional
+        manual limits for region selection
+    verbose : bool, optional
+        prints extra information and plots graphs of the calculation
 
     Returns
     -------
 
     Notes
     -----
-    [1]_
+    [#]_
 
     References
     ----------
-    .. [1] D.Atkinson, A.I.McLeod, K.S.W.Sing, J.Chim.Phys., 81,791(1984)
+    .. [#] D.Atkinson, A.I.McLeod, K.S.W.Sing, J.Chim.Phys., 81,791(1984)
     """
 
     # Function parameter checks

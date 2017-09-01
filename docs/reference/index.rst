@@ -1,7 +1,15 @@
+.. testsetup::
+
+    from pygaps import *
+
 Reference
 =========
 
 .. toctree::
     :glob:
 
-    pygaps*
+    classes
+    calculations
+    interfaces
+    plotting
+    utilities

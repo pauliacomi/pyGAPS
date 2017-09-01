@@ -12,29 +12,46 @@ import numpy
 import scipy
 
 from ..classes.adsorbate import Adsorbate
+from ..graphing.calcgraph import plot_tp
 from .thickness_models import _THICKNESS_MODELS
 from .thickness_models import thickness_halsey
 from .thickness_models import thickness_harkins_jura
 
 
-def t_plot(isotherm, thickness_model, limits=None, verbose=False):
+def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=False):
     """
     Calculates the external surface area and adsorbed volume using the t-plot method
 
     Parameters
     ----------
+    isotherm : PointIsotherm
+        the isotherm of which to calculate the t-plot parameters
+    thickness_model : str
+        name of the thickness model to use
+    custom_model : bool, optional
+        if true, permits a custom thickness model to be supplied,
+        starting from an isotherm or a custom thickness function
+    limits : [:obj:`float`, :obj:`float`], optional
+        manual limits for region selection
+    verbose : bool, optional
+        prints extra information and plots graphs of the calculation
 
     Returns
     -------
 
     Notes
     -----
-    [1]_
+    **Description:**
+
+    The t-plot method [#]_
+
+    **Limitations:**
 
     References
     ----------
-    .. [1] “Studies on Pore Systems in Catalysts V. The t Method”,
-    B. C. Lippens and J. H. de Boer, J. Catalysis, 4, 319 (1965)
+    .. [#] “Studies on Pore Systems in Catalysts V. The t Method”,
+       B. C. Lippens and J. H. de Boer, J. Catalysis, 4, 319 (1965)
+
     """
 
     # Function parameter checks
@@ -61,10 +78,11 @@ def t_plot(isotherm, thickness_model, limits=None, verbose=False):
     pressure = isotherm.pressure_ads()
 
     # Thickness model definitions
-    if thickness_model == "Halsey":
-        t_model = thickness_halsey
-    elif thickness_model == "Harkins/Jura":
-        t_model = thickness_harkins_jura
+    if not custom_model:
+        if thickness_model == "Halsey":
+            t_model = thickness_halsey
+        elif thickness_model == "Harkins/Jura":
+            t_model = thickness_harkins_jura
 
     # Call t-plot function
     results, t_curve = t_plot_raw(
@@ -99,13 +117,38 @@ def t_plot(isotherm, thickness_model, limits=None, verbose=False):
 
 def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_molar_mass, limits=None):
     """
-    Calculates the external surface area and adsorbed volume using the t-plot method
+    This is a 'bare-bones' function to calculate t-plot parameters which is
+    designed as a low-level alternative to the main function.
+    Designed for advanced use, its parameters have to be manually specified.
 
-    loading: in mol/g
-    pressure: relative
-    thickness_model: a callable which returns the thickenss of the adsorbed layer at a pressure p
-    liquid_density: density of the adsorbate in the adsorbed state, in g/cm3
-    adsorbate_molar_mass: in g/mol
+    Parameters
+    ----------
+    loading : array
+        in mol/g
+    pressure : array
+        relative
+    thickness_model : callable
+        function which which returns the thickenss of the adsorbed layer at a pressure p
+    liquid_density : float
+        density of the adsorbate in the adsorbed state, in g/cm3
+    adsorbate_molar_mass : float
+        molar mass of the adsorbate, in g/mol
+
+    Returns
+    -------
+    results : dict
+        A dictionary of results with the following components
+
+        - ``section`` : section
+        - ``area`` : calculated surface area
+        - ``adsorbed_volume`` : the amount adsorbed
+        - ``slope`` : slope of the region
+        - ``intercept`` : intercept of the region
+        - ``corr_coef`` : correlation coefficient of the linear region in the BET plot
+
+    thickness_curve : array
+        The generated thickness curve at each point using the thickness model
+
     """
 
     if len(pressure) != len(loading):
@@ -146,7 +189,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
 
 
 def find_linear_sections(loading):
-
+    """Finds all sections of the t-plot which are linear"""
     linear_sections = []
 
     # To do this we calculate the second
@@ -194,38 +237,3 @@ def t_plot_parameters(thickness_curve, section, loading, molar_mass, liquid_dens
 
         return result_dict
     return
-
-
-def plot_tp(fig, thickness_curve, loading, results, alpha_s=False):
-    """Draws the t-plot"""
-    ax1 = fig.add_subplot(111)
-    if alpha_s:
-        label1 = 'alpha s'
-        label2 = 'alpha s (V/V_0.4)'
-    else:
-        label1 = 't transform'
-        label2 = 'layer thickness (nm)'
-    ax1.plot(thickness_curve, loading,
-             marker='', color='g', label=label1)
-
-    for result in results:
-        # plot chosen points
-        ax1.plot(thickness_curve[result.get('section')], loading[result.get('section')],
-                 marker='.', linestyle='')
-
-        # plot line
-        min_lim = 0
-        max_lim = max(thickness_curve[result.get('section')]) * 1.2
-        x_lim = [min_lim, max_lim]
-        y_lim = [result.get('slope') * min_lim + result.get('intercept'),
-                 result.get('slope') * max_lim + result.get('intercept')]
-
-        ax1.plot(x_lim, y_lim, linestyle='--', color='black')
-
-    ax1.set_title("t-plot")
-    ax1.set_xlim(xmin=0)
-    ax1.set_ylim(ymin=0)
-    ax1.set_xlabel(label2)
-    ax1.set_ylabel('amount adsorbed (mmol/g)')
-    ax1.legend(loc='best')
-    plt.show()
