@@ -200,7 +200,7 @@ class Isotherm(object):
             't_exp': self.t_exp,
             'gas': self.gas,
 
-            'date': self.date,
+            'date': str(self.date),
             't_act': self.t_act,
             'lab': self.lab,
             'comment': self.comment,

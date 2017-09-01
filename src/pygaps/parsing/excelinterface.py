@@ -61,25 +61,26 @@ def isotherm_from_xl(path):
 
     sample_info['comment'] = sht.range('E2').value
 
+    loading_key = "loading"
+    pressure_key = "pressure"
+    other_keys = []
+
     if sample_info["exp_type"] == "Isotherme":
         experiment_data_arr = sht.range('A31').options(
             numpy.array, expand='table').value
-        columns = ["pressure", "loading"]
+        columns = [pressure_key, loading_key]
     elif sample_info["exp_type"] == "Calorimetrie":
         experiment_data_arr = sht.range('A41').options(
             numpy.array, expand='table').value
-        columns = ["pressure", "loading", "enthalpy"]
+        other_key = "enthalpy"
+        other_keys.append(other_key)
+        columns = [pressure_key, loading_key, other_key]
     else:
         raise Exception("Unknown data type")
 
     experiment_data_df = pandas.DataFrame(experiment_data_arr, columns=columns)
 
     xlwings.apps[0].quit()
-
-    loading_key = "loading"
-    pressure_key = "pressure"
-    other_key = "enthalpy"
-    other_keys = [other_key]
 
     isotherm = PointIsotherm(
         experiment_data_df,

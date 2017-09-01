@@ -25,31 +25,31 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
 
     Parameters
     ----------
-    isotherms: list
+    isotherms : list
         an iterable of the isotherms to be plotted
-    plot_type: str
+    plot_type : str
         the plot type, isotherm/enthalpies or combination
-    branch: str
+    branch : str
         list with branches to disply, options: 'ads', 'des'
-    logarithmic: bool
+    logarithmic : bool
         whether the graph should be logarithmic in the x axis
-    color: bool
+    color : bool
         whether the graph should be coloured or grayscale
-    xmaxrange: float
+    xmaxrange : float
         maximum range for pressure on x axis
-    y_adsmaxrange: float
+    y_adsmaxrange : float
         maximum range for loading on y axis
-    y_enthmaxrange: float
+    y_enthmaxrange : float
         maximum range for enthalpy on y axis
-    legend_list: iterable
+    legend_list : iterable
         the components of the legend which are displayed
-    fig_title: str
+    fig_title : str
         title of the graph
-    legend_bottom: bool
+    legend_bottom : bool
         whether the legend should be at the bottom or at the side
-    save: bool
+    save : bool
         whether to save the graph
-    path: str
+    path : str
         the path where the graph will be saved
 
     Returns
@@ -331,7 +331,8 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
                 max_y1 = max(max_y1, lmax_y1)
                 max_y2 = max(max_y2, lmax_y2)
                 del styles['line_style']['mfc']
-                del styles['line_style']['c']
+                if color is not None:
+                    del styles['line_style']['c']
 
     # Convert the exes into logarithmic if required
     if not logarithmic:
