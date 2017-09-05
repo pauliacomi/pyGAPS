@@ -1,7 +1,6 @@
 """
-This module calculates the alpha-s based on an isotherm
+This module contains the alpha-s calculation
 """
-
 
 import warnings
 
@@ -11,7 +10,6 @@ from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
 from .bet import area_BET
 from .tplot import find_linear_sections
-from .tplot import plot_tp
 from .tplot import t_plot_parameters
 
 
@@ -39,10 +37,63 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
 
     Returns
     -------
+    list
+        a list of dictionaries containing the calculated parameters for each
+        straight section, with each dictionary of the form:
 
+            - ``section``(array): the points of the plot chosen for the line
+            - ``area``(float) : calculated surface area, from the section parameters
+            - ``adsorbed_volume``(float) : the amount adsorbed in the pores as calculated
+                per section
+            - ``slope``(float) : slope of the straight trendline fixed through the region
+            - ``intercept``(float) : intercept of the straight trendline through the region
+            - ``corr_coef``(float) : correlation coefficient of the linear region
     Notes
     -----
-    [#]_
+    *Usage*
+
+    Pass an isotherm object to the function to have the alpha-s method applied to it.
+    The ``reference_isotherm`` parameter is an Isotherm class which will form the
+    x-axis of the alpha-s method.
+    The ``limits`` parameter takes the form of an array of two numbers, which are the
+    upper and lower limits of the section which should be taken for analysis.
+
+    *Description*
+
+    In order to extend the t-plot analysis with other adsorbents and non-standard
+    thickness curves, the :math:`\\alpha_s` method was devised [#]_. Instead of
+    a formula that describes the thickness of the adsorbed layer, a reference
+    isotherm is used. This isotherm is measured on a non-porous version of the
+    material with the same surface characteristics and with the same adsorbate.
+    The :math:`\\alpha_s` values are obtained from this isotherm by regularisation with
+    an adsorption amount at a specific relative pressure, usually taken as 0.4 since
+    nitrogen hysterisis loops theoretically close at this value
+
+    .. math::
+
+        \\alpha_s = \\frac{n_a}{n_{0.4}}
+
+    The analysis then proceeds as in the t-plot method.
+
+    The slope of the linear section can be used to calculate the area where the adsorption
+    is taking place. If it is of a linear region at the start of the curve, it will represent
+    the total surface area of the material. If at the end of the curve, it will instead
+    represent external surface area of the sample.
+    The calculation uses the known area of the reference material. If unknown, the area
+    will be calculated here using the BET method.
+
+    .. math::
+
+        A = \\frac{s A_{ref}}{(n_{ref})_{0.4}}
+
+    If the region selected is after a vertical deviation, the intercept of the line
+    will no longer pass through the origin. This intercept be used to calculate the
+    pore volume through the following equation:
+
+    .. math::
+
+        V_{ads} = \\frac{i M_m}{\\rho_{l}}
+
 
     References
     ----------

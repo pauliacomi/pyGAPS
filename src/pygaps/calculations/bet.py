@@ -1,5 +1,5 @@
 """
-This module calculates the BET surface area based on an isotherm
+This module contains BET surface area calculations
 """
 
 import warnings
@@ -29,16 +29,23 @@ def area_BET(isotherm, verbose=False):
     result_dict : dict
         A dictionary of results with the following components
 
-        - ``bet_area``: calculated BET surface area
-        - ``c_const``: the C constant in the BET equation
-        - ``n_monolayer``: the amount adsorbed at the statistical monolayer location
-        - ``p_monolayer``: the pressure at which the statistical monolayer is chosen
-        - ``bet_slope``: slope of the BET plot
-        - ``bet_intercept``: intercept of the BET plot
-        - ``corr_coef``: correlation coefficient of the linear region in the BET plot
+        - ``bet_area``(float) : calculated BET surface area
+        - ``c_const``(float) : the C constant in the BET equation
+        - ``n_monolayer``(float) : the amount adsorbed at the statistical monolayer location
+        - ``p_monolayer``(float) : the pressure at which the statistical monolayer is chosen
+        - ``bet_slope``(float) : slope of the BET plot
+        - ``bet_intercept``(float) : intercept of the BET plot
+        - ``corr_coef``(float) : correlation coefficient of the linear region in the BET plot
 
     Notes
     -----
+    *Usage*
+
+    Pass an isotherm object to the function to have the BET method applied to it. Since
+    the function automatically takes the properties of the adsorbate from the master
+    list, ensure that it contains all the adsorbates which were used in the isotherms,
+    together with the properties required.
+
     *Description:*
 
     The BET surface area [#]_ is one of the first standardised methods to calculate the
@@ -247,24 +254,24 @@ def area_BET_raw(loading, pressure, cross_section):
 
 
 def roq_transform(loading, pressure):
-    "Roquerol transform function"
+    """Roquerol transform function"""
     return loading * (1 - pressure)
 
 
 def bet_transform(loading, pressure):
-    "BET transform function"
+    """BET transform function"""
     return pressure / roq_transform(loading, pressure)
 
 
 def bet_optimisation(pressure, bet_points):
-    "Finds the slope and intercept of the BET region"
+    """Finds the slope and intercept of the BET region"""
     slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
         pressure, bet_points)
     return slope, intercept, corr_coef
 
 
 def bet_parameters(slope, intercept, cross_section):
-    "Calculates the BET parameters from the slope and intercept"
+    """Calculates the BET parameters from the slope and intercept"""
 
     c_const = (slope / intercept) + 1
     n_monolayer = 1 / (intercept * c_const)
