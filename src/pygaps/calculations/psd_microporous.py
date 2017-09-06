@@ -29,10 +29,10 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         properties for the adsorbate in the form of::
 
             adsorbate_properties = dict(
-                molecular_diameter=0,           # nm
-                polarizability=0,               # m3
-                magnetic_susceptibility=0,      # m3
-                surface_density=0,              # molecules/m2
+                'molecular_diameter'=0,           # nm
+                'polarizability'=0,               # m3
+                'magnetic_susceptibility'=0,      # m3
+                'surface_density'=0,              # molecules/m2
             )
 
     adsorbent_properties : dict

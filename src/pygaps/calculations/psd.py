@@ -30,6 +30,8 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
     """
     Calculates the pore size distribution using a 'classical' model, applicable to mesopores
 
+    To use, specify the psd model in the function argument, then pass other
+
     Parameters
     ----------
     isotherm : Isotherm
@@ -43,11 +45,17 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
     model_parameters : dict
         a dictionary to override specific settings for each model
 
+    Other Parameters
+    ----------------
+
     Returns
     -------
     result_dict : dict
-        A dictionary with the following form
+        A dictionary with the pore widths and the pore distributions, of the form:
 
+            - ``pore_widths(array)`` : the widths of the pores
+            - ``pore_distribution(array)`` : contribution of each pore width to the
+              overall pore distribution
 
     Notes
     -----
@@ -60,8 +68,26 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
         - the BJH or Barrett, Joyner and Halenda method
         - the DH or Dollimore-Heal method, an extension of the BJH method
 
-    A common gotcha of data processing is: "garbage in = garbage out". Only use methods
+    A common mantra of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
+
+    According to Roquerol [#]_, in adopting this approach, it is assumed that:
+
+        - The Kelvin equation is applicable over the pore range (mesopores). Therefore
+          in pores which are below a certain size (around 2.5 nm), the granularity
+          of the liquid-vapour interface becomes too large for classical bulk methods
+          to be applied.
+        - The meniscus curvature is controlled be the pore size and shape. Ideal shapes
+          for the curvature are assumed.
+        - The pores are rigid and of well defined shape. They are considered
+          open-ended and non-intersecting
+        - The filling/emptying of each pore does not depend on its location.
+        - The adsorption on the pore walls is not different from surface adsorption.
+
+    See Also
+    --------
+    psd_bjh : the BJH or Barrett, Joyner and Halenda method
+    psd_dollimore_heal : the DH or Dollimore-Heal method
 
     """
 
@@ -175,7 +201,11 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
     Returns
     -------
     result_dict : dict
-        A dictionary with the following form
+        A dictionary with the pore widths and the pore distributions, of the form:
+
+            - ``pore_widths(array)`` : the widths of the pores
+            - ``pore_distribution(array)`` : contribution of each pore width to the
+              overall pore distribution
 
     Notes
     -----
@@ -187,10 +217,14 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
 
     Currently, the methods provided are:
 
-        - the HL, of Horvath-Kawazoe method
+        - the HK, of Horvath-Kawazoe method
 
     A common gotcha of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
+
+    See Also
+    --------
+    psd_microporous.psd_horvath_kawazoe : the HK, of Horvath-Kawazoe method
 
     """
 
@@ -258,7 +292,23 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
 
 
 def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_parameters):
+    """
 
+    Paramters
+    ---------
+    isotherm : PointIsotherm
+        the isotherm to calculate the pore size distribution
+    kernel_
+
+    Returns
+    -------
+    result_dict : dict
+        A dictionary with the pore widths and the pore distributions, of the form:
+
+            - ``pore_widths(array)`` : the widths of the pores
+            - ``pore_distribution(array)`` : contribution of each pore width to the
+              overall pore distribution
+    """
     # Read data in
     loading = isotherm.loading_ads(unit='mmol')
     pressure = isotherm.pressure_ads()

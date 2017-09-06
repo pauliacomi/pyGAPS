@@ -6,10 +6,11 @@ Reference
 =========
 
 .. toctree::
-    :glob:
+   :maxdepth: 3
+   :glob:
 
-    classes
-    calculations
-    interfaces
-    plotting
-    utilities
+   classes
+   calculations
+   interfaces
+   plotting
+   utilities

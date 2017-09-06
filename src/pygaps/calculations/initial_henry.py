@@ -2,7 +2,6 @@
 This module calculates the initial henry constant based on an isotherm
 """
 
-__author__ = 'Paul A. Iacomi'
 
 # import copy
 

@@ -24,7 +24,7 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
     partial_pressures : array or list
         partial pressures of gas components,
         e.g. [5.0, 10.0] (bar)
-    isotherms : list
+    isotherms : list of ModelIsotherms
         model adsorption isotherms.
         e.g. [methane_isotherm, ethane_isotherm]
     verboseflag : bool

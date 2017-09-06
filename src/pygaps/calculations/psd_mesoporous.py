@@ -40,7 +40,7 @@ def psd_bjh(loading, pressure, pore_geometry,
 
     Notes
     -----
-    **Description:**
+    *Description*
 
     The BJH or Barrett, Joyner and Halenda [#]_ method for calculation of pore size distribution
     is based on a classical description of the adsorbate behaviour in the adsorbent pores.
@@ -50,26 +50,45 @@ def psd_bjh(loading, pressure, pore_geometry,
     place can be modelled by a thickness model (such as Halsey, Harkins & Jura, etc.) and a
     critical radius model for condensation/evaporation, based on a form of the Kelvin equation.
 
-    **Limitations:**
+    .. math::
 
-    According to Roquerol, in adopting this approach, it is assumed that:
+        r_p = t + r_k
 
-        - the Kelvin equation is applicable over the pore range (mesopores)
-        - the meniscus curvature is controlled be the pore size and shape
-        - the pores are rigid and of well defined shape
-        - the filling/emptying of each pore does not depend on its location
-        - the adsorption on the pore walls is not different from surface adsorption
+    The original model used the desorption curve as a basis for calculating pore size distribution.
+    Between two points of the curve, the volume desorbed can be described as the volume contribution
+    from pore evaporation and the volume from layer thickness decrease as per the equation
+    above. The computation is done cumulatively, starting from the filled pores and calculating for each
+    point the volume adsorbed in a pore from the following equation:
 
-    Practical considerations for use of BJH:
+    .. math::
 
-        - only pore sized upwards of 2.5 nm can be considered accurately predicted
-        - the pores are considered open-ended and non-intersecting
+        V_p & = \\Big(\\frac{\\bar{r}_p}{\\bar{r}_k + \\Delta t_n}\\Big)^2
+                (\\Delta V_n - \\Delta t_n \\sum_{i=1}^{n-1} \\Delta A_p
+                + \\Delta t_n \\bar{t}_n \\sum_{i=1}^{n-1} \\frac{\\Delta A_p}{\\bar{r}_p})
+
+        A & = 2 \\Delta V_p / r_p
+
+    Where :
+        - :math:`\\Delta A_p` is the area of the pores
+        - :math:`\\Delta V_p` is the adsorbed volume change between two points
+        - :math:`\\bar{r}_p` is the average pore radius calculated as a sum of the
+          kelvin radius and layer thickness of the pores at pressure p between two
+          measurement points
+        - :math:`\\bar{r}_k` is the average kelvin radius between two measurement points
+        - :math:`\\bar{t}_n` is the average layer thickness between two measurement points
+        - :math:`\\Delta t_n` is the average change in layer thickness between two measurement points
+
+    Then, by plotting :math:`\\Delta V / (2*\\Delta r_p)` versus the width of the pores calculated
+    for each point, the pore size distribution can be obtained.
 
     References
     ----------
     .. [#] “The Determination of Pore Volume and Area Distributions in Porous Substances.
        I. Computations from Nitrogen Isotherms”, Elliott P. Barrett, Leslie G. Joyner and
        Paul P. Halenda, J. Amer. Chem. Soc., 73, 373 (1951)
+
+    .. [#] "Adsorption by Powders & Porous Solids", F. Roquerol, J Roquerol
+       and K. Sing, Academic Press, 1999
     """
     # Paramter checks
     if len(pressure) != len(loading):
@@ -161,7 +180,7 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
 
     Notes
     -----
-    **Description:**
+    *Description*
 
     The DH or Dollimore-Heal method [#]_ of calculation of pore size distribution is an
     extension of the BJH method, which takes into account the geometry of the pores
@@ -175,20 +194,38 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     & Jura, etc.) and a critical radius model for condensation/evaporation, based
     on a form of the Kelvin equation.
 
-    **Limitations:**
+    .. math::
 
-    According to Roquerol, in adopting this approach, it is assumed that:
+        r_p = t + r_k
 
-        - the Kelvin equation is applicable over the pore range (mesopores)
-        - the meniscus curvature is controlled be the pore size and shape
-        - the pores are rigid and of well defined shape
-        - the filling/emptying of each pore does not depend on its location
-        - the adsorption on the pore walls is not different from surface adsorption
+    The original model used the desorption curve as a basis for calculating pore size distribution.
+    Between two points of the curve, the volume desorbed can be described as the volume contribution
+    from pore evaporation and the volume from layer thickness decrease as per the equation
+    above. The computation is done cumulatively, starting from the filled pores and calculating for each
+    point the volume adsorbed in a pore from the following equation:
 
-    Practical considerations for use of DH method:
+    .. math::
 
-        - only pore sized upwards of 2.5 nm can be considered accurately predicted
-        - the pores are considered open-ended and non-intersecting
+        V_p & = \\Big(\\frac{\\bar{r}_p}{\\bar{r}_k + \\Delta t_n}\\Big)^2
+                (\\Delta V_n - \\Delta t_n \\sum_{i=1}^{n-1} \\Delta A_p
+                + 2 \\pi \\Delta t_n \\bar{t}_n \\sum_{i=1}^{n-1} L_p)
+
+        A & = 2 \\Delta V_p / r_p
+
+        L & = \\Delta A_p / 2 \\pi r_p
+
+    Where :
+        - :math:`\\Delta A_p` is the area of the pores
+        - :math:`\\Delta V_p` is the adsorbed volume change between two points
+        - :math:`\\bar{r}_p` is the average pore radius calculated as a sum of the
+          kelvin radius and layer thickness of the pores at pressure p between two
+          measurement points
+        - :math:`\\bar{r}_k` is the average kelvin radius between two measurement points
+        - :math:`\\bar{t}_n` is the average layer thickness between two measurement points
+        - :math:`\\Delta t_n` is the average change in layer thickness between two measurement points
+
+    Then, by plotting :math:`\\Delta V/(2*\\Delta r_p)` versus the width of the pores calculated
+    for each point, the pore size distribution can be obtained.
 
     References
     ----------

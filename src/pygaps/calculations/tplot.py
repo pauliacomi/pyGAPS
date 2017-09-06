@@ -23,6 +23,16 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
     Calculates the external surface area and adsorbed volume
     using the t-plot method
 
+
+    Pass an isotherm object to the function to have the t-plot method applied to it.
+    The ``thickness_model`` parameter is a string which names the thickness equation which
+    should be used. Alternatively, a user can implement their own thickness model, either
+    as an experimental isotherm or a function which describes the adsorbed layer. In that
+    case, set the ``custom_model`` flag to ``True`` and instead of a string, pass the
+    Isotherm object or the callable function as the ``thickness_model`` parameter
+    The ``limits`` parameter takes the form of an array of two numbers, which are the
+    upper and lower limits of the section which should be taken for analysis.
+
     Parameters
     ----------
     isotherm : PointIsotherm
@@ -43,27 +53,17 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
         a list of dictionaries containing the calculated parameters for each
         straight section, with each dictionary of the form:
 
-            - ``section``(array): the points of the plot chosen for the line
-            - ``area``(float) : calculated surface area, from the section parameters
-            - ``adsorbed_volume``(float) : the amount adsorbed in the pores as calculated
-                per section
-            - ``slope``(float) : slope of the straight trendline fixed through the region
-            - ``intercept``(float) : intercept of the straight trendline through the region
-            - ``corr_coef``(float) : correlation coefficient of the linear region
+            - ``section(array)`` : the points of the plot chosen for the line
+            - ``area(float)`` : calculated surface area, from the section parameters
+            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
+              per section
+            - ``slope(float)`` : slope of the straight trendline fixed through the region
+            - ``intercept(float)`` : intercept of the straight trendline through the region
+            - ``corr_coef(float)`` : correlation coefficient of the linear region
+
 
     Notes
     -----
-    *Usage*
-
-    Pass an isotherm object to the function to have the t-plot method applied to it.
-    The ``thickness_model`` parameter is a string which names the thickness equation which
-    should be used. Alternatively, a user can implement their own thickness model, either
-    as an experimental isotherm or a function which describes the adsorbed layer. In that
-    case, set the ``custom_model`` flag to ``True`` and instead of a string, pass the
-    Isotherm object or the callable function as the ``thickness_model`` parameter
-    The ``limits`` parameter takes the form of an array of two numbers, which are the
-    upper and lower limits of the section which should be taken for analysis.
-
     *Description*
 
     The t-plot method [#]_ attempts to relate the adsorption on a material with an ideal
@@ -196,24 +196,26 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     pressure : array
         relative
     thickness_model : callable
-        function which which returns the thickenss of the adsorbed layer at a pressure p
+        function which which returns the thickness of the adsorbed layer at a pressure p
     liquid_density : float
         density of the adsorbate in the adsorbed state, in g/cm3
     adsorbate_molar_mass : float
         molar mass of the adsorbate, in g/mol
+    limits : [:obj:`float`, :obj:`float`], optional
+        manual limits for region selection
 
     Returns
     -------
     results : dict
         A dictionary of results with the following components
 
-        - ``section``(array): the points of the plot chosen for the line
-        - ``area``(float) : calculated surface area, from the section parameters
-        - ``adsorbed_volume``(float) : the amount adsorbed in the pores as calculated
-            per section
-        - ``slope``(float) : slope of the straight trendline fixed through the region
-        - ``intercept``(float) : intercept of the straight trendline through the region
-        - ``corr_coef``(float) : correlation coefficient of the linear region
+            - ``section(array)`` : the points of the plot chosen for the line
+            - ``area(float)`` : calculated surface area, from the section parameters
+            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
+              per section
+            - ``slope(float)`` : slope of the straight trendline fixed through the region
+            - ``intercept(float)`` : intercept of the straight trendline through the region
+            - ``corr_coef(float)`` : correlation coefficient of the linear region
 
     thickness_curve : array
         The generated thickness curve at each point using the thickness model

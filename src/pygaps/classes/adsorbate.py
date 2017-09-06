@@ -42,7 +42,7 @@ class Adsorbate(object):
     unique properties which are used by calculations in other modules:
 
         * common_name: used for integration with CoolProp. For a list of names
-          look at the CoolProp list of fluids `here
+          look at the CoolProp `list of fluids
           <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
         * molar_mass
         * saturation_pressure

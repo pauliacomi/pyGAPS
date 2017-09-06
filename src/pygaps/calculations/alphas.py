@@ -17,6 +17,13 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
     """
     Calculates the external surface area and adsorbed volume using the alpha s method
 
+
+    Pass an isotherm object to the function to have the alpha-s method applied to it.
+    The ``reference_isotherm`` parameter is an Isotherm class which will form the
+    x-axis of the alpha-s method.
+    The ``limits`` parameter takes the form of an array of two numbers, which are the
+    upper and lower limits of the section which should be taken for analysis.
+
     Parameters
     ----------
     isotherm : PointIsotherm
@@ -41,23 +48,16 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
         a list of dictionaries containing the calculated parameters for each
         straight section, with each dictionary of the form:
 
-            - ``section``(array): the points of the plot chosen for the line
-            - ``area``(float) : calculated surface area, from the section parameters
-            - ``adsorbed_volume``(float) : the amount adsorbed in the pores as calculated
-                per section
-            - ``slope``(float) : slope of the straight trendline fixed through the region
-            - ``intercept``(float) : intercept of the straight trendline through the region
-            - ``corr_coef``(float) : correlation coefficient of the linear region
+            - ``section(array)`` : the points of the plot chosen for the line
+            - ``area(float)`` : calculated surface area, from the section parameters
+            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
+              per section
+            - ``slope(float)`` : slope of the straight trendline fixed through the region
+            - ``intercept(float)`` : intercept of the straight trendline through the region
+            - ``corr_coef(float)`` : correlation coefficient of the linear region
+
     Notes
     -----
-    *Usage*
-
-    Pass an isotherm object to the function to have the alpha-s method applied to it.
-    The ``reference_isotherm`` parameter is an Isotherm class which will form the
-    x-axis of the alpha-s method.
-    The ``limits`` parameter takes the form of an array of two numbers, which are the
-    upper and lower limits of the section which should be taken for analysis.
-
     *Description*
 
     In order to extend the t-plot analysis with other adsorbents and non-standard
@@ -94,6 +94,12 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
 
         V_{ads} = \\frac{i M_m}{\\rho_{l}}
 
+    *Limitations*
+
+    The reference isotherm chosen for the :math:`\\alpha_s` mehtod must be a description
+    of the adsorption on a completely non-porous sample of the same material. It is
+    often impossible to obtain such non-porous versions, therefore care must be taken
+    how the reference isotherm is defined.
 
     References
     ----------
@@ -169,9 +175,44 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
     return result_dict
 
 
-def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_density, molar_mass, limits=None):
+def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_density, adsorbate_molar_mass, limits=None):
     """
-    Calculates the alpha-s method
+    This is a 'bare-bones' function to calculate alpha-s parameters which is
+    designed as a low-level alternative to the main function.
+    Designed for advanced use, its parameters have to be manually specified.
+
+    Parameters
+    ----------
+    loading : array
+        amount adsorbed at the surface, in mol/g
+    alpha_curve : callable
+        function which which returns the alpha_s value at a pressure p
+    alpha_s_point : float
+        p/p0 value at which the loading is reduced
+    reference_area : float
+        area of the surface on which the reference isotherm is taken
+    liquid_density : float
+        density of the adsorbate in the adsorbed state, in g/cm3
+    adsorbate_molar_mass : float
+        molar mass of the adsorbate, in g/mol
+    limits : [:obj:`float`, :obj:`float`], optional
+        manual limits for region selection
+
+    Returns
+    -------
+    results : dict
+        A dictionary of results with the following components
+
+            - ``section(array)`` : the points of the plot chosen for the line
+            - ``area(float)`` : calculated surface area, from the section parameters
+            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
+              per section
+            - ``slope(float)`` : slope of the straight trendline fixed through the region
+            - ``intercept(float)`` : intercept of the straight trendline through the region
+            - ``corr_coef(float)`` : correlation coefficient of the linear region
+
+    thickness_curve : array
+        The generated thickness curve at each point using the thickness model
     """
 
     if len(loading) != len(alpha_curve):
@@ -188,7 +229,7 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
                                                section, loading,
                                                alpha_s_point,
                                                reference_area,
-                                               molar_mass, liquid_density))
+                                               adsorbate_molar_mass, liquid_density))
     else:
         # Now we need to find the linear regions in the alpha-s for the
         # assesment of surface area.
@@ -200,7 +241,7 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
                                              section, loading,
                                              alpha_s_point,
                                              reference_area,
-                                             molar_mass, liquid_density)
+                                             adsorbate_molar_mass, liquid_density)
             if params is not None:
                 results.append(params)
 

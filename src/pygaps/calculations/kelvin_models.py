@@ -11,10 +11,17 @@ def meniscus_geometry(branch, pore_geometry):
     """
     Function which determines the meniscus geometry
 
-    :param branch: branch of the isotherm used
-    :param geometry: geometry of the pore
+    Parameters
+    ----------
+    branch : {'adsorption', 'desorption'}
+        branch of the isotherm used
+    geometry : {'slit', 'cylinder', 'cylinder'}
+        geometry of the pore
 
-    :returns: geometry of the meniscus in the pore
+    Returns
+    -------
+    str
+        geometry of the meniscus in the pore
     """
     if branch == 'adsorption':
         if pore_geometry == 'cylinder':
@@ -40,22 +47,35 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     Calculates the kelvin radius of the pore, using the standard
     form of the kelvin equation.
 
-    :param pressure: relative, unitless
-    :param meniscus_geometry: geometry of the interface of the vapour and liquid phase
+    Parameters
+    ----------
+    pressure :
+        relative, unitless
+    meniscus_geometry : str
+        geometry of the interface of the vapour and liquid phase
         **WARNING**: it is not the same as the pore geometry
-    :param temperature: in kelvin
-    :param liquid_density: g/cm3
-    :param adsorbate_molar_mass: g/mol
-    :param adsorbate_surface_tension: in mN/m
+    temperature : float
+        in kelvin
+    liquid_density : float
+        g/cm3
+    adsorbate_molar_mass : float
+        g/mol
+    adsorbate_surface_tension : float
+        in mN/m
 
-    :returns: radius(nm)
+    Returns
+    -------
+    float
+        radius(nm)
 
-    Description:
+    Notes
+    -----
+    *Description*
 
     The standard kelvin equation for determining critical pore radius for condensation or
     evaporation.
 
-    Limitations:
+    *Limitations*
 
     The Kelvin equation assumes that adsorption in a pore is not different than adsorption
     on a standard surface. Therefore, no interactions with the adsorbent is accounted for.

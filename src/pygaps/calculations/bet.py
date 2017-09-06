@@ -17,6 +17,13 @@ def area_BET(isotherm, verbose=False):
     Function returns the BET surface area of an isotherm object which
     is passed to it.
 
+
+    Pass an isotherm object to the function to have the BET method applied to it. Since
+    the function automatically takes the properties of the adsorbate from the master
+    list, ensure that it contains all the adsorbates which were used in the isotherms,
+    together with the properties required.
+
+
     Parameters
     ----------
     isotherm : PointIsotherm
@@ -29,24 +36,17 @@ def area_BET(isotherm, verbose=False):
     result_dict : dict
         A dictionary of results with the following components
 
-        - ``bet_area``(float) : calculated BET surface area
-        - ``c_const``(float) : the C constant in the BET equation
-        - ``n_monolayer``(float) : the amount adsorbed at the statistical monolayer location
-        - ``p_monolayer``(float) : the pressure at which the statistical monolayer is chosen
-        - ``bet_slope``(float) : slope of the BET plot
-        - ``bet_intercept``(float) : intercept of the BET plot
-        - ``corr_coef``(float) : correlation coefficient of the linear region in the BET plot
+        - ``bet_area(float)`` : calculated BET surface area
+        - ``c_const(float)`` : the C constant in the BET equation
+        - ``n_monolayer(float)`` : the amount adsorbed at the statistical monolayer location
+        - ``p_monolayer(float)`` : the pressure at which the statistical monolayer is chosen
+        - ``bet_slope(float)`` : slope of the BET plot
+        - ``bet_intercept(float)`` : intercept of the BET plot
+        - ``corr_coef(float)`` : correlation coefficient of the linear region in the BET plot
 
     Notes
     -----
-    *Usage*
-
-    Pass an isotherm object to the function to have the BET method applied to it. Since
-    the function automatically takes the properties of the adsorbate from the master
-    list, ensure that it contains all the adsorbates which were used in the isotherms,
-    together with the properties required.
-
-    *Description:*
+    *Description*
 
     The BET surface area [#]_ is one of the first standardised methods to calculate the
     surface area of a porous material. It is generally applied on isotherms obtained
@@ -81,7 +81,7 @@ def area_BET(isotherm, verbose=False):
         a(BET) = n_m A_N \\sigma
 
 
-    *Limitations:*
+    *Limitations*
 
     While a standard for surface area determinations, the BET area should be used with care,
     as there are many assumptions made in the calculation. To augment the validity of the BET
@@ -96,8 +96,8 @@ def area_BET(isotherm, verbose=False):
 
     This module implements all these checks.
 
-    With all the checks, the BET surface area should still be interpreted carefully. The following
-    assumptions should are implicitly made in this approach:
+    Regardless, the BET surface area should still be interpreted carefully. The following
+    assumptions are implicitly made in this approach:
 
         * Adsorption takes place on the pore surface. Microporous materials which have pores
           in similar size as the molecule adsorbed cannot have a realistic surface area

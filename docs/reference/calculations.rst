@@ -49,5 +49,8 @@ Pore size distribution DFT
 Adsorption modelling
 --------------------
 
+IAST
+....
+
 .. automodule:: pygaps.calculations.pyiast
     :members:
