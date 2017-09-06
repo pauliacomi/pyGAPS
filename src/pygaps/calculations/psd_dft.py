@@ -14,6 +14,33 @@ _KERNELS = {}
 
 def psd_dft_kernel_fit(pressure, loading, kernel_path):
     """
+    Calculates the pore size distribution using a DFT-generated kernel
+
+    Parameters
+    ----------
+    loading : array
+        adsorbed amount in mmol/g
+    pressure : array
+        relative pressure
+    kernel_path : str
+        the location of the kernel to use
+
+    Returns
+    -------
+    pore widths : array
+        the widths of the pores
+    pore_dist : array
+        the distributions for each width
+
+    Notes
+    -----
+    *Description*
+
+    *Limitations*
+
+    References
+    ----------
+
     """
 
     # get the interpolation kernel

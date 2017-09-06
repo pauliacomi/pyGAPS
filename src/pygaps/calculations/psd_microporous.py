@@ -24,7 +24,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     pore_geometry : str
         the geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'
     maximum_adsorbed : float
-        the amount of adsorbate filling the micropores
+        The amount of adsorbate filling the micropores. If the material
+        has only micropores, it is taken as the volume adsorbed at p/p0 = 0.9
     adsorbate_properties : dict
         properties for the adsorbate in the form of::
 
@@ -43,23 +44,31 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     Returns
     -------
     pore widths : array
-        the widths of the pore
+        the widths of the pores
     pore_dist : array
-        the distributions of each width
+        the distributions for each width
 
     Notes
     -----
 
-    **Description:**
-    The H-K method [#]_
+    *Description*
+    The H-K method [#]_ attempts to desribe the adsorption within pores by calculation
+    of the average potential energy for a pore. The method starts by assuming the
+    relationship between the gas phase as being:
 
-    The assumptions made by using the H-K method are:
-        - pore is uniform and of infinite extent
-        - the wall is made up of single layer atoms
-        - only dispersive forces are allowed for
-        - the interactions are only between the adsorbent and adsorbate
+    .. math::
 
-    The equation underpinning the H-K method is:
+        R_g T ln(\\frac{p}{p_0}) = U_0 + P_a
+
+    Here :math:`U_0` is the potential function describing the surface to adsorbent
+    interactions and :math:`P_a` is the potential function describing the adsorbate-
+    adsorbate interactions. This equation is derived from the equation of the free energy
+    of adsorption at constant temperature where term :math:`T \\Delta S^{tr}(w/w_{\\infty})`
+    is assumed to be negligible.
+
+    If a Lennard-Jones-type potential function describes the interactions between the
+    adsorbate molecules and the adsorbent molecules then the two contributions to the
+    total potential can be replaced by the extended function. The resulting equation becomes:
 
     .. math::
 
@@ -98,10 +107,24 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     * :math:`\\varkappa_a` -- magnetic susceptibility of the adsorbate molecule
     * :math:`\\varkappa_A` -- magnetic susceptibility of the adsorbent molecule
 
-    **Limitations:**
 
-    The term :math:`T \\Delta S^{tr}(w/w_{\\infty})` is negligible such that
-    The amount adsorbed in the pores is the amount at p/p0 = 0.9
+    *Limitations*
+
+    The assumptions made by using the H-K method are:
+
+        - It does not have a description of capilary condensation. This means that the
+          pore size distribution can only be considered accurate up to a maximum of 5 nm.
+
+        - Each pore is uniform and of infinite length. Materials with varying pore
+          shapes or highly interconnected networks may not give realistic results.
+
+        - The wall is made up of single layer atoms. Furthermore, since the HK method
+          is reliant on knowing the properties of the surface atoms as well as the
+          adsorbent molecules the material should ideally be homogenous.
+
+        - Only dispersive forces are accounted for. If the adsorbate-adsorbent interactions
+          have other contributions, the Lennard-Jones potential function will not be
+          an accurate description of pore environment.
 
 
     References
