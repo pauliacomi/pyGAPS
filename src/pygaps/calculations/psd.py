@@ -133,12 +133,12 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
 
     # Read data in, depending on branch requested
     if branch == 'adsorption':
-        loading = isotherm.loading_ads(unit='mmol')[::-1]
-        pressure = isotherm.pressure_ads()[::-1]
+        loading = isotherm.loading(unit='mmol', branch='ads')[::-1]
+        pressure = isotherm.pressure(branch='ads')[::-1]
     # If on desorption branch, data will be reversed
     elif branch == 'desorption':
-        loading = isotherm.loading_des(unit='mmol')
-        pressure = isotherm.pressure_des()
+        loading = isotherm.loading(unit='mmol', branch='des')
+        pressure = isotherm.pressure(branch='des')
     if loading is None:
         raise Exception("The isotherm does not have the required branch for"
                         " this calculation")
@@ -264,8 +264,8 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
     )
 
     # Read data in
-    loading = isotherm.loading_ads(unit='mmol')
-    pressure = isotherm.pressure_ads()
+    loading = isotherm.loading(unit='mmol', branch='ads')
+    pressure = isotherm.pressure(branch='ads')
     maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
@@ -377,8 +377,8 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
 
     """
     # Read data in
-    loading = isotherm.loading_ads(unit='mmol')
-    pressure = isotherm.pressure_ads()
+    loading = isotherm.loading(unit='mmol', branch='ads')
+    pressure = isotherm.pressure(branch='ads')
 
     pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)
 

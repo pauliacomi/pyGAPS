@@ -22,8 +22,8 @@ def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
 
     """
     # # copy the isotherm into memory
-    # loading = isotherm.loading_ads()
-    # pressure = isotherm.pressure_ads()
+    # loading = isotherm.loading(branch='ads')
+    # pressure = isotherm.pressure_ads(branch='ads')
 
     # # if the initial pressure is not zero
     # # add a zero point to the graph since the henry constant must have a zero intercept
@@ -40,7 +40,7 @@ def calc_initial_henry(isotherm, max_adjrms=0.1, verbose=False):
     #                                    loading_key=isotherm.loading_key,
     #                                    pressure_key=isotherm.pressure_key,
     #                                    model="Henry")
-    #     adjrmsd = model_isotherm.rmse / numpy.ptp(isotherm.loading_ads())
+    #     adjrmsd = model_isotherm.rmse / numpy.ptp(isotherm.loading(branch='ads'))
 
     #     if adjrmsd > max_adjrms and rows_taken != 2:
     #         rows_taken = rows_taken - 1
@@ -73,8 +73,8 @@ def calc_initial_henry_virial(isotherm, verbose=False):
 
     """
 
-    pressures = numpy.array(isotherm.pressure_ads())
-    loadings = numpy.array(isotherm.loading_ads())
+    loadings = numpy.array(isotherm.loading(branch='ads'))
+    pressures = numpy.array(isotherm.pressure(branch='ads'))
     if pressures[0] == 0 or loadings[0] == 0:
         pressures = numpy.delete(pressures, 0, 0)
         loadings = numpy.delete(loadings, 0, 0)

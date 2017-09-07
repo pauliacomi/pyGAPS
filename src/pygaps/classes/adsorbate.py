@@ -4,6 +4,7 @@ This module contains the adsorbate class
 
 from CoolProp.CoolProp import PropsSI
 
+from ..utilities.unit_converter import convert_pressure
 import pygaps.data as data
 
 
@@ -212,7 +213,7 @@ class Adsorbate(object):
 
         return mol_m
 
-    def saturation_pressure(self, temp, calculate=True):
+    def saturation_pressure(self, temp, unit=None, calculate=True):
         """
         Uses an equation of state to determine the
         saturation pressure at a particular temperature
@@ -221,6 +222,9 @@ class Adsorbate(object):
         ----------
         temp : float
             temperature at which the pressure is desired in K
+        unit : str
+            unit in which to return the saturation pressure
+            if not specifies defaults to Pascal
         calculate : bool, optional
             whether to calculate the property or look it up in the properties
             dictionary, default - True
@@ -228,7 +232,7 @@ class Adsorbate(object):
         Returns
         -------
         float
-            pressure in Pascal
+            pressure in unit requested
 
         Raises
         ------
@@ -239,6 +243,9 @@ class Adsorbate(object):
         sat_p = self.properties.get("saturation_pressure")
         if sat_p is None or calculate:
             sat_p = PropsSI('P', 'T', temp, 'Q', 0, self.common_name())
+
+            if unit is not None:
+                sat_p = convert_pressure(sat_p, 'Pa', unit)
 
         return sat_p
 

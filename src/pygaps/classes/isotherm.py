@@ -2,6 +2,9 @@
 This module contains the main class that describes an isotherm
 """
 
+from ..utilities.unit_converter import _LOADING_UNITS
+from ..utilities.unit_converter import _PRESSURE_UNITS
+
 
 class Isotherm(object):
     """
@@ -54,9 +57,6 @@ class Isotherm(object):
     the ``**isotherm_parameters`` dictionary
     """
 
-    _LOADING_UNITS = {"mol": 1, "mmol": 0.001, "cm3 STP": 4.461e-5}
-    _PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325}
-
     _MATERIAL_MODE = ["mass", "volume"]
     _PRESSURE_MODE = ["absolute", "relative"]
 
@@ -94,11 +94,11 @@ class Isotherm(object):
             raise Exception("One of the units is not specified. See viable"
                             "units in _LOADING_UNITS and _PRESSURE_UNITS")
 
-        if unit_loading not in self._LOADING_UNITS:
+        if unit_loading not in _LOADING_UNITS:
             raise Exception("Unit selected for loading is not an option. See viable"
                             "units in _LOADING_UNITS")
 
-        if unit_pressure not in self._PRESSURE_UNITS:
+        if unit_pressure not in _PRESSURE_UNITS:
             raise Exception("Unit selected for pressure is not an option. See viable"
                             "units in _PRESSURE_UNITS")
 

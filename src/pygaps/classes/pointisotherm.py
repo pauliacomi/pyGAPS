@@ -12,6 +12,9 @@ from scipy.interpolate import interp1d
 import pygaps
 
 from ..graphing.isothermgraphs import plot_iso
+from ..utilities.unit_converter import convert_loading
+from ..utilities.unit_converter import convert_pressure
+from ..utilities.unit_converter import _PRESSURE_UNITS
 from .adsorbate import Adsorbate
 from .isotherm import Isotherm
 from .sample import Sample
@@ -200,10 +203,10 @@ class PointIsotherm(Isotherm):
             unit of pressure
         """
         return pygaps.isotherm_from_json(json_string,
-                                           mode_adsorbent=mode_adsorbent,
-                                           mode_pressure=mode_pressure,
-                                           unit_loading=unit_loading,
-                                           unit_pressure=unit_pressure)
+                                         mode_adsorbent=mode_adsorbent,
+                                         mode_pressure=mode_pressure,
+                                         unit_loading=unit_loading,
+                                         unit_pressure=unit_pressure)
 
 ##########################################################
 #   Overloaded and private functions
@@ -252,54 +255,54 @@ class PointIsotherm(Isotherm):
 ##########################################################
 #   Conversion functions
 
-    def convert_loading(self, unit_to):
+    def convert_unit_loading(self, unit_to):
         """
         Converts the loading of the isotherm from one unit to another
+
+        Parameters
+        ----------
+        unit_to : str
+            the unit into which the internal loading should be converted to
         """
 
-        if unit_to not in self._LOADING_UNITS:
-            raise Exception("Unit selected for loading is not an option. See viable"
-                            "models in self._LOADING_UNITS")
-
-        if unit_to == self.unit_loading:
-            print("Unit is the same, no changes made")
-            return
-
-        self._data[self.loading_key] = self._data[self.loading_key].apply(
-            lambda x: x * self._LOADING_UNITS[self.unit_loading] / self._LOADING_UNITS[unit_to])
+        self._data[self.unit_loading] = convert_loading(
+            self._data[self.loading_key],
+            self.unit_loading,
+            unit_to)
 
         self.unit_loading = unit_to
 
         return
 
-    def convert_pressure(self, unit_to):
+    def convert_unit_pressure(self, unit_to):
         """
         Converts the pressure values of the isotherm from one unit to another
 
         Parameters
         ----------
         unit_to : str
-            the unit into which the data will be converted into
+            the unit into which the internal pressure should be converted to
         """
 
-        if unit_to not in self._PRESSURE_UNITS:
-            raise Exception("Unit selected for loading is not an option. See viable"
-                            "models in self._PRESSURE_UNITS")
-
-        if unit_to == self.unit_pressure:
-            print("Unit is the same, no changes made")
-            return
-
-        self._data[self.pressure_key] = self._data[self.pressure_key].apply(
-            lambda x: x * self._PRESSURE_UNITS[self.unit_pressure] / self._PRESSURE_UNITS[unit_to])
+        self._data[self.pressure_key] = convert_pressure(
+            self._data[self.pressure_key],
+            self.unit_pressure,
+            unit_to)
 
         self.unit_pressure = unit_to
 
         return
 
-    def convert_pressure_mode(self, mode_pressure):
+    def convert_mode_pressure(self, mode_pressure):
         """
-        Converts the pressure values of the isotherm from one unit to another
+        Converts the pressure mode from absolute to relative.
+        Only applicable in the case of isotherms taken below critical
+        point of adsorbate.
+
+        Parameters
+        ----------
+        mode_pressure : {'relative', 'absolute'}
+            the mode in which the isotherm should be put
         """
 
         if mode_pressure not in self._PRESSURE_MODE:
@@ -317,16 +320,24 @@ class PointIsotherm(Isotherm):
 
         self._data[self.pressure_key] = self._data[self.pressure_key].apply(
             lambda x: x *
-            (Adsorbate.from_list(self.gas).saturation_pressure(self.t_exp)
-             / self._PRESSURE_UNITS[self.unit_pressure]) ** sign)
+            (Adsorbate.from_list(self.gas).saturation_pressure(self.t_exp, unit=self.unit_pressure)
+             / _PRESSURE_UNITS[self.unit_pressure]) ** sign)
 
         self.mode_pressure = mode_pressure
 
         return
 
-    def convert_adsorbent_mode(self, mode_adsorbent):
+    def convert_mode_adsorbent(self, mode_adsorbent):
         """
-        Converts the pressure values of the isotherm from one unit to another
+        Converts the mode of the isotherm loading to be
+        either 'per mass' or 'per volume' of adsorbent. Only
+        applicable to absorbents that have been loaded in memory
+        with a 'density' property.
+
+        Parameters
+        ----------
+        mode_adsorbent : {'volume', 'mass'}
+            the mode in which the isotherm should be put
         """
 
         # Syntax checks
@@ -379,171 +390,150 @@ class PointIsotherm(Isotherm):
 ##########################################################
 #   Functions that return parts of the isotherm data
 
-    def data(self):
-        """Returns all data"""
-        return self._data.drop('check', axis=1)
-
-    def data_ads(self):
-        """Returns adsorption part of data"""
-        return self.data().loc[~self._data['check']]
-
-    def data_des(self):
-        """Returns desorption part of data"""
-        return self.data().loc[self._data['check']]
-
-    def pressure_ads(self, unit=None, max_range=None):
+    def data(self, branch=None):
         """
-        Returns adsorption pressure points as an array
+        Returns all data
+
+        Parameters
+        ----------
+        branch : {None, 'ads', 'des'}
+            The branch of the isotherm to return. If None, returns entire
+            dataset
+
+        Returns
+        -------
+        DataFrame
+            The pandas DataFrame containing all isotherm data
+
         """
-        if self.has_ads():
-            ret = self.data_ads().loc[:, self.pressure_key].values
-
-            # Convert in required unit
-            if unit is not None:
-                if unit not in self._PRESSURE_UNITS:
-                    raise Exception("Unit selected for pressure is not an option. "
-                                    "See viable models in self._PRESSURE_UNITS")
-                ret = ret * \
-                    self._PRESSURE_UNITS[self.unit_pressure] / \
-                    self._PRESSURE_UNITS[unit]
-
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
+        if branch is None:
+            return self._data.drop('check', axis=1)
+        elif branch == 'ads':
+            return self._data.loc[~self._data['check']].drop('check', axis=1)
+        elif branch == 'des':
+            return self._data.loc[self._data['check']].drop('check', axis=1)
         else:
             return None
 
-    def loading_ads(self, unit=None, max_range=None):
+    def pressure(self, unit=None, min_range=None, max_range=None, branch=None):
         """
-        Returns adsorption amount adsorbed points as an array
+        Returns pressure points as an array
+
+        Parameters
+        ----------
+        unit : str, optional
+            Unit in which the pressure should be returned. If None
+            it defaults to which pressure unit the isotherm is currently in
+        min_range : float, optional
+            The lower limit for the pressure to select.
+        max_range : float, optional
+            The higher limit for the pressure to select.
+        branch : {None, 'ads', 'des'}
+            The branch of the pressure to return. If None, returns entire
+            dataset
+
+        Returns
+        -------
+        array
+            The pressure slice corresponding to the parameters passesd
         """
-        if self.has_ads():
-            ret = self.data_ads().loc[:, self.loading_key].values
+        ret = self.data(branch=branch).loc[:, self.pressure_key].values
 
-            # Convert in required unit
-            if unit is not None:
-                if unit not in self._LOADING_UNITS:
-                    raise Exception("Unit selected for loading is not an option. "
-                                    "See viable models in self._LOADING_UNITS")
-                ret = ret * \
-                    self._LOADING_UNITS[self.unit_loading] / \
-                    self._LOADING_UNITS[unit]
+        # Convert in required unit
+        if unit is not None:
+            ret = convert_pressure(ret, self.unit_pressure, unit)
 
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
+        # Select required points
+        if max_range is None or min_range is None:
+            return ret
         else:
-            return None
+            if min_range is None:
+                min_range = 0
+            if max_range is None:
+                max_range = max(ret)
+            return [x for x in ret if (min_range <= x and x <= max_range)]
 
-    def other_key_ads(self, key, max_range=None):
+    def loading(self, unit=None, min_range=None, max_range=None, branch=None):
+        """
+        Returns loading points as an array
+
+        Parameters
+        ----------
+        unit : str, optional
+            Unit in which the loading should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        min_range : float, optional
+            The lower limit for the loading to select.
+        max_range : float, optional
+            The higher limit for the loading to select.
+        branch : {None, 'ads', 'des'}
+            The branch of the loading to return. If None, returns entire
+            dataset
+
+        Returns
+        -------
+        array
+            The loading slice corresponding to the parameters passesd
+        """
+        ret = self.data(branch=branch).loc[:, self.loading_key].values
+
+        # Convert in required unit
+        if unit is not None:
+            ret = convert_loading(ret, self.unit_loading, unit)
+
+        # Select required points
+        if max_range is None or min_range is None:
+            return ret
+        else:
+            if min_range is None:
+                min_range = 0
+            if max_range is None:
+                max_range = max(ret)
+            return [x for x in ret if (min_range <= x and x <= max_range)]
+
+    def other_data(self, key, branch=None):
         """
         Returns adsorption enthalpy points as an array
-        """
-        if self.has_ads() and key in self.other_keys:
-            ret = self.data_ads().loc[:, key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-        else:
-            return None
 
-    def pressure_des(self, unit=None, max_range=None):
-        """
-        Returns desorption pressure points as an array
-        """
-        if self.has_des():
-            ret = self.data_des().loc[:, self.pressure_key].values
+        Parameters
+        ----------
+        key : str
+            Key in the isotherm DataFrame containing the data to select
+        unit : str, optional
+            Unit in which the data should be returned. If None
+            it defaults to which data unit the isotherm is currently in
+        branch : {None, 'ads', 'des'}
+            The branch of the data to return. If None, returns entire
+            dataset
 
-            # Convert in required unit
-            if unit is not None:
-                if unit not in self._PRESSURE_UNITS:
-                    raise Exception("Unit selected for pressure is not an option. "
-                                    "See viable models in self._PRESSURE_UNITS")
-                ret = ret * \
-                    self._PRESSURE_UNITS[self.unit_pressure] / \
-                    self._PRESSURE_UNITS[unit]
-
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-        else:
-            return None
-
-    def loading_des(self, unit=None, max_range=None):
-        """
-        Returns desorption amount adsorbed points as an array
-        """
-        if self.has_des():
-            ret = self.data_des().loc[:, self.loading_key].values
-
-            # Convert in required unit
-            if unit is not None:
-                if unit not in self._LOADING_UNITS:
-                    raise Exception("Unit selected for loading is not an option. "
-                                    "See viable models in self._LOADING_UNITS")
-                ret = ret * \
-                    self._LOADING_UNITS[self.unit_loading] / \
-                    self._LOADING_UNITS[unit]
-
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-        else:
-            return None
-
-    def other_key_des(self, key, max_range=None):
-        """
-        Returns desorption key points as an array
-        """
-        if self.has_des() and key in self.other_keys:
-            ret = self.data_des().loc[:, key].values
-            if max_range is None:
-                return ret
-            else:
-                return [x for x in ret if x < max_range]
-        else:
-            return None
-
-    def pressure_all(self):
-        """
-        Returns all pressure points as an array
-        """
-        return self.data().loc[:, self.pressure_key].values
-
-    def loading_all(self):
-        """
-        Returns all amount adsorbed points as an array
-        """
-        return self.data().loc[:, self.loading_key].values
-
-    def other_key_all(self, key):
-        """
-        Returns all enthalpy points as an array
+        Returns
+        -------
+        array
+            The data slice corresponding to the parameters passesd
         """
         if key in self.other_keys:
-            return self.data().loc[:, key].values
+            ret = self.data(branch=branch).loc[:, key].values
+
+            return ret
         else:
             return None
 
-    def has_ads(self):
+    def has_branch(self, branch):
         """
-        Returns if the isotherm has an adsorption branch
-        """
-        if self.data_ads() is None:
-            return False
-        else:
-            return True
+        Returns if the isotherm has an specific branch
 
-    def has_des(self):
+        Parameters
+        ----------
+        branch : {None, 'ads', 'des'}
+            The branch of the data to check for.
+
+        Returns
+        -------
+        bool
+            Whether the data exists or not
         """
-        Returns if the isotherm has an desorption branch
-        """
-        if self.data_des() is None:
+
+        if self.data(branch=branch) is None:
             return False
         else:
             return True
@@ -554,7 +544,7 @@ class PointIsotherm(Isotherm):
 
     def loading_at(self, pressure):
         """
-        Linearly interpolate isotherm to compute loading at pressure P.
+        Interpolate isotherm to compute loading at any pressure P.
         Parameters
         ----------
         pressure : float
@@ -567,6 +557,22 @@ class PointIsotherm(Isotherm):
         """
 
         return self.interp1d(pressure)
+
+    def pressure_at(self, loading):
+        """
+        Interpolate isotherm to compute pressure at any loading n.
+        Parameters
+        ----------
+        loading : float
+            loading at which to compute pressure
+
+        Returns
+        -------
+        float
+            predicted pressure at loading n
+        """
+
+        return self.interp1d(loading)
 
     def spreading_pressure(self, pressure):
         """

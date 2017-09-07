@@ -138,8 +138,8 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
     # Read data in
-    loading = isotherm.loading_ads(unit='mol')
-    pressure = isotherm.pressure_ads()
+    loading = isotherm.loading(unit='mol', branch='ads')
+    pressure = isotherm.pressure(branch='ads')
 
     # Thickness model definitions
     if not custom_model:

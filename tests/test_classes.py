@@ -8,7 +8,7 @@ import pytest
 import pygaps
 
 
-class TestGas(object):
+class TestAdsorbate(object):
     """
     Tests the adsorbate class
     """
@@ -165,40 +165,54 @@ class TestPointIsotherm(object):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
         other_key = "enthalpy"
-
         isotherm = basic_pointisotherm
 
-        assert set(isotherm.pressure_all()) == set(
-            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0])
-        assert set(isotherm.loading_all()) == set(
-            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0])
-        assert set(isotherm.other_key_ads(other_key)) == set([
-            5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
+        # branch
+        assert isotherm.has_branch(branch='ads')
+        assert isotherm.has_branch(branch='des')
 
-        assert isotherm.has_ads()
-        assert isotherm.has_des()
-
-        assert isotherm.data_ads().equals(pandas.DataFrame({
+        # data()
+        assert isotherm.data().equals(pandas.DataFrame({
+            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
+            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
+            other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+        }))
+        assert isotherm.data(branch='ads').equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
         }))
-
-        assert isotherm.data_des().equals(pandas.DataFrame({
+        assert isotherm.data(branch='des').equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [4.0, 2.0],
             basic_pointisotherm.loading_key: [4.0, 2.0],
             other_key: [5.0, 5.0],
         }, index=[6, 7]))
 
-        assert set(isotherm.pressure_ads()) == set(
+        # pressure()
+        assert set(isotherm.pressure()) == set(
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0])
+        assert set(isotherm.pressure(branch='ads')) == set(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        assert set(isotherm.loading_ads()) == set(
+        assert set(isotherm.pressure(branch='des')) == set([4.0, 2.0])
+        assert set(isotherm.pressure(min_range=2.3, max_range=5.0)) == set(
+            [3.0, 4.0, 5.0])
+
+        # loading()
+        assert set(isotherm.loading()) == set(
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0])
+        assert set(isotherm.loading(branch='ads')) == set(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        assert set(isotherm.other_key_ads(other_key)
+        assert set(isotherm.loading(branch='des')) == set([4.0, 2.0])
+        assert set(isotherm.loading(min_range=2.3, max_range=5.0)) == set(
+            [3.0, 4.0, 5.0])
+
+        # other_data()
+        assert set(isotherm.other_data(other_key)) == set([
+            5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
+        assert set(isotherm.other_data(other_key, branch='ads')
                    ) == set([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
-        assert set(isotherm.pressure_des()) == set([4.0, 2.0])
-        assert set(isotherm.loading_des()) == set([4.0, 2.0])
-        assert set(isotherm.other_key_des(other_key)) == set([5.0, 5.0])
+        assert set(isotherm.other_data(
+            other_key, branch='des')) == set([5.0, 5.0])
 
         return
 
@@ -213,7 +227,7 @@ class TestPointIsotherm(object):
         """Checks that the loading conversion function work as expected"""
 
         # Do the conversion
-        basic_pointisotherm.convert_loading(unit)
+        basic_pointisotherm.convert_unit_loading(unit)
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.loading_key] * multiplier
@@ -232,7 +246,7 @@ class TestPointIsotherm(object):
         """Checks that the pressure conversion function work as expected"""
 
         # Do the conversion
-        basic_pointisotherm.convert_pressure(unit)
+        basic_pointisotherm.convert_unit_pressure(unit)
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.pressure_key] * multiplier
@@ -255,7 +269,7 @@ class TestPointIsotherm(object):
         pygaps.data.SAMPLE_LIST.append(basic_sample)
 
         # Do the conversion
-        basic_pointisotherm.convert_adsorbent_mode(mode)
+        basic_pointisotherm.convert_mode_adsorbent(mode)
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.loading_key] * multiplier
@@ -278,7 +292,7 @@ class TestPointIsotherm(object):
         pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         # Do the conversion
-        basic_pointisotherm.convert_pressure_mode(mode)
+        basic_pointisotherm.convert_mode_pressure(mode)
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.pressure_key] * multiplier
@@ -315,4 +329,6 @@ class TestModelIsotherm(object):
         pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
             isotherm_data[:6],
+            basic_isotherm.loading_key,
+            basic_isotherm.pressure_key,
             model)

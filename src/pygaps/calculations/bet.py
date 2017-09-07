@@ -127,8 +127,8 @@ def area_BET(isotherm, verbose=False):
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in
-    loading = isotherm.loading_ads(unit='mol')
-    pressure = isotherm.pressure_ads()
+    loading = isotherm.loading(unit='mol', branch='ads')
+    pressure = isotherm.pressure(branch='ads')
 
     # use the bet function
     (bet_area, c_const, n_monolayer, p_monolayer, slope,

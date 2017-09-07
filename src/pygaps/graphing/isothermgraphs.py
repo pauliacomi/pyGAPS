@@ -303,12 +303,15 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
             if isotherm.has_ads():
                 line_label_ = line_label + ' ads'
                 lmax_y1, lmax_y2, line = graph_caller(axes, axes2,
-                                                      isotherm.pressure_ads(
-                                                          maxrange_pressure),
-                                                      isotherm.loading_ads(
-                                                          maxrange_loading),
-                                                      isotherm.other_key_ads("enthalpy",
-                                                                             maxrange_enthalpy),
+                                                      isotherm.pressure(
+                                                          max_range=maxrange_pressure,
+                                                          branch='ads'),
+                                                      isotherm.loading(
+                                                          max_range=maxrange_loading,
+                                                          branch='ads'),
+                                                      isotherm.other_data("enthalpy",
+                                                                          max_range=maxrange_enthalpy,
+                                                                          branch='ads'),
                                                       line_label_, plot_type, styles)
                 max_y1 = max(max_y1, lmax_y1)
                 max_y2 = max(max_y2, lmax_y2)
@@ -321,12 +324,15 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
                     styles['line_style']['c'] = color
                 line_label_ = line_label + ' des'
                 lmax_y1, lmax_y2, _ = graph_caller(axes, axes2,
-                                                   isotherm.pressure_des(
-                                                       maxrange_pressure),
-                                                   isotherm.loading_des(
-                                                       maxrange_loading),
-                                                   isotherm.other_key_des("enthalpy",
-                                                                          maxrange_enthalpy),
+                                                   isotherm.pressure(
+                                                       max_range=maxrange_pressure,
+                                                       branch='des'),
+                                                   isotherm.loading(
+                                                       max_range=maxrange_loading,
+                                                       branch='des'),
+                                                   isotherm.other_data("enthalpy",
+                                                                       max_range=maxrange_enthalpy,
+                                                                       branch='des'),
                                                    line_label_, plot_type, styles)
                 max_y1 = max(max_y1, lmax_y1)
                 max_y2 = max(max_y2, lmax_y2)

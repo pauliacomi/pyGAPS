@@ -29,22 +29,22 @@ class TestBET(object):
             pygaps.area_BET(isotherm)
 
         pygaps.data.GAS_LIST.append(adsorbate)
-        isotherm.convert_pressure_mode("relative")
-        isotherm.convert_loading("cm3 STP")
+        isotherm.convert_mode_pressure("relative")
+        isotherm.convert_unit_loading("cm3 STP")
 
         # Will raise a "isotherm loading not in mmol exception"
         with pytest.raises(Exception):
             pygaps.area_BET(isotherm)
 
         pygaps.data.SAMPLE_LIST.append(basic_sample)
-        isotherm.convert_loading("mmol")
-        isotherm.convert_adsorbent_mode("volume")
+        isotherm.convert_unit_loading("mmol")
+        isotherm.convert_mode_adsorbent("volume")
 
         # Will raise a "isotherm loading not in volume mode exception"
         with pytest.raises(Exception):
             pygaps.area_BET(isotherm)
 
-        isotherm.convert_adsorbent_mode("mass")
+        isotherm.convert_mode_adsorbent("mass")
         pygaps.data.GAS_LIST = []
 
         # Will raise a "adsorbate not found exception"
@@ -78,7 +78,7 @@ class TestBET(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        isotherm.convert_pressure_mode('relative')
+        isotherm.convert_mode_pressure('relative')
 
         bet_area = pygaps.area_BET(isotherm).get("bet_area")
 
@@ -108,7 +108,7 @@ class TestTPlot(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        isotherm.convert_pressure_mode('relative')
+        isotherm.convert_mode_pressure('relative')
 
         t_plot_r = pygaps.t_plot(
             isotherm, 'Halsey')
@@ -154,7 +154,7 @@ class TestPSD(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        isotherm.convert_pressure_mode('relative')
+        isotherm.convert_mode_pressure('relative')
 
         result_dict = pygaps.mesopore_size_distribution(
             isotherm, psd_model=method, branch='desorption', thickness_model='Halsey', verbose=True)
@@ -178,7 +178,7 @@ class TestPSD(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        isotherm.convert_pressure_mode('relative')
+        isotherm.convert_mode_pressure('relative')
 
         result_dict = pygaps.micropore_size_distribution(
             isotherm, psd_model=method, pore_geometry='slit', verbose=True)
