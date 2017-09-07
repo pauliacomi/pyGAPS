@@ -14,7 +14,7 @@ _KERNELS = {}
 
 def psd_dft_kernel_fit(pressure, loading, kernel_path):
     """
-    Calculates the pore size distribution using a DFT-generated kernel
+    Fits a DFT kernel on experimental adsorption data
 
     Parameters
     ----------
@@ -34,17 +34,22 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
 
     Notes
     -----
-    *Description*
+    The function will take the data in the form of pressure and loading. It will
+    then load the kernel either from disk or from memory and define a minimsation
+    function as the sum of squared differences of the sum of all individual kernel
+    isotherm loadings multiplied by their contribution as per the following function:
 
-    *Limitations*
+    .. math::
 
-    References
-    ----------
+        f(x) = \\sum_{p=p_0}^{p=p_x} (n_{p,exp} - \\sum_{w=w_0}^{w=w_y} n_{p, kernel} X_w )^2
+
+    The function is then minimised using the `scipy.optimise.minimise` module, with the
+    constraint that the contribution of each isotherm cannot be negative.
 
     """
 
     # get the interpolation kernel
-    kernel = load_kernel(kernel_path)
+    kernel = _load_kernel(kernel_path)
 
     # generate the pandas array
     kernel_points = []
@@ -88,7 +93,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
     return pore_widths, pore_dist
 
 
-def load_kernel(path):
+def _load_kernel(path):
     """
     Loads a kernel from disk or from memory
 

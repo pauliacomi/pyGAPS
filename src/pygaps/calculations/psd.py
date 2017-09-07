@@ -217,7 +217,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
 
     Currently, the methods provided are:
 
-        - the HK, of Horvath-Kawazoe method
+        - the HK, or Horvath-Kawazoe method
 
     A common gotcha of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
@@ -293,12 +293,14 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
 
 def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_parameters):
     """
+    Calculates the pore size distribution using a DFT kernel from a PointIsotherm
 
-    Paramters
-    ---------
+    Parameters
+    ----------
     isotherm : PointIsotherm
         the isotherm to calculate the pore size distribution
-    kernel_
+    kernel_path : str
+        the path to the kernel used
 
     Returns
     -------
@@ -308,6 +310,71 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
             - ``pore_widths(array)`` : the widths of the pores
             - ``pore_distribution(array)`` : contribution of each pore width to the
               overall pore distribution
+
+    Notes
+    -----
+    *Description*
+
+    Density Functional Theory (DFT) along with its extensions (NLDFT, QSDFT, etc)
+    have emerged as the most powerful methods of describing adsorption on surfaces
+    and in pores [#]_, [#]_. The theory allows the prediction of molecular behaviour solely
+    on the basis of quantum mechanical considerations, and does not require other
+    properties besides the electron structure and positions of the atoms involved.
+    Calculations of large systems of atoms, such as those involved in adsorption
+    in pores is a computationally intensive task, with modern computing power
+    significantly improving the scales on which the modelling can be applied.
+
+    The theory can be used to model adsorption in a simplified pore of a particular
+    width which yields the the adsorption isotherm on a material comprised solely
+    on pores of that width. The calculation is then repeated on pores of different
+    sizes, to obtain a 'DFT kernel' or a collection of ideal isotherms on a
+    distribution of pores. The generation of this kernel should be judicious, as
+    both the adsorbent and the adsorbate must be modelled accurately. As it is a
+    field in of in itself, the DFT calculations themselves are outside the scope
+    of this program.
+
+    Using the kernel, the isotherm obtained through experimental means can be
+    modelled. The contributions of each kernel isotherm to the overall data is
+    determined through a minimisation function. The contributions and their
+    corresponding pore size form the pore size distribution of the material.
+
+    The program accepts kernel files in a CSV format with the following structure:
+
+    .. csv-table::
+       :header: Pressure(bar), Pore size 1(nm), Pore size 2(nm), ..., Pore size y(nm)
+
+        p1,l11,l21,...,ly1
+        p2,l12,l22,...,ly2
+        p3,l13,l23,...,ly3
+        ...,...,...,...,...
+        px,l1x,l2x,...,lyz
+
+    The kernel should have sufficient points for a good interpolation as well as
+    have a range of pressures that is wide enough to cover possible experimental
+    values.
+
+    *Limitations*
+
+    The accuracy of predicting pore size through DFT kernels is only as good as
+    the kernel itself, which should be tailored to the adsorbate, adsorbent and
+    experimental conditions used.
+
+    The isotherm used to calculate the pore size distribution should have enough
+    datapoints and pressure range in order to cover adsorption in the entire range
+    of pores the material has.
+
+    See Also
+    --------
+    psd_dft.psd_dft_kernel_fit : fitting of isotherm data with a DFT kernel
+
+    References
+    ----------
+    .. [#] A New Analysis Method for the Determination of the Pore Size Distribution of Porous
+       Carbons from Nitrogen Adsorption Measurements; Seaton, Walton, and Quirke; Carbon,
+       Vol. 27, No. 6, pp. 853-861, 1989
+    .. [#] Pore Size Distribution Analysis of Microporous Carbons: A Density Functional
+       Theory Approach; Lastoskie, Gubbins, and Quirke; J. Phys. Chem. 1993, 97, 4786-4796
+
     """
     # Read data in
     loading = isotherm.loading_ads(unit='mmol')

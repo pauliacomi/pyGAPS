@@ -1,13 +1,13 @@
 """
 This module performs the heart of the IAST calculations, given the
-pure-component adsorption isotherm models from the `isotherms` module.
+pure-component adsorption isotherm model.
 """
 
 import numpy
 import scipy.optimize
 
 
-def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
+def iast(partial_pressures, isotherms, verbose=False, warningoff=False,
          adsorbed_mole_fraction_guess=None):
     """
     Perform IAST calculation to predict multi-component adsorption isotherm from
@@ -27,13 +27,13 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
     isotherms : list of ModelIsotherms
         model adsorption isotherms.
         e.g. [methane_isotherm, ethane_isotherm]
-    verboseflag : bool
+    verbose : bool, optional
         print off a lot of information
-    warningoff: bool
+    warningoff: bool, optional
         when False, warnings will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data
-    adsorbed_mole_fraction_guess : array or list
+    adsorbed_mole_fraction_guess : array or list, optional
         starting guesses for adsorbed phase mole fractions that
         `pyiast.iast` solves for
 
@@ -51,11 +51,11 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
     if numpy.size(partial_pressures) != n_components:
         print("""Example use:\n
-              IAST([0.5,0.5], [xe_isotherm, kr_isotherm], verboseflag=true)""")
+              IAST([0.5,0.5], [xe_isotherm, kr_isotherm], verbose=true)""")
         raise Exception("Length of partial pressures != length of array of"
                         " isotherms...")
 
-    if verboseflag:
+    if verbose:
         print("%d components." % n_components)
         for i in range(n_components):
             print("\tPartial pressure component %d = %f" % (i,
@@ -151,7 +151,7 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
     # get loading of each component by multiplying by mole fractions
     loadings = adsorbed_mole_fractions * loading_total
-    if verboseflag:
+    if verbose:
         # print IAST loadings and corresponding pure-component loadings
         for i in range(n_components):
             print("Component ", i)
@@ -178,7 +178,7 @@ def iast(partial_pressures, isotherms, verboseflag=False, warningoff=False,
 
 
 def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
-                 verboseflag=False, warningoff=False,
+                 verbose=False, warningoff=False,
                  gas_mole_fraction_guess=None):
     """
     Perform reverse IAST to predict gas phase composition at total pressure
@@ -197,7 +197,7 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
     isotherms : list
         pure-component adsorption isotherms.
         e.g. [ethane_isotherm, methane_isotherm]
-    verboseflag : bool
+    verbose : bool
         print stuff
     warningoff : bool
         when False, warnings will print when the IAST
@@ -225,14 +225,14 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
     if numpy.size(adsorbed_mole_fractions) != n_components:
         print("""Example use:\n
               reverse_IAST([0.5,0.5], 1.0, [xe_isotherm, kr_isotherm],
-              verboseflag=true)""")
+              verbose=true)""")
         raise Exception("Length of desired adsorbed mole fractions != length of"
                         " array of isotherms...")
 
     if numpy.sum(adsorbed_mole_fractions) != 1.0:
         raise Exception("Desired adsorbed mole fractions should sum to 1.0...")
 
-    if verboseflag:
+    if verbose:
         print("%d components." % n_components)
         for i in range(n_components):
             print("\tDesired adsorbed phase mole fraction of component %d = %f"
@@ -325,7 +325,7 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
     # get loading of each component by multiplying by mole fractions
     loadings = adsorbed_mole_fractions * loading_total
 
-    if verboseflag:
+    if verbose:
         # print off IAST loadings and corresponding pure component loadings
         for i in range(n_components):
             print("Component ", i)
