@@ -151,7 +151,7 @@ class Sample(object):
         """
 
         parameters_dict = {
-            'nick': self.name,
+            'name': self.name,
             'batch': self.batch,
             'owner': self.owner,
             'contact': self.contact,

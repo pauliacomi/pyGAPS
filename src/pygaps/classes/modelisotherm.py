@@ -11,12 +11,14 @@ import scipy.optimize
 
 from .isotherm import Isotherm
 
-# version of pyIAST
-_VERSION = "1.4"
-
 # ! list of models implemented
-_MODELS = ["Langmuir", "Quadratic", "BET", "Henry", "TemkinApprox",
-           "DSLangmuir", "TSLangmuir"]
+_MODELS = ["Langmuir",
+           "Quadratic",
+           "BET",
+           "Henry",
+           "TemkinApprox",
+           "DSLangmuir",
+           "TSLangmuir"]
 
 # ! dictionary of parameters involved in each model
 _MODEL_PARAMS = {

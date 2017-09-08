@@ -96,11 +96,11 @@ def psd_bjh(loading, pressure, pore_geometry,
                         " do not match")
 
     if pore_geometry == 'slit':
-        raise Exception('Not implemented')
+        raise NotImplementedError
     elif pore_geometry == 'cylinder':
         pass
     elif pore_geometry == 'sphere':
-        raise Exception('Not implemented')
+        raise NotImplementedError
 
     # Calculate the adsorbed volume of liquid and diff
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density * 1000
@@ -238,11 +238,11 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
                         " do not match")
 
     if pore_geometry == 'slit':
-        raise Exception('Not implemented')
+        raise NotImplementedError
     if pore_geometry == 'cylinder':
         pass
     if pore_geometry == 'sphere':
-        raise Exception('Not implemented')
+        raise NotImplementedError
 
     # Calculate the adsorbed volume of liquid and diff
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density * 1000

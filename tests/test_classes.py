@@ -18,6 +18,9 @@ class TestAdsorbate(object):
 
         assert adsorbate_data == basic_adsorbate.to_dict()
 
+        with pytest.raises(Exception):
+            pygaps.Adsorbate({})
+
     def test_adsorbate_retreived_list(self, adsorbate_data, basic_adsorbate):
         "Checks adsorbate can be retrieved from master list"
         pygaps.data.GAS_LIST.append(basic_adsorbate)
@@ -25,6 +28,9 @@ class TestAdsorbate(object):
             adsorbate_data.get('nick'))
 
         assert adsorbate_data == uploaded_adsorbate.to_dict()
+
+        with pytest.raises(Exception):
+            pygaps.Adsorbate.from_list('noname')
 
     def test_adsorbate_get_properties(self, adsorbate_data, basic_adsorbate):
         "Checks if properties of a adsorbate can be located"
@@ -55,6 +61,49 @@ class TestAdsorbate(object):
         """Checks the printing is done"""
 
         print(basic_adsorbate)
+
+
+class TestSample(object):
+    """
+    Tests the sample class
+    """
+
+    def test_sample_created(self, sample_data, basic_sample):
+        "Checks sample can be created from test data"
+
+        assert sample_data == basic_sample.to_dict()
+
+        with pytest.raises(Exception):
+            pygaps.Sample({})
+
+    def test_sample_retreived_list(self, sample_data, basic_sample):
+        "Checks sample can be retrieved from master list"
+        pygaps.data.SAMPLE_LIST.append(basic_sample)
+        uploaded_sample = pygaps.Sample.from_list(
+            sample_data.get('name'),
+            sample_data.get('batch'))
+
+        assert sample_data == uploaded_sample.to_dict()
+
+        with pytest.raises(Exception):
+            pygaps.Sample.from_list('noname', 'nobatch')
+
+    def test_sample_get_properties(self, sample_data, basic_sample):
+        "Checks if properties of a sample can be located"
+
+        assert basic_sample.get_prop(
+            'density') == sample_data['properties'].get('density')
+
+        density = basic_sample.properties.pop('density')
+        with pytest.raises(Exception):
+            basic_sample.get_prop(
+                'density') == sample_data['properties'].get('density')
+        basic_sample.properties['density'] = density
+
+    def test_sample_print(self, basic_sample):
+        """Checks the printing is done"""
+
+        print(basic_sample)
 
 
 class TestIsotherm(object):

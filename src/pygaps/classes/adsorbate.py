@@ -66,6 +66,12 @@ class Adsorbate(object):
         """
         Instantiation is done by passing a dictionary with the parameters.
         """
+        # Required sample parameters cheks
+        if any(k not in info
+                for k in ('nick', 'formula')):
+            raise Exception(
+                "Adsorbate class MUST have the following information in the properties dictionary: 'nick', 'formula'")
+
         #: Adsorbate name
         self.name = info.get('nick')
         #: Adsorbate formula

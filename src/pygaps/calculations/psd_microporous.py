@@ -138,9 +138,9 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     if pore_geometry == 'slit':
         pass
     elif pore_geometry == 'cylinder':
-        raise Exception('Not implemented')
+        raise NotImplementedError
     elif pore_geometry == 'sphere':
-        raise Exception('Not implemented')
+        raise NotImplementedError
 
     if adsorbent_properties is None:
         raise Exception("A dictionary of adsorbent properties must be provided"
