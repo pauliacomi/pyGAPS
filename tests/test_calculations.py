@@ -111,7 +111,7 @@ class TestTPlot(object):
         isotherm.convert_mode_pressure('relative')
 
         t_plot_r = pygaps.t_plot(
-            isotherm, 'Halsey')
+            isotherm, 'Halsey', verbose=True)
 
         results = t_plot_r.get('results')
         assert results is not None

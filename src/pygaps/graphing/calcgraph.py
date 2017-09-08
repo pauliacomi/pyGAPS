@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 
-def roq_plot(pressure, roq_points, minimum, maximum, p_monolayer, n_monolayer, roq_monolayer):
+def roq_plot(pressure, roq_points, minimum, maximum, p_monolayer, roq_monolayer):
     """Draws the roquerol plot"""
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
@@ -23,16 +23,22 @@ def roq_plot(pressure, roq_points, minimum, maximum, p_monolayer, n_monolayer, r
     plt.show()
 
 
-def bet_plot(pressure, bet_points, minimum, maximum, p_monolayer, n_monolayer, bet_monolayer):
+def bet_plot(pressure, bet_points, minimum, maximum,
+             slope, intercept, p_monolayer, bet_monolayer):
     """Draws the bet plot"""
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(pressure, bet_points,
-             marker='', color='g', label='all points')
+             marker='', color='g')
     ax1.plot(pressure[minimum:maximum], bet_points[minimum:maximum],
              marker='o', linestyle='', color='r', label='chosen points')
+    x_lim = [0, pressure[maximum]]
+    y_lim = [slope * x_lim[0] + intercept,
+             slope * x_lim[1] + intercept]
+    ax1.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
     ax1.plot(p_monolayer, bet_monolayer,
              marker='x', linestyle='', color='black', label='monolayer point')
+
     ax1.set_ylim(ymin=0, ymax=bet_points[maximum] * 1.2)
     ax1.set_xlim(
         xmin=0, xmax=pressure[maximum] * 1.2)

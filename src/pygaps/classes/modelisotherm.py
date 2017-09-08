@@ -165,8 +165,6 @@ class ModelIsotherm(Isotherm):
 
         # Run base class constructor
         Isotherm.__init__(self,
-                          loading_key,
-                          pressure_key,
                           mode_adsorbent,
                           mode_pressure,
                           unit_loading,

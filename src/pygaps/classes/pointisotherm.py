@@ -14,7 +14,6 @@ import pygaps
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.unit_converter import convert_loading
 from ..utilities.unit_converter import convert_pressure
-from ..utilities.unit_converter import _PRESSURE_UNITS
 from .adsorbate import Adsorbate
 from .isotherm import Isotherm
 from .sample import Sample
@@ -265,7 +264,7 @@ class PointIsotherm(Isotherm):
             the unit into which the internal loading should be converted to
         """
 
-        self._data[self.unit_loading] = convert_loading(
+        self._data[self.loading_key] = convert_loading(
             self._data[self.loading_key],
             self.unit_loading,
             unit_to)
@@ -320,8 +319,7 @@ class PointIsotherm(Isotherm):
 
         self._data[self.pressure_key] = self._data[self.pressure_key].apply(
             lambda x: x *
-            (Adsorbate.from_list(self.gas).saturation_pressure(self.t_exp, unit=self.unit_pressure)
-             / _PRESSURE_UNITS[self.unit_pressure]) ** sign)
+            (Adsorbate.from_list(self.gas).saturation_pressure(self.t_exp, unit=self.unit_pressure)) ** sign)
 
         self.mode_pressure = mode_pressure
 

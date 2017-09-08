@@ -476,19 +476,19 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
             # Insert standard data fields:
             cursor.execute(sql_insert,
                            {'exp_id': isotherm.id, 'dtype': 'pressure',
-                            'data': isotherm.pressure_all().tobytes()}
+                            'data': isotherm.pressure().tobytes()}
                            )
 
             cursor.execute(sql_insert,
                            {'exp_id': isotherm.id, 'dtype': 'loading',
-                            'data': isotherm.loading_all().tobytes()}
+                            'data': isotherm.loading().tobytes()}
                            )
 
             # Update or insert other fields:
             for key in isotherm.other_keys:
                 cursor.execute(sql_insert,
                                {'exp_id': isotherm.id, 'dtype': key,
-                                'data': isotherm.other_key_all(key).tobytes()}
+                                'data': isotherm.other_data(key).tobytes()}
                                )
 
         # Print success

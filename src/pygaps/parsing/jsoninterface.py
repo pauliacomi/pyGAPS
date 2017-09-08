@@ -57,7 +57,7 @@ def isotherm_from_json(json_isotherm,
     loading_key = 'loading'
     pressure_key = 'pressure'
     other_keys = [column for column in data.columns.values if column not in [
-        'loading', 'pressure']]
+        loading_key, pressure_key]]
 
     # generate the isotherm
     isotherm = PointIsotherm(data,

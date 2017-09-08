@@ -12,7 +12,7 @@ from ..graphing.calcgraph import bet_plot
 from ..graphing.calcgraph import roq_plot
 
 
-def area_BET(isotherm, verbose=False):
+def area_BET(isotherm, limits=None, verbose=False):
     """
     Function returns the BET surface area of an isotherm object which
     is passed to it.
@@ -28,7 +28,9 @@ def area_BET(isotherm, verbose=False):
     ----------
     isotherm : PointIsotherm
         The isotherm of which to calculate the BET surface area
-    verbose : bool
+    limits : [:obj:`float`, :obj:`float`], optional
+        manual limits for region selection
+    verbose : bool, optional
         Prints extra information and plots graphs of the calculation
 
     Returns
@@ -36,12 +38,14 @@ def area_BET(isotherm, verbose=False):
     result_dict : dict
         A dictionary of results with the following components
 
-        - ``bet_area(float)`` : calculated BET surface area
-        - ``c_const(float)`` : the C constant in the BET equation
-        - ``n_monolayer(float)`` : the amount adsorbed at the statistical monolayer location
-        - ``p_monolayer(float)`` : the pressure at which the statistical monolayer is chosen
-        - ``bet_slope(float)`` : slope of the BET plot
-        - ``bet_intercept(float)`` : intercept of the BET plot
+        - ``bet_area(float)`` : calculated BET surface area, in m2/unit of adsorbent
+        - ``c_const(float)`` : the C constant in the BET equation, unitless
+        - ``n_monolayer(float)`` : the amount adsorbed at the statistical monolayer location,
+          in mmol
+        - ``p_monolayer(float)`` : the pressure at which the statistical monolayer is chosen,
+          relative
+        - ``bet_slope(float)`` : slope of the BET plot, in g/mol
+        - ``bet_intercept(float)`` : intercept of the BET plot, in g/mol
         - ``corr_coef(float)`` : correlation coefficient of the linear region in the BET plot
 
     Notes
@@ -151,29 +155,30 @@ def area_BET(isotherm, verbose=False):
         print("The intercept of the BET line: i =", round(intercept, 3))
         print("C =", int(round(c_const, 0)))
         print("Amount for a monolayer: n =",
-              round(n_monolayer, 3), "mol/g")
+              round(n_monolayer, 3), "mol/unit")
         print("Minimum pressure point chosen is {0} and maximum is {1}".format(
             round(pressure[minimum], 3), round(pressure[maximum], 3)))
-        print("BET surface area: a =", int(round(bet_area, 0)), "m²/g")
+        print("BET surface area: a =", int(round(bet_area, 0)), "m²/unit")
 
         # Generate plot of the BET points chosen
         bet_plot(pressure,
                  bet_transform(loading, pressure),
                  minimum, maximum,
-                 p_monolayer, n_monolayer,
-                 roq_transform(n_monolayer, p_monolayer))
+                 slope, intercept,
+                 p_monolayer,
+                 bet_transform(n_monolayer, p_monolayer))
 
         # Generate plot of the Roquerol points chosen
         roq_plot(pressure,
                  roq_transform(loading, pressure),
                  minimum, maximum,
-                 p_monolayer, n_monolayer,
-                 bet_transform(n_monolayer, p_monolayer))
+                 p_monolayer,
+                 roq_transform(n_monolayer, p_monolayer))
 
     return result_dict
 
 
-def area_BET_raw(loading, pressure, cross_section):
+def area_BET_raw(loading, pressure, cross_section, limits=None):
     """
     This is a 'bare-bones' function to calculate BET surface area which is
     designed as a low-level alternative to the main function.
@@ -187,6 +192,8 @@ def area_BET_raw(loading, pressure, cross_section):
         pressures, relative
     cross_section : float
         adsorbed cross-section of the molecule of the adsorbate, in nm
+    limits : [:obj:`float`, :obj:`float`], optional
+        manual limits for region selection
 
     Returns
     -------
@@ -218,18 +225,33 @@ def area_BET_raw(loading, pressure, cross_section):
     roq_t_array = roq_transform(loading, pressure)
 
     # select the maximum and minimum of the points and the pressure associated
-    maximum = len(roq_t_array) - 1
-    for index, value in enumerate(roq_t_array):
-        if value > roq_t_array[index + 1]:
-            maximum = index
-            break
-    min_p = pressure[maximum] / 10
+    if limits is None:
+        maximum = len(roq_t_array) - 1
+        for index, value in enumerate(roq_t_array):
+            if value > roq_t_array[index + 1]:
+                maximum = index
+                break
+        min_p = pressure[maximum] / 10
 
-    minimum = 0
-    for index, value in enumerate(pressure):
-        if value > min_p:
-            minimum = index
-            break
+        minimum = 0
+        for index, value in enumerate(pressure):
+            if value > min_p:
+                minimum = index
+                break
+    else:
+        max_p = limits[1]
+        maximum = len(roq_t_array) - 1
+        for index, value in reversed(list(enumerate(pressure))):
+            if value < max_p:
+                maximum = index
+                break
+
+        min_p = limits[0]
+        minimum = 0
+        for index, value in enumerate(pressure):
+            if value > min_p:
+                minimum = index
+                break
 
     # calculate the BET transform, slope and intercept
     bet_t_array = bet_transform(

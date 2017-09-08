@@ -44,11 +44,11 @@ class TestAdsorbate(object):
         temp = 77.355
         assert basic_adsorbate.molar_mass(calculated) == pytest.approx(
             adsorbate_data['properties'].get('molar_mass'), 0.001)
-        assert basic_adsorbate.saturation_pressure(temp, calculated) == pytest.approx(
+        assert basic_adsorbate.saturation_pressure(temp, calculate=calculated) == pytest.approx(
             adsorbate_data['properties'].get('saturation_pressure'), 0.001)
-        assert basic_adsorbate.surface_tension(temp, calculated) == pytest.approx(
+        assert basic_adsorbate.surface_tension(temp, calculate=calculated) == pytest.approx(
             adsorbate_data['properties'].get('surface_tension'), 0.001)
-        assert basic_adsorbate.liquid_density(temp, calculated) == pytest.approx(
+        assert basic_adsorbate.liquid_density(temp, calculate=calculated) == pytest.approx(
             adsorbate_data['properties'].get('liquid_density'), 0.001)
 
     def test_adsorbate_print(self, basic_adsorbate):
@@ -65,26 +65,6 @@ class TestIsotherm(object):
     def test_isotherm_created(self, basic_isotherm):
         "Checks isotherm can be created from test data"
         return basic_isotherm
-
-    @pytest.mark.parametrize('missing_key',
-                             ['loading_key', 'pressure_key'])
-    def test_isotherm_miss_key(self, isotherm_parameters, missing_key):
-        "Tests exception throw for missing data primary key (loading/pressure)"
-
-        keys = dict(
-            pressure_key="pressure",
-            loading_key="loading",
-        )
-
-        del keys[missing_key]
-
-        with pytest.raises(Exception):
-            pygaps.classes.isotherm.Isotherm(
-                loading_key=keys.get('loading_key'),
-                pressure_key=keys.get('pressure_key'),
-                **isotherm_parameters)
-
-        return
 
     @pytest.mark.parametrize('missing_param',
                              ['sample_name', 'sample_batch', 't_exp', 'gas'])
@@ -161,6 +141,27 @@ class TestPointIsotherm(object):
         "Checks isotherm can be created from test data"
         return basic_pointisotherm
 
+    @pytest.mark.parametrize('missing_key',
+                             ['loading_key', 'pressure_key'])
+    def test_isotherm_miss_key(self, isotherm_parameters, isotherm_data, missing_key):
+        "Tests exception throw for missing data primary key (loading/pressure)"
+
+        keys = dict(
+            pressure_key="pressure",
+            loading_key="loading",
+        )
+
+        del keys[missing_key]
+
+        with pytest.raises(Exception):
+            pygaps.classes.pointisotherm.PointIsotherm(
+                isotherm_data,
+                loading_key=keys.get('loading_key'),
+                pressure_key=keys.get('pressure_key'),
+                **isotherm_parameters)
+
+        return
+
     def test_isotherm_ret_funcs(self, basic_pointisotherm):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
@@ -231,7 +232,7 @@ class TestPointIsotherm(object):
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.loading_key] * multiplier
-        iso_converted = basic_pointisotherm.loading_all()
+        iso_converted = basic_pointisotherm.loading()
 
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
@@ -250,7 +251,7 @@ class TestPointIsotherm(object):
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.pressure_key] * multiplier
-        iso_converted = basic_pointisotherm.pressure_all()
+        iso_converted = basic_pointisotherm.pressure()
 
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
@@ -273,7 +274,7 @@ class TestPointIsotherm(object):
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.loading_key] * multiplier
-        iso_converted = basic_pointisotherm.loading_all()
+        iso_converted = basic_pointisotherm.loading()
 
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
@@ -296,7 +297,7 @@ class TestPointIsotherm(object):
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.pressure_key] * multiplier
-        iso_converted = basic_pointisotherm.pressure_all()
+        iso_converted = basic_pointisotherm.pressure()
 
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
@@ -324,11 +325,13 @@ class TestModelIsotherm(object):
     def test_isotherm_create(self, isotherm_data, basic_isotherm, model, data):
         "Checks isotherm can be created from test data"
 
+        loading_key = 'loading'
+        pressure_key = 'presure'
         isotherm_data['loading'] = data
 
-        pygaps.ModelIsotherm.from_isotherm(
-            basic_isotherm,
-            isotherm_data[:6],
-            basic_isotherm.loading_key,
-            basic_isotherm.pressure_key,
-            model)
+        # pygaps.ModelIsotherm.from_isotherm(
+        #     basic_isotherm,
+        #     isotherm_data[:6],
+        #     loading_key,
+        #     pressure_key,
+        #     model)

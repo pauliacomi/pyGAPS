@@ -72,7 +72,7 @@ def isotherm_data(basic_isotherm):
     """
 
     loading_key = 'loading'
-    pressure_key = 'presure'
+    pressure_key = 'pressure'
     other_key = "enthalpy"
 
     isotherm_data = pandas.DataFrame({
@@ -101,7 +101,7 @@ def basic_pointisotherm(isotherm_data, basic_isotherm):
     Creates an isotherm from model data
     """
     loading_key = 'loading'
-    pressure_key = 'presure'
+    pressure_key = 'pressure'
     other_key = "enthalpy"
     other_keys = [other_key]
 
@@ -121,7 +121,7 @@ def basic_modelisotherm(isotherm_data, basic_isotherm):
     """
     model = "Langmuir"
     loading_key = 'loading'
-    pressure_key = 'presure'
+    pressure_key = 'pressure'
 
     isotherm = pygaps.ModelIsotherm.from_isotherm(
         basic_isotherm,
