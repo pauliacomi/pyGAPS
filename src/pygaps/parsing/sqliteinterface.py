@@ -371,6 +371,8 @@ def db_get_experiments(pth, criteria):
 
         for row in cursor:
             exp_params = dict(zip(row.keys(), row))
+            # TODO remove this
+            exp_params['adsorbate'] = exp_params.pop('gas')
 
             # Get the extra data from the experiment_data table
             cur_inner = db.cursor()
@@ -456,7 +458,7 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
                 't_act':            isotherm.t_act,
                 't_exp':            isotherm.t_exp,
                 'machine':          isotherm.machine,
-                'gas':              isotherm.gas,
+                'gas':              isotherm.adsorbate,
                 'user':             isotherm.user,
                 'lab':              isotherm.lab,
                 'project':          isotherm.project,
@@ -501,7 +503,7 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
               isotherm.sample_name,
               isotherm.sample_batch,
               isotherm.user,
-              isotherm.gas,
+              isotherm.adsorbate,
               isotherm.machine,
               isotherm.t_act,
               isotherm.t_exp,
@@ -630,7 +632,7 @@ def db_delete_experiment(pth, isotherm):
               isotherm.sample_name,
               isotherm.sample_batch,
               isotherm.user,
-              isotherm.gas,
+              isotherm.adsorbate,
               isotherm.machine,
               isotherm.t_act,
               isotherm.t_exp,
@@ -749,7 +751,7 @@ def db_get_gasses(pth):
     return gasses
 
 
-def db_upload_gas(pth, gas, overwrite=False):
+def db_upload_gas(pth, adsorbate, overwrite=False):
     """
     Uploads gasses to the database
     If overwrite is set to true, the gas is overwritten
@@ -775,20 +777,20 @@ def db_upload_gas(pth, gas, overwrite=False):
 
             # Upload or modify data in sample table
             cursor.execute(sql_com, {
-                'nick':         gas.name,
-                'formula':      gas.formula,
+                'nick':         adsorbate.name,
+                'formula':      adsorbate.formula,
             }
             )
 
             # Upload or modify data in sample_properties table
-            if len(gas.properties) > 0:
+            if len(adsorbate.properties) > 0:
                 # Get id of gas
                 gas_id = cursor.execute(
                     build_select(table='gasses',
                                  to_select=['id'],
                                  where=['nick']), {
-                        'nick':         gas.name,
-                        'formula':      gas.formula,
+                        'nick':         adsorbate.name,
+                        'formula':      adsorbate.formula,
                     }
                 ).fetchone()[0]
 
@@ -813,7 +815,7 @@ def db_upload_gas(pth, gas, overwrite=False):
                     )
                     updates = [elt[0] for elt in cursor.fetchall()]
 
-                for prop in gas.properties:
+                for prop in adsorbate.properties:
                     if prop in updates:
                         sql_com_prop = sql_update
                     else:
@@ -822,16 +824,16 @@ def db_upload_gas(pth, gas, overwrite=False):
                     cursor.execute(sql_com_prop, {
                         'gas_id':           gas_id,
                         'type':             prop,
-                        'value':            gas.properties[prop]
+                        'value':            adsorbate.properties[prop]
                     })
 
         # Print success
-        print("Gas uploaded", gas.name)
+        print("Adsorbate uploaded", adsorbate.name)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
         print("Error on sample:", "\n",
-              gas.name,
+              adsorbate.name,
               "\n", e)
         raise e
 
@@ -878,7 +880,7 @@ def db_upload_gas_property_type(pth, property_type, property_unit):
         db.close()
 
 
-def db_delete_gas(pth, gas):
+def db_delete_gas(pth, adsorbate):
     """
     Delete experiment to the database
     """
@@ -896,12 +898,12 @@ def db_delete_gas(pth, gas):
                 build_select(table='gasses',
                              to_select=['id'],
                              where=['nick']),
-                {'nick':        gas.name}
+                {'nick':        adsorbate.name}
             ).fetchone()
 
             if ids is None:
                 raise sqlite3.IntegrityError(
-                    "Gas to delete does not exist in database")
+                    "Adsorbate to delete does not exist in database")
             gas_id = ids[0]
 
             # Delete data from gas_properties table
@@ -918,12 +920,12 @@ def db_delete_gas(pth, gas):
             cursor.execute(sql_com, {'id': gas_id})
 
             # Print success
-            print("Success", gas.name)
+            print("Success", adsorbate.name)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
         print("Error on sample:", "\n",
-              gas.name,
+              adsorbate.name,
               "\n", e)
         raise e
 

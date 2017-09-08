@@ -42,7 +42,7 @@ def isotherm_parameters():
         'sample_name': 'TEST',
         'sample_batch': 'TB',
         't_exp': 100,
-        'gas': 'N2',
+        'adsorbate': 'N2',
 
         'date': '26/06/92',
         't_act': 100,

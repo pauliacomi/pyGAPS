@@ -20,20 +20,30 @@ else:
         "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
 
-def isotherm_from_xl(path):
-    '''
+def isotherm_from_xl(path, fmt=None):
+    """
+    A function that will get the experiment and sample data from a excel parser
+    file and return the isotherm object.
 
-    A function that will get the experiment and sample data from a parser file and return the isotherm object.
+    Parameters
+    ----------
+    path : str
+        Path to the file to be read.
+    fmt : {None, 'MADIREL'}, optional
+        If the format is set to MADIREL, then the excel file is a specific version
+        used by the MADIREL lab for internal processing.
 
-    :param path: Path to the file being read
-
-    '''
+    Returns
+    -------
+    PointIsotherm
+        The isotherm contained in the excel file
+    """
 
     if xlwings is None:
         raise Warning(
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
-    # get excel workbook, sheet and range
+    # Get excel workbook, sheet and range
     wb = xlwings.Book(path)
     sht = wb.sheets[0]
 
@@ -54,7 +64,7 @@ def isotherm_from_xl(path):
     sample_info['t_act'] = sht.range('B6').value
     sample_info['machine'] = sht.range('B7').value
     sample_info['t_exp'] = sht.range('B8').value
-    sample_info['gas'] = sht.range('B9').value
+    sample_info['adsorbate'] = sht.range('B9').value
     sample_info['user'] = sht.range('B10').value
     sample_info['lab'] = sht.range('B11').value
     sample_info['project'] = sht.range('B12').value
@@ -80,7 +90,7 @@ def isotherm_from_xl(path):
 
     experiment_data_df = pandas.DataFrame(experiment_data_arr, columns=columns)
 
-    xlwings.apps[0].quit()
+    wb.app.quit()
 
     isotherm = PointIsotherm(
         experiment_data_df,
@@ -92,17 +102,123 @@ def isotherm_from_xl(path):
     return isotherm
 
 
-def isotherm_to_xl(path):
+def isotherm_to_xl(isotherm, path, fmt=None):
     '''
 
     A function that turns the isotherm into an excel file with the data and properties.
 
-    :param path: Path to the file being written
-
+    Parameters
+    ----------
+    isotherm: PointIsotherm
+        Isotherm to be written to excel.
+    path : str
+        Path to the file to be written.
+    fmt : {None, 'MADIREL'}, optional
+        If the format is set to MADIREL, then the excel file is a specific version
+        used by the MADIREL lab for internal processing.
     '''
 
     if xlwings is None:
         raise Warning(
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
+
+    # create a new workbook and select first sheet
+    wb = xlwings.Book()
+    wb.app.screen_updating = False
+    sht = wb.sheets[0]
+
+    # write the isotherm paramterers
+
+    if isotherm.is_real is True:
+        is_real = "Experience"
+    else:
+        is_real = "Simulation"
+
+    sht.range('A1').value = [
+        ["Type manip", isotherm.exp_type],
+        ["Experience ou Simulation", is_real],
+        ["Date de l'expérience", isotherm.date],
+        ["Nom de l'échantillon", isotherm.sample_name],
+        ["Lot de l'échantillon", isotherm.sample_batch],
+        ["Température d'activation (°C)", isotherm.t_act],
+        ["Surnom de l'appareil", isotherm.machine],
+        ["Température de l'expérience (K)", isotherm.t_exp],
+        ["Formule chimique du gaz", isotherm.adsorbate],
+        ["Surnom du contact", isotherm.user],
+        ["Nom du labo", isotherm.lab],
+        ["Nom du projet", isotherm.project],
+    ]
+
+    delimiter_colour = (217, 217, 217)
+    user_cells = (255, 199, 206)
+    xlwings.Range('A1:B2').column_width = 30
+    xlwings.Range('B1:B12').color = user_cells
+    xlwings.Range('A13:B13').color = delimiter_colour
+
+    # Write data
+    if fmt is None:
+        rng_data = 14
+    elif fmt == 'MADIREL':
+        if isotherm.exp_type == "isotherm":
+            rng_data = 30
+        elif isotherm.exp_type == "calorimetry":
+            rng_data = 39
+        else:
+            raise Exception("Unknown data type")
+
+    headings = [
+        isotherm.loading_key,
+        isotherm.pressure_key,
+    ]
+    headings.extend(isotherm.other_keys)
+
+    data = isotherm.data()[headings]
+
+    headings[0] = isotherm.loading_key + \
+        '(' + isotherm.unit_loading + ')'
+    headings[1] = isotherm.pressure_key + \
+        '(' + isotherm.unit_pressure + ')'
+
+    sht.range('A' + str(rng_data)).value = headings
+    sht.range('A' + str(rng_data + 1)).value = data.as_matrix()
+
+    # MADIREL specific
+    if fmt == 'MADIREL':
+        sht.range('A14').value = [
+            ["Constante d'Henry", ],
+            ["Langmuir N1", ],
+            ["Langmuir B1", ],
+            ["Langmuir N2", ],
+            ["Langmuir B2", ],
+            ["Langmuir N3", ],
+            ["Langmuir B3", ],
+            ["Langmuir R2", ],
+            ["C1", ],
+            ["C2", ],
+            ["C3", ],
+            ["C4", ],
+            ["C5", ],
+            ["C6", ],
+            ["C_m", ],
+        ]
+        xlwings.Range('A29:B29').color = delimiter_colour
+
+        if isotherm.exp_type == "calorimetry":
+            sht.range('A30').value = [
+                ["Enthalpie à zéro", ],
+                ["Polynome Enthalpie A", ],
+                ["Polynome Enthalpie B", ],
+                ["Polynome Enthalpie C", ],
+                ["Polynome Enthalpie D", ],
+                ["Polynome Enthalpie E", ],
+                ["Polynome Enthalpie F", ],
+                ["Polynome Enthalpie R2", ],
+            ]
+            xlwings.Range('A38:C38').color = delimiter_colour
+        else:
+            raise Exception("Unknown data type")
+
+    wb.save(path=path)
+    wb.app.quit()
 
     return
