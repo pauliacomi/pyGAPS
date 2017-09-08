@@ -10,7 +10,7 @@ import pygaps
 
 
 @pytest.fixture
-def basic_isotherm_json(isotherm_data, basic_pointisotherm):
+def basic_isotherm_json(basic_pointisotherm):
     """
     Gives a json of the isotherm from model data
     """

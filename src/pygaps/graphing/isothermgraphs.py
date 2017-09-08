@@ -300,7 +300,7 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         color = None
 
         if ads:
-            if isotherm.has_ads():
+            if isotherm.has_branch(branch='ads'):
                 line_label_ = line_label + ' ads'
                 lmax_y1, lmax_y2, line = graph_caller(axes, axes2,
                                                       isotherm.pressure(
@@ -318,7 +318,7 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
                 color = line.get_color()
 
         if des:
-            if isotherm.has_des():
+            if isotherm.has_branch(branch='des'):
                 styles['line_style']['mfc'] = 'none'
                 if color is not None:
                     styles['line_style']['c'] = color

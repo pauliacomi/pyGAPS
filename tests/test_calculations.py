@@ -111,7 +111,7 @@ class TestTPlot(object):
         isotherm.convert_mode_pressure('relative')
 
         t_plot_r = pygaps.t_plot(
-            isotherm, 'Halsey', verbose=True)
+            isotherm, 'Halsey', verbose=False)
 
         results = t_plot_r.get('results')
         assert results is not None
@@ -157,7 +157,7 @@ class TestPSD(object):
         isotherm.convert_mode_pressure('relative')
 
         result_dict = pygaps.mesopore_size_distribution(
-            isotherm, psd_model=method, branch='desorption', thickness_model='Halsey', verbose=True)
+            isotherm, psd_model=method, branch='desorption', thickness_model='Halsey', verbose=False)
 
         # max_error = 0.1  # 10 percent
 
@@ -181,6 +181,6 @@ class TestPSD(object):
         isotherm.convert_mode_pressure('relative')
 
         result_dict = pygaps.micropore_size_distribution(
-            isotherm, psd_model=method, pore_geometry='slit', verbose=True)
+            isotherm, psd_model=method, pore_geometry='slit', verbose=False)
 
         # max_error = 0.1  # 10 percent

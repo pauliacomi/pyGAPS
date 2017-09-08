@@ -489,7 +489,7 @@ class PointIsotherm(Isotherm):
                 max_range = max(ret)
             return [x for x in ret if (min_range <= x and x <= max_range)]
 
-    def other_data(self, key, branch=None):
+    def other_data(self, key, min_range=None, max_range=None, branch=None):
         """
         Returns adsorption enthalpy points as an array
 
@@ -500,6 +500,10 @@ class PointIsotherm(Isotherm):
         unit : str, optional
             Unit in which the data should be returned. If None
             it defaults to which data unit the isotherm is currently in
+        min_range : float, optional
+            The lower limit for the data to select.
+        max_range : float, optional
+            The higher limit for the data to select.
         branch : {None, 'ads', 'des'}
             The branch of the data to return. If None, returns entire
             dataset
@@ -512,7 +516,15 @@ class PointIsotherm(Isotherm):
         if key in self.other_keys:
             ret = self.data(branch=branch).loc[:, key].values
 
-            return ret
+            # Select required points
+            if max_range is None or min_range is None:
+                return ret
+            else:
+                if min_range is None:
+                    min_range = 0
+                if max_range is None:
+                    max_range = max(ret)
+                return [x for x in ret if (min_range <= x and x <= max_range)]
         else:
             return None
 

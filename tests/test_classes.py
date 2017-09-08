@@ -329,8 +329,8 @@ class TestPointIsotherm(object):
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
     @pytest.mark.parametrize('mode, multiplier', [
-                            ('absolute', 1),
                             ('relative', 1 / 7.7827),
+                            ('absolute', 1),
         pytest.param("bad_mode", 1,
                                 marks=pytest.mark.xfail),
     ])
@@ -351,10 +351,10 @@ class TestPointIsotherm(object):
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
-    def test_isotherm_print_parameters(self, basic_isotherm):
+    def test_isotherm_print_parameters(self, basic_pointisotherm):
         "Checks isotherm can print its own info"
 
-        print(basic_isotherm)
+        basic_pointisotherm.print_info()
 
 
 class TestModelIsotherm(object):
