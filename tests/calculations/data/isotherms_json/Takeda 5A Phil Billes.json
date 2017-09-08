@@ -2,7 +2,7 @@
     "comment": null,
     "date": "None",
     "exp_type": "Calorimetrie",
-    "gas": "CO2",
+    "adsorbate": "CO2",
     "id": "49012fdcd65fbf9e10344bf3855af1b9",
     "is_real": true,
     "isotherm_data": {

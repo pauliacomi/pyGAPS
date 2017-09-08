@@ -105,7 +105,7 @@ class Adsorbate(object):
         adsorbate = next(
             (x for x in data.GAS_LIST if adsorbate_name == x.name), None)
         if adsorbate is None:
-            raise Exception("Adsorbate {0} does not exist in list of gasses. "
+            raise Exception("Adsorbate {0} does not exist in list of adsorbates. "
                             "First populate pygaps.data.GAS_LIST "
                             "with required adsorbate class".format(adsorbate_name))
 

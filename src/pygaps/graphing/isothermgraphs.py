@@ -190,15 +190,15 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         Builds a label for the legend depending on requested parameters
         """
         if list_ is None:
-            return isotherm.sample_name + ' ' + convert_chemformula(isotherm.gas)
+            return isotherm.sample_name + ' ' + convert_chemformula(isotherm.adsorbate)
         else:
             text = []
             if 'sample_name' in list_:
                 text.append(isotherm.sample_name)
             if 'sample_batch' in list_:
                 text.append(isotherm.sample_batch)
-            if 'gas' in list_:
-                text.append(convert_chemformula(isotherm.gas))
+            if 'adsorbate' in list_:
+                text.append(convert_chemformula(isotherm.adsorbate))
             if 'type' in list_:
                 text.append(isotherm.type)
             if 'user' in list_:

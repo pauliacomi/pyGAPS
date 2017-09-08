@@ -59,7 +59,7 @@ class PointIsotherm(Isotherm):
             isotherm_params = {
                 'sample_name' : 'Zeolite-1',
                 'sample_batch' : '1234',
-                'gas' : 'N2',
+                'adsorbate' : 'N2',
                 't_exp' : 200,
                 'user' : 'John Doe',
                 'properties' : {
@@ -69,7 +69,7 @@ class PointIsotherm(Isotherm):
             }
 
         The info dictionary must contain an entry for 'sample_name',  'sample_batch',
-        'gas' and 't_exp'
+        'adsorbate' and 't_exp'
 
     Notes
     -----
@@ -319,7 +319,7 @@ class PointIsotherm(Isotherm):
 
         self._data[self.pressure_key] = self._data[self.pressure_key].apply(
             lambda x: x *
-            (Adsorbate.from_list(self.gas).saturation_pressure(self.t_exp, unit=self.unit_pressure)) ** sign)
+            (Adsorbate.from_list(self.adsorbate).saturation_pressure(self.t_exp, unit=self.unit_pressure)) ** sign)
 
         self.mode_pressure = mode_pressure
 
@@ -380,7 +380,7 @@ class PointIsotherm(Isotherm):
             plot_type = 'isotherm'
 
         plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
-                 logarithmic=logarithmic, color=True, fig_title=self.gas)
+                 logarithmic=logarithmic, color=True, fig_title=self.adsorbate)
 
         return
 

@@ -33,7 +33,7 @@ class Isotherm(object):
             isotherm_params = {
                 'sample_name' : 'Zeolite-1',
                 'sample_batch' : '1234',
-                'gas' : 'N2',
+                'adsorbate' : 'N2',
                 't_exp' : 200,
                 'user' : 'John Doe',
                 'properties' : {
@@ -43,7 +43,7 @@ class Isotherm(object):
             }
 
         The info dictionary must contain an entry for 'sample_name',
-        'sample_batch', 'gas' and 't_exp'
+        'sample_batch', 'adsorbate' and 't_exp'
 
     Notes
     -----
@@ -53,7 +53,7 @@ class Isotherm(object):
     implementation additions.
 
     The minimum arguments required to instantiate the class are
-    'sample_name', 'sample_batch', 't_exp', 'gas'. Pass these values in
+    'sample_name', 'sample_batch', 't_exp', 'adsorbate'. Pass these values in
     the ``**isotherm_parameters`` dictionary
     """
 
@@ -73,10 +73,10 @@ class Isotherm(object):
 
         # Checks
         if any(k not in isotherm_parameters
-               for k in ('sample_name', 'sample_batch', 't_exp', 'gas')):
+               for k in ('sample_name', 'sample_batch', 't_exp', 'adsorbate')):
             raise Exception(
                 "Isotherm MUST have the following information in the properties dictionary:"
-                "'sample_name', 'sample_batch', 't_exp', 'gas'")
+                "'sample_name', 'sample_batch', 't_exp', 'adsorbate'")
 
         if mode_adsorbent is None or mode_pressure is None:
             raise Exception("One of the modes is not specified. See viable"
@@ -123,8 +123,8 @@ class Isotherm(object):
         self.sample_batch = isotherm_parameters.pop('sample_batch', None)
         #: Isotherm experimental temperature
         self.t_exp = isotherm_parameters.pop('t_exp', None)
-        #: Isotherm gas used
-        self.gas = isotherm_parameters.pop('gas', None)
+        #: Isotherm adsorbate used
+        self.adsorbate = isotherm_parameters.pop('adsorbate', None)
 
         # Good-to-have properties of the isotherm
         #: Isotherm experiment date
@@ -170,7 +170,7 @@ class Isotherm(object):
         string += ("Material:" + str(self.sample_name) + '\n')
         string += ("Sample Batch:" + str(self.sample_batch) + '\n')
         string += ("Isotherm type:" + str(self.exp_type) + '\n')
-        string += ("Gas used:" + str(self.gas) + '\n')
+        string += ("Adsorbate used:" + str(self.adsorbate) + '\n')
         string += ("Isotherm date:" + str(self.date) + '\n')
         string += ("Machine:" + str(self.machine) + '\n')
         string += ("User:" + str(self.user) + '\n')
@@ -198,7 +198,7 @@ class Isotherm(object):
             'sample_name': self.sample_name,
             'sample_batch': self.sample_batch,
             't_exp': self.t_exp,
-            'gas': self.gas,
+            'adsorbate': self.adsorbate,
 
             'date': str(self.date),
             't_act': self.t_act,

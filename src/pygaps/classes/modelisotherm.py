@@ -75,7 +75,7 @@ class ModelIsotherm(Isotherm):
             isotherm_params = {
                 'sample_name' : 'Zeolite-1',
                 'sample_batch' : '1234',
-                'gas' : 'N2',
+                'adsorbate' : 'N2',
                 't_exp' : 200,
                 'user' : 'John Doe',
                 'properties' : {
@@ -87,7 +87,7 @@ class ModelIsotherm(Isotherm):
     Notes
     -----
 
-    Models supported are as follows. Here, :math:`L` is the gas uptake,
+    Models supported are as follows. Here, :math:`L` is the adsorbate uptake,
     :math:`P` is pressure (fugacity technically).
 
     * Langmuir isotherm model

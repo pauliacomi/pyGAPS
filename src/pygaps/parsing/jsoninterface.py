@@ -88,7 +88,7 @@ def isotherm_from_json(json_isotherm,
 #     info_dict["exp_type"] = raw_dict['isotherm_type']
 #     info_dict["name"] = raw_dict["adsorbentMaterial"]
 #     info_dict["batch"] = raw_dict["DOI"]
-#     info_dict["gas"] = raw_dict["adsorbateGas"]
+#     info_dict["adsorbate"] = raw_dict["adsorbateGas"]
 #     info_dict["t_exp"] = raw_dict["temperature"]
 
 #     # Get modes and units

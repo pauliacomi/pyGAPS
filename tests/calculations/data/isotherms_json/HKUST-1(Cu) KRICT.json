@@ -3,7 +3,7 @@
     "sample_name": "HKUST-1(Cu)",
     "sample_batch": "KRICT",
     "date": "2010-05-21 00:00:00",
-    "gas": "CO2",
+    "adsorbate": "CO2",
     "exp_type": "Calorimetrie",
     "is_real": true,
     "lab": "MADIREL",

@@ -127,7 +127,7 @@ def area_BET(isotherm, limits=None, verbose=False):
         isotherm.convert_pressure_mode('relative')
 
     # get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in

@@ -133,7 +133,7 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
                         "Available models are {}".format(_THICKNESS_MODELS))
 
     # Get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 

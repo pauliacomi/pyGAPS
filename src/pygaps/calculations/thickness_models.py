@@ -58,7 +58,7 @@ def thickness_isotherm(isotherm):
         function which takes pressure and returns thickness
     """
 
-    adsorbate = Adsorbate.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     layer_thickness = adsorbate.get_prop('layer_thickness')
     loading_max = max(isotherm.loading(branch='ads'))
 

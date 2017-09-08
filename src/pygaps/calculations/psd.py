@@ -126,7 +126,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
                         "Available models are {}".format(_THICKNESS_MODELS))
 
     # Get required adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
     surface_tension = adsorbate.surface_tension(isotherm.t_exp)
@@ -255,7 +255,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
                         "Available models are {}".format(_ADSORBENT_MODELS))
 
     # Get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     adsorbate_properties = dict(
         molecular_diameter=adsorbate.get_prop('molecular_diameter'),
         polarizability=adsorbate.get_prop('polarizability'),

@@ -2,7 +2,7 @@
     "comment": null,
     "date": "None",
     "exp_type": "Isotherme",
-    "gas": "N2",
+    "adsorbate": "N2",
     "id": "7e87b510d40653a0d92d3da8ac0f69ae",
     "is_real": true,
     "isotherm_data": {

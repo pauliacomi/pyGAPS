@@ -116,7 +116,7 @@ class TestIsotherm(object):
         return basic_isotherm
 
     @pytest.mark.parametrize('missing_param',
-                             ['sample_name', 'sample_batch', 't_exp', 'gas'])
+                             ['sample_name', 'sample_batch', 't_exp', 'adsorbate'])
     def test_isotherm_miss_param(self, isotherm_parameters, missing_param):
         "Tests exception throw for missing required attributes"
 

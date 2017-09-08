@@ -1,3 +1,7 @@
+"""
+Tests utilities
+"""
+
 import pygaps.utilities as utilities
 
 

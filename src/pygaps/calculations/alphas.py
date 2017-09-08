@@ -120,7 +120,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
     if reference_isotherm is None:
         raise Exception("No reference isotherm for alpha s calculation "
                         "is provided. Please supply one ")
-    if reference_isotherm.gas != isotherm.gas:
+    if reference_isotherm.adsorbate != isotherm.adsorbate:
         raise Exception("The reference isotherm adsorbate is different than the "
                         "calculated isotherm adsorbate. ")
     if reducing_pressure < 0 or reducing_pressure > 1:
@@ -130,7 +130,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
         reference_area = area_BET(reference_isotherm).get('bet_area')
 
     # Get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.gas)
+    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
