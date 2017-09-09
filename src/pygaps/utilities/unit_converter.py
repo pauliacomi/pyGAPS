@@ -1,8 +1,29 @@
 """Module containing the conversions between different units used"""
 
 
-_LOADING_UNITS = {"mol": 1, "mmol": 0.001, "cm3 STP": 4.461e-5}
-_PRESSURE_UNITS = {"bar": 100000, "Pa": 1, "atm": 101325, "mmHg": 133.322}
+_LOADING_UNITS = {
+    "mol": 1,
+    "mmol": 0.001,
+    "cm3 STP": 4.461e-5,
+    "ml": 4.461e-5,
+}
+_MASS_UNITS = {
+    'g': 1,
+    'kg': 1000,
+}
+_VOLUME_UNITS = {
+    'cm3': 1,
+    'ml': 1,
+    'dm3': 1e3,
+    'l': 1e3,
+    'm3': 1e6,
+}
+_PRESSURE_UNITS = {
+    "bar": 100000,
+    "Pa": 1,
+    "atm": 101325,
+    "mmHg": 133.322
+}
 
 
 def convert_pressure(pressure, unit_from, unit_to):

@@ -16,7 +16,8 @@ from .classes.pointisotherm import PointIsotherm
 from .classes.sample import Sample
 from .graphing.iastgraphs import plot_iast_vle
 from .graphing.isothermgraphs import plot_iso
-from .parsing.csvinterface import samples_parser
+from .parsing.csvinterface import isotherm_from_csv
+from .parsing.csvinterface import isotherm_to_csv
 from .parsing.excelinterface import isotherm_from_xl
 from .parsing.excelinterface import isotherm_to_xl
 from .parsing.jsoninterface import isotherm_from_json

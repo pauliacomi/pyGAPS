@@ -7,16 +7,35 @@ import json
 import pandas
 
 from ..classes.pointisotherm import PointIsotherm
+from ..utilities.unit_converter import _VOLUME_UNITS
+from ..utilities.unit_converter import _MASS_UNITS
+from ..utilities.unit_converter import _LOADING_UNITS
 
 
-def isotherm_to_json(isotherm):
+def isotherm_to_json(isotherm, fmt=None):
     """
     Converts an isotherm object to a json structure
     Structure is inspired by the NIST format
+
+    Parameters
+    ----------
+    isotherm : PointIsotherm
+        Isotherm to be written to json.
+    fmt : {None, 'NIST'}, optional
+        If the format is set to NIST, then the json format a specific version
+        used by the NIST database of adsorbents
+
+    Returns
+    -------
+    str
+        A string with the json format of the Isotherm.
     """
 
     # Isotherm properties
     raw_dict = isotherm.to_dict()
+
+    if fmt == 'NIST':
+        raw_dict = _to_json_nist(raw_dict)
 
     # Isotherm data
     isotherm_data_dict = isotherm.data().to_dict(orient='index')
@@ -33,10 +52,31 @@ def isotherm_from_json(json_isotherm,
                        mode_adsorbent='mass',
                        unit_pressure='bar',
                        unit_loading='mmol',
-                       ):
+                       fmt=None):
     """
     Converts a json isotherm format to a internal format
     Structure is inspired by the NIST format
+
+    Parameters
+    ----------
+    mode_pressure : {'relative', 'absolute'}, optional
+        Whether the adsorption is read in terms of either 'per volume'
+        or 'per mass'. Defults to absolute.
+    mode_adsorbent : {'mass','volume'}, optional
+        The pressure mode, either absolute pressures or relative in
+        the form of p/p0. Defults to mass.
+    unit_pressure : str, optional
+        Unit of pressure, Defults to bar.
+    unit_loading : str, optional
+        Unit of loading. Defults to mmol.
+    fmt : {None, 'NIST'}, optional
+        If the format is set to NIST, then the json format a specific version
+        used by the NIST database of adsorbents.
+
+    Returns
+    -------
+    PointIsotherm
+        The isotherm contained in the json
     """
 
     # Parse isotherm in dictionary
@@ -47,6 +87,14 @@ def isotherm_from_json(json_isotherm,
         raw_dict["isotherm_data"], orient='index', dtype='float64')
     del raw_dict["isotherm_data"]
 
+    # Rename keys and get units if needed depending on format
+    if fmt == 'NIST':
+        (raw_dict,
+         mode_pressure,
+         mode_adsorbent,
+         unit_pressure,
+         unit_loading) = _from_json_nist(raw_dict)
+
     # convert index into int (seen as string)
     data.index = data.index.map(int)
 
@@ -54,8 +102,12 @@ def isotherm_from_json(json_isotherm,
     data.sort_index(inplace=True)
 
     # set dataframe keys
-    loading_key = 'loading'
     pressure_key = 'pressure'
+    if fmt is None:
+        loading_key = 'loading'
+    elif fmt == 'NIST':
+        loading_key = 'adsorption'
+
     other_keys = [column for column in data.columns.values if column not in [
         loading_key, pressure_key]]
 
@@ -73,54 +125,60 @@ def isotherm_from_json(json_isotherm,
     return isotherm
 
 
-# def isotherm_from_json_nist(json_isotherm):
-#     """
-#     Converts a json isotherm format to a internal format
-#     Structure is taken from the NIST format
-#     """
+def _to_json_nist(raw_dict):
+    """
+    Converts an internal dictionary format to a NIST format
+    """
+    nist_dict = dict()
 
-#     # Parse isotherm in dictionary
-#     raw_dict = json.loads(json_isotherm)
+    nist_dict['adosrbentMaterial'] = raw_dict['sample_name']
+    nist_dict['hashkey'] = raw_dict['sample_batch']
+    nist_dict['adsorbateGas'] = raw_dict['adsorbate']
+    nist_dict['temperature'] = raw_dict['t_exp']
 
-#     # Build info dictionary for internal format
-#     info_dict = dict()
+    return nist_dict
 
-#     info_dict["exp_type"] = raw_dict['isotherm_type']
-#     info_dict["name"] = raw_dict["adsorbentMaterial"]
-#     info_dict["batch"] = raw_dict["DOI"]
-#     info_dict["adsorbate"] = raw_dict["adsorbateGas"]
-#     info_dict["t_exp"] = raw_dict["temperature"]
 
-#     # Get modes and units
-#     mode_pressure = "absolute"  # raw_dict[""]
-#     mode_adsorbent = "mass"    # raw_dict["mass"]
-#     unit_pressure = raw_dict["pressureUnits"]
-#     unit_loading = "mmol"      # raw_dict["mmol"]
+def _from_json_nist(raw_dict):
+    """
+    Converts a NIST dictionary format to a internal format
+    """
 
-#     # Build pandas dataframe of data
+    nist_dict = dict()
 
-#     # Build pandas dataframe of data
-#     data = pandas.DataFrame.from_dict(
-#         raw_dict["isotherm_data"], orient='index', dtype='float64')
-#     del raw_dict["isotherm_data"]
+    nist_dict['sample_name'] = raw_dict['adosrbentMaterial']
+    nist_dict['sample_batch'] = raw_dict['hashkey']
+    nist_dict['adsorbate'] = raw_dict['adsorbateGas']
+    nist_dict['t_exp'] = raw_dict['temperature']
 
-#     # convert index into int (seen as string)
-#     data.index = data.index.map(int)
+    # Get modes and units
+    loading_string = raw_dict["adsorptionUnits"]
+    comp = loading_string.split('/')
+    if len(comp) != 2:
+        raise Exception("Isotherm cannot be parsed due to loading format")
 
-#     # sort index, in case the json was not sorted
-#     data.sort_index(inplace=True)
+    # TODO ensure that the adsorbent unit is included later
+    if comp[1] in _MASS_UNITS:
+        mode_adsorbent = "mass"
+    elif comp[1] in _VOLUME_UNITS:
+        mode_adsorbent = "volume"
+    else:
+        raise Exception("Isotherm cannot be parsed due to adsorbent unit")
 
-#     # set dataframe keys
-#     loading_key = "Loading"
-#     pressure_key = "Pressure"
+    if comp[0] in _LOADING_UNITS:
+        unit_loading = comp[0]
+    else:
+        raise Exception("Isotherm cannot be parsed due to loading unit")
 
-#     isotherm = PointIsotherm(data,
-#                              loading_key=loading_key,
-#                              pressure_key=pressure_key,
-#                              mode_adsorbent=mode_adsorbent,
-#                              mode_pressure=mode_pressure,
-#                              unit_loading=unit_loading,
-#                              unit_pressure=unit_pressure,
-#                              **raw_dict)
+    mode_pressure = "absolute"
 
-#     return isotherm
+    pressure_string = loading_string = raw_dict["pressureUnits"]
+
+    if pressure_string in _LOADING_UNITS:
+        unit_pressure = pressure_string
+    else:
+        raise Exception("Isotherm cannot be parsed due to pressure unit")
+
+    return (nist_dict,
+            mode_pressure, mode_adsorbent,
+            unit_pressure, unit_loading)

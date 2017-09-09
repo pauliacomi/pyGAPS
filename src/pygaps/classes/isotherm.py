@@ -103,13 +103,13 @@ class Isotherm(object):
                             "units in _PRESSURE_UNITS")
 
         #: mode for the adsorbent
-        self.mode_adsorbent = mode_adsorbent
+        self.mode_adsorbent = str(mode_adsorbent)
         #: mode for the pressure
-        self.mode_pressure = mode_pressure
+        self.mode_pressure = str(mode_pressure)
         #: units for loading
-        self.unit_loading = unit_loading
+        self.unit_loading = str(unit_loading)
         #: units for pressure
-        self.unit_pressure = unit_pressure
+        self.unit_pressure = str(unit_pressure)
 
         # Must-have properties of the isotherm
         if 'id' not in isotherm_parameters:
@@ -118,35 +118,35 @@ class Isotherm(object):
             self.id = isotherm_parameters.pop('id', None)
 
         #: Isotherm material name
-        self.sample_name = isotherm_parameters.pop('sample_name', None)
+        self.sample_name = str(isotherm_parameters.pop('sample_name', None))
         #: Isotherm material batch
-        self.sample_batch = isotherm_parameters.pop('sample_batch', None)
+        self.sample_batch = str(isotherm_parameters.pop('sample_batch', None))
         #: Isotherm experimental temperature
-        self.t_exp = isotherm_parameters.pop('t_exp', None)
+        self.t_exp = float(isotherm_parameters.pop('t_exp', None))
         #: Isotherm adsorbate used
-        self.adsorbate = isotherm_parameters.pop('adsorbate', None)
+        self.adsorbate = str(isotherm_parameters.pop('adsorbate', None))
 
         # Good-to-have properties of the isotherm
         #: Isotherm experiment date
-        self.date = isotherm_parameters.pop('date', None)
+        self.date = str(isotherm_parameters.pop('date', None))
         #: Isotherm sample activation temperature
-        self.t_act = isotherm_parameters.pop('t_act', None)
+        self.t_act = float(isotherm_parameters.pop('t_act', None))
         #: Isotherm lab
-        self.lab = isotherm_parameters.pop('lab', None)
+        self.lab = str(isotherm_parameters.pop('lab', None))
         #: Isotherm comments
-        self.comment = isotherm_parameters.pop('comment', None)
+        self.comment = str(isotherm_parameters.pop('comment', None))
 
         # Other properties
         #: Isotherm user
-        self.user = isotherm_parameters.pop('user', None)
+        self.user = str(isotherm_parameters.pop('user', None))
         #: Isotherm project
-        self.project = isotherm_parameters.pop('project', None)
+        self.project = str(isotherm_parameters.pop('project', None))
         #: Isotherm machine used
-        self.machine = isotherm_parameters.pop('machine', None)
+        self.machine = str(isotherm_parameters.pop('machine', None))
         #: Isotherm physicality (real or simulation)
-        self.is_real = isotherm_parameters.pop('is_real', None)
+        self.is_real = bool(isotherm_parameters.pop('is_real', None))
         #: Isotherm type (calorimetry/isotherm)
-        self.exp_type = isotherm_parameters.pop('exp_type', None)
+        self.exp_type = str(isotherm_parameters.pop('exp_type', None))
 
         # Save the rest of the properties as an extra dict
         # now that the named properties were taken out of

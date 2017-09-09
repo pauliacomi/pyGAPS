@@ -118,7 +118,7 @@ class PointIsotherm(Isotherm):
         self.pressure_key = pressure_key
 
         #: Pandas DataFrame that stores the data
-        self._data = isotherm_data
+        self._data = isotherm_data.sort_index(axis=1)
 
         #: List of column in the dataframe that contains other points
         self.other_keys = other_keys
@@ -157,13 +157,13 @@ class PointIsotherm(Isotherm):
         Parameters
         ----------
         isotherm : Isotherm
-            an instance of the Isotherm parent class
+            An instance of the Isotherm parent class.
         isotherm_data : DataFrame
-            pure-component adsorption isotherm data
+            Pure-component adsorption isotherm data.
         loading_key : str
-            column of the pandas DataFrame where the loading is stored
+            Column of the pandas DataFrame where the loading is stored.
         pressure_key : str
-            column of the pandas DataFrame where the pressure is stored
+            Column of the pandas DataFrame where the pressure is stored.
         """
         return cls(isotherm_data,
                    loading_key=loading_key,
@@ -189,17 +189,17 @@ class PointIsotherm(Isotherm):
         Parameters
         ----------
         json_string : str
-            a json standard isotherm representation
-        mode_adsorbent : str, optional
-            whether the adsorption is read in terms of either 'per volume'
-            or 'per mass'
-        mode_pressure : str, optional
-            the pressure mode, either absolute pressures or relative in
-            the form of p/p0
+            A json standard isotherm representation.
+        mode_adsorbent : {'relative', 'absolute'}, optional
+            Whether the adsorption is read in terms of either 'per volume'
+            or 'per mass'.
+        mode_pressure : {'mass','volume'}, optional
+            The pressure mode, either absolute pressures or relative in
+            the form of p/p0.
         unit_loading : str, optional
-            unit of loading
+            Unit of loading.
         unit_pressure : str, optional
-            unit of pressure
+            Unit of pressure.
         """
         return pygaps.isotherm_from_json(json_string,
                                          mode_adsorbent=mode_adsorbent,

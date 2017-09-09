@@ -26,19 +26,19 @@ def basic_isotherm_json(basic_pointisotherm):
     return json.dumps(isotherm_dict, sort_keys=True)
 
 
-def test_isotherm_to_json(basic_pointisotherm, basic_isotherm_json):
-    """Tests the parsing of an isotherm to json"""
+class TestJson(object):
+    def test_isotherm_to_json(self, basic_pointisotherm, basic_isotherm_json):
+        """Tests the parsing of an isotherm to json"""
 
-    test_isotherm_json = pygaps.isotherm_to_json(basic_pointisotherm)
+        test_isotherm_json = pygaps.isotherm_to_json(basic_pointisotherm)
 
-    assert basic_isotherm_json == test_isotherm_json
+        assert basic_isotherm_json == test_isotherm_json
 
-    return
+        return
 
+    def test_isotherm_from_json(self, basic_pointisotherm, basic_isotherm_json):
 
-def test_isotherm_from_json(basic_pointisotherm, basic_isotherm_json):
+        test_isotherm = pygaps.isotherm_from_json(basic_isotherm_json)
+        assert basic_pointisotherm == test_isotherm
 
-    test_isotherm = pygaps.isotherm_from_json(basic_isotherm_json)
-    assert basic_pointisotherm == test_isotherm
-
-    return
+        return

@@ -2,14 +2,32 @@
 Tests excel interaction
 """
 
-from ..conftest import windows
-
 import pygaps
+
+from ..conftest import windows
 
 
 @windows
-def test_create_excel(basic_pointisotherm, tmpdir_factory):
-    """Tests creation of excel file"""
+class TestExcel(object):
 
-    pygaps.isotherm_to_xl(basic_pointisotherm,
-                          path=tmpdir_factory.mktemp('excel'))
+    def test_create_excel(self, basic_pointisotherm, tmpdir_factory):
+        """Tests creation of the regular excel file"""
+
+        path = tmpdir_factory.mktemp('excel').join('regular.xlsx').strpath
+        pygaps.isotherm_to_xl(basic_pointisotherm,
+                              path=path)
+
+        isotherm = pygaps.isotherm_from_xl(path)
+
+        assert isotherm == basic_pointisotherm
+
+    def test_create_excel_madirel(self, basic_pointisotherm, tmpdir_factory):
+        """Tests creation of the MADIREL file"""
+
+        path = tmpdir_factory.mktemp('excel').join('MADIREL.xlsx').strpath
+        pygaps.isotherm_to_xl(basic_pointisotherm,
+                              path=path, fmt='MADIREL')
+
+        isotherm = pygaps.isotherm_from_xl(path, fmt='MADIREL')
+
+        assert isotherm == basic_pointisotherm

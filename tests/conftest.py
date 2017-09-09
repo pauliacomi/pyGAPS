@@ -41,18 +41,18 @@ def isotherm_parameters():
 
         'sample_name': 'TEST',
         'sample_batch': 'TB',
-        't_exp': 100,
+        't_exp': 100.0,
         'adsorbate': 'N2',
 
         'date': '26/06/92',
-        't_act': 100,
+        't_act': 100.0,
         'lab': 'TL',
         'comment': 'test comment',
 
         'user': 'TU',
         'project': 'TP',
         'machine': 'TM',
-        'is_real': 'True',
+        'is_real': True,
         'exp_type': 'calorimetry',
 
         # other properties
