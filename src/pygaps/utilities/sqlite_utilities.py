@@ -109,7 +109,7 @@ def build_delete(table, where):
     """
 
     sql_q = "DELETE "
-    sql_q += ' FROM \"' + table + '\"'
+    sql_q += 'FROM \"' + table + '\"'
     sql_q += ' WHERE '
     sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
 
