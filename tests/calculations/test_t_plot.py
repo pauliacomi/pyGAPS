@@ -62,10 +62,10 @@ class TestTPlot(object):
 
         isotherm.convert_mode_pressure('relative')
 
-        t_plot_r = pygaps.t_plot(
+        res = pygaps.t_plot(
             isotherm, thickness_model='Halsey')
 
-        results = t_plot_r.get('results')
+        results = res.get('results')
         assert results is not None
 
         max_error = 0.3  # 30 percent
@@ -88,9 +88,9 @@ class TestTPlot(object):
 
         isotherm.convert_mode_pressure('relative')
 
-        t_plot_r = pygaps.t_plot(
+        res = pygaps.t_plot(
             isotherm, 'Halsey', limits=[0.7, 1.0])
-        results = t_plot_r.get('results')
+        results = res.get('results')
 
         max_error = 0.3  # 30 percent
 
@@ -112,7 +112,5 @@ class TestTPlot(object):
 
         isotherm.convert_mode_pressure('relative')
 
-        t_plot_r = pygaps.t_plot(
+        pygaps.t_plot(
             isotherm, 'Halsey', verbose=True)
-
-        t_plot_r.get('results')

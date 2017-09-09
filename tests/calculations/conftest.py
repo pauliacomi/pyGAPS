@@ -14,8 +14,8 @@ DATA = {
     'NaY': {
         'file': 'NaY N2 77.355.json',
         'bet_area': 700.0,
-        't_pore_volume': 0.20,
-        't_area': 200.0,
+        't_pore_volume': 0.26,
+        't_area': 120.0,
     },
     'SiO2': {
         'file': 'SiO2 N2 77.355.json',
@@ -33,7 +33,7 @@ DATA = {
         'file': 'UiO-66(Zr) N2 77.355.json',
         'bet_area': 1250.0,
         't_pore_volume': 0.48,
-        't_area': 6.0,
+        't_area': 20.0,
     },
 }
 

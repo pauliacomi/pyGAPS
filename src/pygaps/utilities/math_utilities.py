@@ -17,7 +17,7 @@ def find_linear_sections(xdata, ydata):
 
     # We then find the points close to zero in the second derivative
     # These are the points where the graph is linear
-    margin = 0.00001 / (len(ydata) * max(ydata))
+    margin = 0.01 / (len(ydata) * max(ydata))
     close_zero = numpy.abs(second_deriv) < margin
 
     # This snippet divides the the points in linear sections
