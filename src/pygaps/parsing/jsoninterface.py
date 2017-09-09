@@ -7,9 +7,9 @@ import json
 import pandas
 
 from ..classes.pointisotherm import PointIsotherm
-from ..utilities.unit_converter import _VOLUME_UNITS
-from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _LOADING_UNITS
+from ..utilities.unit_converter import _MASS_UNITS
+from ..utilities.unit_converter import _VOLUME_UNITS
 
 
 def isotherm_to_json(isotherm, fmt=None):

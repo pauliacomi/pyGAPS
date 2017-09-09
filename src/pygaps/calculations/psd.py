@@ -4,22 +4,20 @@ Calculation of the pore size distribution based on an isotherm
 
 from functools import partial
 
-
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
-from .kelvin_models import meniscus_geometry
-from .kelvin_models import kelvin_radius_std
-from .thickness_models import _THICKNESS_MODELS
-from .thickness_models import thickness_halsey
-from .thickness_models import thickness_harkins_jura
 from .adsorbent_models import _ADSORBENT_MODELS
 from .adsorbent_models import PROPERTIES_CARBON
 from .adsorbent_models import PROPERTIES_OXIDE_ION
+from .kelvin_models import kelvin_radius_std
+from .kelvin_models import meniscus_geometry
+from .psd_dft import psd_dft_kernel_fit
 from .psd_mesoporous import psd_bjh
 from .psd_mesoporous import psd_dollimore_heal
 from .psd_microporous import psd_horvath_kawazoe
-from .psd_dft import psd_dft_kernel_fit
-
+from .thickness_models import _THICKNESS_MODELS
+from .thickness_models import thickness_halsey
+from .thickness_models import thickness_harkins_jura
 
 _MESO_PSD_MODELS = ['BJH', 'DH', 'HK']
 _MICRO_PSD_MODELS = ['HK']

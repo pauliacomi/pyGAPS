@@ -4,8 +4,9 @@ This module contains the adsorbate class
 
 from CoolProp.CoolProp import PropsSI
 
-from ..utilities.unit_converter import convert_pressure
 import pygaps.data as data
+
+from ..utilities.unit_converter import convert_pressure
 
 
 class Adsorbate(object):
