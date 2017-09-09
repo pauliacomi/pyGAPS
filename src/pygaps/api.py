@@ -10,6 +10,8 @@ from .calculations.psd import mesopore_size_distribution
 from .calculations.psd import micropore_size_distribution
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw
+from .calculations.alphas import alpha_s
+from .calculations.alphas import alpha_s_raw
 from .classes.adsorbate import Adsorbate
 from .classes.modelisotherm import ModelIsotherm
 from .classes.pointisotherm import PointIsotherm
