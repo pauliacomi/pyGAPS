@@ -393,6 +393,4 @@ def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
         plt.savefig(path, bbox_extra_artists=(lgd,),
                     bbox_inches='tight', transparent=False)
 
-    plt.show()
-
-    return
+    return axes, axes2

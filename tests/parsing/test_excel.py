@@ -3,11 +3,13 @@ Tests excel interaction
 """
 
 import pygaps
+import pytest
 
 from ..conftest import windows
 
 
 @windows
+@pytest.mark.slowtest
 class TestExcel(object):
 
     def test_create_excel(self, basic_pointisotherm, tmpdir_factory):

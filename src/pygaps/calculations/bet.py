@@ -137,7 +137,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     # use the bet function
     (bet_area, c_const, n_monolayer, p_monolayer, slope,
      intercept, minimum, maximum, corr_coef) = area_BET_raw(
-        loading, pressure, cross_section)
+        loading, pressure, cross_section, limits=limits)
 
     result_dict = {
         'bet_area': bet_area,

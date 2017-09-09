@@ -59,6 +59,8 @@ def isotherm_from_json(json_isotherm,
 
     Parameters
     ----------
+    json_isotherm : str
+        The isotherm in the json format, as string.
     mode_pressure : {'relative', 'absolute'}, optional
         Whether the adsorption is read in terms of either 'per volume'
         or 'per mass'. Defults to absolute.

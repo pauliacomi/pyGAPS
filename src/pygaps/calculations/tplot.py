@@ -3,15 +3,14 @@ This module contains the t-plot calculation
 """
 
 import warnings
-from itertools import groupby
 
-import matplotlib.pyplot as plt
 import numpy
 import scipy
 
 from ..classes.adsorbate import Adsorbate
 from ..classes.isotherm import Isotherm
 from ..graphing.calcgraph import plot_tp
+from ..utilities.math_utilities import find_linear_sections
 from .thickness_models import _THICKNESS_MODELS
 from .thickness_models import thickness_halsey
 from .thickness_models import thickness_harkins_jura
@@ -177,8 +176,8 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
                     round(result.get('adsorbed_volume'), 4),
                     round(result.get('area'), 4)
                 ))
-            fig = plt.figure()
-            plot_tp(fig, t_curve, loading, results)
+
+            plot_tp(t_curve, loading, results)
 
     return result_dict
 
@@ -242,7 +241,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     else:
         # Now we need to find the linear regions in the t-plot for the
         # assesment of surface area.
-        linear_sections = find_linear_sections(loading)
+        linear_sections = find_linear_sections(thickness_curve, loading)
 
         # For each section we compute the linear fit
         for section in linear_sections:
@@ -257,31 +256,6 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
                 'Could not find linear regions, attempt a manual limit')
 
     return results, thickness_curve
-
-
-def find_linear_sections(loading):
-    """Finds all sections of the t-plot which are linear"""
-    linear_sections = []
-
-    # To do this we calculate the second
-    # derivative of the thickness plot
-    second_deriv = numpy.gradient(numpy.gradient(loading))
-
-    # We then find the points close to zero in the second derivative
-    # These are the points where the graph is linear
-    margin = 0.00001 / (len(loading) * max(loading))
-    close_zero = numpy.abs(second_deriv) < margin
-
-    # This snippet divides the the points in linear sections
-    # where linearity holds at least for a number of measurements
-    continuous_p = 3
-
-    for k, g in groupby(enumerate(close_zero), lambda x: x[1]):
-        group = list(g)
-        if len(group) > continuous_p and k:
-            linear_sections.append(list(map(lambda x: x[0], group)))
-
-    return linear_sections
 
 
 def t_plot_parameters(thickness_curve, section, loading, molar_mass, liquid_density):

@@ -552,7 +552,7 @@ class PointIsotherm(Isotherm):
 ##########################################################
 #   Functions that interpolate values of the isotherm data
 
-    def loading_at(self, pressure):
+    def loading_at(self, pressure, unit=None, branch='ads'):
         """
         Interpolate isotherm to compute loading at any pressure P.
         Parameters
@@ -566,15 +566,27 @@ class PointIsotherm(Isotherm):
             predicted loading at pressure P
         """
 
-        return self.interp1d(pressure)
+        if branch == 'ads':
+            if unit is None:
+                return self.interp1d(pressure)
+            else:
+                return convert_loading(self.interp1d(pressure), self.unit_loading, unit)
+        else:
+            # TODO implement
+            raise NotImplementedError
 
-    def pressure_at(self, loading):
+    def pressure_at(self, loading, unit=None, branch='ads'):
         """
         Interpolate isotherm to compute pressure at any loading n.
         Parameters
         ----------
         loading : float
             loading at which to compute pressure
+        unit : str, optional
+            Unit in which the data should be returned. If None
+            it defaults to which data unit the isotherm is currently in
+        branch : {'ads', 'des'}
+            The branch of the use for calculation. Defaults to adsorption.
 
         Returns
         -------
@@ -582,7 +594,8 @@ class PointIsotherm(Isotherm):
             predicted pressure at loading n
         """
 
-        return self.interp1d(loading)
+        # TODO implement
+        raise NotImplementedError
 
     def spreading_pressure(self, pressure):
         """

@@ -6,8 +6,32 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 
-def roq_plot(pressure, roq_points, minimum, maximum, p_monolayer, roq_monolayer):
-    """Draws the roquerol plot"""
+def roq_plot(pressure, roq_points, minimum, maximum,
+             p_monolayer, roq_monolayer):
+    """
+    Draws the roquerol plot
+
+    Parameters
+    ----------
+    pressure : array
+        Pressure points which will make up the x axix
+    roq_points : array
+        Roquerol-transformed points which will make up the y axis
+    minimum : int
+        Lower bound of the selected points
+    maximum : int
+        Higher bound of the selected points
+    p_monolayer : float
+        Pressure at which statistical monolayer is achieved
+    rol_monolayer : float
+        Roquerol transform of the point at which statistical monolayer is achieved
+
+    Returns
+    -------
+    matplotlib.axes
+        Matplotlib axes of the graph generated. The user can then apply their
+        own styling if desired.
+    """
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(pressure, roq_points,
@@ -20,12 +44,40 @@ def roq_plot(pressure, roq_points, minimum, maximum, p_monolayer, roq_monolayer)
     ax1.set_xlabel('p/p°')
     ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
     ax1.legend(loc='best')
-    plt.show()
+
+    return ax1
 
 
 def bet_plot(pressure, bet_points, minimum, maximum,
              slope, intercept, p_monolayer, bet_monolayer):
-    """Draws the bet plot"""
+    """
+    Draws the bet plot
+
+    Parameters
+    ----------
+    pressure : array
+        Pressure points which will make up the x axix
+    bet_points : array
+        BET-transformed points which will make up the y axis
+    minimum : int
+        Lower bound of the selected points
+    maximum : int
+        Higher bound of the selected points
+    slope : float
+        Slope of the chosen linear region
+    intercept : float
+        Intercept of the cosen linear region
+    p_monolayer : float
+        Pressure at which statistical monolayer is achieved
+    rol_monolayer : float
+        BET transform of the point at which statistical monolayer is achieved
+
+    Returns
+    -------
+    matplotlib.axes
+        Matplotlib axes of the graph generated. The user can then apply their
+        own styling if desired.
+    """
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(pressure, bet_points,
@@ -46,11 +98,45 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     ax1.set_xlabel('p/p°')
     ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
     ax1.legend(loc='best')
-    plt.show()
+
+    return ax1
 
 
-def plot_tp(fig, thickness_curve, loading, results, alpha_s=False):
-    """Draws the t-plot"""
+def plot_tp(thickness_curve, loading, results, alpha_s=False):
+    """
+    Draws the t-plot
+    Also used for alpha-s plot
+
+    Parameters
+    ----------
+    thickness_curve : array
+        Thickness of the adsorbed layer at selected points.
+        In the case of alpha_s plot, it is the alpha_s transform of the
+        reference isotherm.
+    loading : array
+        Loading of the isotherm to plot.
+    results : dict
+        Dictionary of linear regions selected with the members:
+
+            - ``section(array)`` : the points of the plot chosen for the line
+            - ``area(float)`` : calculated surface area, from the section parameters
+            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
+              per section
+            - ``slope(float)`` : slope of the straight trendline fixed through the region
+            - ``intercept(float)`` : intercept of the straight trendline through the region
+            - ``corr_coef(float)`` : correlation coefficient of the linear region
+
+    alpha_s : bool
+        Whether the function is used for alpha_s display
+
+    Returns
+    -------
+    matplotlib.axes
+        Matplotlib axes of the graph generated. The user can then apply their
+        own styling if desired.
+    """
+
+    fig = plt.figure()
     ax1 = fig.add_subplot(111)
     if alpha_s:
         label1 = 'alpha s'
@@ -79,13 +165,36 @@ def plot_tp(fig, thickness_curve, loading, results, alpha_s=False):
     ax1.set_xlim(xmin=0)
     ax1.set_ylim(ymin=0)
     ax1.set_xlabel(label2)
-    ax1.set_ylabel('amount adsorbed (mmol/g)')
+    ax1.set_ylabel('amount adsorbed (smol/g)')
     ax1.legend(loc='best')
+
     plt.show()
+
+    return ax1
 
 
 def psd_plot(pore_radii, pore_dist, log=True, xmax=None):
-    """Draws the pore size distribution plot"""
+    """
+    Draws the pore size distribution plot
+
+    Parameters
+    ----------
+    pore_radii : array
+        Array of the pore radii which will become the x axis
+    pore_dist : array
+        Contribution of each pore radius which will make up the y axis
+    log : int
+        Whether to display a logarithmic graph
+    xmax : int
+        Higher bound of the selected pore widths
+
+    Returns
+    -------
+    matplotlib.axes
+        Matplotlib axes of the graph generated. The user can then apply their
+        own styling if desired.
+
+    """
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(pore_radii, pore_dist,
@@ -101,4 +210,5 @@ def psd_plot(pore_radii, pore_dist, log=True, xmax=None):
     ax1.set_xlim(xmin=0, xmax=xmax)
     ax1.set_ylim(ymin=0)
     ax1.grid(True)
-    plt.show()
+
+    return ax1

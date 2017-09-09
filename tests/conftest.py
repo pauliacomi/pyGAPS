@@ -5,6 +5,7 @@ import sys
 
 import pandas
 import pytest
+import matplotlib.pyplot as plt
 
 import pygaps
 
@@ -28,8 +29,23 @@ def pytest_runtest_setup(item):
         if previousfailed is not None:
             pytest.xfail("previous test failed (%s)" % previousfailed.name)
 
+# matplotlib functionality
+
+
+@pytest.fixture(scope='function')
+def noplot():
+    plt.ioff()
+    return
+
+
+@pytest.fixture(scope='function')
+def doplot():
+    plt.ion()
+    return
 
 # Global fixtures
+
+
 @pytest.fixture(scope='function')
 def isotherm_parameters():
     """

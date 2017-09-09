@@ -4,12 +4,11 @@ This module contains the alpha-s calculation
 
 import warnings
 
-import matplotlib.pyplot as plt
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
+from ..utilities.math_utilities import find_linear_sections
 from .bet import area_BET
-from .tplot import find_linear_sections
 from .tplot import t_plot_parameters
 
 
@@ -137,7 +136,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
     # Read data in
     loading = isotherm.loading(unit='mol', branch='ads')
     reference_loading = reference_isotherm.loading(unit='mol', branch='ads')
-    alpha_s_point = reference_isotherm.loading_at(0.4)
+    alpha_s_point = reference_isotherm.loading_at(0.4, unit='mol', branch='ads')
     alpha_curve = reference_loading / alpha_s_point
 
     # Call alpha s function
@@ -169,8 +168,8 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None, reducing_pressure
                     round(result.get('adsorbed_volume'), 4),
                     round(result.get('area'), 4)
                 ))
-            fig = plt.figure()
-            plot_tp(fig, alpha_curve, loading, results, alpha_s=True)
+
+            plot_tp(alpha_curve, loading, results, alpha_s=True)
 
     return result_dict
 
@@ -233,7 +232,7 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
     else:
         # Now we need to find the linear regions in the alpha-s for the
         # assesment of surface area.
-        linear_sections = find_linear_sections(loading)
+        linear_sections = find_linear_sections(alpha_curve, loading)
 
         # For each section we compute the linear fit
         for section in linear_sections:
