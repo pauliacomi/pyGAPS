@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 import os
-
+import sys
+from unittest.mock import MagicMock
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -56,4 +57,13 @@ autodoc_member_order = 'bysource'
 autodoc_mock_imports = ['_tkinter']
 
 suppress_warnings = ['image.nonlocal_uri']
+
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+
 MOCK_MODULES = ['matplotlib', 'numpy', 'pandas', 'scipy']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
