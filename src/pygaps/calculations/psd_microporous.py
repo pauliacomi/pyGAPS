@@ -223,6 +223,6 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2
     pore_dist = numpy.diff(loading / maximum_adsorbed) / \
         numpy.diff(pore_widths)
-    c_pore_dist = loading / maximum_adsorbed
+    # c_pore_dist = loading / maximum_adsorbed
 
     return avg_pore_widths, pore_dist

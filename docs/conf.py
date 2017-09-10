@@ -53,3 +53,4 @@ napoleon_use_rtype = False
 napoleon_use_param = False
 
 autodoc_member_order = 'bysource'
+autodoc_mock_imports = ['_tkinter']
