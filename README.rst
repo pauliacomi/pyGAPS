@@ -26,9 +26,9 @@ Overview
     :target: https://readthedocs.org/projects/pygaps
     :alt: Documentation Status
 
-.. |travis| image:: https://travis-ci.org/pauliacomi/pygaps.svg?branch=master
+.. |travis| image:: https://travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
     :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/pauliacomi/pygaps
+    :target: https://travis-ci.org/pauliacomi/pyGAPS
 
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/pauliacomi/pygaps?branch=master&svg=true
     :alt: AppVeyor Build Status
