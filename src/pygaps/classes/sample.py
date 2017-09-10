@@ -16,16 +16,16 @@ class Sample(object):
     info : dict
         To initially construct the class, use a dictionary of the form::
 
-        adsorbent_info = {
-            'name' : 'Zeolite-1',
-            'batch' : '1234',
+            adsorbent_info = {
+                'name' : 'Zeolite-1',
+                'batch' : '1234',
 
-            'owner' : 'John Doe',
-            'properties' : {
-                'density' : 1.5
-                'x' : 'y'
+                'owner' : 'John Doe',
+                'properties' : {
+                    'density' : 1.5
+                    'x' : 'y'
+                }
             }
-        }
 
         The info dictionary must contain an entry for 'name' and 'batch'.
 

@@ -25,14 +25,14 @@ class Adsorbate(object):
     info : dict
         To initially construct the class, use a dictionary of the form::
 
-        adsorbate_info = {
-            'nick' : 'nitrogen',
-            'formula' : 'N2',
-            'properties' : {
-                'x' : 'y'
-                'z' : 't'
+            adsorbate_info = {
+                'nick' : 'nitrogen',
+                'formula' : 'N2',
+                'properties' : {
+                    'x' : 'y'
+                    'z' : 't'
+                }
             }
-        }
 
         The info dictionary must contain an entry for 'nick'.
 
