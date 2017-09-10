@@ -65,5 +65,7 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = ['matplotlib', 'numpy', 'pandas', 'scipy']
+MOCK_MODULES = ['matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker',
+                'numpy', 'pandas', 'scipy', 'scipy.constants', 'scipy.stats',
+                'scipy.optimize', 'scipy.interpolate']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
