@@ -34,9 +34,9 @@ Overview
     :alt: AppVeyor Build Status
     :target: https://ci.appveyor.com/project/pauliacomi/pygaps
 
-.. |requires| image:: https://requires.io/github/pauliacomi/pygaps/requirements.svg?branch=master
+.. |requires| image:: https://requires.io/github/pauliacomi/pyGAPS/requirements.svg?branch=master
     :alt: Requirements Status
-    :target: https://requires.io/github/pauliacomi/pygaps/requirements/?branch=master
+    :target: https://requires.io/github/pauliacomi/pyGAPS/requirements/?branch=master
 
 .. |codecov| image:: https://codecov.io/github/pauliacomi/pygaps/coverage.svg?branch=master
     :alt: Coverage Status
