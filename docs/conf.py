@@ -54,3 +54,6 @@ napoleon_use_param = False
 
 autodoc_member_order = 'bysource'
 autodoc_mock_imports = ['_tkinter']
+
+suppress_warnings = ['image.nonlocal_uri']
+MOCK_MODULES = ['matplotlib', 'numpy', 'pandas', 'scipy']
