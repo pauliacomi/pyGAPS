@@ -3,6 +3,7 @@ Tests utilities
 """
 
 import os
+
 import pytest
 
 import pygaps.utilities as utilities

@@ -3,13 +3,14 @@ This test module has tests relating to alpha_s calculations
 """
 
 import os
+
 import pytest
 
 import pygaps
 
-from .conftest import approx
-from .conftest import HERE
 from .conftest import DATA
+from .conftest import HERE
+from .conftest import approx
 
 
 class TestAlphaSPlot(object):

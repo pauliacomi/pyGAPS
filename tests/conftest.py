@@ -3,9 +3,9 @@ Configuration file for pytest and commonly used fixtures
 """
 import sys
 
+import matplotlib.pyplot as plt
 import pandas
 import pytest
-import matplotlib.pyplot as plt
 
 import pygaps
 

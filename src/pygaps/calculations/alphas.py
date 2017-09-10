@@ -4,7 +4,6 @@ This module contains the alpha-s calculation
 
 import warnings
 
-
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
 from ..utilities.math_utilities import find_linear_sections

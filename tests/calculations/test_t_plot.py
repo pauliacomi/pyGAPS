@@ -3,13 +3,14 @@ This test module has tests relating to tplot calculations
 """
 
 import os
+
 import pytest
 
 import pygaps
 
-from .conftest import approx
-from .conftest import HERE
 from .conftest import DATA
+from .conftest import HERE
+from .conftest import approx
 
 
 class TestTPlot(object):

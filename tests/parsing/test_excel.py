@@ -2,8 +2,9 @@
 Tests excel interaction
 """
 
-import pygaps
 import pytest
+
+import pygaps
 
 from ..conftest import windows
 

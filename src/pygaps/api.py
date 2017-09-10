@@ -1,6 +1,8 @@
 # pylint: disable=W0614,W0401,W0611,W0622
 # flake8: noqa
 
+from .calculations.alphas import alpha_s
+from .calculations.alphas import alpha_s_raw
 from .calculations.bet import area_BET
 from .calculations.bet import area_BET_raw
 from .calculations.initial_henry import calc_initial_henry
@@ -10,8 +12,6 @@ from .calculations.psd import mesopore_size_distribution
 from .calculations.psd import micropore_size_distribution
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw
-from .calculations.alphas import alpha_s
-from .calculations.alphas import alpha_s_raw
 from .classes.adsorbate import Adsorbate
 from .classes.modelisotherm import ModelIsotherm
 from .classes.pointisotherm import PointIsotherm
