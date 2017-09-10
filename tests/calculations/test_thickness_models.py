@@ -2,8 +2,8 @@
 This test module has tests relating to thickness model validations
 """
 
-import pytest
 import numpy
+import pytest
 
 from pygaps.calculations.thickness_models import _THICKNESS_MODELS
 

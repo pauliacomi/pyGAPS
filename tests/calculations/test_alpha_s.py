@@ -5,10 +5,10 @@ This test module has tests relating to alpha_s calculations
 import os
 
 import pytest
+from numpy import isclose
+
 import pygaps
 
-
-from numpy import isclose
 from .conftest import DATA
 from .conftest import HERE
 

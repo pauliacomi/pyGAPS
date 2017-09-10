@@ -5,12 +5,12 @@ This test module has tests relating to pore size distribution calculations
 import os
 
 import pytest
+from numpy import isclose
 
 import pygaps
 
-from numpy import isclose
-from .conftest import HERE
 from .conftest import DATA
+from .conftest import HERE
 
 
 class TestPSD(object):

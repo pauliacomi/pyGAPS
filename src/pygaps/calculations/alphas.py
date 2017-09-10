@@ -3,6 +3,7 @@ This module contains the alpha-s calculation
 """
 
 import warnings
+
 import scipy
 
 from ..classes.adsorbate import Adsorbate

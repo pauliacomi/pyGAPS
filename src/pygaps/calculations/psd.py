@@ -6,13 +6,13 @@ from functools import partial
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
+from .adsorbent_models import get_adsorbent_model
 from .kelvin_models import kelvin_radius_std
 from .kelvin_models import meniscus_geometry
 from .psd_dft import psd_dft_kernel_fit
 from .psd_mesoporous import psd_bjh
 from .psd_mesoporous import psd_dollimore_heal
 from .psd_microporous import psd_horvath_kawazoe
-from .adsorbent_models import get_adsorbent_model
 from .thickness_models import get_thickness_model
 
 _MESO_PSD_MODELS = ['BJH', 'DH', 'HK']

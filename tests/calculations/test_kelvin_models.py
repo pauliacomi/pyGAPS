@@ -2,8 +2,8 @@
 This test module has tests relating to kelvin model validations
 """
 
-import pytest
 import numpy
+import pytest
 
 import pygaps.calculations.kelvin_models as km
 from pygaps.calculations.kelvin_models import _KELVIN_MODELS

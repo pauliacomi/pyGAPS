@@ -5,12 +5,12 @@ This test module has tests relating to BET area calculations
 import os
 
 import pytest
+from numpy import isclose
 
 import pygaps
 
 from .conftest import DATA
 from .conftest import HERE
-from numpy import isclose
 
 
 class TestBET(object):
