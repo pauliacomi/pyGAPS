@@ -7,7 +7,7 @@ import pytest
 
 import pygaps
 
-from .conftest import approx
+# from .conftest import approx
 from .conftest import HERE
 
 
@@ -43,6 +43,8 @@ class TestPSD(object):
 
         # max_error = 0.1  # 10 percent
 
+        assert result_dict is not None
+
     @pytest.mark.parametrize('method', [
         'HK',
     ])
@@ -66,3 +68,5 @@ class TestPSD(object):
             isotherm, psd_model=method, pore_geometry='slit', verbose=False)
 
         # max_error = 0.1  # 10 percent
+
+        assert result_dict is not None

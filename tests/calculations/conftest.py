@@ -1,5 +1,4 @@
 import os
-import pytest
 
 HERE = os.path.dirname(__file__)
 

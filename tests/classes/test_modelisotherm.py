@@ -12,6 +12,7 @@ class TestModelIsotherm(object):
     Tests the pointisotherm class
     """
 
+    @pytest.mark.xfail
     @pytest.mark.parametrize('model, data', [
         ("Langmuir", [3.0, 6.0, 7.0, 8.0, 8.5, 8.8, 0, 0]),
         ("Quadratic", [3.0, 6.0, 7.0, 8.0, 8.5, 8.8, 0, 0]),
@@ -28,9 +29,9 @@ class TestModelIsotherm(object):
         pressure_key = 'presure'
         isotherm_data['loading'] = data
 
-        # pygaps.ModelIsotherm.from_isotherm(
-        #     basic_isotherm,
-        #     isotherm_data[:6],
-        #     loading_key,
-        #     pressure_key,
-        #     model)
+        pygaps.ModelIsotherm.from_isotherm(
+            basic_isotherm,
+            isotherm_data[:6],
+            loading_key,
+            pressure_key,
+            model)
