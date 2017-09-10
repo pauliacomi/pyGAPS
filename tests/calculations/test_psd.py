@@ -5,7 +5,6 @@ This test module has tests relating to pore size distribution calculations
 import os
 
 import pytest
-from numpy import isclose
 
 import pygaps
 
