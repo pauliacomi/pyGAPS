@@ -5,12 +5,12 @@ This test module has tests relating to alpha_s calculations
 import os
 
 import pytest
-
 import pygaps
 
+
+from numpy import isclose
 from .conftest import DATA
 from .conftest import HERE
-from .conftest import approx
 
 
 class TestAlphaSPlot(object):
@@ -34,7 +34,7 @@ class TestAlphaSPlot(object):
         pygaps.data.SAMPLE_LIST.append(basic_sample)
         isotherm.convert_mode_adsorbent("volume")
 
-        # Will raise a "isotherm loading not in volume mode exception"
+        # Will raise a "isotherm loading not in mass mode exception"
         with pytest.raises(Exception):
             pygaps.alpha_s(isotherm, isotherm)
 
@@ -46,11 +46,10 @@ class TestAlphaSPlot(object):
 
         return
 
-    @pytest.mark.xfail
     @pytest.mark.parametrize('file, area, micropore_volume',
                              [(data['file'],
-                               data['t_area'],
-                               data['t_pore_volume']) for data in list(DATA.values())]
+                               data['bet_area'],
+                               0) for data in list(DATA.values())]
                              )
     def test_alphas(self, file, basic_adsorbate, area, micropore_volume):
         """Test calculation with several model isotherms"""
@@ -70,13 +69,15 @@ class TestAlphaSPlot(object):
         results = res.get('results')
         assert results is not None
 
-        max_error = 0.3  # 30 percent
+        err_relative = 0.1  # 10 percent
+        err_absolute_area = 0.1  # units
+        err_absolute_volume = 0.01  # units
 
-        assert approx(results[-1].get('adsorbed_volume'),
-                      micropore_volume, max_error)
-        assert approx(results[-1].get('area'), area, max_error)
+        assert isclose(results[-1].get('adsorbed_volume'),
+                       micropore_volume, err_relative, err_absolute_area)
+        assert isclose(results[-1].get('area'),
+                       area, err_relative, err_absolute_volume)
 
-    @pytest.mark.xfail
     def test_alphas_choice(self, basic_adsorbate):
         """Test choice of points"""
         pygaps.data.GAS_LIST.append(basic_adsorbate)
@@ -95,11 +96,14 @@ class TestAlphaSPlot(object):
             isotherm, isotherm, limits=[0.7, 1.0])
         results = res.get('results')
 
-        max_error = 0.3  # 30 percent
+        err_relative = 0.1  # 10 percent
+        err_absolute_area = 0.1  # units
+        err_absolute_volume = 0.01  # units
 
-        assert approx(results[-1].get('adsorbed_volume'),
-                      data['t_pore_volume'], max_error)
-        assert approx(results[-1].get('area'), data['t_area'], max_error)
+        assert isclose(results[-1].get('adsorbed_volume'),
+                       0, err_relative, err_absolute_area)
+        assert isclose(results[-1].get('area'),
+                       data['bet_area'], err_relative, err_absolute_volume)
 
     def test_alphas_output(self, basic_adsorbate, noplot):
         """Test verbosity"""
@@ -115,7 +119,4 @@ class TestAlphaSPlot(object):
 
         isotherm.convert_mode_pressure('relative')
 
-        t_plot_r = pygaps.alpha_s(
-            isotherm, isotherm, verbose=True)
-
-        t_plot_r.get('results')
+        pygaps.alpha_s(isotherm, isotherm, verbose=True)

@@ -10,7 +10,7 @@ import pygaps
 
 from .conftest import DATA
 from .conftest import HERE
-from .conftest import approx
+from numpy import isclose
 
 
 class TestBET(object):
@@ -58,9 +58,10 @@ class TestBET(object):
 
         bet_area = pygaps.area_BET(isotherm).get("bet_area")
 
-        max_error = 0.1  # 10 percent
+        err_relative = 0.1  # 10 percent
+        err_absolute = 0.1  # 0.1 m2
 
-        assert approx(bet_area, expected_bet, max_error)
+        assert isclose(bet_area, expected_bet, err_relative, err_absolute)
 
     def test_BET_choice(self, basic_adsorbate):
         """Test choice of points"""
@@ -79,9 +80,11 @@ class TestBET(object):
         bet_area = pygaps.area_BET(
             isotherm, limits=[0.05, 0.30]).get("bet_area")
 
-        max_error = 0.1  # 10 percent
+        err_relative = 0.1  # 10 percent
+        err_absolute = 0.1  # 0.1 m2
 
-        assert approx(bet_area, data['s_bet_area'], max_error)
+        assert isclose(bet_area, data['s_bet_area'],
+                       err_relative, err_absolute)
 
     def test_BET_output(self, basic_adsorbate, noplot):
         """Test verbosity"""
@@ -97,5 +100,4 @@ class TestBET(object):
 
         isotherm.convert_mode_pressure('relative')
 
-        pygaps.area_BET(
-            isotherm, verbose=True).get("bet_area")
+        pygaps.area_BET(isotherm, verbose=True)

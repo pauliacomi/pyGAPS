@@ -4,11 +4,15 @@ kernel. Please note that calculation of the DFT/NLDFT/QSDFT kernels are outside 
 scope of this program
 """
 
+import os
 import numpy
 import pandas
 import scipy
 
 _KERNELS = {}
+
+INTERNAL = os.path.join(os.path.dirname(__file__),
+                        'kernels', 'dft - N2 - carbon.csv')
 
 
 def psd_dft_kernel_fit(pressure, loading, kernel_path):
@@ -46,6 +50,10 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
     constraint that the contribution of each isotherm cannot be negative.
 
     """
+    # Paramter checks
+    if len(pressure) != len(loading):
+        raise Exception("The length of the pressure and loading arrays"
+                        " do not match")
 
     # get the interpolation kernel
     kernel = _load_kernel(kernel_path)
@@ -106,6 +114,8 @@ def _load_kernel(path):
     array
         kernel
     """
+    if path == 'internal':
+        path = INTERNAL
 
     if path in _KERNELS:
         return _KERNELS[path]

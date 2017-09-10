@@ -100,3 +100,8 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     radius = - coefficient / numpy.log(pressure)
 
     return radius
+
+
+_KELVIN_MODELS = {
+    'Kelvin': kelvin_radius_std,
+}

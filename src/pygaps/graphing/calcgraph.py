@@ -174,7 +174,7 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False):
     return ax1
 
 
-def psd_plot(pore_radii, pore_dist, log=True, xmax=None):
+def psd_plot(pore_radii, pore_dist, method=None, log=True, xmax=None):
     """
     Draws the pore size distribution plot
 
@@ -204,7 +204,7 @@ def psd_plot(pore_radii, pore_dist, log=True, xmax=None):
         ax1.set_xscale('log')
         ax1.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
-    ax1.set_title("PSD plot")
+    ax1.set_title("PSD plot " + str(method))
     ax1.set_xlabel('Pore width (nm)')
     ax1.set_ylabel('Pore size')
     ax1.legend(loc='best')

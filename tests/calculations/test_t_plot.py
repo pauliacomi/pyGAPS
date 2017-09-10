@@ -8,9 +8,9 @@ import pytest
 
 import pygaps
 
+from numpy import isclose
 from .conftest import DATA
 from .conftest import HERE
-from .conftest import approx
 
 
 class TestTPlot(object):
@@ -69,11 +69,14 @@ class TestTPlot(object):
         results = res.get('results')
         assert results is not None
 
-        max_error = 0.3  # 30 percent
+        err_relative = 0.3  # 30 percent
+        err_absolute_area = 0.1  # units
+        err_absolute_volume = 0.01  # units
 
-        assert approx(results[-1].get('adsorbed_volume'),
-                      micropore_volume, max_error)
-        assert approx(results[-1].get('area'), area, max_error)
+        assert isclose(results[-1].get('adsorbed_volume'),
+                       micropore_volume, err_relative, err_absolute_area)
+        assert isclose(results[-1].get('area'), area,
+                       err_relative, err_absolute_volume)
 
     def test_tplot_choice(self, basic_adsorbate):
         """Test choice of points"""
@@ -93,11 +96,14 @@ class TestTPlot(object):
             isotherm, 'Halsey', limits=[0.7, 1.0])
         results = res.get('results')
 
-        max_error = 0.3  # 30 percent
+        err_relative = 0.3  # 30 percent
+        err_absolute_area = 0.1  # units
+        err_absolute_volume = 0.01  # units
 
-        assert approx(results[-1].get('adsorbed_volume'),
-                      data['t_pore_volume'], max_error)
-        assert approx(results[-1].get('area'), data['t_area'], max_error)
+        assert isclose(results[-1].get('adsorbed_volume'),
+                       data['t_pore_volume'], err_relative, err_absolute_area)
+        assert isclose(results[-1].get('area'),
+                       data['t_area'], err_relative, err_absolute_volume)
 
     def test_tplot_output(self, basic_adsorbate, noplot):
         """Test verbosity"""
@@ -113,5 +119,4 @@ class TestTPlot(object):
 
         isotherm.convert_mode_pressure('relative')
 
-        pygaps.t_plot(
-            isotherm, 'Halsey', verbose=True)
+        pygaps.t_plot(isotherm, 'Halsey', verbose=True)

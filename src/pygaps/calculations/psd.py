@@ -6,25 +6,22 @@ from functools import partial
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
-from .adsorbent_models import _ADSORBENT_MODELS
-from .adsorbent_models import PROPERTIES_CARBON
-from .adsorbent_models import PROPERTIES_OXIDE_ION
 from .kelvin_models import kelvin_radius_std
 from .kelvin_models import meniscus_geometry
 from .psd_dft import psd_dft_kernel_fit
 from .psd_mesoporous import psd_bjh
 from .psd_mesoporous import psd_dollimore_heal
 from .psd_microporous import psd_horvath_kawazoe
-from .thickness_models import _THICKNESS_MODELS
-from .thickness_models import thickness_halsey
-from .thickness_models import thickness_harkins_jura
+from .adsorbent_models import get_adsorbent_model
+from .thickness_models import get_thickness_model
 
 _MESO_PSD_MODELS = ['BJH', 'DH', 'HK']
 _MICRO_PSD_MODELS = ['HK']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
-def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', verbose=False, **model_parameters):
+def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
+                               verbose=False, **model_parameters):
     """
     Calculates the pore size distribution using a 'classical' model, applicable to mesopores
 
@@ -45,6 +42,10 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
 
     Other Parameters
     ----------------
+    branch : {'adsorption', 'desorption'}
+        Branch of the isotherm to use. It defaults to desorption.
+    thickness_model : str
+        The thickness model to use for PSD, It defaults to Harkins and Jura.
 
     Returns
     -------
@@ -104,24 +105,20 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
         raise Exception("Model {} not an option for psd.".format(psd_model),
                         "Available models are {}".format(_MESO_PSD_MODELS))
     if pore_geometry not in _PORE_GEOMETRIES:
-        raise Exception("Geometry {} not an option for pore size distribution.".format(pore_geometry),
+        raise Exception("Geometry {} not an option for pore size"
+                        "distribution.".format(pore_geometry),
                         "Available geometries are {}".format(_PORE_GEOMETRIES))
 
     branch = model_parameters.get('branch')
     if branch is None:
-        raise Exception("Specify the isotherm part to select for the calculation"
-                        "'branch'= either 'adsorption' or 'desorption'")
+        branch = 'desorption'
     if branch not in ['adsorption', 'desorption']:
         raise Exception("Branch {} not an option for psd.".format(branch),
                         "Select either 'adsorption' or 'desorption'")
 
-    if 'thickness_model' in model_parameters:
-        thickness_model = model_parameters.get('thickness_model')
-    else:
+    thickness_model = model_parameters.get('thickness_model')
+    if thickness_model is None:
         thickness_model = 'Harkins/Jura'
-    if thickness_model not in _THICKNESS_MODELS:
-        raise Exception("Model {} not an option for pore size distribution.".format(thickness_model),
-                        "Available models are {}".format(_THICKNESS_MODELS))
 
     # Get required adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
@@ -142,10 +139,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
                         " this calculation")
 
     # Thickness model definitions
-    if thickness_model == 'Halsey':
-        t_model = thickness_halsey
-    elif thickness_model == 'Harkins/Jura':
-        t_model = thickness_harkins_jura
+    t_model = get_thickness_model(thickness_model)
 
     # Kelvin model definitions
     m_geometry = meniscus_geometry(branch, pore_geometry)
@@ -168,18 +162,20 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', ve
             t_model, k_model,
             liquid_density, molar_mass)
 
+    # Package the results
     result_dict = {
         'pore_widths': pore_widths,
         'pore_distribution': pore_dist,
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist)
+        psd_plot(pore_widths, pore_dist, method=psd_model)
 
     return result_dict
 
 
-def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', verbose=False, **model_parameters):
+def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
+                                verbose=False, **model_parameters):
     """
     Calculates the microporous size distribution using a 'classical' model
 
@@ -195,6 +191,11 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
         prints out extra information on the calculation and graphs the results
     model_parameters : dict
         a dictionary to override specific settings for each model
+
+    Other Parameters
+    ----------------
+    adsorbent_model : obj('str') or obj('dict')
+        The adsorbent model to use for PSD, It defaults to Carbon(HK).
 
     Returns
     -------
@@ -244,13 +245,9 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
         raise Exception("Geometry {} not an option for pore size distribution.".format(pore_geometry),
                         "Available geometries are {}".format(_PORE_GEOMETRIES))
 
-    if 'adsorbent_model' in model_parameters:
-        adsorbent_model = model_parameters.get('adsorbent_model')
-    else:
+    adsorbent_model = model_parameters.get('adsorbent_model')
+    if adsorbent_model is None:
         adsorbent_model = 'Carbon(HK)'
-    if adsorbent_model not in _ADSORBENT_MODELS:
-        raise Exception("Model {} not an option for pore size distribution.".format(adsorbent_model),
-                        "Available models are {}".format(_ADSORBENT_MODELS))
 
     # Get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
@@ -267,10 +264,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
     maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
-    if adsorbent_model == 'Carbon(HK)':
-        adsorbent_properties = PROPERTIES_CARBON
-    elif adsorbent_model == 'OxideIon(SF)':
-        adsorbent_properties = PROPERTIES_OXIDE_ION
+    adsorbent_properties = get_adsorbent_model(adsorbent_model)
 
     # Call specified pore size distribution function
     if psd_model == 'HK':
@@ -278,13 +272,14 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder', v
             loading, pressure, isotherm.t_exp, pore_geometry,
             maximum_adsorbed, adsorbate_properties, adsorbent_properties)
 
+    # Package the results
     result_dict = {
         'pore_widths': pore_widths,
         'pore_distribution': pore_dist,
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist, log=False, xmax=2)
+        psd_plot(pore_widths, pore_dist, log=False, xmax=2.5, method=psd_model)
 
     return result_dict
 
@@ -374,18 +369,25 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
        Theory Approach; Lastoskie, Gubbins, and Quirke; J. Phys. Chem. 1993, 97, 4786-4796
 
     """
+    # Check kernel
+    if kernel_path is None:
+        raise Exception("A path to the kernel to be used must be specified."
+                        "Use 'internal' to use the internal kernel (USE JUDICIOUSLY).")
+
     # Read data in
     loading = isotherm.loading(unit='mmol', branch='ads')
     pressure = isotherm.pressure(branch='ads')
 
+    # Call the DFT function
     pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)
 
+    # Package the results
     result_dict = {
         'pore_widths': pore_widths,
         'pore_distribution': pore_dist,
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist)
+        psd_plot(pore_widths, pore_dist, method='DFT')
 
     return result_dict

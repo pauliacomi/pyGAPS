@@ -3,10 +3,12 @@ import os
 
 import pygaps
 
-json_path = os.path.join(os.getcwd(), 'tests', 'data', 'isotherms_json')
+json_path = os.path.join(os.getcwd(), 'tests',
+                         'calculations', 'data', 'isotherms_json')
 json_file_paths = pygaps.util_get_file_paths(json_path, '.json')
 isotherms = []
 for filepath in json_file_paths:
+    print(filepath)
     with open(filepath, 'r') as text_file:
         isotherms.append(pygaps.isotherm_from_json(
             text_file.read()))
@@ -32,10 +34,7 @@ for isotherm in isotherms:
 #
 # %%
 # Get gasses
-
-db_path = os.path.expanduser(
-    r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
-pygaps.data.GAS_LIST = pygaps.db_get_gasses(db_path)
+pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
 
 # %%
 # Calculate BET
@@ -57,9 +56,7 @@ for isotherm in isotherms:
 #
 # %%
 # Get gasses
-db_path = os.path.expanduser(
-    r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
-pygaps.data.GAS_LIST = pygaps.db_get_gasses(db_path)
+pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
 
 # %%
 # Calculate t-plot
@@ -72,15 +69,45 @@ for isotherm in isotherms:
 
 # Pore size distribution
 #################################################################################
-#%%
+# %%
+# Get gasses
+pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
 
-path = r"src/pygaps/calculations/kernels/dft - N2 - carbon.csv"
+# %%
+# Mesoporous pore size distribution
+for isotherm in isotherms:
+    isotherm.convert_mode_pressure('relative')
+    result_dict = pygaps.mesopore_size_distribution(
+        isotherm,
+        psd_model='BJH',
+        branch='desorption',
+        verbose=True)
+
+# %%
+# Microporous pore size distribution
+for isotherm in isotherms:
+    if isotherm.adsorbate != 'CO2':
+        isotherm.convert_mode_pressure('relative')
+        result_dict = pygaps.micropore_size_distribution(
+            isotherm,
+            psd_model='HK',
+            pore_geometry='slit',
+            verbose=True)
+
+# %%
+for x in result_dict['pore_widths']:
+    print(x)
+print('x')
+for x in result_dict['pore_distribution']:
+    print(x)
+
+# %%
 
 for isotherm in isotherms:
     print(isotherm.sample_name)
     print(isotherm.gas)
     isotherm.convert_pressure_mode("relative")
-    pygaps.dft_size_distribution(isotherm, path, verbose=True)
+    pygaps.dft_size_distribution(isotherm, 'internal', verbose=True)
 
 
 #################################################################################

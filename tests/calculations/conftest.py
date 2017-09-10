@@ -19,7 +19,7 @@ DATA = {
     'SiO2': {
         'file': 'SiO2 N2 77.355.json',
         'bet_area': 200.0,
-        't_pore_volume': 0.06,
+        't_pore_volume': 0.0,
         't_area': 280.0,
     },
     'Takeda 5A': {
@@ -35,14 +35,3 @@ DATA = {
         't_area': 20.0,
     },
 }
-
-
-# ('MCM-41 N2 77.355.json', 60, -0.1),
-# ('NaY N2 77.355.json', 100, 0.17),
-# ('SiO2 N2 77.355.json', 250, -0.1),
-# ('Takeda 5A N2 77.355.json', 85, 0),
-# ('UiO-66(Zr) N2 77.355.json', 3.5, 0.13),
-
-def approx(value1, value2, error):
-    return (abs(value1) < abs(value2 * (1 + error))
-            ) and (abs(value1) > abs(value2 * (1 - error)))

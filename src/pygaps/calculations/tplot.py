@@ -8,16 +8,12 @@ import numpy
 import scipy
 
 from ..classes.adsorbate import Adsorbate
-from ..classes.isotherm import Isotherm
 from ..graphing.calcgraph import plot_tp
 from ..utilities.math_utilities import find_linear_sections
-from .thickness_models import _THICKNESS_MODELS
-from .thickness_models import thickness_halsey
-from .thickness_models import thickness_harkins_jura
-from .thickness_models import thickness_isotherm
+from .thickness_models import get_thickness_model
 
 
-def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=False):
+def t_plot(isotherm, thickness_model, limits=None, verbose=False):
     """
     Calculates the external surface area and adsorbed volume
     using the t-plot method
@@ -27,24 +23,21 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
     The ``thickness_model`` parameter is a string which names the thickness equation which
     should be used. Alternatively, a user can implement their own thickness model, either
     as an experimental isotherm or a function which describes the adsorbed layer. In that
-    case, set the ``custom_model`` flag to ``True`` and instead of a string, pass the
-    Isotherm object or the callable function as the ``thickness_model`` parameter
-    The ``limits`` parameter takes the form of an array of two numbers, which are the
-    upper and lower limits of the section which should be taken for analysis.
+    case, instead of a string, pass the Isotherm object or the callable function as the
+    ``thickness_model`` parameter. The ``limits`` parameter takes the form of an array of
+    two numbers, which are the upper and lower limits of the section which should be taken
+    for analysis.
 
     Parameters
     ----------
     isotherm : PointIsotherm
-        the isotherm of which to calculate the t-plot parameters
-    thickness_model : str
-        name of the thickness model to use
-    custom_model : bool, optional
-        if true, permits a custom thickness model to be supplied,
-        starting from an isotherm or a custom thickness function
+        the isotherm of which to calculate the t-plot parameters.
+    thickness_model : obj(`str`) or obj(`Isotherm`) or obj(`callable`)
+        Name of the thickness model to use.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
     verbose : bool, optional
-        prints extra information and plots graphs of the calculation
+        Prints extra information and plots graphs of the calculation.
 
     Returns
     -------
@@ -127,9 +120,6 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
     if thickness_model is None:
         raise Exception("Specify a model to generate the thickness curve"
                         " e.g. thickness_model=\"Halsey\"")
-    if thickness_model not in _THICKNESS_MODELS:
-        raise Exception("Model {} not an option for t-plot.".format(thickness_model),
-                        "Available models are {}".format(_THICKNESS_MODELS))
 
     # Get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
@@ -140,16 +130,8 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
     loading = isotherm.loading(unit='mol', branch='ads')
     pressure = isotherm.pressure(branch='ads')
 
-    # Thickness model definitions
-    if not custom_model:
-        if thickness_model == "Halsey":
-            t_model = thickness_halsey
-        elif thickness_model == "Harkins/Jura":
-            t_model = thickness_harkins_jura
-    elif issubclass(thickness_model, Isotherm):
-        t_model = thickness_isotherm(thickness_model)
-    else:
-        t_model = thickness_model
+    # Get thickness model
+    t_model = get_thickness_model(thickness_model)
 
     # Call t-plot function
     results, t_curve = t_plot_raw(
@@ -161,7 +143,7 @@ def t_plot(isotherm, thickness_model, custom_model=False, limits=None, verbose=F
     }
 
     if verbose:
-        if len(results) == 0:
+        if not results:
             print('Could not find linear regions, attempt a manual limit')
         else:
             for index, result in enumerate(results):

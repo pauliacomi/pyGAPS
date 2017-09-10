@@ -5,9 +5,7 @@ import pygaps
 
 xl_path = os.path.join(os.getcwd(), 'tests', 'data', 'isotherms')
 json_path = os.path.join(os.getcwd(), 'tests', 'data', 'isotherms_json')
-
-db_path = os.path.expanduser(
-    r"~\OneDrive\Documents\PhD Documents\Data processing\Database\local.db")
+db_path = pygaps.DATABASE
 
 #################################################################################
 #       Excel import | dataimport/excelinterface.py
@@ -23,6 +21,13 @@ print(xl_file_paths)
 # Import them
 isotherms = [pygaps.isotherm_from_xl(path) for path in xl_file_paths]
 
+#################################################################################
+#       Excel export | dataimport/excelinterface.py
+#################################################################################
+
+# Export each isotherm in turn
+for isotherm in isotherms:
+    pygaps.isotherm_to_xl(isotherm, isotherm.name + '.xlsx')
 
 #################################################################################
 #       Database import | dataimport/sqlinterface.py
@@ -32,12 +37,12 @@ isotherms = [pygaps.isotherm_from_xl(path) for path in xl_file_paths]
 # Experiments
 criteria = {
     'sname':        "UiO-66(Zr)",
+    'gas':          "N2",
     # 'sbatch':       "",
     # 'user':         "",
-    't_exp':        303,
+    # 't_exp':        303,
     # 't_act':        "",
     # 'machine':      "",
-    'gas':          "N2",
     # 'exp_type':     "",
 }
 isotherms = pygaps.db_get_experiments(db_path, criteria)
@@ -49,6 +54,14 @@ pygaps.data.SAMPLE_LIST = pygaps.db_get_samples(db_path)
 # %%
 # Gasses
 pygaps.data.GAS_LIST = pygaps.db_get_gasses(db_path)
+
+#################################################################################
+#       Database save | dataimport/sqlinterface.py
+#################################################################################
+#
+# %%
+for isotherm in isotherms:
+    pygaps.db_upload_experiment(pygaps.DATABASE, isotherm)
 
 #################################################################################
 #       Json import | dataimport/jsoninterface.py
