@@ -18,10 +18,10 @@ for filepath in json_file_paths:
             text_file.read()))
 
 # %%
-isotherm = isotherms[1]
+isotherm = isotherms[0]
 
-p_int = numpy.arange(0.01, 0.95, 0.02)
-l_int = isotherm.loading_at(p_int)
+p_int = numpy.arange(0.3, 24, 0.4)
+l_int = isotherm.loading_at(p_int, interpolation_type='linear')
 pressure = isotherm.pressure()
 loading = isotherm.loading()
 fig, ax = plt.subplots(1, 1, figsize=(12, 12))

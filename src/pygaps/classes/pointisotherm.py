@@ -562,6 +562,7 @@ class PointIsotherm(Isotherm):
                    interpolation_type='linear'):
         """
         Interpolate isotherm to compute loading at any pressure P.
+
         Parameters
         ----------
         pressure : float or array
@@ -580,7 +581,7 @@ class PointIsotherm(Isotherm):
 
         Returns
         -------
-        float
+        float or array
             predicted loading at pressure P
         """
         # Check to see if interpolator is already generated
