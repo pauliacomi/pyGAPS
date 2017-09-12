@@ -10,18 +10,12 @@ import numpy
 import scipy.optimize
 
 from .isotherm import Isotherm
+from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 
 # ! list of models implemented
-_MODELS = ["Langmuir",
-           "Quadratic",
-           "BET",
-           "Henry",
-           "TemkinApprox",
-           "DSLangmuir",
-           "TSLangmuir"]
-
-# ! dictionary of parameters involved in each model
-_MODEL_PARAMS = {
+# ! with parameters involved in each model
+_MODELS = {
     "Langmuir": {"M": numpy.nan, "K": numpy.nan},
     "Quadratic": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
     "BET": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
@@ -58,7 +52,9 @@ class ModelIsotherm(Isotherm):
     optimization_method : str
         method in SciPy minimization function to use in fitting model to data.
         See `here
-        <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`_.
+        <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+    verbose : bool
+        Prints out extra information about steps taken.
     mode_adsorbent : str, optional
         whether the adsorption is read in terms of either 'per volume'
         or 'per mass'
@@ -147,6 +143,7 @@ class ModelIsotherm(Isotherm):
                  model=None,
                  param_guess=None,
                  optimization_method="Nelder-Mead",
+                 verbose=False,
                  mode_adsorbent="mass",
                  mode_pressure="absolute",
                  unit_loading="mmol",
@@ -159,11 +156,14 @@ class ModelIsotherm(Isotherm):
         """
         # Checks
         if model is None:
-            raise Exception("Specify a model to fit to the pure-component"
-                            " isotherm data. e.g. model=\"Langmuir\"")
+            raise ParameterError("Specify a model to fit to the pure-component"
+                                 " isotherm data. e.g. model=\"Langmuir\"")
         if model not in _MODELS:
-            raise Exception("Model {0} not an option in pyIAST. See viable"
-                            "models with pyiast._MODELS".format(model))
+            raise ParameterError("Model {0} not an option in pyIAST. Viable"
+                                 "models are {1}".format(model, _MODELS))
+
+        # We change it to a model
+        isotherm_parameters['is_real'] = False
 
         # Run base class constructor
         Isotherm.__init__(self,
@@ -188,17 +188,19 @@ class ModelIsotherm(Isotherm):
         if param_guess is not None:
             for param, guess_val in param_guess.items():
                 if param not in self.param_guess.keys():
-                    raise Exception("%s is not a valid parameter"
-                                    " in the %s model." % (param, model))
+                    raise ParameterError("%s is not a valid parameter"
+                                         " in the %s model." % (param, model))
                 self.param_guess[param] = guess_val
 
         # ! Dictionary of identified model parameters
         # initialize params as nan
-        self.params = copy.deepcopy(_MODEL_PARAMS[model])
+        self.params = copy.deepcopy(_MODELS[model])
 
         # fit model to isotherm data
         self._fit(data[loading_key].values,
-                  data[pressure_key].values, optimization_method)
+                  data[pressure_key].values,
+                  optimization_method,
+                  verbose)
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
@@ -239,8 +241,13 @@ class ModelIsotherm(Isotherm):
                    **isotherm.to_dict())
 
     @classmethod
-    def from_pointisotherm(cls, isotherm, model, param_guess=None,
-                           optimization_method="Nelder-Mead"):
+    def from_pointisotherm(cls,
+                           isotherm,
+                           model,
+                           branch='ads',
+                           param_guess=None,
+                           optimization_method="Nelder-Mead",
+                           verbose=False):
         """
         Constructs a ModelIsotherm using a the data from a PointIsotherm
         and all its parameters.
@@ -248,30 +255,125 @@ class ModelIsotherm(Isotherm):
         Parameters
         ----------
         isotherm : PointIsotherm
-            an instance of the PointIsotherm parent class to model
+            An instance of the PointIsotherm parent class to model.
         model : str
-            the model to be used to describe the isotherm
-        param_guess : dict
-            starting guess for model parameters in the data fitting routine
-        optimization_method : str
-            method in SciPy minimization function to use in fitting model to data.
+            The model to be used to describe the isotherm
+            Pass ``'guess'`` to attempt to find the best fit
+            model, which will take more time.
+        branch : {None, 'ads', 'des'}, optional
+            Branch of isotherm to model. Defaults to adsorption branch.
+        param_guess : dict, optional
+            Starting guess for model parameters in the data fitting routine.
+        optimization_method : str, optional
+            Method in SciPy minimization function to use in fitting model to data.
+        verbose : bool
+            Prints out extra information about steps taken.
         """
+        if model == 'guess':
+            return ModelIsotherm.guess(isotherm.data(branch=branch),
+                                       loading_key=isotherm.loading_key,
+                                       pressure_key=isotherm.pressure_key,
+                                       optimization_method=optimization_method,
+                                       verbose=verbose,
+                                       mode_adsorbent=isotherm.mode_adsorbent,
+                                       mode_pressure=isotherm.mode_pressure,
+                                       unit_loading=isotherm.unit_loading,
+                                       unit_pressure=isotherm.unit_pressure,
+                                       **isotherm.to_dict())
+
         return cls(isotherm.data(),
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_method=optimization_method,
+                   verbose=verbose,
                    mode_adsorbent=isotherm.mode_adsorbent,
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
                    unit_pressure=isotherm.unit_pressure,
                    **isotherm.to_dict())
 
-##########################################################
-#   Overloaded and private functions
+    @classmethod
+    def guess(cls, data,
+              loading_key=None,
+              pressure_key=None,
+              optimization_method="Nelder-Mead",
+              verbose=False,
+              mode_adsorbent="mass",
+              mode_pressure="absolute",
+              unit_loading="mmol",
+              unit_pressure="bar",
+              **isotherm_parameters):
+        """
+        Attempts to model the data using all available models, then returns
+        the one with the best rms fit.
 
-    def _fit(self, loading, pressure, optimization_method):
+        May take a long time depending on the number of datapoints.
+
+        Parameters
+        ----------
+        isotherm_data : DataFrame
+            pure-component adsorption isotherm data
+        loading_key : str
+            column of the pandas DataFrame where the loading is stored
+        pressure_key : str
+            column of the pandas DataFrame where the pressure is stored
+        optimization_method : str
+            method in SciPy minimization function to use in fitting model to data.
+        verbose : bool, optional
+            Prints out extra information about steps taken.
+        mode_adsorbent : str, optional
+            whether the adsorption is read in terms of either 'per volume'
+            or 'per mass'
+        mode_pressure : str, optional
+            the pressure mode, either absolute pressures or relative in
+            the form of p/p0
+        unit_loading : str, optional
+            unit of loading
+        unit_pressure : str, optional
+            unit of pressure
+        isotherm_parameters:
+            dictionary with the paramters
+        """
+        attempts = []
+        for model in _MODELS:
+            try:
+                isotherm = ModelIsotherm(data,
+                                         loading_key=loading_key,
+                                         pressure_key=pressure_key,
+                                         model=model,
+                                         param_guess=None,
+                                         optimization_method=optimization_method,
+                                         verbose=verbose,
+                                         mode_adsorbent=mode_adsorbent,
+                                         mode_pressure=mode_pressure,
+                                         unit_loading=unit_loading,
+                                         unit_pressure=unit_pressure,
+                                         **isotherm_parameters)
+
+                attempts.append(isotherm)
+
+            except CalculationError:
+                if verbose:
+                    print("Modelling using {0} failed".format(model))
+
+        if not attempts:
+            raise CalculationError(
+                "No model could be reliably fit on the isotherm")
+        else:
+            errors = [x.rmse for x in attempts]
+            best_fit = attempts[errors.index(min(errors))]
+
+            if verbose:
+                print("Best model fit is {0}".format(best_fit.model))
+
+            return best_fit
+
+        ##########################################################
+        #   Overloaded and private functions
+
+    def _fit(self, loading, pressure, optimization_method, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss
         function. Assigns parameters to self
@@ -284,7 +386,12 @@ class ModelIsotherm(Isotherm):
             the pressures of each point
         optimization_method : str
             method in SciPy minimization function to use in fitting model to data.
+        verbose : bool, optional
+            Prints out extra information about steps taken.
         """
+        if verbose:
+            print("Attempting to model using {}".format(self.model))
+
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params.keys()]
         # guess
@@ -298,18 +405,19 @@ class ModelIsotherm(Isotherm):
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = params_[i]
 
-            return numpy.sum((loading - self.loading(pressure) ** 2))
+            return numpy.sum((loading - self.loading_at(pressure)) ** 2)
 
         # minimize RSS
         opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
                                           method=optimization_method)
         if not opt_res.success:
-            print(opt_res.message)
-            print("\n\tDefault starting guess for parameters:", self.param_guess)
-            raise Exception("""Minimization of RSS for %s isotherm fitting
-            failed. Try a different starting point in the nonlinear optimization
+            raise CalculationError("""
+            Minimization of RSS for {0} isotherm fitting failed with error {1}.
+            Try a different starting point in the nonlinear optimization
             by passing a dictionary of parameter guesses, param_guess, to the
-            constructor""" % self.model)
+            constructor.
+            "\n\tDefault starting guess for parameters: {2}"
+            """.format(self.model, opt_res.message, self.param_guess))
 
         # assign params
         for index, _ in enumerate(param_names):
@@ -317,10 +425,14 @@ class ModelIsotherm(Isotherm):
 
         self.rmse = numpy.sqrt(opt_res.fun / len(pressure))
 
+        if verbose:
+            print("Model {0} success, rmse is {1}".format(
+                self.model, self.rmse))
+
 ##########################################################
 #   Methods
 
-    def loading(self, pressure):
+    def loading_at(self, pressure):
         """
         Given stored model parameters, compute loading at pressure P.
 

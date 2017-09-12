@@ -40,10 +40,10 @@ pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
 # Calculate BET
 for isotherm in isotherms:
     print(isotherm.sample_name)
-    print(isotherm.gas)
-    isotherm.convert_pressure_mode("relative")
+    print(isotherm.adsorbate)
+    isotherm.convert_mode_pressure("relative")
     pygaps.area_BET(isotherm, verbose=True)
-    isotherm.convert_pressure_mode("absolute")
+    isotherm.convert_mode_pressure("absolute")
 
 # %%
 for isotherm in isotherms:
@@ -63,9 +63,9 @@ pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
 for isotherm in isotherms:
     print(isotherm.sample_name)
     print(isotherm.gas)
-    isotherm.convert_pressure_mode("relative")
+    isotherm.convert_mode_pressure("relative")
     pygaps.t_plot(isotherm, 'Halsey', verbose=True)
-    isotherm.convert_pressure_mode("absolute")
+    isotherm.convert_mode_pressure("absolute")
 
 # Pore size distribution
 #################################################################################
@@ -106,7 +106,7 @@ for x in result_dict['pore_distribution']:
 for isotherm in isotherms:
     print(isotherm.sample_name)
     print(isotherm.gas)
-    isotherm.convert_pressure_mode("relative")
+    isotherm.convert_mode_pressure("relative")
     pygaps.dft_size_distribution(isotherm, 'internal', verbose=True)
 
 
@@ -115,8 +115,13 @@ for isotherm in isotherms:
 # PyIAST isotherm modelling
 #
 # %%
-orig = isotherms[2]
-model = orig.get_model_isotherm("Henry")
+# Attempt to guess the best model
+for isotherm in isotherms:
+    model = pygaps.ModelIsotherm.from_pointisotherm(
+        isotherm, model='guess', verbose=True)
+    pygaps.plot_iso([isotherm, model])
 
-pygaps.plot_iso({orig, model}, plot_type='isotherm',
-                branch='ads', logarithmic=False, color=True)
+# %%
+# For a particular model
+model = pygaps.ModelIsotherm.from_pointisotherm(
+    isotherms[3], model='BET', verbose=True)
