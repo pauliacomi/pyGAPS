@@ -11,10 +11,10 @@ import sqlite3
 import numpy
 import pandas
 
-from ..utilities.exceptions import ParsingError
 from ..classes.adsorbate import Adsorbate
 from ..classes.pointisotherm import PointIsotherm
 from ..classes.sample import Sample
+from ..utilities.exceptions import ParsingError
 from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select

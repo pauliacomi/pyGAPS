@@ -3,12 +3,13 @@ This test module has tests relating to the adsorbate class
 """
 
 import os
+
 import pytest
 
 import pygaps
 
-from ..calculations.conftest import HERE
 from ..calculations.conftest import DATA
+from ..calculations.conftest import HERE
 
 
 class TestModelIsotherm(object):

@@ -9,8 +9,8 @@ import os
 
 import pandas
 
-from ..utilities.exceptions import ParsingError
 from ..classes.pointisotherm import PointIsotherm
+from ..utilities.exceptions import ParsingError
 
 # chose an implementation, depending on os
 if os.name == 'nt':  # sys.platform == 'win32':

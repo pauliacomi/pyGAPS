@@ -3,6 +3,7 @@ This module contains general functions for folder stepping
 """
 
 import os.path
+
 from .exceptions import Error
 
 

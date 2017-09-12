@@ -6,8 +6,8 @@ pure-component adsorption isotherm model.
 import numpy
 import scipy.optimize
 
-from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 
 
 def iast(partial_pressures, isotherms, verbose=False, warningoff=False,

@@ -9,9 +9,9 @@ import copy
 import numpy
 import scipy.optimize
 
-from .isotherm import Isotherm
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from .isotherm import Isotherm
 
 # ! list of models implemented
 # ! with parameters involved in each model

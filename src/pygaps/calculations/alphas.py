@@ -6,9 +6,9 @@ import warnings
 
 import scipy
 
-from ..utilities.exceptions import ParameterError
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
+from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
 from .bet import area_BET
 

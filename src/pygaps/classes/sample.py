@@ -3,6 +3,7 @@ This module contains the experimental sample class
 """
 
 import pygaps.data as data
+
 from ..utilities.exceptions import ParameterError
 
 

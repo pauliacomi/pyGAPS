@@ -6,9 +6,9 @@ from CoolProp.CoolProp import PropsSI
 
 import pygaps.data as data
 
-from ..utilities.unit_converter import convert_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.unit_converter import convert_pressure
 
 
 class Adsorbate(object):

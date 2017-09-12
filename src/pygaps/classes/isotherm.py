@@ -2,9 +2,9 @@
 This module contains the main class that describes an isotherm
 """
 
+from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _LOADING_UNITS
 from ..utilities.unit_converter import _PRESSURE_UNITS
-from ..utilities.exceptions import ParameterError
 
 
 class Isotherm(object):

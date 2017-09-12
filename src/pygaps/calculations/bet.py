@@ -7,11 +7,10 @@ import warnings
 import scipy.constants as constants
 import scipy.stats
 
-
-from ..utilities.exceptions import ParameterError
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import bet_plot
 from ..graphing.calcgraph import roq_plot
+from ..utilities.exceptions import ParameterError
 
 
 def area_BET(isotherm, limits=None, verbose=False):

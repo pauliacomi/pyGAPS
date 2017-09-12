@@ -6,8 +6,8 @@ import json
 
 import pandas
 
-from ..utilities.exceptions import ParsingError
 from ..classes.pointisotherm import PointIsotherm
+from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import _LOADING_UNITS
 from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _VOLUME_UNITS

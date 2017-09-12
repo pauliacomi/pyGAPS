@@ -7,9 +7,9 @@ import warnings
 import numpy
 import scipy
 
-from ..utilities.exceptions import ParameterError
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
+from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
 from .thickness_models import get_thickness_model
 

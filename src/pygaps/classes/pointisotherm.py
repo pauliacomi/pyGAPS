@@ -12,10 +12,10 @@ from scipy.interpolate import interp1d
 import pygaps
 
 from ..graphing.isothermgraphs import plot_iso
-from ..utilities.unit_converter import convert_loading
-from ..utilities.unit_converter import convert_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.unit_converter import convert_loading
+from ..utilities.unit_converter import convert_pressure
 from .adsorbate import Adsorbate
 from .isotherm import Isotherm
 from .sample import Sample
