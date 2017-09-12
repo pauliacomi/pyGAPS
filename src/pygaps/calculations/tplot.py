@@ -14,7 +14,7 @@ from ..utilities.math_utilities import find_linear_sections
 from .thickness_models import get_thickness_model
 
 
-def t_plot(isotherm, thickness_model, limits=None, verbose=False):
+def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False):
     """
     Calculates the external surface area and adsorbed volume
     using the t-plot method
@@ -33,8 +33,9 @@ def t_plot(isotherm, thickness_model, limits=None, verbose=False):
     ----------
     isotherm : PointIsotherm
         the isotherm of which to calculate the t-plot parameters.
-    thickness_model : obj(`str`) or obj(`Isotherm`) or obj(`callable`)
-        Name of the thickness model to use.
+    thickness_model : obj(`str`) or obj(`Isotherm`) or obj(`callable`), optional
+        Name of the thickness model to use. Defaults to the Harkins and Jura
+        thickness curve.
     limits : [:obj:`float`, :obj:`float`], optional
         Manual limits for region selection.
     verbose : bool, optional

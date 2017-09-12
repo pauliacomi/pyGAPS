@@ -243,7 +243,8 @@ class ModelIsotherm(Isotherm):
     @classmethod
     def from_pointisotherm(cls,
                            isotherm,
-                           model,
+                           model=None,
+                           guess_model=False,
                            branch='ads',
                            param_guess=None,
                            optimization_method="Nelder-Mead",
@@ -258,8 +259,10 @@ class ModelIsotherm(Isotherm):
             An instance of the PointIsotherm parent class to model.
         model : str
             The model to be used to describe the isotherm
-            Pass ``'guess'`` to attempt to find the best fit
-            model, which will take more time.
+        guess_model : bool
+            Set to true if you want to attemt to guess which model best
+            fits the isotherm data. This will mean a calculation of all
+            models available, so it will take a longer time.
         branch : {None, 'ads', 'des'}, optional
             Branch of isotherm to model. Defaults to adsorption branch.
         param_guess : dict, optional
@@ -269,7 +272,7 @@ class ModelIsotherm(Isotherm):
         verbose : bool
             Prints out extra information about steps taken.
         """
-        if model == 'guess':
+        if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
                                        loading_key=isotherm.loading_key,
                                        pressure_key=isotherm.pressure_key,
