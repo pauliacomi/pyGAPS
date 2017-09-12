@@ -178,6 +178,13 @@ class TestPointIsotherm(object):
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
+    def test_isotherm_loading_interpolation(self, basic_pointisotherm):
+        """Checks that the interpolation works as expected"""
+
+        a = basic_pointisotherm.loading_at(1)
+        a = basic_pointisotherm.loading_at(4)
+        a = basic_pointisotherm.loading_at(3.5)
+
     def test_isotherm_print_parameters(self, basic_pointisotherm, noplot):
         "Checks isotherm can print its own info"
 

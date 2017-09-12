@@ -128,17 +128,15 @@ class PointIsotherm(Isotherm):
         # Split the data in adsorption/desorption
         self._data = self._splitdata(self._data)
 
+        #: The internal interpolator function. This is generated
+        #: the first time it is needed to make calculations faster
+        self.interp_fun = None
+        #: the branch the internal interpolator is branched on
+        self.interp_branch = None
+        #: the kind of interpolator in the internal interpolator
+        self.interp_kind = None
         #: value of loading to assume beyond highest pressure in the data
-        self.fill_value = None
-
-        # Generate the interpolator object
-        if self.fill_value is None:
-            self.interp1d = interp1d(self._data[pressure_key],
-                                     self._data[loading_key])
-        else:
-            self.interp1d = interp1d(self._data[pressure_key],
-                                     self._data[loading_key],
-                                     fill_value=self.fill_value, bounds_error=False)
+        self.interp_fill = None
 
         # Now that all data has been saved, generate the unique id if needed
         if self.id is None:
@@ -225,6 +223,7 @@ class PointIsotherm(Isotherm):
         """
         object.__setattr__(self, name, value)
 
+        # TODO change from not in to in a known array of parameters
         if self._instantiated and name not in ['id', '_instantiated']:
             # Generate the unique id using md5
             self.id = None
@@ -556,28 +555,63 @@ class PointIsotherm(Isotherm):
 ##########################################################
 #   Functions that interpolate values of the isotherm data
 
-    def loading_at(self, pressure, unit=None, branch='ads'):
+    def loading_at(self, pressure,
+                   unit=None,
+                   branch='ads',
+                   interp_fill=None,
+                   interpolation_type='linear'):
         """
         Interpolate isotherm to compute loading at any pressure P.
         Parameters
         ----------
-        pressure : float
+        pressure : float or array
             pressure at which to compute loading
+        unit : str
+            Unit the pressure is returned in. If None, it defaults to
+            internal isotherm units.
+        branch : {'ads','des'}
+            The branch the interpolation takes into account.
+        interp_fill : float
+            Maximum value until which the interpolation is done. If blank,
+            interpolation will not predict outside the bounds of data.
+        interpolation_type : str
+            The type of scipi.interp1d used: `linear`, `nearest`, `zero`,
+            `slinear`, `quadratic`, `cubic`. It defaults to `linear`.
 
         Returns
         -------
         float
             predicted loading at pressure P
         """
+        # Check to see if interpolator is already generated
+        if self.interp_fun is None or \
+                self.interp_branch != branch or  \
+                self.interp_kind != interpolation_type or \
+                self.interp_fill != interp_fill:
 
-        if branch == 'ads':
-            if unit is None:
-                return self.interp1d(pressure)
+            #: the branch the internal interpolator is branched on
+            self.interp_branch = branch
+            #: the kind of interpolator in the internal interpolator
+            self.interp_kind = interpolation_type
+            #: value of loading to assume beyond highest pressure in the data
+            self.interp_fill = interp_fill
+
+            # Generate the interpolator object
+            if self.interp_fill is None:
+                self.interp_fun = interp1d(self.pressure(branch=branch),
+                                           self.loading(branch=branch),
+                                           kind=interpolation_type)
             else:
-                return convert_loading(self.interp1d(pressure), self.unit_loading, unit)
+                self.interp_fun = interp1d(self.pressure(branch=branch),
+                                           self.loading(branch=branch),
+                                           fill_value=self.interp_fill, bounds_error=False,
+                                           kind=interpolation_type)
+
+        # Now interpolate and return the value
+        if unit is None:
+            return self.interp_fun(pressure)
         else:
-            # TODO implement
-            raise NotImplementedError
+            return convert_loading(self.interp_fun(pressure), self.unit_loading, unit)
 
     def pressure_at(self, loading, unit=None, branch='ads'):
         """
@@ -602,7 +636,7 @@ class PointIsotherm(Isotherm):
         # TODO implement
         raise NotImplementedError
 
-    def spreading_pressure(self, pressure):
+    def spreading_pressure(self, pressure, interp_fill=None):
         """
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.
         (see Tarafder eqn 4)
@@ -631,7 +665,7 @@ class PointIsotherm(Isotherm):
             spreading pressure, :math:`\\Pi`
         """
         # throw exception if interpolating outside the range.
-        if (self.fill_value is None) & \
+        if (self.interp_fill is None) & \
                 (pressure > self._data[self.pressure_key].max()):
             raise CalculationError("""
             To compute the spreading pressure at this bulk
@@ -644,10 +678,10 @@ class PointIsotherm(Isotherm):
             pressure range to characterize the isotherm at higher pressures.
 
             Option 1: fit an analytical model to extrapolate the isotherm
-            Option 2: pass a `fill_value` to the construction of the
+            Option 2: pass a `interp_fill` to the construction of the
                 InterpolatorIsotherm object. Then, InterpolatorIsotherm will
                 assume that the uptake beyond pressure %f is equal to
-                `fill_value`. This is reasonable if your isotherm data exhibits
+                `interp_fill`. This is reasonable if your isotherm data exhibits
                 a plateau at the highest pressures.
             Option 3: Go back to the lab or computer to collect isotherm data
                 at higher pressures. (Extrapolation can be dangerous!)"""
