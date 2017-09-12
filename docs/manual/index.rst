@@ -4,4 +4,4 @@ Manual
 .. toctree::
     :glob:
 
-    manual
+    graphing
