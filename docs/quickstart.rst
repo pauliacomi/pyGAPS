@@ -108,12 +108,12 @@ For more information on how to use each method, check the detailed manual.
    The results obtained using these tools are only as good as the data and settings
    chosen. Errors are thrown wherever possible, but the user should be aware of the
    theory and applicability behind the methods. A couple of examples where there's a
-   high posibility of the calculations becoming a waste of CPU cycles:
+   high posibility of the results being a waste of CPU cycles:
 
     - Using isotherms measured at high temperatures and pressures where the difference
       between *excess* and *absolute* adsorption becomes significant.
 
-    - Using a provided model outside with a wrong adsorbate or temperature range, for
+    - Using a provided model with a wrong adsorbate or temperature range, for
       example using the Halsey thickness curve on anything else besides nitrogen at 77K
       or the internal DFT kernel on isotherms measured on MOFs.
 
