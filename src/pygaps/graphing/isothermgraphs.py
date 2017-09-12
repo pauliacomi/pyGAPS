@@ -16,7 +16,8 @@ _PLOT_TYPES = ["isotherm", "enthalpy", "iso-enth"]
 _BRANCH_TYPES = ["ads", "des"]
 
 
-def plot_iso(isotherms, plot_type, branch, logarithmic=False, color=True,
+def plot_iso(isotherms, plot_type="isotherm",
+             branch=_BRANCH_TYPES, logarithmic=False, color=True,
              xmaxrange=None, y_adsmaxrange=None, y_enthmaxrange=None,
              legend_list=None, fig_title=None, legend_bottom=False,
              save=False, path=None):
