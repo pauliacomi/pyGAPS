@@ -3,13 +3,17 @@ Custom errors thrown by the program
 """
 
 
-class PygapsError(Exception):
-    """Error raised by the program"""
+class Error(Exception):
+    """Error raised by this program"""
 
 
-class ParameterError(PygapsError):
+class ParameterError(Error):
     """Raised when one of the parameters is unsuitable"""
 
 
-class CalculationError(PygapsError):
+class CalculationError(Error):
     """Raised when a calculation fails"""
+
+
+class ParsingError(Error):
+    """Raised when parsing fails"""

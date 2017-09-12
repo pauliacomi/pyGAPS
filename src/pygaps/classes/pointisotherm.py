@@ -14,6 +14,8 @@ import pygaps
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.unit_converter import convert_loading
 from ..utilities.unit_converter import convert_pressure
+from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 from .adsorbate import Adsorbate
 from .isotherm import Isotherm
 from .sample import Sample
@@ -106,7 +108,7 @@ class PointIsotherm(Isotherm):
                           **isotherm_parameters)
 
         if None in [loading_key, pressure_key]:
-            raise Exception(
+            raise ParameterError(
                 "Pass loading_key and pressure_key, the names of the loading and"
                 " pressure columns in the DataFrame, to the constructor.")
 
@@ -305,8 +307,9 @@ class PointIsotherm(Isotherm):
         """
 
         if mode_pressure not in self._PRESSURE_MODE:
-            raise Exception("Mode selected for pressure is not an option. See viable"
-                            "models in self._PRESSURE_MODE")
+            raise ParameterError(
+                "Mode selected for pressure is not an option. See viable"
+                "models in self._PRESSURE_MODE")
 
         if mode_pressure == self.mode_pressure:
             print("Mode is the same, no changes made")
@@ -340,8 +343,9 @@ class PointIsotherm(Isotherm):
 
         # Syntax checks
         if mode_adsorbent not in self._MATERIAL_MODE:
-            raise Exception("Mode selected for adsorbent is not an option. See viable"
-                            "models in self._MATERIAL_MODE")
+            raise ParameterError(
+                "Mode selected for adsorbent is not an option. See viable"
+                "models in self._MATERIAL_MODE")
 
         if mode_adsorbent == self.mode_adsorbent:
             print("Mode is the same, no changes made")
@@ -629,7 +633,8 @@ class PointIsotherm(Isotherm):
         # throw exception if interpolating outside the range.
         if (self.fill_value is None) & \
                 (pressure > self._data[self.pressure_key].max()):
-            raise Exception("""To compute the spreading pressure at this bulk
+            raise CalculationError("""
+            To compute the spreading pressure at this bulk
             adsorbate pressure, we would need to extrapolate the isotherm since this
             pressure is outside the range of the highest pressure in your
             pure-component isotherm data, %f.
@@ -646,8 +651,8 @@ class PointIsotherm(Isotherm):
                 a plateau at the highest pressures.
             Option 3: Go back to the lab or computer to collect isotherm data
                 at higher pressures. (Extrapolation can be dangerous!)"""
-                            % (self._data[self.pressure_key].max(),
-                               self._data[self.pressure_key].max()))
+                                   % (self._data[self.pressure_key].max(),
+                                      self._data[self.pressure_key].max()))
 
         # Get all data points that are at nonzero pressures
         pressures = self._data[self.pressure_key].values[

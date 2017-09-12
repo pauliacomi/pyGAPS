@@ -29,7 +29,7 @@ class TestPointIsotherm(object):
 
         del keys[missing_key]
 
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.classes.pointisotherm.PointIsotherm(
                 isotherm_data,
                 loading_key=keys.get('loading_key'),

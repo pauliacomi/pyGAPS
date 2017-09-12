@@ -6,6 +6,8 @@ the micropore range (<2 nm).
 import numpy
 import scipy
 
+from ..utilities.exceptions import ParameterError
+
 
 def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
                         maximum_adsorbed, adsorbate_properties,
@@ -143,33 +145,37 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         raise NotImplementedError
 
     if adsorbent_properties is None:
-        raise Exception("A dictionary of adsorbent properties must be provided"
-                        " for the HK method. The properties required are:"
-                        "molecular_diameter, polarizability,"
-                        "magnetic_susceptibility and surface_density"
-                        "Some standard models can be found in "
-                        " .calculations.adsorbent_parameters")
+        raise ParameterError(
+            "A dictionary of adsorbent properties must be provided"
+            " for the HK method. The properties required are:"
+            "molecular_diameter, polarizability,"
+            "magnetic_susceptibility and surface_density"
+            "Some standard models can be found in "
+            " .calculations.adsorbent_parameters")
     missing = [x for x in adsorbent_properties if x not in ['molecular_diameter',
                                                             'polarizability',
                                                             'magnetic_susceptibility',
                                                             'surface_density']]
     if len(missing) != 0:
-        raise Exception("Adsorbent properties dictionary is missing parameters: "
-                        "{}".format(' '.join(missing)))
+        raise ParameterError(
+            "Adsorbent properties dictionary is missing parameters: "
+            "{}".format(' '.join(missing)))
 
     if adsorbate_properties is None:
-        raise Exception("A dictionary of adsorbate properties must be provided"
-                        " for the HK method. The properties required are:"
-                        "molecular_diameter, liquid_density, polarizability,"
-                        "magnetic_susceptibility, surface_density")
+        raise ParameterError(
+            "A dictionary of adsorbate properties must be provided"
+            " for the HK method. The properties required are:"
+            "molecular_diameter, liquid_density, polarizability,"
+            "magnetic_susceptibility, surface_density")
     missing = [x for x in adsorbate_properties if x not in ['molecular_diameter',
                                                             'liquid_density',
                                                             'polarizability',
                                                             'magnetic_susceptibility',
                                                             'surface_density']]
     if len(missing) != 0:
-        raise Exception("Adsorbate properties dictionary is missing parameters: "
-                        "{}".format(' '.join(missing)))
+        raise ParameterError(
+            "Adsorbate properties dictionary is missing parameters: "
+            "{}".format(' '.join(missing)))
 
     # dictionary unpacking
     d_adsorbate = adsorbate_properties.get('molecular_diameter')

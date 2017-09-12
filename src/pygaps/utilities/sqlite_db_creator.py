@@ -5,6 +5,7 @@ This module contains the functions that generate the sqlite database
 
 import sqlite3
 
+from .exceptions import ParsingError
 from .sqlite_db_pragmas import PRAGMAS
 
 
@@ -51,7 +52,7 @@ def db_execute_general(pth, statement):
     # Catch the exception
     except sqlite3.OperationalError as e_info:
         print("Unable to execute statement", statement)
-        raise e_info
+        raise ParsingError from e_info
 
     # Close the db connection
     if db:

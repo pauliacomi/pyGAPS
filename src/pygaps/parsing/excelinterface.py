@@ -9,6 +9,7 @@ import os
 
 import pandas
 
+from ..utilities.exceptions import ParsingError
 from ..classes.pointisotherm import PointIsotherm
 
 # chose an implementation, depending on os
@@ -36,7 +37,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     '''
 
     if xlwings is None:
-        raise Warning(
+        raise ParsingError(
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
     # create a new workbook and select first sheet
@@ -89,7 +90,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
         elif isotherm.exp_type == "calorimetry":
             rng_data = 39
         else:
-            raise Exception("Unknown data type")
+            raise ParsingError("Unknown experiment type")
 
     headings = [
         isotherm.loading_key,
@@ -141,7 +142,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
             ]
             xlwings.Range('A38:C38').color = delimiter_colour
         else:
-            raise Exception("Unknown data type")
+            raise ParsingError("Unknown data type")
 
     wb.save(path=path)
     wb.app.quit()
@@ -169,7 +170,7 @@ def isotherm_from_xl(path, fmt=None):
     """
 
     if xlwings is None:
-        raise Warning(
+        raise ParsingError(
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
     # Get excel workbook, sheet and range
@@ -220,7 +221,7 @@ def isotherm_from_xl(path, fmt=None):
         elif sample_info["exp_type"] == "calorimetry":
             rng_data = 39
         else:
-            raise Exception("Unknown data type")
+            raise ParsingError("Unknown data type")
 
     experiment_data_df = sht.range('A' + str(rng_data)).options(
         pandas.DataFrame, expand='table', index=0).value

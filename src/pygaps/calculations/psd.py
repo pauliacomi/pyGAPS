@@ -14,6 +14,7 @@ from .psd_mesoporous import psd_bjh
 from .psd_mesoporous import psd_dollimore_heal
 from .psd_microporous import psd_horvath_kawazoe
 from .thickness_models import get_thickness_model
+from ..utilities.exceptions import ParameterError
 
 _MESO_PSD_MODELS = ['BJH', 'DH', 'HK']
 _MICRO_PSD_MODELS = ['HK']
@@ -92,29 +93,29 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     # Function parameter checks
     if isotherm.mode_adsorbent != "mass":
-        raise Exception("The isotherm must be in per mass of adsorbent."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in per mass of adsorbent."
+                             "First convert it using implicit functions")
     if isotherm.mode_pressure != "relative":
-        raise Exception("The isotherm must be in relative pressure mode."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in relative pressure mode."
+                             "First convert it using implicit functions")
 
     if psd_model is None:
-        raise Exception("Specify a model to generate the pore size"
-                        " distribution e.g. psd_model=\"BJH\"")
+        raise ParameterError("Specify a model to generate the pore size"
+                             " distribution e.g. psd_model=\"BJH\"")
     if psd_model not in _MESO_PSD_MODELS:
-        raise Exception("Model {} not an option for psd.".format(psd_model),
-                        "Available models are {}".format(_MESO_PSD_MODELS))
+        raise ParameterError("Model {} not an option for psd.".format(psd_model),
+                             "Available models are {}".format(_MESO_PSD_MODELS))
     if pore_geometry not in _PORE_GEOMETRIES:
-        raise Exception("Geometry {} not an option for pore size"
-                        "distribution.".format(pore_geometry),
-                        "Available geometries are {}".format(_PORE_GEOMETRIES))
+        raise ParameterError("Geometry {} not an option for pore size"
+                             "distribution.".format(pore_geometry),
+                             "Available geometries are {}".format(_PORE_GEOMETRIES))
 
     branch = model_parameters.get('branch')
     if branch is None:
         branch = 'desorption'
     if branch not in ['adsorption', 'desorption']:
-        raise Exception("Branch {} not an option for psd.".format(branch),
-                        "Select either 'adsorption' or 'desorption'")
+        raise ParameterError("Branch {} not an option for psd.".format(branch),
+                             "Select either 'adsorption' or 'desorption'")
 
     thickness_model = model_parameters.get('thickness_model')
     if thickness_model is None:
@@ -135,8 +136,8 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         loading = isotherm.loading(unit='mmol', branch='des')
         pressure = isotherm.pressure(branch='des')
     if loading is None:
-        raise Exception("The isotherm does not have the required branch for"
-                        " this calculation")
+        raise ParameterError("The isotherm does not have the required branch for"
+                             " this calculation")
 
     # Thickness model definitions
     t_model = get_thickness_model(thickness_model)
@@ -229,21 +230,23 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     # Function parameter checks
     if isotherm.mode_adsorbent != "mass":
-        raise Exception("The isotherm must be in per mass of adsorbent."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in per mass of adsorbent."
+                             "First convert it using implicit functions")
     if isotherm.mode_pressure != "relative":
-        raise Exception("The isotherm must be in relative pressure mode."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in relative pressure mode."
+                             "First convert it using implicit functions")
 
     if psd_model is None:
-        raise Exception("Specify a model to generate the pore size"
-                        " distribution e.g. psd_model=\"BJH\"")
+        raise ParameterError("Specify a model to generate the pore size"
+                             " distribution e.g. psd_model=\"BJH\"")
     if psd_model not in _MICRO_PSD_MODELS:
-        raise Exception("Model {} not an option for psd.".format(psd_model),
-                        "Available models are {}".format(_MICRO_PSD_MODELS))
+        raise ParameterError("Model {} not an option for psd.".format(psd_model),
+                             "Available models are {}".format(_MICRO_PSD_MODELS))
     if pore_geometry not in _PORE_GEOMETRIES:
-        raise Exception("Geometry {} not an option for pore size distribution.".format(pore_geometry),
-                        "Available geometries are {}".format(_PORE_GEOMETRIES))
+        raise ParameterError(
+            "Geometry {} not an option for pore size distribution.".format(
+                pore_geometry),
+            "Available geometries are {}".format(_PORE_GEOMETRIES))
 
     adsorbent_model = model_parameters.get('adsorbent_model')
     if adsorbent_model is None:
@@ -371,8 +374,9 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
     """
     # Check kernel
     if kernel_path is None:
-        raise Exception("A path to the kernel to be used must be specified."
-                        "Use 'internal' to use the internal kernel (USE JUDICIOUSLY).")
+        raise ParameterError(
+            "A path to the kernel to be used must be specified."
+            "Use 'internal' to use the internal kernel (USE JUDICIOUSLY).")
 
     # Read data in
     loading = isotherm.loading(unit='mmol', branch='ads')

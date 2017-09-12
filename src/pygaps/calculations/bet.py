@@ -7,6 +7,8 @@ import warnings
 import scipy.constants as constants
 import scipy.stats
 
+
+from ..utilities.exceptions import ParameterError
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import bet_plot
 from ..graphing.calcgraph import roq_plot
@@ -121,10 +123,11 @@ def area_BET(isotherm, limits=None, verbose=False):
     """
     # Checks
     if isotherm.mode_adsorbent != "mass":
-        raise Exception("The isotherm must be in per mass of adsorbent."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in per mass of adsorbent."
+                             "First convert it using implicit functions")
     if isotherm.mode_pressure != "relative":
-        isotherm.convert_pressure_mode('relative')
+        raise ParameterError("The isotherm must be in relative pressure mode."
+                             "First convert it using implicit functions")
 
     # get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
@@ -218,8 +221,8 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
 
     """
     if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays"
-                        " do not match")
+        raise ParameterError("The length of the pressure and loading arrays"
+                             " do not match")
 
     # Generate the Roquerol array
     roq_t_array = roq_transform(loading, pressure)

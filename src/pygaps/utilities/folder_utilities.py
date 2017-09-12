@@ -3,6 +3,7 @@ This module contains general functions for folder stepping
 """
 
 import os.path
+from .exceptions import Error
 
 
 def util_get_file_paths(folder, extension=None):
@@ -23,7 +24,7 @@ def util_get_file_paths(folder, extension=None):
 
     '''
     if extension is None:
-        raise Exception("Must provide a file extension to look for")
+        raise Error("Must provide a file extension to look for")
 
     paths = []
 

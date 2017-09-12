@@ -6,6 +6,7 @@ import json
 
 import pandas
 
+from ..utilities.exceptions import ParsingError
 from ..classes.pointisotherm import PointIsotherm
 from ..utilities.unit_converter import _LOADING_UNITS
 from ..utilities.unit_converter import _MASS_UNITS
@@ -157,7 +158,7 @@ def _from_json_nist(raw_dict):
     loading_string = raw_dict["adsorptionUnits"]
     comp = loading_string.split('/')
     if len(comp) != 2:
-        raise Exception("Isotherm cannot be parsed due to loading format")
+        raise ParsingError("Isotherm cannot be parsed due to loading format")
 
     # TODO ensure that the adsorbent unit is included later
     if comp[1] in _MASS_UNITS:
@@ -165,12 +166,12 @@ def _from_json_nist(raw_dict):
     elif comp[1] in _VOLUME_UNITS:
         mode_adsorbent = "volume"
     else:
-        raise Exception("Isotherm cannot be parsed due to adsorbent unit")
+        raise ParsingError("Isotherm cannot be parsed due to adsorbent unit")
 
     if comp[0] in _LOADING_UNITS:
         unit_loading = comp[0]
     else:
-        raise Exception("Isotherm cannot be parsed due to loading unit")
+        raise ParsingError("Isotherm cannot be parsed due to loading unit")
 
     mode_pressure = "absolute"
 
@@ -179,7 +180,7 @@ def _from_json_nist(raw_dict):
     if pressure_string in _LOADING_UNITS:
         unit_pressure = pressure_string
     else:
-        raise Exception("Isotherm cannot be parsed due to pressure unit")
+        raise ParsingError("Isotherm cannot be parsed due to pressure unit")
 
     return (nist_dict,
             mode_pressure, mode_adsorbent,

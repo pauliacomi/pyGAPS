@@ -11,6 +11,7 @@ import sqlite3
 import numpy
 import pandas
 
+from ..utilities.exceptions import ParsingError
 from ..classes.adsorbate import Adsorbate
 from ..classes.pointisotherm import PointIsotherm
 from ..classes.sample import Sample
@@ -166,7 +167,7 @@ def db_upload_sample(pth, sample, overwrite=False):
               sample.name,
               sample.batch,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -204,7 +205,7 @@ def db_upload_sample_type(pth, sample_type):
         print("Error on sample type:", "\n",
               sample_type['nick'],
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -241,7 +242,7 @@ def db_upload_sample_form(pth, sample_form):
         print("Error on sample form:", "\n",
               sample_form['nick'],
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -277,7 +278,7 @@ def db_upload_sample_property_type(pth, property_type, property_unit):
         print("Error on sample:", "\n",
               property_type,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -333,7 +334,7 @@ def db_delete_sample(pth, sample):
               sample.name,
               sample.batch,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -508,7 +509,7 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
               isotherm.t_act,
               isotherm.t_exp,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -546,7 +547,7 @@ def db_upload_experiment_type(pth, experiment_type):
         print("Error on experiment type:", "\n",
               experiment_type['nick'],
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -582,7 +583,7 @@ def db_upload_experiment_data_type(pth, data_type, data_unit):
         print("Error on sample:", "\n",
               data_type,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -637,7 +638,7 @@ def db_delete_experiment(pth, isotherm):
               isotherm.t_act,
               isotherm.t_exp,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -691,7 +692,7 @@ def db_upload_experiment_calculated(pth, data, overwrite=False):
         print("Error on id:", "\n",
               data['exp_id'],
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     finally:
         # Close the db connection
@@ -835,7 +836,7 @@ def db_upload_gas(pth, adsorbate, overwrite=False):
         print("Error on sample:", "\n",
               adsorbate.name,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -873,7 +874,7 @@ def db_upload_gas_property_type(pth, property_type, property_unit):
         print("Error on sample:", "\n",
               property_type,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -927,7 +928,7 @@ def db_delete_gas(pth, adsorbate):
         print("Error on sample:", "\n",
               adsorbate.name,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -980,7 +981,7 @@ def db_upload_contact(pth, contact_dict, overwrite=False):
         print("Error on contact:", "\n",
               contact_dict.get('nick'),
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -1027,7 +1028,7 @@ def db_delete_contact(pth, contact_nick):
         print("Error on sample:", "\n",
               contact_nick,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -1075,7 +1076,7 @@ def db_upload_lab(pth, lab_dict, overwrite=False):
         print("Error on lab:", "\n",
               lab_dict.get('nick'),
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -1122,7 +1123,7 @@ def db_delete_lab(pth, lab_nick):
         print("Error on lab:", "\n",
               lab_nick,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -1170,7 +1171,7 @@ def db_upload_machine(pth, machine_dict, overwrite=False):
         print("Error on machine:", "\n",
               machine_dict.get('nick'),
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -1207,7 +1208,7 @@ def db_upload_machine_type(pth, machine_type):
         print("Error on machine type:", "\n",
               machine_type,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:
@@ -1252,7 +1253,7 @@ def db_delete_machine(pth, machine_nick):
         print("Error on machine:", "\n",
               machine_nick,
               "\n", e)
-        raise e
+        raise ParsingError from e
 
     # Close the db connection
     if db:

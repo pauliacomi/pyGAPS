@@ -4,6 +4,7 @@ This module contains the main class that describes an isotherm
 
 from ..utilities.unit_converter import _LOADING_UNITS
 from ..utilities.unit_converter import _PRESSURE_UNITS
+from ..utilities.exceptions import ParameterError
 
 
 class Isotherm(object):
@@ -74,33 +75,39 @@ class Isotherm(object):
         # Checks
         if any(k not in isotherm_parameters
                for k in ('sample_name', 'sample_batch', 't_exp', 'adsorbate')):
-            raise Exception(
+            raise ParameterError(
                 "Isotherm MUST have the following information in the properties dictionary:"
                 "'sample_name', 'sample_batch', 't_exp', 'adsorbate'")
 
         if mode_adsorbent is None or mode_pressure is None:
-            raise Exception("One of the modes is not specified. See viable"
-                            "modes in _MATERIAL_MODE and _PRESSURE_MODE")
+            raise ParameterError(
+                "One of the modes is not specified. See viable"
+                "modes in _MATERIAL_MODE and _PRESSURE_MODE")
 
         if mode_adsorbent not in self._MATERIAL_MODE:
-            raise Exception("Mode selected for adsorbent is not an option. See viable"
-                            "modes in _MATERIAL_MODE")
+            raise ParameterError(
+                "Mode selected for adsorbent is not an option. See viable"
+                "modes in _MATERIAL_MODE")
 
         if mode_pressure not in self._PRESSURE_MODE:
-            raise Exception("Mode selected for pressure is not an option. See viable"
-                            "modes in _PRESSURE_MODE")
+            raise ParameterError(
+                "Mode selected for pressure is not an option. See viable"
+                "modes in _PRESSURE_MODE")
 
         if unit_loading is None or unit_pressure is None:
-            raise Exception("One of the units is not specified. See viable"
-                            "units in _LOADING_UNITS and _PRESSURE_UNITS")
+            raise ParameterError(
+                "One of the units is not specified. See viable"
+                "units in _LOADING_UNITS and _PRESSURE_UNITS")
 
         if unit_loading not in _LOADING_UNITS:
-            raise Exception("Unit selected for loading is not an option. See viable"
-                            "units in _LOADING_UNITS")
+            raise ParameterError(
+                "Unit selected for loading is not an option. See viable"
+                "units in _LOADING_UNITS")
 
         if unit_pressure not in _PRESSURE_UNITS:
-            raise Exception("Unit selected for pressure is not an option. See viable"
-                            "units in _PRESSURE_UNITS")
+            raise ParameterError(
+                "Unit selected for pressure is not an option. See viable"
+                "units in _PRESSURE_UNITS")
 
         #: mode for the adsorbent
         self.mode_adsorbent = str(mode_adsorbent)

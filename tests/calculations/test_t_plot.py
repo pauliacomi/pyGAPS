@@ -25,7 +25,7 @@ class TestTPlot(object):
         adsorbate = basic_adsorbate
 
         # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.t_plot(isotherm, thickness_model='Halsey')
 
         pygaps.data.GAS_LIST.append(adsorbate)
@@ -35,13 +35,13 @@ class TestTPlot(object):
         isotherm.convert_mode_adsorbent("volume")
 
         # Will raise a "isotherm loading not in volume mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.t_plot(isotherm, thickness_model='Halsey')
 
         isotherm.convert_mode_adsorbent("mass")
 
         # Will raise a "no suitable model exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.t_plot(isotherm, thickness_model='random')
 
         return

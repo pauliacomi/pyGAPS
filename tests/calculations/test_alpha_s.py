@@ -25,7 +25,7 @@ class TestAlphaSPlot(object):
         adsorbate = basic_adsorbate
 
         # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.alpha_s(isotherm, isotherm)
 
         pygaps.data.GAS_LIST.append(adsorbate)
@@ -35,14 +35,18 @@ class TestAlphaSPlot(object):
         isotherm.convert_mode_adsorbent("volume")
 
         # Will raise a "isotherm loading not in mass mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.alpha_s(isotherm, isotherm)
 
         isotherm.convert_mode_adsorbent("mass")
 
-        # Will raise a "no suitable model exception"
-        with pytest.raises(Exception):
-            pygaps.alpha_s(isotherm, isotherm)
+        # Will raise a "no reference isotherm exception"
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.alpha_s(isotherm, None)
+
+        # Will raise a "bad reducing pressure exception"
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.alpha_s(isotherm, isotherm, reducing_pressure=1.3)
 
         return
 

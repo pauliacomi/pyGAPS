@@ -49,5 +49,6 @@ from .parsing.sqliteinterface import db_upload_sample_property_type
 from .parsing.sqliteinterface import db_upload_sample_type
 from .utilities.folder_utilities import util_get_file_paths
 from .utilities.exceptions import CalculationError
-from .utilities.exceptions import PygapsError
+from .utilities.exceptions import ParsingError
 from .utilities.exceptions import ParameterError
+from .utilities.exceptions import Error

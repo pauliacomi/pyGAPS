@@ -6,6 +6,8 @@ the mesopore range (2-50 nm).
 import numpy
 import scipy
 
+from ..utilities.exceptions import ParameterError
+
 
 def psd_bjh(loading, pressure, pore_geometry,
             thickness_model, condensation_model,
@@ -92,8 +94,8 @@ def psd_bjh(loading, pressure, pore_geometry,
     """
     # Paramter checks
     if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays"
-                        " do not match")
+        raise ParameterError("The length of the pressure and loading arrays"
+                             " do not match")
 
     if pore_geometry == 'slit':
         raise NotImplementedError
@@ -234,8 +236,8 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     """
     # Checks
     if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays"
-                        " do not match")
+        raise ParameterError("The length of the pressure and loading arrays"
+                             " do not match")
 
     if pore_geometry == 'slit':
         raise NotImplementedError

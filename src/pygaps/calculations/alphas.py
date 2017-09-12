@@ -6,6 +6,7 @@ import warnings
 
 import scipy
 
+from ..utilities.exceptions import ParameterError
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
 from ..utilities.math_utilities import find_linear_sections
@@ -108,23 +109,26 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
 
     # Function parameter checks
     if isotherm.mode_adsorbent != "mass":
-        raise Exception("The isotherm must be in per mass of adsorbent."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in per mass of adsorbent."
+                             "First convert it using implicit functions")
     if isotherm.mode_pressure != "relative":
-        isotherm.convert_pressure_mode('relative')
-
-    if reference_isotherm.mode_pressure != "relative":
-        reference_isotherm.convert_pressure_mode('relative')
+        raise ParameterError("The isotherm must be in relative pressure mode."
+                             "First convert it using implicit functions")
 
     # Check to see if reference isotherm is given
     if reference_isotherm is None:
-        raise Exception("No reference isotherm for alpha s calculation "
-                        "is provided. Please supply one ")
+        raise ParameterError("No reference isotherm for alpha s calculation "
+                             "is provided. Please supply one ")
     if reference_isotherm.adsorbate != isotherm.adsorbate:
-        raise Exception("The reference isotherm adsorbate is different than the "
-                        "calculated isotherm adsorbate. ")
+        raise ParameterError("The reference isotherm adsorbate is different than the "
+                             "calculated isotherm adsorbate. ")
+    if reference_isotherm.mode_pressure != "relative":
+        raise ParameterError("The reference isotherm must be in relative pressure mode."
+                             "First convert it using implicit functions")
+
     if reducing_pressure < 0 or reducing_pressure > 1:
-        raise Exception("The reducing pressure is outside the bounds of 0-1")
+        raise ParameterError(
+            "The reducing pressure is outside the bounds of 0-1")
     if reference_area is None:
         reference_area = area_BET(reference_isotherm).get('bet_area')
 
@@ -213,8 +217,8 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
     """
 
     if len(loading) != len(alpha_curve):
-        raise Exception("The length of the parameter arrays"
-                        " do not match")
+        raise ParameterError("The length of the parameter arrays"
+                             " do not match")
 
     # The alpha-s method is a generalisation of the t-plot method
     # As such, we can just call the t-plot method with the required parameters

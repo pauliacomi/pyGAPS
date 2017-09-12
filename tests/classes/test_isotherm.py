@@ -24,7 +24,7 @@ class TestIsotherm(object):
         data = isotherm_parameters
         del data[missing_param]
 
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.classes.isotherm.Isotherm(
                 **data)
 
@@ -51,7 +51,7 @@ class TestIsotherm(object):
 
         props[prop] = set_to
 
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.classes.isotherm.Isotherm(
                 mode_adsorbent=props.get('mode_adsorbent'),
                 mode_pressure=props.get('mode_pressure'),

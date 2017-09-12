@@ -6,6 +6,9 @@ pure-component adsorption isotherm model.
 import numpy
 import scipy.optimize
 
+from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import CalculationError
+
 
 def iast(partial_pressures, isotherms, verbose=False, warningoff=False,
          adsorbed_mole_fraction_guess=None):
@@ -47,13 +50,13 @@ def iast(partial_pressures, isotherms, verbose=False, warningoff=False,
     partial_pressures = numpy.array(partial_pressures)
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:
-        raise Exception("Pass list of pure component isotherms...")
+        raise ParameterError("Pass list of pure component isotherms...")
 
     if numpy.size(partial_pressures) != n_components:
         print("""Example use:\n
               IAST([0.5,0.5], [xe_isotherm, kr_isotherm], verbose=true)""")
-        raise Exception("Length of partial pressures != length of array of"
-                        " isotherms...")
+        raise ParameterError("Length of partial pressures != length of array of"
+                             " isotherms...")
 
     if verbose:
         print("%d components." % n_components)
@@ -122,7 +125,8 @@ def iast(partial_pressures, isotherms, verbose=False, warningoff=False,
 
     if not res.success:
         print(res.message)
-        raise Exception("""Root finding for adsorbed phase mole fractions failed.
+        raise CalculationError(
+            """Root finding for adsorbed phase mole fractions failed.
         This is likely because the default guess in pyIAST is not good enough.
         Try a different starting guess for the adsorbed phase mole fractions by
         passing an array adsorbed_mole_fraction_guess to this function.""")
@@ -135,7 +139,7 @@ def iast(partial_pressures, isotherms, verbose=False, warningoff=False,
 
     if (numpy.sum(adsorbed_mole_fractions < 0.0) != 0) | (
             numpy.sum(adsorbed_mole_fractions > 1.0) != 0):
-        raise Exception("""Adsorbed mole fraction not in [0,1]. Try a different
+        raise CalculationError("""Adsorbed mole fraction not in [0,1]. Try a different
         starting guess for the adsorbed mole fractions by passing an array or
         list 'adsorbed_mole_fraction_guess' into this function.
         e.g. adsorbed_mole_fraction_guess=[0.2, 0.8]""")
@@ -220,17 +224,18 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
     n_components = len(isotherms)  # number of components in the mixture
     adsorbed_mole_fractions = numpy.array(adsorbed_mole_fractions)
     if n_components == 1:
-        raise Exception("Pass list of pure component isotherms...")
+        raise ParameterError("Pass list of pure component isotherms...")
 
     if numpy.size(adsorbed_mole_fractions) != n_components:
         print("""Example use:\n
               reverse_IAST([0.5,0.5], 1.0, [xe_isotherm, kr_isotherm],
               verbose=true)""")
-        raise Exception("Length of desired adsorbed mole fractions != length of"
-                        " array of isotherms...")
+        raise ParameterError("Length of desired adsorbed mole fractions != length of"
+                             " array of isotherms...")
 
     if numpy.sum(adsorbed_mole_fractions) != 1.0:
-        raise Exception("Desired adsorbed mole fractions should sum to 1.0...")
+        raise ParameterError(
+            "Desired adsorbed mole fractions should sum to 1.0...")
 
     if verbose:
         print("%d components." % n_components)
@@ -294,7 +299,8 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
 
     if not res.success:
         print(res.message)
-        raise Exception("""Root finding for gas phase mole fractions failed.
+        raise CalculationError(
+            """Root finding for gas phase mole fractions failed.
         This is likely because the default guess in pyIAST is not good enough.
         Try a different starting guess for the gas phase mole fractions by
         passing an array or list gas_mole_fraction_guess to this function.""")
@@ -308,7 +314,8 @@ def reverse_iast(adsorbed_mole_fractions, total_pressure, isotherms,
 
     if (numpy.sum(gas_mole_fractions < 0.0) != 0) | (
             numpy.sum(gas_mole_fractions > 1.0) != 0):
-        raise Exception("""Gas phase mole fraction not in [0,1]. Try a different
+        raise CalculationError(
+            """Gas phase mole fraction not in [0,1]. Try a different
         starting guess for the gas phase mole fractions by passing an array or
         list 'gas_mole_fraction_guess' into this function.
         e.g. gas_mole_fraction_guess=[0.2, 0.8]""")

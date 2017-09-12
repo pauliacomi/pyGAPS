@@ -23,7 +23,7 @@ class TestPSD(object):
         adsorbate = basic_adsorbate
 
         # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.mesopore_size_distribution(isotherm, isotherm)
 
         pygaps.data.GAS_LIST.append(adsorbate)
@@ -33,26 +33,26 @@ class TestPSD(object):
         isotherm.convert_mode_adsorbent("volume")
 
         # Will raise a "isotherm loading not in mass mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.mesopore_size_distribution(isotherm, isotherm)
 
         isotherm.convert_mode_adsorbent("mass")
 
         # Will raise a "no model exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.mesopore_size_distribution(isotherm, None)
 
         # Will raise a "no suitable model exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.mesopore_size_distribution(isotherm, 'Test')
 
         # Will raise a "no applicable geometry exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.mesopore_size_distribution(
                 isotherm, 'BJH', pore_geometry='test')
 
         # Will raise a "no applicable branch exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.mesopore_size_distribution(isotherm, 'BJH', branch='test')
 
     @pytest.mark.parametrize('method', [
@@ -90,7 +90,7 @@ class TestPSD(object):
         adsorbate = basic_adsorbate
 
         # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(isotherm, isotherm)
 
         pygaps.data.GAS_LIST.append(adsorbate)
@@ -100,26 +100,26 @@ class TestPSD(object):
         isotherm.convert_mode_adsorbent("volume")
 
         # Will raise a "isotherm loading not in mass mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(isotherm, isotherm)
 
         isotherm.convert_mode_adsorbent("mass")
 
         # Will raise a "no model exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(isotherm, None)
 
         # Will raise a "no suitable model exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(isotherm, 'Test')
 
         # Will raise a "no applicable geometry exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(
                 isotherm, 'HK', pore_geometry='test')
 
         # Will raise a "no applicable branch exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(isotherm, 'BJH', branch='test')
 
     @pytest.mark.parametrize('method', [
@@ -155,7 +155,7 @@ class TestPSD(object):
         isotherm = basic_pointisotherm
 
         # Will raise a "no kernel exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(isotherm, None)
 
     @pytest.mark.parametrize('file', [

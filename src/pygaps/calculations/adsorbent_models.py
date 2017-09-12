@@ -2,6 +2,8 @@
 Contains dictionaries for use in the Horvath-Kawazoe method
 """
 
+from ..utilities.exceptions import ParameterError
+
 
 def get_adsorbent_model(model):
     """
@@ -22,14 +24,15 @@ def get_adsorbent_model(model):
 
     Raises
     ------
-    Exception
+    ``ParameterError``
         When string is not in the dictionary of models.
     """
     # If the model is a string, get a model from the _THICKNESS_MODELS
     if isinstance(model, str):
         if model not in _ADSORBENT_MODELS:
-            raise Exception("Model {} not an option for t-plot.".format(model),
-                            "Available models are {}".format(_ADSORBENT_MODELS.keys()))
+            raise ParameterError(
+                "Model {} not an option for t-plot.".format(model),
+                "Available models are {}".format(_ADSORBENT_MODELS.keys()))
         else:
             a_model = _ADSORBENT_MODELS[model]
 
@@ -39,8 +42,9 @@ def get_adsorbent_model(model):
 
     # Raise error if anything else is passed
     else:
-        raise Exception("Model {} not an option for t-plot.".format(model),
-                        "Available models are {}".format(_ADSORBENT_MODELS))
+        raise ParameterError(
+            "Model {} not an option for t-plot.".format(model),
+            "Available models are {}".format(_ADSORBENT_MODELS))
 
     return a_model
 

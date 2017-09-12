@@ -17,7 +17,7 @@ class TestSample(object):
 
         assert sample_data == basic_sample.to_dict()
 
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.Sample({})
 
     def test_sample_retreived_list(self, sample_data, basic_sample):
@@ -29,7 +29,7 @@ class TestSample(object):
 
         assert sample_data == uploaded_sample.to_dict()
 
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.Sample.from_list('noname', 'nobatch')
 
     def test_sample_get_properties(self, sample_data, basic_sample):
@@ -39,7 +39,7 @@ class TestSample(object):
             'density') == sample_data['properties'].get('density')
 
         density = basic_sample.properties.pop('density')
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             basic_sample.get_prop(
                 'density') == sample_data['properties'].get('density')
         basic_sample.properties['density'] = density

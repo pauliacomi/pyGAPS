@@ -3,6 +3,7 @@ This module contains the experimental sample class
 """
 
 import pygaps.data as data
+from ..utilities.exceptions import ParameterError
 
 
 class Sample(object):
@@ -50,7 +51,7 @@ class Sample(object):
         # Required sample parameters cheks
         if any(k not in sample_info
                 for k in ('name', 'batch')):
-            raise Exception(
+            raise ParameterError(
                 "Sample class MUST have the following information in the properties dictionary: 'name', 'batch'")
 
         #: Sample name
@@ -98,7 +99,7 @@ class Sample(object):
 
         Raises
         ------
-        ``Exception``
+        ``ParameterError``
             if it does not exist or cannot be calculated
         """
         # Checks to see if sample exists in master list
@@ -110,10 +111,11 @@ class Sample(object):
             None)
 
         if sample is None:
-            raise Exception("Sample {0}{1} does not exist in list of samples. "
-                            "First populate pygaps.SAMPLE_LIST "
-                            "with required sample class".format(
-                                sample_name, sample_batch))
+            raise ParameterError(
+                "Sample {0}{1} does not exist in list of samples. "
+                "First populate pygaps.SAMPLE_LIST "
+                "with required sample class".format(
+                    sample_name, sample_batch))
 
         return sample
 
@@ -182,15 +184,15 @@ class Sample(object):
 
         Raises
         ------
-        ``Exception``
+        ``ParameterError``
             if it does not exist
         """
 
         req_prop = self.properties.get(prop)
         if req_prop is None:
-            raise Exception("The {0} entry was not found in the "
-                            "sample.properties dictionary "
-                            "for sample {1} {2}".format(
-                                prop, self.name, self.batch))
+            raise ParameterError("The {0} entry was not found in the "
+                                 "sample.properties dictionary "
+                                 "for sample {1} {2}".format(
+                                     prop, self.name, self.batch))
 
         return req_prop

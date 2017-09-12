@@ -10,6 +10,8 @@ import numpy
 import pandas
 import scipy
 
+from ..utilities.exceptions import CalculationError
+
 _KERNELS = {}
 
 INTERNAL = os.path.join(os.path.dirname(__file__),
@@ -95,6 +97,11 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
     guess = [0 for pore in points_arr.index]
     result = scipy.optimize.minimize(
         sum_squares, guess, method='SLSQP', constraints=cons)
+
+    if not result.success:
+        raise CalculationError(
+            "Minimization of DFT failed with error {1}".format(result.message)
+        )
 
     pore_dist = result.x
 

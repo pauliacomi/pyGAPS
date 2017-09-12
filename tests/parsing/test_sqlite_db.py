@@ -3,7 +3,6 @@ This test module has tests relating to sqlite database utilities
 """
 
 import copy
-import sqlite3
 
 import pytest
 
@@ -26,7 +25,7 @@ def db_file(tmpdir_factory):
 class TestDatabase(object):
     def test_db_create(self, db_file):
         "Tests the database creation"
-        with pytest.raises(sqlite3.OperationalError):
+        with pytest.raises(pygaps.ParsingError):
             db_execute_general("/", "SELECT")
         return db_file
 
@@ -38,17 +37,17 @@ class TestDatabase(object):
             'type': 'TestType',
         }
         pygaps.db_upload_machine_type(db_file, machine_dict["type"])
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_machine_type(db_file, machine_dict["type"])
 
         pygaps.db_upload_machine(db_file, machine_dict)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_machine(db_file, machine_dict)
 
         pygaps.db_upload_machine(db_file, machine_dict, overwrite=True)
 
         pygaps.db_delete_machine(db_file, machine_dict["nick"])
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_delete_machine(db_file, machine_dict["nick"])
 
         pygaps.db_upload_machine(db_file, machine_dict)
@@ -64,13 +63,13 @@ class TestDatabase(object):
             'address': 'Test Address',
         }
         pygaps.db_upload_lab(db_file, lab_dict)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_lab(db_file, lab_dict)
 
         pygaps.db_upload_lab(db_file, lab_dict, overwrite=True)
 
         pygaps.db_delete_lab(db_file, lab_dict["nick"])
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_delete_lab(db_file, lab_dict["nick"])
         pygaps.db_upload_lab(db_file, lab_dict)
 
@@ -88,13 +87,13 @@ class TestDatabase(object):
             'permanent': True,
         }
         pygaps.db_upload_contact(db_file, contact_dict)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_contact(db_file, contact_dict)
 
         pygaps.db_upload_contact(db_file, contact_dict, overwrite=True)
 
         pygaps.db_delete_contact(db_file, contact_dict["nick"])
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_delete_contact(db_file, contact_dict["nick"])
 
         pygaps.db_upload_contact(db_file, contact_dict)
@@ -109,7 +108,7 @@ class TestDatabase(object):
             pygaps.db_upload_gas_property_type(db_file, prop, "test unit")
             if test_duplicate:
                 test_duplicate = False
-                with pytest.raises(sqlite3.IntegrityError):
+                with pytest.raises(pygaps.ParsingError):
                     pygaps.db_upload_gas_property_type(
                         db_file, prop, "test unit")
 
@@ -118,7 +117,7 @@ class TestDatabase(object):
         assert len(pygaps.db_get_gasses(db_file)) == 0
 
         pygaps.db_upload_gas(db_file, basic_adsorbate)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_gas(db_file, basic_adsorbate)
 
         basic_adsorbate.formula = "New Formula"
@@ -127,7 +126,7 @@ class TestDatabase(object):
             db_file)[0].formula == basic_adsorbate.formula
 
         pygaps.db_delete_gas(db_file, basic_adsorbate)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_delete_gas(db_file, basic_adsorbate)
         pygaps.db_upload_gas(db_file, basic_adsorbate)
 
@@ -139,14 +138,14 @@ class TestDatabase(object):
         # Test sample_form table
         pygaps.db_upload_sample_form(db_file, {'nick': sample_data['form'],
                                                'name': 'test name'})
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_sample_form(db_file, {'nick': sample_data['form'],
                                                    'name': 'test name'})
 
         # Test sample_type table
         pygaps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
                                                'name': 'test name'})
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
                                                    'name': 'test name'})
 
@@ -155,7 +154,7 @@ class TestDatabase(object):
         for prop in sample_data["properties"]:
             pygaps.db_upload_sample_property_type(db_file, prop, "test unit")
             if test_error:
-                with pytest.raises(sqlite3.IntegrityError):
+                with pytest.raises(pygaps.ParsingError):
                     test_error = False
                     pygaps.db_upload_sample_property_type(
                         db_file, prop, "test unit")
@@ -165,7 +164,7 @@ class TestDatabase(object):
         assert len(pygaps.db_get_samples(db_file)) == 0
 
         pygaps.db_upload_sample(db_file, basic_sample)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_sample(db_file, basic_sample)
 
         basic_sample.comment = 'New comment'
@@ -174,7 +173,7 @@ class TestDatabase(object):
             db_file)[0].comment == basic_sample.comment
 
         pygaps.db_delete_sample(db_file, basic_sample)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_delete_sample(db_file, basic_sample)
         pygaps.db_upload_sample(db_file, basic_sample)
 
@@ -188,7 +187,7 @@ class TestDatabase(object):
         # Test experiment_type table
         pygaps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
                                                    'name': 'test type'})
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
                                                        'name': 'test type'})
 
@@ -201,7 +200,7 @@ class TestDatabase(object):
             pygaps.db_upload_experiment_data_type(
                 db_file, key, "test unit")
 
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_experiment_data_type(
                 db_file, isotherm.loading_key, "test unit")
 
@@ -209,7 +208,7 @@ class TestDatabase(object):
         assert len(pygaps.db_get_experiments(db_file, {})) == 0
 
         pygaps.db_upload_experiment(db_file, isotherm)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_experiment(db_file, isotherm)
         replace_isotherm = copy.deepcopy(isotherm)
         replace_isotherm.comment = 'New comment'
@@ -219,7 +218,7 @@ class TestDatabase(object):
             db_file, {'id': replace_isotherm.id})[0].comment == replace_isotherm.comment
 
         pygaps.db_delete_experiment(db_file, replace_isotherm)
-        with pytest.raises(sqlite3.IntegrityError):
+        with pytest.raises(pygaps.ParsingError):
             pygaps.db_delete_experiment(db_file, isotherm)
 
         pygaps.db_upload_experiment(db_file, isotherm)

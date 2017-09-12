@@ -17,7 +17,7 @@ class TestAdsorbate(object):
 
         assert adsorbate_data == basic_adsorbate.to_dict()
 
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.Adsorbate({})
 
     def test_adsorbate_retreived_list(self, adsorbate_data, basic_adsorbate):
@@ -28,7 +28,7 @@ class TestAdsorbate(object):
 
         assert adsorbate_data == uploaded_adsorbate.to_dict()
 
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.Adsorbate.from_list('noname')
 
     def test_adsorbate_get_properties(self, adsorbate_data, basic_adsorbate):
@@ -40,7 +40,7 @@ class TestAdsorbate(object):
         ) == adsorbate_data['properties'].get('common_name')
 
         name = basic_adsorbate.properties.pop('common_name')
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             basic_adsorbate.common_name()
         basic_adsorbate.properties['common_name'] = name
 

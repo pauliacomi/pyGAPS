@@ -7,6 +7,8 @@ from CoolProp.CoolProp import PropsSI
 import pygaps.data as data
 
 from ..utilities.unit_converter import convert_pressure
+from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 
 
 class Adsorbate(object):
@@ -70,7 +72,7 @@ class Adsorbate(object):
         # Required sample parameters cheks
         if any(k not in info
                 for k in ('nick', 'formula')):
-            raise Exception(
+            raise ParameterError(
                 "Adsorbate class MUST have the following information in the properties dictionary: 'nick', 'formula'")
 
         #: Adsorbate name
@@ -99,16 +101,17 @@ class Adsorbate(object):
 
         Raises
         ------
-        ``Exception``
-            if it does not exist or cannot be calculated
+        ``ParameterError``
+            If it does not exist in list.
         """
         # See if adsorbate exists in master list
         adsorbate = next(
             (x for x in data.GAS_LIST if adsorbate_name == x.name), None)
         if adsorbate is None:
-            raise Exception("Adsorbate {0} does not exist in list of adsorbates. "
-                            "First populate pygaps.data.GAS_LIST "
-                            "with required adsorbate class".format(adsorbate_name))
+            raise ParameterError(
+                "Adsorbate {0} does not exist in list of adsorbates. "
+                "First populate pygaps.data.GAS_LIST "
+                "with required adsorbate class".format(adsorbate_name))
 
         return adsorbate
 
@@ -161,14 +164,15 @@ class Adsorbate(object):
 
         Raises
         ------
-        ``Exception``
+        ``ParameterError``
             if it does not exist
         """
 
         req_prop = self.properties.get(prop)
         if req_prop is None:
-            raise Exception("Adsorbate {0} does not have a property named "
-                            "{1}.".format(self.name, prop))
+            raise ParameterError(
+                "Adsorbate {0} does not have a property named "
+                "{1}.".format(self.name, prop))
 
         return req_prop
 
@@ -183,14 +187,15 @@ class Adsorbate(object):
 
         Raises
         ------
-        ``Exception``
+        ``ParameterError``
             if it does not exist
         """
         c_name = self.properties.get("common_name")
         if c_name is None:
-            raise Exception("Adsorbate {0} does not have a property named "
-                            "common_name. This must be available for CoolProp "
-                            "interaction".format(self.name))
+            raise ParameterError(
+                "Adsorbate {0} does not have a property named "
+                "common_name. This must be available for CoolProp "
+                "interaction".format(self.name))
         return c_name
 
     def molar_mass(self, calculate=True):
@@ -210,13 +215,22 @@ class Adsorbate(object):
 
         Raises
         ------
-        ``Exception``
-            if it does not exist or cannot be calculated
-
+        ``ParameterError``
+            If it does not exist
+        ``CalculationError``
+            If it cannot be calculated
         """
-        mol_m = self.properties.get("molar_mass")
-        if mol_m is None or calculate:
-            mol_m = PropsSI('M', self.common_name()) * 1000
+        if calculate:
+            try:
+                mol_m = PropsSI('M', self.common_name()) * 1000
+            except Exception as e_info:
+                raise CalculationError from e_info
+        else:
+            mol_m = self.properties.get("molar_mass")
+            if mol_m is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "molar_mass.".format(self.name))
 
         return mol_m
 
@@ -243,16 +257,26 @@ class Adsorbate(object):
 
         Raises
         ------
-        ``Exception``
-            if it does not exist or cannot be calculated
+        ``ParameterError``
+            If it does not exist
+        ``CalculationError``
+            If it cannot be calculated
 
         """
-        sat_p = self.properties.get("saturation_pressure")
-        if sat_p is None or calculate:
-            sat_p = PropsSI('P', 'T', temp, 'Q', 0, self.common_name())
+        if calculate:
+            try:
+                sat_p = PropsSI('P', 'T', temp, 'Q', 0, self.common_name())
+            except Exception as e_info:
+                raise CalculationError from e_info
 
             if unit is not None:
                 sat_p = convert_pressure(sat_p, 'Pa', unit)
+        else:
+            sat_p = self.properties.get("saturation_pressure")
+            if sat_p is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "saturation_pressure.".format(self.name))
 
         return sat_p
 
@@ -276,13 +300,24 @@ class Adsorbate(object):
 
         Raises
         ------
-        ``Exception``
-            if it does not exist or cannot be calculated
+        ``ParameterError``
+            If it does not exist
+        ``CalculationError``
+            If it cannot be calculated
 
         """
-        surf_t = self.properties.get("surface_tension")
-        if surf_t is None or calculate:
-            surf_t = PropsSI('I', 'T', temp, 'Q', 0, self.common_name()) * 1000
+        if calculate:
+            try:
+                surf_t = PropsSI('I', 'T', temp, 'Q', 0,
+                                 self.common_name()) * 1000
+            except Exception as e_info:
+                raise CalculationError from e_info
+        else:
+            surf_t = self.properties.get("surface_tension")
+            if surf_t is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "surface_tension.".format(self.name))
 
         return surf_t
 
@@ -306,12 +341,23 @@ class Adsorbate(object):
 
         Raises
         ------
-        ``Exception``
-            if it does not exist or cannot be calculated
+        ``ParameterError``
+            If it does not exist
+        ``CalculationError``
+            If it cannot be calculated
 
         """
-        liq_d = self.properties.get("liquid_density")
-        if liq_d is None or calculate:
-            liq_d = PropsSI('D', 'T', temp, 'Q', 0, self.common_name()) / 1000
+        if calculate:
+            try:
+                liq_d = PropsSI('D', 'T', temp, 'Q', 0,
+                                self.common_name()) / 1000
+            except Exception as e_info:
+                raise CalculationError from e_info
+        else:
+            liq_d = self.properties.get("liquid_density")
+            if liq_d is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "liquid_density.".format(self.name))
 
         return liq_d

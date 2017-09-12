@@ -7,6 +7,7 @@ import warnings
 import numpy
 import scipy
 
+from ..utilities.exceptions import ParameterError
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
 from ..utilities.math_utilities import find_linear_sections
@@ -112,14 +113,14 @@ def t_plot(isotherm, thickness_model, limits=None, verbose=False):
 
     # Function parameter checks
     if isotherm.mode_adsorbent != "mass":
-        raise Exception("The isotherm must be in per mass of adsorbent."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in per mass of adsorbent."
+                             "First convert it using implicit functions")
     if isotherm.mode_pressure != "relative":
-        raise Exception("The isotherm must be in relative pressure mode."
-                        "First convert it using implicit functions")
+        raise ParameterError("The isotherm must be in relative pressure mode."
+                             "First convert it using implicit functions")
     if thickness_model is None:
-        raise Exception("Specify a model to generate the thickness curve"
-                        " e.g. thickness_model=\"Halsey\"")
+        raise ParameterError("Specify a model to generate the thickness curve"
+                             " e.g. thickness_model=\"Halsey\"")
 
     # Get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
@@ -204,8 +205,8 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     """
 
     if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays"
-                        " do not match")
+        raise ParameterError("The length of the pressure and loading arrays"
+                             " do not match")
 
     # Generate the thickness curve for the pressure points
     thickness_curve = numpy.array(list(map(thickness_model, pressure)))

@@ -25,7 +25,7 @@ class TestBET(object):
         adsorbate = basic_adsorbate
 
         # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.area_BET(isotherm)
 
         pygaps.data.GAS_LIST.append(adsorbate)
@@ -35,7 +35,7 @@ class TestBET(object):
         isotherm.convert_mode_adsorbent("volume")
 
         # Will raise a "isotherm loading not in volume mode exception"
-        with pytest.raises(Exception):
+        with pytest.raises(pygaps.ParameterError):
             pygaps.area_BET(isotherm)
 
         isotherm.convert_mode_adsorbent("mass")
