@@ -34,3 +34,6 @@ from .utilities.exceptions import Error
 from .utilities.exceptions import ParameterError
 from .utilities.exceptions import ParsingError
 from .utilities.folder_utilities import util_get_file_paths
+from .utilities.coolprop_utilities import backend_use_coolprop
+from .utilities.coolprop_utilities import backend_use_refprop
+from .utilities.coolprop_utilities import COOLPROP_BACKEND

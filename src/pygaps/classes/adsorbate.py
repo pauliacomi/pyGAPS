@@ -2,7 +2,7 @@
 This module contains the adsorbate class
 """
 
-from CoolProp.CoolProp import PropsSI
+import CoolProp
 
 import pygaps
 
@@ -84,6 +84,10 @@ class Adsorbate(object):
         #: Adsorbate properties
         self.properties = info.get('properties')
 
+        # CoolProp interaction variables, only generate when called
+        self._backend = None
+        self._state = None
+
         return
 
     @classmethod
@@ -118,9 +122,9 @@ class Adsorbate(object):
         return adsorbate
 
     def __str__(self):
-        '''
+        """
         Prints a short summary of all the adsorbate parameters
-        '''
+        """
         string = ""
 
         string += ("Adsorbate: " + self.name + '\n')
@@ -130,6 +134,17 @@ class Adsorbate(object):
             string += (prop + ':' + str(self.properties.get(prop)) + '\n')
 
         return string
+
+    def _get_state(self):
+        """
+        Returns the CoolProp state asociated with the fluid
+        """
+        if not self._backend or self._backend != pygaps.COOLPROP_BACKEND:
+            self._backend = pygaps.COOLPROP_BACKEND
+            self._state = CoolProp.AbstractState(
+                pygaps.COOLPROP_BACKEND, self.common_name())
+
+        return self._state
 
     def to_dict(self):
         """
@@ -227,7 +242,8 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                mol_m = PropsSI('M', self.common_name()) * 1000
+                mol_m = self._get_state().molar_mass() * 1000
+
             except Exception as e_info:
                 raise CalculationError from e_info
         else:
@@ -271,7 +287,10 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                sat_p = PropsSI('P', 'T', temp, 'Q', 0, self.common_name())
+                state = self._get_state()
+                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                sat_p = state.p()
+
             except Exception as e_info:
                 raise CalculationError from e_info
 
@@ -285,6 +304,94 @@ class Adsorbate(object):
                     "saturation_pressure.".format(self.name))
 
         return sat_p
+
+    def surface_tension(self, temp, calculate=True):
+        """
+        Uses an equation of state to determine the
+        surface tension at a particular temperature
+
+        Parameters
+        ----------
+        temp : float
+            temperature at which the surface_tension is desired in K
+        calculate : bool, optional
+            whether to calculate the property or look it up in the properties
+            dictionary, default - True
+
+        Returns
+        -------
+        float
+            surface tension in mN/m
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+
+        """
+        if calculate:
+            try:
+                state = self._get_state()
+                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                surf_t = state.surface_tension() * 1000
+
+            except Exception as e_info:
+                raise CalculationError from e_info
+        else:
+            surf_t = self.properties.get("surface_tension")
+            if surf_t is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "surface_tension.".format(self.name))
+
+        return surf_t
+
+    def liquid_density(self, temp, calculate=True):
+        """
+        Uses an equation of state to determine the
+        liquid density at a particular temperature
+
+        Parameters
+        ----------
+        temp : float
+            temperature at which the liquid density is desired in K
+        calculate : bool, optional
+            whether to calculate the property or look it up in the properties
+            dictionary, default - True
+
+        Returns
+        -------
+        float
+            density in g/cm3
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+
+        """
+        if calculate:
+            try:
+                state = self._get_state()
+                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                liq_d = state.rhomass() / 1000
+
+            except Exception as e_info:
+                raise CalculationError from e_info
+        else:
+            liq_d = self.properties.get("liquid_density")
+            if liq_d is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "liquid_density.".format(self.name))
+
+        return liq_d
 
     def convert_mode(self, mode_pressure, pressure, temp, unit=None):
         """
@@ -329,87 +436,3 @@ class Adsorbate(object):
             sign = -1
 
         return pressure * self.saturation_pressure(temp, unit=unit) ** sign
-
-    def surface_tension(self, temp, calculate=True):
-        """
-        Uses an equation of state to determine the
-        surface tension at a particular temperature
-
-        Parameters
-        ----------
-        temp : float
-            temperature at which the surface_tension is desired in K
-        calculate : bool, optional
-            whether to calculate the property or look it up in the properties
-            dictionary, default - True
-
-        Returns
-        -------
-        float
-            surface tension in mN/m
-
-        Raises
-        ------
-        ``ParameterError``
-            If the calculation is not requested and the property does not exist
-            in the class dictionary.
-        ``CalculationError``
-            If it cannot be calculated, due to a physical reason.
-
-        """
-        if calculate:
-            try:
-                surf_t = PropsSI('I', 'T', temp, 'Q', 0,
-                                 self.common_name()) * 1000
-            except Exception as e_info:
-                raise CalculationError from e_info
-        else:
-            surf_t = self.properties.get("surface_tension")
-            if surf_t is None:
-                raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "surface_tension.".format(self.name))
-
-        return surf_t
-
-    def liquid_density(self, temp, calculate=True):
-        """
-        Uses an equation of state to determine the
-        liquid density at a particular temperature
-
-        Parameters
-        ----------
-        temp : float
-            temperature at which the liquid density is desired in K
-        calculate : bool, optional
-            whether to calculate the property or look it up in the properties
-            dictionary, default - True
-
-        Returns
-        -------
-        float
-            density in g/cm3
-
-        Raises
-        ------
-        ``ParameterError``
-            If the calculation is not requested and the property does not exist
-            in the class dictionary.
-        ``CalculationError``
-            If it cannot be calculated, due to a physical reason.
-
-        """
-        if calculate:
-            try:
-                liq_d = PropsSI('D', 'T', temp, 'Q', 0,
-                                self.common_name()) / 1000
-            except Exception as e_info:
-                raise CalculationError from e_info
-        else:
-            liq_d = self.properties.get("liquid_density")
-            if liq_d is None:
-                raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "liquid_density.".format(self.name))
-
-        return liq_d
