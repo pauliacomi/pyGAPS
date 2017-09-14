@@ -20,7 +20,7 @@ class TestExcel(object):
         try:
             pygaps.isotherm_to_xl(basic_pointisotherm,
                                   path=path)
-        except SystemError as e_info:
+        except SystemError:
             # Excel is not installed
             return
 

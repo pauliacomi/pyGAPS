@@ -44,7 +44,8 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     try:
         wb = xlwings.Book()
     except Exception as e_info:
-        raise SystemError from e_info
+        raise SystemError(
+            "Failed to connect to excel. Is it available?") from e_info
 
     wb.app.screen_updating = False
     sht = wb.sheets[0]
