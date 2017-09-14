@@ -45,7 +45,7 @@ install:
 
   # this is now the downloaded conda
   - cmd: conda info -a
-  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% setuptools pip pytest=3.2.2 numpy pandas scipy matplotlib bokeh xlwings jinja2
+  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% setuptools pip pytest>3.1 numpy pandas scipy matplotlib bokeh xlwings jinja2
   - activate testenv
   - pip install coverage
 
