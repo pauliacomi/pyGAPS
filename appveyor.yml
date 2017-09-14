@@ -60,7 +60,7 @@ install:
   - cmd: conda info -a
   - cmd: conda create -q -n testenv python=%PYTHON_VERSION% setuptools pip pytest>3.1 numpy pandas scipy matplotlib bokeh xlwings jinja2
   - activate testenv
-  - pip install -U "pytest>=3.1.0"
+  - pip install -U "pytest>=3.1.0" --ignore-installed
   - pip install coverage
 
   # Now build the module
