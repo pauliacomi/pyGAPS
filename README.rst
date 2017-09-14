@@ -12,7 +12,7 @@ Overview
       - | |status|
         | |commits-since|
     * - docs
-      - |docs|
+      - | |docs|
     * - tests
       - | |travis| |appveyor|
         | |codecov|
