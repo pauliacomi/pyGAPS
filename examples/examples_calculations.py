@@ -33,10 +33,6 @@ for isotherm in isotherms:
 #################################################################################
 #
 # %%
-# Get gasses
-pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
-
-# %%
 # Calculate BET
 for isotherm in isotherms:
     print(isotherm.sample_name)
@@ -54,9 +50,6 @@ for isotherm in isotherms:
 # t-plot calculations
 #################################################################################
 #
-# %%
-# Get gasses
-pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
 
 # %%
 # Calculate t-plot
@@ -69,10 +62,6 @@ for isotherm in isotherms:
 
 # Pore size distribution
 #################################################################################
-# %%
-# Get gasses
-pygaps.data.GAS_LIST = pygaps.db_get_gasses(pygaps.DATABASE)
-
 # %%
 # Mesoporous pore size distribution
 for isotherm in isotherms:

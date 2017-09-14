@@ -35,7 +35,7 @@ if missing_dependencies:
         "Missing required dependencies {0}".format(missing_dependencies))
 del hard_dependencies, dependency, missing_dependencies
 
-from pygaps.data import DATABASE
-from pygaps.data import GAS_LIST
-from pygaps.data import SAMPLE_LIST
-from pygaps.api import *
+from .data import DATABASE
+from .data import ADSORBATE_LIST
+from .data import SAMPLE_LIST
+from .api import *

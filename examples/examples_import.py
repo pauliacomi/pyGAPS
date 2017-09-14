@@ -47,14 +47,6 @@ criteria = {
 }
 isotherms = pygaps.db_get_experiments(db_path, criteria)
 
-# %%
-# Samples
-pygaps.data.SAMPLE_LIST = pygaps.db_get_samples(db_path)
-
-# %%
-# Gasses
-pygaps.data.GAS_LIST = pygaps.db_get_gasses(db_path)
-
 #################################################################################
 #       Database save | dataimport/sqlinterface.py
 #################################################################################
