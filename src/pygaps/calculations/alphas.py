@@ -99,7 +99,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
 
     *Limitations*
 
-    The reference isotherm chosen for the :math:`\\alpha_s` mehtod must be a description
+    The reference isotherm chosen for the :math:`\\alpha_s` method must be a description
     of the adsorption on a completely non-porous sample of the same material. It is
     often impossible to obtain such non-porous versions, therefore care must be taken
     how the reference isotherm is defined.
