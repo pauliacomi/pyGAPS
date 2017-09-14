@@ -5,6 +5,7 @@ Overview
 .. start-badges
 
 .. list-table::
+    :widths: 10 90
     :stub-columns: 1
 
     * - status
