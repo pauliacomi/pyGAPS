@@ -41,7 +41,11 @@ def isotherm_to_xl(isotherm, path, fmt=None):
             "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
     # create a new workbook and select first sheet
-    wb = xlwings.Book()
+    try:
+        wb = xlwings.Book()
+    except Exception as e_info:
+        raise SystemError from e_info
+
     wb.app.screen_updating = False
     sht = wb.sheets[0]
 

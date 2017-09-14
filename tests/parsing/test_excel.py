@@ -17,8 +17,12 @@ class TestExcel(object):
         """Tests creation of the regular excel file"""
 
         path = tmpdir_factory.mktemp('excel').join('regular.xlsx').strpath
-        pygaps.isotherm_to_xl(basic_pointisotherm,
-                              path=path)
+        try:
+            pygaps.isotherm_to_xl(basic_pointisotherm,
+                                  path=path)
+        except SystemError as e_info:
+            # Excel is not installed
+            return
 
         isotherm = pygaps.isotherm_from_xl(path)
 
@@ -28,8 +32,12 @@ class TestExcel(object):
         """Tests creation of the MADIREL file"""
 
         path = tmpdir_factory.mktemp('excel').join('MADIREL.xlsx').strpath
-        pygaps.isotherm_to_xl(basic_pointisotherm,
-                              path=path, fmt='MADIREL')
+        try:
+            pygaps.isotherm_to_xl(basic_pointisotherm,
+                                  path=path, fmt='MADIREL')
+        except SystemError as e_info:
+            # Excel is not installed
+            return
 
         isotherm = pygaps.isotherm_from_xl(path, fmt='MADIREL')
 
