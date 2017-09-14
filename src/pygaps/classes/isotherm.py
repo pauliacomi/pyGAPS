@@ -2,11 +2,11 @@
 This module contains the main class that describes an isotherm
 """
 
+from ..classes.adsorbate import _PRESSURE_MODE
+from ..classes.sample import _MATERIAL_MODE
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _LOADING_UNITS
 from ..utilities.unit_converter import _PRESSURE_UNITS
-from ..classes.adsorbate import _PRESSURE_MODE
-from ..classes.sample import _MATERIAL_MODE
 
 
 class Isotherm(object):

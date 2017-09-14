@@ -25,9 +25,9 @@ from .parsing.excelinterface import isotherm_to_xl
 from .parsing.jsoninterface import isotherm_from_json
 from .parsing.jsoninterface import isotherm_to_json
 from .parsing.sqliteinterface import db_get_experiments
-from .parsing.sqliteinterface import db_upload_experiment
 from .parsing.sqliteinterface import db_get_gasses
 from .parsing.sqliteinterface import db_get_samples
+from .parsing.sqliteinterface import db_upload_experiment
 from .parsing.sqliteinterface import db_upload_sample
 from .utilities.exceptions import CalculationError
 from .utilities.exceptions import Error
