@@ -138,17 +138,17 @@ class TestDatabase(object):
 
         # Test sample_form table
         ps.db_upload_sample_form(db_file, {'nick': sample_data['form'],
-                                               'name': 'test name'})
+                                           'name': 'test name'})
         with pytest.raises(pygaps.ParsingError):
             ps.db_upload_sample_form(db_file, {'nick': sample_data['form'],
-                                                   'name': 'test name'})
+                                               'name': 'test name'})
 
         # Test sample_type table
         ps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
-                                               'name': 'test name'})
+                                           'name': 'test name'})
         with pytest.raises(pygaps.ParsingError):
             ps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
-                                                   'name': 'test name'})
+                                               'name': 'test name'})
 
         # Test sample_property_type table
         test_error = True
@@ -187,10 +187,10 @@ class TestDatabase(object):
 
         # Test experiment_type table
         ps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
-                                                   'name': 'test type'})
+                                               'name': 'test type'})
         with pytest.raises(pygaps.ParsingError):
             ps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
-                                                       'name': 'test type'})
+                                                   'name': 'test type'})
 
         # Test experiment_data_type table
         ps.db_upload_experiment_data_type(

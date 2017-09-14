@@ -58,7 +58,7 @@ def isotherm_parameters():
         'sample_name': 'TEST',
         'sample_batch': 'TB',
         't_exp': 100.0,
-        'adsorbate': 'N2',
+        'adsorbate': 'TA',
 
         'date': '26/06/92',
         't_act': 100.0,
@@ -69,7 +69,7 @@ def isotherm_parameters():
         'project': 'TP',
         'machine': 'TM',
         'is_real': True,
-        'exp_type': 'Calorimetrie',
+        'exp_type': 'calorimetry',
 
         # other properties
 

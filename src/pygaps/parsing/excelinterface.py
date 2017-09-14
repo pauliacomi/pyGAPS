@@ -52,8 +52,17 @@ def isotherm_to_xl(isotherm, path, fmt=None):
         else:
             is_real = "Simulation"
 
+        exp_type = isotherm.exp_type
+        if fmt == 'MADIREL':
+            if isotherm.exp_type == "isotherm":
+                exp_type = 'Isotherme'
+            elif isotherm.exp_type == "calorimetry":
+                exp_type = 'Calorimetrie'
+            else:
+                raise ParsingError("Unknown experiment type")
+
         sht.range('A1').value = [
-            ["Type manip", isotherm.exp_type],
+            ["Type manip", exp_type],
             ["Experience ou Simulation", is_real],
             ["Date de l'expérience", isotherm.date],
             ["Nom de l'échantillon", isotherm.sample_name],
@@ -86,9 +95,9 @@ def isotherm_to_xl(isotherm, path, fmt=None):
         if fmt is None:
             rng_data = 14
         elif fmt == 'MADIREL':
-            if isotherm.exp_type == "isotherm":
+            if exp_type == "Isotherme":
                 rng_data = 30
-            elif isotherm.exp_type == "calorimetry":
+            elif exp_type == "Calorimetrie":
                 rng_data = 39
             else:
                 raise ParsingError("Unknown experiment type")
@@ -99,12 +108,15 @@ def isotherm_to_xl(isotherm, path, fmt=None):
         ]
         headings.extend(isotherm.other_keys)
 
+        # Gets the data sorted in the correct order
         data = isotherm.data()[headings]
 
-        headings[0] = isotherm.loading_key + \
-            '(' + isotherm.unit_loading + ')'
-        headings[1] = isotherm.pressure_key + \
-            '(' + isotherm.unit_pressure + ')'
+        if fmt == 'MADIREL':
+            headings[0] = 'adsorbed'
+            headings[1] = 'Pressure'
+
+        headings[0] = headings[0] + '(' + isotherm.unit_loading + ')'
+        headings[1] = headings[1] + '(' + isotherm.unit_pressure + ')'
 
         sht.range('A' + str(rng_data)).value = headings
         sht.range('A' + str(rng_data + 1)).value = data.as_matrix()
@@ -130,7 +142,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
             ]
             xlwings.Range('A29:B29').color = delimiter_colour
 
-            if isotherm.exp_type == "calorimetry":
+            if exp_type == "Calorimetrie":
                 sht.range('A30').value = [
                     ["Enthalpie à zéro", ],
                     ["Polynome Enthalpie A", ],
@@ -185,7 +197,16 @@ def isotherm_from_xl(path, fmt=None):
         sample_info = {}
 
         # read the isotherm paramterers
-        sample_info["exp_type"] = sht.range('B1').value
+        exp_type = sht.range('B1').value
+        sample_info["exp_type"] = exp_type
+
+        if fmt == 'MADIREL':
+            if exp_type == "Isotherme":
+                sample_info["exp_type"] = 'isotherm'
+            elif exp_type == "Calorimetrie":
+                sample_info["exp_type"] = 'calorimetry'
+            else:
+                raise ParsingError("Unknown experiment type")
 
         is_real = sht.range('B2').value
 
@@ -220,9 +241,9 @@ def isotherm_from_xl(path, fmt=None):
         if fmt is None:
             rng_data = 14
         elif fmt == 'MADIREL':
-            if sample_info["exp_type"] == "Isotherme":
+            if exp_type == "Isotherme":
                 rng_data = 30
-            elif sample_info["exp_type"] == "Calorimetrie":
+            elif exp_type == "Calorimetrie":
                 rng_data = 39
             else:
                 raise ParsingError("Unknown data type")
@@ -232,16 +253,18 @@ def isotherm_from_xl(path, fmt=None):
 
         loading_key = 'loading'
         pressure_key = 'pressure'
+        s_loading_key = loading_key
+        s_pressure_key = pressure_key
         if fmt == 'MADIREL':
-            loading_key = 'adsorbed'
-            pressure_key = 'Pressure'
+            s_loading_key = 'adsorbed'
+            s_pressure_key = 'Pressure'
         other_keys = []
 
         for column in experiment_data_df.columns:
-            if loading_key in column:
+            if s_loading_key in column:
                 experiment_data_df.rename(
                     index=str, columns={column: loading_key}, inplace=True)
-            elif pressure_key in column:
+            elif s_pressure_key in column:
                 experiment_data_df.rename(
                     index=str, columns={column: pressure_key}, inplace=True)
             else:
