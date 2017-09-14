@@ -84,7 +84,8 @@ https://pygaps.readthedocs.io/
 Development
 ===========
 
-To run the all tests run::
+If you have all the python environments needed to run the entire test suite,
+use tox. To run the all tests run::
 
     tox
 
@@ -104,3 +105,9 @@ Note, to combine the coverage data from all the tox environments run:
       - ::
 
             PYTEST_ADDOPTS=--cov-append tox
+
+For testing only with the environment you are currently on, run pytest instead::
+
+    py.test --cov
+
+Alternatively, depend travisCI for the testing, which will be slower overall.
