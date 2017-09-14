@@ -37,7 +37,9 @@ def area_BET(isotherm, limits=None, verbose=False):
     Returns
     -------
     result_dict : dict
-        A dictionary of results with the following components
+        A dictionary of results with the following components. The basis of these
+        results will be derived from the basis of the isotherm (per mass or per
+        volume of adsorbent):
 
         - ``bet_area(float)`` : calculated BET surface area, in m2/unit of adsorbent
         - ``c_const(float)`` : the C constant in the BET equation, unitless
@@ -120,21 +122,13 @@ def area_BET(isotherm, limits=None, verbose=False):
        and K. Sing, Academic Press, 1999
 
     """
-    # Checks
-    if isotherm.mode_adsorbent != "mass":
-        raise ParameterError("The isotherm must be in per mass of adsorbent."
-                             "First convert it using implicit functions")
-    if isotherm.mode_pressure != "relative":
-        raise ParameterError("The isotherm must be in relative pressure mode."
-                             "First convert it using implicit functions")
-
     # get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in
     loading = isotherm.loading(unit='mol', branch='ads')
-    pressure = isotherm.pressure(branch='ads')
+    pressure = isotherm.pressure(mode='relative', branch='ads')
 
     # use the bet function
     (bet_area, c_const, n_monolayer, p_monolayer, slope,
@@ -230,13 +224,17 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
     if limits is None:
         maximum = len(roq_t_array) - 1
         for index, value in enumerate(roq_t_array):
+            if index == maximum:
+                break
             if value > roq_t_array[index + 1]:
                 maximum = index
                 break
         min_p = pressure[maximum] / 10
 
-        minimum = 0
+        minimum = len(roq_t_array) - 1
         for index, value in enumerate(pressure):
+            if index == minimum:
+                break
             if value > min_p:
                 minimum = index
                 break

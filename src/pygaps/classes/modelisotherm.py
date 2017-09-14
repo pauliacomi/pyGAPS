@@ -55,7 +55,7 @@ class ModelIsotherm(Isotherm):
         <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
     verbose : bool
         Prints out extra information about steps taken.
-    mode_adsorbent : str, optional
+    basis_adsorbent : str, optional
         whether the adsorption is read in terms of either 'per volume'
         or 'per mass'
     mode_pressure : str, optional
@@ -144,7 +144,7 @@ class ModelIsotherm(Isotherm):
                  param_guess=None,
                  optimization_method="Nelder-Mead",
                  verbose=False,
-                 mode_adsorbent="mass",
+                 basis_adsorbent="mass",
                  mode_pressure="absolute",
                  unit_loading="mmol",
                  unit_pressure="bar",
@@ -167,7 +167,7 @@ class ModelIsotherm(Isotherm):
 
         # Run base class constructor
         Isotherm.__init__(self,
-                          mode_adsorbent,
+                          basis_adsorbent,
                           mode_pressure,
                           unit_loading,
                           unit_pressure,
@@ -234,7 +234,7 @@ class ModelIsotherm(Isotherm):
                    model=model,
                    param_guess=param_guess,
                    optimization_method=optimization_method,
-                   mode_adsorbent=isotherm.mode_adsorbent,
+                   basis_adsorbent=isotherm.basis_adsorbent,
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
                    unit_pressure=isotherm.unit_pressure,
@@ -278,7 +278,7 @@ class ModelIsotherm(Isotherm):
                                        pressure_key=isotherm.pressure_key,
                                        optimization_method=optimization_method,
                                        verbose=verbose,
-                                       mode_adsorbent=isotherm.mode_adsorbent,
+                                       basis_adsorbent=isotherm.basis_adsorbent,
                                        mode_pressure=isotherm.mode_pressure,
                                        unit_loading=isotherm.unit_loading,
                                        unit_pressure=isotherm.unit_pressure,
@@ -291,7 +291,7 @@ class ModelIsotherm(Isotherm):
                    param_guess=param_guess,
                    optimization_method=optimization_method,
                    verbose=verbose,
-                   mode_adsorbent=isotherm.mode_adsorbent,
+                   basis_adsorbent=isotherm.basis_adsorbent,
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
                    unit_pressure=isotherm.unit_pressure,
@@ -303,7 +303,7 @@ class ModelIsotherm(Isotherm):
               pressure_key=None,
               optimization_method="Nelder-Mead",
               verbose=False,
-              mode_adsorbent="mass",
+              basis_adsorbent="mass",
               mode_pressure="absolute",
               unit_loading="mmol",
               unit_pressure="bar",
@@ -326,7 +326,7 @@ class ModelIsotherm(Isotherm):
             method in SciPy minimization function to use in fitting model to data.
         verbose : bool, optional
             Prints out extra information about steps taken.
-        mode_adsorbent : str, optional
+        basis_adsorbent : str, optional
             whether the adsorption is read in terms of either 'per volume'
             or 'per mass'
         mode_pressure : str, optional
@@ -349,7 +349,7 @@ class ModelIsotherm(Isotherm):
                                          param_guess=None,
                                          optimization_method=optimization_method,
                                          verbose=verbose,
-                                         mode_adsorbent=mode_adsorbent,
+                                         basis_adsorbent=basis_adsorbent,
                                          mode_pressure=mode_pressure,
                                          unit_loading=unit_loading,
                                          unit_pressure=unit_pressure,

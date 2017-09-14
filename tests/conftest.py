@@ -69,7 +69,7 @@ def isotherm_parameters():
         'project': 'TP',
         'machine': 'TM',
         'is_real': True,
-        'exp_type': 'calorimetry',
+        'exp_type': 'Calorimetrie',
 
         # other properties
 
@@ -167,7 +167,7 @@ def sample_data():
         'comment': 'test comment',
 
         'properties': {
-                'density': 22.5,  # g/cm3
+                'density': 10,  # g/cm3
                 'poresize': 14,
         }
     }
@@ -191,8 +191,8 @@ def adsorbate_data():
     Creates an dict with all data for an model adsorbate
     """
     adsorbate_data = {
-        'nick': 'N2',
-        'formula': 'N2',
+        'nick': 'TA',
+        'formula': 'TA21',
 
         'properties': {
             'common_name': 'nitrogen',

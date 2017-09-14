@@ -4,11 +4,13 @@ This module contains the adsorbate class
 
 from CoolProp.CoolProp import PropsSI
 
-import pygaps.data as data
+import pygaps
 
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import convert_pressure
+
+_PRESSURE_MODE = ["absolute", "relative"]
 
 
 class Adsorbate(object):
@@ -106,11 +108,11 @@ class Adsorbate(object):
         """
         # See if adsorbate exists in master list
         adsorbate = next(
-            (x for x in data.GAS_LIST if adsorbate_name == x.name), None)
+            (x for x in pygaps.ADSORBATE_LIST if adsorbate_name == x.name), None)
         if adsorbate is None:
             raise ParameterError(
                 "Adsorbate {0} does not exist in list of adsorbates. "
-                "First populate pygaps.data.GAS_LIST "
+                "First populate pygaps.ADSORBATE_LIST "
                 "with required adsorbate class".format(adsorbate_name))
 
         return adsorbate
@@ -165,7 +167,8 @@ class Adsorbate(object):
         Raises
         ------
         ``ParameterError``
-            if it does not exist
+            If the the property does not exist
+            in the class dictionary.
         """
 
         req_prop = self.properties.get(prop)
@@ -188,7 +191,8 @@ class Adsorbate(object):
         Raises
         ------
         ``ParameterError``
-            if it does not exist
+            If the the property does not exist
+            in the class dictionary.
         """
         c_name = self.properties.get("common_name")
         if c_name is None:
@@ -216,9 +220,10 @@ class Adsorbate(object):
         Raises
         ------
         ``ParameterError``
-            If it does not exist
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
         ``CalculationError``
-            If it cannot be calculated
+            If it cannot be calculated, due to a physical reason.
         """
         if calculate:
             try:
@@ -258,9 +263,10 @@ class Adsorbate(object):
         Raises
         ------
         ``ParameterError``
-            If it does not exist
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
         ``CalculationError``
-            If it cannot be calculated
+            If it cannot be calculated, due to a physical reason.
 
         """
         if calculate:
@@ -279,6 +285,50 @@ class Adsorbate(object):
                     "saturation_pressure.".format(self.name))
 
         return sat_p
+
+    def convert_mode(self, mode_pressure, pressure, temp, unit=None):
+        """
+        Converts absolute pressure to relative and vice-versa.
+        Only possible if in the subcritical region.
+
+        Parameters
+        ----------
+        mode_pressure : {'relative', 'absolute'}
+            Whether to convert to relative from absolute or to absolute
+            from relative.
+        pressure : float
+            The absolute pressure which is to be converted into
+            relative pressure.
+        temp : float
+            Temperature at which the pressure is measured, in K
+        unit : optional
+            Unit in which the absolute presure is passed.
+            If not specifies defaults to Pascal.
+
+        Returns
+        -------
+        float
+            Pressure in the mode requested.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the mode selected is not an option
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+        """
+
+        if mode_pressure not in _PRESSURE_MODE:
+            raise ParameterError(
+                "Mode selected for pressure is not an option. See viable"
+                "models in self._PRESSURE_MODE")
+
+        if mode_pressure == "absolute":
+            sign = 1
+        elif mode_pressure == "relative":
+            sign = -1
+
+        return pressure * self.saturation_pressure(temp, unit=unit) ** sign
 
     def surface_tension(self, temp, calculate=True):
         """
@@ -301,9 +351,10 @@ class Adsorbate(object):
         Raises
         ------
         ``ParameterError``
-            If it does not exist
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
         ``CalculationError``
-            If it cannot be calculated
+            If it cannot be calculated, due to a physical reason.
 
         """
         if calculate:
@@ -342,9 +393,10 @@ class Adsorbate(object):
         Raises
         ------
         ``ParameterError``
-            If it does not exist
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
         ``CalculationError``
-            If it cannot be calculated
+            If it cannot be calculated, due to a physical reason.
 
         """
         if calculate:

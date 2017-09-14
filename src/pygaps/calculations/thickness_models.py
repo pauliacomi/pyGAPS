@@ -107,7 +107,7 @@ def thickness_isotherm(isotherm):
     loading_max = max(isotherm.loading(branch='ads'))
 
     def thickness(pressure):
-        return isotherm.loading_at(pressure) / loading_max * layer_thickness
+        return isotherm.loading_at(pressure, pressure_mode='relative') / loading_max * layer_thickness
 
     return thickness
 

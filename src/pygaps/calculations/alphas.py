@@ -47,7 +47,9 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     -------
     list
         a list of dictionaries containing the calculated parameters for each
-        straight section, with each dictionary of the form:
+        straight section, with each dictionary of the form. The basis of these
+        results will be derived from the basis of the isotherm (per mass or per
+        volume of adsorbent):
 
             - ``section(array)`` : the points of the plot chosen for the line
             - ``area(float)`` : calculated surface area, from the section parameters
@@ -107,14 +109,6 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     .. [#] D.Atkinson, A.I.McLeod, K.S.W.Sing, J.Chim.Phys., 81,791(1984)
     """
 
-    # Function parameter checks
-    if isotherm.mode_adsorbent != "mass":
-        raise ParameterError("The isotherm must be in per mass of adsorbent."
-                             "First convert it using implicit functions")
-    if isotherm.mode_pressure != "relative":
-        raise ParameterError("The isotherm must be in relative pressure mode."
-                             "First convert it using implicit functions")
-
     # Check to see if reference isotherm is given
     if reference_isotherm is None:
         raise ParameterError("No reference isotherm for alpha s calculation "
@@ -122,9 +116,6 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     if reference_isotherm.adsorbate != isotherm.adsorbate:
         raise ParameterError("The reference isotherm adsorbate is different than the "
                              "calculated isotherm adsorbate. ")
-    if reference_isotherm.mode_pressure != "relative":
-        raise ParameterError("The reference isotherm must be in relative pressure mode."
-                             "First convert it using implicit functions")
 
     if reducing_pressure < 0 or reducing_pressure > 1:
         raise ParameterError(
@@ -141,7 +132,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     loading = isotherm.loading(unit='mol', branch='ads')
     reference_loading = reference_isotherm.loading(unit='mol', branch='ads')
     alpha_s_point = reference_isotherm.loading_at(
-        0.4, unit='mol', branch='ads')
+        0.4, loading_unit='mol', pressure_mode='relative', branch='ads')
     alpha_curve = reference_loading / alpha_s_point
 
     # Call alpha s function

@@ -2,9 +2,11 @@
 This module contains the experimental sample class
 """
 
-import pygaps.data as data
+import pygaps
 
 from ..utilities.exceptions import ParameterError
+
+_MATERIAL_MODE = ["mass", "volume"]
 
 
 class Sample(object):
@@ -105,7 +107,7 @@ class Sample(object):
         """
         # Checks to see if sample exists in master list
         sample = next(
-            (sample for sample in data.SAMPLE_LIST
+            (sample for sample in pygaps.SAMPLE_LIST
                 if sample_name == sample.name
                 and
                 sample_batch == sample.batch),
@@ -113,7 +115,7 @@ class Sample(object):
 
         if sample is None:
             raise ParameterError(
-                "Sample {0}{1} does not exist in list of samples. "
+                "Sample {0} {1} does not exist in list of samples. "
                 "First populate pygaps.SAMPLE_LIST "
                 "with required sample class".format(
                     sample_name, sample_batch))
@@ -197,3 +199,42 @@ class Sample(object):
                                      prop, self.name, self.batch))
 
         return req_prop
+
+    def convert_basis(self, basis_to, basis_value, unit=None):
+        """
+        Converts mass to volume of adsorbent and vice-versa.
+        Requires a `density` key in the sample properties dictionary.
+
+        Parameters
+        ----------
+        basis_to : {'mass', 'volume'}
+            Whether to convert to a mass basis from a volume basis or
+            to a volume basis from a mass basis
+        basis_value : float
+            The weight or the volume of the sample, respectively
+        unit : str, optional
+            Unit in which the basis is to be returned. Defaults to
+            grams for mass and to cm3 for volume
+
+        Returns
+        -------
+        float
+            Value in the basis requested.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the mode selected is not an option.
+        """
+
+        if basis_to not in _MATERIAL_MODE:
+            raise ParameterError(
+                "Mode selected for adsorbent is not an option. Viable"
+                "modes are {}".format(_MATERIAL_MODE))
+
+        if basis_to == 'mass':
+            sign = 1
+        elif basis_to == 'volume':
+            sign = -1
+
+        return basis_value * self.get_prop('density') ** sign

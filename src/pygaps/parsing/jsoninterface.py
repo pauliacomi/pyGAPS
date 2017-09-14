@@ -49,8 +49,8 @@ def isotherm_to_json(isotherm, fmt=None):
 
 
 def isotherm_from_json(json_isotherm,
+                       basis_adsorbent='mass',
                        mode_pressure='absolute',
-                       mode_adsorbent='mass',
                        unit_pressure='bar',
                        unit_loading='mmol',
                        fmt=None):
@@ -65,7 +65,7 @@ def isotherm_from_json(json_isotherm,
     mode_pressure : {'relative', 'absolute'}, optional
         Whether the adsorption is read in terms of either 'per volume'
         or 'per mass'. Defults to absolute.
-    mode_adsorbent : {'mass','volume'}, optional
+    basis_adsorbent : {'mass','volume'}, optional
         The pressure mode, either absolute pressures or relative in
         the form of p/p0. Defults to mass.
     unit_pressure : str, optional
@@ -94,7 +94,7 @@ def isotherm_from_json(json_isotherm,
     if fmt == 'NIST':
         (raw_dict,
          mode_pressure,
-         mode_adsorbent,
+         basis_adsorbent,
          unit_pressure,
          unit_loading) = _from_json_nist(raw_dict)
 
@@ -119,7 +119,7 @@ def isotherm_from_json(json_isotherm,
                              loading_key=loading_key,
                              pressure_key=pressure_key,
                              other_keys=other_keys,
-                             mode_adsorbent=mode_adsorbent,
+                             basis_adsorbent=basis_adsorbent,
                              mode_pressure=mode_pressure,
                              unit_loading=unit_loading,
                              unit_pressure=unit_pressure,

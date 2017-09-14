@@ -54,10 +54,6 @@ criteria = {
 }
 isotherms = pygaps.db_get_experiments(db_path, criteria)
 
-# %%
-pygaps.data.SAMPLE_LIST = pygaps.db_get_samples(db_path)
-pygaps.data.GAS_LIST = pygaps.db_get_gasses(db_path)
-
 #################################################################################
 # BET calcs
 #################################################################################
@@ -120,7 +116,7 @@ for isotherm in isotherms:
     with open(isotherm.sample_name + ' ' + isotherm.sample_batch + '.json', "w") as text_file:
         text_file.write(pygaps.isotherm_to_json(isotherm))
 
-# %% 
+# %%
 for isotherm in isotherms:
     if isotherm.other_keys:
         pygaps.plot_iso([isotherm], plot_type='enthalpy', branch=['ads'])

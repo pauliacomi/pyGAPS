@@ -18,35 +18,17 @@ class TestAlphaSPlot(object):
     Tests everything related to alpha-s calculation
     """
 
-    def test_alphas_checks(self, basic_pointisotherm, basic_adsorbate, basic_sample):
+    def test_alphas_checks(self, basic_pointisotherm):
         """Test checks"""
-
-        isotherm = basic_pointisotherm
-        adsorbate = basic_adsorbate
-
-        # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.alpha_s(isotherm, isotherm)
-
-        pygaps.data.GAS_LIST.append(adsorbate)
-        isotherm.convert_mode_pressure("relative")
-
-        pygaps.data.SAMPLE_LIST.append(basic_sample)
-        isotherm.convert_mode_adsorbent("volume")
-
-        # Will raise a "isotherm loading not in mass mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.alpha_s(isotherm, isotherm)
-
-        isotherm.convert_mode_adsorbent("mass")
 
         # Will raise a "no reference isotherm exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.alpha_s(isotherm, None)
+            pygaps.alpha_s(basic_pointisotherm, None)
 
         # Will raise a "bad reducing pressure exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.alpha_s(isotherm, isotherm, reducing_pressure=1.3)
+            pygaps.alpha_s(basic_pointisotherm, basic_pointisotherm,
+                           reducing_pressure=1.3)
 
         return
 
@@ -55,17 +37,14 @@ class TestAlphaSPlot(object):
                                data['bet_area'],
                                0) for data in list(DATA.values())]
                              )
-    def test_alphas(self, file, basic_adsorbate, area, micropore_volume):
+    def test_alphas(self, file, area, micropore_volume):
         """Test calculation with several model isotherms"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         res = pygaps.alpha_s(
             isotherm, isotherm)
@@ -82,9 +61,8 @@ class TestAlphaSPlot(object):
         assert isclose(results[-1].get('area'),
                        area, err_relative, err_absolute_volume)
 
-    def test_alphas_choice(self, basic_adsorbate):
+    def test_alphas_choice(self):
         """Test choice of points"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         data = DATA['MCM-41']
 
@@ -93,8 +71,6 @@ class TestAlphaSPlot(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         res = pygaps.alpha_s(
             isotherm, isotherm, limits=[0.7, 1.0])
@@ -109,9 +85,8 @@ class TestAlphaSPlot(object):
         assert isclose(results[-1].get('area'),
                        data['bet_area'], err_relative, err_absolute_volume)
 
-    def test_alphas_output(self, basic_adsorbate, noplot):
+    def test_alphas_output(self, noplot):
         """Test verbosity"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         data = DATA['MCM-41']
 
@@ -120,7 +95,5 @@ class TestAlphaSPlot(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         pygaps.alpha_s(isotherm, isotherm, verbose=True)

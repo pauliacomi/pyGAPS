@@ -17,43 +17,25 @@ class TestPSD(object):
     Tests everything related to pore size distribution calculation
     """
 
-    def test_psd_meso_checks(self, basic_pointisotherm, basic_adsorbate, basic_sample):
-
-        isotherm = basic_pointisotherm
-        adsorbate = basic_adsorbate
-
-        # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.mesopore_size_distribution(isotherm, isotherm)
-
-        pygaps.data.GAS_LIST.append(adsorbate)
-        isotherm.convert_mode_pressure("relative")
-
-        pygaps.data.SAMPLE_LIST.append(basic_sample)
-        isotherm.convert_mode_adsorbent("volume")
-
-        # Will raise a "isotherm loading not in mass mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.mesopore_size_distribution(isotherm, isotherm)
-
-        isotherm.convert_mode_adsorbent("mass")
+    def test_psd_meso_checks(self, basic_pointisotherm, basic_sample):
 
         # Will raise a "no model exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.mesopore_size_distribution(isotherm, None)
+            pygaps.mesopore_size_distribution(basic_pointisotherm, None)
 
         # Will raise a "no suitable model exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.mesopore_size_distribution(isotherm, 'Test')
+            pygaps.mesopore_size_distribution(basic_pointisotherm, 'Test')
 
         # Will raise a "no applicable geometry exception"
         with pytest.raises(pygaps.ParameterError):
             pygaps.mesopore_size_distribution(
-                isotherm, 'BJH', pore_geometry='test')
+                basic_pointisotherm, 'BJH', pore_geometry='test')
 
         # Will raise a "no applicable branch exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.mesopore_size_distribution(isotherm, 'BJH', branch='test')
+            pygaps.mesopore_size_distribution(
+                basic_pointisotherm, 'BJH', branch='test')
 
     @pytest.mark.parametrize('method', [
         'BJH',
@@ -62,17 +44,14 @@ class TestPSD(object):
     @pytest.mark.parametrize('file', [
         (data['file']) for data in list(DATA.values())
     ])
-    def test_psd_meso(self, file, basic_adsorbate, method):
+    def test_psd_meso(self, file, method):
         """Test psd calculation with several model isotherms"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         result_dict = pygaps.mesopore_size_distribution(
             isotherm,
@@ -84,43 +63,25 @@ class TestPSD(object):
 
         assert result_dict is not None
 
-    def test_psd_micro_checks(self, basic_pointisotherm, basic_adsorbate, basic_sample):
-
-        isotherm = basic_pointisotherm
-        adsorbate = basic_adsorbate
-
-        # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.micropore_size_distribution(isotherm, isotherm)
-
-        pygaps.data.GAS_LIST.append(adsorbate)
-        isotherm.convert_mode_pressure("relative")
-
-        pygaps.data.SAMPLE_LIST.append(basic_sample)
-        isotherm.convert_mode_adsorbent("volume")
-
-        # Will raise a "isotherm loading not in mass mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.micropore_size_distribution(isotherm, isotherm)
-
-        isotherm.convert_mode_adsorbent("mass")
+    def test_psd_micro_checks(self, basic_pointisotherm):
 
         # Will raise a "no model exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.micropore_size_distribution(isotherm, None)
+            pygaps.micropore_size_distribution(basic_pointisotherm, None)
 
         # Will raise a "no suitable model exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.micropore_size_distribution(isotherm, 'Test')
+            pygaps.micropore_size_distribution(basic_pointisotherm, 'Test')
 
         # Will raise a "no applicable geometry exception"
         with pytest.raises(pygaps.ParameterError):
             pygaps.micropore_size_distribution(
-                isotherm, 'HK', pore_geometry='test')
+                basic_pointisotherm, 'HK', pore_geometry='test')
 
         # Will raise a "no applicable branch exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.micropore_size_distribution(isotherm, 'BJH', branch='test')
+            pygaps.micropore_size_distribution(
+                basic_pointisotherm, 'BJH', branch='test')
 
     @pytest.mark.parametrize('method', [
         'HK',
@@ -128,17 +89,14 @@ class TestPSD(object):
     @pytest.mark.parametrize('file', [
         (data['file']) for data in list(DATA.values())
     ])
-    def test_psd_micro(self, file, basic_adsorbate, method):
+    def test_psd_micro(self, file, method):
         """Test psd calculation with several model isotherms"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         result_dict = pygaps.micropore_size_distribution(
             isotherm,
@@ -152,26 +110,23 @@ class TestPSD(object):
 
     def test_psd_dft_checks(self, basic_pointisotherm):
 
-        isotherm = basic_pointisotherm
-
         # Will raise a "no kernel exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.micropore_size_distribution(isotherm, None)
+            pygaps.micropore_size_distribution(basic_pointisotherm, None)
+
+        return
 
     @pytest.mark.parametrize('file', [
         (data['file']) for data in list(DATA.values())
     ])
-    def test_psd_dft(self, file, basic_adsorbate):
+    def test_psd_dft(self, file):
         """Test psd calculation with several model isotherms"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         result_dict = pygaps.dft_size_distribution(
             isotherm,
@@ -181,3 +136,5 @@ class TestPSD(object):
         # max_error = 0.1  # 10 percent
 
         assert result_dict is not None
+
+        return

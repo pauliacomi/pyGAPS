@@ -92,13 +92,6 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     """
 
     # Function parameter checks
-    if isotherm.mode_adsorbent != "mass":
-        raise ParameterError("The isotherm must be in per mass of adsorbent."
-                             "First convert it using implicit functions")
-    if isotherm.mode_pressure != "relative":
-        raise ParameterError("The isotherm must be in relative pressure mode."
-                             "First convert it using implicit functions")
-
     if psd_model is None:
         raise ParameterError("Specify a model to generate the pore size"
                              " distribution e.g. psd_model=\"BJH\"")
@@ -130,11 +123,11 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     # Read data in, depending on branch requested
     if branch == 'adsorption':
         loading = isotherm.loading(unit='mmol', branch='ads')[::-1]
-        pressure = isotherm.pressure(branch='ads')[::-1]
+        pressure = isotherm.pressure(branch='ads', mode='relative')[::-1]
     # If on desorption branch, data will be reversed
     elif branch == 'desorption':
         loading = isotherm.loading(unit='mmol', branch='des')
-        pressure = isotherm.pressure(branch='des')
+        pressure = isotherm.pressure(branch='des', mode='relative')
     if loading is None:
         raise ParameterError("The isotherm does not have the required branch for"
                              " this calculation")
@@ -229,13 +222,6 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     """
 
     # Function parameter checks
-    if isotherm.mode_adsorbent != "mass":
-        raise ParameterError("The isotherm must be in per mass of adsorbent."
-                             "First convert it using implicit functions")
-    if isotherm.mode_pressure != "relative":
-        raise ParameterError("The isotherm must be in relative pressure mode."
-                             "First convert it using implicit functions")
-
     if psd_model is None:
         raise ParameterError("Specify a model to generate the pore size"
                              " distribution e.g. psd_model=\"BJH\"")
@@ -263,7 +249,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     # Read data in
     loading = isotherm.loading(unit='mmol', branch='ads')
-    pressure = isotherm.pressure(branch='ads')
+    pressure = isotherm.pressure(branch='ads', mode='relative')
     maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
@@ -380,7 +366,7 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
 
     # Read data in
     loading = isotherm.loading(unit='mmol', branch='ads')
-    pressure = isotherm.pressure(branch='ads')
+    pressure = isotherm.pressure(branch='ads', mode='relative')
 
     # Call the DFT function
     pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)

@@ -18,31 +18,12 @@ class TestTPlot(object):
     Tests everything related to tplot calculation
     """
 
-    def test_tplot_checks(self, basic_pointisotherm, basic_adsorbate, basic_sample):
+    def test_tplot_checks(self, basic_pointisotherm, basic_sample):
         """Test checks"""
-
-        isotherm = basic_pointisotherm
-        adsorbate = basic_adsorbate
-
-        # Will raise a "isotherm not in relative pressure mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.t_plot(isotherm, thickness_model='Halsey')
-
-        pygaps.data.GAS_LIST.append(adsorbate)
-        isotherm.convert_mode_pressure("relative")
-
-        pygaps.data.SAMPLE_LIST.append(basic_sample)
-        isotherm.convert_mode_adsorbent("volume")
-
-        # Will raise a "isotherm loading not in volume mode exception"
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.t_plot(isotherm, thickness_model='Halsey')
-
-        isotherm.convert_mode_adsorbent("mass")
 
         # Will raise a "no suitable model exception"
         with pytest.raises(pygaps.ParameterError):
-            pygaps.t_plot(isotherm, thickness_model='random')
+            pygaps.t_plot(basic_pointisotherm, thickness_model='random')
 
         return
 
@@ -51,17 +32,14 @@ class TestTPlot(object):
                                data['t_area'],
                                data['t_pore_volume']) for data in list(DATA.values())]
                              )
-    def test_tplot(self, file, basic_adsorbate, area, micropore_volume):
+    def test_tplot(self, file, area, micropore_volume):
         """Test calculation with several model isotherms"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         res = pygaps.t_plot(
             isotherm, thickness_model='Halsey')
@@ -78,9 +56,8 @@ class TestTPlot(object):
         assert isclose(results[-1].get('area'), area,
                        err_relative, err_absolute_volume)
 
-    def test_tplot_choice(self, basic_adsorbate):
+    def test_tplot_choice(self):
         """Test choice of points"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         data = DATA['MCM-41']
 
@@ -89,8 +66,6 @@ class TestTPlot(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         res = pygaps.t_plot(
             isotherm, 'Halsey', limits=[0.7, 1.0])
@@ -105,9 +80,8 @@ class TestTPlot(object):
         assert isclose(results[-1].get('area'),
                        data['t_area'], err_relative, err_absolute_volume)
 
-    def test_tplot_output(self, basic_adsorbate, noplot):
+    def test_tplot_output(self, noplot):
         """Test verbosity"""
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         data = DATA['MCM-41']
 
@@ -116,7 +90,5 @@ class TestTPlot(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
-
-        isotherm.convert_mode_pressure('relative')
 
         pygaps.t_plot(isotherm, 'Halsey', verbose=True)

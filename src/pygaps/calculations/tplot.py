@@ -45,7 +45,9 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     -------
     list
         a list of dictionaries containing the calculated parameters for each
-        straight section, with each dictionary of the form:
+        straight section, with each dictionary of the form. The basis of these
+        results will be derived from the basis of the isotherm (per mass or per
+        volume of adsorbent)::
 
             - ``section(array)`` : the points of the plot chosen for the line
             - ``area(float)`` : calculated surface area, from the section parameters
@@ -113,12 +115,6 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     """
 
     # Function parameter checks
-    if isotherm.mode_adsorbent != "mass":
-        raise ParameterError("The isotherm must be in per mass of adsorbent."
-                             "First convert it using implicit functions")
-    if isotherm.mode_pressure != "relative":
-        raise ParameterError("The isotherm must be in relative pressure mode."
-                             "First convert it using implicit functions")
     if thickness_model is None:
         raise ParameterError("Specify a model to generate the thickness curve"
                              " e.g. thickness_model=\"Halsey\"")
@@ -130,7 +126,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
 
     # Read data in
     loading = isotherm.loading(unit='mol', branch='ads')
-    pressure = isotherm.pressure(branch='ads')
+    pressure = isotherm.pressure(branch='ads', mode='relative')
 
     # Get thickness model
     t_model = get_thickness_model(thickness_model)

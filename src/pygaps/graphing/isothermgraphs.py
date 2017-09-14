@@ -60,13 +60,13 @@ def plot_iso(isotherms, plot_type="isotherm",
     # Initial checks
     #
     # Check for isotherm units
-    mode_adsorbent = isotherms[0].mode_adsorbent
+    basis_adsorbent = isotherms[0].basis_adsorbent
     mode_pressure = isotherms[0].mode_pressure
 
     unit_pressure = isotherms[0].unit_pressure
     unit_loading = isotherms[0].unit_loading
 
-    if not all(isotherm.mode_adsorbent == mode_adsorbent for isotherm in isotherms):
+    if not all(isotherm.basis_adsorbent == basis_adsorbent for isotherm in isotherms):
         raise Exception("Mode for adsorbent does not match all isotherms")
 
     if not all(isotherm.mode_pressure == mode_pressure for isotherm in isotherms):
@@ -129,9 +129,9 @@ def plot_iso(isotherms, plot_type="isotherm",
         _TEXT_PRESSURE = _TEXT_PRESSURE + ' ($' + unit_pressure + '$)'
     elif mode_pressure == "relative":
         _TEXT_PRESSURE = "Relative " + _TEXT_PRESSURE
-    if mode_adsorbent == "mass":
+    if basis_adsorbent == "mass":
         _TEXT_LOADING = _TEXT_LOADING + ' ($' + unit_loading + r'\/g^{-1}$)'
-    elif mode_adsorbent == "volume":
+    elif basis_adsorbent == "volume":
         _TEXT_LOADING = _TEXT_LOADING + ' ($' + unit_loading + r'\/cm^{-3}$)'
 
     # Set the colours of the graph

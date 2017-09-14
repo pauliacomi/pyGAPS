@@ -132,21 +132,21 @@ class TestPointIsotherm(object):
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
-    @pytest.mark.parametrize('mode, multiplier', [
+    @pytest.mark.parametrize('basis, multiplier', [
                             ('mass', 1),
-                            ('volume', 22.5),
+                            ('volume', 0.1),
         pytest.param("bad_mode", 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_loading_mode(self, basic_pointisotherm, basic_sample,
-                                           isotherm_data, mode, multiplier):
-        """Checks that the loading mode conversion function work as expected"""
+    def test_isotherm_convert_loading_basis(self, basic_pointisotherm, basic_sample,
+                                            isotherm_data, basis, multiplier):
+        """Checks that the loading basis conversion function work as expected"""
 
         # Add sample to list
         pygaps.data.SAMPLE_LIST.append(basic_sample)
 
         # Do the conversion
-        basic_pointisotherm.convert_mode_adsorbent(mode)
+        basic_pointisotherm.convert_basis_adsorbent(basis)
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.loading_key] * multiplier
@@ -161,12 +161,9 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_pressure_mode(self, basic_pointisotherm, basic_adsorbate,
+    def test_isotherm_convert_pressure_mode(self, basic_pointisotherm,
                                             isotherm_data, mode, multiplier):
         """Checks that the pressure mode conversion function work as expected"""
-
-        # Add sample to list
-        pygaps.data.GAS_LIST.append(basic_adsorbate)
 
         # Do the conversion
         basic_pointisotherm.convert_mode_pressure(mode)
@@ -178,11 +175,23 @@ class TestPointIsotherm(object):
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
-    def test_isotherm_loading_interpolation(self, basic_pointisotherm):
+    def test_isotherm_loading_interpolation(self, basic_pointisotherm, basic_sample):
         """Checks that the interpolation works as expected"""
 
-        assert basic_pointisotherm.loading_at(1) == 1
+        # Add sample to list
+        pygaps.data.SAMPLE_LIST.append(basic_sample)
+
         assert basic_pointisotherm.loading_at(3.5) == 3.5
+        assert basic_pointisotherm.loading_at(
+            10, interp_fill=10) == 10
+        assert basic_pointisotherm.loading_at(
+            1, loading_unit='mol') == 0.001
+        assert basic_pointisotherm.loading_at(
+            100000, pressure_unit='Pa') == 1
+        assert basic_pointisotherm.loading_at(
+            1, adsorbent_basis='volume') == 0.1
+        assert basic_pointisotherm.loading_at(
+            0.25697, pressure_mode='relative') == pytest.approx(2, 0.001)
 
     def test_isotherm_print_parameters(self, basic_pointisotherm, noplot):
         "Checks isotherm can print its own info"

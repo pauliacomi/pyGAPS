@@ -5,6 +5,8 @@ This module contains the main class that describes an isotherm
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _LOADING_UNITS
 from ..utilities.unit_converter import _PRESSURE_UNITS
+from ..classes.adsorbate import _PRESSURE_MODE
+from ..classes.sample import _MATERIAL_MODE
 
 
 class Isotherm(object):
@@ -18,7 +20,7 @@ class Isotherm(object):
 
     Parameters
     ----------
-    mode_adsorbent : str, optional
+    basis_adsorbent : str, optional
         whether the adsorption is read in terms of either 'per volume'
         or 'per mass'
     mode_pressure : str, optional
@@ -58,11 +60,8 @@ class Isotherm(object):
     the ``**isotherm_parameters`` dictionary
     """
 
-    _MATERIAL_MODE = ["mass", "volume"]
-    _PRESSURE_MODE = ["absolute", "relative"]
-
     def __init__(self,
-                 mode_adsorbent="mass",
+                 basis_adsorbent="mass",
                  mode_pressure="absolute",
                  unit_loading="mmol",
                  unit_pressure="bar",
@@ -79,17 +78,17 @@ class Isotherm(object):
                 "Isotherm MUST have the following information in the properties dictionary:"
                 "'sample_name', 'sample_batch', 't_exp', 'adsorbate'")
 
-        if mode_adsorbent is None or mode_pressure is None:
+        if basis_adsorbent is None or mode_pressure is None:
             raise ParameterError(
                 "One of the modes is not specified. See viable"
                 "modes in _MATERIAL_MODE and _PRESSURE_MODE")
 
-        if mode_adsorbent not in self._MATERIAL_MODE:
+        if basis_adsorbent not in _MATERIAL_MODE:
             raise ParameterError(
                 "Mode selected for adsorbent is not an option. See viable"
                 "modes in _MATERIAL_MODE")
 
-        if mode_pressure not in self._PRESSURE_MODE:
+        if mode_pressure not in _PRESSURE_MODE:
             raise ParameterError(
                 "Mode selected for pressure is not an option. See viable"
                 "modes in _PRESSURE_MODE")
@@ -109,8 +108,8 @@ class Isotherm(object):
                 "Unit selected for pressure is not an option. See viable"
                 "units in _PRESSURE_UNITS")
 
-        #: mode for the adsorbent
-        self.mode_adsorbent = str(mode_adsorbent)
+        #: basis for the adsorbent
+        self.basis_adsorbent = str(basis_adsorbent)
         #: mode for the pressure
         self.mode_pressure = str(mode_pressure)
         #: units for loading
