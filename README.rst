@@ -9,15 +9,17 @@ Overview
     :stub-columns: 1
 
     * - status
-      - |status|
+      - | |status|
+        | |commits-since|
     * - docs
       - |docs|
     * - tests
-      - | |travis| |appveyor| |requires|
+      - | |travis| |appveyor|
         | |codecov|
+        | |requires|
     * - package
-      - | |version| |wheel| |supported-versions| |supported-implementations|
-        | |commits-since|
+      - | |version| |wheel|
+        | |supported-versions| |supported-implementations|
 
 .. |status| image:: http://www.repostatus.org/badges/latest/wip.svg
     :target: http://www.repostatus.org/#wip
