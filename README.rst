@@ -74,6 +74,20 @@ Work in progress
 
 * Free software: MIT license
 
+Features
+========
+
+    - Routine analysis such as BET surface area, t-plot, alpha-s method
+    - Pore size distribution calculations for mesopores (BJH, Dollimore-Heal)
+    - Pore size distribution calculations for micropores (Horowitz-Kawazoe)
+    - Pore size distribution calculations using DFT kernels
+    - Isotherm modelling (Henry, Langmuir, DS/TS Langmuir, etc..)
+    - IAST predictions for binary adsorption
+    - Isosteric heat of adsorption calculation
+    - Parsing to and from multiple formats such as Excel, CSV and JSON
+    - An sqlite database backend for storing and retrieving data
+    - Simple methods for isotherm graphing and comparison
+
 Documentation
 =============
 
