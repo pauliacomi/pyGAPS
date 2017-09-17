@@ -17,3 +17,7 @@ class CalculationError(Error):
 
 class ParsingError(Error):
     """Raised when parsing fails"""
+
+
+class GraphingError(Error):
+    """Raised when graphing fails"""

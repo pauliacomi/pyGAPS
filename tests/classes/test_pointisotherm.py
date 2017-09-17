@@ -50,9 +50,9 @@ class TestPointIsotherm(object):
 
         # data()
         assert isotherm.data().equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
-            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0],
-            other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
         }))
         assert isotherm.data(branch='ads').equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -60,36 +60,36 @@ class TestPointIsotherm(object):
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
         }))
         assert isotherm.data(branch='des').equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [4.0, 2.0],
-            basic_pointisotherm.loading_key: [4.0, 2.0],
-            other_key: [5.0, 5.0],
+            basic_pointisotherm.pressure_key: [4.5, 2.5],
+            basic_pointisotherm.loading_key: [4.5, 2.5],
+            other_key: [4.0, 4.0],
         }, index=[6, 7]))
 
         # pressure()
         assert set(isotherm.pressure()) == set(
-            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0])
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5])
         assert set(isotherm.pressure(branch='ads')) == set(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        assert set(isotherm.pressure(branch='des')) == set([4.0, 2.0])
-        assert set(isotherm.pressure(min_range=2.3, max_range=5.0)) == set(
+        assert set(isotherm.pressure(branch='des')) == set([4.5, 2.5])
+        assert set(isotherm.pressure(branch='ads', min_range=2.3, max_range=5.0)) == set(
             [3.0, 4.0, 5.0])
 
         # loading()
         assert set(isotherm.loading()) == set(
-            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.0, 2.0])
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5])
         assert set(isotherm.loading(branch='ads')) == set(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        assert set(isotherm.loading(branch='des')) == set([4.0, 2.0])
-        assert set(isotherm.loading(min_range=2.3, max_range=5.0)) == set(
+        assert set(isotherm.loading(branch='des')) == set([4.5, 2.5])
+        assert set(isotherm.loading(branch='ads', min_range=2.3, max_range=5.0)) == set(
             [3.0, 4.0, 5.0])
 
         # other_data()
         assert set(isotherm.other_data(other_key)) == set([
-            5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
+            5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0])
         assert set(isotherm.other_data(other_key, branch='ads')
                    ) == set([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
         assert set(isotherm.other_data(
-            other_key, branch='des')) == set([5.0, 5.0])
+            other_key, branch='des')) == set([4.0, 4.0])
 
         return
 
