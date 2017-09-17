@@ -2,11 +2,14 @@
 Tests for the isotherm graphs
 """
 
+from matplotlib.testing.decorators import cleanup
+
 import pytest
 
 import pygaps
 
 
+@cleanup
 @pytest.mark.slowtest
 class TestIsothermGraphs(object):
 
