@@ -3,7 +3,6 @@ This module contains the functions for plotting and comparing isotherms
 """
 
 import matplotlib.pyplot as plt
-import pandas
 from cycler import cycler
 from matplotlib import cm
 from numpy import linspace
