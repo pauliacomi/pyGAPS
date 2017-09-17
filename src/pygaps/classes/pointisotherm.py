@@ -385,12 +385,14 @@ class PointIsotherm(Isotherm):
         print(self)
 
         if 'enthalpy' in self.other_keys:
-            plot_type = 'iso-enth'
+            plot_type = 'combo'
+            secondary_key = 'enthalpy'
         else:
             plot_type = 'isotherm'
+            secondary_key = None
 
         plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
-                 logarithmic=logarithmic, color=True, fig_title=self.adsorbate)
+                 logarithmic=logarithmic, color=True, secondary_key=secondary_key)
 
         return
 
@@ -423,7 +425,8 @@ class PointIsotherm(Isotherm):
         else:
             return None
 
-    def pressure(self, unit=None, branch=None, mode=None, min_range=None, max_range=None):
+    def pressure(self, unit=None, branch=None, mode=None,
+                 min_range=None, max_range=None, indexed=False):
         """
         Returns pressure points as an array
 
@@ -442,12 +445,16 @@ class PointIsotherm(Isotherm):
             The lower limit for the pressure to select.
         max_range : float, optional
             The higher limit for the pressure to select.
+        indexed : bool, optional
+            If this is specified to true, then the function returns an indexed
+            pandas.Series with the columns requested instead of an array.
+
         Returns
         -------
-        array
+        array or Series
             The pressure slice corresponding to the parameters passesd
         """
-        ret = self.data(branch=branch).loc[:, self.pressure_key].values
+        ret = self.data(branch=branch).loc[:, self.pressure_key]
 
         # Convert if needed
         if mode is not None and mode != self.mode_pressure:
@@ -460,16 +467,21 @@ class PointIsotherm(Isotherm):
             ret = convert_pressure(ret, self.unit_pressure, unit)
 
         # Select required points
-        if max_range is None or min_range is None:
-            return ret
-        else:
+        if max_range is not None or min_range is not None:
             if min_range is None:
-                min_range = 0
+                min_range = min(ret)
             if max_range is None:
                 max_range = max(ret)
-            return [x for x in ret if (min_range <= x and x <= max_range)]
+            ret = ret.loc[lambda x: x >=
+                          min_range].loc[lambda x: x <= max_range]
 
-    def loading(self, unit=None, branch=None, basis=None, min_range=None, max_range=None):
+        if indexed:
+            return ret
+        else:
+            return ret.values
+
+    def loading(self, unit=None, branch=None, basis=None,
+                min_range=None, max_range=None, indexed=False):
         """
         Returns loading points as an array
 
@@ -488,13 +500,16 @@ class PointIsotherm(Isotherm):
             The lower limit for the loading to select.
         max_range : float, optional
             The higher limit for the loading to select.
+        indexed : bool, optional
+            If this is specified to true, then the function returns an indexed
+            pandas.Series with the columns requested instead of an array.
 
         Returns
         -------
-        array
+        array or Series
             The loading slice corresponding to the parameters passesd
         """
-        ret = self.data(branch=branch).loc[:, self.loading_key].values
+        ret = self.data(branch=branch).loc[:, self.loading_key]
 
         # Convert if needed
         if basis is not None and basis != self.basis_adsorbent:
@@ -505,16 +520,21 @@ class PointIsotherm(Isotherm):
             ret = convert_loading(ret, self.unit_loading, unit)
 
         # Select required points
-        if max_range is None or min_range is None:
-            return ret
-        else:
+        if max_range is not None or min_range is not None:
             if min_range is None:
-                min_range = 0
+                min_range = min(ret)
             if max_range is None:
                 max_range = max(ret)
-            return [x for x in ret if (min_range <= x and x <= max_range)]
+            ret = ret.loc[lambda x: x >=
+                          min_range].loc[lambda x: x <= max_range]
 
-    def other_data(self, key, branch=None, min_range=None, max_range=None):
+        if indexed:
+            return ret
+        else:
+            return ret.values
+
+    def other_data(self, key, branch=None,
+                   min_range=None, max_range=None, indexed=False):
         """
         Returns adsorption enthalpy points as an array
 
@@ -529,24 +549,32 @@ class PointIsotherm(Isotherm):
             The lower limit for the data to select.
         max_range : float, optional
             The higher limit for the data to select.
+        indexed : bool, optional
+            If this is specified to true, then the function returns an indexed
+            pandas.Series with the columns requested instead of an array.
 
         Returns
         -------
-        array
+        array or Series
             The data slice corresponding to the parameters passesd
         """
         if key in self.other_keys:
-            ret = self.data(branch=branch).loc[:, key].values
+            ret = self.data(branch=branch).loc[:, key]
 
             # Select required points
-            if max_range is None or min_range is None:
-                return ret
-            else:
+            if max_range is not None or min_range is not None:
                 if min_range is None:
-                    min_range = 0
+                    min_range = min(ret)
                 if max_range is None:
                     max_range = max(ret)
-                return [x for x in ret if (min_range <= x and x <= max_range)]
+                ret = ret.loc[lambda x: x >=
+                              min_range].loc[lambda x: x <= max_range]
+
+            if indexed:
+                return ret
+            else:
+                return ret.values
+
         else:
             return None
 
