@@ -2,10 +2,9 @@
 Tests calculation graphs such as PSD/t_plot/BET etc
 """
 
-import pygaps.graphing.calcgraph as graphing
-import pytest
-import matplotlib.pyplot as plt
 from matplotlib.testing.decorators import cleanup
+
+import pygaps.graphing.calcgraph as graphing
 
 
 class TestCalcGraphs(object):
@@ -32,7 +31,7 @@ class TestCalcGraphs(object):
         """Test BET graph"""
 
         pressure = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
-        bet_points = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4]
+        roq_points = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4]
         min_p = 2
         max_p = 6
         slope = 0.5

@@ -2,10 +2,10 @@
 This test module has tests relating to alpha_s calculations
 """
 
-from matplotlib.testing.decorators import cleanup
 import os
 
 import pytest
+from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps

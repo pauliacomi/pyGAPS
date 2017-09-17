@@ -5,8 +5,8 @@ This test module has tests relating to pore size distribution calculations
 import os
 
 import pytest
-
 from matplotlib.testing.decorators import cleanup
+
 import pygaps
 
 from .conftest import DATA

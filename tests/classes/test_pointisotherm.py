@@ -1,9 +1,9 @@
 """
 This test module has tests relating to the pointisotherm class
 """
-from matplotlib.testing.decorators import cleanup
 import pandas
 import pytest
+from matplotlib.testing.decorators import cleanup
 
 import pygaps
 

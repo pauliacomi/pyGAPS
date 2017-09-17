@@ -2,8 +2,9 @@
 Tests for the isotherm graphs
 """
 
-import pygaps
 import pytest
+
+import pygaps
 
 
 @pytest.mark.slowtest

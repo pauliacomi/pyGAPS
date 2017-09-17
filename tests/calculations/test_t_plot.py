@@ -5,9 +5,9 @@ This test module has tests relating to tplot calculations
 import os
 
 import pytest
+from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
-from matplotlib.testing.decorators import cleanup
 import pygaps
 
 from .conftest import DATA

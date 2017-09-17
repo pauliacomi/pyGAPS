@@ -2,15 +2,15 @@
 This module contains the functions for plotting and comparing isotherms
 """
 
-import pandas
 import matplotlib.pyplot as plt
+import pandas
 from cycler import cycler
 from matplotlib import cm
 from numpy import linspace
 
-from ..utilities.string_utilities import convert_chemformula
-from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import GraphingError
+from ..utilities.exceptions import ParameterError
+from ..utilities.string_utilities import convert_chemformula
 
 # ! list of plot types
 _PLOT_TYPES = ("isotherm", "property", "combo")
