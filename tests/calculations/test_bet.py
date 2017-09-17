@@ -4,6 +4,7 @@ This test module has tests relating to BET area calculations
 
 import os
 
+from matplotlib.testing.decorators import cleanup
 import pytest
 from numpy import isclose
 
@@ -61,6 +62,7 @@ class TestBET(object):
         assert isclose(bet_area, data['s_bet_area'],
                        err_relative, err_absolute)
 
+    @cleanup
     def test_BET_output(self, noplot):
         """Test verbosity"""
 

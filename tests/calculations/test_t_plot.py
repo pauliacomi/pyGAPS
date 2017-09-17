@@ -7,6 +7,7 @@ import os
 import pytest
 from numpy import isclose
 
+from matplotlib.testing.decorators import cleanup
 import pygaps
 
 from .conftest import DATA
@@ -80,6 +81,7 @@ class TestTPlot(object):
         assert isclose(results[-1].get('area'),
                        data['t_area'], err_relative, err_absolute_volume)
 
+    @cleanup
     def test_tplot_output(self, noplot):
         """Test verbosity"""
 

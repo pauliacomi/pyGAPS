@@ -1,7 +1,7 @@
 """
 This test module has tests relating to the pointisotherm class
 """
-
+from matplotlib.testing.decorators import cleanup
 import pandas
 import pytest
 
@@ -193,7 +193,8 @@ class TestPointIsotherm(object):
         assert basic_pointisotherm.loading_at(
             0.25697, pressure_mode='relative') == pytest.approx(2, 0.001)
 
-    def test_isotherm_print_parameters(self, basic_pointisotherm, noplot):
+    @cleanup
+    def test_isotherm_print_parameters(self, basic_pointisotherm):
         "Checks isotherm can print its own info"
 
         basic_pointisotherm.print_info()

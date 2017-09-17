@@ -6,6 +6,7 @@ import os
 
 import pytest
 
+from matplotlib.testing.decorators import cleanup
 import pygaps
 
 from .conftest import DATA
@@ -37,6 +38,7 @@ class TestPSD(object):
             pygaps.mesopore_size_distribution(
                 basic_pointisotherm, 'BJH', branch='test')
 
+    @cleanup
     @pytest.mark.parametrize('method', [
         'BJH',
         'DH',
@@ -83,6 +85,7 @@ class TestPSD(object):
             pygaps.micropore_size_distribution(
                 basic_pointisotherm, 'BJH', branch='test')
 
+    @cleanup
     @pytest.mark.parametrize('method', [
         'HK',
     ])
@@ -116,6 +119,7 @@ class TestPSD(object):
 
         return
 
+    @cleanup
     @pytest.mark.parametrize('file', [
         (data['file']) for data in list(DATA.values())
     ])

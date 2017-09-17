@@ -2,6 +2,7 @@
 This test module has tests relating to alpha_s calculations
 """
 
+from matplotlib.testing.decorators import cleanup
 import os
 
 import pytest
@@ -85,6 +86,7 @@ class TestAlphaSPlot(object):
         assert isclose(results[-1].get('area'),
                        data['bet_area'], err_relative, err_absolute_volume)
 
+    @cleanup
     def test_alphas_output(self, noplot):
         """Test verbosity"""
 
