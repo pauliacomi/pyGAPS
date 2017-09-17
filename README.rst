@@ -2,6 +2,8 @@
 Overview
 ========
 
+pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorption data analysis written in python 3.
+
 .. start-badges
 
 .. list-table::
@@ -72,17 +74,25 @@ Work in progress
 
 * Free software: MIT license
 
+Documentation
+=============
+
+For more info, as well as a complete manual and reference visit:
+
+https://pygaps.readthedocs.io/
+
+
 Installation
 ============
 
+The easiest way to install pyGAPS is from the command line.
 ::
 
     pip install pygaps
 
-Documentation
-=============
+On Windows, Anaconda is your best bet since it manages environments for you.
+First install the suite and then use pip inside your regular python 3 environment.
 
-https://pygaps.readthedocs.io/
 
 Development
 ===========
