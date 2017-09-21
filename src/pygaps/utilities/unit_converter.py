@@ -39,8 +39,8 @@ def convert_pressure(pressure, unit_from, unit_to):
 
     if unit_to not in _PRESSURE_UNITS or unit_from not in _PRESSURE_UNITS:
         raise ParameterError(
-            "Units selected for pressure are not an option. See viable"
-            "units in self._PRESSURE_UNITS")
+            "Units selected for pressure are not an option. Viable"
+            "units are {}".format(_PRESSURE_UNITS.keys()))
 
     pressure = pressure * \
         _PRESSURE_UNITS[unit_from] / _PRESSURE_UNITS[unit_to]
@@ -55,8 +55,8 @@ def convert_loading(loading, unit_from, unit_to):
 
     if unit_to not in _LOADING_UNITS or unit_from not in _LOADING_UNITS:
         raise ParameterError(
-            "Units selected for loading are not an option. See viable"
-            "units in self._LOADING_UNITS")
+            "Units selected for loading are not an option. Viable"
+            " units are {}".format(_LOADING_UNITS.keys()))
 
     loading = loading * \
         _LOADING_UNITS[unit_from] / _LOADING_UNITS[unit_to]
