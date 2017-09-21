@@ -1,60 +1,120 @@
 # # %%
 # import os
 # import numpy
-# import matplotlib.pyplot as plt
-
-# # chose an implementation, depending on os
-# import xlwings as xw
+import matplotlib.pyplot as plt
+from ..utilities.string_utilities import convert_chemformula
 
 
-def plot_iast_vle():
-    "Function to generate the selectivity graph"
+def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
+    """
+    Plots a vapour-adsorbed equilibrium graph from IAST data
 
-#     # get excel workbook, sheet and range
-#     wb = xw.Book
-#     sht = xw.sheets[3]
-#     data_1 = sht.range('A1').options(numpy.array, expand='table').value
-#     data_2 = sht.range('D1').options(numpy.array, expand='table').value
-#     data_3 = sht.range('G1').options(numpy.array, expand='table').value
+    Paramaters
+    ----------
+    x_data : array or list
+        The molar fraction in the adsorbed phase.
+    y_data : array or list
+        The molar fraction in the gas phase.
+    adsorbate1 : str
+        Name of the adsorbate which is regarded as the main component.
+    adsorbate1 : str
+        Name of the adsorbate which is regarded as the secondary component.
+    pressure : float
+        Pressure at which the vle is plotted.
+    p_unit : str
+        Unit of the pressure, for axis labelling.
 
-#     # split into multiple
-#     data_1_x, data_1_y = numpy.hsplit(data_1, 2)
-#     data_2_x, data_2_y = numpy.hsplit(data_2, 2)
-#     data_3_x, data_3_y = numpy.hsplit(data_3, 2)
+    Returns
+    -------
+    fig : matplotlib Figure
+        The figure object
+    ax : matplotlib ax
+        The ax object
+    """
+    # Generate the figure
+    fig, ax = plt.subplots(figsize=(8, 8))
 
-#     text_x = r'y $CO_2$'
-#     text_y = r'x $CO_2$'
-#     # title_graph = r'$CO_2$ in $N_2$, 303K'
-#     # title_graph = r'$CO_2$ in $CH_4$, 303K'
-#     title_graph = r'$C_3H_6$ in $C_3H_8$, 303K'
+    text_x = 'Gas fraction ' + convert_chemformula(adsorbate1)
+    text_y = 'Adsorbed fraction ' + convert_chemformula(adsorbate1)
+    title_graph = convert_chemformula(adsorbate1) + \
+        ' in ' + convert_chemformula(adsorbate2)
+    label = str(pressure) + ' (' + p_unit + ')'
 
-#     fig, ax = plt.subplots(figsize=(8, 8))
+    # graph title
+    ax.set_title(title_graph, fontsize=22, ha='center', va='bottom')
 
-#     # graph title
-#     plt.title(title_graph, fontsize=22, ha='center', va='bottom')
+    # labels for the axes
+    ax.set_xlabel(text_x, fontsize=15)
+    ax.set_ylabel(text_y, fontsize=15)
 
-#     # labels for the axes
-#     plt.xlabel(text_x, fontsize=15)
-#     plt.ylabel(text_y, fontsize=15)
+    # Regular data
+    ax.plot(x_data, y_data, label=label)
 
-#     plt.plot(data_1_x, data_1_y, label='1 bar')
-#     plt.plot(data_2_x, data_2_y, label='5 bar')
-#     plt.plot(data_3_x, data_3_y, label='10 bar')
+    # Straight line
+    line = [0, 1]
+    ax.plot(line, line, color='black')
 
-#     # Straight line
-#     line = [0, 1]
-#     plt.plot(line, line, color='black')
+    ax.legend(fontsize=15, loc='best')
 
-#     plt.legend(fontsize=15, loc='lower right')
+    ax.grid(True, zorder=5)
+    ax.set_xlim(xmin=0, xmax=1)
+    ax.set_ylim(ymin=0, ymax=1)
+    ax.set_xscale('linear')
 
-#     ax.grid(True, zorder=5)
-#     ax.set_xlim(xmin=0, xmax=1)
-#     ax.set_ylim(ymin=0, ymax=1)
-#     ax.set_xscale('linear')
+    return fig, ax
 
-#     title = title_graph + '.png'
-#     plt.savefig(title, transparent=False)
 
-#     plt.show()
+def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
+    """
+    Plots a selectivity-vs-pressure graph from IAST data
 
-    return
+    Paramaters
+    ----------
+    p_data : array or list
+        The pressures at which selectivity is calculated.
+    s_data : array or list
+        The selectivity towards the main component as a function of pressure.
+    adsorbate1 : str
+        Name of the adsorbate which is regarded as the main component.
+    adsorbate1 : str
+        Name of the adsorbate which is regarded as the secondary component.
+    fraction : float
+        Molar fraction of the main component in the mixture.
+    p_unit : str
+        Unit of the pressure, for axis labelling.
+
+    Returns
+    -------
+    fig : matplotlib Figure
+        The figure object
+    ax : matplotlib ax
+        The ax object
+    """
+
+    # Generate the figure
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    text_x = 'Pressure (' + p_unit + ')'
+    text_y = 'Selectivity ' + convert_chemformula(adsorbate1)
+    title_graph = convert_chemformula(adsorbate1) + \
+        ' in ' + convert_chemformula(adsorbate2)
+    label = str(round(fraction, 2) * 100) + '% ' + \
+        convert_chemformula(adsorbate1)
+
+    # graph title
+    ax.set_title(title_graph, fontsize=22, ha='center', va='bottom')
+
+    # labels for the axes
+    ax.set_xlabel(text_x, fontsize=15)
+    ax.set_ylabel(text_y, fontsize=15)
+
+    # Regular data
+    ax.plot(p_data, s_data, label=label)
+
+    ax.legend(fontsize=15, loc='best')
+
+    ax.grid(True, zorder=5)
+    ax.set_ylim(ymin=0)
+    ax.set_xscale('linear')
+
+    return fig, ax

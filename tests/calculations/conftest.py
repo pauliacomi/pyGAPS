@@ -1,6 +1,6 @@
 import os
 
-HERE = os.path.dirname(__file__)
+DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'isotherms_json')
 
 DATA = {
     'MCM-41': {
@@ -33,5 +33,15 @@ DATA = {
         'bet_area': 1250.0,
         't_pore_volume': 0.48,
         't_area': 20.0,
+    },
+
+}
+
+DATA_IAST = {
+    'CH4': {
+        'file': 'MOF-5(Zn) - IAST - CH4.json',
+    },
+    'C2H6': {
+        'file': 'MOF-5(Zn) - IAST - C2H6.json',
     },
 }
