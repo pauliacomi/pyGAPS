@@ -492,7 +492,7 @@ class ModelIsotherm(Isotherm):
                                        self.params["theta"] * langmuir_fractional_loading ** 2 *
                                        langmuir_fractional_loading)
 
-    def spreading_pressure(self, pressure):
+    def spreading_pressure_at(self, pressure):
         """
         Calculate reduced spreading pressure at a bulk gas pressure P.
 

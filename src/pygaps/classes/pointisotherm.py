@@ -705,7 +705,7 @@ class PointIsotherm(Isotherm):
         # TODO implement
         raise NotImplementedError
 
-    def spreading_pressure(self, pressure, interp_fill=None):
+    def spreading_pressure_at(self, pressure, unit=None, branch='ads', interp_fill=None):
         """
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.
         (see Tarafder eqn 4)
@@ -733,35 +733,33 @@ class PointIsotherm(Isotherm):
         float
             spreading pressure, :math:`\\Pi`
         """
+        # Get all data points that are at nonzero pressures
+        pressures = self.pressure()  # branch / unit??
+        loadings = self.loading()
+
         # throw exception if interpolating outside the range.
-        if (self.interp_fill is None) & \
-                (pressure > self._data[self.pressure_key].max()):
-            raise CalculationError("""
+        if (interp_fill is None) & (pressure > pressures.max()):
+            raise CalculationError(
+                """
             To compute the spreading pressure at this bulk
             adsorbate pressure, we would need to extrapolate the isotherm since this
             pressure is outside the range of the highest pressure in your
-            pure-component isotherm data, %f.
+            pure-component isotherm data, {0}.
 
-            At present, your InterpolatorIsotherm object is set to throw an
+            At present, the PointIsotherm object is set to throw an
             exception when this occurs, as we do not have data outside this
             pressure range to characterize the isotherm at higher pressures.
 
             Option 1: fit an analytical model to extrapolate the isotherm
-            Option 2: pass a `interp_fill` to the construction of the
-                InterpolatorIsotherm object. Then, InterpolatorIsotherm will
-                assume that the uptake beyond pressure %f is equal to
+            Option 2: pass a `interp_fill` to the spreading pressure function of the
+                PointIsotherm object. Then, PointIsotherm will
+                assume that the uptake beyond pressure {0} is equal to
                 `interp_fill`. This is reasonable if your isotherm data exhibits
                 a plateau at the highest pressures.
             Option 3: Go back to the lab or computer to collect isotherm data
-                at higher pressures. (Extrapolation can be dangerous!)"""
-                                   % (self._data[self.pressure_key].max(),
-                                      self._data[self.pressure_key].max()))
-
-        # Get all data points that are at nonzero pressures
-        pressures = self._data[self.pressure_key].values[
-            self._data[self.pressure_key].values != 0.0]
-        loadings = self._data[self.loading_key].values[
-            self._data[self.pressure_key].values != 0.0]
+                at higher pressures. (Extrapolation can be dangerous!)
+                """.format(pressures.max())
+            )
 
         # approximate loading up to first pressure point with Henry's law
         # loading = henry_const * P
