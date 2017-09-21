@@ -262,14 +262,14 @@ def isotherm_from_xl(path, fmt=None):
         s_pressure_key = pressure_key
         if fmt == 'MADIREL':
             s_loading_key = 'adsorbed'
-            s_pressure_key = 'Pressure'
+            s_pressure_key = 'pressure'
         other_keys = []
 
         for column in experiment_data_df.columns:
-            if s_loading_key in column:
+            if s_loading_key in column.lower():
                 experiment_data_df.rename(
                     index=str, columns={column: loading_key}, inplace=True)
-            elif s_pressure_key in column:
+            elif s_pressure_key in column.lower():
                 experiment_data_df.rename(
                     index=str, columns={column: pressure_key}, inplace=True)
             else:
