@@ -11,7 +11,7 @@ from numpy import isclose
 import pygaps
 
 from .conftest import DATA
-from .conftest import HERE
+from .conftest import DATA_PATH
 
 
 class TestAlphaSPlot(object):
@@ -41,7 +41,7 @@ class TestAlphaSPlot(object):
     def test_alphas(self, file, area, micropore_volume):
         """Test calculation with several model isotherms"""
 
-        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+        filepath = os.path.join(DATA_PATH, file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
@@ -67,7 +67,7 @@ class TestAlphaSPlot(object):
 
         data = DATA['MCM-41']
 
-        filepath = os.path.join(HERE, 'data', 'isotherms_json', data['file'])
+        filepath = os.path.join(DATA_PATH, data['file'])
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
@@ -92,7 +92,7 @@ class TestAlphaSPlot(object):
 
         data = DATA['MCM-41']
 
-        filepath = os.path.join(HERE, 'data', 'isotherms_json', data['file'])
+        filepath = os.path.join(DATA_PATH, data['file'])
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(

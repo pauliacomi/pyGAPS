@@ -9,7 +9,7 @@ import pytest
 import pygaps
 
 from ..calculations.conftest import DATA
-from ..calculations.conftest import HERE
+from ..calculations.conftest import DATA_PATH
 
 
 class TestModelIsotherm(object):
@@ -22,7 +22,7 @@ class TestModelIsotherm(object):
     def test_isotherm_create(self, file):
         "Checks isotherm can be created from test data"
 
-        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+        filepath = os.path.join(DATA_PATH, file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.PointIsotherm.from_json(

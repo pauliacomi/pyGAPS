@@ -8,4 +8,4 @@ This test module has tests relating to isosteric heat calculations
 # import pygaps
 
 # from .conftest import approx
-# from .conftest import HERE
+# from .conftest import DATA_PATH

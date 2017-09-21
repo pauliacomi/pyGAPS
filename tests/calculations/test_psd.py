@@ -10,7 +10,7 @@ from matplotlib.testing.decorators import cleanup
 import pygaps
 
 from .conftest import DATA
-from .conftest import HERE
+from .conftest import DATA_PATH
 
 
 class TestPSD(object):
@@ -49,7 +49,7 @@ class TestPSD(object):
     def test_psd_meso(self, file, method):
         """Test psd calculation with several model isotherms"""
 
-        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+        filepath = os.path.join(DATA_PATH, file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
@@ -95,7 +95,7 @@ class TestPSD(object):
     def test_psd_micro(self, file, method):
         """Test psd calculation with several model isotherms"""
 
-        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+        filepath = os.path.join(DATA_PATH, file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
@@ -126,7 +126,7 @@ class TestPSD(object):
     def test_psd_dft(self, file):
         """Test psd calculation with several model isotherms"""
 
-        filepath = os.path.join(HERE, 'data', 'isotherms_json', file)
+        filepath = os.path.join(DATA_PATH, file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
