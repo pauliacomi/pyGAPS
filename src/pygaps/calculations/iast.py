@@ -6,8 +6,8 @@ pure-component adsorption isotherm model.
 import numpy
 import scipy.optimize
 
-from ..graphing.iastgraphs import plot_iast_vle
 from ..graphing.iastgraphs import plot_iast_svp
+from ..graphing.iastgraphs import plot_iast_vle
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 

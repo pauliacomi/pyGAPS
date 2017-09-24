@@ -1,15 +1,16 @@
 """
 This test module has tests relating to IAST calculations
 """
+import os
+
+import numpy
+import pytest
+
+import pygaps
+from pygaps.utilities.exceptions import ParameterError
+
 from .conftest import DATA_IAST
 from .conftest import DATA_PATH
-
-import os
-import pytest
-import pygaps
-import numpy
-
-from pygaps.utilities.exceptions import ParameterError
 
 
 @pytest.fixture()

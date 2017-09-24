@@ -5,9 +5,9 @@ from .calculations.alphas import alpha_s
 from .calculations.alphas import alpha_s_raw
 from .calculations.bet import area_BET
 from .calculations.bet import area_BET_raw
-from .calculations.iast import iast_binary_vle
-from .calculations.iast import iast_binary_svp
 from .calculations.iast import iast
+from .calculations.iast import iast_binary_svp
+from .calculations.iast import iast_binary_vle
 from .calculations.iast import reverse_iast
 from .calculations.initial_henry import calc_initial_henry
 from .calculations.initial_henry import calc_initial_henry_virial

@@ -2,9 +2,8 @@
 Tests for the isotherm graphs
 """
 
-from matplotlib.testing.decorators import cleanup
-
 import pytest
+from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
