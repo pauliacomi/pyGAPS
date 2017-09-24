@@ -602,6 +602,46 @@ class PointIsotherm(Isotherm):
 ##########################################################
 #   Functions that interpolate values of the isotherm data
 
+    def generate_interpolator(self,
+                              branch='ads',
+                              interpolation_type='linear',
+                              interp_fill=None,
+                              loading_unit=None,
+                              pressure_unit=None,
+                              pressure_mode=None,
+                              adsorbent_basis=None):
+        """
+        Generates the isotherm interpolator
+        """
+
+        if self.interp_fun is None or \
+                self.interp_branch != branch or  \
+                self.interp_mode != pressure_mode or  \
+                self.interp_basis != adsorbent_basis or  \
+                self.interp_kind != interpolation_type or \
+                self.interp_fill != interp_fill:
+
+            self.interp_branch = branch
+            self.interp_mode = pressure_mode
+            self.interp_basis = adsorbent_basis
+            self.interp_kind = interpolation_type
+            self.interp_fill = interp_fill
+
+            # Generate the interpolator object
+            if self.interp_fill is None:
+                self.interp_fun = interp1d(self.pressure(branch=branch, mode=pressure_mode),
+                                           self.loading(
+                    branch=branch, basis=adsorbent_basis),
+                    kind=interpolation_type)
+            else:
+                self.interp_fun = interp1d(self.pressure(branch=branch, mode=pressure_mode),
+                                           self.loading(
+                    branch=branch, basis=adsorbent_basis),
+                    fill_value=self.interp_fill, bounds_error=False,
+                    kind=interpolation_type)
+
+        return
+
     def loading_at(self, pressure,
                    branch='ads',
                    interpolation_type='linear',
@@ -616,7 +656,7 @@ class PointIsotherm(Isotherm):
         Parameters
         ----------
         pressure : float or array
-            pressure at which to compute loading
+            Pressure at which to compute loading.
         branch : {'ads','des'}
             The branch the interpolation takes into account.
         interpolation_type : str
@@ -641,34 +681,18 @@ class PointIsotherm(Isotherm):
         Returns
         -------
         float or array
-            predicted loading at pressure P
+            Predicted loading at pressure P.
         """
         # Check to see if interpolator is already generated
-        if self.interp_fun is None or \
-                self.interp_branch != branch or  \
-                self.interp_mode != pressure_mode or  \
-                self.interp_basis != adsorbent_basis or  \
-                self.interp_kind != interpolation_type or \
-                self.interp_fill != interp_fill:
-
-            self.interp_branch = branch
-            self.interp_mode = pressure_mode
-            self.interp_basis = adsorbent_basis
-            self.interp_kind = interpolation_type
-            self.interp_fill = interp_fill
-
-            # Generate the interpolator object
-            if self.interp_fill is None:
-                self.interp_fun = interp1d(self.pressure(branch=branch, mode=pressure_mode),
-                                           self.loading(
-                                               branch=branch, basis=adsorbent_basis),
-                                           kind=interpolation_type)
-            else:
-                self.interp_fun = interp1d(self.pressure(branch=branch, mode=pressure_mode),
-                                           self.loading(
-                                               branch=branch, basis=adsorbent_basis),
-                                           fill_value=self.interp_fill, bounds_error=False,
-                                           kind=interpolation_type)
+        self.generate_interpolator(
+            branch=branch,
+            interpolation_type=interpolation_type,
+            interp_fill=interp_fill,
+            loading_unit=loading_unit,
+            pressure_unit=pressure_unit,
+            pressure_mode=pressure_mode,
+            adsorbent_basis=adsorbent_basis
+        )
 
         # Now interpolate and return the value
         if pressure_unit is None or pressure_unit == self.unit_pressure:
@@ -705,7 +729,13 @@ class PointIsotherm(Isotherm):
         # TODO implement
         raise NotImplementedError
 
-    def spreading_pressure_at(self, pressure, unit=None, branch='ads', interp_fill=None):
+    def spreading_pressure_at(self, pressure,
+                              pressure_unit=None,
+                              pressure_mode=None,
+                              loading_unit=None,
+                              adsorbent_basis=None,
+                              branch='ads',
+                              interp_fill=None):
         """
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.
         (see Tarafder eqn 4)
@@ -733,12 +763,16 @@ class PointIsotherm(Isotherm):
         float
             spreading pressure, :math:`\\Pi`
         """
-        # Get all data points that are at nonzero pressures
-        pressures = self.pressure()  # branch / unit??
-        loadings = self.loading()
+        # Get all data points
+        pressures = self.pressure(branch=branch,
+                                  unit=pressure_unit,
+                                  mode=pressure_mode)
+        loadings = self.loading(branch=branch,
+                                unit=loading_unit,
+                                basis=adsorbent_basis)
 
         # throw exception if interpolating outside the range.
-        if (interp_fill is None) & (pressure > pressures.max()):
+        if (self.interp_fill is None) & (pressure > pressures.max()):
             raise CalculationError(
                 """
             To compute the spreading pressure at this bulk

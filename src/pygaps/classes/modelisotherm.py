@@ -11,7 +11,11 @@ import scipy.optimize
 
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.unit_converter import convert_loading
+from ..utilities.unit_converter import convert_pressure
+from .adsorbate import Adsorbate
 from .isotherm import Isotherm
+from .sample import Sample
 
 # ! list of models implemented
 # ! with parameters involved in each model
@@ -317,27 +321,27 @@ class ModelIsotherm(Isotherm):
         Parameters
         ----------
         isotherm_data : DataFrame
-            pure-component adsorption isotherm data
+            Pure-component adsorption isotherm data.
         loading_key : str
-            column of the pandas DataFrame where the loading is stored
+            Column of the pandas DataFrame where the loading is stored.
         pressure_key : str
-            column of the pandas DataFrame where the pressure is stored
+            Column of the pandas DataFrame where the pressure is stored.
         optimization_method : str
-            method in SciPy minimization function to use in fitting model to data.
+            Method in SciPy minimization function to use in fitting model to data.
         verbose : bool, optional
             Prints out extra information about steps taken.
-        basis_adsorbent : str, optional
-            whether the adsorption is read in terms of either 'per volume'
-            or 'per mass'
-        mode_pressure : str, optional
-            the pressure mode, either absolute pressures or relative in
-            the form of p/p0
+        basis_adsorbent : {'relative', 'optional'}
+            Whether the adsorption is read in terms of either 'per volume'
+            or 'per mass'.
+        mode_pressure : {'relative', 'optional'}
+            The pressure mode, either absolute pressures or relative in
+            the form of p/p0.
         unit_loading : str, optional
-            unit of loading
+            Unit of loading.
         unit_pressure : str, optional
-            unit of pressure
+            Unit of pressure.
         isotherm_parameters:
-            dictionary with the paramters
+            Dictionary with the paramters.
         """
         attempts = []
         for model in _MODELS:
@@ -435,64 +439,101 @@ class ModelIsotherm(Isotherm):
 ##########################################################
 #   Methods
 
-    def loading_at(self, pressure):
+    def loading_at(self, pressure,
+                   pressure_unit=None,
+                   pressure_mode=None,
+                   loading_unit=None,
+                   adsorbent_basis=None):
         """
         Given stored model parameters, compute loading at pressure P.
 
         Parameters
         ----------
-        pressure : float/array
-            pressure (in corresponding units as data in instantiation)
+        pressure : float or array
+            Pressure at which to compute loading.
+        loading_unit : str
+            Unit the loading is returned in. If None, it defaults to
+            internal model units.
+        pressure_unit : str
+            Unit the pressure is specified in. If None, it defaults to
+            internal model units.
+        adsorbent_basis : str
+            The basis the loading should be returned in. If None, it defaults to
+            internal model basis.
+        pressure_mode : str
+            The mode the pressure is passed in. If None, it defaults to
+            internal model mode.
 
         Returns
         -------
-        float/array
-            predicted loading at pressure P (in corresponding units as data
-            in instantiation) using fitted model params in `self.params`
+        float or array
+            predicted loading at pressure P using fitted model
+            parameters
         """
+        # Ensure pressure is in correct units and mode for the internal model
+        if pressure_unit is not None or pressure_unit != self.unit_pressure:
+            pressure = convert_pressure(
+                pressure, pressure_unit, self.unit_pressure)
+        if pressure_mode is not None or pressure_mode != self.mode_pressure:
+            pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
+                pressure_mode, pressure, self.t_exp, pressure_unit)
+
+        # Calculate loading using internal model
         if self.model == "Langmuir":
-            return self.params["M"] * self.params["K"] * pressure / \
+            loading = self.params["M"] * self.params["K"] * pressure / \
                 (1.0 + self.params["K"] * pressure)
 
-        if self.model == "Quadratic":
-            return self.params["M"] * (self.params["Ka"] +
-                                       2.0 * self.params["Kb"] * pressure) * pressure / (
+        elif self.model == "Quadratic":
+            loading = self.params["M"] * (self.params["Ka"] +
+                                          2.0 * self.params["Kb"] * pressure) * pressure / (
                 1.0 + self.params["Ka"] * pressure +
                 self.params["Kb"] * pressure ** 2)
 
         if self.model == "BET":
-            return self.params["M"] * self.params["Ka"] * pressure / (
+            loading = self.params["M"] * self.params["Ka"] * pressure / (
                 (1.0 - self.params["Kb"] * pressure) *
                 (1.0 - self.params["Kb"] * pressure +
                  self.params["Ka"] * pressure))
 
-        if self.model == "DSLangmuir":
+        elif self.model == "DSLangmuir":
             # K_i P
             k1p = self.params["K1"] * pressure
             k2p = self.params["K2"] * pressure
-            return self.params["M1"] * k1p / (1.0 + k1p) + \
+            loading = self.params["M1"] * k1p / (1.0 + k1p) + \
                 self.params["M2"] * k2p / (1.0 + k2p)
 
-        if self.model == "TSLangmuir":
+        elif self.model == "TSLangmuir":
             # K_i P
             k1p = self.params["K1"] * pressure
             k2p = self.params["K2"] * pressure
             k3p = self.params["K3"] * pressure
-            return self.params["M1"] * k1p / (1.0 + k1p) + \
+            loading = self.params["M1"] * k1p / (1.0 + k1p) + \
                 self.params["M2"] * k2p / (1.0 + k2p) + \
                 self.params["M3"] * k3p / (1.0 + k3p)
 
-        if self.model == "Henry":
+        elif self.model == "Henry":
             return self.params["KH"] * pressure
 
-        if self.model == "TemkinApprox":
+        elif self.model == "TemkinApprox":
             langmuir_fractional_loading = self.params["K"] * pressure / \
                 (1.0 + self.params["K"] * pressure)
-            return self.params["M"] * (langmuir_fractional_loading +
-                                       self.params["theta"] * langmuir_fractional_loading ** 2 *
-                                       langmuir_fractional_loading)
+            loading = self.params["M"] * (langmuir_fractional_loading +
+                                          self.params["theta"] * langmuir_fractional_loading ** 2 *
+                                          langmuir_fractional_loading)
 
-    def spreading_pressure_at(self, pressure):
+        # Ensure loading is in correct units and basis for the internal model
+        if loading_unit is not None or loading_unit != self.unit_loading:
+            loading = convert_loading(
+                loading, self.unit_loading, loading_unit)
+        if adsorbent_basis is not None or adsorbent_basis != self.basis_adsorbent:
+            loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
+                adsorbent_basis, pressure, self.unit_loading)
+
+        return loading
+
+    def spreading_pressure_at(self, pressure,
+                              pressure_unit=None,
+                              pressure_mode=None):
         """
         Calculate reduced spreading pressure at a bulk gas pressure P.
 
@@ -516,6 +557,15 @@ class ModelIsotherm(Isotherm):
         float
             spreading pressure, :math:`\\Pi`
         """
+
+        # Ensure pressure is in correct units and mode for the internal model
+        if pressure_unit is not None or pressure_unit != self.unit_pressure:
+            pressure = convert_pressure(
+                pressure, pressure_unit, self.unit_pressure)
+        if pressure_mode is not None or pressure_mode != self.mode_pressure:
+            pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
+                pressure_mode, pressure, self.t_exp, pressure_unit)
+
         if self.model == "Langmuir":
             return self.params["M"] * numpy.log(1.0 + self.params["K"] * pressure)
 
@@ -593,10 +643,12 @@ def get_default_guess_params(model, data, pressure_key, loading_key):
     dict
         initial parameter guesses for particular model
     """
+
     # guess saturation loading to 10% more than highest loading
     saturation_loading = 1.1 * data[loading_key].max()
+
     # guess Langmuir K using the guess for saturation loading and lowest
-    #   pressure point (but not zero)
+    # pressure point (but not zero)
     df_nonzero = data[data[loading_key] != 0.0]
     idx_min = df_nonzero[loading_key].argmin()
     langmuir_k = df_nonzero[loading_key].loc[idx_min] / \
