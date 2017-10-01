@@ -5,10 +5,10 @@ This module contains the main class that describes an isotherm through discrete 
 
 import hashlib
 
+import matplotlib.pyplot as plt
 import numpy
 import pandas
 from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
 
 import pygaps
 
