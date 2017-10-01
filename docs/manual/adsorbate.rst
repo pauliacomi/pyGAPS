@@ -5,8 +5,8 @@ The Adsorbate class
 
 .. _adsorbate-manual-general:
 
-General concepts
-----------------
+Overview
+--------
 
 In order for many of the calculations included in pyGAPS to be performed, properties of the adsorbate used
 in the isotherm must be known. To make the process as simple and as painless as possible, the Adsorbate

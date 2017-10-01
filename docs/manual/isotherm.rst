@@ -5,8 +5,8 @@ The Isotherm classes
 
 .. _isotherms-manual-general:
 
-General concepts
-----------------
+Overview
+--------
 
 In pyGAPS, an isotherm can be represented in two ways: as a PointIsotherm object or as a
 ModelIsotherm object. These two classes have many common methods and attributes, but they
@@ -216,7 +216,7 @@ For adsorbent basis conversions, the density of the adsorbent should be known. T
 is very similar to property retrieval from the adsorbates. A list of Samples is kept by pyGAPS,
 loaded at import-time from the database. The user must create a Sample instance, populate it with the density
 parameter and then upload it either to the internal list or the internal database. For more info on this
-go to ........
+see the :ref:`Sample class <sample-manual>`
 
 .. _isotherms-manual-export:
 

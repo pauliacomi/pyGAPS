@@ -5,8 +5,8 @@ The Sample class
 
 .. _sample-manual-general:
 
-General concepts
-----------------
+Overview
+--------
 
 For simplicity, the isotherm class only contains the name and batch of the sample it is measured on.
 However, the user might want to store a list of samples in the database, as well as to add other information

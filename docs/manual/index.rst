@@ -12,5 +12,5 @@ Manual
     modelling
     graphing
     sqlitedb
-    eqstate
     units
+    eqstate

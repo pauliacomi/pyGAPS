@@ -3,6 +3,11 @@
 Data import and export
 ======================
 
+.. _parsing-manual-general:
+
+Overview
+--------
+
 Besides the raw method of creating an isotherm which is explained in detail in
 :ref:`this section <isotherms-manual-create>` of the manual, there are other options on how to import or
 export isotherms.

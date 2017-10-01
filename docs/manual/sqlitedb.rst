@@ -5,8 +5,8 @@ Sqlite database
 
 .. _sqlite-manual-general:
 
-General concepts
-----------------
+Overview
+--------
 
 The frameork provides capabilities to interact with an sqlite database, in order to store objects such as
 isotherms, samples, adsorbates, users and so on.
@@ -59,13 +59,13 @@ is measured on the novel adsorbent *Carbon X1*, with nitrogen at 77 K.
 
       ::
 
-        pygaps.db_upload_sample(my_adsorbent)
+        pygaps.db_upload_sample(pygaps.DATABASE, my_adsorbent)
 
     - Finally, the isotherm can be uploaded as well.
 
       ::
 
-        pygaps.db_upload_isotherm(my_isotherm)
+        pygaps.db_upload_isotherm(pygaps.DATABASE, my_isotherm)
 
 
 .. _sqlite-manual-creation:
