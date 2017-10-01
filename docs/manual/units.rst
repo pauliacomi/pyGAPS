@@ -48,8 +48,8 @@ between the different unit types. The user can use the functions as well by impo
 
 ::
 
-    >>> from pygaps.utilities.unit_converter import convert_pressure
-    >>> convert_pressure(1, 'bar', 'Pa')
+    from pygaps.utilities.unit_converter import convert_pressure
+    convert_pressure(1, 'bar', 'Pa')
     100000
 
 

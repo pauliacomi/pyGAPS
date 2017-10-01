@@ -71,7 +71,7 @@ For example, for the Adsorbate created above, to get the vapour pressure at 25 d
 
 ::
 
-    >>> my_adsorbate.saturation_pressure(298, unit='bar')
+    my_adsorbate.saturation_pressure(298, unit='bar')
     2.8
 
 .. caution::
@@ -85,7 +85,7 @@ properties dictionary. Here the value is static and the temperature and unit mus
 
 ::
 
-    >>> my_adsorbate.saturation_pressure(298, calculate=False)
+    my_adsorbate.saturation_pressure(298, calculate=False)
     33
 
 
