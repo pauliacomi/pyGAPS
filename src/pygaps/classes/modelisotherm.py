@@ -471,10 +471,10 @@ class ModelIsotherm(Isotherm):
             parameters
         """
         # Ensure pressure is in correct units and mode for the internal model
-        if pressure_unit is not None or pressure_unit != self.unit_pressure:
+        if pressure_unit is not None and pressure_unit != self.unit_pressure:
             pressure = convert_pressure(
                 pressure, pressure_unit, self.unit_pressure)
-        if pressure_mode is not None or pressure_mode != self.mode_pressure:
+        if pressure_mode is not None and pressure_mode != self.mode_pressure:
             pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
                 pressure_mode, pressure, self.t_exp, pressure_unit)
 
@@ -522,10 +522,10 @@ class ModelIsotherm(Isotherm):
                                           langmuir_fractional_loading)
 
         # Ensure loading is in correct units and basis for the internal model
-        if loading_unit is not None or loading_unit != self.unit_loading:
+        if loading_unit is not None and loading_unit != self.unit_loading:
             loading = convert_loading(
                 loading, self.unit_loading, loading_unit)
-        if adsorbent_basis is not None or adsorbent_basis != self.basis_adsorbent:
+        if adsorbent_basis is not None and adsorbent_basis != self.basis_adsorbent:
             loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
                 adsorbent_basis, pressure, self.unit_loading)
 
@@ -559,10 +559,10 @@ class ModelIsotherm(Isotherm):
         """
 
         # Ensure pressure is in correct units and mode for the internal model
-        if pressure_unit is not None or pressure_unit != self.unit_pressure:
+        if pressure_unit is not None and pressure_unit != self.unit_pressure:
             pressure = convert_pressure(
                 pressure, pressure_unit, self.unit_pressure)
-        if pressure_mode is not None or pressure_mode != self.mode_pressure:
+        if pressure_mode is not None and pressure_mode != self.mode_pressure:
             pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
                 pressure_mode, pressure, self.t_exp, pressure_unit)
 

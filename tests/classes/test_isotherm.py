@@ -66,7 +66,7 @@ class TestIsotherm(object):
 
         assert isotherm_parameters == basic_isotherm.to_dict()
 
-    def test_isotherm_print_parameters(self, basic_isotherm):
+    def test_isotherm_print_parameters(self, basic_isotherm, noplot):
         "Checks isotherm can print its own info"
 
         print(basic_isotherm)
