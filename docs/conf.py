@@ -23,7 +23,7 @@ if os.getenv('SPELLCHECK'):
     spelling_lang = 'en_US'
 
 source_suffix = '.rst'
-master_doc = 'readme'
+master_doc = 'index'
 project = 'pygaps'
 year = '2017'
 author = 'Paul Iacomi'

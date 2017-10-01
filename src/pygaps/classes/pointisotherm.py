@@ -472,6 +472,7 @@ class PointIsotherm(Isotherm):
                 min_range = min(ret)
             if max_range is None:
                 max_range = max(ret)
+
             ret = ret.loc[lambda x: x >=
                           min_range].loc[lambda x: x <= max_range]
 
@@ -606,8 +607,6 @@ class PointIsotherm(Isotherm):
                               branch='ads',
                               interpolation_type='linear',
                               interp_fill=None,
-                              loading_unit=None,
-                              pressure_unit=None,
                               pressure_mode=None,
                               adsorbent_basis=None):
         """
@@ -688,8 +687,6 @@ class PointIsotherm(Isotherm):
             branch=branch,
             interpolation_type=interpolation_type,
             interp_fill=interp_fill,
-            loading_unit=loading_unit,
-            pressure_unit=pressure_unit,
             pressure_mode=pressure_mode,
             adsorbent_basis=adsorbent_basis
         )

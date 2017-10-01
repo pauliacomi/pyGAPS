@@ -1,18 +1,34 @@
+.. _parsing-ref:
+
 Parsing and interfaces
 ======================
 
-json
+.. _parsing-ref-json:
+
+JSON
 ----
 .. automodule:: pygaps.parsing.jsoninterface
     :members:
 
-excel
+.. _parsing-ref-excel:
+
+Excel
 -----
 .. automodule:: pygaps.parsing.excelinterface
     :members:
 
-sqlite
+
+.. _parsing-ref-sqlite:
+
+Sqlite
 ------
 .. automodule:: pygaps.parsing.sqliteinterface
     :members:
 
+
+.. _parsing-ref-csv:
+
+CSV
+---
+.. automodule:: pygaps.parsing.csvinterface
+    :members:

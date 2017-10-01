@@ -1,11 +1,4 @@
-Getting data
-============
-
-Data processing
-===============
-
-Modelling
-=========
+.. _plotting-manual:
 
 Plotting
 ========

@@ -5,7 +5,9 @@ Quickstart
 Creating an isotherm
 --------------------
 
-First, to use pyGAPS in a python or jupyther project, import it::
+First, to use pyGAPS in a python or jupyther project, import it.
+
+::
 
     import pygaps
 
@@ -25,7 +27,9 @@ a dictionary with the parameters and a DataFrame with the data.
 
 The isotherm parameters dictionary has to have at least four specific components: the sample
 name, the sample batch, the adsorbent used and the temperature (in K) at which the data was
-recorded::
+recorded.
+
+::
 
     isotherm_parameters = {
         'sample_name' : 'carbon',
@@ -37,14 +41,18 @@ recorded::
 The pandas DataFrame which contains the data should have at least two columns: the pressures
 at which each point was recorded, and the loadings for each point. Other data columns, such
 as calorimetry data, magnetic field strengths, or other simultaneous measurements are also
-supported.::
+supported.
+
+::
 
     isotherm_data = pandas.DataFrame({
         'pressure' : [1, 2, 3, 4, 5, 3, 2]
         'loading' : [1, 2, 3, 4, 5, 3, 2]
     })
 
-With these two components, the isotherm can be created::
+With these two components, the isotherm can be created:
+
+::
 
     isotherm = pygaps.PointIsotherm(
         isotherm_data,
@@ -57,7 +65,9 @@ The `loading_key` and `pressure_key` parameters specify which column in the Data
 contain which data of the isotherm. By default, the loading is read in *mmmol/g* and the
 pressure is read in *bar*, although these settings can be changed.
 
-To see a summary of the isotherm as well as a graph, use the included function::
+To see a summary of the isotherm as well as a graph, use the included function:
+
+::
 
     isotherm.print_info()
 
@@ -79,12 +89,16 @@ porous materials such as:
     - isosteric heat of adsorption calculation
 
 From a PointIsotherm object, it's easy to start a characterisation. For example, to get
-a dictionary with all the parameters of the BET surface area analysis, use::
+a dictionary with all the parameters of the BET surface area analysis, use:
+
+::
 
     result_dict = pygaps.area_BET(isotherm)
 
 If in an interactive environment, such as iPython or jupyther, it is useful to see the
-details of the calculation directly. To do this, increase the verbosity of the method::
+details of the calculation directly. To do this, increase the verbosity of the method:
+
+::
 
     result_dict = pygaps.t_plot(isotherm, verbose=True)
 
@@ -92,14 +106,17 @@ Depending on the method, different parameters can be passed to change the way th
 calculations are performed. For example, if a mesoporous size distribution is
 desired using the Dollimore-Heal method on the adsorption branch of the isotherm,
 assuming the pores are cylindrical, one side open and that adsorbate thickness can
-be described by a Halsey-type thickness curve, the code will look like::
+be described by a Halsey-type thickness curve, the code will look like:
+
+::
 
     result_dict = pygaps.mesopore_size_distribution(
         isotherm,
         psd_model='DH',
+        branch='ads',
         pore_geometry='cylindrical',
         thickness_model='Halsey',
-        verbose=True
+        verbose=True,
     )
 
 For more information on how to use each method, check the detailed manual.
@@ -139,7 +156,9 @@ data, it stores model coefficients for the model it's describing.
 
 To create a ModelIsotherm, the same parameters dictionary / pandas DataFrame procedure can
 be used. But, assuming we've already created a PointIsotherm object, we can use it to instantiate
-the ModelIsotherm instead. To do this we use the class method::
+the ModelIsotherm instead. To do this we use the class method:
+
+::
 
     model_iso = pygaps.ModelIsotherm.from_pointisotherm(isotherm, model='Langmuir')
 
@@ -151,13 +170,17 @@ bool which allows the ModelIsotherm to select the best fitting model. This means
 models available will be calculated and the best one will be returned and will of course
 take more processing power.
 
+::
+
     model_iso = pygaps.ModelIsotherm.from_pointisotherm(isotherm, guess_model=True)
 
 More advanced settings can also be specified, such as the optimisation model to be used in the
 optimisation routine or the initial parameter guess.
 
 To print the model parameters use the internal print function. The calculation of loading
-made with the model can be accessed by using the loading function::
+made with the model can be accessed by using the loading function.
+
+::
 
     # Prints isotherm parameters and model info
     model_iso.print_info()
@@ -170,9 +193,6 @@ made with the model can be accessed by using the loading function::
     model_iso.loading_at(pressure)
 
 
-Using models for IAST calculations
-----------------------------------
-
 
 Graphing
 --------
@@ -184,4 +204,4 @@ as simple as::
     pygaps.plot_iso([isotherm])
 
 Many settings can be specified to change the look and feel of the graphs. More settings
-can be found in the manual.
+can be found in the :ref:`manual <plotting-manual>`.
