@@ -373,7 +373,7 @@ class PointIsotherm(Isotherm):
 ###########################################################
 #   Info function
 
-    def print_info(self, logarithmic=False):
+    def print_info(self, logarithmic=False, show=True):
         """
         Prints a short summary of all the isotherm parameters and a graph of the isotherm
 
@@ -381,6 +381,8 @@ class PointIsotherm(Isotherm):
         ----------
         logarithmic : bool, optional
             Specifies if the graph printed is logarithmic or not
+        show : bool, optional
+            Specifies if the graph is shown automatically or not
         """
 
         print(self)
@@ -395,7 +397,8 @@ class PointIsotherm(Isotherm):
         plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
                  logarithmic=logarithmic, color=True, secondary_key=secondary_key)
 
-        plt.show()
+        if show:
+            plt.show()
 
         return
 
