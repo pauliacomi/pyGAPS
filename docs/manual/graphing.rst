@@ -11,8 +11,8 @@ Overview
 While the user can of course take the isotherm data and generate their own customised plots, pyGAPS
 includes a few plotting functions which make it easier for standard plots to be generated.
 
-The main plotting tool is in the ``plot_iso`` function which handles the plotting of isotherms. Some
-common use-case scenarios for the functionality are:
+The main plotting tool is in the :meth:`~pygaps.graphing.isothermgraphs.plot_iso` function which handles
+the plotting of isotherms. Some common use-case scenarios for the functionality are:
 
     - Visualising the data after isotherm instantiation.
     - Quickly comparing several isotherms.
@@ -23,7 +23,7 @@ The function can take many parameters which will modify the graph style, colours
 also accepts keywords to specify the unit, pressure mode and basis of the graphs. A complete list
 of parameters can be found in the :ref:`reference <isotherm-plot-ref>`.
 
-The function also returns the `matplotlib` figure and ax, to allow for further customisation for the
+The function also returns the ``matplotlib`` figure and ax, to allow for further customisation for the
 resulting plot.
 
 
@@ -32,7 +32,7 @@ resulting plot.
 Examples
 --------
 
-Examples
+Some examples of different graphs are shown below
 
     - A logarithmic isotherm graph comparing the adsorption branch of two isotherms up to 1 bar.
 

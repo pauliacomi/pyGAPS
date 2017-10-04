@@ -12,11 +12,11 @@ In order for many of the calculations included in pyGAPS to be performed, proper
 in the isotherm must be known. To make the process as simple and as painless as possible, the Adsorbate
 class is used.
 
-Each isotherm must contain a required property (string) called adsorbate. The adsorbate class also
-contains a property called name. If the two are identical, this connects the isotherm object and the
+Each isotherm must contain a required property (string) called ``adsorbate``. The adsorbate class also
+contains a property called ``name``. If the two are identical, this connects the isotherm object and the
 particular adsorbate class associated to it.
 
-Each time an adsorbate property is needed, pyGAPS looks in the main adsorbate list (pygaps.ADSORBATE_LIST)
+Each time an adsorbate property is needed, pyGAPS looks in the main adsorbate list (``pygaps.ADSORBATE_LIST``)
 for an object which corresponds to the isotherm adsorbate property.
 This list is populated as import-time with the adsorbates stored in the internal database. The user can also
 add their own adsorbate to the list, or upload it to the database for permanent storage.
@@ -30,8 +30,8 @@ Creating an Adsorbate
 
 The creation process of an adsorbate is similar to that of other pyGAPS classes, done by passing a
 dictionary of parameters. Some parameters are strictly required for instantiation, while others are
-recognised and can then be accessed by names. All other parameters passed are saved as well, in an
-internal dictionary called `properties`.
+recognised and can then be accessed by names. All other parameters passed are saved as well in an
+internal dictionary called ``properties``.
 
 An example of how to create an adsorbate:
 
@@ -59,7 +59,7 @@ Adsorbate class methods
 -----------------------
 
 The Adsorbate class has methods which allow the properties of the adsorbate to be either calculated
-using the CoolProp or REFPROP backend or retreived as a string from the internal dictionary.
+using the CoolProp or REFPROP backend or retrieved as a string from the internal dictionary.
 The properties which can be calculated are:
 
     - Molar Mass
@@ -80,7 +80,7 @@ For example, for the Adsorbate created above, to get the vapour pressure at 25 d
     Be aware of the limitations of CoolProp and REFPROP.
 
 
-The calculate boolean can also be set to ``False``, to return the value that is present in the
+The ``calculate`` boolean can also be set to ``False``, to return the value that is present in the
 properties dictionary. Here the value is static and the temperature and unit must be known by the user.
 
 ::
@@ -89,7 +89,7 @@ properties dictionary. Here the value is static and the temperature and unit mus
     33
 
 
-For all the adsorbate methods, see the reference
+For all the adsorbate methods, see the :ref:`reference<adsorbate-ref>`
 
 .. _adsorbate-manual-manage:
 
@@ -107,5 +107,5 @@ adsorbate class method with the name as the parameter:
     my_adsorbate = pygaps.Adsorbate.from_list('butane')
 
 The user can also generate their own adsorbates, or modify the ones that are in memory. To store a custom
-adsorbate for later use, the user can upload it to the database. For more info, check out the sqlite
-section of the manual.
+adsorbate for later use, the user can upload it to the database. For more info, check out the
+:ref:`sqlite <sqlite-manual>` section of the manual.

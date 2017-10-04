@@ -8,18 +8,18 @@ Units in pyGAPS
 Overview
 --------
 
-When computers work with physical data, units are always a variable that inrtoduces confusion to the
+When computers work with physical data, units are always a variable that introduces confusion to the
 human users. This page attempts to explain how pyGAPS handles units and other such real world concepts
 such as relative pressure and mass or volume basis.
 
 Units can be specified for the following properties:
 
     - Isotherm pressure: *bar*, *Pa*, *atm*, *mmHg*
-    - Isotherm loadingL: *mol*, *mmol*, *ml*, *cm3 STP*
+    - Isotherm loading: *mol*, *mmol*, *ml*, *cm3 STP*
     - Adsorbent mass, if working on a mass basis: *g*, *kg*
     - Adsorbent volume, if working on a volume basis: *cm3*, *ml*, *dm3*, *l*, *m3*
 
-Two special physical concepts are handled by pyGAPS: relative pressure and adsorbent basis.
+Two special physical concepts are handled by pyGAPS, relative pressure and adsorbent basis.
 
     - In adsorption terms, relative pressure is a dimensionless value which is obtained by
       dividing the absolute pressure by the critical pressure / vapour pressure of the
@@ -33,7 +33,7 @@ Two special physical concepts are handled by pyGAPS: relative pressure and adsor
       basis, while volume basis is more important in industry where adsorbent bed design
       sizing is required. In order to convert between the two basis, the density of the
       sample is needed. Therefore, adsorbent basis conversions are bundled with the
-      :ref:`Sample class <sample-ref>`
+      :ref:`Sample class <sample-ref>`.
 
 
 
@@ -44,12 +44,13 @@ Low-level unit convert
 
 The way units are converted under the hood is through the use of dictionaries to store conversion factors
 between the different unit types. The user can use the functions as well by importing the
-``pygaps.utilities.unit_converter`` module.
+:meth:`pygaps.utilities.unit_converter` module.
 
 ::
 
     from pygaps.utilities.unit_converter import convert_pressure
     convert_pressure(1, 'bar', 'Pa')
+
     100000
 
 
@@ -67,7 +68,7 @@ data in a different unit than specified at instantiation, most methods can accep
 
 The isotherm internal data can also be permanently converted into another unit, pressure mode or basis.
 This is not normally required, but can be done if the isotherm is to be exported in different units.
-To do this, use the provided methods such as :py:meth:`~pygaps.classes.PointIsotherm.convert_unit_loading()`.
+To do this, use the provided methods such as :meth:`~pygaps.classes.PointIsotherm.convert_unit_loading`.
 
 
 .. _units-manual-impact:
@@ -80,7 +81,7 @@ convert it beforehand. Therefore, if for example the BET area function is called
 automatically in order to return the surface area in square metres.
 
 The basis of the adsorbent is unchanged however. Therefore, if the isotherm was in a volume basis with units
-of *cm3* before the calculation above, the returned surface area will be in **square meters per cubic centimeter
+of *cm3* before the calculation above, the returned surface area will be in **square meters per cubic centimetre
 of adsorbent**.
 
 

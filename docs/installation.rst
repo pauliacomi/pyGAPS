@@ -7,8 +7,8 @@ you need to do is at the command line::
 
     pip install pygaps
 
-If on windows, we reccomend using the `Anaconda/Conda <https://www.anaconda.com/>`__ environment,
-as it preinstalls most required dependencies as well as making managing environemts a breeze.
+If on windows, we recommend using the `Anaconda/Conda <https://www.anaconda.com/>`__ environment,
+as it preinstalls most required dependencies as well as making managing environments a breeze.
 
 Dependencies
 ============

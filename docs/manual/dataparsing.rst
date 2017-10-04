@@ -15,7 +15,7 @@ export isotherms.
     - A json string or file.
     - Parsing an excel file of a standard format.
     - Parsing a csv file of a standard format.
-    - From an sqlite database: pyGAPS contains functionality to store and retreive constructed
+    - From an sqlite database: pyGAPS contains functionality to store and retrieve constructed
       isotherms in a sqlite database.
 
 .. _parsing-manual-sqlite:
@@ -25,7 +25,7 @@ Sqlite parsing
 
 Since pyGAPS includes an internal sqlite database, isotherms which are imported can be saved for later use, as
 well as samples, adsorbates, contacts etc.
-The sqlite functionality is an integeral part of the framework, and it has its own
+The sqlite functionality is an integral part of the framework, and it has its own
 :ref:`section <sqlite-manual>`.
 
 
@@ -36,7 +36,7 @@ JSON parsing
 
 Importing and exporting isotherms in a JSON format is a great alternative to a CSV or XML file and is the
 recommended pyGAPS way of sharing isotherms. The JSON format has several advantages of the others, such as
-it being a standard for REST APIs, ease of reading and near-universal parsing capabilities, not to mention
+being a standard for REST APIs, ease of reading and near-universal parsing capabilities, not to mention
 the ease of extensibility afforded by the structure.
 
 .. caution::

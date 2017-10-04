@@ -15,10 +15,13 @@ The framework currently provides the following functionality:
     - BET surface area :meth:`pygaps.calculations.bet`
     - The t-plot method :meth:`pygaps.calculations.tplot`
     - The :math:`\\alpha_s` method :meth:`pygaps.calculations.alphas`
-    - PSD (pore size distribution) calculations :meth:`pygaps.calculations.psd`
-        - Mesoporous PSD calculations :meth:`pygaps.calculations.psd_mesoporous`
-        - Microporous PSD calculations :meth:`pygaps.calculations.psd_microporous`
-        - DFT kernel fitting PSD methods :meth:`pygaps.calculations.psd_dft`
+    - PSD (pore size distribution) calculations
+        - Mesoporous PSD calculations :meth:`pygaps.calculations.psd.mesopore_size_distribution`
+          and :meth:`pygaps.calculations.psd_mesoporous`
+        - Microporous PSD calculations :meth:`pygaps.calculations.psd.micropore_size_distribution`
+          and :meth:`pygaps.calculations.psd_microporous`
+        - DFT kernel fitting PSD methods :meth:`pygaps.calculations.psd.dft_size_distribution`
+          and :meth:`pygaps.calculations.psd_dft`
     - Isosteric heat of adsorption calculation :meth:`pygaps.calculations.isosteric_heat`
 
 
