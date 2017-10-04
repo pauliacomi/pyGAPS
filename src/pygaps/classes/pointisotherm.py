@@ -212,6 +212,53 @@ class PointIsotherm(Isotherm):
                                          unit_loading=unit_loading,
                                          unit_pressure=unit_pressure)
 
+    @classmethod
+    def from_modelisotherm(cls, modelisotherm,
+                           pressure_points=None):
+        """
+        Constructs a PointIsotherm from a ModelIsothem class.
+        This class method allows for the model to be converted into
+        a list of points calculated by using the model in the isotherm.
+
+        Parameters
+        ----------
+        modelisotherm : ModelIsotherm
+            The isotherm containing the model.
+        pressure_points : None or List or PointIsotherm
+            How the pressure points should be chosen for the resulting PointIsotherm.
+
+                - If None, the PointIsotherm returned has a fixed number of
+                  equidistant points
+                - If an array, the PointIsotherm returned has points at each of the
+                  values of the array
+                - If a PointIsotherm is passed, the values will be calculated at each
+                  of the pressure points in the passed isotherm. This is useful for
+                  comparing a model overlap with the real isotherm.
+        """
+
+        if not pressure_points:
+            pressure = modelisotherm.pressure()
+        elif isinstance(pressure_points, PointIsotherm):
+            pressure = pressure_points.pressure(branch=modelisotherm.branch)
+        else:
+            pressure = pressure_points
+
+        iso_data = pandas.DataFrame(
+            {
+                modelisotherm.pressure_key: pressure,
+                modelisotherm.loading_key: modelisotherm.loading_at(pressure)
+            }
+        )
+
+        return PointIsotherm(iso_data,
+                             loading_key=modelisotherm.loading_key,
+                             pressure_key=modelisotherm.pressure_key,
+                             basis_adsorbent=modelisotherm.basis_adsorbent,
+                             mode_pressure=modelisotherm.mode_pressure,
+                             unit_loading=modelisotherm.unit_loading,
+                             unit_pressure=modelisotherm.unit_pressure,
+                             **modelisotherm.to_dict())
+
 ##########################################################
 #   Overloaded and private functions
 
@@ -387,9 +434,9 @@ class PointIsotherm(Isotherm):
 
         print(self)
 
-        if 'enthalpy' in self.other_keys:
+        if self.other_keys:
             plot_type = 'combo'
-            secondary_key = 'enthalpy'
+            secondary_key = self.other_keys[0]
         else:
             plot_type = 'isotherm'
             secondary_key = None
