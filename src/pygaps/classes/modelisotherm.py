@@ -6,9 +6,12 @@ isotherms from experimental or simulated data.
 
 import copy
 
+import matplotlib.pyplot as plt
 import numpy
+import pandas
 import scipy.optimize
 
+from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import convert_loading
@@ -57,6 +60,10 @@ class ModelIsotherm(Isotherm):
         method in SciPy minimization function to use in fitting model to data.
         See `here
         <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+    branch : ['ads', 'des'], optional
+        The branch on which the model isotherm is based on. It is assumed to be the
+        adsorption branch, as it is the most commonly modelled part, although may
+        set to desorption as well.
     verbose : bool
         Prints out extra information about steps taken.
     basis_adsorbent : str, optional
@@ -147,11 +154,12 @@ class ModelIsotherm(Isotherm):
                  model=None,
                  param_guess=None,
                  optimization_method="Nelder-Mead",
+                 branch='ads',
                  verbose=False,
-                 basis_adsorbent="mass",
-                 mode_pressure="absolute",
-                 unit_loading="mmol",
-                 unit_pressure="bar",
+                 basis_adsorbent='mass',
+                 mode_pressure='absolute',
+                 unit_loading='mmol',
+                 unit_pressure='bar',
                  **isotherm_parameters):
         """
         Instantiation is done by passing the data to be fitted, model to be
@@ -176,6 +184,20 @@ class ModelIsotherm(Isotherm):
                           unit_loading,
                           unit_pressure,
                           **isotherm_parameters)
+
+        # Save column names
+        #: Name of column in the dataframe that contains adsorbed amount
+        self.loading_key = loading_key
+
+        #: Name of column in the dataframe that contains pressure
+        self.pressure_key = pressure_key
+
+        #: The pressure range on which the model was built
+        self.pressure_range = [min(data[pressure_key]),
+                               max(data[pressure_key])]
+
+        #: Branch the isotherm model is based on
+        self.branch = branch
 
         #: Name of analytical model to fit to pure-component isotherm data
         #: adsorption isotherm
@@ -281,6 +303,7 @@ class ModelIsotherm(Isotherm):
                                        loading_key=isotherm.loading_key,
                                        pressure_key=isotherm.pressure_key,
                                        optimization_method=optimization_method,
+                                       branch=branch,
                                        verbose=verbose,
                                        basis_adsorbent=isotherm.basis_adsorbent,
                                        mode_pressure=isotherm.mode_pressure,
@@ -288,12 +311,13 @@ class ModelIsotherm(Isotherm):
                                        unit_pressure=isotherm.unit_pressure,
                                        **isotherm.to_dict())
 
-        return cls(isotherm.data(),
+        return cls(isotherm.data(branch=branch),
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_method=optimization_method,
+                   branch=branch,
                    verbose=verbose,
                    basis_adsorbent=isotherm.basis_adsorbent,
                    mode_pressure=isotherm.mode_pressure,
@@ -306,6 +330,7 @@ class ModelIsotherm(Isotherm):
               loading_key=None,
               pressure_key=None,
               optimization_method="Nelder-Mead",
+              branch='ads',
               verbose=False,
               basis_adsorbent="mass",
               mode_pressure="absolute",
@@ -328,6 +353,10 @@ class ModelIsotherm(Isotherm):
             Column of the pandas DataFrame where the pressure is stored.
         optimization_method : str
             Method in SciPy minimization function to use in fitting model to data.
+        branch : ['ads', 'des'], optional
+            The branch on which the model isotherm is based on. It is assumed to be the
+            adsorption branch, as it is the most commonly modelled part, although may
+            set to desorption as well.
         verbose : bool, optional
             Prints out extra information about steps taken.
         basis_adsorbent : {'relative', 'optional'}
@@ -352,6 +381,7 @@ class ModelIsotherm(Isotherm):
                                          model=model,
                                          param_guess=None,
                                          optimization_method=optimization_method,
+                                         branch=branch,
                                          verbose=verbose,
                                          basis_adsorbent=basis_adsorbent,
                                          mode_pressure=mode_pressure,
@@ -439,6 +469,155 @@ class ModelIsotherm(Isotherm):
 ##########################################################
 #   Methods
 
+    def has_branch(self, branch):
+        """
+        Returns if the isotherm has an specific branch
+
+        Parameters
+        ----------
+        branch : {None, 'ads', 'des'}
+            The branch of the data to check for.
+
+        Returns
+        -------
+        bool
+            Whether the data exists or not
+        """
+
+        if self.branch == branch:
+            return True
+        else:
+            return False
+
+    def pressure(self, points=20, unit=None, branch=None, mode=None,
+                 min_range=None, max_range=None, indexed=False):
+        """
+        Returns a numpy.linspace generated array with
+        a fixed number of equidistant points within the
+        pressure range the model was created.
+
+        Parameters
+        ----------
+        points : int
+            The number of points to get.
+        unit : str, optional
+            Unit in which the pressure should be returned. If None
+            it defaults to which pressure unit the isotherm is currently in
+        branch : {None, 'ads', 'des'}
+            The branch of the pressure to return. If None, returns the branch
+            the isotherm is modelled on
+        mode : {None, 'absolute', 'relative'}
+            The mode in which to return the pressure, if possible. If None,
+            returns mode the isotherm is currently in.
+        min_range : float, optional
+            The lower limit for the pressure to select.
+        max_range : float, optional
+            The higher limit for the pressure to select.
+        indexed : bool, optional
+            If this is specified to true, then the function returns an indexed
+            pandas.Series with the columns requested instead of an array.
+
+
+        Returns
+        -------
+        numpy.array
+            Pressure points in the model pressure range.
+        """
+        if branch and branch != self.branch:
+            raise ParameterError(
+                "ModelIsotherm is not based off this isotherm branch")
+
+        # Generate pressure points
+        ret = numpy.linspace(self.pressure_range[0],
+                             self.pressure_range[1],
+                             points)
+
+        # Convert if needed
+        if mode is not None and mode != self.mode_pressure:
+            ret = Adsorbate.from_list(self.adsorbate).convert_mode(
+                mode,
+                ret,
+                self.t_exp,
+                self.unit_pressure)
+        if unit is not None and unit != self.unit_pressure:
+            ret = convert_pressure(ret, self.unit_pressure, unit)
+
+        # Select required points
+        if max_range is not None or min_range is not None:
+            if min_range is None:
+                min_range = min(ret)
+            if max_range is None:
+                max_range = max(ret)
+
+            ret = ret.loc[lambda x: x >=
+                          min_range].loc[lambda x: x <= max_range]
+
+        if indexed:
+            return pandas.Series(ret)
+        else:
+            return ret
+
+    def loading(self, points=20, unit=None, branch=None, basis=None,
+                min_range=None, max_range=None, indexed=False):
+        """
+        Returns the loading calculated at equidistant pressure
+        points within the pressure range the model was created.
+
+        Parameters
+        ----------
+        points : int
+            The number of points to get.
+        unit : str, optional
+            Unit in which the loading should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        branch : {None, 'ads', 'des'}
+            The branch of the loading to return. If None, returns entire
+            dataset
+        basis : {None, 'mass', 'volume'}
+            The basis on which to return the loading, if possible. If None,
+            returns on the basis the isotherm is currently in.
+        min_range : float, optional
+            The lower limit for the loading to select.
+        max_range : float, optional
+            The higher limit for the loading to select.
+        indexed : bool, optional
+            If this is specified to true, then the function returns an indexed
+            pandas.Series with the columns requested instead of an array.
+
+
+        Returns
+        -------
+        numpy.array
+            Loading calculated at points the model pressure range.
+        """
+        if branch and branch != self.branch:
+            raise ParameterError(
+                "ModelIsotherm is not based off this isotherm branch")
+
+        ret = self.loading_at(self.pressure(points))
+
+        # Convert if needed
+        if basis is not None and basis != self.basis_adsorbent:
+            ret = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
+                basis,
+                ret)
+        if unit is not None and unit != self.unit_loading:
+            ret = convert_loading(ret, self.unit_loading, unit)
+
+        # Select required points
+        if max_range is not None or min_range is not None:
+            if min_range is None:
+                min_range = min(ret)
+            if max_range is None:
+                max_range = max(ret)
+            ret = ret.loc[lambda x: x >=
+                          min_range].loc[lambda x: x <= max_range]
+
+        if indexed:
+            return pandas.Series(ret)
+        else:
+            return ret
+
     def loading_at(self, pressure,
                    pressure_unit=None,
                    pressure_mode=None,
@@ -477,6 +656,9 @@ class ModelIsotherm(Isotherm):
         if pressure_mode is not None and pressure_mode != self.mode_pressure:
             pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
                 pressure_mode, pressure, self.t_exp, pressure_unit)
+
+        # Convert to numpy array just in case
+        pressure = numpy.array(pressure)
 
         # Calculate loading using internal model
         if self.model == "Langmuir":
@@ -602,10 +784,17 @@ class ModelIsotherm(Isotherm):
                                        self.params["theta"] * (2.0 * self.params["K"] * pressure + 1.0) /
                                        (2.0 * one_plus_kp ** 2))
 
-    def print_info(self):
-        '''
+    def print_info(self, logarithmic=False, show=True):
+        """
         Prints a short summary of all the isotherm parameters
-        '''
+
+        Parameters
+        ----------
+        logarithmic : bool, optional
+            Specifies if the graph printed is logarithmic or not
+        show : bool, optional
+            Specifies if the graph is shown automatically or not
+        """
 
         print(self)
 
@@ -613,6 +802,14 @@ class ModelIsotherm(Isotherm):
         for param, val in self.params.items():
             print("\t%s = %f" % (param, val))
         print("RMSE = ", self.rmse)
+
+        plot_iso([self], plot_type='isotherm',
+                 logarithmic=logarithmic, color=True)
+
+        if show:
+            plt.show()
+
+        return
 
 
 def get_default_guess_params(model, data, pressure_key, loading_key):

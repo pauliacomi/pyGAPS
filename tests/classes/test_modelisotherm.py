@@ -28,4 +28,7 @@ class TestModelIsotherm(object):
             isotherm = pygaps.PointIsotherm.from_json(
                 text_file.read())
 
-        pygaps.ModelIsotherm.from_pointisotherm(isotherm, guess_model=True)
+        isotherm = pygaps.ModelIsotherm.from_pointisotherm(
+            isotherm, guess_model=True)
+
+        isotherm.print_info()
