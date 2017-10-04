@@ -5,6 +5,7 @@ This test module has tests relating to the adsorbate class
 import os
 
 import pytest
+from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
@@ -31,4 +32,11 @@ class TestModelIsotherm(object):
         isotherm = pygaps.ModelIsotherm.from_pointisotherm(
             isotherm, guess_model=True)
 
-        isotherm.print_info()
+    @cleanup
+    def test_isotherm_print_parameters(self, basic_pointisotherm):
+        "Checks isotherm can print its own info"
+
+        isotherm = pygaps.ModelIsotherm.from_pointisotherm(
+            basic_pointisotherm, guess_model=True)
+
+        isotherm.print_info(show=False)
