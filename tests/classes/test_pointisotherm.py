@@ -220,15 +220,15 @@ class TestPointIsotherm(object):
             basic_pointisotherm, model='Henry')
 
         # Try to generate the new isotherm
-        pygaps.PointIsotherm.from_modelisotherm(model).print_info()
+        pygaps.PointIsotherm.from_modelisotherm(model)
 
         # Based on new
         pygaps.PointIsotherm.from_modelisotherm(
-            model, pressure_points=[1, 2, 3]).print_info()
+            model, pressure_points=[1, 2, 3])
 
         # Based on new
         pygaps.PointIsotherm.from_modelisotherm(
-            model, pressure_points=basic_pointisotherm).print_info()
+            model, pressure_points=basic_pointisotherm)
 
     @cleanup
     def test_isotherm_print_parameters(self, basic_pointisotherm):
