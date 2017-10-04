@@ -6,6 +6,7 @@ import sys
 from unittest.mock import MagicMock
 
 extensions = [
+    'nbsphinx',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
@@ -29,6 +30,8 @@ year = '2017'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
 version = release = '0.1.0'
+
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 pygments_style = 'trac'
 templates_path = ['.']
