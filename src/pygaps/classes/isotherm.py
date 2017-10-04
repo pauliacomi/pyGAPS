@@ -136,7 +136,11 @@ class Isotherm(object):
         #: Isotherm experiment date
         self.date = str(isotherm_parameters.pop('date', None))
         #: Isotherm sample activation temperature
-        self.t_act = float(isotherm_parameters.pop('t_act', None))
+        t_act = isotherm_parameters.pop('t_act', None)
+        if t_act:
+            self.t_act = float(t_act)
+        else:
+            self.t_act = None
         #: Isotherm lab
         self.lab = str(isotherm_parameters.pop('lab', None))
         #: Isotherm comments
@@ -173,16 +177,28 @@ class Isotherm(object):
         else:
             string += ("Simulated isotherm" + '\n')
 
-        string += ("Material:" + str(self.sample_name) + '\n')
-        string += ("Sample Batch:" + str(self.sample_batch) + '\n')
-        string += ("Isotherm type:" + str(self.exp_type) + '\n')
-        string += ("Adsorbate used:" + str(self.adsorbate) + '\n')
-        string += ("Isotherm date:" + str(self.date) + '\n')
-        string += ("Machine:" + str(self.machine) + '\n')
-        string += ("User:" + str(self.user) + '\n')
-        string += ("Activation temperature:" + str(self.t_act) + "°C" + '\n')
-        string += ("Isotherm temperature:" + str(self.t_exp) + "K" + '\n')
-        string += ("Isotherm comments:" + str(self.comment) + '\n')
+        string += ("Material: " + str(self.sample_name) + '\n')
+        string += ("Batch: " + str(self.sample_batch) + '\n')
+        if self.exp_type:
+            string += ("Isotherm type: " + str(self.exp_type) + '\n')
+        if self.adsorbate:
+            string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
+        if self.date:
+            string += ("Isotherm date: " + str(self.date) + '\n')
+        if self.machine:
+            string += ("Machine: " + str(self.machine) + '\n')
+        if self.user:
+            string += ("User: " + str(self.user) + '\n')
+        if self.t_act:
+            string += ("Activation temperature: " +
+                       str(self.t_act) + "°C" + '\n')
+        if self.t_exp:
+            string += ("Isotherm temperature: " + str(self.t_exp) + "K" + '\n')
+        if self.comment:
+            string += ("Isotherm comments: " + str(self.comment) + '\n')
+
+        for prop in self.other_properties:
+            string += (prop + ": " + str(self.other_properties[prop]) + '\n')
 
         return string
 
