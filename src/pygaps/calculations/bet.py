@@ -11,6 +11,7 @@ from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import bet_plot
 from ..graphing.calcgraph import roq_plot
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import CalculationError
 
 
 def area_BET(isotherm, limits=None, verbose=False):
@@ -149,9 +150,9 @@ def area_BET(isotherm, limits=None, verbose=False):
 
         print("The slope of the BET line: s =", round(slope, 3))
         print("The intercept of the BET line: i =", round(intercept, 3))
-        print("C =", int(round(c_const, 0)))
+        print("C =", int(round(c_const, 1)))
         print("Amount for a monolayer: n =",
-              round(n_monolayer, 3), "mol/unit")
+              round(n_monolayer, 5), "mol/unit")
         print("Minimum pressure point chosen is {0} and maximum is {1}".format(
             round(pressure[minimum], 3), round(pressure[maximum], 3)))
         print("BET surface area: a =", int(round(bet_area, 0)), "m²/unit")
@@ -252,6 +253,10 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
             if value > min_p:
                 minimum = index
                 break
+
+    if maximum - minimum < 3:
+        raise CalculationError("The isotherm does not have enough points in the BET"
+                               "region. Unable to calculate BET area.")
 
     # calculate the BET transform, slope and intercept
     bet_t_array = bet_transform(
