@@ -1,0 +1,94 @@
+{
+    "adsorbate": "C2H6",
+    "comment": "None",
+    "date": "None",
+    "exp_type": "Isotherm",
+    "id": "406cf45c875ba23b3f2a013582a28cda",
+    "is_real": true,
+    "isotherm_data": {
+        "0": {
+            "loading": "0.000176173692101",
+            "pressure": "0.0001"
+        },
+        "1": {
+            "loading": "0.00180283372211",
+            "pressure": "0.001"
+        },
+        "10": {
+            "loading": "8.78564731563",
+            "pressure": "3.0"
+        },
+        "11": {
+            "loading": "13.0828059096",
+            "pressure": "5.0"
+        },
+        "12": {
+            "loading": "14.9247011914",
+            "pressure": "7.0"
+        },
+        "13": {
+            "loading": "16.273309735",
+            "pressure": "10.0"
+        },
+        "14": {
+            "loading": "17.4436405299",
+            "pressure": "15.0"
+        },
+        "15": {
+            "loading": "18.1453141011",
+            "pressure": "20.0"
+        },
+        "16": {
+            "loading": "19.0177650568",
+            "pressure": "30.0"
+        },
+        "17": {
+            "loading": "19.4477205374",
+            "pressure": "40.0"
+        },
+        "18": {
+            "loading": "19.8850632905",
+            "pressure": "50.0"
+        },
+        "2": {
+            "loading": "0.0176802507036",
+            "pressure": "0.01"
+        },
+        "3": {
+            "loading": "0.180894607699",
+            "pressure": "0.1"
+        },
+        "4": {
+            "loading": "0.372260480758",
+            "pressure": "0.2"
+        },
+        "5": {
+            "loading": "0.562033846454",
+            "pressure": "0.3"
+        },
+        "6": {
+            "loading": "0.768816271847",
+            "pressure": "0.4"
+        },
+        "7": {
+            "loading": "0.976064911567",
+            "pressure": "0.5"
+        },
+        "8": {
+            "loading": "1.54230166145",
+            "pressure": "0.75"
+        },
+        "9": {
+            "loading": "2.16626474485",
+            "pressure": "1.0"
+        }
+    },
+    "lab": "MADIREL",
+    "machine": "None",
+    "project": "None",
+    "sample_batch": "Test",
+    "sample_name": "MOF-5(Zn)",
+    "t_act": 150.0,
+    "t_exp": 298.0,
+    "user": "PI"
+}
