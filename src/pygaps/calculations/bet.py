@@ -10,8 +10,8 @@ import scipy.stats
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import bet_plot
 from ..graphing.calcgraph import roq_plot
-from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 
 
 def area_BET(isotherm, limits=None, verbose=False):
