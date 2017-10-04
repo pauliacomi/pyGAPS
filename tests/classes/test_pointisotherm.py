@@ -13,9 +13,28 @@ class TestPointIsotherm(object):
     Tests the pointisotherm class
     """
 
-    def test_isotherm_create(self, basic_pointisotherm):
-        "Checks isotherm can be created from test data"
-        return basic_pointisotherm
+    def test_isotherm_create(self):
+        "Checks isotherm can be created from basic data"
+        isotherm_param = {
+            'sample_name': 'carbon',
+            'sample_batch': 'X1',
+            'adsorbate': 'nitrogen',
+            't_exp': 77,
+        }
+
+        isotherm_data = pandas.DataFrame({
+            'pressure': [1, 2, 3, 4, 5, 3, 2],
+            'loading': [1, 2, 3, 4, 5, 3, 2]
+        })
+
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data,
+            loading_key='loading',
+            pressure_key='pressure',
+            **isotherm_param
+        )
+
+        return isotherm
 
     @pytest.mark.parametrize('missing_key',
                              ['loading_key', 'pressure_key'])
@@ -192,6 +211,24 @@ class TestPointIsotherm(object):
             1, adsorbent_basis='volume') == 0.1
         assert basic_pointisotherm.loading_at(
             0.25697, pressure_mode='relative') == pytest.approx(2, 0.001)
+
+    def test_isotherm_from_model(self, basic_pointisotherm):
+        """Checks that the isotherm can be created from a model"""
+
+        # Generate the model
+        model = pygaps.ModelIsotherm.from_pointisotherm(
+            basic_pointisotherm, model='Henry')
+
+        # Try to generate the new isotherm
+        pygaps.PointIsotherm.from_modelisotherm(model).print_info()
+
+        # Based on new
+        pygaps.PointIsotherm.from_modelisotherm(
+            model, pressure_points=[1, 2, 3]).print_info()
+
+        # Based on new
+        pygaps.PointIsotherm.from_modelisotherm(
+            model, pressure_points=basic_pointisotherm).print_info()
 
     @cleanup
     def test_isotherm_print_parameters(self, basic_pointisotherm):
