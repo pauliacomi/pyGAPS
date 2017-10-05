@@ -442,7 +442,14 @@ class PointIsotherm(Isotherm):
             secondary_key = None
 
         plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
-                 logarithmic=logarithmic, color=True, secondary_key=secondary_key)
+                 logarithmic=logarithmic, secondary_key=secondary_key,
+
+                 basis_adsorbent=self.basis_adsorbent,
+                 mode_pressure=self.mode_pressure,
+                 unit_loading=self.unit_pressure,
+                 unit_pressure=self.unit_loading,
+
+                 )
 
         if show:
             plt.show()
@@ -764,16 +771,31 @@ class PointIsotherm(Isotherm):
         ----------
         loading : float
             loading at which to compute pressure
-        unit : str, optional
-            Unit in which the data should be returned. If None
-            it defaults to which data unit the isotherm is currently in
         branch : {'ads', 'des'}
             The branch of the use for calculation. Defaults to adsorption.
+        interpolation_type : str
+            The type of scipi.interp1d used: `linear`, `nearest`, `zero`,
+            `slinear`, `quadratic`, `cubic`. It defaults to `linear`.
+        interp_fill : float
+            Maximum value until which the interpolation is done. If blank,
+            interpolation will not predict outside the bounds of data.
+        loading_unit : str
+            Unit the loading is specified in. If None, it defaults to
+            internal isotherm units.
+        pressure_unit : str
+            Unit the pressure is returned in. If None, it defaults to
+            internal isotherm units.
+        adsorbent_basis : str
+            The basis the loading is passed in. If None, it defaults to
+            internal isotherm basis.
+        pressure_mode : str
+            The mode the pressure is returned in. If None, it defaults to
+            internal isotherm mode.
 
         Returns
         -------
         float
-            predicted pressure at loading n
+            predicted pressure at loading specified
         """
 
         # TODO implement
