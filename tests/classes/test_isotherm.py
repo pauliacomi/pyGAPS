@@ -12,9 +12,20 @@ class TestIsotherm(object):
     Tests the parent isotherm object
     """
 
-    def test_isotherm_created(self, basic_isotherm):
+    def test_isotherm_created(self):
         "Checks isotherm can be created from test data"
-        return basic_isotherm
+
+        isotherm_param = {
+            'is_real': False,
+            'sample_name': 'carbon',
+            'sample_batch': 'X1',
+            'adsorbate': 'nitrogen',
+            't_exp': 77,
+        }
+
+        isotherm = pygaps.classes.isotherm.Isotherm(**isotherm_param)
+
+        return isotherm
 
     @pytest.mark.parametrize('missing_param',
                              ['sample_name', 'sample_batch', 't_exp', 'adsorbate'])

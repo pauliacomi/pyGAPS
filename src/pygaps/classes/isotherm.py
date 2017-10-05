@@ -134,29 +134,60 @@ class Isotherm(object):
 
         # Good-to-have properties of the isotherm
         #: Isotherm experiment date
-        self.date = str(isotherm_parameters.pop('date', None))
+        self.date = None
+        date = isotherm_parameters.pop('date', None)
+        if date:
+            self.date = str(date)
+
         #: Isotherm sample activation temperature
+        self.t_act = None
         t_act = isotherm_parameters.pop('t_act', None)
         if t_act:
             self.t_act = float(t_act)
-        else:
-            self.t_act = None
-        #: Isotherm lab
-        self.lab = str(isotherm_parameters.pop('lab', None))
-        #: Isotherm comments
-        self.comment = str(isotherm_parameters.pop('comment', None))
 
+        #: Isotherm lab
+        self.lab = None
+        lab = isotherm_parameters.pop('lab', None)
+        if lab:
+            self.lab = str(date)
+
+        #: Isotherm comments
+        self.comment = None
+        comment = isotherm_parameters.pop('comment', None)
+        if comment:
+            self.comment = str(date)
+
+        #
         # Other properties
         #: Isotherm user
-        self.user = str(isotherm_parameters.pop('user', None))
+        self.user = None
+        user = isotherm_parameters.pop('user', None)
+        if user:
+            self.user = str(user)
+
         #: Isotherm project
-        self.project = str(isotherm_parameters.pop('project', None))
+        self.project = None
+        project = isotherm_parameters.pop('project', None)
+        if project:
+            self.project = str(project)
+
         #: Isotherm machine used
-        self.machine = str(isotherm_parameters.pop('machine', None))
+        self.machine = None
+        machine = isotherm_parameters.pop('machine', None)
+        if machine:
+            self.machine = str(machine)
+
         #: Isotherm physicality (real or simulation)
-        self.is_real = bool(isotherm_parameters.pop('is_real', None))
+        self.is_real = None
+        is_real = isotherm_parameters.pop('is_real', None)
+        if is_real:
+            self.is_real = bool(is_real)
+
         #: Isotherm type (calorimetry/isotherm)
-        self.exp_type = str(isotherm_parameters.pop('exp_type', None))
+        self.exp_type = None
+        exp_type = isotherm_parameters.pop('exp_type', None)
+        if exp_type:
+            self.exp_type = str(exp_type)
 
         # Save the rest of the properties as an extra dict
         # now that the named properties were taken out of
