@@ -1,0 +1,242 @@
+{
+    "adsorbate": "C4H10",
+    "comment": null,
+    "date": "None",
+    "exp_type": "isotherm",
+    "id": "6d05336028505ab29b5146b503af6af8",
+    "is_real": true,
+    "isotherm_data": {
+        "0": {
+            "loading": "0.728",
+            "pressure": "0.0086"
+        },
+        "1": {
+            "loading": "1.133",
+            "pressure": "0.0097"
+        },
+        "10": {
+            "loading": "3.914",
+            "pressure": "0.0483"
+        },
+        "11": {
+            "loading": "4.171",
+            "pressure": "0.0551"
+        },
+        "12": {
+            "loading": "4.418",
+            "pressure": "0.063"
+        },
+        "13": {
+            "loading": "4.64",
+            "pressure": "0.0724"
+        },
+        "14": {
+            "loading": "4.865",
+            "pressure": "0.0818"
+        },
+        "15": {
+            "loading": "5.076",
+            "pressure": "0.0914"
+        },
+        "16": {
+            "loading": "5.28",
+            "pressure": "0.1017"
+        },
+        "17": {
+            "loading": "5.821",
+            "pressure": "0.1339"
+        },
+        "18": {
+            "loading": "6.289",
+            "pressure": "0.1699"
+        },
+        "19": {
+            "loading": "6.727",
+            "pressure": "0.209"
+        },
+        "2": {
+            "loading": "1.478",
+            "pressure": "0.0135"
+        },
+        "20": {
+            "loading": "7.128",
+            "pressure": "0.2487"
+        },
+        "21": {
+            "loading": "7.509",
+            "pressure": "0.2925"
+        },
+        "22": {
+            "loading": "7.875",
+            "pressure": "0.3373"
+        },
+        "23": {
+            "loading": "8.205",
+            "pressure": "0.385"
+        },
+        "24": {
+            "loading": "8.543",
+            "pressure": "0.4306"
+        },
+        "25": {
+            "loading": "8.875",
+            "pressure": "0.4784"
+        },
+        "26": {
+            "loading": "9.181",
+            "pressure": "0.5279"
+        },
+        "27": {
+            "loading": "9.479",
+            "pressure": "0.5803"
+        },
+        "28": {
+            "loading": "9.758",
+            "pressure": "0.634"
+        },
+        "29": {
+            "loading": "10.031",
+            "pressure": "0.6849"
+        },
+        "3": {
+            "loading": "1.858",
+            "pressure": "0.0144"
+        },
+        "30": {
+            "loading": "10.3",
+            "pressure": "0.74"
+        },
+        "31": {
+            "loading": "10.568",
+            "pressure": "0.7934"
+        },
+        "32": {
+            "loading": "10.83",
+            "pressure": "0.849"
+        },
+        "33": {
+            "loading": "11.07",
+            "pressure": "0.9048"
+        },
+        "34": {
+            "loading": "11.329",
+            "pressure": "0.9618"
+        },
+        "35": {
+            "loading": "11.537",
+            "pressure": "1.0201"
+        },
+        "36": {
+            "loading": "11.746",
+            "pressure": "1.0785"
+        },
+        "37": {
+            "loading": "11.951",
+            "pressure": "1.1389"
+        },
+        "38": {
+            "loading": "12.161",
+            "pressure": "1.1995"
+        },
+        "39": {
+            "loading": "12.405",
+            "pressure": "1.2592"
+        },
+        "4": {
+            "loading": "2.201",
+            "pressure": "0.0187"
+        },
+        "40": {
+            "loading": "12.613",
+            "pressure": "1.3178"
+        },
+        "41": {
+            "loading": "12.814",
+            "pressure": "1.3767"
+        },
+        "42": {
+            "loading": "13.004",
+            "pressure": "1.4397"
+        },
+        "43": {
+            "loading": "13.219",
+            "pressure": "1.4984"
+        },
+        "44": {
+            "loading": "13.423",
+            "pressure": "1.5575"
+        },
+        "45": {
+            "loading": "13.625",
+            "pressure": "1.6161"
+        },
+        "46": {
+            "loading": "13.833",
+            "pressure": "1.6766"
+        },
+        "47": {
+            "loading": "14.035",
+            "pressure": "1.7376"
+        },
+        "48": {
+            "loading": "14.28",
+            "pressure": "1.7962"
+        },
+        "49": {
+            "loading": "14.54",
+            "pressure": "1.855"
+        },
+        "5": {
+            "loading": "2.512",
+            "pressure": "0.0222"
+        },
+        "50": {
+            "loading": "14.802",
+            "pressure": "1.9133"
+        },
+        "51": {
+            "loading": "15.064",
+            "pressure": "1.9724"
+        },
+        "52": {
+            "loading": "15.331",
+            "pressure": "2.0309"
+        },
+        "53": {
+            "loading": "15.607",
+            "pressure": "2.0866"
+        },
+        "54": {
+            "loading": "15.912",
+            "pressure": "2.1435"
+        },
+        "55": {
+            "loading": "16.243",
+            "pressure": "2.2002"
+        },
+        "6": {
+            "loading": "2.825",
+            "pressure": "0.0245"
+        },
+        "7": {
+            "loading": "3.122",
+            "pressure": "0.0295"
+        },
+        "8": {
+            "loading": "3.381",
+            "pressure": "0.0345"
+        },
+        "9": {
+            "loading": "3.66",
+            "pressure": "0.0422"
+        }
+    },
+    "lab": null,
+    "machine": null,
+    "project": null,
+    "sample_batch": "Test",
+    "sample_name": "BAX 1500",
+    "t_act": null,
+    "t_exp": 298.15,
+    "user": null
+}
