@@ -184,7 +184,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
     Parameters
     ----------
     loading : array
-        loadings, in mol/g
+        loadings, in mol/basis
     pressure : array
         pressures, relative
     cross_section : float
