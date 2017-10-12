@@ -43,11 +43,11 @@ class isotherm_interpolator(object):
         #: The kind of variable the interpolator will process
         self.output_var = interp_type
         #: the branch the internal interpolator is on
-        self.interp_branch = None
+        self.interp_branch = interp_branch
         #: the kind of interpolator in the internal interpolator
-        self.interp_kind = None
+        self.interp_kind = interp_kind
         #: value of loading to assume beyond highest pressure in the data
-        self.interp_fill = None
+        self.interp_fill = interp_fill
 
         #: The internal interpolator function. This is generated
         #: the first time it is needed to make calculations faster
