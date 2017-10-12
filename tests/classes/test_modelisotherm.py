@@ -242,6 +242,39 @@ class TestModelIsotherm(object):
 
         return
 
+    def test_isotherm_ret_pressure_at(self, basic_modelisotherm, use_sample, use_adsorbate):
+        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+
+        # Wrong branch
+        with pytest.raises(pygaps.ParameterError):
+            basic_modelisotherm.pressure_at(1, branch='des')
+
+        # Standard return
+        pressure = basic_modelisotherm.pressure_at(1)
+        assert pressure == pytest.approx(1.0, 1e-5)
+
+        # Loading unit specified
+        pressure_lunit = basic_modelisotherm.pressure_at(
+            0.001, loading_unit='mol')
+        assert pressure_lunit == pytest.approx(1, 1e-5)
+
+        # Pressure unit specified
+        pressure_punit = basic_modelisotherm.pressure_at(
+            1.0, pressure_unit='Pa')
+        assert pressure_punit == pytest.approx(100000, 0.1)
+
+        # Basis specified
+        pressure_bads = basic_modelisotherm.pressure_at(
+            0.1, adsorbent_basis='volume')
+        assert pressure_bads == pytest.approx(1.0, 1e-5)
+
+        # Mode specified
+        pressure_mode = basic_modelisotherm.pressure_at(
+            3.89137, pressure_mode='relative')
+        assert pressure_mode == pytest.approx(0.5, 1e-5)
+
+        return
+
     def test_isotherm_spreading_pressure_at(self, basic_modelisotherm, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 

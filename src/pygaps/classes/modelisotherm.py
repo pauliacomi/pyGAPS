@@ -647,8 +647,7 @@ class ModelIsotherm(Isotherm):
         pressure : float or array
             Pressure at which to compute loading.
         branch : {None, 'ads', 'des'}
-            The branch of the loading to return. If None, returns entire
-            dataset
+            The branch the calculation is based on.
         loading_unit : str
             Unit the loading is returned in. If None, it defaults to
             internal model units.
@@ -674,6 +673,9 @@ class ModelIsotherm(Isotherm):
         else:
             branch = self.branch
 
+        # Convert to numpy array just in case
+        pressure = numpy.array(pressure)
+
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_unit is not None and pressure_unit != self.unit_pressure:
             pressure = convert_pressure(
@@ -685,9 +687,6 @@ class ModelIsotherm(Isotherm):
             if pressure_mode == 'relative':
                 pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
                     'absolute', pressure, self.t_exp, self.unit_pressure)
-
-        # Convert to numpy array just in case
-        pressure = numpy.array(pressure)
 
         # Calculate loading using internal model
         if self.model == "Langmuir":
@@ -732,15 +731,103 @@ class ModelIsotherm(Isotherm):
                                           self.params["theta"] * langmuir_fractional_loading ** 2 *
                                           langmuir_fractional_loading)
 
-        # Ensure loading is in correct units and basis for the internal model
+        # Ensure loading is in correct units and basis requested
         if loading_unit is not None and loading_unit != self.unit_loading:
             loading = convert_loading(
                 loading, self.unit_loading, loading_unit)
         if adsorbent_basis is not None and adsorbent_basis != self.basis_adsorbent:
             loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                adsorbent_basis, pressure, self.unit_loading)
+                adsorbent_basis, loading, self.unit_loading)
 
         return loading
+
+    def pressure_at(self, loading,
+                    branch=None,
+                    pressure_unit=None,
+                    pressure_mode=None,
+                    loading_unit=None,
+                    adsorbent_basis=None):
+        """
+        Given stored model parameters, compute pressure at loading L.
+
+        Parameters
+        ----------
+        loading : float or array
+            Loading at which to compute pressure.
+        branch : {None, 'ads', 'des'}
+            The branch the calculation is based on.
+        loading_unit : str
+            Unit the loading is specified in. If None, it defaults to
+            internal model units.
+        pressure_unit : str
+            Unit the pressure is returned in. If None, it defaults to
+            internal model units.
+        adsorbent_basis : str
+            The basis the loading is specified in. If None, it defaults to
+            internal model basis.
+        pressure_mode : str
+            The mode the pressure is returned in. If None, it defaults to
+            internal model mode.
+
+        Returns
+        -------
+        float or array
+            predicted pressure at loading L using fitted model
+            parameters
+        """
+        if branch and branch != self.branch:
+            raise ParameterError(
+                "ModelIsotherm is not based off this isotherm branch")
+        else:
+            branch = self.branch
+
+        # Convert to numpy array just in case
+        loading = numpy.array(loading)
+
+        # Ensure loading is in correct units and basis for the internal model
+        if loading_unit is not None and loading_unit != self.unit_loading:
+            loading = convert_loading(
+                loading, loading_unit, self.unit_loading)
+        if adsorbent_basis is not None and adsorbent_basis != self.basis_adsorbent:
+            if adsorbent_basis == 'mass':
+                loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
+                    'volume', loading, self.unit_loading)
+            elif adsorbent_basis == 'volume':
+                loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
+                    'mass', loading, self.unit_loading)
+
+        # Calculate loading using internal model
+        if self.model == "Langmuir":
+            pressure = loading / \
+                (self.params["K"] * (self.params["M"] - loading))
+
+        elif self.model == "Quadratic":
+            raise NotImplementedError
+
+        elif self.model == "BET":
+            raise NotImplementedError
+
+        elif self.model == "DSLangmuir":
+            raise NotImplementedError
+
+        elif self.model == "TSLangmuir":
+            raise NotImplementedError
+
+        elif self.model == "Henry":
+            pressure = loading / self.params["KH"]
+
+        elif self.model == "TemkinApprox":
+            raise NotImplementedError
+
+        # Ensure pressure is in correct units and mode requested
+        if pressure_unit is not None and pressure_unit != self.unit_pressure:
+            pressure = convert_pressure(
+                pressure, self.unit_pressure, pressure_unit)
+        if pressure_mode is not None and pressure_mode != self.mode_pressure:
+            pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
+                pressure_mode, pressure, self.t_exp, self.unit_pressure)
+
+        return pressure
 
     def spreading_pressure_at(self, pressure,
                               branch=None,

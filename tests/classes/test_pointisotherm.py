@@ -259,6 +259,39 @@ class TestPointIsotherm(object):
 
         return
 
+    def test_isotherm_ret_pressure_at(self, basic_pointisotherm, use_sample, use_adsorbate):
+        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+
+        # Standard return
+        pressure = basic_pointisotherm.pressure_at(1)
+        assert pressure == pytest.approx(1.0, 1e-5)
+
+        # Branch specified
+        pressure_branch = basic_pointisotherm.pressure_at(4.0, branch='des')
+        assert pressure_branch == pytest.approx(4.0, 1e-5)
+
+        # Loading unit specified
+        pressure_lunit = basic_pointisotherm.pressure_at(
+            0.001, loading_unit='mol')
+        assert pressure_lunit == pytest.approx(1, 1e-5)
+
+        # Pressure unit specified
+        pressure_punit = basic_pointisotherm.pressure_at(
+            1.0, pressure_unit='Pa')
+        assert pressure_punit == pytest.approx(100000, 0.1)
+
+        # Basis specified
+        pressure_bads = basic_pointisotherm.pressure_at(
+            0.1, adsorbent_basis='volume')
+        assert pressure_bads == pytest.approx(1.0, 1e-5)
+
+        # Mode specified
+        pressure_mode = basic_pointisotherm.pressure_at(
+            3.89137, pressure_mode='relative')
+        assert pressure_mode == pytest.approx(0.5, 1e-5)
+
+        return
+
     def test_isotherm_spreading_pressure_at(self, basic_pointisotherm, use_adsorbate):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
@@ -360,39 +393,6 @@ class TestPointIsotherm(object):
 
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
-
-    def test_isotherm_loading_interpolation(self, basic_pointisotherm, use_sample):
-        """Checks that the interpolation works as expected"""
-
-        assert basic_pointisotherm.loading_at(3.5) == 3.5
-        assert basic_pointisotherm.loading_at(
-            10, interp_fill=10) == 10
-        assert basic_pointisotherm.loading_at(
-            1, loading_unit='mol') == 0.001
-        assert basic_pointisotherm.loading_at(
-            100000, pressure_unit='Pa') == 1
-        assert basic_pointisotherm.loading_at(
-            1, adsorbent_basis='volume') == 0.1
-        assert basic_pointisotherm.loading_at(
-            0.25697, pressure_mode='relative') == pytest.approx(2, 0.001)
-
-    def test_isotherm_from_model(self, basic_pointisotherm):
-        """Checks that the isotherm can be created from a model"""
-
-        # Generate the model
-        model = pygaps.ModelIsotherm.from_pointisotherm(
-            basic_pointisotherm, model='Henry')
-
-        # Try to generate the new isotherm
-        pygaps.PointIsotherm.from_modelisotherm(model)
-
-        # Based on new
-        pygaps.PointIsotherm.from_modelisotherm(
-            model, pressure_points=[1, 2, 3])
-
-        # Based on new
-        pygaps.PointIsotherm.from_modelisotherm(
-            model, pressure_points=basic_pointisotherm)
 
     @cleanup
     def test_isotherm_print_parameters(self, basic_pointisotherm):
