@@ -36,6 +36,45 @@ class TestPointIsotherm(object):
 
         return isotherm
 
+    def test_isotherm_create_from_isotherm(self, basic_isotherm):
+        "Checks isotherm can be created from isotherm"
+
+        isotherm_data = pandas.DataFrame({
+            'pressure': [1, 2, 3, 4, 5, 3, 2],
+            'loading': [1, 2, 3, 4, 5, 3, 2]
+        })
+
+        # regular creation
+        isotherm = pygaps.PointIsotherm.from_isotherm(
+            basic_isotherm,
+            isotherm_data,
+        )
+
+        return isotherm
+
+    def test_isotherm_create_from_modelisotherm(self, basic_modelisotherm, basic_pointisotherm):
+        "Checks isotherm can be created from isotherm"
+
+        # regular creation
+        isotherm = pygaps.PointIsotherm.from_modelisotherm(
+            basic_modelisotherm,
+            pressure_points=None
+        )
+
+        # Specifying points
+        isotherm = pygaps.PointIsotherm.from_modelisotherm(
+            basic_modelisotherm,
+            pressure_points=[1, 2, 3, 4]
+        )
+
+        # Specifying isotherm
+        isotherm = pygaps.PointIsotherm.from_modelisotherm(
+            basic_modelisotherm,
+            pressure_points=basic_pointisotherm
+        )
+
+        return isotherm
+
     @pytest.mark.parametrize('missing_key',
                              ['loading_key', 'pressure_key'])
     def test_isotherm_miss_key(self, isotherm_parameters, isotherm_data, missing_key):
@@ -57,58 +96,189 @@ class TestPointIsotherm(object):
 
         return
 
-    def test_isotherm_ret_funcs(self, basic_pointisotherm):
+    def test_isotherm_ret_has_branch(self, basic_pointisotherm):
+        """Checks that all the functions in pointIsotherm return their specified parameter"""
+
+        # branch
+        assert basic_pointisotherm.has_branch(branch='ads')
+        assert basic_pointisotherm.has_branch(branch='des')
+
+        return
+
+    def test_isotherm_ret_data(self, basic_pointisotherm):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
         other_key = "enthalpy"
-        isotherm = basic_pointisotherm
 
-        # branch
-        assert isotherm.has_branch(branch='ads')
-        assert isotherm.has_branch(branch='des')
-
-        # data()
-        assert isotherm.data().equals(pandas.DataFrame({
+        # all data
+        assert basic_pointisotherm.data().equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
             basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
         }))
-        assert isotherm.data(branch='ads').equals(pandas.DataFrame({
+
+        # adsorption branch
+        assert basic_pointisotherm.data(branch='ads').equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
         }))
-        assert isotherm.data(branch='des').equals(pandas.DataFrame({
+
+        # desorption branch
+        assert basic_pointisotherm.data(branch='des').equals(pandas.DataFrame({
             basic_pointisotherm.pressure_key: [4.5, 2.5],
             basic_pointisotherm.loading_key: [4.5, 2.5],
             other_key: [4.0, 4.0],
         }, index=[6, 7]))
 
-        # pressure()
-        assert set(isotherm.pressure()) == set(
+        return
+
+    def test_isotherm_ret_pressure(self, basic_pointisotherm, use_adsorbate):
+        """Checks that all the functions in pointIsotherm return their specified parameter"""
+
+        # Regular return
+        assert set(basic_pointisotherm.pressure()) == set(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5])
-        assert set(isotherm.pressure(branch='ads')) == set(
-            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        assert set(isotherm.pressure(branch='des')) == set([4.5, 2.5])
-        assert set(isotherm.pressure(branch='ads', min_range=2.3, max_range=5.0)) == set(
+
+        # Branch specified
+        assert set(basic_pointisotherm.pressure(
+            branch='des')) == set([4.5, 2.5])
+
+        # Unit specified
+        assert set(basic_pointisotherm.pressure(branch='ads', unit='Pa')) == set(
+            [100000, 200000, 300000, 400000, 500000, 600000])
+
+        # Mode specified
+        assert basic_pointisotherm.pressure(branch='ads', mode='relative')[
+            0] == pytest.approx(0.12849, 0.001)
+
+        # Range specified
+        assert set(basic_pointisotherm.pressure(branch='ads', min_range=2.3, max_range=5.0)) == set(
             [3.0, 4.0, 5.0])
 
-        # loading()
-        assert set(isotherm.loading()) == set(
+        # Indexed option specified
+        assert basic_pointisotherm.pressure(indexed=True).equals(pandas.Series(
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5]
+        ))
+
+        return
+
+    def test_isotherm_ret_loading(self, basic_pointisotherm, use_sample):
+        """Checks that all the functions in pointIsotherm return their specified parameter"""
+
+        # Standard return
+        assert set(basic_pointisotherm.loading()) == set(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5])
-        assert set(isotherm.loading(branch='ads')) == set(
+
+        # Branch specified
+        assert set(basic_pointisotherm.loading(branch='ads')) == set(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        assert set(isotherm.loading(branch='des')) == set([4.5, 2.5])
-        assert set(isotherm.loading(branch='ads', min_range=2.3, max_range=5.0)) == set(
+
+        # Unit specified
+        assert basic_pointisotherm.loading(branch='ads', unit='mol')[
+            0] == pytest.approx(0.001, 1e-5)
+
+        # Basis specified
+        assert basic_pointisotherm.loading(branch='ads', basis='volume')[
+            0] == pytest.approx(0.1, 1e-5)
+
+        # Range specified
+        assert set(basic_pointisotherm.loading(branch='ads', min_range=2.3, max_range=5.0)) == set(
             [3.0, 4.0, 5.0])
 
-        # other_data()
-        assert set(isotherm.other_data(other_key)) == set([
+        # Indexed option specified
+        assert basic_pointisotherm.loading(indexed=True).equals(pandas.Series(
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5]
+        ))
+
+        return
+
+    def test_isotherm_ret_other_data(self, basic_pointisotherm):
+        """Checks that all the functions in pointIsotherm return their specified parameter"""
+
+        other_key = "enthalpy"
+
+        # Standard return
+        assert set(basic_pointisotherm.other_data(other_key)) == set([
             5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0])
-        assert set(isotherm.other_data(other_key, branch='ads')
+
+        # Branch specified
+        assert set(basic_pointisotherm.other_data(other_key, branch='ads')
                    ) == set([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
-        assert set(isotherm.other_data(
-            other_key, branch='des')) == set([4.0, 4.0])
+
+        # Range specified
+        assert set(basic_pointisotherm.other_data(other_key, min_range=3, max_range=4.5)
+                   ) == set([4.0, 4.0])
+
+        # Indexed option specified
+        assert basic_pointisotherm.other_data(other_key, indexed=True).equals(pandas.Series(
+            [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0]
+        ))
+
+        return
+
+    def test_isotherm_ret_loading_at(self, basic_pointisotherm, use_sample, use_adsorbate):
+        """Checks that all the functions in pointIsotherm return their specified parameter"""
+
+        # Standard return
+        loading = basic_pointisotherm.loading_at(1)
+        assert loading == pytest.approx(1.0, 1e-5)
+
+        # Branch specified
+        loading_branch = basic_pointisotherm.loading_at(1, branch='ads')
+        assert loading_branch == pytest.approx(1.0, 1e-5)
+
+        # Loading unit specified
+        loading_lunit = basic_pointisotherm.loading_at(1, loading_unit='mol')
+        assert loading_lunit == pytest.approx(0.001, 1e-5)
+
+        # Pressure unit specified
+        loading_punit = basic_pointisotherm.loading_at(
+            100000, pressure_unit='Pa')
+        assert loading_punit == pytest.approx(1.0, 1e-5)
+
+        # Basis specified
+        loading_bads = basic_pointisotherm.loading_at(
+            1, adsorbent_basis='volume')
+        assert loading_bads == pytest.approx(0.1, 1e-5)
+
+        # Mode specified
+        loading_mode = basic_pointisotherm.loading_at(
+            0.5, pressure_mode='relative')
+        assert loading_mode == pytest.approx(3.89137, 1e-5)
+
+        # Interp_fill specified
+        loading_fill = basic_pointisotherm.loading_at(
+            10, interp_fill=(0, 20))
+        assert loading_fill == pytest.approx(20.0, 1e-5)
+
+        # Interp_type specified
+        loading_type = basic_pointisotherm.loading_at(
+            1, interpolation_type='slinear')
+        assert loading_type == pytest.approx(1.0, 1e-5)
+
+        return
+
+    def test_isotherm_spreading_pressure_at(self, basic_pointisotherm, use_adsorbate):
+        """Checks that all the functions in pointIsotherm return their specified parameter"""
+
+        # Standard return
+        spressure = basic_pointisotherm.spreading_pressure_at(1)
+        assert spressure == pytest.approx(1.0, 1e-5)
+
+        # Branch specified
+        bpressure = basic_pointisotherm.spreading_pressure_at(1, branch='ads')
+        assert bpressure == pytest.approx(1.0, 1e-5)
+
+        # Pressure unit specified
+        spressure_punit = basic_pointisotherm.spreading_pressure_at(
+            100000, pressure_unit='Pa')
+        assert spressure_punit == pytest.approx(1.0, 1e-5)
+
+        # Mode specified
+        spressure_mode = basic_pointisotherm.spreading_pressure_at(
+            0.5, pressure_mode='relative')
+        assert spressure_mode == pytest.approx(3.89137, 1e-5)
 
         return
 
@@ -157,12 +327,9 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_loading_basis(self, basic_pointisotherm, basic_sample,
+    def test_isotherm_convert_loading_basis(self, basic_pointisotherm, use_sample,
                                             isotherm_data, basis, multiplier):
         """Checks that the loading basis conversion function work as expected"""
-
-        # Add sample to list
-        pygaps.data.SAMPLE_LIST.append(basic_sample)
 
         # Do the conversion
         basic_pointisotherm.convert_basis_adsorbent(basis)
@@ -180,7 +347,7 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_pressure_mode(self, basic_pointisotherm,
+    def test_isotherm_convert_pressure_mode(self, basic_pointisotherm, use_adsorbate,
                                             isotherm_data, mode, multiplier):
         """Checks that the pressure mode conversion function work as expected"""
 
@@ -194,11 +361,8 @@ class TestPointIsotherm(object):
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
-    def test_isotherm_loading_interpolation(self, basic_pointisotherm, basic_sample):
+    def test_isotherm_loading_interpolation(self, basic_pointisotherm, use_sample):
         """Checks that the interpolation works as expected"""
-
-        # Add sample to list
-        pygaps.data.SAMPLE_LIST.append(basic_sample)
 
         assert basic_pointisotherm.loading_at(3.5) == 3.5
         assert basic_pointisotherm.loading_at(

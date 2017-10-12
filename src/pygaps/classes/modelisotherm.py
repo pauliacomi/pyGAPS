@@ -148,7 +148,7 @@ class ModelIsotherm(Isotherm):
 ##########################################################
 #   Instantiation and classmethods
 
-    def __init__(self, data,
+    def __init__(self, isotherm_data,
                  loading_key=None,
                  pressure_key=None,
                  model=None,
@@ -179,25 +179,28 @@ class ModelIsotherm(Isotherm):
 
         # Run base class constructor
         Isotherm.__init__(self,
-                          basis_adsorbent,
-                          mode_pressure,
-                          unit_loading,
-                          unit_pressure,
+                          pressure_key=pressure_key,
+                          loading_key=loading_key,
+                          basis_adsorbent=basis_adsorbent,
+                          mode_pressure=mode_pressure,
+                          unit_loading=unit_loading,
+                          unit_pressure=unit_pressure,
                           **isotherm_parameters)
 
-        # Save column names
-        #: Name of column in the dataframe that contains adsorbed amount
-        self.loading_key = loading_key
+        # Get required branch
+        data = self._splitdata(isotherm_data)
 
-        #: Name of column in the dataframe that contains pressure
-        self.pressure_key = pressure_key
+        if branch == 'ads':
+            data = data.loc[~data['check']]
+        elif branch == 'des':
+            data = data.loc[data['check']]
+
+        #: Branch the isotherm model is based on
+        self.branch = branch
 
         #: The pressure range on which the model was built
         self.pressure_range = [min(data[pressure_key]),
                                max(data[pressure_key])]
-
-        #: Branch the isotherm model is based on
-        self.branch = branch
 
         #: Name of analytical model to fit to pure-component isotherm data
         #: adsorption isotherm
@@ -207,7 +210,7 @@ class ModelIsotherm(Isotherm):
         self.rmse = numpy.nan
 
         # ! Dictionary of parameters as a starting point for data fitting
-        self.param_guess = get_default_guess_params(model, data, pressure_key,
+        self.param_guess = get_default_guess_params(model, isotherm_data, pressure_key,
                                                     loading_key)
 
         # Override defaults if user provides param_guess dictionary
@@ -230,36 +233,47 @@ class ModelIsotherm(Isotherm):
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
-                      loading_key, pressure_key,
-                      model, param_guess=None,
-                      optimization_method="Nelder-Mead"):
+                      model=None,
+                      param_guess=None,
+                      optimization_method="Nelder-Mead",
+                      branch='ads',
+                      verbose=False,
+                      ):
         """
         Constructs a ModelIsotherm using a parent isotherm as the template for
         all the parameters.
 
         Parameters
         ----------
+
         isotherm : Isotherm
             an instance of the Isotherm parent class
         isotherm_data : DataFrame
             pure-component adsorption isotherm data
-        loading_key : str
-            column of the pandas DataFrame where the loading is stored
-        pressure_key : str
-            column of the pandas DataFrame where the pressure is stored
         model : str
             the model to be used to describe the isotherm
         param_guess : dict
             starting guess for model parameters in the data fitting routine
         optimization_method : str
             method in SciPy minimization function to use in fitting model to data.
+            See `here
+            <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+        branch : ['ads', 'des'], optional
+            The branch on which the model isotherm is based on. It is assumed to be the
+            adsorption branch, as it is the most commonly modelled part, although may
+            set to desorption as well.
+        verbose : bool
+            Prints out extra information about steps taken.
         """
         return cls(isotherm_data,
-                   loading_key=loading_key,
-                   pressure_key=pressure_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_method=optimization_method,
+                   branch=branch,
+                   verbose=verbose,
+
+                   loading_key=isotherm.loading_key,
+                   pressure_key=isotherm.pressure_key,
                    basis_adsorbent=isotherm.basis_adsorbent,
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
@@ -300,11 +314,12 @@ class ModelIsotherm(Isotherm):
         """
         if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
-                                       loading_key=isotherm.loading_key,
-                                       pressure_key=isotherm.pressure_key,
                                        optimization_method=optimization_method,
                                        branch=branch,
                                        verbose=verbose,
+
+                                       loading_key=isotherm.loading_key,
+                                       pressure_key=isotherm.pressure_key,
                                        basis_adsorbent=isotherm.basis_adsorbent,
                                        mode_pressure=isotherm.mode_pressure,
                                        unit_loading=isotherm.unit_loading,
@@ -312,13 +327,14 @@ class ModelIsotherm(Isotherm):
                                        **isotherm.to_dict())
 
         return cls(isotherm.data(branch=branch),
-                   loading_key=isotherm.loading_key,
-                   pressure_key=isotherm.pressure_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_method=optimization_method,
                    branch=branch,
                    verbose=verbose,
+
+                   loading_key=isotherm.loading_key,
+                   pressure_key=isotherm.pressure_key,
                    basis_adsorbent=isotherm.basis_adsorbent,
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
@@ -549,8 +565,7 @@ class ModelIsotherm(Isotherm):
             if max_range is None:
                 max_range = max(ret)
 
-            ret = ret.loc[lambda x: x >=
-                          min_range].loc[lambda x: x <= max_range]
+            ret = list(filter(lambda x: x >= min_range and x <= max_range, ret))
 
         if indexed:
             return pandas.Series(ret)
@@ -610,8 +625,8 @@ class ModelIsotherm(Isotherm):
                 min_range = min(ret)
             if max_range is None:
                 max_range = max(ret)
-            ret = ret.loc[lambda x: x >=
-                          min_range].loc[lambda x: x <= max_range]
+
+            ret = list(filter(lambda x: x >= min_range and x <= max_range, ret))
 
         if indexed:
             return pandas.Series(ret)
@@ -619,6 +634,7 @@ class ModelIsotherm(Isotherm):
             return ret
 
     def loading_at(self, pressure,
+                   branch=None,
                    pressure_unit=None,
                    pressure_mode=None,
                    loading_unit=None,
@@ -630,6 +646,9 @@ class ModelIsotherm(Isotherm):
         ----------
         pressure : float or array
             Pressure at which to compute loading.
+        branch : {None, 'ads', 'des'}
+            The branch of the loading to return. If None, returns entire
+            dataset
         loading_unit : str
             Unit the loading is returned in. If None, it defaults to
             internal model units.
@@ -649,13 +668,23 @@ class ModelIsotherm(Isotherm):
             predicted loading at pressure P using fitted model
             parameters
         """
+        if branch and branch != self.branch:
+            raise ParameterError(
+                "ModelIsotherm is not based off this isotherm branch")
+        else:
+            branch = self.branch
+
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_unit is not None and pressure_unit != self.unit_pressure:
             pressure = convert_pressure(
                 pressure, pressure_unit, self.unit_pressure)
         if pressure_mode is not None and pressure_mode != self.mode_pressure:
-            pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                pressure_mode, pressure, self.t_exp, pressure_unit)
+            if pressure_mode == 'absolute':
+                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
+                    'relative', pressure, self.t_exp, self.unit_pressure)
+            if pressure_mode == 'relative':
+                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
+                    'absolute', pressure, self.t_exp, self.unit_pressure)
 
         # Convert to numpy array just in case
         pressure = numpy.array(pressure)
@@ -671,7 +700,7 @@ class ModelIsotherm(Isotherm):
                 1.0 + self.params["Ka"] * pressure +
                 self.params["Kb"] * pressure ** 2)
 
-        if self.model == "BET":
+        elif self.model == "BET":
             loading = self.params["M"] * self.params["Ka"] * pressure / (
                 (1.0 - self.params["Kb"] * pressure) *
                 (1.0 - self.params["Kb"] * pressure +
@@ -694,7 +723,7 @@ class ModelIsotherm(Isotherm):
                 self.params["M3"] * k3p / (1.0 + k3p)
 
         elif self.model == "Henry":
-            return self.params["KH"] * pressure
+            loading = self.params["KH"] * pressure
 
         elif self.model == "TemkinApprox":
             langmuir_fractional_loading = self.params["K"] * pressure / \
@@ -714,6 +743,7 @@ class ModelIsotherm(Isotherm):
         return loading
 
     def spreading_pressure_at(self, pressure,
+                              branch=None,
                               pressure_unit=None,
                               pressure_mode=None):
         """
@@ -733,56 +763,77 @@ class ModelIsotherm(Isotherm):
         ----------
         pressure : float
             pressure (in corresponding units as data in instantiation)
+        branch : {'ads', 'des'}
+            The branch of the use for calculation. Defaults to adsorption.
+        pressure_unit : str
+            Unit the pressure is returned in. If None, it defaults to
+            internal isotherm units.
+        pressure_mode : str
+            The mode the pressure is returned in. If None, it defaults to
+            internal isotherm mode.
 
         Returns
         -------
         float
             spreading pressure, :math:`\\Pi`
         """
+        if branch and branch != self.branch:
+            raise ParameterError(
+                "ModelIsotherm is not based off this isotherm branch")
+        else:
+            branch = self.branch
 
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_unit is not None and pressure_unit != self.unit_pressure:
             pressure = convert_pressure(
                 pressure, pressure_unit, self.unit_pressure)
-        if pressure_mode is not None and pressure_mode != self.mode_pressure:
-            pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                pressure_mode, pressure, self.t_exp, pressure_unit)
+        elif pressure_mode is not None and pressure_mode != self.mode_pressure:
+            if pressure_mode == 'absolute':
+                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
+                    'relative', pressure, self.t_exp, self.unit_pressure)
+            if pressure_mode == 'relative':
+                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
+                    'absolute', pressure, self.t_exp, self.unit_pressure)
 
+        # based on model
         if self.model == "Langmuir":
-            return self.params["M"] * numpy.log(1.0 + self.params["K"] * pressure)
+            spreading_p = self.params["M"] * \
+                numpy.log(1.0 + self.params["K"] * pressure)
 
-        if self.model == "Quadratic":
-            return self.params["M"] * numpy.log(1.0 + self.params["Ka"] * pressure +
-                                                self.params["Kb"] * pressure ** 2)
+        elif self.model == "Quadratic":
+            spreading_p = self.params["M"] * numpy.log(1.0 + self.params["Ka"] * pressure +
+                                                       self.params["Kb"] * pressure ** 2)
 
-        if self.model == "BET":
-            return self.params["M"] * numpy.log(
+        elif self.model == "BET":
+            spreading_p = self.params["M"] * numpy.log(
                 (1.0 - self.params["Kb"] * pressure +
                  self.params["Ka"] * pressure) /
                 (1.0 - self.params["Kb"] * pressure))
 
-        if self.model == "DSLangmuir":
-            return self.params["M1"] * numpy.log(
+        elif self.model == "DSLangmuir":
+            spreading_p = self.params["M1"] * numpy.log(
                 1.0 + self.params["K1"] * pressure) +\
                 self.params["M2"] * numpy.log(
                 1.0 + self.params["K2"] * pressure)
 
-        if self.model == "TSLangmuir":
-            return self.params["M1"] * numpy.log(
+        elif self.model == "TSLangmuir":
+            spreading_p = self.params["M1"] * numpy.log(
                 1.0 + self.params["K1"] * pressure) +\
                 self.params["M2"] * numpy.log(
                 1.0 + self.params["K2"] * pressure) +\
                 self.params["M3"] * numpy.log(
                 1.0 + self.params["K3"] * pressure)
 
-        if self.model == "Henry":
-            return self.params["KH"] * pressure
+        elif self.model == "Henry":
+            spreading_p = self.params["KH"] * pressure
 
-        if self.model == "TemkinApprox":
+        elif self.model == "TemkinApprox":
             one_plus_kp = 1.0 + self.params["K"] * pressure
-            return self.params["M"] * (numpy.log(one_plus_kp) +
-                                       self.params["theta"] * (2.0 * self.params["K"] * pressure + 1.0) /
-                                       (2.0 * one_plus_kp ** 2))
+            spreading_p = self.params["M"] * (numpy.log(one_plus_kp) +
+                                              self.params["theta"] * (2.0 * self.params["K"] * pressure + 1.0) /
+                                              (2.0 * one_plus_kp ** 2))
+
+        return spreading_p
 
     def print_info(self, logarithmic=False, show=True):
         """
@@ -808,8 +859,8 @@ class ModelIsotherm(Isotherm):
 
                  basis_adsorbent=self.basis_adsorbent,
                  mode_pressure=self.mode_pressure,
-                 unit_loading=self.unit_pressure,
-                 unit_pressure=self.unit_loading,
+                 unit_loading=self.unit_loading,
+                 unit_pressure=self.unit_pressure,
 
                  )
 

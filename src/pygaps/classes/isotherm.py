@@ -2,6 +2,8 @@
 This module contains the main class that describes an isotherm
 """
 
+import pandas
+
 from ..classes.adsorbate import _PRESSURE_MODE
 from ..classes.sample import _MATERIAL_MODE
 from ..utilities.exceptions import ParameterError
@@ -61,6 +63,8 @@ class Isotherm(object):
     """
 
     def __init__(self,
+                 loading_key=None,
+                 pressure_key=None,
                  basis_adsorbent="mass",
                  mode_pressure="absolute",
                  unit_loading="mmol",
@@ -108,6 +112,11 @@ class Isotherm(object):
                 "Unit selected for pressure is not an option. See viable"
                 "units in _PRESSURE_UNITS")
 
+        if None in [loading_key, pressure_key]:
+            raise ParameterError(
+                "Pass loading_key and pressure_key, the names of the loading and"
+                " pressure columns in the DataFrame, to the constructor.")
+
         #: basis for the adsorbent
         self.basis_adsorbent = str(basis_adsorbent)
         #: mode for the pressure
@@ -116,6 +125,13 @@ class Isotherm(object):
         self.unit_loading = str(unit_loading)
         #: units for pressure
         self.unit_pressure = str(unit_pressure)
+
+        # Save column names
+        #: Name of column in the dataframe that contains adsorbed amount
+        self.loading_key = loading_key
+
+        #: Name of column in the dataframe that contains pressure
+        self.pressure_key = pressure_key
 
         # Must-have properties of the isotherm
         if 'id' not in isotherm_parameters:
@@ -149,13 +165,13 @@ class Isotherm(object):
         self.lab = None
         lab = isotherm_parameters.pop('lab', None)
         if lab:
-            self.lab = str(date)
+            self.lab = str(lab)
 
         #: Isotherm comments
         self.comment = None
         comment = isotherm_parameters.pop('comment', None)
         if comment:
-            self.comment = str(date)
+            self.comment = str(comment)
 
         #
         # Other properties
@@ -269,3 +285,14 @@ class Isotherm(object):
         parameters_dict.update(self.other_properties)
 
         return parameters_dict
+
+    # Figure out the adsorption and desorption branches
+    def _splitdata(self, _data):
+        """
+        Splits isotherm data into an adsorption and desorption part and
+        adds a column to mark the transition between the two
+        """
+        increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
+        increasing.rename('check', inplace=True)
+
+        return pandas.concat([_data, increasing], axis=1)

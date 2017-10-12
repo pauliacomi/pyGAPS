@@ -46,13 +46,18 @@ def doplot():
 # Global fixtures
 
 
+LOADING_KEY = 'loading'
+PRESSURE_KEY = 'pressure'
+OTHER_KEY = "enthalpy"
+
+
 @pytest.fixture(scope='function')
 def isotherm_parameters():
     """
     Creates a dictionary with all parameters for an model isotherm
     """
 
-    isotherm_parameters = {
+    parameters = {
         'id': None,
 
         'sample_name': 'TEST',
@@ -75,26 +80,22 @@ def isotherm_parameters():
 
         'DOI': 'dx.doi/10.0000',
         'origin': 'test',
-        'test_parameter': 'parameter'
+        'test_parameter': 'parameter',
+
     }
 
-    return isotherm_parameters
+    return parameters
 
 
 @pytest.fixture(scope='function')
-def isotherm_data(basic_isotherm):
+def isotherm_data():
     """
     Creates a dataframe with all data for an model isotherm
     """
-
-    loading_key = 'loading'
-    pressure_key = 'pressure'
-    other_key = "enthalpy"
-
     isotherm_data = pandas.DataFrame({
-        pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-        loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-        other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
+        PRESSURE_KEY: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        LOADING_KEY: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        OTHER_KEY: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
     })
 
     return isotherm_data
@@ -106,6 +107,8 @@ def basic_isotherm(isotherm_parameters):
     Creates an basic isotherm from model data
     """
     isotherm = pygaps.classes.isotherm.Isotherm(
+        loading_key=LOADING_KEY,
+        pressure_key=PRESSURE_KEY,
         **isotherm_parameters)
 
     return isotherm
@@ -116,35 +119,27 @@ def basic_pointisotherm(isotherm_data, basic_isotherm):
     """
     Creates an isotherm from model data
     """
-    loading_key = 'loading'
-    pressure_key = 'pressure'
-    other_key = "enthalpy"
-    other_keys = [other_key]
+    other_keys = [OTHER_KEY]
 
     isotherm = pygaps.PointIsotherm.from_isotherm(
         basic_isotherm,
         isotherm_data,
-        loading_key,
-        pressure_key,
         other_keys=other_keys)
 
     return isotherm
 
 
-def basic_modelisotherm(isotherm_data, basic_isotherm):
+@pytest.fixture()
+def basic_modelisotherm(basic_pointisotherm):
     """
     Creates an isotherm from model data
     """
-    model = "Langmuir"
-    loading_key = 'loading'
-    pressure_key = 'pressure'
+    model = "Henry"
 
-    isotherm = pygaps.ModelIsotherm.from_isotherm(
-        basic_isotherm,
-        isotherm_data,
-        loading_key,
-        pressure_key,
-        model)
+    isotherm = pygaps.ModelIsotherm.from_pointisotherm(
+        basic_pointisotherm,
+        model=model,
+    )
 
     return isotherm
 
@@ -226,3 +221,31 @@ def basic_adsorbate(adsorbate_data):
     adsorbate = pygaps.Adsorbate(adsorbate_data)
 
     return adsorbate
+
+
+@pytest.fixture()
+def use_adsorbate(basic_adsorbate):
+    """
+    Uploads adsorbate to list
+    """
+
+    adsorbate = next(
+        (x for x in pygaps.ADSORBATE_LIST if basic_adsorbate.name == x.name), None)
+    if not adsorbate:
+        pygaps.ADSORBATE_LIST.append(basic_adsorbate)
+
+    return
+
+
+@pytest.fixture()
+def use_sample(basic_sample):
+    """
+    Uploads sample to list
+    """
+
+    sample = next(
+        (x for x in pygaps.SAMPLE_LIST if basic_sample.name == x.name and basic_sample.batch == x.batch), None)
+    if not sample:
+        pygaps.SAMPLE_LIST.append(basic_sample)
+
+    return

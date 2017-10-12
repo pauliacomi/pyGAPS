@@ -23,7 +23,10 @@ class TestIsotherm(object):
             't_exp': 77,
         }
 
-        isotherm = pygaps.classes.isotherm.Isotherm(**isotherm_param)
+        isotherm = pygaps.classes.isotherm.Isotherm(
+            loading_key='loading',
+            pressure_key='pressure',
+            ** isotherm_param)
 
         return isotherm
 
@@ -77,7 +80,7 @@ class TestIsotherm(object):
 
         assert isotherm_parameters == basic_isotherm.to_dict()
 
-    def test_isotherm_print_parameters(self, basic_isotherm, noplot):
+    def test_isotherm_print_parameters(self, basic_isotherm):
         "Checks isotherm can print its own info"
 
         print(basic_isotherm)

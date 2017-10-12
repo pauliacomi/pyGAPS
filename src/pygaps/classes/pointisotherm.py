@@ -14,7 +14,6 @@ import pygaps
 
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import convert_loading
 from ..utilities.unit_converter import convert_pressure
 from .adsorbate import Adsorbate
@@ -102,23 +101,13 @@ class PointIsotherm(Isotherm):
 
         # Run base class constructor
         Isotherm.__init__(self,
-                          basis_adsorbent,
-                          mode_pressure,
-                          unit_loading,
-                          unit_pressure,
+                          loading_key=loading_key,
+                          pressure_key=pressure_key,
+                          basis_adsorbent=basis_adsorbent,
+                          mode_pressure=mode_pressure,
+                          unit_loading=unit_loading,
+                          unit_pressure=unit_pressure,
                           **isotherm_parameters)
-
-        if None in [loading_key, pressure_key]:
-            raise ParameterError(
-                "Pass loading_key and pressure_key, the names of the loading and"
-                " pressure columns in the DataFrame, to the constructor.")
-
-        # Save column names
-        #: Name of column in the dataframe that contains adsorbed amount
-        self.loading_key = loading_key
-
-        #: Name of column in the dataframe that contains pressure
-        self.pressure_key = pressure_key
 
         #: Pandas DataFrame that stores the data
         self._data = isotherm_data.sort_index(axis=1)
@@ -154,7 +143,7 @@ class PointIsotherm(Isotherm):
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
-                      loading_key, pressure_key, other_keys=None):
+                      other_keys=None):
         """
         Constructs a point isotherm using a parent isotherm as the template for
         all the parameters.
@@ -171,9 +160,9 @@ class PointIsotherm(Isotherm):
             Column of the pandas DataFrame where the pressure is stored.
         """
         return cls(isotherm_data,
-                   loading_key=loading_key,
-                   pressure_key=pressure_key,
                    other_keys=other_keys,
+                   pressure_key=isotherm.pressure_key,
+                   loading_key=isotherm.loading_key,
                    basis_adsorbent=isotherm.basis_adsorbent,
                    mode_pressure=isotherm.mode_pressure,
                    unit_loading=isotherm.unit_loading,
@@ -185,7 +174,7 @@ class PointIsotherm(Isotherm):
                   basis_adsorbent="mass",
                   mode_pressure="absolute",
                   unit_loading="mmol",
-                  unit_pressure="bar",):
+                  unit_pressure="bar"):
         """
         Constructs a PointIsotherm from a standard json-represented isotherm.
         This function is just a wrapper around the more powerful .isotherm_from_json
@@ -291,17 +280,6 @@ class PointIsotherm(Isotherm):
         """
 
         return self.id == other_isotherm.id
-
-    # Figure out the adsorption and desorption branches
-    def _splitdata(self, _data):
-        """
-        Splits isotherm data into an adsorption and desorption part and
-        adds a column to mark the transition between the two
-        """
-        increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
-        increasing.rename('check', inplace=True)
-
-        return pandas.concat([_data, increasing], axis=1)
 
 
 ##########################################################
@@ -446,8 +424,8 @@ class PointIsotherm(Isotherm):
 
                  basis_adsorbent=self.basis_adsorbent,
                  mode_pressure=self.mode_pressure,
-                 unit_loading=self.unit_pressure,
-                 unit_pressure=self.unit_loading,
+                 unit_loading=self.unit_loading,
+                 unit_pressure=self.unit_pressure,
 
                  )
 
@@ -802,11 +780,11 @@ class PointIsotherm(Isotherm):
         raise NotImplementedError
 
     def spreading_pressure_at(self, pressure,
+                              branch='ads',
                               pressure_unit=None,
                               pressure_mode=None,
                               loading_unit=None,
                               adsorbent_basis=None,
-                              branch='ads',
                               interp_fill=None):
         """
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.
@@ -829,6 +807,23 @@ class PointIsotherm(Isotherm):
         ----------
         pressure : float
             pressure (in corresponding units as data in instantiation)
+        branch : {'ads', 'des'}
+            The branch of the use for calculation. Defaults to adsorption.
+        loading_unit : str
+            Unit the loading is specified in. If None, it defaults to
+            internal isotherm units.
+        pressure_unit : str
+            Unit the pressure is returned in. If None, it defaults to
+            internal isotherm units.
+        adsorbent_basis : str
+            The basis the loading is passed in. If None, it defaults to
+            internal isotherm basis.
+        pressure_mode : str
+            The mode the pressure is returned in. If None, it defaults to
+            internal isotherm mode.
+        interp_fill : float
+            Maximum value until which the interpolation is done. If blank,
+            interpolation will not predict outside the bounds of data.
 
         Returns
         -------
@@ -894,7 +889,14 @@ class PointIsotherm(Isotherm):
                     numpy.log(pressures[i + 1] / pressures[i])
 
             # finally, area of last segment
-            slope = (self.loading_at(pressure) - loadings[n_points - 1]) / (
+            slope = (
+                self.loading_at(pressure,
+                                branch=branch,
+                                loading_unit=loading_unit,
+                                pressure_unit=pressure_unit,
+                                adsorbent_basis=adsorbent_basis,
+                                pressure_mode=pressure_mode,
+                                interp_fill=interp_fill) - loadings[n_points - 1]) / (
                 pressure - pressures[n_points - 1])
             intercept = loadings[n_points - 1] - \
                 slope * pressures[n_points - 1]
