@@ -58,7 +58,6 @@ def isotherm_parameters():
     """
 
     parameters = {
-        'id': None,
 
         'sample_name': 'TEST',
         'sample_batch': 'TB',

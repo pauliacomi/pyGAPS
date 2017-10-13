@@ -259,32 +259,44 @@ class Isotherm(object):
         dict
             dictionary of all parameters
         """
+        parameter_dict = {}
 
         # Get the named properties
-        parameters_dict = {
-            'id': self.id,
+        if self.id:
+            parameter_dict.update({'id': self.id})
+        if self.sample_name:
+            parameter_dict.update({'sample_name': self.sample_name})
+        if self.sample_batch:
+            parameter_dict.update({'sample_batch': self.sample_batch})
+        if self.t_exp:
+            parameter_dict.update({'t_exp': self.t_exp})
+        if self.adsorbate:
+            parameter_dict.update({'adsorbate': self.adsorbate})
 
-            'sample_name': self.sample_name,
-            'sample_batch': self.sample_batch,
-            't_exp': self.t_exp,
-            'adsorbate': self.adsorbate,
+        if self.date:
+            parameter_dict.update({'date': str(self.date)})
+        if self.t_act:
+            parameter_dict.update({'t_act': self.t_act})
+        if self.lab:
+            parameter_dict.update({'lab': self.lab})
+        if self.comment:
+            parameter_dict.update({'comment': self.comment})
 
-            'date': str(self.date),
-            't_act': self.t_act,
-            'lab': self.lab,
-            'comment': self.comment,
-
-            'user': self.user,
-            'project': self.project,
-            'machine': self.machine,
-            'is_real': self.is_real,
-            'exp_type': self.exp_type,
-        }
+        if self.user:
+            parameter_dict.update({'user': self.user})
+        if self.project:
+            parameter_dict.update({'project': self.project})
+        if self.machine:
+            parameter_dict.update({'machine': self.machine})
+        if self.is_real:
+            parameter_dict.update({'is_real': self.is_real})
+        if self.exp_type:
+            parameter_dict.update({'exp_type': self.exp_type})
 
         # Now add the rest
-        parameters_dict.update(self.other_properties)
+        parameter_dict.update(self.other_properties)
 
-        return parameters_dict
+        return parameter_dict
 
     # Figure out the adsorption and desorption branches
     def _splitdata(self, _data):
