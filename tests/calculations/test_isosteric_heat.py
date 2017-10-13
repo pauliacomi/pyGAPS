@@ -7,6 +7,7 @@ import os
 import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
+from numpy import average
 
 import pygaps
 
@@ -74,6 +75,8 @@ class TestIsostericHeat(object):
             isotherms.append(isotherm)
 
         result_dict = pygaps.isosteric_heat(isotherms, verbose=False)
+
+        assert isclose(average(result_dict['isosteric_heat']), 29, 3)
 
         return
 
