@@ -11,6 +11,8 @@ from .calculations.iast import iast_binary_vle
 from .calculations.iast import reverse_iast
 from .calculations.initial_henry import calc_initial_henry
 from .calculations.initial_henry import calc_initial_henry_virial
+from .calculations.isosteric_heat import isosteric_heat
+from .calculations.isosteric_heat import isosteric_heat_raw
 from .calculations.psd import dft_size_distribution
 from .calculations.psd import mesopore_size_distribution
 from .calculations.psd import micropore_size_distribution

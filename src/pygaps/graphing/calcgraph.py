@@ -213,3 +213,41 @@ def psd_plot(pore_radii, pore_dist, method=None, log=True, xmax=None):
     ax1.grid(True)
 
     return ax1
+
+
+def isosteric_heat_plot(loading, isosteric_heat, log=False):
+    """
+    Draws the pore size distribution plot
+
+    Parameters
+    ----------
+    loading : array
+        Loadings for which the isosteric heat was calculated.
+    isosteric_heat : array
+        The isosteric heat corresponding to each loading.
+    log : int
+        Whether to display a logarithmic graph
+    Returns
+    -------
+    matplotlib.axes
+        Matplotlib axes of the graph generated. The user can then apply their
+        own styling if desired.
+
+    """
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.plot(loading, isosteric_heat,
+             marker='o', color='g', label='heat')
+    if(log):
+        ax1.set_xscale('log')
+        ax1.xaxis.set_major_locator(ticker.LogLocator(
+            base=10.0, numticks=15, numdecs=20))
+    ax1.set_title("Isosteric heat plot")
+    ax1.set_xlabel('Loading')
+    ax1.set_ylabel('Isosteric heat')
+    ax1.legend(loc='best')
+    ax1.set_xlim(xmin=0)
+    ax1.set_ylim(ymin=0)
+    ax1.grid(True)
+
+    return ax1

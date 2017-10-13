@@ -1,9 +1,7 @@
 {
     "adsorbate": "C4H10",
-    "comment": null,
     "date": "None",
     "exp_type": "isotherm",
-    "id": "765a41dfce56bfdb4a68b16229060765",
     "is_real": true,
     "isotherm_data": {
         "0": {
@@ -183,12 +181,7 @@
             "pressure": "0.1097"
         }
     },
-    "lab": null,
-    "machine": null,
-    "project": null,
-    "sample_batch": "Test",
-    "sample_name": "BAX 1500",
-    "t_act": null,
-    "t_exp": 348.15,
-    "user": null
+    "sample_batch": "TB",
+    "sample_name": "TEST",
+    "t_exp": 348.15
 }

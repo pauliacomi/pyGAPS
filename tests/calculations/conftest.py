@@ -45,3 +45,15 @@ DATA_IAST = {
         'file': 'MOF-5(Zn) - IAST - C2H6.json',
     },
 }
+
+DATA_ISOSTERIC = {
+    't1': {
+        'file': 'BAX 1500 - Isosteric Heat - 298.json',
+    },
+    't2': {
+        'file': 'BAX 1500 - Isosteric Heat - 323.json',
+    },
+    't3': {
+        'file': 'BAX 1500 - Isosteric Heat - 348.json',
+    },
+}
