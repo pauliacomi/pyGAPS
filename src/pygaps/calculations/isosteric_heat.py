@@ -2,9 +2,9 @@
 This module calculates the isosteric heat for isotherms at different temperatures
 """
 
+import numpy
 import scipy.constants as constants
 import scipy.stats
-import numpy
 
 from ..graphing.calcgraph import isosteric_heat_plot
 from ..utilities.exceptions import ParameterError

@@ -6,8 +6,8 @@ import os
 
 import pytest
 from matplotlib.testing.decorators import cleanup
-from numpy import isclose
 from numpy import average
+from numpy import isclose
 
 import pygaps
 
