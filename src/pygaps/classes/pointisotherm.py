@@ -267,8 +267,30 @@ class PointIsotherm(Isotherm):
         """
         object.__setattr__(self, name, value)
 
-        # TODO change from not in to in a known array of parameters
-        if self._instantiated and name not in ['id', '_instantiated']:
+        if self._instantiated and name in [
+            'sample_name',
+            'sample_batch',
+            'adsorbent',
+            't_exp',
+
+            'date',
+            't_act',
+            'lab',
+            'comment',
+            'user',
+            'project',
+            'machine',
+            'is_real',
+            'exp_type',
+
+            'other_properties',
+            '_data',
+            'unit_pressure',
+            'unit_loading'
+            'mode_pressure'
+            'basis_adsorbent'
+        ]:
+            print('id generated', name, value)
             # Generate the unique id using md5
             self.id = None
             md_hasher = hashlib.md5(
@@ -451,7 +473,7 @@ class PointIsotherm(Isotherm):
         print(self)
 
         if self.other_keys:
-            plot_type = 'combo'
+            plot_type = 'combined'
             secondary_key = self.other_keys[0]
         else:
             plot_type = 'isotherm'
