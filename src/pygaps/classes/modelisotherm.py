@@ -609,15 +609,11 @@ class ModelIsotherm(Isotherm):
             raise ParameterError(
                 "ModelIsotherm is not based off this isotherm branch")
 
-        ret = self.loading_at(self.pressure(points))
-
-        # Convert if needed
-        if basis is not None and basis != self.basis_adsorbent:
-            ret = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                basis,
-                ret)
-        if unit is not None and unit != self.unit_loading:
-            ret = convert_loading(ret, self.unit_loading, unit)
+        ret = self.loading_at(
+            self.pressure(points),
+            adsorbent_basis=basis,
+            loading_unit=unit,
+        )
 
         # Select required points
         if max_range is not None or min_range is not None:
