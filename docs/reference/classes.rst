@@ -1,7 +1,7 @@
+.. _classes-ref:
+
 Classes
 =======
-
-.. _adsorbate-ref:
 
 Adsorbate
 ---------
@@ -9,7 +9,6 @@ Adsorbate
 .. automodule:: pygaps.classes.adsorbate
     :members:
 
-.. _sample-ref:
 
 Sample
 ------
@@ -22,7 +21,6 @@ Sample
 Isotherms
 ---------
 
-.. _isotherm-ref:
 
 Master Isotherm
 ...............
@@ -30,7 +28,6 @@ Master Isotherm
 .. automodule:: pygaps.classes.isotherm
     :members:
 
-.. _pointisotherm-ref:
 
 Point Isotherm
 ...............
@@ -38,7 +35,6 @@ Point Isotherm
 .. automodule:: pygaps.classes.pointisotherm
     :members:
 
-.. _modelisotherm-ref:
 
 Model Isotherm
 ...............

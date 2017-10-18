@@ -1,3 +1,5 @@
+.. _utilities-ref:
+
 Other utilities
 ===============
 .. automodule:: pygaps.utilities.folder_utilities

@@ -26,7 +26,7 @@ Sqlite parsing
 Since pyGAPS includes an internal sqlite database, isotherms which are imported can be saved for later use, as
 well as samples, adsorbates, contacts etc.
 The sqlite functionality is an integral part of the framework, and it has its own
-:ref:`section <sqlite-manual>`.
+:ref:`section <sqlite-manual>` of the manual.
 
 
 .. _parsing-manual-json:
@@ -44,10 +44,10 @@ the ease of extensibility afforded by the structure.
     The JSON format is, by definition, unsorted. Therefore, even though pyGAPS sorts the keys alphabetically
     before returning the string, one should not rely on their order.
 
-The framework provides several functions which can read JSON strings:
+The framework provides two functions for JSON strings:
 
-    - Import an isotherm from JSON.
-    - Export an isotherm to JSON
+    - Import an isotherm from JSON: :meth:`~pygaps.parsing.jsoninterface.isotherm_from_json`
+    - Export an isotherm to JSON: :meth:`~pygaps.parsing.jsoninterface.isotherm_to_json`
 
 Assuming we have an isotherm which was previously created, use the following code to convert it to
 a JSON string.
@@ -63,7 +63,7 @@ To convert the json back into an isotherm, use the *from* function.
 
     my_isotherm = pygaps.isotherm_from_json(json_string)
 
-For more info about JSON parsing, check out the :ref:`reference <parsing-ref-json>`.
+For more info about JSON parsing, check out the :mod:`~pygaps.parsing.jsoninterface` reference.
 
 
 .. _parsing-manual-excel:
@@ -75,6 +75,11 @@ The isotherms can also be imported or exported in an Excel format, if required. 
 of the xlwings python package and is, of course, only available on the systems where Excel is already
 installed.
 An example excel isotherm can be found :download:`here <../files/isotherm.xlsx>`.
+
+The framework provides two functions for Excel files:
+
+    - Import an isotherm from Excel: :meth:`~pygaps.parsing.excelinterface.isotherm_from_xl`
+    - Export an isotherm to Excel: :meth:`~pygaps.parsing.excelinterface.isotherm_to_xl`
 
 To export an isotherm to an Excel file, pass the isotherm object, as well as the path where the excel file
 should be created.
@@ -95,8 +100,7 @@ To convert the excel back into an isotherm, use the *from* function.
     my_isotherm = pygaps.isotherm_from_xl(path)
 
 
-For more info about Excel parsing, check out the :ref:`reference <parsing-ref-excel>`.
-
+For more info about Excel parsing, check out the :mod:`~pygaps.parsing.excelinterface` reference.
 
 
 .. _parsing-manual-csv:
@@ -105,7 +109,7 @@ CSV parsing
 -----------
 
 CSV files can also be used as a convenient storage for isotherms. However, the format is not as flexible
-as the alternatives and is not recommended.
+as the alternatives.
 
 The CSV files created will have all the isotherm properties as initial headers, followed by a data section which
 includes all the data in the isotherm.
@@ -129,4 +133,4 @@ To convert the file back into an isotherm, use the *from* function.
 
     my_isotherm = pygaps.isotherm_from_csv(path)
 
-For more info about CSV parsing, check out the :ref:`reference <parsing-ref-csv>`.
+For more info about CSV parsing, check out the :mod:`~pygaps.parsing.csvinterface` reference.

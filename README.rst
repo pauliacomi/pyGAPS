@@ -15,6 +15,8 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
         | |commits-since|
     * - docs
       - | |docs|
+    * - license
+      - | |license|
     * - tests
       - | |travis| |appveyor|
         | |codecov|
@@ -27,9 +29,17 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :target: http://www.repostatus.org/#wip
     :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
 
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v0.1.0.svg
+    :alt: Commits since latest release
+    :target: https://github.com/pauliacomi/pygaps/compare/v0.1.0...master
+
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
     :alt: Documentation Status
+
+.. |license| image:: https://img.shields.io/badge/License-MIT-yellow.svg
+    :target: https://opensource.org/licenses/MIT
+    :alt: Project License
 
 .. |travis| image:: https://travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
     :alt: Travis-CI Build Status
@@ -51,10 +61,6 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :alt: PyPI Package latest release
     :target: https://pypi.python.org/pypi/pygaps
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v0.1.0.svg
-    :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v0.1.0...master
-
 .. |wheel| image:: https://img.shields.io/pypi/wheel/pygaps.svg
     :alt: PyPI Wheel
     :target: https://pypi.python.org/pypi/pygaps
@@ -70,9 +76,6 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
 
 .. end-badges
 
-Work in progress
-
-* Free software: MIT license
 
 Features
 ========
@@ -100,13 +103,29 @@ Installation
 ============
 
 The easiest way to install pyGAPS is from the command line.
-::
+
+.. code-block:: bash
 
     pip install pygaps
 
-On Windows, Anaconda is your best bet since it manages environments for you.
+On Windows, `Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
+environments for you.
 First install the suite and then use pip inside your regular python 3 environment.
 
+Alternatively, to install the development branch, clone the repository from Github.
+Then install the package with setuptools, either in regular or developer mode
+
+.. code-block:: bash
+
+    git clone https://github.com/pauliacomi/pyGAPS
+
+    # then install
+
+    setup.py install
+
+    # or developer mode
+
+    setup.py develop
 
 Development
 ===========
@@ -137,4 +156,17 @@ For testing only with the environment you are currently on, run pytest instead::
 
     py.test --cov
 
-Alternatively, depend travisCI for the testing, which will be slower overall.
+Alternatively, you can depend on travisCI for the testing, which will be slower overall
+but should have all the environments required.
+
+Questions?
+==========
+
+I'm more than happy to answer any questions. Shoot me an email at paul.iacomi@univ-amu or find
+me on some social media.
+
+For any bugs found, please open an `issue <https://github.com/pauliacomi/pyGAPS/issues/>`__ or, If
+you feel like you can do the fix yourself, submit a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__.
+It'll make my life easier
+
+This also applies to any features which you think might benefit the project.

@@ -10,6 +10,21 @@ you need to do is at the command line::
 If on windows, we recommend using the `Anaconda/Conda <https://www.anaconda.com/>`__ environment,
 as it preinstalls most required dependencies as well as making managing environments a breeze.
 
+Alternatively, to install the development branch, clone the repository from Github.
+Then install the package with setuptools, either in regular or developer mode
+
+::
+
+    git clone https://github.com/pauliacomi/pyGAPS
+
+    // then install
+
+    setup.py install
+
+    // or developer mode
+
+    setup.py develop
+
 Dependencies
 ============
 

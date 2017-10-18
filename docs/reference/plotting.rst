@@ -1,7 +1,7 @@
+.. _plotting-ref:
+
 Graphs and plotting
 ===================
-
-.. _isotherm-plot-ref:
 
 Isotherm plotting
 -----------------

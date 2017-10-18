@@ -20,3 +20,8 @@ To go back to the standard CoolProp backend, use:
 
     pygaps.backend_use_coolprop()
 
+
+.. warning::
+
+    If REFPROP is not previously installed and configured on the user's computer, calculations
+    will fail

@@ -9,6 +9,7 @@ Contents
    installation
    quickstart
    manual/index
+   examples/index
    reference/index
    contributing
    authors

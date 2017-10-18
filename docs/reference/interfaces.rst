@@ -3,14 +3,10 @@
 Parsing and interfaces
 ======================
 
-.. _parsing-ref-json:
-
 JSON
 ----
 .. automodule:: pygaps.parsing.jsoninterface
     :members:
-
-.. _parsing-ref-excel:
 
 Excel
 -----
@@ -18,15 +14,10 @@ Excel
     :members:
 
 
-.. _parsing-ref-sqlite:
-
 Sqlite
 ------
 .. automodule:: pygaps.parsing.sqliteinterface
     :members:
-
-
-.. _parsing-ref-csv:
 
 CSV
 ---

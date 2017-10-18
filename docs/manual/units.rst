@@ -26,14 +26,14 @@ Two special physical concepts are handled by pyGAPS, relative pressure and adsor
       adsorbent at the measurement temperature. Relative pressure only has meaning when
       the isotherm is recorded in a sub-critical regime. In order to calculate it, a
       property of the specific adsorbate is required. Therefore, relative pressure
-      calculation is bundled in the :ref:`Adsorbate class <adsorbate-ref>`.
+      calculation is bundled in the :class:`~pygaps.classes.adsorbate.Adsorbate` class.
 
     - Adsorbent basis refers to whether the loading is calculated on the adsorbent in a
       "per mass" or "per volume" way. The scientific community regularly uses the mass
       basis, while volume basis is more important in industry where adsorbent bed design
       sizing is required. In order to convert between the two basis, the density of the
       sample is needed. Therefore, adsorbent basis conversions are bundled with the
-      :ref:`Sample class <sample-ref>`.
+      :class:`~pygaps.classes.sample.Sample` class
 
 
 
@@ -44,7 +44,7 @@ Low-level unit convert
 
 The way units are converted under the hood is through the use of dictionaries to store conversion factors
 between the different unit types. The user can use the functions as well by importing the
-:meth:`pygaps.utilities.unit_converter` module.
+:mod:`pygaps.utilities.unit_converter` module.
 
 ::
 
@@ -68,7 +68,7 @@ data in a different unit than specified at instantiation, most methods can accep
 
 The isotherm internal data can also be permanently converted into another unit, pressure mode or basis.
 This is not normally required, but can be done if the isotherm is to be exported in different units.
-To do this, use the provided methods such as :meth:`~pygaps.classes.PointIsotherm.convert_unit_loading`.
+To do this, use the provided methods such as :meth:`~pygaps.classes.pointisotherm.PointIsotherm.convert_unit_loading`.
 
 
 .. _units-manual-impact:

@@ -14,7 +14,7 @@ isotherms, samples, adsorbates, users and so on.
 All the functions which interact with a database, take the database path as their first argument. If the
 internal database is to be used, the parameter passed should be the ``pygaps.DATABASE`` constant.
 
-.. caution::
+.. note::
 
     For most purposes, the internal database is adequate for storage and retrieval. However, it can be
     difficult to locate it on the disk, and, depending on the amount of data it stores, it can grow to
@@ -40,7 +40,7 @@ A diagram of the database schema can be seen below:
 Database methods
 ----------------
 
-A complete list of methods can be found in :ref:`reference <parsing-ref-sqlite>`
+A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinterface` reference.
 
 
 .. _sqlite-manual-examples:
