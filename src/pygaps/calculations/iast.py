@@ -71,6 +71,10 @@ def iast_binary_vle(isotherms, pressure,
 
     x_data = [x[0] / (x[0] + x[1]) for x in component_loadings]
 
+    # Add start and end points
+    x_data = numpy.concatenate([[0], x_data, [1]])
+    y_data = numpy.concatenate([[0], y_data, [1]])
+
     # Generate the aray of partial pressures
     if verbose:
         plot_iast_vle(x_data, y_data,
