@@ -10,6 +10,7 @@ Manual
     dataparsing
     characterisation
     modelling
+    iast
     graphing
     sqlitedb
     units

@@ -21,7 +21,8 @@ for an object which corresponds to the isotherm adsorbate property.
 This list is populated as import-time with the adsorbates stored in the internal database. The user can also
 add their own adsorbate to the list, or upload it to the database for permanent storage.
 
-For a complete list of methods and individual descriptions look at the :ref:`reference <adsorbate-ref>`.
+For a complete list of methods and individual descriptions look at the :class:`~pygaps.classes.adsorbate.Adsorbate`
+reference.
 
 .. _adsorbate-manual-create:
 
@@ -89,7 +90,7 @@ properties dictionary. Here the value is static and the temperature and unit mus
     33
 
 
-For all the adsorbate methods, see the :ref:`reference<adsorbate-ref>`
+For all the adsorbate methods, see the :class:`~pygaps.classes.adsorbate.Adsorbate` reference
 
 .. _adsorbate-manual-manage:
 
@@ -98,7 +99,7 @@ Adsorbate management
 --------------------
 
 A selection of the most common adsorbates used in experiments is already stored in the internal database.
-At import-time, they are automatically loaded into memory and stored in `pygaps.ADSORBATE_LIST`.
+At import-time, they are automatically loaded into memory and stored in ``pygaps.ADSORBATE_LIST``.
 This should be enough for most uses of the framework. To retrieve an adsorbate from the list, use the
 adsorbate class method with the name as the parameter:
 

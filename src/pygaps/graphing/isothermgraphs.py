@@ -12,7 +12,7 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.string_utilities import convert_chemformula
 
 # ! list of plot types
-_PLOT_TYPES = ("isotherm", "property", "combo")
+_PLOT_TYPES = ("isotherm", "property", "combined")
 
 # ! list of branch types
 _BRANCH_TYPES = ("ads", "des")
@@ -44,7 +44,7 @@ def plot_iso(isotherms,
     ----------
     isotherms : list
         an iterable of the isotherms to be plotted
-    plot_type : {'isotherm', 'property', 'combo'}
+    plot_type : {'isotherm', 'property', 'combined'}
         The plot type, to display: isotherm, a property or a combination.
         The 'isotherm' graph type displays only isotherm data and is the standard.
         If other data is recorded in the isotherm object, such as enthalpy, it
@@ -52,7 +52,7 @@ def plot_iso(isotherms,
         loading graph by selecting one of the other graph types
     secondary_key : 'str'
         The key which has the column with the supplementary data to be plotted.
-        This parameter is only required in the 'property' and 'combo' graphs
+        This parameter is only required in the 'property' and 'combined' graphs
     branch : list
         List with branches to disply, options: 'ads', 'des'.
     logx : bool
@@ -113,7 +113,7 @@ def plot_iso(isotherms,
         raise ParameterError("Plot type {0} not an option. Viable plot"
                              "types are {1}".format(plot_type, _PLOT_TYPES))
 
-    if plot_type == 'property' or plot_type == 'combo':
+    if plot_type == 'property' or plot_type == 'combined':
         if secondary_key is None:
             raise ParameterError("No secondary_key parameter specified")
         if all(secondary_key not in isotherm.other_keys for isotherm in isotherms):
@@ -149,7 +149,7 @@ def plot_iso(isotherms,
     #
     # Generate the graph iself
     fig, axes = plt.subplots(1, 1, figsize=(8, 8))
-    if plot_type == 'combo':
+    if plot_type == 'combined':
         axes2 = axes.twinx()
 
     # Build the name of the axes
@@ -194,7 +194,7 @@ def plot_iso(isotherms,
         range_pressure = (None, None)
         range_loading = x_range
         range_property = y1_range
-    elif plot_type == 'combo':
+    elif plot_type == 'combined':
         axes.set_prop_cycle(pc_iso)
         axes2.set_prop_cycle(pc_prop)
         range_pressure = x_range
@@ -335,7 +335,7 @@ def plot_iso(isotherms,
                                   o_points,
                                   label, styles_dict=styles)
 
-        elif pl_type == 'combo':
+        elif pl_type == 'combined':
             p_points, l_points = pressure().align(loading(), join='inner')
             line = isotherm_graph(axes,
                                   p_points,
@@ -417,7 +417,7 @@ def plot_iso(isotherms,
 
     # Add the legend
     lines, labels = axes.get_legend_handles_labels()
-    if plot_type == 'combo':
+    if plot_type == 'combined':
         lines2, labels2 = axes2.get_legend_handles_labels()
         lines = lines + lines2
         labels = labels + labels2
