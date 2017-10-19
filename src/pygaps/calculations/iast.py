@@ -67,7 +67,8 @@ def iast_binary_vle(isotherms, pressure,
         # We assume ideal behaviour
         partial_pressures = pressure * fraction
         component_loadings[index, :] = iast(
-            isotherms, partial_pressures, warningoff=warningoff, adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess)
+            isotherms, partial_pressures, warningoff=warningoff,
+            adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess)
 
     x_data = [x[0] / (x[0] + x[1]) for x in component_loadings]
 
@@ -143,7 +144,8 @@ def iast_binary_svp(isotherms, mole_fractions, pressure_range,
     for index, pressure in enumerate(pressure_range):
         partial_pressures = pressure * mole_fractions
         component_loadings[index, :] = iast(
-            isotherms, partial_pressures, warningoff=warningoff, adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess)
+            isotherms, partial_pressures, warningoff=warningoff,
+            adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess)
 
     selectivities = [(x[0] / mole_fractions[0]) /
                      (x[1] / mole_fractions[1]) for x in component_loadings]
@@ -280,8 +282,10 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
     adsorbed_mole_fractions = res.x
 
     # concatenate mole fraction of last component
-    adsorbed_mole_fractions = numpy.concatenate((adsorbed_mole_fractions,
-                                                 numpy.array([1.0 - numpy.sum(adsorbed_mole_fractions)])))
+    adsorbed_mole_fractions = numpy.concatenate(adsorbed_mole_fractions,
+                                                numpy.array(
+                                                    [1.0 - numpy.sum(adsorbed_mole_fractions)])
+                                                )
 
     if (numpy.sum(adsorbed_mole_fractions < 0.0) != 0) | (
             numpy.sum(adsorbed_mole_fractions > 1.0) != 0):
