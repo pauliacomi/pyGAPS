@@ -3,13 +3,8 @@
 
 __author__ = 'Paul A. Iacomi'
 __docformat__ = 'restructuredtext'
-__doc__ = """
-This module has many functionalities for manipulating
-data from adsorption experiments
 
-isort:skip_file
-"""
-
+# isort:skip_file
 
 # This code is written for Python 3.
 import sys

@@ -67,7 +67,7 @@ class Sample(object):
         #: Sample contact nickname
         self.contact = sample_info.get('contact')
         #: Sample source laboratory
-        self.source_lab = sample_info.get('source_lab')
+        self.source = sample_info.get('source')
         #: Sample project
         self.project = sample_info.get('project')
         #: Sample structure
@@ -132,7 +132,7 @@ class Sample(object):
         string += ("Batch:" + self.batch + '\n')
         string += ("Owner:" + self.owner + '\n')
         string += ("Contact:" + self.contact + '\n')
-        string += ("Source Laboratory:" + self.source_lab + '\n')
+        string += ("Source:" + self.source + '\n')
         string += ("Project:" + self.project + '\n')
         string += ("Structure:" + self.struct + '\n')
         string += ("Type:" + self.type + '\n')
@@ -160,7 +160,7 @@ class Sample(object):
             'batch': self.batch,
             'owner': self.owner,
             'contact': self.contact,
-            'source_lab': self.source_lab,
+            'source': self.source,
             'project': self.project,
             'struct': self.struct,
             'type': self.type,

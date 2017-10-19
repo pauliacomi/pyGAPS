@@ -21,6 +21,8 @@ from ..utilities.sqlite_utilities import build_select
 from ..utilities.sqlite_utilities import build_update
 
 
+# ---------------------- Samples
+
 def db_get_samples(pth):
     """
     Gets all samples and their properties
@@ -90,24 +92,25 @@ def db_upload_sample(pth, sample, overwrite=False):
 
             if overwrite:
                 sql_com = build_update(table="samples",
-                                       to_set=['project', 'struct', 'owner', 'type',
-                                               'contact', 'form', 'source_lab', 'comment'],
+                                       to_set=['project', 'struct', 'type',
+                                               'contact', 'form', 'source', 'comment'],
                                        where=['name', 'batch'])
             else:
                 sql_com = build_insert(table="samples",
-                                       to_insert=['name', 'batch', 'project', 'struct', 'owner', 'type',
-                                                  'contact', 'form', 'source_lab', 'comment'])
+                                       to_insert=['name', 'batch', 'project', 'struct', 'type',
+                                                  'contact', 'form', 'source', 'comment'])
 
             # Upload or modify data in sample table
             cursor.execute(sql_com, {
                 'name':         sample.name,
                 'batch':        sample.batch,
-                'owner':        sample.owner,
+
                 'contact':      sample.contact,
-                'source_lab':   sample.source_lab,
+                'source':       sample.source,
+                'type':         sample.type,
+
                 'project':      sample.project,
                 'struct':       sample.struct,
-                'type':         sample.type,
                 'form':         sample.form,
                 'comment':      sample.comment,
             }
@@ -212,43 +215,6 @@ def db_upload_sample_type(pth, sample_type):
         db.close()
 
 
-def db_upload_sample_form(pth, sample_form):
-    "Uploads a sample form"
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            sql_com = build_insert(table="sample_forms",
-                                   to_insert=['nick', 'name', 'desc'])
-
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'nick':         sample_form['nick'],
-                'name':         sample_form['name'],
-                'desc':         sample_form.get('desc'),
-            }
-            )
-
-        # Print success
-        print("Sample form uploaded", sample_form)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample form:", "\n",
-              sample_form['nick'],
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-
 def db_upload_sample_property_type(pth, property_type, property_unit):
     "Uploads a property type"
 
@@ -342,6 +308,26 @@ def db_delete_sample(pth, sample):
 
     return
 
+# ---------------------- Experiments
+
+
+EXP_NAMED_PARAMS = [
+                'id',
+                'sample_name',
+                'sample_batch',
+                't_exp',
+                'adsorbate',
+                'user',
+                'machine',
+                'exp_type',
+                'date',
+                'is_real',
+                't_act',
+                'lab',
+                'project',
+                'comment',
+]
+
 
 def db_get_experiments(pth, criteria):
     """
@@ -359,9 +345,7 @@ def db_get_experiments(pth, criteria):
 
         # Build SQL request
         sql_com = build_select(table='experiments',
-                               to_select=['id', 'date', 'is_real', 'exp_type',
-                                          'sample_name', 'sample_batch', 't_act',  't_exp', 'machine',
-                                          'gas', 'user', 'lab', 'project',  'comment'],
+                               to_select=EXP_NAMED_PARAMS,
                                where=criteria.keys())
 
         # Get experiment info from database
@@ -372,14 +356,12 @@ def db_get_experiments(pth, criteria):
 
         for row in cursor:
             exp_params = dict(zip(row.keys(), row))
-            # TODO remove this
-            exp_params['adsorbate'] = exp_params.pop('gas')
 
             # Get the extra data from the experiment_data table
             cur_inner = db.cursor()
 
             cur_inner.execute(build_select(table='experiment_data',
-                                           to_select=['dtype', 'data'],
+                                           to_select=['type', 'data'],
                                            where=['exp_id']),
                               {'exp_id': str(exp_params['id'])}
                               )
@@ -439,32 +421,16 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
             if overwrite:
                 db_delete_experiment(pth, overwrite)
 
-            # Thenn, the sample is going to be inserted into the database
+            # Then, the sample is going to be inserted into the database
             # Build SQL request
             sql_com = build_insert(table='experiments',
-                                   to_insert=['id', 'date', 'is_real',
-                                              'exp_type', 'sample_name', 'sample_batch',
-                                              't_act', 't_exp', 'machine',
-                                              'gas', 'user', 'lab',
-                                              'project', 'comment'])
+                                   to_insert=EXP_NAMED_PARAMS)
 
             # Build upload dict
-            upload_dict = {
-                'id':               isotherm.id,
-                'date':             isotherm.date,
-                'is_real':          isotherm.is_real,
-                'exp_type':         isotherm.exp_type,
-                'sample_name':      isotherm.sample_name,
-                'sample_batch':     isotherm.sample_batch,
-                't_act':            isotherm.t_act,
-                't_exp':            isotherm.t_exp,
-                'machine':          isotherm.machine,
-                'gas':              isotherm.adsorbate,
-                'user':             isotherm.user,
-                'lab':              isotherm.lab,
-                'project':          isotherm.project,
-                'comment':          isotherm.comment
-            }
+            upload_dict = {}
+            iso_dict = isotherm.to_dict()
+            for param in EXP_NAMED_PARAMS:
+                upload_dict.update({param: iso_dict.get(param)})
 
             # Upload experiment info to database
             cursor.execute(sql_com, upload_dict)
@@ -474,23 +440,23 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
 
             # Build sql request
             sql_insert = build_insert(table='experiment_data',
-                                      to_insert=['exp_id', 'dtype', 'data'])
+                                      to_insert=['exp_id', 'type', 'data'])
 
             # Insert standard data fields:
             cursor.execute(sql_insert,
-                           {'exp_id': isotherm.id, 'dtype': 'pressure',
+                           {'exp_id': isotherm.id, 'type': 'pressure',
                             'data': isotherm.pressure().tobytes()}
                            )
 
             cursor.execute(sql_insert,
-                           {'exp_id': isotherm.id, 'dtype': 'loading',
+                           {'exp_id': isotherm.id, 'type': 'loading',
                             'data': isotherm.loading().tobytes()}
                            )
 
             # Update or insert other fields:
             for key in isotherm.other_keys:
                 cursor.execute(sql_insert,
-                               {'exp_id': isotherm.id, 'dtype': key,
+                               {'exp_id': isotherm.id, 'type': key,
                                 'data': isotherm.other_data(key).tobytes()}
                                )
 
@@ -647,65 +613,14 @@ def db_delete_experiment(pth, isotherm):
     return
 
 
-def db_upload_experiment_calculated(pth, data, overwrite=False):
+# ---------------------- Adsorbates
+
+def db_get_adsorbates(pth):
     """
-    Uploads an experiment calculated value to be stored in the database
-    (such as initial enthalpy of adsorption, henry constant etc)
-    Specify overwrite to write on top of existing values
-    """
-    # Build sql request
-    if overwrite:
-        sql_com = build_update(table='experiment_calculated',
-                               to_set=['henry_c', 'enth_init'],
-                               where=['exp_id'])
+    Gets all adsorbates and their properties
 
-    else:
-        sql_com = build_insert(table='experiment_calculated',
-                               to_insert=['exp_id', 'henry_c', 'enth_init'])
-
-    try:
-        # Creates or opens a file called mydb with a SQLite3 DB
-        db = sqlite3.connect(pth)
-
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Upload data to database
-        cursor.execute(sql_com, {
-            'exp_id':         data['exp_id'],
-            'henry_c':        data['henry_c'],
-            'enth_init':      data['enth_init']
-        }
-        )
-
-        # Commit the change
-        db.commit()
-
-        # Print success
-        print("Calculated data uploaded")
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        # Roll back any change if something goes wrong
-        db.rollback()
-        print("Error on id:", "\n",
-              data['exp_id'],
-              "\n", e)
-        raise ParsingError from e
-
-    finally:
-        # Close the db connection
-        db.close()
-
-    return
-
-
-def db_get_gasses(pth):
-    """
-    Gets all gasses and their properties
-
-    The number of gasses is usually small, so all can be loaded in memory at once
+    The number of adsorbates is usually small, so all can be
+    loaded in memory at once
     """
 
     # Connect to database
@@ -717,46 +632,46 @@ def db_get_gasses(pth):
         cursor = db.cursor()
         cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Get required gas from database
-        cursor.execute('''SELECT * FROM gasses''')
+        # Get required adsorbate from database
+        cursor.execute('''SELECT * FROM adsorbates''')
 
-        gasses = []
+        adsorbates = []
 
-        # Create the gasses
+        # Create the adsorbates
         for row in cursor:
 
-            gas_params = dict(zip(row.keys(), row))
+            adsorbate_params = dict(zip(row.keys(), row))
 
-            # Get the extra data from the gas_properties table
+            # Get the extra data from the adsorbate_properties table
             cur_inner = db.cursor()
 
-            cur_inner.execute(build_select(table='gas_properties',
+            cur_inner.execute(build_select(table='adsorbate_properties',
                                            to_select=['type', 'value'],
-                                           where=['gas_id']), {
-                'gas_id': gas_params.get('id')
+                                           where=['ads_id']), {
+                'ads_id': adsorbate_params.get('id')
             })
 
-            gas_params['properties'] = {
+            adsorbate_params['properties'] = {
                 row[0]: row[1] for row in cur_inner}
 
-            # Build gas objects
-            gasses.append(Adsorbate(gas_params))
+            # Build adsorbate objects
+            adsorbates.append(Adsorbate(adsorbate_params))
 
     # Close the db connection
     if db:
         db.close()
 
     # Print success
-    print("Selected", len(gasses), "gasses")
+    print("Selected", len(adsorbates), "adsorbates")
 
-    return gasses
+    return adsorbates
 
 
-def db_upload_gas(pth, adsorbate, overwrite=False):
+def db_upload_adsorbate(pth, adsorbate, overwrite=False):
     """
-    Uploads gasses to the database
-    If overwrite is set to true, the gas is overwritten
-    Overwrite is done based on gas.name
+    Uploads adsorbates to the database
+    If overwrite is set to true, the adsorbate is overwritten
+    Overwrite is done based on adsorbate.name
     WARNING: Overwrite is done on ALL fields
     """
 
@@ -769,11 +684,11 @@ def db_upload_gas(pth, adsorbate, overwrite=False):
             cursor.execute('PRAGMA foreign_keys = ON')
 
             if overwrite:
-                sql_com = build_update(table="gasses",
+                sql_com = build_update(table="adsorbates",
                                        to_set=['formula'],
                                        where=['nick'])
             else:
-                sql_com = build_insert(table="gasses",
+                sql_com = build_insert(table="adsorbates",
                                        to_insert=['nick', 'formula'])
 
             # Upload or modify data in sample table
@@ -785,9 +700,9 @@ def db_upload_gas(pth, adsorbate, overwrite=False):
 
             # Upload or modify data in sample_properties table
             if len(adsorbate.properties) > 0:
-                # Get id of gas
-                gas_id = cursor.execute(
-                    build_select(table='gasses',
+                # Get id of adsorbate
+                ads_id = cursor.execute(
+                    build_select(table='adsorbates',
                                  to_select=['id'],
                                  where=['nick']), {
                         'nick':         adsorbate.name,
@@ -796,22 +711,22 @@ def db_upload_gas(pth, adsorbate, overwrite=False):
                 ).fetchone()[0]
 
                 # Sql of update routine
-                sql_update = build_update(table='gas_properties',
+                sql_update = build_update(table='adsorbate_properties',
                                           to_set=['type', 'value'],
-                                          where=['gas_id'])
+                                          where=['ads_id'])
                 # Sql of insert routine
-                sql_insert = build_insert(table='gas_properties',
-                                          to_insert=['gas_id', 'type', 'value'])
+                sql_insert = build_insert(table='adsorbate_properties',
+                                          to_insert=['ads_id', 'type', 'value'])
 
                 updates = []
 
                 if overwrite:
                     # Find existing properties
                     cursor.execute(
-                        build_select(table='gas_properties',
+                        build_select(table='adsorbate_properties',
                                      to_select=['type'],
-                                     where=['gas_id']), {
-                            'gas_id':        gas_id,
+                                     where=['ads_id']), {
+                            'ads_id':        ads_id,
                         }
                     )
                     updates = [elt[0] for elt in cursor.fetchall()]
@@ -823,7 +738,7 @@ def db_upload_gas(pth, adsorbate, overwrite=False):
                         sql_com_prop = sql_insert
 
                     cursor.execute(sql_com_prop, {
-                        'gas_id':           gas_id,
+                        'ads_id':           ads_id,
                         'type':             prop,
                         'value':            adsorbate.properties[prop]
                     })
@@ -845,7 +760,7 @@ def db_upload_gas(pth, adsorbate, overwrite=False):
     return
 
 
-def db_upload_gas_property_type(pth, property_type, property_unit):
+def db_upload_adsorbate_property_type(pth, property_type, property_unit):
     "Uploads a property type"
 
     # Connect to database
@@ -856,7 +771,7 @@ def db_upload_gas_property_type(pth, property_type, property_unit):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
-            sql_com = build_insert(table="gas_properties_type",
+            sql_com = build_insert(table="adsorbate_properties_type",
                                    to_insert=['type', 'unit'])
 
             # Upload or modify data in sample table
@@ -881,9 +796,9 @@ def db_upload_gas_property_type(pth, property_type, property_unit):
         db.close()
 
 
-def db_delete_gas(pth, adsorbate):
+def db_delete_adsorbate(pth, adsorbate):
     """
-    Delete experiment to the database
+    Delete adsorbate from the database
     """
 
     # Connect to database
@@ -894,9 +809,9 @@ def db_delete_gas(pth, adsorbate):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
-            # Get id of gas
+            # Get id of adsorbate
             ids = cursor.execute(
-                build_select(table='gasses',
+                build_select(table='adsorbates',
                              to_select=['id'],
                              where=['nick']),
                 {'nick':        adsorbate.name}
@@ -905,20 +820,20 @@ def db_delete_gas(pth, adsorbate):
             if ids is None:
                 raise sqlite3.IntegrityError(
                     "Adsorbate to delete does not exist in database")
-            gas_id = ids[0]
+            ads_id = ids[0]
 
-            # Delete data from gas_properties table
+            # Delete data from adsorbate_properties table
             # Build sql request
-            sql_com = build_delete(table='gas_properties',
-                                   where=['gas_id'])
+            sql_com = build_delete(table='adsorbate_properties',
+                                   where=['ads_id'])
 
-            cursor.execute(sql_com, {'gas_id': gas_id})
+            cursor.execute(sql_com, {'ads_id': ads_id})
 
             # Delete sample info in labs table
-            sql_com = build_delete(table='gasses',
+            sql_com = build_delete(table='adsorbates',
                                    where=['id'])
 
-            cursor.execute(sql_com, {'id': gas_id})
+            cursor.execute(sql_com, {'id': ads_id})
 
             # Print success
             print("Success", adsorbate.name)
@@ -936,10 +851,12 @@ def db_delete_gas(pth, adsorbate):
 
     return
 
+# ---------------------- Contacts
+
 
 def db_upload_contact(pth, contact_dict, overwrite=False):
     """
-    Uploads cpmtact to the database
+    Uploads comtact to the database
     If overwrite is set to true, the contact is overwritten
     WARNING: Overwrite is done on ALL fields
     """
@@ -954,12 +871,11 @@ def db_upload_contact(pth, contact_dict, overwrite=False):
 
             if overwrite:
                 sql_com = build_update(table="contacts",
-                                       to_set=['name', 'email', 'phone',
-                                               'labID', 'type', 'permanent'],
+                                       to_set=['name', 'email', 'phone'],
                                        where=['nick'])
             else:
                 sql_com = build_insert(table="contacts",
-                                       to_insert=['nick', 'name', 'email', 'phone', 'labID', 'type', 'permanent'])
+                                       to_insert=['nick', 'name', 'email', 'phone'])
 
             # Upload or modify data in sample table
             cursor.execute(sql_com, {
@@ -967,9 +883,6 @@ def db_upload_contact(pth, contact_dict, overwrite=False):
                 'name':          contact_dict.get('name'),
                 'email':         contact_dict.get('email'),
                 'phone':         contact_dict.get('phone'),
-                'labID':         contact_dict.get('labID'),
-                'type':          contact_dict.get('type'),
-                'permanent':     contact_dict.get('permanent'),
             }
             )
 
@@ -1036,11 +949,13 @@ def db_delete_contact(pth, contact_nick):
 
     return
 
+# ---------------------- Sources
 
-def db_upload_lab(pth, lab_dict, overwrite=False):
+
+def db_upload_source(pth, source_dict, overwrite=False):
     """
-    Uploads lab to the database
-    If overwrite is set to true, the lab is overwritten
+    Uploads source to the database
+    If overwrite is set to true, the source is overwritten
     WARNING: Overwrite is done on ALL fields
     """
 
@@ -1053,28 +968,27 @@ def db_upload_lab(pth, lab_dict, overwrite=False):
             cursor.execute('PRAGMA foreign_keys = ON')
 
             if overwrite:
-                sql_com = build_update(table="labs",
-                                       to_set=['name', 'address'],
+                sql_com = build_update(table="sources",
+                                       to_set=['name'],
                                        where=['nick'])
             else:
-                sql_com = build_insert(table="labs",
-                                       to_insert=['nick', 'name', 'address'])
+                sql_com = build_insert(table="sources",
+                                       to_insert=['nick', 'name'])
 
-            # Upload or modify data in labs table
+            # Upload or modify data in sources table
             cursor.execute(sql_com, {
-                'nick':         lab_dict.get('nick'),
-                'name':         lab_dict.get('name'),
-                'address':      lab_dict.get('address'),
+                'nick':         source_dict.get('nick'),
+                'name':         source_dict.get('name'),
             }
             )
 
         # Print success
-        print("Lab uploaded", lab_dict.get('nick'))
+        print("Lab uploaded", source_dict.get('nick'))
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        print("Error on lab:", "\n",
-              lab_dict.get('nick'),
+        print("Error on source:", "\n",
+              source_dict.get('nick'),
               "\n", e)
         raise ParsingError from e
 
@@ -1085,9 +999,9 @@ def db_upload_lab(pth, lab_dict, overwrite=False):
     return
 
 
-def db_delete_lab(pth, lab_nick):
+def db_delete_source(pth, source_nick):
     """
-    Delete lab in the database
+    Delete source in the database
     """
 
     # Connect to database
@@ -1098,30 +1012,30 @@ def db_delete_lab(pth, lab_nick):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
-            # Check if lab exists
+            # Check if source exists
             ids = cursor.execute(
-                build_select(table='labs',
+                build_select(table='sources',
                              to_select=['nick'],
                              where=['nick']),
-                {'nick':        lab_nick}
+                {'nick':        source_nick}
             ).fetchone()
 
             if ids is None:
                 raise sqlite3.IntegrityError(
                     "Lab to delete does not exist in database")
 
-            sql_com = build_delete(table='labs',
+            sql_com = build_delete(table='sources',
                                    where=['nick'])
 
-            cursor.execute(sql_com, {'nick': lab_nick})
+            cursor.execute(sql_com, {'nick': source_nick})
 
             # Print success
-            print("Success", lab_nick)
+            print("Success", source_nick)
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        print("Error on lab:", "\n",
-              lab_nick,
+        print("Error on source:", "\n",
+              source_nick,
               "\n", e)
         raise ParsingError from e
 
@@ -1130,6 +1044,8 @@ def db_delete_lab(pth, lab_nick):
         db.close()
 
     return
+
+# ---------------------- Machines
 
 
 def db_upload_machine(pth, machine_dict, overwrite=False):
@@ -1178,41 +1094,6 @@ def db_upload_machine(pth, machine_dict, overwrite=False):
         db.close()
 
     return
-
-
-def db_upload_machine_type(pth, machine_type):
-    "Uploads a machine type"
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            sql_com = build_insert(table="machine_type",
-                                   to_insert=['type'])
-
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'type':         machine_type,
-            }
-            )
-
-        # Print success
-        print("Machine type uploaded", machine_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on machine type:", "\n",
-              machine_type,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
 
 
 def db_delete_machine(pth, machine_nick):
