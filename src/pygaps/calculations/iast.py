@@ -282,10 +282,10 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
     adsorbed_mole_fractions = res.x
 
     # concatenate mole fraction of last component
-    adsorbed_mole_fractions = numpy.concatenate(adsorbed_mole_fractions,
-                                                numpy.array(
-                                                    [1.0 - numpy.sum(adsorbed_mole_fractions)])
-                                                )
+    adsorbed_mole_fractions = numpy.concatenate((adsorbed_mole_fractions,
+                                                 numpy.array(
+                                                     [1.0 - numpy.sum(adsorbed_mole_fractions)])
+                                                 ))
 
     if (numpy.sum(adsorbed_mole_fractions < 0.0) != 0) | (
             numpy.sum(adsorbed_mole_fractions > 1.0) != 0):
