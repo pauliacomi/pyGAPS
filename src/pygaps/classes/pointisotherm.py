@@ -290,7 +290,6 @@ class PointIsotherm(Isotherm):
             'mode_pressure'
             'basis_adsorbent'
         ]:
-            print('id generated', name, value)
             # Generate the unique id using md5
             self.id = None
             md_hasher = hashlib.md5(
