@@ -7,7 +7,6 @@ import copy
 import pytest
 
 import pygaps
-import pygaps.parsing as ps
 from pygaps.utilities.sqlite_db_creator import db_create
 from pygaps.utilities.sqlite_db_creator import db_execute_general
 
@@ -39,24 +38,27 @@ class TestDatabase(object):
         }
 
         # First upload
-        ps.db_upload_machine(db_file, machine_dict)
+        pygaps.db_upload_machine(db_file, machine_dict)
+
+        # Select test
+        assert len(pygaps.db_get_machines(db_file)) == 1
 
         # Error test uniqueness
         with pytest.raises(pygaps.ParsingError):
-            ps.db_upload_machine(db_file, machine_dict)
+            pygaps.db_upload_machine(db_file, machine_dict)
 
         # Overwrite upload
-        ps.db_upload_machine(db_file, machine_dict, overwrite=True)
+        pygaps.db_upload_machine(db_file, machine_dict, overwrite=True)
 
         # Delete test
-        ps.db_delete_machine(db_file, machine_dict["nick"])
+        pygaps.db_delete_machine(db_file, machine_dict["nick"])
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
-            ps.db_delete_machine(db_file, machine_dict["nick"])
+            pygaps.db_delete_machine(db_file, machine_dict["nick"])
 
         # Final upload
-        ps.db_upload_machine(db_file, machine_dict)
+        pygaps.db_upload_machine(db_file, machine_dict)
 
         return
 
@@ -68,24 +70,27 @@ class TestDatabase(object):
         }
 
         # First upload
-        ps.db_upload_source(db_file, source_dict)
+        pygaps.db_upload_source(db_file, source_dict)
+
+        # Select test
+        assert len(pygaps.db_get_sources(db_file)) == 1
 
         # Error test uniqueness
         with pytest.raises(pygaps.ParsingError):
-            ps.db_upload_source(db_file, source_dict)
+            pygaps.db_upload_source(db_file, source_dict)
 
         # Overwrite upload
-        ps.db_upload_source(db_file, source_dict, overwrite=True)
+        pygaps.db_upload_source(db_file, source_dict, overwrite=True)
 
         # Delete test
-        ps.db_delete_source(db_file, source_dict["nick"])
+        pygaps.db_delete_source(db_file, source_dict["nick"])
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
-            ps.db_delete_source(db_file, source_dict["nick"])
+            pygaps.db_delete_source(db_file, source_dict["nick"])
 
         # Final upload
-        ps.db_upload_source(db_file, source_dict)
+        pygaps.db_upload_source(db_file, source_dict)
 
         return
 
@@ -99,24 +104,27 @@ class TestDatabase(object):
         }
 
         # First upload
-        ps.db_upload_contact(db_file, contact_dict)
+        pygaps.db_upload_contact(db_file, contact_dict)
+
+        # Select test
+        assert len(pygaps.db_get_contacts(db_file)) == 1
 
         # Error test uniqueness
         with pytest.raises(pygaps.ParsingError):
-            ps.db_upload_contact(db_file, contact_dict)
+            pygaps.db_upload_contact(db_file, contact_dict)
 
         # Overwrite upload
-        ps.db_upload_contact(db_file, contact_dict, overwrite=True)
+        pygaps.db_upload_contact(db_file, contact_dict, overwrite=True)
 
         # Delete test
-        ps.db_delete_contact(db_file, contact_dict["nick"])
+        pygaps.db_delete_contact(db_file, contact_dict["nick"])
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
-            ps.db_delete_contact(db_file, contact_dict["nick"])
+            pygaps.db_delete_contact(db_file, contact_dict["nick"])
 
         # Final upload
-        ps.db_upload_contact(db_file, contact_dict)
+        pygaps.db_upload_contact(db_file, contact_dict)
 
         return
 
@@ -124,14 +132,24 @@ class TestDatabase(object):
         "Tests functions related to gasses table, then inserts a test gas"
 
         # Property type testing
-        test_duplicate = True
+        pygaps.db_upload_adsorbate_property_type(db_file, {
+            'type': 'prop',
+            'unit': "test unit"
+        })
+        assert len(pygaps.db_get_adsorbate_property_types(db_file)) == 1
+        with pytest.raises(pygaps.ParsingError):
+            pygaps.db_upload_adsorbate_property_type(db_file, {
+                'type': 'prop',
+                'unit': "test unit"
+            })
+        pygaps.db_delete_adsorbate_property_type(db_file, 'prop')
+
+        # Property type upload
         for prop in adsorbate_data["properties"]:
-            ps.db_upload_adsorbate_property_type(db_file, prop, "test unit")
-            if test_duplicate:
-                test_duplicate = False
-                with pytest.raises(pygaps.ParsingError):
-                    ps.db_upload_adsorbate_property_type(
-                        db_file, prop, "test unit")
+            pygaps.db_upload_adsorbate_property_type(db_file, {
+                'type': prop,
+                'unit': "test unit"
+            })
 
         # Start testing samples table
         basic_adsorbate = pygaps.Adsorbate(adsorbate_data)
@@ -140,27 +158,27 @@ class TestDatabase(object):
         assert len(pygaps.db_get_adsorbates(db_file)) == 0
 
         # First upload
-        ps.db_upload_adsorbate(db_file, basic_adsorbate)
+        pygaps.db_upload_adsorbate(db_file, basic_adsorbate)
 
         # Error test uniqueness
         with pytest.raises(pygaps.ParsingError):
-            ps.db_upload_adsorbate(db_file, basic_adsorbate)
+            pygaps.db_upload_adsorbate(db_file, basic_adsorbate)
 
         # Overwrite upload
         basic_adsorbate.formula = "New Formula"
-        ps.db_upload_adsorbate(db_file, basic_adsorbate, overwrite=True)
+        pygaps.db_upload_adsorbate(db_file, basic_adsorbate, overwrite=True)
         assert pygaps.db_get_adsorbates(
             db_file)[0].formula == basic_adsorbate.formula
 
         # Delete test
-        ps.db_delete_adsorbate(db_file, basic_adsorbate)
+        pygaps.db_delete_adsorbate(db_file, basic_adsorbate)
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
-            ps.db_delete_adsorbate(db_file, basic_adsorbate)
+            pygaps.db_delete_adsorbate(db_file, basic_adsorbate)
 
         # Final upload
-        ps.db_upload_adsorbate(db_file, basic_adsorbate)
+        pygaps.db_upload_adsorbate(db_file, basic_adsorbate)
 
         return
 
@@ -168,21 +186,37 @@ class TestDatabase(object):
         "Tests functions related to samples table, then inserts a test sample"
 
         # Test sample_type table
-        ps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
-                                           'name': 'test name'})
+        pygaps.db_upload_sample_type(db_file, {'type': sample_data['type'],
+                                               'name': 'test name'})
+
+        assert len(pygaps.db_get_sample_types(db_file)) == 1
+
         with pytest.raises(pygaps.ParsingError):
-            ps.db_upload_sample_type(db_file, {'nick': sample_data['type'],
+            pygaps.db_upload_sample_type(db_file, {'type': sample_data['type'],
+                                                   'name': 'test name'})
+        pygaps.db_delete_sample_type(db_file, sample_data['type'])
+        pygaps.db_upload_sample_type(db_file, {'type': sample_data['type'],
                                                'name': 'test name'})
 
         # Property type testing
-        test_error = True
+        pygaps.db_upload_sample_property_type(db_file, {
+            'type': 'prop',
+            'unit': "test unit"
+        })
+        assert len(pygaps.db_get_sample_property_types(db_file)) == 1
+        with pytest.raises(pygaps.ParsingError):
+            pygaps.db_upload_sample_property_type(db_file, {
+                'type': 'prop',
+                'unit': "test unit"
+            })
+        pygaps.db_delete_sample_property_type(db_file, 'prop')
+
+        # Property type upload
         for prop in sample_data["properties"]:
-            ps.db_upload_sample_property_type(db_file, prop, "test unit")
-            if test_error:
-                with pytest.raises(pygaps.ParsingError):
-                    test_error = False
-                    ps.db_upload_sample_property_type(
-                        db_file, prop, "test unit")
+            pygaps.db_upload_sample_property_type(db_file, {
+                'type': prop,
+                'unit': "test unit"
+            })
 
         # Start testing samples table
         basic_sample = pygaps.Sample(sample_data)
@@ -204,11 +238,11 @@ class TestDatabase(object):
             db_file)[0].comment == basic_sample.comment
 
         # Delete test
-        ps.db_delete_sample(db_file, basic_sample)
+        pygaps.db_delete_sample(db_file, basic_sample)
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
-            ps.db_delete_sample(db_file, basic_sample)
+            pygaps.db_delete_sample(db_file, basic_sample)
 
         # Final upload
         pygaps.db_upload_sample(db_file, basic_sample)
@@ -221,24 +255,47 @@ class TestDatabase(object):
         isotherm = basic_pointisotherm
 
         # Test experiment_type table
-        ps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
-                                               'name': 'test type'})
+        pygaps.db_upload_experiment_type(db_file, {'type': isotherm.exp_type,
+                                                   'name': 'test type'})
+
+        assert len(pygaps.db_get_experiment_types(db_file)) == 1
+
         with pytest.raises(pygaps.ParsingError):
-            ps.db_upload_experiment_type(db_file, {'nick': isotherm.exp_type,
+            pygaps.db_upload_experiment_type(db_file, {'type': isotherm.exp_type,
+                                                       'name': 'test type'})
+        pygaps.db_delete_experiment_type(db_file, isotherm.exp_type)
+        pygaps.db_upload_experiment_type(db_file, {'type': isotherm.exp_type,
                                                    'name': 'test type'})
 
         # Test experiment_data_type table
-        ps.db_upload_experiment_data_type(
-            db_file, isotherm.loading_key, "test unit")
-        ps.db_upload_experiment_data_type(
-            db_file, isotherm.pressure_key, "test unit")
-        for key in isotherm.other_keys:
-            ps.db_upload_experiment_data_type(
-                db_file, key, "test unit")
+        pygaps.db_upload_experiment_data_type(db_file, {
+            'type': 'test',
+            'unit': "test unit"
+        })
+
+        assert len(pygaps.db_get_experiment_data_types(db_file)) == 1
 
         with pytest.raises(pygaps.ParsingError):
-            ps.db_upload_experiment_data_type(
-                db_file, isotherm.loading_key, "test unit")
+            pygaps.db_upload_experiment_data_type(db_file, {
+                'type': 'test',
+                'unit': "test unit"
+            })
+        pygaps.db_delete_experiment_data_type(db_file, 'test')
+
+        # Good upload
+        pygaps.db_upload_experiment_data_type(db_file, {
+            'type': isotherm.loading_key,
+            'unit': "test unit"
+        })
+        pygaps.db_upload_experiment_data_type(db_file, {
+            'type': isotherm.pressure_key,
+            'unit': "test unit"
+        })
+        for key in isotherm.other_keys:
+            pygaps.db_upload_experiment_data_type(db_file, {
+                'type': key,
+                'unit': "test unit"
+            })
 
         # Start testing experiments table
         assert len(pygaps.db_get_experiments(db_file, {})) == 0
@@ -258,11 +315,11 @@ class TestDatabase(object):
             db_file, {'id': replace_isotherm.id})[0].comment == replace_isotherm.comment
 
         # Delete test
-        ps.db_delete_experiment(db_file, replace_isotherm)
+        pygaps.db_delete_experiment(db_file, replace_isotherm)
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
-            ps.db_delete_experiment(db_file, isotherm)
+            pygaps.db_delete_experiment(db_file, isotherm)
 
         # Final upload
         pygaps.db_upload_experiment(db_file, isotherm)

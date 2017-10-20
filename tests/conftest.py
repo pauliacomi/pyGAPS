@@ -153,7 +153,7 @@ def sample_data():
         'batch': 'TB',
         'owner': 'TU',
         'contact': 'TU',
-        'source_lab': 'TL',
+        'source': 'TL',
         'project': 'TP',
         'struct': 'MOF-1',
         'type': 'MOF',

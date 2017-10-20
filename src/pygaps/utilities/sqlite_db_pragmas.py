@@ -25,7 +25,7 @@ PRAGMA_SAMPLES = """
                 UNIQUE(name,batch)
                 FOREIGN KEY(`contact`)      REFERENCES `contacts`(`nick`),
                 FOREIGN KEY(`source`)       REFERENCES `sources`(`nick`),
-                FOREIGN KEY(`type`)         REFERENCES `sample_type`(`nick`)
+                FOREIGN KEY(`type`)         REFERENCES `sample_type`(`type`)
                 );
 """
 
@@ -34,7 +34,7 @@ PRAGMA_SAMPLE_TYPE = """
 
             CREATE TABLE "sample_type" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `nick`          TEXT        NOT NULL UNIQUE,
+                `type`          TEXT        NOT NULL UNIQUE,
                 `name`          TEXT
                 );
 """
@@ -90,7 +90,7 @@ PRAGMA_EXPERIMENTS = """
                 `comment`       TEXT,
 
                 FOREIGN KEY(`sample_name`,`sample_batch`)   REFERENCES `samples`(`name`,`batch`),
-                FOREIGN KEY(`exp_type`)         REFERENCES `experiment_type`(`nick`),
+                FOREIGN KEY(`exp_type`)         REFERENCES `experiment_type`(`type`),
                 FOREIGN KEY(`machine`)          REFERENCES `machines`(`nick`),
                 FOREIGN KEY(`user`)             REFERENCES `contacts`(`nick`),
                 FOREIGN KEY(`adsorbate`)        REFERENCES `adsorbates`(`nick`)
@@ -103,7 +103,7 @@ PRAGMA_EXPERIMENT_TYPE = """
 
             CREATE TABLE "experiment_type" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `nick`          TEXT        NOT NULL UNIQUE,
+                `type`          TEXT        NOT NULL UNIQUE,
                 `name`          TEXT
                 );
 """

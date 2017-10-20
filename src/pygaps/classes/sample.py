@@ -128,19 +128,30 @@ class Sample(object):
         '''
         string = ""
 
-        string += ("Sample:" + self.name + '\n')
-        string += ("Batch:" + self.batch + '\n')
-        string += ("Owner:" + self.owner + '\n')
-        string += ("Contact:" + self.contact + '\n')
-        string += ("Source:" + self.source + '\n')
-        string += ("Project:" + self.project + '\n')
-        string += ("Structure:" + self.struct + '\n')
-        string += ("Type:" + self.type + '\n')
-        string += ("Form:" + self.form + '\n')
-        string += ("Comments:" + self.comment + '\n')
+        if self.name:
+            string += ("Sample:" + self.name + '\n')
+        if self.batch:
+            string += ("Batch:" + self.batch + '\n')
+        if self.owner:
+            string += ("Owner:" + self.owner + '\n')
+        if self.contact:
+            string += ("Contact:" + self.contact + '\n')
+        if self.source:
+            string += ("Source:" + self.source + '\n')
+        if self.project:
+            string += ("Project:" + self.project + '\n')
+        if self.struct:
+            string += ("Structure:" + self.struct + '\n')
+        if self.type:
+            string += ("Type:" + self.type + '\n')
+        if self.form:
+            string += ("Form:" + self.form + '\n')
+        if self.comment:
+            string += ("Comments:" + self.comment + '\n')
 
-        for prop in self.properties:
-            string += (prop + ':' + str(self.properties.get(prop)) + '\n')
+        if self.properties:
+            for prop in self.properties:
+                string += (prop + ':' + str(self.properties.get(prop)) + '\n')
 
         return string
 
