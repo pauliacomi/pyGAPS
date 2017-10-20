@@ -7,7 +7,7 @@ Contents
 
    readme
    installation
-   quickstart
+   examples/quickstart
    manual/index
    examples/index
    reference/index

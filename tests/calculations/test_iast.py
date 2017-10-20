@@ -10,7 +10,7 @@ import pygaps
 from pygaps.utilities.exceptions import ParameterError
 
 from .conftest import DATA_IAST
-from .conftest import DATA_PATH
+from .conftest import DATA_IAST_PATH
 
 
 @pytest.fixture()
@@ -18,13 +18,13 @@ def load_iast():
     """
     Creates a dictionary with all parameters for an model isotherm
     """
-    filepath = os.path.join(DATA_PATH, DATA_IAST['CH4'].get('file'))
+    filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['CH4'].get('file'))
 
     with open(filepath, 'r') as text_file:
         ch4 = pygaps.isotherm_from_json(
             text_file.read())
 
-    filepath = os.path.join(DATA_PATH, DATA_IAST['C2H6'].get('file'))
+    filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['C2H6'].get('file'))
 
     with open(filepath, 'r') as text_file:
         c2h6 = pygaps.isotherm_from_json(

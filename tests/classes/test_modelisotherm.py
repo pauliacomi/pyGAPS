@@ -11,7 +11,7 @@ from matplotlib.testing.decorators import cleanup
 import pygaps
 
 from ..calculations.conftest import DATA
-from ..calculations.conftest import DATA_PATH
+from ..calculations.conftest import DATA_N77_PATH
 
 
 class TestModelIsotherm(object):
@@ -141,7 +141,7 @@ class TestModelIsotherm(object):
     def test_isotherm_create_guess(self, file):
         "Checks isotherm can be created from a pointisotherm"
 
-        filepath = os.path.join(DATA_PATH, file)
+        filepath = os.path.join(DATA_N77_PATH, file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.PointIsotherm.from_json(

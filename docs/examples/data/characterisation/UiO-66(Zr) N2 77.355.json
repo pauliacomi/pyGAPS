@@ -1,6 +1,4 @@
 {
-    "comment": null,
-    "date": "None",
     "exp_type": "Isotherme",
     "adsorbate": "N2",
     "id": "7e87b510d40653a0d92d3da8ac0f69ae",
@@ -461,8 +459,6 @@
     },
     "lab": "MADIREL",
     "machine": "Triflex",
-    "other_properties": null,
-    "project": null,
     "sample_batch": "Test",
     "sample_name": "UiO-66(Zr)",
     "t_act": 200.0,

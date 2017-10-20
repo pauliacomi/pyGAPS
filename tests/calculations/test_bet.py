@@ -11,7 +11,7 @@ from numpy import isclose
 import pygaps
 
 from .conftest import DATA
-from .conftest import DATA_PATH
+from .conftest import DATA_N77_PATH
 
 
 class TestBET(object):
@@ -29,7 +29,7 @@ class TestBET(object):
     def test_BET(self, file, expected_bet):
         """Test calculation with several model isotherms"""
 
-        filepath = os.path.join(DATA_PATH, file)
+        filepath = os.path.join(DATA_N77_PATH, file)
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
@@ -47,7 +47,7 @@ class TestBET(object):
 
         data = DATA['MCM-41']
 
-        filepath = os.path.join(DATA_PATH, data['file'])
+        filepath = os.path.join(DATA_N77_PATH, data['file'])
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
@@ -68,7 +68,7 @@ class TestBET(object):
 
         data = DATA['MCM-41']
 
-        filepath = os.path.join(DATA_PATH, data['file'])
+        filepath = os.path.join(DATA_N77_PATH, data['file'])
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(

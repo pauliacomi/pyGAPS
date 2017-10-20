@@ -98,6 +98,11 @@ For more info, as well as a complete manual and reference visit:
 
 https://pygaps.readthedocs.io/
 
+Most of the examples in the documentation are actually in the form of Jupyter Notebooks
+which are turned into webpages with nbsphinx. You can find them for download in:
+
+https://github.com/pauliacomi/pyGAPS/tree/master/docs/examples
+
 
 Installation
 ============

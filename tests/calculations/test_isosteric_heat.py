@@ -12,7 +12,7 @@ from numpy import isclose
 import pygaps
 
 from .conftest import DATA_ISOSTERIC
-from .conftest import DATA_PATH
+from .conftest import DATA_ISOSTERIC_PATH
 
 
 class TestIsostericHeat(object):
@@ -29,7 +29,7 @@ class TestIsostericHeat(object):
         for temp in DATA_ISOSTERIC:
 
             filepath = os.path.join(
-                DATA_PATH, DATA_ISOSTERIC.get(temp)['file'])
+                DATA_ISOSTERIC_PATH, DATA_ISOSTERIC.get(temp)['file'])
 
             with open(filepath, 'r') as text_file:
                 isotherm = pygaps.isotherm_from_json(
@@ -66,7 +66,7 @@ class TestIsostericHeat(object):
         for temp in DATA_ISOSTERIC:
 
             filepath = os.path.join(
-                DATA_PATH, DATA_ISOSTERIC.get(temp)['file'])
+                DATA_ISOSTERIC_PATH, DATA_ISOSTERIC.get(temp)['file'])
 
             with open(filepath, 'r') as text_file:
                 isotherm = pygaps.isotherm_from_json(
@@ -90,7 +90,7 @@ class TestIsostericHeat(object):
         for temp in DATA_ISOSTERIC:
 
             filepath = os.path.join(
-                DATA_PATH, DATA_ISOSTERIC.get(temp)['file'])
+                DATA_ISOSTERIC_PATH, DATA_ISOSTERIC.get(temp)['file'])
 
             with open(filepath, 'r') as text_file:
                 isotherm = pygaps.isotherm_from_json(

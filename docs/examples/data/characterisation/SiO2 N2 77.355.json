@@ -1,6 +1,4 @@
 {
-    "comment": null,
-    "date": "None",
     "exp_type": "Isotherme",
     "adsorbate": "N2",
     "id": "9f1858649bf327fd4428d93f211a076e",
@@ -177,8 +175,6 @@
     },
     "lab": "MADIREL",
     "machine": "Triflex",
-    "other_properties": null,
-    "project": null,
     "sample_batch": "Test",
     "sample_name": "SiO2",
     "t_act": 150.0,

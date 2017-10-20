@@ -1,6 +1,4 @@
 {
-    "comment": null,
-    "date": "None",
     "exp_type": "Isotherme",
     "adsorbate": "N2",
     "id": "91ef5aec1aa833b6525ff87735b9f88a",
@@ -417,8 +415,6 @@
     },
     "lab": "MADIREL",
     "machine": "Triflex",
-    "other_properties": null,
-    "project": null,
     "sample_batch": "Test",
     "sample_name": "NaY",
     "t_act": 200.0,

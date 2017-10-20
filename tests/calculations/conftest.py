@@ -1,6 +1,13 @@
 import os
 
-DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'isotherms_json')
+
+DATA_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    'docs', 'examples', 'data')
+
+DATA_N77_PATH = os.path.join(DATA_PATH, 'characterisation')
+DATA_IAST_PATH = os.path.join(DATA_PATH, 'iast')
+DATA_ISOSTERIC_PATH = os.path.join(DATA_PATH, 'isosteric')
 
 DATA = {
     'MCM-41': {
