@@ -20,7 +20,6 @@ from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
 from ..utilities.sqlite_utilities import build_update
 
-
 # ---------------------- Samples
 
 def db_upload_sample(pth, sample, overwrite=False):
