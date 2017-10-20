@@ -22,7 +22,7 @@ def read(*names, **kwargs):
 
 setup(
     name='pygaps',
-    version='0.1.0',
+    version='0.9.0',
     license='MIT license',
     description='',
     long_description='%s\n%s' % (
