@@ -8,11 +8,13 @@ Sqlite database
 Overview
 --------
 
-The frameork provides capabilities to interact with an sqlite database, in order to store objects such as
-isotherms, samples, adsorbates, users and so on.
+The framework provides capabilities to interact with an sqlite database, in order to store objects such as
+isotherms, samples, adsorbates and so on.
 
-All the functions which interact with a database, take the database path as their first argument. If the
-internal database is to be used, the parameter passed should be the ``pygaps.DATABASE`` constant.
+The database was initially envisioned as a centralised data storage for the MADIREL Laboratory in
+Marseille, at Philip Llewellyn's request. To generalize the concept for a this framework, the
+database has been simplified to what the authors consider a barebones, but still extensible, functionality.
+Suggests for further improvements are welcome.
 
 .. note::
 
@@ -27,20 +29,46 @@ Database structure
 ------------------
 
 The database is configured to use foreign keys, in order to prevent data redundancy and to enforce some
-error checking. An example is connecting the isotherm adsorbate to an adsorbate which already exists in the
+error checking. An example is connecting the isotherm  to an adsorbate which already exists in the
 database. This will make sure that no stored isotherm has an unknown or misspelled adsorbate but it also
 means that some groundwork is required before uploading the first isotherm.
 
 A diagram of the database schema can be seen below:
 
-
+.. image:: /figures/db_schema.png
+    :scale: 30%
+    :alt: Database schema.
+    :align: center
 
 .. _sqlite-manual-methods:
 
 Database methods
 ----------------
 
+
+All the functions which interact with a database, take the database path as their first argument. If the
+internal database is to be used, the parameter passed should be the ``pygaps.DATABASE`` constant.
+
+There are a few types of database functions:
+
+    - :class:`~pygaps.classes.adsorbate.Adsorbate` management functions
+    - :class:`~pygaps.classes.sample.Sample` management functions.
+    - :class:`~pygaps.classes.pointisotherm.PointIsotherm` management functions,
+      here called `experiment`
+    - Functions which manage the `sources` table. This table is supposed to have a list of
+      laboratories, papers or any similar source where the sample is from
+    - Functions which manage the `contacts` table. This table is used for both sample
+      connections (for example who is the sample responsible, the synthesiser, the paper
+      author, etc...) and for experiment connections (who performed the experiment, who
+      is the simulation author, etc...)
+    - Functions which manage the `machines` table. This table is supposed to store a
+      list of the machines where the experiments could be performed.
+
 A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinterface` reference.
+
+.. note::
+
+    For now, ModelIsotherms cannot be stored in the database.
 
 
 .. _sqlite-manual-examples:
@@ -48,24 +76,7 @@ A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinter
 Database example
 ----------------
 
-Let's assume we want to upload a newly created isotherm in the internal database. This isotherm
-is measured on the novel adsorbent *Carbon X1*, with nitrogen at 77 K.
-
-    - The internal database already contains nitrogen as an adsorbate therefore, there's no need to
-      worry about this.
-
-    - Since no samples are present in the internal database, we must first upload the sample object.
-      We create a Sample class and then upload it to the database by using:
-
-      ::
-
-        pygaps.db_upload_sample(pygaps.DATABASE, my_adsorbent)
-
-    - Finally, the isotherm can be uploaded as well.
-
-      ::
-
-        pygaps.db_upload_isotherm(pygaps.DATABASE, my_isotherm)
+Check it out in the ipython notebook in the :ref:`examples <examples/database.ipynb>` section
 
 
 .. _sqlite-manual-creation:
