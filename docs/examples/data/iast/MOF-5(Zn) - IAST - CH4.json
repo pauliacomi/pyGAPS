@@ -1,7 +1,6 @@
 {
     "adsorbate": "CH4",
     "exp_type": "Isotherm",
-    "id": "01a66b8f176789bbe663cbc989c24d00",
     "is_real": true,
     "isotherm_data": {
         "0": {

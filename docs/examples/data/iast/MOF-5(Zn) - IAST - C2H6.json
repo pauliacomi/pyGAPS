@@ -1,7 +1,6 @@
 {
     "adsorbate": "C2H6",
     "exp_type": "Isotherm",
-    "id": "406cf45c875ba23b3f2a013582a28cda",
     "is_real": true,
     "isotherm_data": {
         "0": {

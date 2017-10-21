@@ -1,7 +1,6 @@
 {
     "exp_type": "Isotherme",
     "adsorbate": "N2",
-    "id": "6270ed92faa3e615268e809816157dc1",
     "is_real": true,
     "isotherm_data": {
         "0": {
