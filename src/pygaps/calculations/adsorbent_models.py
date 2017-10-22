@@ -27,24 +27,26 @@ def get_adsorbent_model(model):
     ``ParameterError``
         When string is not in the dictionary of models.
     """
-    # If the model is a string, get a model from the _THICKNESS_MODELS
+    # If the model is a string, get a model from the _ADSORBENT_MODELS
     if isinstance(model, str):
         if model not in _ADSORBENT_MODELS:
             raise ParameterError(
-                "Model {} not an option for t-plot.".format(model),
+                "Model {} not an option for pore size distribution.".format(
+                    model),
                 "Available models are {}".format(_ADSORBENT_MODELS.keys()))
         else:
             a_model = _ADSORBENT_MODELS[model]
 
-    # If the model is an isotherm, transform it into a thickness curve
+    # If the model is an dictionary, use it as is
     elif isinstance(model, dict):
         a_model = model
 
     # Raise error if anything else is passed
     else:
         raise ParameterError(
-            "Model {} not an option for t-plot.".format(model),
-            "Available models are {}".format(_ADSORBENT_MODELS))
+            "Model {} not an option for pore size distribution.".format(model),
+            "Available models are {}".format(_ADSORBENT_MODELS),
+            "or pass a dictionary with the required parameters")
 
     return a_model
 
