@@ -938,7 +938,7 @@ class ModelIsotherm(Isotherm):
         print("RMSE = ", self.rmse)
 
         plot_iso([self], plot_type='isotherm',
-                 logarithmic=logarithmic,
+                 logx=logarithmic,
 
                  basis_adsorbent=self.basis_adsorbent,
                  mode_pressure=self.mode_pressure,

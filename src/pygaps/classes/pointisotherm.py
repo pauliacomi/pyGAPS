@@ -479,7 +479,7 @@ class PointIsotherm(Isotherm):
             secondary_key = None
 
         plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
-                 logarithmic=logarithmic, secondary_key=secondary_key,
+                 logx=logarithmic, secondary_key=secondary_key,
 
                  basis_adsorbent=self.basis_adsorbent,
                  mode_pressure=self.mode_pressure,
