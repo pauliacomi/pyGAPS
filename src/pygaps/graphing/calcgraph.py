@@ -102,7 +102,7 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     return ax1
 
 
-def plot_tp(thickness_curve, loading, results, alpha_s=False):
+def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=None):
     """
     Draws the t-plot
     Also used for alpha-s plot
@@ -128,6 +128,8 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False):
 
     alpha_s : bool
         Whether the function is used for alpha_s display
+    alpha_reducing_p : bool
+        The reducing pressure used for alpha_s
 
     Returns
     -------
@@ -140,7 +142,7 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False):
     ax1 = fig.add_subplot(111)
     if alpha_s:
         label1 = '$\\alpha_s$ method'
-        label2 = '$\\alpha_s (V/V_0.4)$'
+        label2 = '$\\alpha_s (V/V_{' + str(alpha_reducing_p) + '})$'
         label3 = '$\\alpha_s$ method'
     else:
         label1 = 't transform'
@@ -174,7 +176,8 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False):
     return ax1
 
 
-def psd_plot(pore_radii, pore_dist, method=None, log=True, xmax=None):
+def psd_plot(pore_radii, pore_dist, method=None, label=None,
+             log=True, xmax=None, xmin=None):
     """
     Draws the pore size distribution plot
 
@@ -184,10 +187,16 @@ def psd_plot(pore_radii, pore_dist, method=None, log=True, xmax=None):
         Array of the pore radii which will become the x axis
     pore_dist : array
         Contribution of each pore radius which will make up the y axis
+    method : str
+        The method used. Will be a string part of the title.
+    label : str
+        The label for the plotted data, which will appear in the legend.
     log : int
         Whether to display a logarithmic graph
     xmax : int
         Higher bound of the selected pore widths
+    xmax : int
+        Lower bound of the selected pore widths
 
     Returns
     -------
@@ -196,19 +205,39 @@ def psd_plot(pore_radii, pore_dist, method=None, log=True, xmax=None):
         own styling if desired.
 
     """
-    fig = plt.figure()
+    if not label:
+        label = 'distribution'
+
+    fig = plt.figure(figsize=(15, 5))
     ax1 = fig.add_subplot(111)
     ax1.plot(pore_radii, pore_dist,
-             marker='', color='g', label='distribution')
+             marker='', color='g', label=label)
+
+    # Func formatter
+    def formatter(x, pos):
+        return "{0:g}".format(x)
+
     if(log):
+
         ax1.set_xscale('log')
+        ax1.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
+        ax1.xaxis.set_major_formatter(ticker.FuncFormatter(formatter))
         ax1.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
+        ax1.tick_params(axis='x', which='minor', width=0.75,
+                        length=2.5, labelsize=10)
+        ax1.tick_params(axis='x', which='major',
+                        width=2, length=10, labelsize=10)
+        ax1.set_xlim(xmin=xmin, xmax=xmax)
+    else:
+        if not xmin:
+            xmin = 0
+        ax1.set_xlim(xmin=xmin, xmax=xmax)
+
     ax1.set_title("PSD plot " + str(method))
     ax1.set_xlabel('Pore width (nm)')
     ax1.set_ylabel('Pore size')
     ax1.legend(loc='best')
-    ax1.set_xlim(xmin=0, xmax=xmax)
     ax1.set_ylim(ymin=0)
     ax1.grid(True)
 
