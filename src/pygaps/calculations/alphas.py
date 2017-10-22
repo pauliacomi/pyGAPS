@@ -29,7 +29,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     ----------
     isotherm : PointIsotherm
         the isotherm of which to calculate the alpha-s plot parameters
-    reference_isotherm : PointIsotherm
+    reference_isotherm : PointIsotherm or ModelIsotherm
         the isotherm to use as reference
     reference_area : str, optional
         area of the reference material
@@ -130,7 +130,10 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
 
     # Read data in
     loading = isotherm.loading(unit='mol', branch='ads')
-    reference_loading = reference_isotherm.loading(unit='mol', branch='ads')
+    reference_loading = reference_isotherm.loading_at(
+        isotherm.pressure(branch='ads', unit=isotherm.unit_pressure),
+        pressure_unit=isotherm.unit_pressure,
+        loading_unit='mol', branch='ads')
     alpha_s_point = reference_isotherm.loading_at(
         0.4, loading_unit='mol', pressure_mode='relative', branch='ads')
     alpha_curve = reference_loading / alpha_s_point
@@ -162,7 +165,8 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
                     round(result.get('area'), 4)
                 ))
 
-            plot_tp(alpha_curve, loading, results, alpha_s=True)
+            plot_tp(alpha_curve, loading, results, alpha_s=True,
+                    alpha_reducing_p=reducing_pressure)
 
     return result_dict
 
