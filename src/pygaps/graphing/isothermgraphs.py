@@ -21,6 +21,7 @@ _BRANCH_TYPES = ("ads", "des")
 def plot_iso(isotherms,
              plot_type='isotherm', secondary_key=None,
              branch=_BRANCH_TYPES, logx=False, color=True,
+             match_points=False,
 
              basis_adsorbent='mass',
              mode_pressure='absolute',
@@ -60,6 +61,9 @@ def plot_iso(isotherms,
     color : bool, optional
         Whether the graph should be coloured or grayscale. Grayscale graphs
         are usually preffered for publications or print media.
+    match_points : bool, optional
+        Whether the plotting should attempt to match all the pressure
+        points with the first passed isotherm.
 
     basis_adsorbent : str, optional
         Whether the adsorption is read in terms of either 'per volume'
