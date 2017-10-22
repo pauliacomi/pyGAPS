@@ -101,6 +101,8 @@ def plot_iso(isotherms,
     Returns
     -------
 
+    axes1 : Matplotlib figure
+        The figure object generated
     axes1 : Matplotlib ax
         Ax object for primary graph
     axes2 : Matplotlib ax
@@ -428,7 +430,7 @@ def plot_iso(isotherms,
         lines = lines + lines2
         labels = labels + labels2
 
-    legend_style = dict(handlelength=3, fontsize=15, loc='lower right')
+    legend_style = dict(handlelength=3, fontsize=15, loc='best')
     if legend_bottom:
         legend_style['bbox_to_anchor'] = (0.5, -0.1)
         legend_style['ncol'] = 2
@@ -443,7 +445,7 @@ def plot_iso(isotherms,
     plt.tight_layout()
 
     if save is True:
-        plt.savefig(path, bbox_extra_artists=(lgd,),
+        fig.savefig(path, bbox_extra_artists=(lgd,),
                     bbox_inches='tight', transparent=False)
 
-    return axes, axes2
+    return fig, axes, axes2
