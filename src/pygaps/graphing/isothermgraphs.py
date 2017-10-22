@@ -100,6 +100,12 @@ def plot_iso(isotherms,
 
     Returns
     -------
+
+    axes1 : Matplotlib ax
+        Ax object for primary graph
+    axes2 : Matplotlib ax
+        Ax object for secondary graph
+
     """
 #######################################
 #
