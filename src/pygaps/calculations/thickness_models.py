@@ -43,7 +43,7 @@ def get_thickness_model(model):
             t_model = _THICKNESS_MODELS[model]
 
     # If the model is an isotherm, transform it into a thickness curve
-    elif issubclass(model, Isotherm):
+    elif isinstance(model, Isotherm):
         t_model = thickness_isotherm(model)
 
     # If the model is an callable, return it instead
