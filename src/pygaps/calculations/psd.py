@@ -16,7 +16,7 @@ from .psd_mesoporous import psd_dollimore_heal
 from .psd_microporous import psd_horvath_kawazoe
 from .thickness_models import get_thickness_model
 
-_MESO_PSD_MODELS = ['BJH', 'DH', 'HK']
+_MESO_PSD_MODELS = ['BJH', 'DH']
 _MICRO_PSD_MODELS = ['HK']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
@@ -43,9 +43,12 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     Other Parameters
     ----------------
-    branch : {'adsorption', 'desorption'}
+    branch : {'adsorption', 'desorption'}, optional
         Branch of the isotherm to use. It defaults to desorption.
-    thickness_model : str
+    kelvin_model : callable, optional
+        A custom user kelvin model. It should be a callable that only takes
+        relative pressure as an argument.
+    thickness_model : str or callable, optional
         The thickness model to use for PSD, It defaults to Harkins and Jura.
 
     Returns
@@ -110,6 +113,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         raise ParameterError("Branch {} not an option for psd.".format(branch),
                              "Select either 'adsorption' or 'desorption'")
 
+    # Default thickness model
     thickness_model = model_parameters.get('thickness_model')
     if thickness_model is None:
         thickness_model = 'Harkins/Jura'
@@ -136,13 +140,17 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     t_model = get_thickness_model(thickness_model)
 
     # Kelvin model definitions
-    m_geometry = meniscus_geometry(branch, pore_geometry)
-    k_model = partial(kelvin_radius_std,
-                      meniscus_geometry=m_geometry,
-                      temperature=isotherm.t_exp,
-                      liquid_density=liquid_density,
-                      adsorbate_molar_mass=molar_mass,
-                      adsorbate_surface_tension=surface_tension)
+    kelvin_model = model_parameters.get('kelvin_model')
+    if kelvin_model:
+        k_model = kelvin_model
+    else:
+        m_geometry = meniscus_geometry(branch, pore_geometry)
+        k_model = partial(kelvin_radius_std,
+                          meniscus_geometry=m_geometry,
+                          temperature=isotherm.t_exp,
+                          liquid_density=liquid_density,
+                          adsorbate_molar_mass=molar_mass,
+                          adsorbate_surface_tension=surface_tension)
 
     # Call specified pore size distribution function
     if psd_model == 'BJH':
@@ -168,7 +176,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     return result_dict
 
 
-def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
+def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
                                 verbose=False, **model_parameters):
     """
     Calculates the microporous size distribution using a 'classical' model
@@ -188,6 +196,8 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     Other Parameters
     ----------------
+    adsorbate_model : obj('dict')
+        The adsorbate model to use for PSD, If null, properties are taken from the adsorbate in the list.
     adsorbent_model : obj('str') or obj('dict')
         The adsorbent model to use for PSD, It defaults to Carbon(HK).
 
@@ -239,13 +249,16 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         adsorbent_model = 'Carbon(HK)'
 
     # Get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
-    adsorbate_properties = dict(
-        molecular_diameter=adsorbate.get_prop('molecular_diameter'),
-        polarizability=adsorbate.get_prop('polarizability'),
-        magnetic_susceptibility=adsorbate.get_prop('magnetic_susceptibility'),
-        surface_density=adsorbate.get_prop('surface_density'),
-    )
+    adsorbate_properties = model_parameters.get('adsorbate_model')
+    if adsorbate_properties is None:
+        adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+        adsorbate_properties = dict(
+            molecular_diameter=adsorbate.get_prop('molecular_diameter'),
+            polarizability=adsorbate.get_prop('polarizability'),
+            magnetic_susceptibility=adsorbate.get_prop(
+                'magnetic_susceptibility'),
+            surface_density=adsorbate.get_prop('surface_density'),
+        )
 
     # Read data in
     loading = isotherm.loading(unit='mmol', branch='ads')
