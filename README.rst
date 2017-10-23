@@ -108,12 +108,11 @@ Installation
 ============
 
 The easiest way to install pyGAPS is from the command line.
+Make sure that you have `numpy`, `scipy`, `pandas` and `matplotlib` already installed.
 
 .. code-block:: bash
 
     pip install pygaps
-
-Make sure that you have numpy, scipy, pandas and matplotlib already installed.
 
 On Windows, `Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
 environments for you.
