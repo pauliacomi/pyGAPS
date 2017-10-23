@@ -465,7 +465,8 @@ class ModelIsotherm(Isotherm):
                                           method=optimization_method)
         if not opt_res.success:
             raise CalculationError("""
-            Minimization of RSS for {0} isotherm fitting failed with error {1}.
+            Minimization of RSS for {0} isotherm fitting failed with error:
+            \n\t {1}
             Try a different starting point in the nonlinear optimization
             by passing a dictionary of parameter guesses, param_guess, to the
             constructor.
