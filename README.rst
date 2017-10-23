@@ -80,7 +80,7 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
 Features
 ========
 
-    - Advanced adsorption data manipulation and transforms
+    - Advanced adsorption data import and manipulation
     - Routine analysis such as BET surface area, t-plot, alpha-s method
     - Pore size distribution calculations for mesopores (BJH, Dollimore-Heal)
     - Pore size distribution calculations for micropores (Horvath-Kawazoe)
