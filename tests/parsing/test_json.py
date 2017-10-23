@@ -2,8 +2,8 @@
 This test module has tests relating to parser classes
 """
 
-import os
 import json
+import os
 
 import pytest
 
