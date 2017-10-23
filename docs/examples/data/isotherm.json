@@ -2,7 +2,7 @@
     "adsorbate": "CO2",
     "date": "2010-05-21 00:00:00",
     "exp_type": "Calorimetrie",
-    "id": "a47d7ae889969dcf00ed0906122dfad4",
+    "id": "6db7312c2d4e8b0b2981dcdd316af96e",
     "is_real": true,
     "isotherm_data": [
         {
@@ -143,7 +143,9 @@
     ],
     "lab": "MADIREL",
     "machine": "CV",
-    "sample_batch": "Test",
+    "other_properties": null,
+    "project": "EU MACADEMIA",
+    "sample_batch": "KRICT",
     "sample_name": "HKUST-1(Cu)",
     "t_act": 150.0,
     "t_exp": 303.0,

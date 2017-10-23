@@ -1,0 +1,63 @@
+{
+    "filename": "10.1002adem.200500223.isotherm2",
+    "DOI": "10.1002/adem.200500223",
+    "hashkey": "NISTSRDXXX-991daf7313251e7e607e2bab2da57e33",
+    "adsorbentMaterial": "CuBTC",
+    "InChIKey": "UFHFLCQGNIYNRP-UHFFFAOYSA-N",
+    "adsorbateGas": "Hydrogen",
+    "temperature": 87,
+    "isotherm_type": "",
+    "category": "",
+    "pressureUnits": "bar",
+    "adsorptionUnits": "cm3(STP)/g",
+    "isotherm_data": [
+        {
+            "pressure": 0.0149343,
+            "adsorption": 7.56894
+        },
+        {
+            "pressure": 0.0608167,
+            "adsorption": 29.4177
+        },
+        {
+            "pressure": 0.106699,
+            "adsorption": 48.5353
+        },
+        {
+            "pressure": 0.202833,
+            "adsorption": 78.0311
+        },
+        {
+            "pressure": 0.307707,
+            "adsorption": 100.426
+        },
+        {
+            "pressure": 0.403842,
+            "adsorption": 116.813
+        },
+        {
+            "pressure": 0.506531,
+            "adsorption": 130.468
+        },
+        {
+            "pressure": 0.60485,
+            "adsorption": 141.392
+        },
+        {
+            "pressure": 0.700985,
+            "adsorption": 152.317
+        },
+        {
+            "pressure": 0.801489,
+            "adsorption": 160.51
+        },
+        {
+            "pressure": 0.906363,
+            "adsorption": 167.065
+        },
+        {
+            "pressure": 1.0025,
+            "adsorption": 172.527
+        }
+    ]
+}

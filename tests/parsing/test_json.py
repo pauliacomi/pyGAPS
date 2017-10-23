@@ -2,6 +2,7 @@
 This test module has tests relating to parser classes
 """
 
+import os
 import json
 
 import pytest
@@ -19,8 +20,8 @@ def basic_isotherm_json(basic_pointisotherm):
     isotherm_dict.update({'id': basic_pointisotherm.id})
 
     isotherm_data_dict = basic_pointisotherm.data().to_dict(orient='index')
-    isotherm_data_dict = {str(k): {p: str(t) for p, t in v.items()}
-                          for k, v in isotherm_data_dict.items()}
+    isotherm_data_dict = [{p: str(t) for p, t in v.items()}
+                          for k, v in isotherm_data_dict.items()]
     isotherm_dict["isotherm_data"] = isotherm_data_dict
 
     return json.dumps(isotherm_dict, sort_keys=True)
@@ -40,5 +41,16 @@ class TestJson(object):
 
         test_isotherm = pygaps.isotherm_from_json(basic_isotherm_json)
         assert basic_pointisotherm == test_isotherm
+
+        return
+
+    def test_isotherm_from_json_nist(self):
+
+        JSON_PATH_NIST = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            'docs', 'examples', 'data', 'parsing', 'nist', 'nist_iso.json')
+
+        with open(JSON_PATH_NIST) as file:
+            pygaps.isotherm_from_json(file.read(), fmt='NIST')
 
         return
