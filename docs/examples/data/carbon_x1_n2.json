@@ -1,6 +1,4 @@
 {
-    "comment": null,
-    "date": "None",
     "exp_type": "Isotherme",
     "adsorbate": "N2",
     "id": "b3d3e5efe512973312043c2c16729ac7",
@@ -533,8 +531,6 @@
     },
     "lab": "MADIREL",
     "machine": "Triflex",
-    "other_properties": null,
-    "project": null,
     "sample_batch": "Test",
     "sample_name": "Takeda 5A",
     "t_act": 200.0,
