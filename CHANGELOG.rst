@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.9.2 (2017-10-24)
+------------------
+
+* Slightly changed json format for efficiency
+
 0.9.1 (2017-10-23)
 ------------------
 
