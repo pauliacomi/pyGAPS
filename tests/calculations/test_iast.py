@@ -16,7 +16,7 @@ from .conftest import DATA_IAST_PATH
 @pytest.fixture()
 def load_iast():
     """
-    Creates a dictionary with all parameters for an model isotherm
+    Loads the files from disk
     """
     filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['CH4'].get('file'))
 
@@ -31,6 +31,21 @@ def load_iast():
             text_file.read())
 
     return ch4, c2h6
+
+
+@pytest.fixture()
+def load_iast_models(load_iast):
+    """
+    Creates models from the disk files
+    """
+
+    ch4, c2h6 = load_iast
+
+    ch4_model = pygaps.ModelIsotherm.from_pointisotherm(ch4, model='Langmuir')
+    c2h6_model = pygaps.ModelIsotherm.from_pointisotherm(
+        c2h6, model='Langmuir')
+
+    return ch4_model, c2h6_model
 
 
 class TestIAST(object):
@@ -111,6 +126,20 @@ class TestIAST(object):
         result_dict = pygaps.iast_binary_svp([ch4, c2h6], [0.5, 0.5], rng)
 
         expected_avg = 0.19
+        avg = numpy.average(result_dict['selectivity'])
+
+        assert numpy.isclose(avg, expected_avg, atol=0.01)
+
+    def test_iast_svp_model(self, load_iast_models):
+        """Tests the selectivity-pressure graph"""
+
+        ch4, c2h6 = load_iast_models
+
+        rng = numpy.linspace(0.01, 10, 30)
+
+        result_dict = pygaps.iast_binary_svp([ch4, c2h6], [0.5, 0.5], rng)
+
+        expected_avg = 0.13
         avg = numpy.average(result_dict['selectivity'])
 
         assert numpy.isclose(avg, expected_avg, atol=0.01)
