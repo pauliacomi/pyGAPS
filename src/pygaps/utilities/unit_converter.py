@@ -5,10 +5,13 @@ from .exceptions import ParameterError
 _LOADING_UNITS = {
     "mol": 1,
     "mmol": 0.001,
+    "kmol": 1000,
     "cm3 STP": 4.461e-5,
+    "cm3(STP)": 4.461e-5,
     "ml": 4.461e-5,
 }
 _MASS_UNITS = {
+    'mg': 0.001,
     'g': 1,
     'kg': 1000,
 }
