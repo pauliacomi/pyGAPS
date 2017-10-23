@@ -68,10 +68,6 @@ have been introduced which make it easier to do common calculations and generate
                                             )
         plt.show()
 
-      .. figure:: /figures/svp_graph.png
-         :alt: Methane in ethane selectivity graph over pressure range.
-         :figwidth: 60%
-         :align: center
 
     - :func:`~pygaps.calculations.iast.iast_binary_vle` is a function to calculate the
       gas-adsorbed equilibrium at a constant pressure, over the entire range of
@@ -88,8 +84,11 @@ have been introduced which make it easier to do common calculations and generate
 
         plt.show()
 
-      .. figure:: /figures/vle_graph.png
-         :alt: Gas fraction versus adsorbed fraction of methane in a methane-ethane mixture.
-         :figwidth: 60%
-         :align: center
 
+.. _iast-manual-examples:
+
+IAST example
+------------
+
+Check it out in the ipython notebook in the :ref:`examples <examples/iast.ipynb>` section for a
+demonstration.

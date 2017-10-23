@@ -82,7 +82,7 @@ Features
 
     - Routine analysis such as BET surface area, t-plot, alpha-s method
     - Pore size distribution calculations for mesopores (BJH, Dollimore-Heal)
-    - Pore size distribution calculations for micropores (Horowitz-Kawazoe)
+    - Pore size distribution calculations for micropores (Horvath-Kawazoe)
     - Pore size distribution calculations using DFT kernels
     - Isotherm modelling (Henry, Langmuir, DS/TS Langmuir, etc..)
     - IAST predictions for binary adsorption

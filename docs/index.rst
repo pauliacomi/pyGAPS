@@ -1,6 +1,17 @@
+========================
+The pyGAPS documentation
+========================
+
+Welcome to the documentation for the pyGAPS framework.
+
 ========
 Contents
 ========
+
+.. toctree::
+   :hidden:
+
+   self
 
 .. toctree::
    :maxdepth: 4

@@ -146,3 +146,9 @@ isotherm.
     pygaps.plot_iso([new_point_isotherm, point_isotherm])
 
 
+.. _modelling-manual-examples:
+
+Modelling example
+-----------------
+
+Check it out in the ipython notebook in the :ref:`examples <examples/modelling.ipynb>` section

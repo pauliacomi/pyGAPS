@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.9.0 (2017-10-20)
+------------------
+
+* Code is now in mostly working state.
+* Manual and reference are built.
+
+
 0.1.0 (2017-07-27)
 ------------------
 

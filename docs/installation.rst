@@ -2,6 +2,9 @@
 Installation
 ============
 
+Command line
+============
+
 The installation process should take care of the dependencies for you. If using pip all
 you need to do is at the command line::
 
