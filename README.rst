@@ -113,9 +113,18 @@ The easiest way to install pyGAPS is from the command line.
 
     pip install pygaps
 
+Make sure that you have numpy, scipy, pandas and matplotlib already installed.
+
 On Windows, `Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
 environments for you.
-First install the suite and then use pip inside your regular python 3 environment.
+First create a new environment and use conda to install the dependencies (or start with one 
+that already has a full instalation). Then use pip inside your environment.
+
+.. code-block:: bat
+
+    conda create -n py36 python=3.6 numpy scipy pandas matplotlib
+    activate py36
+    pip install pygaps
 
 Alternatively, to install the development branch, clone the repository from Github.
 Then install the package with setuptools, either in regular or developer mode
