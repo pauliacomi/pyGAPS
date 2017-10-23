@@ -167,7 +167,10 @@ def plot_iso(isotherms,
     # Build the name of the axes
     text_xaxis = r'Pressure'
     text_yaxis = r'Loading'
-    text_y2axis = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
+    if secondary_key == 'enthalpy':
+        text_y2axis = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
+    else:
+        text_y2axis = secondary_key
     if mode_pressure == "absolute":
         text_xaxis = text_xaxis + ' ($' + unit_pressure + '$)'
     elif mode_pressure == "relative":
