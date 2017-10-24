@@ -23,10 +23,12 @@ def plot_iso(isotherms,
              branch=_BRANCH_TYPES, logx=False, color=True,
              match_points=False,
 
-             basis_adsorbent='mass',
-             mode_pressure='absolute',
-             unit_pressure='bar',
-             unit_loading='mmol',
+             basis_adsorbent="mass",
+             unit_adsorbent="g",
+             basis_loading="molar",
+             unit_loading="mmol",
+             mode_pressure="absolute",
+             unit_pressure="bar",
 
              x_range=(None, None),
              y1_range=(None, None),
@@ -68,11 +70,15 @@ def plot_iso(isotherms,
     basis_adsorbent : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         or 'per mass'.
+    unit_adsorbent : str, optional
+        Unit of loading.
+    basis_loading : str, optional
+        Loading basis.
+    unit_loading : str, optional
+        Unit of loading.
     mode_pressure : str, optional
         The pressure mode, either absolute pressures or relative in
         the form of p/p0.
-    unit_loading : str, optional
-        Unit of loading
     unit_pressure : str, optional
         Unit of pressure.
 
@@ -175,10 +181,8 @@ def plot_iso(isotherms,
         text_xaxis = text_xaxis + ' ($' + unit_pressure + '$)'
     elif mode_pressure == "relative":
         text_xaxis = "Relative " + text_xaxis
-    if basis_adsorbent == "mass":
-        text_yaxis = text_yaxis + ' ($' + unit_loading + ' g^{-1}$)'
-    elif basis_adsorbent == "volume":
-        text_yaxis = text_yaxis + ' ($' + unit_loading + ' cm^{-3}$)'
+    text_yaxis = text_yaxis + \
+        ' ($' + unit_loading + '/' + unit_adsorbent + '$)'
 
     # Set the colours of the graph
     number_of_lines = 6

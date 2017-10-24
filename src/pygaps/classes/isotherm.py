@@ -8,6 +8,8 @@ from ..classes.adsorbate import _PRESSURE_MODE
 from ..classes.sample import _MATERIAL_MODE
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _LOADING_UNITS
+from ..utilities.unit_converter import _MASS_UNITS
+from ..utilities.unit_converter import _VOLUME_UNITS
 from ..utilities.unit_converter import _PRESSURE_UNITS
 
 
@@ -23,15 +25,19 @@ class Isotherm(object):
     Parameters
     ----------
     basis_adsorbent : str, optional
-        whether the adsorption is read in terms of either 'per volume'
-        or 'per mass'
-    mode_pressure : str, optional
-        the pressure mode, either absolute pressures or relative in
-        the form of p/p0
+        Whether the adsorption is read in terms of either 'per volume'
+        or 'per mass'.
+    unit_adsorbent : str, optional
+        Unit of loading.
+    basis_loading : str, optional
+        Loading basis.
     unit_loading : str, optional
-        unit of loading
+        Unit of loading.
+    mode_pressure : str, optional
+        The pressure mode, either absolute pressures or relative in
+        the form of p/p0.
     unit_pressure : str, optional
-        unit of pressure
+        Unit of pressure.
     isotherm_parameters:
         dictionary of the form::
 
@@ -65,10 +71,14 @@ class Isotherm(object):
     def __init__(self,
                  loading_key=None,
                  pressure_key=None,
+
                  basis_adsorbent="mass",
-                 mode_pressure="absolute",
+                 unit_adsorbent="g",
+                 basis_loading="molar",
                  unit_loading="mmol",
+                 mode_pressure="absolute",
                  unit_pressure="bar",
+
                  **isotherm_parameters):
         """
         Instantiation is done by passing a dictionary with the parameters,
@@ -82,36 +92,47 @@ class Isotherm(object):
                 "Isotherm MUST have the following information in the properties dictionary:"
                 "'sample_name', 'sample_batch', 't_exp', 'adsorbate'")
 
-        if basis_adsorbent is None or mode_pressure is None:
+        # Basis and mode
+        if basis_adsorbent is None or mode_pressure is None or basis_loading is None:
             raise ParameterError(
-                "One of the modes is not specified. See viable"
-                "modes in _MATERIAL_MODE and _PRESSURE_MODE")
+                "One of the modes or bases is not specified.")
 
         if basis_adsorbent not in _MATERIAL_MODE:
             raise ParameterError(
-                "Mode selected for adsorbent is not an option. See viable"
-                "modes in _MATERIAL_MODE")
+                "Basis selected for adsorbent is not an option. See viable"
+                "values: {0}".format(_MATERIAL_MODE))
+
+        if basis_loading not in _MATERIAL_MODE:
+            raise ParameterError(
+                "Basis selected for loading is not an option. See viable"
+                "values: {0}".format(_MATERIAL_MODE))
 
         if mode_pressure not in _PRESSURE_MODE:
             raise ParameterError(
                 "Mode selected for pressure is not an option. See viable"
-                "modes in _PRESSURE_MODE")
+                "values: {0}".format(_PRESSURE_MODE))
 
-        if unit_loading is None or unit_pressure is None:
+        # Units
+        if unit_loading is None or unit_pressure is None or unit_adsorbent is None:
             raise ParameterError(
-                "One of the units is not specified. See viable"
-                "units in _LOADING_UNITS and _PRESSURE_UNITS")
+                "One of the units is not specified.")
 
         if unit_loading not in _LOADING_UNITS:
             raise ParameterError(
                 "Unit selected for loading is not an option. See viable"
-                "units in _LOADING_UNITS")
+                "values: {0}".format(_LOADING_UNITS))
 
         if unit_pressure not in _PRESSURE_UNITS:
             raise ParameterError(
                 "Unit selected for pressure is not an option. See viable"
-                "units in _PRESSURE_UNITS")
+                "values: {0}".format(_PRESSURE_UNITS))
 
+        if unit_adsorbent not in _VOLUME_UNITS and unit_adsorbent not in _MASS_UNITS:
+            raise ParameterError(
+                "Unit selected for adsorbent is not an option. See viable"
+                "values: {0} {1}".format(_VOLUME_UNITS,  _MASS_UNITS))
+
+        # Column titles
         if None in [loading_key, pressure_key]:
             raise ParameterError(
                 "Pass loading_key and pressure_key, the names of the loading and"
@@ -119,10 +140,14 @@ class Isotherm(object):
 
         #: basis for the adsorbent
         self.basis_adsorbent = str(basis_adsorbent)
-        #: mode for the pressure
-        self.mode_pressure = str(mode_pressure)
+        #: unit for the adsorbent
+        self.unit_adsorbent = str(unit_adsorbent)
+        #: basis for the loading
+        self.basis_loading = str(basis_loading)
         #: units for loading
         self.unit_loading = str(unit_loading)
+        #: mode for the pressure
+        self.mode_pressure = str(mode_pressure)
         #: units for pressure
         self.unit_pressure = str(unit_pressure)
 
@@ -224,12 +249,14 @@ class Isotherm(object):
         else:
             string += ("Simulated isotherm" + '\n')
 
+        # Required
         string += ("Material: " + str(self.sample_name) + '\n')
         string += ("Batch: " + str(self.sample_batch) + '\n')
+        string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
+        string += ("Isotherm temperature: " + str(self.t_exp) + "K" + '\n')
+
         if self.exp_type:
             string += ("Isotherm type: " + str(self.exp_type) + '\n')
-        if self.adsorbate:
-            string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
         if self.date:
             string += ("Isotherm date: " + str(self.date) + '\n')
         if self.machine:
@@ -239,11 +266,19 @@ class Isotherm(object):
         if self.t_act:
             string += ("Activation temperature: " +
                        str(self.t_act) + "°C" + '\n')
-        if self.t_exp:
-            string += ("Isotherm temperature: " + str(self.t_exp) + "K" + '\n')
         if self.comment:
             string += ("Isotherm comments: " + str(self.comment) + '\n')
 
+        # Units/basis
+        string += ("Units: \n")
+        string += ("Unit for loading: " + str(self.unit_loading) +
+                   "/" + str(self.unit_adsorbent) + '\n')
+        if self.mode_pressure == 'relative':
+            string += ("Relative pressure \n")
+        else:
+            string += ("Unit for pressure: " + str(self.unit_pressure) + '\n')
+
+        string += ("Other properties: \n")
         for prop in self.other_properties:
             string += (prop + ": " + str(self.other_properties[prop]) + '\n')
 
@@ -292,6 +327,14 @@ class Isotherm(object):
             parameter_dict.update({'is_real': self.is_real})
         if self.exp_type:
             parameter_dict.update({'exp_type': self.exp_type})
+
+        # Get the units
+        parameter_dict.update({'pressure_unit': self.unit_pressure})
+        parameter_dict.update({'pressure_mode': self.mode_pressure})
+        parameter_dict.update({'adsorbent_unit': self.unit_adsorbent})
+        parameter_dict.update({'adsorbent_basis': self.basis_adsorbent})
+        parameter_dict.update({'loading_unit': self.unit_loading})
+        parameter_dict.update({'loading_basis': self.basis_loading})
 
         # Now add the rest
         parameter_dict.update(self.other_properties)

@@ -6,7 +6,7 @@ import pygaps
 
 from ..utilities.exceptions import ParameterError
 
-_MATERIAL_MODE = ["mass", "volume"]
+_MATERIAL_MODE = ["mass", "volume", "molar"]
 
 
 class Sample(object):

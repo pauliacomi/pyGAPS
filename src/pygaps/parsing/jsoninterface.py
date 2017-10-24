@@ -38,10 +38,9 @@ def isotherm_to_json(isotherm, fmt=None):
 
     if fmt == 'NIST':
         raw_dict = _to_json_nist(raw_dict,
-                                 isotherm.mode_pressure,
-                                 isotherm.basis_adsorbent,
-                                 isotherm.unit_pressure,
-                                 isotherm.unit_loading)
+                                 isotherm.basis_adsorbent, isotherm.unit_adsorbent,
+                                 isotherm.basis_loading, isotherm.unit_loading,
+                                 isotherm.mode_pressure, isotherm.unit_pressure)
 
     # Isotherm data
     isotherm_data_dict = isotherm.data().to_dict(orient='index')
@@ -58,9 +57,11 @@ def isotherm_from_json(json_isotherm,
                        loading_key='loading',
 
                        basis_adsorbent='mass',
+                       unit_adsorbent='g',
+                       basis_loading='molar',
+                       unit_loading='mmol',
                        mode_pressure='absolute',
                        unit_pressure='bar',
-                       unit_loading='mmol',
                        fmt=None):
     """
     Converts a json isotherm format to a internal format
@@ -100,10 +101,9 @@ def isotherm_from_json(json_isotherm,
     if fmt == 'NIST':
         loading_key = 'adsorption'
         (raw_dict,
-         mode_pressure,
-         basis_adsorbent,
-         unit_pressure,
-         unit_loading) = _from_json_nist(raw_dict)
+         basis_adsorbent, unit_adsorbent,
+         basis_loading, unit_loading,
+         mode_pressure, unit_pressure) = _from_json_nist(raw_dict)
 
     # get the other data in the json
     other_keys = [column for column in data.columns.values
@@ -115,8 +115,10 @@ def isotherm_from_json(json_isotherm,
                              pressure_key=pressure_key,
                              other_keys=other_keys,
                              basis_adsorbent=basis_adsorbent,
-                             mode_pressure=mode_pressure,
+                             unit_adsorbent=unit_adsorbent,
+                             basis_loading=basis_loading,
                              unit_loading=unit_loading,
+                             mode_pressure=mode_pressure,
                              unit_pressure=unit_pressure,
                              **raw_dict)
 
@@ -153,8 +155,9 @@ NIST_ADSORBATES = {
 
 
 def _to_json_nist(raw_dict,
-                  mode_pressure, basis_adsorbent,
-                  unit_pressure, unit_loading):
+                  basis_adsorbent, unit_adsorbent,
+                  basis_loading, unit_loading,
+                  mode_pressure, unit_pressure):
     """
     Converts an internal dictionary format to a NIST format
     """
@@ -231,6 +234,11 @@ def _from_json_nist(raw_dict):
     # Add all the rest of the parameters
     nist_dict.update(raw_dict)
 
+    # TODO expand this
+    basis_loading = 'molar'
+    unit_adsorbent = 'g'
+
     return (nist_dict,
-            mode_pressure, basis_adsorbent,
-            unit_pressure, unit_loading)
+            basis_adsorbent, unit_adsorbent,
+            basis_loading, unit_loading,
+            mode_pressure, unit_pressure)

@@ -46,15 +46,19 @@ class PointIsotherm(Isotherm):
     other_keys : iterable
         other pandas DataFrame columns with data
     basis_adsorbent : str, optional
-        whether the adsorption is read in terms of either 'per volume'
-        or 'per mass'
-    mode_pressure : str, optional
-        the pressure mode, either absolute pressures or relative in
-        the form of p/p0
+        Whether the adsorption is read in terms of either 'per volume'
+        or 'per mass'.
+    unit_adsorbent : str, optional
+        Unit of loading.
+    basis_loading : str, optional
+        Loading basis.
     unit_loading : str, optional
-        unit of loading
+        Unit of loading.
+    mode_pressure : str, optional
+        The pressure mode, either absolute pressures or relative in
+        the form of p/p0.
     unit_pressure : str, optional
-        unit of pressure
+        Unit of pressure.
     isotherm_parameters:
         dictionary of the form::
 
@@ -85,10 +89,14 @@ class PointIsotherm(Isotherm):
                  loading_key=None,
                  pressure_key=None,
                  other_keys=None,
+
                  basis_adsorbent="mass",
-                 mode_pressure="absolute",
+                 unit_adsorbent="g",
+                 basis_loading="molar",
                  unit_loading="mmol",
+                 mode_pressure="absolute",
                  unit_pressure="bar",
+
                  **isotherm_parameters):
         """
         Instantiation is done by passing the discrete data as a pandas
@@ -103,10 +111,14 @@ class PointIsotherm(Isotherm):
         Isotherm.__init__(self,
                           loading_key=loading_key,
                           pressure_key=pressure_key,
+
                           basis_adsorbent=basis_adsorbent,
-                          mode_pressure=mode_pressure,
+                          unit_adsorbent=unit_adsorbent,
+                          basis_loading=basis_loading,
                           unit_loading=unit_loading,
+                          mode_pressure=mode_pressure,
                           unit_pressure=unit_pressure,
+
                           **isotherm_parameters)
 
         #: Pandas DataFrame that stores the data
@@ -166,18 +178,25 @@ class PointIsotherm(Isotherm):
                    other_keys=other_keys,
                    pressure_key=isotherm.pressure_key,
                    loading_key=isotherm.loading_key,
+
                    basis_adsorbent=isotherm.basis_adsorbent,
-                   mode_pressure=isotherm.mode_pressure,
+                   unit_adsorbent=isotherm.unit_adsorbent,
+                   basis_loading=isotherm.basis_loading,
                    unit_loading=isotherm.unit_loading,
+                   mode_pressure=isotherm.mode_pressure,
                    unit_pressure=isotherm.unit_pressure,
+
                    **isotherm.to_dict())
 
     @classmethod
     def from_json(cls, json_string,
                   basis_adsorbent="mass",
-                  mode_pressure="absolute",
+                  unit_adsorbent="g",
+                  basis_loading="molar",
                   unit_loading="mmol",
-                  unit_pressure="bar"):
+                  mode_pressure="absolute",
+                  unit_pressure="bar"
+                  ):
         """
         Constructs a PointIsotherm from a standard json-represented isotherm.
         This function is just a wrapper around the more powerful .isotherm_from_json
@@ -200,9 +219,12 @@ class PointIsotherm(Isotherm):
         """
         return pygaps.isotherm_from_json(json_string,
                                          basis_adsorbent=basis_adsorbent,
-                                         mode_pressure=mode_pressure,
+                                         unit_adsorbent=unit_adsorbent,
+                                         basis_loading=basis_loading,
                                          unit_loading=unit_loading,
-                                         unit_pressure=unit_pressure)
+                                         mode_pressure=mode_pressure,
+                                         unit_pressure=unit_pressure
+                                         )
 
     @classmethod
     def from_modelisotherm(cls, modelisotherm,
@@ -245,10 +267,14 @@ class PointIsotherm(Isotherm):
         return PointIsotherm(iso_data,
                              loading_key=modelisotherm.loading_key,
                              pressure_key=modelisotherm.pressure_key,
+
+                             unit_adsorbent=modelisotherm.unit_adsorbent,
                              basis_adsorbent=modelisotherm.basis_adsorbent,
-                             mode_pressure=modelisotherm.mode_pressure,
                              unit_loading=modelisotherm.unit_loading,
+                             basis_loading=modelisotherm.basis_loading,
+                             mode_pressure=modelisotherm.mode_pressure,
                              unit_pressure=modelisotherm.unit_pressure,
+
                              **modelisotherm.to_dict())
 
 ##########################################################
@@ -286,9 +312,11 @@ class PointIsotherm(Isotherm):
             'other_properties',
             '_data',
             'unit_pressure',
+            'unit_adsorbent',
             'unit_loading'
             'mode_pressure'
             'basis_adsorbent'
+            'basis_loading'
         ]:
             # Generate the unique id using md5
             self.id = None
@@ -427,7 +455,7 @@ class PointIsotherm(Isotherm):
         Parameters
         ----------
         basis_adsorbent : {'volume', 'mass'}
-            the basis in which the isotherm should be put
+            the basis in which the isotherm should be converted.
         """
         if basis_adsorbent == self.basis_adsorbent:
             if verbose:
@@ -482,9 +510,11 @@ class PointIsotherm(Isotherm):
                  logx=logarithmic, secondary_key=secondary_key,
 
                  basis_adsorbent=self.basis_adsorbent,
-                 mode_pressure=self.mode_pressure,
+                 unit_adsorbent=self.unit_adsorbent,
+                 basis_loading=self.basis_loading,
                  unit_loading=self.unit_loading,
                  unit_pressure=self.unit_pressure,
+                 mode_pressure=self.mode_pressure,
 
                  )
 

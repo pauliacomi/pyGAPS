@@ -75,6 +75,14 @@ def isotherm_parameters():
         'is_real': True,
         'exp_type': 'calorimetry',
 
+        # Units/bases
+        'adsorbent_basis': 'mass',
+        'adsorbent_unit': 'g',
+        'loading_basis': 'molar',
+        'loading_unit': 'mmol',
+        'pressure_mode': 'absolute',
+        'pressure_unit': 'bar',
+
         # other properties
 
         'DOI': 'dx.doi/10.0000',

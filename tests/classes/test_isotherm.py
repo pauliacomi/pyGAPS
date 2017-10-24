@@ -57,9 +57,11 @@ class TestIsotherm(object):
         "Tests exception throw for missing or wrong unit"
 
         props = dict(
+            unit_adsorbent='g',
             basis_adsorbent='mass',
-            mode_pressure='absolute',
+            basis_loading='molar',
             unit_loading='mmol',
+            mode_pressure='absolute',
             unit_pressure='bar',
         )
 
@@ -67,9 +69,11 @@ class TestIsotherm(object):
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.classes.isotherm.Isotherm(
+                unit_adsorbent=props.get('unit_adsorbent'),
                 basis_adsorbent=props.get('basis_adsorbent'),
-                mode_pressure=props.get('mode_pressure'),
+                basis_loading=props.get('basis_loading'),
                 unit_loading=props.get('unit_loading'),
+                mode_pressure=props.get('mode_pressure'),
                 unit_pressure=props.get('unit_pressure'),
                 **isotherm_parameters)
 

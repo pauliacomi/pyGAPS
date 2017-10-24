@@ -67,15 +67,19 @@ class ModelIsotherm(Isotherm):
     verbose : bool
         Prints out extra information about steps taken.
     basis_adsorbent : str, optional
-        whether the adsorption is read in terms of either 'per volume'
-        or 'per mass'
-    mode_pressure : str, optional
-        the pressure mode, either absolute pressures or relative in
-        the form of p/p0
+        Whether the adsorption is read in terms of either 'per volume'
+        or 'per mass'.
+    unit_adsorbent : str, optional
+        Unit of loading.
+    basis_loading : str, optional
+        Loading basis.
     unit_loading : str, optional
-        unit of loading
+        Unit of loading.
+    mode_pressure : str, optional
+        The pressure mode, either absolute pressures or relative in
+        the form of p/p0.
     unit_pressure : str, optional
-        unit of pressure
+        Unit of pressure.
     isotherm_parameters:
         dictionary of the form::
 
@@ -156,10 +160,14 @@ class ModelIsotherm(Isotherm):
                  optimization_method="Nelder-Mead",
                  branch='ads',
                  verbose=False,
-                 basis_adsorbent='mass',
-                 mode_pressure='absolute',
-                 unit_loading='mmol',
-                 unit_pressure='bar',
+
+                 basis_adsorbent="mass",
+                 unit_adsorbent="g",
+                 basis_loading="molar",
+                 unit_loading="mmol",
+                 mode_pressure="absolute",
+                 unit_pressure="bar",
+
                  **isotherm_parameters):
         """
         Instantiation is done by passing the data to be fitted, model to be
@@ -181,10 +189,14 @@ class ModelIsotherm(Isotherm):
         Isotherm.__init__(self,
                           pressure_key=pressure_key,
                           loading_key=loading_key,
+
                           basis_adsorbent=basis_adsorbent,
-                          mode_pressure=mode_pressure,
+                          unit_adsorbent=unit_adsorbent,
+                          basis_loading=basis_loading,
                           unit_loading=unit_loading,
+                          mode_pressure=mode_pressure,
                           unit_pressure=unit_pressure,
+
                           **isotherm_parameters)
 
         # Get required branch
@@ -271,12 +283,14 @@ class ModelIsotherm(Isotherm):
                    optimization_method=optimization_method,
                    branch=branch,
                    verbose=verbose,
-
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
+
                    basis_adsorbent=isotherm.basis_adsorbent,
-                   mode_pressure=isotherm.mode_pressure,
+                   unit_adsorbent=isotherm.unit_adsorbent,
+                   basis_loading=isotherm.basis_loading,
                    unit_loading=isotherm.unit_loading,
+                   mode_pressure=isotherm.mode_pressure,
                    unit_pressure=isotherm.unit_pressure,
                    **isotherm.to_dict())
 
@@ -320,9 +334,12 @@ class ModelIsotherm(Isotherm):
 
                                        loading_key=isotherm.loading_key,
                                        pressure_key=isotherm.pressure_key,
+
                                        basis_adsorbent=isotherm.basis_adsorbent,
-                                       mode_pressure=isotherm.mode_pressure,
+                                       unit_adsorbent=isotherm.unit_adsorbent,
+                                       basis_loading=isotherm.basis_loading,
                                        unit_loading=isotherm.unit_loading,
+                                       mode_pressure=isotherm.mode_pressure,
                                        unit_pressure=isotherm.unit_pressure,
                                        **isotherm.to_dict())
 
@@ -335,9 +352,12 @@ class ModelIsotherm(Isotherm):
 
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
+
                    basis_adsorbent=isotherm.basis_adsorbent,
-                   mode_pressure=isotherm.mode_pressure,
+                   unit_adsorbent=isotherm.unit_adsorbent,
+                   basis_loading=isotherm.basis_loading,
                    unit_loading=isotherm.unit_loading,
+                   mode_pressure=isotherm.mode_pressure,
                    unit_pressure=isotherm.unit_pressure,
                    **isotherm.to_dict())
 
@@ -348,10 +368,14 @@ class ModelIsotherm(Isotherm):
               optimization_method="Nelder-Mead",
               branch='ads',
               verbose=False,
+
               basis_adsorbent="mass",
-              mode_pressure="absolute",
+              unit_adsorbent="g",
+              basis_loading="molar",
               unit_loading="mmol",
+              mode_pressure="absolute",
               unit_pressure="bar",
+
               **isotherm_parameters):
         """
         Attempts to model the data using all available models, then returns
@@ -375,14 +399,18 @@ class ModelIsotherm(Isotherm):
             set to desorption as well.
         verbose : bool, optional
             Prints out extra information about steps taken.
-        basis_adsorbent : {'relative', 'optional'}
+        basis_adsorbent : str, optional
             Whether the adsorption is read in terms of either 'per volume'
             or 'per mass'.
-        mode_pressure : {'relative', 'optional'}
-            The pressure mode, either absolute pressures or relative in
-            the form of p/p0.
+        unit_adsorbent : str, optional
+            Unit of loading.
+        basis_loading : str, optional
+            Loading basis.
         unit_loading : str, optional
             Unit of loading.
+        mode_pressure : str, optional
+            The pressure mode, either absolute pressures or relative in
+            the form of p/p0.
         unit_pressure : str, optional
             Unit of pressure.
         isotherm_parameters:
@@ -399,10 +427,14 @@ class ModelIsotherm(Isotherm):
                                          optimization_method=optimization_method,
                                          branch=branch,
                                          verbose=verbose,
+
                                          basis_adsorbent=basis_adsorbent,
-                                         mode_pressure=mode_pressure,
+                                         unit_adsorbent=unit_adsorbent,
+                                         basis_loading=basis_loading,
                                          unit_loading=unit_loading,
+                                         mode_pressure=mode_pressure,
                                          unit_pressure=unit_pressure,
+
                                          **isotherm_parameters)
 
                 attempts.append(isotherm)
@@ -942,9 +974,11 @@ class ModelIsotherm(Isotherm):
                  logx=logarithmic,
 
                  basis_adsorbent=self.basis_adsorbent,
-                 mode_pressure=self.mode_pressure,
+                 unit_adsorbent=self.unit_adsorbent,
+                 basis_loading=self.basis_loading,
                  unit_loading=self.unit_loading,
                  unit_pressure=self.unit_pressure,
+                 mode_pressure=self.mode_pressure,
 
                  )
 
