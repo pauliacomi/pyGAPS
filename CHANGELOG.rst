@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.9.3 (2017-10-24)
+------------------
+
+* Added unit_adsorbate and basis_loading as parameters for an isotherm,
+  although they currently do not have any influence on data processing
+
 0.9.2 (2017-10-24)
 ------------------
 
