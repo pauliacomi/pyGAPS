@@ -9,8 +9,8 @@ from ..classes.sample import _MATERIAL_MODE
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _LOADING_UNITS
 from ..utilities.unit_converter import _MASS_UNITS
-from ..utilities.unit_converter import _VOLUME_UNITS
 from ..utilities.unit_converter import _PRESSURE_UNITS
+from ..utilities.unit_converter import _VOLUME_UNITS
 
 
 class Isotherm(object):
