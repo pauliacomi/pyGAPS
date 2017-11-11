@@ -14,11 +14,10 @@ import scipy.optimize
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import convert_loading
-from ..utilities.unit_converter import convert_pressure
-from .adsorbate import Adsorbate
+from ..utilities.unit_converter import c_pressure
+from ..utilities.unit_converter import c_loading
+from ..utilities.unit_converter import c_adsorbent
 from .isotherm import Isotherm
-from .sample import Sample
 
 # ! list of models implemented
 # ! with parameters involved in each model
@@ -64,36 +63,44 @@ class ModelIsotherm(Isotherm):
         The branch on which the model isotherm is based on. It is assumed to be the
         adsorption branch, as it is the most commonly modelled part, although may
         set to desorption as well.
-    verbose : bool
-        Prints out extra information about steps taken.
+    sample_name : str
+        Name of the sample on which the isotherm is measured.
+    sample_batch : str
+        Batch (or identifier) of the sample on which the isotherm is measured.
+    adsorbate : str
+        The adsorbate used in the experiment.
+    t_exp : float
+        Experiment temperature.
+    isotherm_parameters : dict
+        Any other parameters of the isotherm which should be stored
+        internally. Pass a dictionary of the form::
+
+            isotherm_params = {
+                'user' : 'John Doe',
+                'doi' : '10.0000/',
+                'x' : 'y',
+                }
+            }
+
+    Other Parameters
+    ----------------
     basis_adsorbent : str, optional
         Whether the adsorption is read in terms of either 'per volume'
-        or 'per mass'.
+        'per molar amount' or 'per mass' of material.
     unit_adsorbent : str, optional
-        Unit of loading.
+        Unit in which the adsorbent basis is expressed.
     basis_loading : str, optional
-        Loading basis.
+        Whether the adsorbed material is read in terms of either 'volume'
+        'molar' or 'mass'.
     unit_loading : str, optional
-        Unit of loading.
+        Unit in which the loading basis is expressed.
     mode_pressure : str, optional
-        The pressure mode, either absolute pressures or relative in
+        The pressure mode, either 'absolute' pressures or 'relative' in
         the form of p/p0.
     unit_pressure : str, optional
         Unit of pressure.
-    isotherm_parameters:
-        dictionary of the form::
-
-            isotherm_params = {
-                'sample_name' : 'Zeolite-1',
-                'sample_batch' : '1234',
-                'adsorbate' : 'N2',
-                't_exp' : 200,
-                'user' : 'John Doe',
-                'properties' : {
-                    'doi' : '10.0000/'
-                    'x' : 'y'
-                }
-            }
+    verbose : bool
+        Prints out extra information about steps taken.
 
     Notes
     -----
@@ -283,15 +290,9 @@ class ModelIsotherm(Isotherm):
                    optimization_method=optimization_method,
                    branch=branch,
                    verbose=verbose,
+
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
-
-                   basis_adsorbent=isotherm.basis_adsorbent,
-                   unit_adsorbent=isotherm.unit_adsorbent,
-                   basis_loading=isotherm.basis_loading,
-                   unit_loading=isotherm.unit_loading,
-                   mode_pressure=isotherm.mode_pressure,
-                   unit_pressure=isotherm.unit_pressure,
                    **isotherm.to_dict())
 
     @classmethod
@@ -334,13 +335,6 @@ class ModelIsotherm(Isotherm):
 
                                        loading_key=isotherm.loading_key,
                                        pressure_key=isotherm.pressure_key,
-
-                                       basis_adsorbent=isotherm.basis_adsorbent,
-                                       unit_adsorbent=isotherm.unit_adsorbent,
-                                       basis_loading=isotherm.basis_loading,
-                                       unit_loading=isotherm.unit_loading,
-                                       mode_pressure=isotherm.mode_pressure,
-                                       unit_pressure=isotherm.unit_pressure,
                                        **isotherm.to_dict())
 
         return cls(isotherm.data(branch=branch),
@@ -352,13 +346,6 @@ class ModelIsotherm(Isotherm):
 
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
-
-                   basis_adsorbent=isotherm.basis_adsorbent,
-                   unit_adsorbent=isotherm.unit_adsorbent,
-                   basis_loading=isotherm.basis_loading,
-                   unit_loading=isotherm.unit_loading,
-                   mode_pressure=isotherm.mode_pressure,
-                   unit_pressure=isotherm.unit_pressure,
                    **isotherm.to_dict())
 
     @classmethod
@@ -368,13 +355,6 @@ class ModelIsotherm(Isotherm):
               optimization_method="Nelder-Mead",
               branch='ads',
               verbose=False,
-
-              basis_adsorbent="mass",
-              unit_adsorbent="g",
-              basis_loading="molar",
-              unit_loading="mmol",
-              mode_pressure="absolute",
-              unit_pressure="bar",
 
               **isotherm_parameters):
         """
@@ -391,6 +371,7 @@ class ModelIsotherm(Isotherm):
             Column of the pandas DataFrame where the loading is stored.
         pressure_key : str
             Column of the pandas DataFrame where the pressure is stored.
+
         optimization_method : str
             Method in SciPy minimization function to use in fitting model to data.
         branch : ['ads', 'des'], optional
@@ -399,22 +380,8 @@ class ModelIsotherm(Isotherm):
             set to desorption as well.
         verbose : bool, optional
             Prints out extra information about steps taken.
-        basis_adsorbent : str, optional
-            Whether the adsorption is read in terms of either 'per volume'
-            or 'per mass'.
-        unit_adsorbent : str, optional
-            Unit of loading.
-        basis_loading : str, optional
-            Loading basis.
-        unit_loading : str, optional
-            Unit of loading.
-        mode_pressure : str, optional
-            The pressure mode, either absolute pressures or relative in
-            the form of p/p0.
-        unit_pressure : str, optional
-            Unit of pressure.
         isotherm_parameters:
-            Dictionary with the paramters.
+            Any other parameters of the isotherm which should be stored internally.
         """
         attempts = []
         for model in _MODELS:
@@ -427,13 +394,6 @@ class ModelIsotherm(Isotherm):
                                          optimization_method=optimization_method,
                                          branch=branch,
                                          verbose=verbose,
-
-                                         basis_adsorbent=basis_adsorbent,
-                                         unit_adsorbent=unit_adsorbent,
-                                         basis_loading=basis_loading,
-                                         unit_loading=unit_loading,
-                                         mode_pressure=mode_pressure,
-                                         unit_pressure=unit_pressure,
 
                                          **isotherm_parameters)
 
@@ -455,8 +415,8 @@ class ModelIsotherm(Isotherm):
 
             return best_fit
 
-        ##########################################################
-        #   Overloaded and private functions
+##########################################################
+#   Overloaded and private functions
 
     def _fit(self, loading, pressure, optimization_method, verbose=False):
         """
@@ -466,11 +426,11 @@ class ModelIsotherm(Isotherm):
         Parameters
         ----------
         loading : ndarray
-            the loading for each point
+            The loading for each point.
         pressure : ndarray
-            the pressures of each point
+            The pressures of each point.
         optimization_method : str
-            method in SciPy minimization function to use in fitting model to data.
+            Method in SciPy minimization function to use in fitting model to data.
         verbose : bool, optional
             Prints out extra information about steps taken.
         """
@@ -538,7 +498,8 @@ class ModelIsotherm(Isotherm):
         else:
             return False
 
-    def pressure(self, points=20, unit=None, branch=None, mode=None,
+    def pressure(self, points=20, branch=None,
+                 pressure_unit=None, pressure_mode=None,
                  min_range=None, max_range=None, indexed=False):
         """
         Returns a numpy.linspace generated array with
@@ -549,13 +510,13 @@ class ModelIsotherm(Isotherm):
         ----------
         points : int
             The number of points to get.
-        unit : str, optional
-            Unit in which the pressure should be returned. If None
-            it defaults to which pressure unit the isotherm is currently in
         branch : {None, 'ads', 'des'}
             The branch of the pressure to return. If None, returns the branch
             the isotherm is modelled on
-        mode : {None, 'absolute', 'relative'}
+        pressure_unit : str, optional
+            Unit in which the pressure should be returned. If None
+            it defaults to which pressure unit the isotherm is currently in
+        modpressure_modee : {None, 'absolute', 'relative'}
             The mode in which to return the pressure, if possible. If None,
             returns mode the isotherm is currently in.
         min_range : float, optional
@@ -569,7 +530,7 @@ class ModelIsotherm(Isotherm):
 
         Returns
         -------
-        numpy.array
+        numpy.array or pandas.Series
             Pressure points in the model pressure range.
         """
         if branch and branch != self.branch:
@@ -582,14 +543,20 @@ class ModelIsotherm(Isotherm):
                              points)
 
         # Convert if needed
-        if mode is not None and mode != self.mode_pressure:
-            ret = Adsorbate.from_list(self.adsorbate).convert_mode(
-                mode,
-                ret,
-                self.t_exp,
-                self.unit_pressure)
-        if unit is not None and unit != self.unit_pressure:
-            ret = convert_pressure(ret, self.unit_pressure, unit)
+        if pressure_mode or pressure_unit:
+            if not pressure_mode:
+                pressure_mode = self.mode_pressure
+            if not pressure_unit:
+                pressure_unit = self.unit_pressure
+
+            ret = c_pressure(ret,
+                             mode_from=self.mode_pressure,
+                             mode_to=pressure_mode,
+                             unit_from=self.unit_pressure,
+                             unit_to=pressure_unit,
+                             adsorbate_name=self.adsorbate,
+                             temp=self.t_exp
+                             )
 
         # Select required points
         if max_range is not None or min_range is not None:
@@ -605,7 +572,9 @@ class ModelIsotherm(Isotherm):
         else:
             return ret
 
-    def loading(self, points=20, unit=None, branch=None, basis=None,
+    def loading(self, points=20, branch=None,
+                loading_unit=None, loading_basis=None,
+                adsorbent_unit=None, adsorbent_basis=None,
                 min_range=None, max_range=None, indexed=False):
         """
         Returns the loading calculated at equidistant pressure
@@ -615,14 +584,20 @@ class ModelIsotherm(Isotherm):
         ----------
         points : int
             The number of points to get.
-        unit : str, optional
-            Unit in which the loading should be returned. If None
-            it defaults to which loading unit the isotherm is currently in
         branch : {None, 'ads', 'des'}
             The branch of the loading to return. If None, returns entire
             dataset
-        basis : {None, 'mass', 'volume'}
+        loading_unit : str, optional
+            Unit in which the loading should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        loading_basis : {None, 'mass', 'volume'}
             The basis on which to return the loading, if possible. If None,
+            returns on the basis the isotherm is currently in.
+        adsorbent_unit : str, optional
+            Unit in which the adsorbent should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        adsorbent_basis : {None, 'mass', 'volume'}
+            The basis on which to return the adsorbent, if possible. If None,
             returns on the basis the isotherm is currently in.
         min_range : float, optional
             The lower limit for the loading to select.
@@ -635,7 +610,7 @@ class ModelIsotherm(Isotherm):
 
         Returns
         -------
-        numpy.array
+        numpy.array or pandas.Series
             Loading calculated at points the model pressure range.
         """
         if branch and branch != self.branch:
@@ -644,8 +619,10 @@ class ModelIsotherm(Isotherm):
 
         ret = self.loading_at(
             self.pressure(points),
-            adsorbent_basis=basis,
-            loading_unit=unit,
+            loading_unit=loading_unit,
+            loading_basis=loading_basis,
+            adsorbent_unit=adsorbent_unit,
+            adsorbent_basis=adsorbent_basis,
         )
 
         # Select required points
@@ -662,12 +639,16 @@ class ModelIsotherm(Isotherm):
         else:
             return ret
 
+##########################################################
+#   Functions that calculate values of the isotherm data
+
     def loading_at(self, pressure,
                    branch=None,
-                   pressure_unit=None,
-                   pressure_mode=None,
-                   loading_unit=None,
-                   adsorbent_basis=None):
+
+                   pressure_unit=None, pressure_mode=None,
+                   loading_unit=None, loading_basis=None,
+                   adsorbent_unit=None, adsorbent_basis=None,
+                   ):
         """
         Given stored model parameters, compute loading at pressure P.
 
@@ -677,18 +658,26 @@ class ModelIsotherm(Isotherm):
             Pressure at which to compute loading.
         branch : {None, 'ads', 'des'}
             The branch the calculation is based on.
-        loading_unit : str
-            Unit the loading is returned in. If None, it defaults to
-            internal model units.
+
         pressure_unit : str
             Unit the pressure is specified in. If None, it defaults to
-            internal model units.
-        adsorbent_basis : str
-            The basis the loading should be returned in. If None, it defaults to
-            internal model basis.
+            internal isotherm units.
         pressure_mode : str
             The mode the pressure is passed in. If None, it defaults to
-            internal model mode.
+            internal isotherm mode.
+
+        loading_unit : str, optional
+            Unit in which the loading should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        loading_basis : {None, 'mass', 'volume'}
+            The basis on which to return the loading, if possible. If None,
+            returns on the basis the isotherm is currently in.
+        adsorbent_unit : str, optional
+            Unit in which the adsorbent should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        adsorbent_basis : {None, 'mass', 'volume'}
+            The basis on which to return the adsorbent, if possible. If None,
+            returns on the basis the isotherm is currently in.
 
         Returns
         -------
@@ -706,16 +695,22 @@ class ModelIsotherm(Isotherm):
         pressure = numpy.array(pressure)
 
         # Ensure pressure is in correct units and mode for the internal model
-        if pressure_unit is not None and pressure_unit != self.unit_pressure:
-            pressure = convert_pressure(
-                pressure, pressure_unit, self.unit_pressure)
-        if pressure_mode is not None and pressure_mode != self.mode_pressure:
-            if pressure_mode == 'absolute':
-                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                    'relative', pressure, self.t_exp, self.unit_pressure)
-            if pressure_mode == 'relative':
-                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                    'absolute', pressure, self.t_exp, self.unit_pressure)
+        if pressure_mode or pressure_unit:
+            if not pressure_mode:
+                pressure_mode = self.mode_pressure
+            if not pressure_unit:
+                pressure_unit = self.unit_pressure
+            if not pressure_unit and self.mode_pressure == 'relative':
+                raise ParameterError("Must specify a pressure unit if the input"
+                                     " is in an absolute mode")
+
+            pressure = c_pressure(pressure,
+                                  mode_from=pressure_mode,
+                                  mode_to=self.mode_pressure,
+                                  unit_from=pressure_unit,
+                                  unit_to=self.unit_pressure,
+                                  adsorbate_name=self.adsorbate,
+                                  temp=self.t_exp)
 
         # Calculate loading using internal model
         if self.model == "Langmuir":
@@ -761,21 +756,41 @@ class ModelIsotherm(Isotherm):
                                           langmuir_fractional_loading)
 
         # Ensure loading is in correct units and basis requested
-        if loading_unit is not None and loading_unit != self.unit_loading:
-            loading = convert_loading(
-                loading, self.unit_loading, loading_unit)
-        if adsorbent_basis is not None and adsorbent_basis != self.basis_adsorbent:
-            loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                adsorbent_basis, loading, self.unit_loading)
+        if adsorbent_basis or adsorbent_unit:
+            if not adsorbent_basis:
+                adsorbent_basis = self.basis_adsorbent
+
+            loading = c_adsorbent(loading,
+                                  basis_from=self.basis_adsorbent,
+                                  basis_to=adsorbent_basis,
+                                  unit_from=self.unit_adsorbent,
+                                  unit_to=adsorbent_unit,
+                                  sample_name=self.sample_name,
+                                  sample_batch=self.sample_batch
+                                  )
+
+        if loading_basis or loading_unit:
+            if not loading_basis:
+                loading_basis = self.basis_loading
+
+            loading = c_loading(loading,
+                                basis_from=self.basis_loading,
+                                basis_to=loading_basis,
+                                unit_from=self.unit_loading,
+                                unit_to=loading_unit,
+                                adsorbate_name=self.adsorbate,
+                                temp=self.t_exp
+                                )
 
         return loading
 
     def pressure_at(self, loading,
                     branch=None,
-                    pressure_unit=None,
-                    pressure_mode=None,
-                    loading_unit=None,
-                    adsorbent_basis=None):
+
+                    pressure_unit=None, pressure_mode=None,
+                    loading_unit=None, loading_basis=None,
+                    adsorbent_unit=None, adsorbent_basis=None,
+                    ):
         """
         Given stored model parameters, compute pressure at loading L.
 
@@ -785,18 +800,26 @@ class ModelIsotherm(Isotherm):
             Loading at which to compute pressure.
         branch : {None, 'ads', 'des'}
             The branch the calculation is based on.
-        loading_unit : str
-            Unit the loading is specified in. If None, it defaults to
-            internal model units.
+
         pressure_unit : str
             Unit the pressure is returned in. If None, it defaults to
-            internal model units.
-        adsorbent_basis : str
-            The basis the loading is specified in. If None, it defaults to
-            internal model basis.
+            internal isotherm units.
         pressure_mode : str
             The mode the pressure is returned in. If None, it defaults to
-            internal model mode.
+            internal isotherm mode.
+
+        loading_unit : str
+            Unit the loading is specified in. If None, it defaults to
+            internal isotherm units.
+        loading_basis : {None, 'mass', 'volume'}
+            The basis the loading is specified in. If None,
+            assumes the basis the isotherm is currently in.
+        adsorbent_unit : str, optional
+            Unit in which the adsorbent is passed in. If None
+            it defaults to which loading unit the isotherm is currently in
+        adsorbent_basis : str
+            The basis the loading is passed in. If None, it defaults to
+            internal isotherm basis.
 
         Returns
         -------
@@ -814,16 +837,37 @@ class ModelIsotherm(Isotherm):
         loading = numpy.array(loading)
 
         # Ensure loading is in correct units and basis for the internal model
-        if loading_unit is not None and loading_unit != self.unit_loading:
-            loading = convert_loading(
-                loading, loading_unit, self.unit_loading)
-        if adsorbent_basis is not None and adsorbent_basis != self.basis_adsorbent:
-            if adsorbent_basis == 'mass':
-                loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                    'volume', loading, self.unit_loading)
-            elif adsorbent_basis == 'volume':
-                loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                    'mass', loading, self.unit_loading)
+        if adsorbent_basis or adsorbent_unit:
+            if not adsorbent_basis:
+                adsorbent_basis = self.basis_adsorbent
+            if not adsorbent_unit:
+                raise ParameterError("Must specify an adsorbent unit if the input"
+                                     " is in another basis")
+
+            loading = c_adsorbent(loading,
+                                  basis_from=adsorbent_basis,
+                                  basis_to=self.basis_adsorbent,
+                                  unit_from=adsorbent_unit,
+                                  unit_to=self.unit_adsorbent,
+                                  sample_name=self.sample_name,
+                                  sample_batch=self.sample_batch
+                                  )
+
+        if loading_basis or loading_unit:
+            if not loading_basis:
+                loading_basis = self.basis_loading
+            if not loading_unit:
+                raise ParameterError("Must specify a loading unit if the input"
+                                     " is in another basis")
+
+            loading = c_loading(loading,
+                                basis_from=loading_basis,
+                                basis_to=self.basis_loading,
+                                unit_from=loading_unit,
+                                unit_to=self.unit_loading,
+                                adsorbate_name=self.adsorbate,
+                                temp=self.t_exp
+                                )
 
         # Calculate loading using internal model
         if self.model == "Langmuir":
@@ -849,12 +893,19 @@ class ModelIsotherm(Isotherm):
             raise NotImplementedError
 
         # Ensure pressure is in correct units and mode requested
-        if pressure_unit is not None and pressure_unit != self.unit_pressure:
-            pressure = convert_pressure(
-                pressure, self.unit_pressure, pressure_unit)
-        if pressure_mode is not None and pressure_mode != self.mode_pressure:
-            pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                pressure_mode, pressure, self.t_exp, self.unit_pressure)
+        if pressure_mode or pressure_unit:
+            if not pressure_mode:
+                pressure_mode = self.mode_pressure
+            if not pressure_unit:
+                pressure_unit = self.unit_pressure
+
+            pressure = c_pressure(pressure,
+                                  mode_from=self.mode_pressure,
+                                  mode_to=pressure_mode,
+                                  unit_from=self.unit_pressure,
+                                  unit_to=pressure_unit,
+                                  adsorbate_name=self.adsorbate,
+                                  temp=self.t_exp)
 
         return pressure
 
@@ -900,16 +951,22 @@ class ModelIsotherm(Isotherm):
             branch = self.branch
 
         # Ensure pressure is in correct units and mode for the internal model
-        if pressure_unit is not None and pressure_unit != self.unit_pressure:
-            pressure = convert_pressure(
-                pressure, pressure_unit, self.unit_pressure)
-        elif pressure_mode is not None and pressure_mode != self.mode_pressure:
-            if pressure_mode == 'absolute':
-                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                    'relative', pressure, self.t_exp, self.unit_pressure)
-            if pressure_mode == 'relative':
-                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                    'absolute', pressure, self.t_exp, self.unit_pressure)
+        if pressure_mode or pressure_unit:
+            if not pressure_mode:
+                pressure_mode = self.mode_pressure
+            if not pressure_unit:
+                pressure_unit = self.unit_pressure
+            if not pressure_unit and self.mode_pressure == 'relative':
+                raise ParameterError("Must specify a pressure unit if the input"
+                                     " is in an absolute mode")
+
+            pressure = c_pressure(pressure,
+                                  mode_from=pressure_mode,
+                                  mode_to=self.mode_pressure,
+                                  unit_from=pressure_unit,
+                                  unit_to=self.unit_pressure,
+                                  adsorbate_name=self.adsorbate,
+                                  temp=self.t_exp)
 
         # based on model
         if self.model == "Langmuir":

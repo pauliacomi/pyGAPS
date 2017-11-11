@@ -4,13 +4,13 @@ This module contains the main class that describes an isotherm
 
 import pandas
 
-from ..classes.adsorbate import _PRESSURE_MODE
-from ..classes.sample import _MATERIAL_MODE
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import _LOADING_UNITS
-from ..utilities.unit_converter import _MASS_UNITS
-from ..utilities.unit_converter import _PRESSURE_UNITS
+from ..utilities.unit_converter import _MOLAR_UNITS
 from ..utilities.unit_converter import _VOLUME_UNITS
+from ..utilities.unit_converter import _MASS_UNITS
+from ..utilities.unit_converter import _MATERIAL_MODE
+from ..utilities.unit_converter import _PRESSURE_UNITS
+from ..utilities.unit_converter import _PRESSURE_MODE
 
 
 class Isotherm(object):
@@ -22,39 +22,53 @@ class Isotherm(object):
     an isotherm, such as material, adsorbate, data units etc., but without
     any of the data itself.
 
+    Think of this class as a extended python dictionary.
+
     Parameters
     ----------
-    basis_adsorbent : str, optional
-        Whether the adsorption is read in terms of either 'per volume'
-        or 'per mass'.
-    unit_adsorbent : str, optional
-        Unit of loading.
-    basis_loading : str, optional
-        Loading basis.
-    unit_loading : str, optional
-        Unit of loading.
-    mode_pressure : str, optional
-        The pressure mode, either absolute pressures or relative in
-        the form of p/p0.
-    unit_pressure : str, optional
-        Unit of pressure.
-    isotherm_parameters:
-        dictionary of the form::
+
+    loading_key : str
+        The title of the pressure data in the DataFrame provided.
+    pressure_key
+        The title of the loading data in the DataFrame provided.
+    sample_name : str
+        Name of the sample on which the isotherm is measured.
+    sample_batch : str
+        Batch (or identifier) of the sample on which the isotherm is measured.
+    adsorbate : str
+        The adsorbate used in the experiment.
+    t_exp : float
+        Experiment temperature.
+    isotherm_parameters : dict
+        Any other parameters of the isotherm which should be stored
+        internally. Pass a dictionary of the form::
 
             isotherm_params = {
-                'sample_name' : 'Zeolite-1',
-                'sample_batch' : '1234',
-                'adsorbate' : 'N2',
-                't_exp' : 200,
                 'user' : 'John Doe',
-                'properties' : {
-                    'doi' : '10.0000/'
-                    'x' : 'y'
+                'doi' : '10.0000/',
+                'x' : 'y',
                 }
             }
 
-        The info dictionary must contain an entry for 'sample_name',
-        'sample_batch', 'adsorbate' and 't_exp'
+
+    Other Parameters
+    ----------------
+    basis_adsorbent : str, optional
+        Whether the adsorption is read in terms of either 'per volume'
+        'per molar amount' or 'per mass' of material.
+    unit_adsorbent : str, optional
+        Unit in which the adsorbent basis is expressed.
+    basis_loading : str, optional
+        Whether the adsorbed material is read in terms of either 'volume'
+        'molar' or 'mass'.
+    unit_loading : str, optional
+        Unit in which the loading basis is expressed.
+    mode_pressure : str, optional
+        The pressure mode, either 'absolute' pressures or 'relative' in
+        the form of p/p0.
+    unit_pressure : str, optional
+        Unit of pressure.
+
 
     Notes
     -----
@@ -89,7 +103,7 @@ class Isotherm(object):
         if any(k not in isotherm_parameters
                for k in ('sample_name', 'sample_batch', 't_exp', 'adsorbate')):
             raise ParameterError(
-                "Isotherm MUST have the following information in the properties dictionary:"
+                "Isotherm MUST have the following properties:"
                 "'sample_name', 'sample_batch', 't_exp', 'adsorbate'")
 
         # Basis and mode
@@ -117,10 +131,10 @@ class Isotherm(object):
             raise ParameterError(
                 "One of the units is not specified.")
 
-        if unit_loading not in _LOADING_UNITS:
+        if unit_loading not in _MOLAR_UNITS:
             raise ParameterError(
                 "Unit selected for loading is not an option. See viable"
-                "values: {0}".format(_LOADING_UNITS))
+                "values: {0}".format(_MOLAR_UNITS))
 
         if unit_pressure not in _PRESSURE_UNITS:
             raise ParameterError(

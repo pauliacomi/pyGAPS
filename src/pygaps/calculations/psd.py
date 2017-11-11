@@ -126,12 +126,18 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     # Read data in, depending on branch requested
     if branch == 'adsorption':
-        loading = isotherm.loading(unit='mmol', branch='ads')[::-1]
-        pressure = isotherm.pressure(branch='ads', mode='relative')[::-1]
+        loading = isotherm.loading(branch='ads',
+                                   loading_basis='molar',
+                                   loading_unit='mmol')[::-1]
+        pressure = isotherm.pressure(branch='ads',
+                                     pressure_mode='relative')[::-1]
     # If on desorption branch, data will be reversed
     elif branch == 'desorption':
-        loading = isotherm.loading(unit='mmol', branch='des')
-        pressure = isotherm.pressure(branch='des', mode='relative')
+        loading = isotherm.loading(branch='ads',
+                                   loading_basis='molar',
+                                   loading_unit='mmol')
+        pressure = isotherm.pressure(branch='ads',
+                                     pressure_mode='relative')
     if loading is None:
         raise ParameterError("The isotherm does not have the required branch for"
                              " this calculation")
@@ -261,8 +267,11 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
         )
 
     # Read data in
-    loading = isotherm.loading(unit='mmol', branch='ads')
-    pressure = isotherm.pressure(branch='ads', mode='relative')
+    loading = isotherm.loading(branch='ads',
+                               loading_basis='molar',
+                               loading_unit='mmol')
+    pressure = isotherm.pressure(branch='ads',
+                                 pressure_mode='relative')
     maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
@@ -378,8 +387,11 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
             "Use 'internal' to use the internal kernel (USE JUDICIOUSLY).")
 
     # Read data in
-    loading = isotherm.loading(unit='mmol', branch='ads')
-    pressure = isotherm.pressure(branch='ads', mode='relative')
+    loading = isotherm.loading(branch='ads',
+                               loading_basis='molar',
+                               loading_unit='mmol')
+    pressure = isotherm.pressure(branch='ads',
+                                 pressure_mode='relative')
 
     # Call the DFT function
     pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)

@@ -13,6 +13,12 @@ import pygaps
 windows = pytest.mark.skipif(
     sys.platform != 'win32', reason="requires windows")
 
+# Basic functionality
+basic = pytest.mark.basic
+
+# Characterisation functionality
+characterisation = pytest.mark.characterisation
+
 # Incremental tests
 
 
@@ -171,6 +177,7 @@ def sample_data():
         'properties': {
                 'density': 10,  # g/cm3
                 'poresize': 14,
+                'molar_mass': 10,  # g/mol
         }
     }
 

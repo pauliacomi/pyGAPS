@@ -314,8 +314,8 @@ def plot_iso(isotherms,
         def pressure():
             return isotherm.pressure(
                 branch=plot_branch,
-                unit=unit_pressure,
-                mode=mode_pressure,
+                pressure_unit=unit_pressure,
+                pressure_mode=mode_pressure,
                 min_range=range_pressure[0],
                 max_range=range_pressure[1],
                 indexed=True,
@@ -324,8 +324,10 @@ def plot_iso(isotherms,
         def loading():
             return isotherm.loading(
                 branch=plot_branch,
-                unit=unit_loading,
-                basis=basis_adsorbent,
+                loading_unit=unit_loading,
+                loading_basis=basis_loading,
+                adsorbent_unit=unit_adsorbent,
+                adsorbent_basis=basis_adsorbent,
                 min_range=range_loading[0],
                 max_range=range_loading[1],
                 indexed=True,

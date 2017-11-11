@@ -129,9 +129,11 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
     # Read data in
-    loading = isotherm.loading(unit='mol', branch='ads')
+    loading = isotherm.loading(branch='ads',
+                               loading_unit='mol',
+                               loading_basis='molar')
     reference_loading = reference_isotherm.loading_at(
-        isotherm.pressure(branch='ads', unit=isotherm.unit_pressure),
+        isotherm.pressure(branch='ads', pressure_unit=isotherm.unit_pressure),
         pressure_unit=isotherm.unit_pressure,
         loading_unit='mol', branch='ads')
     alpha_s_point = reference_isotherm.loading_at(

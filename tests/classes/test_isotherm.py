@@ -6,13 +6,16 @@ import pytest
 
 import pygaps
 
+from ..conftest import basic
 
+
+@basic
 class TestIsotherm(object):
     """
     Tests the parent isotherm object
     """
 
-    def test_isotherm_created(self):
+    def test_isotherm_create(self):
         "Checks isotherm can be created from test data"
 
         isotherm_param = {
@@ -30,6 +33,26 @@ class TestIsotherm(object):
 
         return isotherm
 
+    @pytest.mark.parametrize('missing_key',
+                             ['loading_key', 'pressure_key'])
+    def test_isotherm_miss_key(self, isotherm_parameters, missing_key):
+        "Tests exception throw for missing data primary key (loading/pressure)"
+
+        keys = dict(
+            pressure_key="pressure",
+            loading_key="loading",
+        )
+
+        del keys[missing_key]
+
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.classes.isotherm.Isotherm(
+                loading_key=keys.get('loading_key'),
+                pressure_key=keys.get('pressure_key'),
+                **isotherm_parameters)
+
+        return
+
     @pytest.mark.parametrize('missing_param',
                              ['sample_name', 'sample_batch', 't_exp', 'adsorbate'])
     def test_isotherm_miss_param(self, isotherm_parameters, missing_param):
@@ -40,19 +63,23 @@ class TestIsotherm(object):
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.classes.isotherm.Isotherm(
-                **data)
+                **isotherm_parameters)
 
         return
 
     @pytest.mark.parametrize('prop, set_to', [
-                            ('basis_adsorbent', None),
-                            ('basis_adsorbent', 'something'),
+                            ('unit_pressure', None),
+                            ('unit_pressure', 'something'),
                             ('mode_pressure', None),
                             ('mode_pressure', 'something'),
                             ('unit_loading', None),
                             ('unit_loading', 'something'),
-                            ('unit_pressure', None),
-                            ('unit_pressure', 'something')])
+                            ('basis_loading', None),
+                            ('basis_loading', 'something'),
+                            ('unit_adsorbent', None),
+                            ('unit_adsorbent', 'something'),
+                            ('basis_adsorbent', None),
+                            ('basis_adsorbent', 'something')])
     def test_isotherm_mode_and_units(self, isotherm_parameters, prop, set_to):
         "Tests exception throw for missing or wrong unit"
 

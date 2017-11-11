@@ -6,7 +6,10 @@ import sys
 
 import pytest
 
+from .conftest import basic
 
+
+@basic
 @pytest.mark.skip(reason="not well implemented")
 def test_python_three(monkeypatch):
     monkeypatch.setattr(sys, 'version_info', (2, 7, 0, 'final', 0))
@@ -19,6 +22,7 @@ def test_python_three(monkeypatch):
     return
 
 
+@basic
 @pytest.mark.skip(reason="not well implemented")
 def test_dependency_check(monkeypatch):
 

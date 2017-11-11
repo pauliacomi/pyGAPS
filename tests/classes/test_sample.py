@@ -6,7 +6,10 @@ import pytest
 
 import pygaps
 
+from ..conftest import basic
 
+
+@basic
 class TestSample(object):
     """
     Tests the sample class
@@ -42,20 +45,6 @@ class TestSample(object):
         with pytest.raises(pygaps.ParameterError):
             basic_sample.get_prop('density')
         basic_sample.properties['density'] = density
-
-    def test_sample_basis_conversion(self, basic_sample):
-        """Tests the conversion between relative and absolute pressure"""
-
-        mass = 10
-        volume = 1
-
-        assert basic_sample.convert_basis(
-            'volume', mass) == pytest.approx(volume, 0.1)
-
-        assert basic_sample.convert_basis(
-            'mass', volume) == pytest.approx(mass, 0.1)
-
-        return
 
     def test_sample_print(self, basic_sample):
         """Checks the printing is done"""

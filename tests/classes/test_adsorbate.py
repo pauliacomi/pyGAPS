@@ -5,8 +5,10 @@ This test module has tests relating to the adsorbate class
 import pytest
 
 import pygaps
+from ..conftest import basic
 
 
+@basic
 class TestAdsorbate(object):
     """
     Tests the adsorbate class
@@ -61,21 +63,6 @@ class TestAdsorbate(object):
             adsorbate_data['properties'].get('surface_tension'), 0.001)
         assert basic_adsorbate.liquid_density(temp, calculate=calculated) == pytest.approx(
             adsorbate_data['properties'].get('liquid_density'), 0.001)
-
-        return
-
-    def test_adsorbate_mode_conversion(self, basic_adsorbate):
-        """Tests the conversion between relative and absolute pressure"""
-
-        temp = 100
-        p_abs = 389137.5
-        p_rel = 0.5
-
-        assert basic_adsorbate.convert_mode(
-            'relative', p_abs, temp) == pytest.approx(p_rel, 0.1)
-
-        assert basic_adsorbate.convert_mode(
-            'absolute', p_rel, temp) == pytest.approx(p_abs, 0.1)
 
         return
 

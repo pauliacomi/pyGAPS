@@ -8,9 +8,8 @@ import pygaps
 
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import convert_pressure
-
-_PRESSURE_MODE = ["absolute", "relative"]
+from ..utilities.unit_converter import c_unit
+from ..utilities.unit_converter import _PRESSURE_UNITS
 
 
 class Adsorbate(object):
@@ -295,7 +294,7 @@ class Adsorbate(object):
                 raise CalculationError from e_info
 
             if unit is not None:
-                sat_p = convert_pressure(sat_p, 'Pa', unit)
+                sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
         else:
             sat_p = self.properties.get("saturation_pressure")
             if sat_p is None:
@@ -392,47 +391,3 @@ class Adsorbate(object):
                     "liquid_density.".format(self.name))
 
         return liq_d
-
-    def convert_mode(self, mode_pressure, pressure, temp, unit=None):
-        """
-        Converts absolute pressure to relative and vice-versa.
-        Only possible if in the subcritical region.
-
-        Parameters
-        ----------
-        mode_pressure : {'relative', 'absolute'}
-            Whether to convert to relative from absolute or to absolute
-            from relative.
-        pressure : float
-            The absolute pressure which is to be converted into
-            relative pressure.
-        temp : float
-            Temperature at which the pressure is measured, in K
-        unit : optional
-            Unit in which the absolute presure is passed.
-            If not specifies defaults to Pascal.
-
-        Returns
-        -------
-        float
-            Pressure in the mode requested.
-
-        Raises
-        ------
-        ``ParameterError``
-            If the mode selected is not an option
-        ``CalculationError``
-            If it cannot be calculated, due to a physical reason.
-        """
-
-        if mode_pressure not in _PRESSURE_MODE:
-            raise ParameterError(
-                "Mode selected for pressure is not an option. See viable"
-                "models in self._PRESSURE_MODE")
-
-        if mode_pressure == "absolute":
-            sign = 1
-        elif mode_pressure == "relative":
-            sign = -1
-
-        return pressure * self.saturation_pressure(temp, unit=unit) ** sign

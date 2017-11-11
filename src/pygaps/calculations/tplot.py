@@ -125,8 +125,11 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
     # Read data in
-    loading = isotherm.loading(unit='mol', branch='ads')
-    pressure = isotherm.pressure(branch='ads', mode='relative')
+    loading = isotherm.loading(branch='ads',
+                               loading_unit='mol',
+                               loading_basis='molar')
+    pressure = isotherm.pressure(branch='ads',
+                                 pressure_mode='relative')
 
     # Get thickness model
     t_model = get_thickness_model(thickness_model)

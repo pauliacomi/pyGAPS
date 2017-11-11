@@ -13,12 +13,12 @@ import pygaps
 
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 from ..utilities.isotherm_interpolator import isotherm_interpolator
-from ..utilities.unit_converter import convert_loading
-from ..utilities.unit_converter import convert_pressure
-from .adsorbate import Adsorbate
+from ..utilities.unit_converter import c_pressure
+from ..utilities.unit_converter import c_loading
+from ..utilities.unit_converter import c_adsorbent
 from .isotherm import Isotherm
-from .sample import Sample
 
 
 class PointIsotherm(Isotherm):
@@ -40,42 +40,48 @@ class PointIsotherm(Isotherm):
     isotherm_data : DataFrame
         pure-component adsorption isotherm data
     loading_key : str
-        column of the pandas DataFrame where the loading is stored
-    pressure_key : str
-        column of the pandas DataFrame where the pressure is stored
+        The title of the pressure data in the DataFrame provided.
+    pressure_key
+        The title of the loading data in the DataFrame provided.
     other_keys : iterable
-        other pandas DataFrame columns with data
-    basis_adsorbent : str, optional
-        Whether the adsorption is read in terms of either 'per volume'
-        or 'per mass'.
-    unit_adsorbent : str, optional
-        Unit of loading.
-    basis_loading : str, optional
-        Loading basis.
-    unit_loading : str, optional
-        Unit of loading.
-    mode_pressure : str, optional
-        The pressure mode, either absolute pressures or relative in
-        the form of p/p0.
-    unit_pressure : str, optional
-        Unit of pressure.
-    isotherm_parameters:
-        dictionary of the form::
+        Other pandas DataFrame columns which contain data to be stored.
+    sample_name : str
+        Name of the sample on which the isotherm is measured.
+    sample_batch : str
+        Batch (or identifier) of the sample on which the isotherm is measured.
+    adsorbate : str
+        The adsorbate used in the experiment.
+    t_exp : float
+        Experiment temperature.
+    isotherm_parameters : dict
+        Any other parameters of the isotherm which should be stored
+        internally. Pass a dictionary of the form::
 
             isotherm_params = {
-                'sample_name' : 'Zeolite-1',
-                'sample_batch' : '1234',
-                'adsorbate' : 'N2',
-                't_exp' : 200,
                 'user' : 'John Doe',
-                'properties' : {
-                    'doi' : '10.0000/'
-                    'x' : 'y'
+                'doi' : '10.0000/',
+                'x' : 'y',
                 }
             }
 
-        The info dictionary must contain an entry for 'sample_name',  'sample_batch',
-        'adsorbate' and 't_exp'
+    Other Parameters
+    ----------------
+    basis_adsorbent : str, optional
+        Whether the adsorption is read in terms of either 'per volume'
+        'per molar amount' or 'per mass' of material.
+    unit_adsorbent : str, optional
+        Unit in which the adsorbent basis is expressed.
+    basis_loading : str, optional
+        Whether the adsorbed material is read in terms of either 'volume'
+        'molar' or 'mass'.
+    unit_loading : str, optional
+        Unit in which the loading basis is expressed.
+    mode_pressure : str, optional
+        The pressure mode, either 'absolute' pressures or 'relative' in
+        the form of p/p0.
+    unit_pressure : str, optional
+        Unit of pressure.
+
 
     Notes
     -----
@@ -85,7 +91,8 @@ class PointIsotherm(Isotherm):
 ##########################################################
 #   Instantiation and classmethods
 
-    def __init__(self, isotherm_data,
+    def __init__(self,
+                 isotherm_data,
                  loading_key=None,
                  pressure_key=None,
                  other_keys=None,
@@ -176,27 +183,13 @@ class PointIsotherm(Isotherm):
         """
         return cls(isotherm_data,
                    other_keys=other_keys,
+
                    pressure_key=isotherm.pressure_key,
                    loading_key=isotherm.loading_key,
-
-                   basis_adsorbent=isotherm.basis_adsorbent,
-                   unit_adsorbent=isotherm.unit_adsorbent,
-                   basis_loading=isotherm.basis_loading,
-                   unit_loading=isotherm.unit_loading,
-                   mode_pressure=isotherm.mode_pressure,
-                   unit_pressure=isotherm.unit_pressure,
-
                    **isotherm.to_dict())
 
     @classmethod
-    def from_json(cls, json_string,
-                  basis_adsorbent="mass",
-                  unit_adsorbent="g",
-                  basis_loading="molar",
-                  unit_loading="mmol",
-                  mode_pressure="absolute",
-                  unit_pressure="bar"
-                  ):
+    def from_json(cls, json_string, **isotherm_parameters):
         """
         Constructs a PointIsotherm from a standard json-represented isotherm.
         This function is just a wrapper around the more powerful .isotherm_from_json
@@ -206,29 +199,13 @@ class PointIsotherm(Isotherm):
         ----------
         json_string : str
             A json standard isotherm representation.
-        basis_adsorbent : {'relative', 'absolute'}, optional
-            Whether the adsorption is read in terms of either 'per volume'
-            or 'per mass'.
-        mode_pressure : {'mass','volume'}, optional
-            The pressure mode, either absolute pressures or relative in
-            the form of p/p0.
-        unit_loading : str, optional
-            Unit of loading.
-        unit_pressure : str, optional
-            Unit of pressure.
+        isotherm_parameters :
+            Any other options to be passed to the isotherm creation, like mode, basis or unit.
         """
-        return pygaps.isotherm_from_json(json_string,
-                                         basis_adsorbent=basis_adsorbent,
-                                         unit_adsorbent=unit_adsorbent,
-                                         basis_loading=basis_loading,
-                                         unit_loading=unit_loading,
-                                         mode_pressure=mode_pressure,
-                                         unit_pressure=unit_pressure
-                                         )
+        return pygaps.isotherm_from_json(json_string, **isotherm_parameters)
 
     @classmethod
-    def from_modelisotherm(cls, modelisotherm,
-                           pressure_points=None):
+    def from_modelisotherm(cls, modelisotherm, pressure_points=None):
         """
         Constructs a PointIsotherm from a ModelIsothem class.
         This class method allows for the model to be converted into
@@ -267,14 +244,6 @@ class PointIsotherm(Isotherm):
         return PointIsotherm(iso_data,
                              loading_key=modelisotherm.loading_key,
                              pressure_key=modelisotherm.pressure_key,
-
-                             unit_adsorbent=modelisotherm.unit_adsorbent,
-                             basis_adsorbent=modelisotherm.basis_adsorbent,
-                             unit_loading=modelisotherm.unit_loading,
-                             basis_loading=modelisotherm.basis_loading,
-                             mode_pressure=modelisotherm.mode_pressure,
-                             unit_pressure=modelisotherm.unit_pressure,
-
                              **modelisotherm.to_dict())
 
 ##########################################################
@@ -337,44 +306,11 @@ class PointIsotherm(Isotherm):
 ##########################################################
 #   Conversion functions
 
-    def convert_unit_pressure(self, unit_to, verbose=False):
+    def convert_pressure(self, mode_to=None, unit_to=None, verbose=False):
         """
         Converts the pressure values of the isotherm from one unit to another
+        and the pressure mode from absolute to relative.
 
-        Parameters
-        ----------
-        unit_to : str
-            the unit into which the internal pressure should be converted to
-        """
-        if unit_to == self.unit_pressure:
-            if verbose:
-                print("Unit is the same, no changes made")
-            return
-
-        self._data[self.pressure_key] = convert_pressure(
-            self._data[self.pressure_key],
-            self.unit_pressure,
-            unit_to)
-
-        self.unit_pressure = unit_to
-
-        # Re-process interpolator
-        interp_branch = 'ads'
-        self.p_interpolator = isotherm_interpolator('pressure',
-                                                    self.loading(
-                                                        branch=interp_branch),
-                                                    self.pressure(
-                                                        branch=interp_branch),
-                                                    interp_branch=interp_branch)
-
-        if verbose:
-            print("Changed pressure unit to {}".format(unit_to))
-
-        return
-
-    def convert_mode_pressure(self, mode_pressure, verbose=False):
-        """
-        Converts the pressure mode from absolute to relative.
         Only applicable in the case of isotherms taken below critical
         point of adsorbate.
 
@@ -382,103 +318,156 @@ class PointIsotherm(Isotherm):
         ----------
         mode_pressure : {'relative', 'absolute'}
             the mode in which the isotherm should be put
+        unit_to : str
+            the unit into which the internal pressure should be converted to
         """
-        if mode_pressure == self.mode_pressure:
+
+        if mode_to == self.mode_pressure and unit_to == self.unit_pressure:
             if verbose:
-                print("Mode is the same, no changes made")
-            return
+                print("Mode and units are the same, no changes made")
 
-        self._data[self.pressure_key] = Adsorbate.from_list(self.adsorbate).convert_mode(
-            mode_pressure,
-            self._data[self.pressure_key],
-            self.t_exp,
-            self.unit_pressure)
+        else:
+            if not mode_to:
+                mode_to = self.mode_pressure
+            if not unit_to:
+                unit_to = self.unit_pressure
 
-        self.mode_pressure = mode_pressure
+            self._data[self.pressure_key] = c_pressure(
+                self._data[self.pressure_key],
+                mode_from=self.mode_pressure,
+                mode_to=mode_to,
+                unit_from=self.unit_pressure,
+                unit_to=unit_to,
+                adsorbate_name=self.adsorbate,
+                temp=self.t_exp)
 
-        # Re-process interpolator
-        interp_branch = 'ads'
-        self.p_interpolator = isotherm_interpolator('pressure',
-                                                    self.loading(
-                                                        branch=interp_branch),
-                                                    self.pressure(
-                                                        branch=interp_branch),
-                                                    interp_branch=interp_branch)
+            if unit_to != self.unit_pressure:
+                self.unit_pressure = unit_to
+            if mode_to != self.mode_pressure:
+                self.mode_pressure = mode_to
 
-        if verbose:
-            print("Changed pressure mode to {}".format(mode_pressure))
+            # Re-process interpolator
+            interp_branch = self.p_interpolator.interp_branch
+            self.p_interpolator = isotherm_interpolator('pressure',
+                                                        self.loading(
+                                                            branch=interp_branch),
+                                                        self.pressure(
+                                                            branch=interp_branch),
+                                                        interp_branch=interp_branch)
+
+            if verbose:
+                print("Changed pressure to mode {0}, unit {1}".format(
+                    mode_to, unit_to))
 
         return
 
-    def convert_unit_loading(self, unit_to, verbose=False):
+    def convert_loading(self, basis_to=None, unit_to=None, verbose=False):
         """
         Converts the loading of the isotherm from one unit to another
+        and the basis of the isotherm loading to be
+        either 'per mass' or 'per volume' of adsorbent.
 
-        Parameters
-        ----------
-        unit_to : str
-            the unit into which the internal loading should be converted to
-        """
-        if unit_to == self.unit_loading:
-            if verbose:
-                print("Unit is the same, no changes made")
-            return
-
-        self._data[self.loading_key] = convert_loading(
-            self._data[self.loading_key],
-            self.unit_loading,
-            unit_to)
-
-        self.unit_loading = unit_to
-
-        # Re-process interpolator
-        interp_branch = 'ads'
-        self.l_interpolator = isotherm_interpolator('loading',
-                                                    self.pressure(
-                                                        branch=interp_branch),
-                                                    self.loading(
-                                                        branch=interp_branch),
-                                                    interp_branch=interp_branch)
-
-        if verbose:
-            print("Changed loading unit to {}".format(unit_to))
-
-        return
-
-    def convert_basis_adsorbent(self, basis_adsorbent, verbose=False):
-        """
-        Converts the basis of the isotherm loading to be
-        either 'per mass' or 'per volume' of adsorbent. Only
-        applicable to absorbents that have been loaded in memory
+        Only applicable to absorbents that have been loaded in memory
         with a 'density' property.
 
         Parameters
         ----------
-        basis_adsorbent : {'volume', 'mass'}
+        basis : {'volume', 'mass', 'molar'}
             the basis in which the isotherm should be converted.
+        unit_to : str
+            the unit into which the internal loading should be converted to
+
         """
-        if basis_adsorbent == self.basis_adsorbent:
+
+        if basis_to == self.basis_loading and unit_to == self.unit_loading:
             if verbose:
-                print("Mode is the same, no changes made")
-            return
+                print("Mode and units are the same, no changes made")
 
-        self._data[self.loading_key] = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-            basis_adsorbent,
-            self._data[self.loading_key],
-            self.unit_loading)
+        else:
+            if not basis_to:
+                basis_to = self.basis_loading
 
-        self.basis_adsorbent = basis_adsorbent
+            self._data[self.loading_key] = c_loading(
+                self._data[self.loading_key],
+                basis_from=self.basis_loading,
+                basis_to=basis_to,
+                unit_from=self.unit_loading,
+                unit_to=unit_to,
+                adsorbate_name=self.adsorbate,
+                temp=self.t_exp)
 
-        # Re-process interpolator
-        interp_branch = 'ads'
-        self.l_interpolator = isotherm_interpolator('loading',
-                                                    self.pressure(
-                                                        branch=interp_branch),
-                                                    self.loading(
-                                                        branch=interp_branch),
-                                                    interp_branch=interp_branch)
-        if verbose:
-            print("Changed loading basis to {}".format(basis_adsorbent))
+            if unit_to != self.unit_loading:
+                self.unit_loading = unit_to
+            if basis_to != self.basis_loading:
+                self.basis_loading = basis_to
+
+            # Re-process interpolator
+            interp_branch = self.p_interpolator.interp_branch
+            self.p_interpolator = isotherm_interpolator('pressure',
+                                                        self.loading(
+                                                            branch=interp_branch),
+                                                        self.pressure(
+                                                            branch=interp_branch),
+                                                        interp_branch=interp_branch)
+
+            if verbose:
+                print("Changed loading to basis {0}, unit {1}".format(
+                    basis_to, unit_to))
+
+        return
+
+    def convert_adsorbent(self, basis_to=None, unit_to=None, verbose=False):
+        """
+        Converts the adsorbent of the isotherm from one unit to another
+        and the basis of the isotherm loading to be
+        either 'per mass' or 'per volume' of adsorbent.
+
+        Only applicable to absorbents that have been loaded in memory
+        with a 'density' property.
+
+        Parameters
+        ----------
+        basis : {'volume', 'mass', 'molar'}
+            the basis in which the isotherm should be converted.
+        unit_to : str
+            the unit into which the internal loading should be converted to
+
+        """
+
+        if basis_to == self.basis_adsorbent and unit_to == self.unit_adsorbent:
+            if verbose:
+                print("Mode and units are the same, no changes made")
+
+        else:
+            if not basis_to:
+                basis_to = self.basis_adsorbent
+
+            self._data[self.loading_key] = c_adsorbent(
+                self._data[self.loading_key],
+                basis_from=self.basis_adsorbent,
+                basis_to=basis_to,
+                unit_from=self.unit_adsorbent,
+                unit_to=unit_to,
+                sample_name=self.sample_name,
+                sample_batch=self.sample_batch)
+
+            if unit_to != self.unit_adsorbent:
+                self.unit_adsorbent = unit_to
+            if basis_to != self.basis_adsorbent:
+                self.basis_adsorbent = basis_to
+
+            # Re-process interpolator
+            interp_branch = self.p_interpolator.interp_branch
+            self.p_interpolator = isotherm_interpolator('pressure',
+                                                        self.loading(
+                                                            branch=interp_branch),
+                                                        self.pressure(
+                                                            branch=interp_branch),
+                                                        interp_branch=interp_branch)
+
+            if verbose:
+                print("Changed loading to basis {0}, unit {1}".format(
+                    basis_to, unit_to))
 
         return
 
@@ -552,20 +541,21 @@ class PointIsotherm(Isotherm):
         else:
             return None
 
-    def pressure(self, unit=None, branch=None, mode=None,
+    def pressure(self, branch=None,
+                 pressure_unit=None, pressure_mode=None,
                  min_range=None, max_range=None, indexed=False):
         """
         Returns pressure points as an array
 
         Parameters
         ----------
-        unit : str, optional
-            Unit in which the pressure should be returned. If None
-            it defaults to which pressure unit the isotherm is currently in
         branch : {None, 'ads', 'des'}
             The branch of the pressure to return. If None, returns entire
             dataset
-        mode : {None, 'absolute', 'relative'}
+        pressure_unit : str, optional
+            Unit in which the pressure should be returned. If None
+            it defaults to which pressure unit the isotherm is currently in
+        pressure_mode : {None, 'absolute', 'relative'}
             The mode in which to return the pressure, if possible. If None,
             returns mode the isotherm is currently in.
         min_range : float, optional
@@ -584,14 +574,20 @@ class PointIsotherm(Isotherm):
         ret = self.data(branch=branch).loc[:, self.pressure_key]
 
         # Convert if needed
-        if mode is not None and mode != self.mode_pressure:
-            ret = Adsorbate.from_list(self.adsorbate).convert_mode(
-                mode,
-                ret,
-                self.t_exp,
-                self.unit_pressure)
-        if unit is not None and unit != self.unit_pressure:
-            ret = convert_pressure(ret, self.unit_pressure, unit)
+        if pressure_mode or pressure_unit:
+            if not pressure_mode:
+                pressure_mode = self.mode_pressure
+            if not pressure_unit:
+                pressure_unit = self.unit_pressure
+
+            ret = c_pressure(ret,
+                             mode_from=self.mode_pressure,
+                             mode_to=pressure_mode,
+                             unit_from=self.unit_pressure,
+                             unit_to=pressure_unit,
+                             adsorbate_name=self.adsorbate,
+                             temp=self.t_exp
+                             )
 
         # Select required points
         if max_range is not None or min_range is not None:
@@ -608,21 +604,29 @@ class PointIsotherm(Isotherm):
         else:
             return ret.values
 
-    def loading(self, unit=None, branch=None, basis=None,
+    def loading(self, branch=None,
+                loading_unit=None, loading_basis=None,
+                adsorbent_unit=None, adsorbent_basis=None,
                 min_range=None, max_range=None, indexed=False):
         """
         Returns loading points as an array
 
         Parameters
         ----------
-        unit : str, optional
-            Unit in which the loading should be returned. If None
-            it defaults to which loading unit the isotherm is currently in
         branch : {None, 'ads', 'des'}
             The branch of the loading to return. If None, returns entire
             dataset
-        basis : {None, 'mass', 'volume'}
+        loading_unit : str, optional
+            Unit in which the loading should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        loading_basis : {None, 'mass', 'volume'}
             The basis on which to return the loading, if possible. If None,
+            returns on the basis the isotherm is currently in.
+        adsorbent_unit : str, optional
+            Unit in which the adsorbent should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        adsorbent_basis : {None, 'mass', 'volume'}
+            The basis on which to return the adsorbent, if possible. If None,
             returns on the basis the isotherm is currently in.
         min_range : float, optional
             The lower limit for the loading to select.
@@ -640,12 +644,31 @@ class PointIsotherm(Isotherm):
         ret = self.data(branch=branch).loc[:, self.loading_key]
 
         # Convert if needed
-        if basis is not None and basis != self.basis_adsorbent:
-            ret = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                basis,
-                ret)
-        if unit is not None and unit != self.unit_loading:
-            ret = convert_loading(ret, self.unit_loading, unit)
+        if adsorbent_basis or adsorbent_unit:
+            if not adsorbent_basis:
+                adsorbent_basis = self.basis_adsorbent
+
+            ret = c_adsorbent(ret,
+                              basis_from=self.basis_adsorbent,
+                              basis_to=adsorbent_basis,
+                              unit_from=self.unit_adsorbent,
+                              unit_to=adsorbent_unit,
+                              sample_name=self.sample_name,
+                              sample_batch=self.sample_batch
+                              )
+
+        if loading_basis or loading_unit:
+            if not loading_basis:
+                loading_basis = self.basis_loading
+
+            ret = c_loading(ret,
+                            basis_from=self.basis_loading,
+                            basis_to=loading_basis,
+                            unit_from=self.unit_loading,
+                            unit_to=loading_unit,
+                            adsorbate_name=self.adsorbate,
+                            temp=self.t_exp
+                            )
 
         # Select required points
         if max_range is not None or min_range is not None:
@@ -734,10 +757,11 @@ class PointIsotherm(Isotherm):
                    branch='ads',
                    interpolation_type='linear',
                    interp_fill=None,
-                   loading_unit=None,
-                   pressure_unit=None,
-                   pressure_mode=None,
-                   adsorbent_basis=None):
+
+                   pressure_unit=None, pressure_mode=None,
+                   loading_unit=None, loading_basis=None,
+                   adsorbent_unit=None, adsorbent_basis=None,
+                   ):
         """
         Interpolate isotherm to compute loading at any pressure P.
 
@@ -754,18 +778,25 @@ class PointIsotherm(Isotherm):
             Maximum value until which the interpolation is done. If blank,
             interpolation will not predict outside the bounds of data.
 
-        loading_unit : str
-            Unit the loading is returned in. If None, it defaults to
-            internal isotherm units.
         pressure_unit : str
             Unit the pressure is specified in. If None, it defaults to
             internal isotherm units.
-        adsorbent_basis : str
-            The basis the loading should be returned in. If None, it defaults to
-            internal isotherm basis.
         pressure_mode : str
             The mode the pressure is passed in. If None, it defaults to
             internal isotherm mode.
+
+        loading_unit : str, optional
+            Unit in which the loading should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        loading_basis : {None, 'mass', 'volume'}
+            The basis on which to return the loading, if possible. If None,
+            returns on the basis the isotherm is currently in.
+        adsorbent_unit : str, optional
+            Unit in which the adsorbent should be returned. If None
+            it defaults to which loading unit the isotherm is currently in
+        adsorbent_basis : {None, 'mass', 'volume'}
+            The basis on which to return the adsorbent, if possible. If None,
+            returns on the basis the isotherm is currently in.
 
         Returns
         -------
@@ -791,27 +822,52 @@ class PointIsotherm(Isotherm):
                                                         interp_fill=interp_fill)
 
         # Ensure pressure is in correct units and mode for the internal model
-        if pressure_unit is not None and pressure_unit != self.unit_pressure:
-            pressure = convert_pressure(
-                pressure, pressure_unit, self.unit_pressure)
-        if pressure_mode is not None and pressure_mode != self.mode_pressure:
-            if pressure_mode == 'absolute':
-                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                    'relative', pressure, self.t_exp, self.unit_pressure)
-            if pressure_mode == 'relative':
-                pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                    'absolute', pressure, self.t_exp, self.unit_pressure)
+        if pressure_mode or pressure_unit:
+            if not pressure_mode:
+                pressure_mode = self.mode_pressure
+            if not pressure_unit:
+                pressure_unit = self.unit_pressure
+            if not pressure_unit and self.mode_pressure == 'relative':
+                raise ParameterError("Must specify a pressure unit if the input"
+                                     " is in an absolute mode")
+
+            pressure = c_pressure(pressure,
+                                  mode_from=pressure_mode,
+                                  mode_to=self.mode_pressure,
+                                  unit_from=pressure_unit,
+                                  unit_to=self.unit_pressure,
+                                  adsorbate_name=self.adsorbate,
+                                  temp=self.t_exp)
 
         # Interpolate using the internal interpolator
         loading = self.l_interpolator(pressure)
 
         # Ensure loading is in correct units and basis requested
-        if loading_unit is not None and loading_unit != self.unit_loading:
-            loading = convert_loading(
-                loading, self.unit_loading, loading_unit)
-        if adsorbent_basis is not None and adsorbent_basis != self.basis_adsorbent:
-            loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                adsorbent_basis, loading, self.unit_loading)
+        if adsorbent_basis or adsorbent_unit:
+            if not adsorbent_basis:
+                adsorbent_basis = self.basis_adsorbent
+
+            loading = c_adsorbent(loading,
+                                  basis_from=self.basis_adsorbent,
+                                  basis_to=adsorbent_basis,
+                                  unit_from=self.unit_adsorbent,
+                                  unit_to=adsorbent_unit,
+                                  sample_name=self.sample_name,
+                                  sample_batch=self.sample_batch
+                                  )
+
+        if loading_basis or loading_unit:
+            if not loading_basis:
+                loading_basis = self.basis_loading
+
+            loading = c_loading(loading,
+                                basis_from=self.basis_loading,
+                                basis_to=loading_basis,
+                                unit_from=self.unit_loading,
+                                unit_to=loading_unit,
+                                adsorbate_name=self.adsorbate,
+                                temp=self.t_exp
+                                )
 
         return loading
 
@@ -819,10 +875,11 @@ class PointIsotherm(Isotherm):
                     branch='ads',
                     interpolation_type='linear',
                     interp_fill=None,
-                    loading_unit=None,
-                    pressure_unit=None,
-                    pressure_mode=None,
-                    adsorbent_basis=None):
+
+                    pressure_unit=None, pressure_mode=None,
+                    loading_unit=None, loading_basis=None,
+                    adsorbent_unit=None, adsorbent_basis=None,
+                    ):
         """
         Interpolate isotherm to compute pressure at any loading n.
 
@@ -838,18 +895,26 @@ class PointIsotherm(Isotherm):
         interp_fill : float
             Maximum value until which the interpolation is done. If blank,
             interpolation will not predict outside the bounds of data.
-        loading_unit : str
-            Unit the loading is specified in. If None, it defaults to
-            internal isotherm units.
+
         pressure_unit : str
             Unit the pressure is returned in. If None, it defaults to
             internal isotherm units.
-        adsorbent_basis : str
-            The basis the loading is passed in. If None, it defaults to
-            internal isotherm basis.
         pressure_mode : str
             The mode the pressure is returned in. If None, it defaults to
             internal isotherm mode.
+
+        loading_unit : str
+            Unit the loading is specified in. If None, it defaults to
+            internal isotherm units.
+        loading_basis : {None, 'mass', 'volume'}
+            The basis the loading is specified in. If None,
+            assumes the basis the isotherm is currently in.
+        adsorbent_unit : str, optional
+            Unit in which the adsorbent is passed in. If None
+            it defaults to which loading unit the isotherm is currently in
+        adsorbent_basis : str
+            The basis the loading is passed in. If None, it defaults to
+            internal isotherm basis.
 
         Returns
         -------
@@ -875,35 +940,66 @@ class PointIsotherm(Isotherm):
                                                         interp_fill=interp_fill)
 
         # Ensure loading is in correct units and basis for the internal model
-        if loading_unit is not None and loading_unit != self.unit_loading:
-            loading = convert_loading(
-                loading, loading_unit, self.unit_loading)
-        if adsorbent_basis is not None and adsorbent_basis != self.basis_adsorbent:
-            if adsorbent_basis == 'mass':
-                loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                    'volume', loading, self.unit_loading)
-            elif adsorbent_basis == 'volume':
-                loading = Sample.from_list(self.sample_name, self.sample_batch).convert_basis(
-                    'mass', loading, self.unit_loading)
+        if adsorbent_basis or adsorbent_unit:
+            if not adsorbent_basis:
+                adsorbent_basis = self.basis_adsorbent
+            if not adsorbent_unit:
+                raise ParameterError("Must specify an adsorbent unit if the input"
+                                     " is in another basis")
+
+            loading = c_adsorbent(loading,
+                                  basis_from=adsorbent_basis,
+                                  basis_to=self.basis_adsorbent,
+                                  unit_from=adsorbent_unit,
+                                  unit_to=self.unit_adsorbent,
+                                  sample_name=self.sample_name,
+                                  sample_batch=self.sample_batch
+                                  )
+
+        if loading_basis or loading_unit:
+            if not loading_basis:
+                loading_basis = self.basis_loading
+            if not loading_unit:
+                raise ParameterError("Must specify a loading unit if the input"
+                                     " is in another basis")
+
+            loading = c_loading(loading,
+                                basis_from=loading_basis,
+                                basis_to=self.basis_loading,
+                                unit_from=loading_unit,
+                                unit_to=self.unit_loading,
+                                adsorbate_name=self.adsorbate,
+                                temp=self.t_exp
+                                )
 
         # Interpolate using the internal interpolator
         pressure = self.p_interpolator(loading)
 
         # Ensure pressure is in correct units and mode requested
-        if pressure_unit is not None and pressure_unit != self.unit_pressure:
-            pressure = convert_pressure(
-                pressure, self.unit_pressure, pressure_unit)
-        if pressure_mode is not None and pressure_mode != self.mode_pressure:
-            pressure = Adsorbate.from_list(self.adsorbate).convert_mode(
-                pressure_mode, pressure, self.t_exp, self.unit_pressure)
+        if pressure_mode or pressure_unit:
+            if not pressure_mode:
+                pressure_mode = self.mode_pressure
+            if not pressure_unit:
+                pressure_unit = self.unit_pressure
+
+            pressure = c_pressure(pressure,
+                                  mode_from=self.mode_pressure,
+                                  mode_to=pressure_mode,
+                                  unit_from=self.unit_pressure,
+                                  unit_to=pressure_unit,
+                                  adsorbate_name=self.adsorbate,
+                                  temp=self.t_exp)
 
         return pressure
 
     def spreading_pressure_at(self, pressure,
                               branch='ads',
+
                               pressure_unit=None,
                               pressure_mode=None,
                               loading_unit=None,
+                              loading_basis=None,
+                              adsorbent_unit=None,
                               adsorbent_basis=None,
                               interp_fill=None):
         """
@@ -952,11 +1048,13 @@ class PointIsotherm(Isotherm):
         """
         # Get all data points
         pressures = self.pressure(branch=branch,
-                                  unit=pressure_unit,
-                                  mode=pressure_mode)
+                                  pressure_unit=pressure_unit,
+                                  pressure_mode=pressure_mode)
         loadings = self.loading(branch=branch,
-                                unit=loading_unit,
-                                basis=adsorbent_basis)
+                                loading_unit=loading_unit,
+                                loading_basis=loading_basis,
+                                adsorbent_unit=adsorbent_unit,
+                                adsorbent_basis=adsorbent_basis)
 
         # throw exception if interpolating outside the range.
         if (self.l_interpolator.interp_fill is None) & (pressure > pressures.max()):
@@ -1012,10 +1110,13 @@ class PointIsotherm(Isotherm):
             slope = (
                 self.loading_at(pressure,
                                 branch=branch,
-                                loading_unit=loading_unit,
                                 pressure_unit=pressure_unit,
-                                adsorbent_basis=adsorbent_basis,
                                 pressure_mode=pressure_mode,
+
+                                loading_unit=loading_unit,
+                                loading_basis=loading_basis,
+                                adsorbent_unit=adsorbent_unit,
+                                adsorbent_basis=adsorbent_basis,
                                 interp_fill=interp_fill) - loadings[n_points - 1]) / (
                 pressure - pressures[n_points - 1])
             intercept = loadings[n_points - 1] - \
