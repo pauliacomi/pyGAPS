@@ -5,6 +5,7 @@ This test module has tests relating to the adsorbate class
 import pytest
 
 import pygaps
+
 from ..conftest import basic
 
 

@@ -8,8 +8,8 @@ import pygaps
 
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import c_unit
 from ..utilities.unit_converter import _PRESSURE_UNITS
+from ..utilities.unit_converter import c_unit
 
 
 class Adsorbate(object):

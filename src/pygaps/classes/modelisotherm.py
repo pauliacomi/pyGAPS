@@ -14,9 +14,9 @@ import scipy.optimize
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import c_pressure
-from ..utilities.unit_converter import c_loading
 from ..utilities.unit_converter import c_adsorbent
+from ..utilities.unit_converter import c_loading
+from ..utilities.unit_converter import c_pressure
 from .isotherm import Isotherm
 
 # ! list of models implemented

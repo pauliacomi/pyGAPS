@@ -11,9 +11,9 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
-from ..conftest import basic
 from ..calculations.conftest import DATA
 from ..calculations.conftest import DATA_N77_PATH
+from ..conftest import basic
 
 
 @basic

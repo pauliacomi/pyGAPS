@@ -1,8 +1,8 @@
 """Module containing the conversions between different units used"""
 
-from .exceptions import ParameterError
-
 import pygaps
+
+from .exceptions import ParameterError
 
 _MOLAR_UNITS = {
     "mol": 1,

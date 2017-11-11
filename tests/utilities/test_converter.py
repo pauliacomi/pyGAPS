@@ -1,6 +1,6 @@
 # %%
-import pytest
 import numpy
+import pytest
 
 import pygaps
 
