@@ -436,6 +436,11 @@ def plot_iso(isotherms,
         axes.set_xscale('linear')
         axes.set_xlim(xmin=0)
 
+    axes.set_xlim(x_range)
+    axes.set_ylim(y1_range)
+    if axes2:
+        axes2.set_ylim(y2_range)
+
     # Add the legend
     lines, labels = axes.get_legend_handles_labels()
     if plot_type == 'combined':
