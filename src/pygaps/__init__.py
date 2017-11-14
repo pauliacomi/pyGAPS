@@ -8,6 +8,7 @@ __version__ = '0.9.3'
 # isort:skip_file
 
 # This code is written for Python 3.
+import importlib
 import sys
 if sys.version_info[0] != 3:
     print("Code requires Python 3.")
@@ -22,7 +23,7 @@ dependency = None
 
 for dependency in hard_dependencies:
     try:
-        __import__(dependency)
+        importlib.import_module(dependency)
     except ImportError as e_info:
         missing_dependencies.append(dependency)
 
