@@ -140,12 +140,12 @@ def _to_json_nist(raw_dict):
     """
     nist_dict = dict()
 
-    basis_adsorbent = raw_dict.pop('basis_adsorbent')
-    # unit_adsorbent = raw_dict.pop('unit_adsorbent')
-    # basis_loading = raw_dict.pop('basis_loading')
-    unit_loading = raw_dict.pop('unit_loading')
-    # mode_pressure = raw_dict.pop('mode_pressure')
-    unit_pressure = raw_dict.pop('unit_pressure')
+    adsorbent_basis = raw_dict.pop('adsorbent_basis')
+    # adsorbent_unit = raw_dict.pop('adsorbent_unit')
+    # loading_basis = raw_dict.pop('loading_basis')
+    loading_unit = raw_dict.pop('loading_unit')
+    # pressure_mode = raw_dict.pop('pressure_mode')
+    pressure_unit = raw_dict.pop('pressure_unit')
 
     nist_dict['adsorbentMaterial'] = raw_dict.pop('sample_name')
     nist_dict['hashkey'] = raw_dict.pop('sample_batch')
@@ -156,8 +156,8 @@ def _to_json_nist(raw_dict):
                       if v == internal_adsorbate]
     nist_dict['adsorbateGas'] = nist_adsorbate
 
-    nist_dict["adsorptionUnits"] = '/'.join([unit_loading, basis_adsorbent])
-    nist_dict["pressureUnits"] = unit_pressure
+    nist_dict["adsorptionUnits"] = '/'.join([loading_unit, adsorbent_basis])
+    nist_dict["pressureUnits"] = pressure_unit
 
     # Add all the rest of the parameters
     nist_dict.update(raw_dict)
@@ -195,23 +195,23 @@ def _from_json_nist(raw_dict):
             "Isotherm cannot be parsed due to loading string format")
 
     if comp[0] in _MOLAR_UNITS:
-        unit_loading = comp[0]
+        loading_unit = comp[0]
     else:
         raise ParsingError("Isotherm cannot be parsed due to loading unit")
 
     if comp[1] in _MASS_UNITS:
-        basis_adsorbent = "mass"
+        adsorbent_basis = "mass"
     elif comp[1] in _VOLUME_UNITS:
-        basis_adsorbent = "volume"
+        adsorbent_basis = "volume"
     else:
         raise ParsingError("Isotherm cannot be parsed due to adsorbent basis")
 
     # Get pressure mode and unit
-    mode_pressure = "absolute"
+    pressure_mode = "absolute"
     pressure_string = raw_dict.pop("pressureUnits")
 
     if pressure_string in _PRESSURE_UNITS:
-        unit_pressure = pressure_string
+        pressure_unit = pressure_string
     else:
         raise ParsingError("Isotherm cannot be parsed due to pressure unit")
 
@@ -219,16 +219,16 @@ def _from_json_nist(raw_dict):
     nist_dict.update(raw_dict)
 
     # TODO expand this
-    basis_loading = 'molar'
-    unit_adsorbent = 'g'
+    loading_basis = 'molar'
+    adsorbent_unit = 'g'
 
     nist_dict.update({
-        'basis_adsorbent': basis_adsorbent,
-        'unit_adsorbent': unit_adsorbent,
-        'basis_loading': basis_loading,
-        'unit_loading': unit_loading,
-        'mode_pressure': mode_pressure,
-        'unit_pressure': unit_pressure,
+        'adsorbent_basis': adsorbent_basis,
+        'adsorbent_unit': adsorbent_unit,
+        'loading_basis': loading_basis,
+        'loading_unit': loading_unit,
+        'pressure_mode': pressure_mode,
+        'pressure_unit': pressure_unit,
     })
 
     return nist_dict

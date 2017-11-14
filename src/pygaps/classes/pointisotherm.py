@@ -66,20 +66,20 @@ class PointIsotherm(Isotherm):
 
     Other Parameters
     ----------------
-    basis_adsorbent : str, optional
+    adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
-    unit_adsorbent : str, optional
+    adsorbent_unit : str, optional
         Unit in which the adsorbent basis is expressed.
-    basis_loading : str, optional
+    loading_basis : str, optional
         Whether the adsorbed material is read in terms of either 'volume'
         'molar' or 'mass'.
-    unit_loading : str, optional
+    loading_unit : str, optional
         Unit in which the loading basis is expressed.
-    mode_pressure : str, optional
+    pressure_mode : str, optional
         The pressure mode, either 'absolute' pressures or 'relative' in
         the form of p/p0.
-    unit_pressure : str, optional
+    pressure_unit : str, optional
         Unit of pressure.
 
 
@@ -97,12 +97,12 @@ class PointIsotherm(Isotherm):
                  pressure_key=None,
                  other_keys=None,
 
-                 basis_adsorbent="mass",
-                 unit_adsorbent="g",
-                 basis_loading="molar",
-                 unit_loading="mmol",
-                 mode_pressure="absolute",
-                 unit_pressure="bar",
+                 adsorbent_basis="mass",
+                 adsorbent_unit="g",
+                 loading_basis="molar",
+                 loading_unit="mmol",
+                 pressure_mode="absolute",
+                 pressure_unit="bar",
 
                  **isotherm_parameters):
         """
@@ -119,12 +119,12 @@ class PointIsotherm(Isotherm):
                           loading_key=loading_key,
                           pressure_key=pressure_key,
 
-                          basis_adsorbent=basis_adsorbent,
-                          unit_adsorbent=unit_adsorbent,
-                          basis_loading=basis_loading,
-                          unit_loading=unit_loading,
-                          mode_pressure=mode_pressure,
-                          unit_pressure=unit_pressure,
+                          adsorbent_basis=adsorbent_basis,
+                          adsorbent_unit=adsorbent_unit,
+                          loading_basis=loading_basis,
+                          loading_unit=loading_unit,
+                          pressure_mode=pressure_mode,
+                          pressure_unit=pressure_unit,
 
                           **isotherm_parameters)
 
@@ -280,12 +280,12 @@ class PointIsotherm(Isotherm):
 
             'other_properties',
             '_data',
-            'unit_pressure',
-            'unit_adsorbent',
-            'unit_loading'
-            'mode_pressure'
-            'basis_adsorbent'
-            'basis_loading'
+            'pressure_unit',
+            'adsorbent_unit',
+            'loading_unit'
+            'pressure_mode'
+            'adsorbent_basis'
+            'loading_basis'
         ]:
             # Generate the unique id using md5
             self.id = None
@@ -316,35 +316,35 @@ class PointIsotherm(Isotherm):
 
         Parameters
         ----------
-        mode_pressure : {'relative', 'absolute'}
+        pressure_mode : {'relative', 'absolute'}
             the mode in which the isotherm should be put
         unit_to : str
             the unit into which the internal pressure should be converted to
         """
 
-        if mode_to == self.mode_pressure and unit_to == self.unit_pressure:
+        if mode_to == self.pressure_mode and unit_to == self.pressure_unit:
             if verbose:
                 print("Mode and units are the same, no changes made")
 
         else:
             if not mode_to:
-                mode_to = self.mode_pressure
+                mode_to = self.pressure_mode
             if not unit_to:
-                unit_to = self.unit_pressure
+                unit_to = self.pressure_unit
 
             self._data[self.pressure_key] = c_pressure(
                 self._data[self.pressure_key],
-                mode_from=self.mode_pressure,
+                mode_from=self.pressure_mode,
                 mode_to=mode_to,
-                unit_from=self.unit_pressure,
+                unit_from=self.pressure_unit,
                 unit_to=unit_to,
                 adsorbate_name=self.adsorbate,
                 temp=self.t_exp)
 
-            if unit_to != self.unit_pressure:
-                self.unit_pressure = unit_to
-            if mode_to != self.mode_pressure:
-                self.mode_pressure = mode_to
+            if unit_to != self.pressure_unit:
+                self.pressure_unit = unit_to
+            if mode_to != self.pressure_mode:
+                self.pressure_mode = mode_to
 
             # Re-process interpolator
             interp_branch = self.p_interpolator.interp_branch
@@ -379,27 +379,27 @@ class PointIsotherm(Isotherm):
 
         """
 
-        if basis_to == self.basis_loading and unit_to == self.unit_loading:
+        if basis_to == self.loading_basis and unit_to == self.loading_unit:
             if verbose:
                 print("Mode and units are the same, no changes made")
 
         else:
             if not basis_to:
-                basis_to = self.basis_loading
+                basis_to = self.loading_basis
 
             self._data[self.loading_key] = c_loading(
                 self._data[self.loading_key],
-                basis_from=self.basis_loading,
+                basis_from=self.loading_basis,
                 basis_to=basis_to,
-                unit_from=self.unit_loading,
+                unit_from=self.loading_unit,
                 unit_to=unit_to,
                 adsorbate_name=self.adsorbate,
                 temp=self.t_exp)
 
-            if unit_to != self.unit_loading:
-                self.unit_loading = unit_to
-            if basis_to != self.basis_loading:
-                self.basis_loading = basis_to
+            if unit_to != self.loading_unit:
+                self.loading_unit = unit_to
+            if basis_to != self.loading_basis:
+                self.loading_basis = basis_to
 
             # Re-process interpolator
             interp_branch = self.p_interpolator.interp_branch
@@ -434,27 +434,27 @@ class PointIsotherm(Isotherm):
 
         """
 
-        if basis_to == self.basis_adsorbent and unit_to == self.unit_adsorbent:
+        if basis_to == self.adsorbent_basis and unit_to == self.adsorbent_unit:
             if verbose:
                 print("Mode and units are the same, no changes made")
 
         else:
             if not basis_to:
-                basis_to = self.basis_adsorbent
+                basis_to = self.adsorbent_basis
 
             self._data[self.loading_key] = c_adsorbent(
                 self._data[self.loading_key],
-                basis_from=self.basis_adsorbent,
+                basis_from=self.adsorbent_basis,
                 basis_to=basis_to,
-                unit_from=self.unit_adsorbent,
+                unit_from=self.adsorbent_unit,
                 unit_to=unit_to,
                 sample_name=self.sample_name,
                 sample_batch=self.sample_batch)
 
-            if unit_to != self.unit_adsorbent:
-                self.unit_adsorbent = unit_to
-            if basis_to != self.basis_adsorbent:
-                self.basis_adsorbent = basis_to
+            if unit_to != self.adsorbent_unit:
+                self.adsorbent_unit = unit_to
+            if basis_to != self.adsorbent_basis:
+                self.adsorbent_basis = basis_to
 
             # Re-process interpolator
             interp_branch = self.p_interpolator.interp_branch
@@ -498,12 +498,12 @@ class PointIsotherm(Isotherm):
         plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
                  logx=logarithmic, secondary_key=secondary_key,
 
-                 basis_adsorbent=self.basis_adsorbent,
-                 unit_adsorbent=self.unit_adsorbent,
-                 basis_loading=self.basis_loading,
-                 unit_loading=self.unit_loading,
-                 unit_pressure=self.unit_pressure,
-                 mode_pressure=self.mode_pressure,
+                 adsorbent_basis=self.adsorbent_basis,
+                 adsorbent_unit=self.adsorbent_unit,
+                 loading_basis=self.loading_basis,
+                 loading_unit=self.loading_unit,
+                 pressure_unit=self.pressure_unit,
+                 pressure_mode=self.pressure_mode,
 
                  )
 
@@ -576,14 +576,14 @@ class PointIsotherm(Isotherm):
         # Convert if needed
         if pressure_mode or pressure_unit:
             if not pressure_mode:
-                pressure_mode = self.mode_pressure
+                pressure_mode = self.pressure_mode
             if not pressure_unit:
-                pressure_unit = self.unit_pressure
+                pressure_unit = self.pressure_unit
 
             ret = c_pressure(ret,
-                             mode_from=self.mode_pressure,
+                             mode_from=self.pressure_mode,
                              mode_to=pressure_mode,
-                             unit_from=self.unit_pressure,
+                             unit_from=self.pressure_unit,
                              unit_to=pressure_unit,
                              adsorbate_name=self.adsorbate,
                              temp=self.t_exp
@@ -646,12 +646,12 @@ class PointIsotherm(Isotherm):
         # Convert if needed
         if adsorbent_basis or adsorbent_unit:
             if not adsorbent_basis:
-                adsorbent_basis = self.basis_adsorbent
+                adsorbent_basis = self.adsorbent_basis
 
             ret = c_adsorbent(ret,
-                              basis_from=self.basis_adsorbent,
+                              basis_from=self.adsorbent_basis,
                               basis_to=adsorbent_basis,
-                              unit_from=self.unit_adsorbent,
+                              unit_from=self.adsorbent_unit,
                               unit_to=adsorbent_unit,
                               sample_name=self.sample_name,
                               sample_batch=self.sample_batch
@@ -659,12 +659,12 @@ class PointIsotherm(Isotherm):
 
         if loading_basis or loading_unit:
             if not loading_basis:
-                loading_basis = self.basis_loading
+                loading_basis = self.loading_basis
 
             ret = c_loading(ret,
-                            basis_from=self.basis_loading,
+                            basis_from=self.loading_basis,
                             basis_to=loading_basis,
-                            unit_from=self.unit_loading,
+                            unit_from=self.loading_unit,
                             unit_to=loading_unit,
                             adsorbate_name=self.adsorbate,
                             temp=self.t_exp
@@ -824,18 +824,18 @@ class PointIsotherm(Isotherm):
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:
             if not pressure_mode:
-                pressure_mode = self.mode_pressure
+                pressure_mode = self.pressure_mode
             if not pressure_unit:
-                pressure_unit = self.unit_pressure
-            if not pressure_unit and self.mode_pressure == 'relative':
+                pressure_unit = self.pressure_unit
+            if not pressure_unit and self.pressure_mode == 'relative':
                 raise ParameterError("Must specify a pressure unit if the input"
                                      " is in an absolute mode")
 
             pressure = c_pressure(pressure,
                                   mode_from=pressure_mode,
-                                  mode_to=self.mode_pressure,
+                                  mode_to=self.pressure_mode,
                                   unit_from=pressure_unit,
-                                  unit_to=self.unit_pressure,
+                                  unit_to=self.pressure_unit,
                                   adsorbate_name=self.adsorbate,
                                   temp=self.t_exp)
 
@@ -845,12 +845,12 @@ class PointIsotherm(Isotherm):
         # Ensure loading is in correct units and basis requested
         if adsorbent_basis or adsorbent_unit:
             if not adsorbent_basis:
-                adsorbent_basis = self.basis_adsorbent
+                adsorbent_basis = self.adsorbent_basis
 
             loading = c_adsorbent(loading,
-                                  basis_from=self.basis_adsorbent,
+                                  basis_from=self.adsorbent_basis,
                                   basis_to=adsorbent_basis,
-                                  unit_from=self.unit_adsorbent,
+                                  unit_from=self.adsorbent_unit,
                                   unit_to=adsorbent_unit,
                                   sample_name=self.sample_name,
                                   sample_batch=self.sample_batch
@@ -858,12 +858,12 @@ class PointIsotherm(Isotherm):
 
         if loading_basis or loading_unit:
             if not loading_basis:
-                loading_basis = self.basis_loading
+                loading_basis = self.loading_basis
 
             loading = c_loading(loading,
-                                basis_from=self.basis_loading,
+                                basis_from=self.loading_basis,
                                 basis_to=loading_basis,
-                                unit_from=self.unit_loading,
+                                unit_from=self.loading_unit,
                                 unit_to=loading_unit,
                                 adsorbate_name=self.adsorbate,
                                 temp=self.t_exp
@@ -942,32 +942,32 @@ class PointIsotherm(Isotherm):
         # Ensure loading is in correct units and basis for the internal model
         if adsorbent_basis or adsorbent_unit:
             if not adsorbent_basis:
-                adsorbent_basis = self.basis_adsorbent
+                adsorbent_basis = self.adsorbent_basis
             if not adsorbent_unit:
                 raise ParameterError("Must specify an adsorbent unit if the input"
                                      " is in another basis")
 
             loading = c_adsorbent(loading,
                                   basis_from=adsorbent_basis,
-                                  basis_to=self.basis_adsorbent,
+                                  basis_to=self.adsorbent_basis,
                                   unit_from=adsorbent_unit,
-                                  unit_to=self.unit_adsorbent,
+                                  unit_to=self.adsorbent_unit,
                                   sample_name=self.sample_name,
                                   sample_batch=self.sample_batch
                                   )
 
         if loading_basis or loading_unit:
             if not loading_basis:
-                loading_basis = self.basis_loading
+                loading_basis = self.loading_basis
             if not loading_unit:
                 raise ParameterError("Must specify a loading unit if the input"
                                      " is in another basis")
 
             loading = c_loading(loading,
                                 basis_from=loading_basis,
-                                basis_to=self.basis_loading,
+                                basis_to=self.loading_basis,
                                 unit_from=loading_unit,
-                                unit_to=self.unit_loading,
+                                unit_to=self.loading_unit,
                                 adsorbate_name=self.adsorbate,
                                 temp=self.t_exp
                                 )
@@ -978,14 +978,14 @@ class PointIsotherm(Isotherm):
         # Ensure pressure is in correct units and mode requested
         if pressure_mode or pressure_unit:
             if not pressure_mode:
-                pressure_mode = self.mode_pressure
+                pressure_mode = self.pressure_mode
             if not pressure_unit:
-                pressure_unit = self.unit_pressure
+                pressure_unit = self.pressure_unit
 
             pressure = c_pressure(pressure,
-                                  mode_from=self.mode_pressure,
+                                  mode_from=self.pressure_mode,
                                   mode_to=pressure_mode,
-                                  unit_from=self.unit_pressure,
+                                  unit_from=self.pressure_unit,
                                   unit_to=pressure_unit,
                                   adsorbate_name=self.adsorbate,
                                   temp=self.t_exp)

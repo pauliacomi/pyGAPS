@@ -68,40 +68,25 @@ class TestIsotherm(object):
         return
 
     @pytest.mark.parametrize('prop, set_to', [
-                            ('unit_pressure', None),
-                            ('unit_pressure', 'something'),
-                            ('mode_pressure', None),
-                            ('mode_pressure', 'something'),
-                            ('unit_loading', None),
-                            ('unit_loading', 'something'),
-                            ('basis_loading', None),
-                            ('basis_loading', 'something'),
-                            ('unit_adsorbent', None),
-                            ('unit_adsorbent', 'something'),
-                            ('basis_adsorbent', None),
-                            ('basis_adsorbent', 'something')])
+                            ('pressure_unit', None),
+                            ('pressure_unit', 'something'),
+                            ('pressure_mode', None),
+                            ('pressure_mode', 'something'),
+                            ('loading_unit', None),
+                            ('loading_unit', 'something'),
+                            ('loading_basis', None),
+                            ('loading_basis', 'something'),
+                            ('adsorbent_unit', None),
+                            ('adsorbent_unit', 'something'),
+                            ('adsorbent_basis', None),
+                            ('adsorbent_basis', 'something')])
     def test_isotherm_mode_and_units(self, isotherm_parameters, prop, set_to):
         "Tests exception throw for missing or wrong unit"
 
-        props = dict(
-            unit_adsorbent='g',
-            basis_adsorbent='mass',
-            basis_loading='molar',
-            unit_loading='mmol',
-            mode_pressure='absolute',
-            unit_pressure='bar',
-        )
-
-        props[prop] = set_to
+        isotherm_parameters[prop] = set_to
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.classes.isotherm.Isotherm(
-                unit_adsorbent=props.get('unit_adsorbent'),
-                basis_adsorbent=props.get('basis_adsorbent'),
-                basis_loading=props.get('basis_loading'),
-                unit_loading=props.get('unit_loading'),
-                mode_pressure=props.get('mode_pressure'),
-                unit_pressure=props.get('unit_pressure'),
                 **isotherm_parameters)
 
         return

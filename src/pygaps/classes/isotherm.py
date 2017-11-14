@@ -53,20 +53,20 @@ class Isotherm(object):
 
     Other Parameters
     ----------------
-    basis_adsorbent : str, optional
+    adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
-    unit_adsorbent : str, optional
+    adsorbent_unit : str, optional
         Unit in which the adsorbent basis is expressed.
-    basis_loading : str, optional
+    loading_basis : str, optional
         Whether the adsorbed material is read in terms of either 'volume'
         'molar' or 'mass'.
-    unit_loading : str, optional
+    loading_unit : str, optional
         Unit in which the loading basis is expressed.
-    mode_pressure : str, optional
+    pressure_mode : str, optional
         The pressure mode, either 'absolute' pressures or 'relative' in
         the form of p/p0.
-    unit_pressure : str, optional
+    pressure_unit : str, optional
         Unit of pressure.
 
 
@@ -86,12 +86,12 @@ class Isotherm(object):
                  loading_key=None,
                  pressure_key=None,
 
-                 basis_adsorbent="mass",
-                 unit_adsorbent="g",
-                 basis_loading="molar",
-                 unit_loading="mmol",
-                 mode_pressure="absolute",
-                 unit_pressure="bar",
+                 adsorbent_basis="mass",
+                 adsorbent_unit="g",
+                 loading_basis="molar",
+                 loading_unit="mmol",
+                 pressure_mode="absolute",
+                 pressure_unit="bar",
 
                  **isotherm_parameters):
         """
@@ -107,41 +107,41 @@ class Isotherm(object):
                 "'sample_name', 'sample_batch', 't_exp', 'adsorbate'")
 
         # Basis and mode
-        if basis_adsorbent is None or mode_pressure is None or basis_loading is None:
+        if adsorbent_basis is None or pressure_mode is None or loading_basis is None:
             raise ParameterError(
                 "One of the modes or bases is not specified.")
 
-        if basis_adsorbent not in _MATERIAL_MODE:
+        if adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for adsorbent is not an option. See viable"
                 "values: {0}".format(_MATERIAL_MODE))
 
-        if basis_loading not in _MATERIAL_MODE:
+        if loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for loading is not an option. See viable"
                 "values: {0}".format(_MATERIAL_MODE))
 
-        if mode_pressure not in _PRESSURE_MODE:
+        if pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
                 "Mode selected for pressure is not an option. See viable"
                 "values: {0}".format(_PRESSURE_MODE))
 
         # Units
-        if unit_loading is None or unit_pressure is None or unit_adsorbent is None:
+        if loading_unit is None or pressure_unit is None or adsorbent_unit is None:
             raise ParameterError(
                 "One of the units is not specified.")
 
-        if unit_loading not in _MOLAR_UNITS:
+        if loading_unit not in _MOLAR_UNITS:
             raise ParameterError(
                 "Unit selected for loading is not an option. See viable"
                 "values: {0}".format(_MOLAR_UNITS))
 
-        if unit_pressure not in _PRESSURE_UNITS:
+        if pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
                 "Unit selected for pressure is not an option. See viable"
                 "values: {0}".format(_PRESSURE_UNITS))
 
-        if unit_adsorbent not in _VOLUME_UNITS and unit_adsorbent not in _MASS_UNITS:
+        if adsorbent_unit not in _VOLUME_UNITS and adsorbent_unit not in _MASS_UNITS:
             raise ParameterError(
                 "Unit selected for adsorbent is not an option. See viable"
                 "values: {0} {1}".format(_VOLUME_UNITS,  _MASS_UNITS))
@@ -153,17 +153,17 @@ class Isotherm(object):
                 " pressure columns in the DataFrame, to the constructor.")
 
         #: basis for the adsorbent
-        self.basis_adsorbent = str(basis_adsorbent)
+        self.adsorbent_basis = str(adsorbent_basis)
         #: unit for the adsorbent
-        self.unit_adsorbent = str(unit_adsorbent)
+        self.adsorbent_unit = str(adsorbent_unit)
         #: basis for the loading
-        self.basis_loading = str(basis_loading)
+        self.loading_basis = str(loading_basis)
         #: units for loading
-        self.unit_loading = str(unit_loading)
+        self.loading_unit = str(loading_unit)
         #: mode for the pressure
-        self.mode_pressure = str(mode_pressure)
+        self.pressure_mode = str(pressure_mode)
         #: units for pressure
-        self.unit_pressure = str(unit_pressure)
+        self.pressure_unit = str(pressure_unit)
 
         # Save column names
         #: Name of column in the dataframe that contains adsorbed amount
@@ -285,12 +285,12 @@ class Isotherm(object):
 
         # Units/basis
         string += ("Units: \n")
-        string += ("Unit for loading: " + str(self.unit_loading) +
-                   "/" + str(self.unit_adsorbent) + '\n')
-        if self.mode_pressure == 'relative':
+        string += ("Unit for loading: " + str(self.loading_unit) +
+                   "/" + str(self.adsorbent_unit) + '\n')
+        if self.pressure_mode == 'relative':
             string += ("Relative pressure \n")
         else:
-            string += ("Unit for pressure: " + str(self.unit_pressure) + '\n')
+            string += ("Unit for pressure: " + str(self.pressure_unit) + '\n')
 
         string += ("Other properties: \n")
         for prop in self.other_properties:
@@ -343,12 +343,12 @@ class Isotherm(object):
             parameter_dict.update({'exp_type': self.exp_type})
 
         # Get the units
-        parameter_dict.update({'pressure_unit': self.unit_pressure})
-        parameter_dict.update({'pressure_mode': self.mode_pressure})
-        parameter_dict.update({'adsorbent_unit': self.unit_adsorbent})
-        parameter_dict.update({'adsorbent_basis': self.basis_adsorbent})
-        parameter_dict.update({'loading_unit': self.unit_loading})
-        parameter_dict.update({'loading_basis': self.basis_loading})
+        parameter_dict.update({'pressure_unit': self.pressure_unit})
+        parameter_dict.update({'pressure_mode': self.pressure_mode})
+        parameter_dict.update({'adsorbent_unit': self.adsorbent_unit})
+        parameter_dict.update({'adsorbent_basis': self.adsorbent_basis})
+        parameter_dict.update({'loading_unit': self.loading_unit})
+        parameter_dict.update({'loading_basis': self.loading_basis})
 
         # Now add the rest
         parameter_dict.update(self.other_properties)

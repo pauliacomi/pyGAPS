@@ -86,7 +86,7 @@ def isosteric_heat(isotherms, loading_points=None, verbose=False):
             'Isotherms passed are not measured on the same material and batch.')
 
     # Check same basis
-    if not all(x.basis_adsorbent == isotherms[0].basis_adsorbent for x in isotherms):
+    if not all(x.adsorbent_basis == isotherms[0].adsorbent_basis for x in isotherms):
         raise ParameterError(
             'Isotherm passed are in a different adsorbent basis.')
 

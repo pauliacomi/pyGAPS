@@ -84,20 +84,20 @@ class ModelIsotherm(Isotherm):
 
     Other Parameters
     ----------------
-    basis_adsorbent : str, optional
+    adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
-    unit_adsorbent : str, optional
+    adsorbent_unit : str, optional
         Unit in which the adsorbent basis is expressed.
-    basis_loading : str, optional
+    loading_basis : str, optional
         Whether the adsorbed material is read in terms of either 'volume'
         'molar' or 'mass'.
-    unit_loading : str, optional
+    loading_unit : str, optional
         Unit in which the loading basis is expressed.
-    mode_pressure : str, optional
+    pressure_mode : str, optional
         The pressure mode, either 'absolute' pressures or 'relative' in
         the form of p/p0.
-    unit_pressure : str, optional
+    pressure_unit : str, optional
         Unit of pressure.
     verbose : bool
         Prints out extra information about steps taken.
@@ -168,12 +168,12 @@ class ModelIsotherm(Isotherm):
                  branch='ads',
                  verbose=False,
 
-                 basis_adsorbent="mass",
-                 unit_adsorbent="g",
-                 basis_loading="molar",
-                 unit_loading="mmol",
-                 mode_pressure="absolute",
-                 unit_pressure="bar",
+                 adsorbent_basis="mass",
+                 adsorbent_unit="g",
+                 loading_basis="molar",
+                 loading_unit="mmol",
+                 pressure_mode="absolute",
+                 pressure_unit="bar",
 
                  **isotherm_parameters):
         """
@@ -197,12 +197,12 @@ class ModelIsotherm(Isotherm):
                           pressure_key=pressure_key,
                           loading_key=loading_key,
 
-                          basis_adsorbent=basis_adsorbent,
-                          unit_adsorbent=unit_adsorbent,
-                          basis_loading=basis_loading,
-                          unit_loading=unit_loading,
-                          mode_pressure=mode_pressure,
-                          unit_pressure=unit_pressure,
+                          adsorbent_basis=adsorbent_basis,
+                          adsorbent_unit=adsorbent_unit,
+                          loading_basis=loading_basis,
+                          loading_unit=loading_unit,
+                          pressure_mode=pressure_mode,
+                          pressure_unit=pressure_unit,
 
                           **isotherm_parameters)
 
@@ -545,14 +545,14 @@ class ModelIsotherm(Isotherm):
         # Convert if needed
         if pressure_mode or pressure_unit:
             if not pressure_mode:
-                pressure_mode = self.mode_pressure
+                pressure_mode = self.pressure_mode
             if not pressure_unit:
-                pressure_unit = self.unit_pressure
+                pressure_unit = self.pressure_unit
 
             ret = c_pressure(ret,
-                             mode_from=self.mode_pressure,
+                             mode_from=self.pressure_mode,
                              mode_to=pressure_mode,
-                             unit_from=self.unit_pressure,
+                             unit_from=self.pressure_unit,
                              unit_to=pressure_unit,
                              adsorbate_name=self.adsorbate,
                              temp=self.t_exp
@@ -697,18 +697,18 @@ class ModelIsotherm(Isotherm):
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:
             if not pressure_mode:
-                pressure_mode = self.mode_pressure
+                pressure_mode = self.pressure_mode
             if not pressure_unit:
-                pressure_unit = self.unit_pressure
-            if not pressure_unit and self.mode_pressure == 'relative':
+                pressure_unit = self.pressure_unit
+            if not pressure_unit and self.pressure_mode == 'relative':
                 raise ParameterError("Must specify a pressure unit if the input"
                                      " is in an absolute mode")
 
             pressure = c_pressure(pressure,
                                   mode_from=pressure_mode,
-                                  mode_to=self.mode_pressure,
+                                  mode_to=self.pressure_mode,
                                   unit_from=pressure_unit,
-                                  unit_to=self.unit_pressure,
+                                  unit_to=self.pressure_unit,
                                   adsorbate_name=self.adsorbate,
                                   temp=self.t_exp)
 
@@ -758,12 +758,12 @@ class ModelIsotherm(Isotherm):
         # Ensure loading is in correct units and basis requested
         if adsorbent_basis or adsorbent_unit:
             if not adsorbent_basis:
-                adsorbent_basis = self.basis_adsorbent
+                adsorbent_basis = self.adsorbent_basis
 
             loading = c_adsorbent(loading,
-                                  basis_from=self.basis_adsorbent,
+                                  basis_from=self.adsorbent_basis,
                                   basis_to=adsorbent_basis,
-                                  unit_from=self.unit_adsorbent,
+                                  unit_from=self.adsorbent_unit,
                                   unit_to=adsorbent_unit,
                                   sample_name=self.sample_name,
                                   sample_batch=self.sample_batch
@@ -771,12 +771,12 @@ class ModelIsotherm(Isotherm):
 
         if loading_basis or loading_unit:
             if not loading_basis:
-                loading_basis = self.basis_loading
+                loading_basis = self.loading_basis
 
             loading = c_loading(loading,
-                                basis_from=self.basis_loading,
+                                basis_from=self.loading_basis,
                                 basis_to=loading_basis,
-                                unit_from=self.unit_loading,
+                                unit_from=self.loading_unit,
                                 unit_to=loading_unit,
                                 adsorbate_name=self.adsorbate,
                                 temp=self.t_exp
@@ -839,32 +839,32 @@ class ModelIsotherm(Isotherm):
         # Ensure loading is in correct units and basis for the internal model
         if adsorbent_basis or adsorbent_unit:
             if not adsorbent_basis:
-                adsorbent_basis = self.basis_adsorbent
+                adsorbent_basis = self.adsorbent_basis
             if not adsorbent_unit:
                 raise ParameterError("Must specify an adsorbent unit if the input"
                                      " is in another basis")
 
             loading = c_adsorbent(loading,
                                   basis_from=adsorbent_basis,
-                                  basis_to=self.basis_adsorbent,
+                                  basis_to=self.adsorbent_basis,
                                   unit_from=adsorbent_unit,
-                                  unit_to=self.unit_adsorbent,
+                                  unit_to=self.adsorbent_unit,
                                   sample_name=self.sample_name,
                                   sample_batch=self.sample_batch
                                   )
 
         if loading_basis or loading_unit:
             if not loading_basis:
-                loading_basis = self.basis_loading
+                loading_basis = self.loading_basis
             if not loading_unit:
                 raise ParameterError("Must specify a loading unit if the input"
                                      " is in another basis")
 
             loading = c_loading(loading,
                                 basis_from=loading_basis,
-                                basis_to=self.basis_loading,
+                                basis_to=self.loading_basis,
                                 unit_from=loading_unit,
-                                unit_to=self.unit_loading,
+                                unit_to=self.loading_unit,
                                 adsorbate_name=self.adsorbate,
                                 temp=self.t_exp
                                 )
@@ -895,14 +895,14 @@ class ModelIsotherm(Isotherm):
         # Ensure pressure is in correct units and mode requested
         if pressure_mode or pressure_unit:
             if not pressure_mode:
-                pressure_mode = self.mode_pressure
+                pressure_mode = self.pressure_mode
             if not pressure_unit:
-                pressure_unit = self.unit_pressure
+                pressure_unit = self.pressure_unit
 
             pressure = c_pressure(pressure,
-                                  mode_from=self.mode_pressure,
+                                  mode_from=self.pressure_mode,
                                   mode_to=pressure_mode,
-                                  unit_from=self.unit_pressure,
+                                  unit_from=self.pressure_unit,
                                   unit_to=pressure_unit,
                                   adsorbate_name=self.adsorbate,
                                   temp=self.t_exp)
@@ -953,18 +953,18 @@ class ModelIsotherm(Isotherm):
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:
             if not pressure_mode:
-                pressure_mode = self.mode_pressure
+                pressure_mode = self.pressure_mode
             if not pressure_unit:
-                pressure_unit = self.unit_pressure
-            if not pressure_unit and self.mode_pressure == 'relative':
+                pressure_unit = self.pressure_unit
+            if not pressure_unit and self.pressure_mode == 'relative':
                 raise ParameterError("Must specify a pressure unit if the input"
                                      " is in an absolute mode")
 
             pressure = c_pressure(pressure,
                                   mode_from=pressure_mode,
-                                  mode_to=self.mode_pressure,
+                                  mode_to=self.pressure_mode,
                                   unit_from=pressure_unit,
-                                  unit_to=self.unit_pressure,
+                                  unit_to=self.pressure_unit,
                                   adsorbate_name=self.adsorbate,
                                   temp=self.t_exp)
 
@@ -1030,12 +1030,12 @@ class ModelIsotherm(Isotherm):
         plot_iso([self], plot_type='isotherm',
                  logx=logarithmic,
 
-                 basis_adsorbent=self.basis_adsorbent,
-                 unit_adsorbent=self.unit_adsorbent,
-                 basis_loading=self.basis_loading,
-                 unit_loading=self.unit_loading,
-                 unit_pressure=self.unit_pressure,
-                 mode_pressure=self.mode_pressure,
+                 adsorbent_basis=self.adsorbent_basis,
+                 adsorbent_unit=self.adsorbent_unit,
+                 loading_basis=self.loading_basis,
+                 loading_unit=self.loading_unit,
+                 pressure_unit=self.pressure_unit,
+                 pressure_mode=self.pressure_mode,
 
                  )
 

@@ -133,8 +133,8 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
                                loading_unit='mol',
                                loading_basis='molar')
     reference_loading = reference_isotherm.loading_at(
-        isotherm.pressure(branch='ads', pressure_unit=isotherm.unit_pressure),
-        pressure_unit=isotherm.unit_pressure,
+        isotherm.pressure(branch='ads', pressure_unit=isotherm.pressure_unit),
+        pressure_unit=isotherm.pressure_unit,
         loading_unit='mol', branch='ads')
     alpha_s_point = reference_isotherm.loading_at(
         0.4, loading_unit='mol', pressure_mode='relative', branch='ads')

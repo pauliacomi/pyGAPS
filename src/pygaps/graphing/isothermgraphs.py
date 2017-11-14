@@ -23,12 +23,12 @@ def plot_iso(isotherms,
              branch=_BRANCH_TYPES, logx=False, color=True,
              match_points=False,
 
-             basis_adsorbent="mass",
-             unit_adsorbent="g",
-             basis_loading="molar",
-             unit_loading="mmol",
-             mode_pressure="absolute",
-             unit_pressure="bar",
+             adsorbent_basis="mass",
+             adsorbent_unit="g",
+             loading_basis="molar",
+             loading_unit="mmol",
+             pressure_mode="absolute",
+             pressure_unit="bar",
 
              x_range=(None, None),
              y1_range=(None, None),
@@ -67,19 +67,19 @@ def plot_iso(isotherms,
         Whether the plotting should attempt to match all the pressure
         points with the first passed isotherm.
 
-    basis_adsorbent : str, optional
+    adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         or 'per mass'.
-    unit_adsorbent : str, optional
+    adsorbent_unit : str, optional
         Unit of loading.
-    basis_loading : str, optional
+    loading_basis : str, optional
         Loading basis.
-    unit_loading : str, optional
+    loading_unit : str, optional
         Unit of loading.
-    mode_pressure : str, optional
+    pressure_mode : str, optional
         The pressure mode, either absolute pressures or relative in
         the form of p/p0.
-    unit_pressure : str, optional
+    pressure_unit : str, optional
         Unit of pressure.
 
     x_range : tuple
@@ -177,12 +177,12 @@ def plot_iso(isotherms,
         text_y2axis = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
     else:
         text_y2axis = secondary_key
-    if mode_pressure == "absolute":
-        text_xaxis = text_xaxis + ' ($' + unit_pressure + '$)'
-    elif mode_pressure == "relative":
+    if pressure_mode == "absolute":
+        text_xaxis = text_xaxis + ' ($' + pressure_unit + '$)'
+    elif pressure_mode == "relative":
         text_xaxis = "Relative " + text_xaxis
     text_yaxis = text_yaxis + \
-        ' ($' + unit_loading + '/' + unit_adsorbent + '$)'
+        ' ($' + loading_unit + '/' + adsorbent_unit + '$)'
 
     # Set the colours of the graph
     number_of_lines = 6
@@ -314,8 +314,8 @@ def plot_iso(isotherms,
         def pressure():
             return isotherm.pressure(
                 branch=plot_branch,
-                pressure_unit=unit_pressure,
-                pressure_mode=mode_pressure,
+                pressure_unit=pressure_unit,
+                pressure_mode=pressure_mode,
                 min_range=range_pressure[0],
                 max_range=range_pressure[1],
                 indexed=True,
@@ -324,10 +324,10 @@ def plot_iso(isotherms,
         def loading():
             return isotherm.loading(
                 branch=plot_branch,
-                loading_unit=unit_loading,
-                loading_basis=basis_loading,
-                adsorbent_unit=unit_adsorbent,
-                adsorbent_basis=basis_adsorbent,
+                loading_unit=loading_unit,
+                loading_basis=loading_basis,
+                adsorbent_unit=adsorbent_unit,
+                adsorbent_basis=adsorbent_basis,
                 min_range=range_loading[0],
                 max_range=range_loading[1],
                 indexed=True,

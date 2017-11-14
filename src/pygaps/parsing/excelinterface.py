@@ -120,8 +120,8 @@ def isotherm_to_xl(isotherm, path, fmt=None):
             headings[0] = 'adsorbed'
             headings[1] = 'Pressure'
 
-        headings[0] = headings[0] + '(' + isotherm.unit_loading + ')'
-        headings[1] = headings[1] + '(' + isotherm.unit_pressure + ')'
+        headings[0] = headings[0] + '(' + isotherm.loading_unit + ')'
+        headings[1] = headings[1] + '(' + isotherm.pressure_unit + ')'
 
         sht.range('A' + str(rng_data)).value = headings
         sht.range('A' + str(rng_data + 1)).value = data.as_matrix()
