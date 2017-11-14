@@ -1,4 +1,4 @@
-"""Module containing the conversions between different units used"""
+"""Module performing the conversions between different units used"""
 
 import pygaps
 
@@ -47,36 +47,37 @@ def c_pressure(value,
                unit_from, unit_to,
                adsorbate_name=None, temp=None):
     """
-    Converts absolute pressure to relative and vice-versa.
-    Only possible if in the subcritical region.
+    Converts pressure units and modes.
+    Adsorbate name and temeperature have to be
+    specified when converting between modes.
 
     Parameters
     ----------
-    pygaps.classes.adsorbate.Adsorbate : Adsorbate
-        The dsorbate for which the mode is changed.
-    mode : {'relative', 'absolute'}
-        Whether to convert to relative from absolute or to absolute
-        from relative.
-    pressure : float
-        The absolute pressure which is to be converted into
-        relative pressure.
+    value : float
+        The value to convert.
+    mode_from : str
+        Whether to convert from a mode.
+    mode_to: str
+        Whether to convert to a mode.
+    unit_from : str
+        Unit from which to convert.
+    unit_from : str
+        Unit to which to convert.
+    adsorbate_name : str
+        Name of the adsorbate on which the pressure is to be
+        converted
     temp : float
         Temperature at which the pressure is measured, in K
-    unit : optional
-        Unit in which the absolute presure is passed.
-        If not specifies defaults to Pascal.
 
     Returns
     -------
     float
-        Pressure in the mode requested.
+        Pressure converted as requested.
 
     Raises
     ------
     ``ParameterError``
-        If the mode selected is not an option
-    ``CalculationError``
-        If it cannot be calculated, due to a physical reason.
+        If the mode selected is not an option.
     """
     if mode_from != mode_to:
 
@@ -107,6 +108,37 @@ def c_loading(value,
               unit_from, unit_to,
               adsorbate_name=None, temp=None):
     """
+    Converts loading units and basis.
+    Adsorbate name and temeperature have to be
+    specified when converting between basis.
+
+    Parameters
+    ----------
+    value : float
+        The value to convert.
+    basis_from : str
+        Whether to convert from a basis.
+    basis_to: str
+        Whether to convert to a basis.
+    unit_from : str
+        Unit from which to convert.
+    unit_from : str
+        Unit to which to convert.
+    adsorbate_name : str
+        Name of the adsorbate on which the pressure is to be
+        converted
+    temp : float
+        Temperature at which the pressure is measured, in K
+
+    Returns
+    -------
+    float
+        Loading converted as requested.
+
+    Raises
+    ------
+    ``ParameterError``
+        If the mode selected is not an option.
     """
     if basis_from != basis_to:
 
@@ -170,31 +202,36 @@ def c_adsorbent(value,
                 unit_from, unit_to,
                 sample_name=None, sample_batch=None):
     """
-    Converts mass to volume of adsorbent and vice-versa.
-    Requires a `density` key in the pygaps.classes.sample.Sample properties dictionary.
+    Converts adsorbent units and basis.
+    The name and batch of the sample have to be
+    specified when converting between basis.
 
     Parameters
     ----------
-    adsorbent : pygaps.classes.sample.Sample
-        The pygaps.classes.sample.Sample to use when converting basis.
-    basis_to : {'mass', 'volume'}
-        Whether to convert to a mass basis from a volume basis or
-        to a volume basis from a mass basis
-    basis_value : float
-        The weight or the volume of the pygaps.classes.sample.Sample, respectively
-    unit : str, optional
-        Unit in which the basis is specified in the pygaps.classes.sample.Sample.
+    value : float
+        The value to convert.
+    basis_from : str
+        Whether to convert from a basis.
+    basis_to: str
+        Whether to convert to a basis.
+    unit_from : str
+        Unit from which to convert.
+    unit_from : str
+        Unit to which to convert.
+    sample_name : str
+        Name of the sample on which the value is based.
+    sample_batch : float
+        Batch of the sample on which the value is based.
 
     Returns
     -------
     float
-        Value in the basis requested.
+        Loading converted as requested.
 
     Raises
     ------
     ``ParameterError``
         If the mode selected is not an option.
-
 
     """
     if basis_from != basis_to:
@@ -257,9 +294,31 @@ def c_adsorbent(value,
 
 def c_unit(unit_list, value, unit_from, unit_to, sign=1):
     """
-    Converts units depending on unit type
+    Converts a units based on their proportions in
+    a dictionary.
 
     Parameters
+    ----------
+    unit_list : dict
+        The dictionary with the units and their relationship.
+    value : dict
+        The value to convert.
+    unit_from : str
+        Unit from which to convert.
+    unit_from : str
+        Unit to which to convert.
+    sign : int
+        If the conversion is inverted or not.
+
+    Returns
+    -------
+    float
+        Value converted as requested.
+
+    Raises
+    ------
+    ``ParameterError``
+        If the unit selected is not an option.
     """
 
     if unit_to not in unit_list or unit_from not in unit_list:
