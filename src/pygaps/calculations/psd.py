@@ -7,14 +7,14 @@ from functools import partial
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
 from ..utilities.exceptions import ParameterError
-from .adsorbent_models import get_adsorbent_model
-from .kelvin_models import kelvin_radius_std
-from .kelvin_models import meniscus_geometry
+from .models_hk import get_hk_model
+from .models_kelvin import kelvin_radius_std
+from .models_kelvin import meniscus_geometry
+from .models_thickness import get_thickness_model
 from .psd_dft import psd_dft_kernel_fit
 from .psd_mesoporous import psd_bjh
 from .psd_mesoporous import psd_dollimore_heal
 from .psd_microporous import psd_horvath_kawazoe
-from .thickness_models import get_thickness_model
 
 _MESO_PSD_MODELS = ['BJH', 'DH']
 _MICRO_PSD_MODELS = ['HK']
@@ -275,7 +275,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
-    adsorbent_properties = get_adsorbent_model(adsorbent_model)
+    adsorbent_properties = get_hk_model(adsorbent_model)
 
     # Call specified pore size distribution function
     if psd_model == 'HK':

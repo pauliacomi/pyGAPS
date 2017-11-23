@@ -11,8 +11,10 @@ import pygaps
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
+from ..conftest import characterisation
 
 
+@characterisation
 class TestPSD(object):
     """
     Tests everything related to pore size distribution calculation

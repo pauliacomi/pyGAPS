@@ -181,7 +181,7 @@ def db_get_samples(pth):
 
 def db_delete_sample(pth, sample):
     """
-    Delete experiment to the database
+    Delete sample from the database
     """
 
     # Connect to database

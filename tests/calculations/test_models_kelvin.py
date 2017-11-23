@@ -5,10 +5,12 @@ This test module has tests relating to kelvin model validations
 import numpy
 import pytest
 
-import pygaps.calculations.kelvin_models as km
-from pygaps.calculations.kelvin_models import _KELVIN_MODELS
+import pygaps.calculations.models_kelvin as km
+from pygaps.calculations.models_kelvin import _KELVIN_MODELS
+from ..conftest import characterisation
 
 
+@characterisation
 class TestKelvinModels(object):
     """
     Tests the thickness models

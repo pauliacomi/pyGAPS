@@ -12,8 +12,10 @@ import pygaps
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
+from ..conftest import characterisation
 
 
+@characterisation
 class TestBET(object):
     """
     Tests everything related to BET surface area calculation

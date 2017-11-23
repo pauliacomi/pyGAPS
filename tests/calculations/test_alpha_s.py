@@ -12,8 +12,10 @@ import pygaps
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
+from ..conftest import characterisation
 
 
+@characterisation
 class TestAlphaSPlot(object):
     """
     Tests everything related to alpha-s calculation

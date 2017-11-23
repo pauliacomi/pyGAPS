@@ -13,8 +13,10 @@ import pygaps
 
 from .conftest import DATA_ISOSTERIC
 from .conftest import DATA_ISOSTERIC_PATH
+from ..conftest import characterisation
 
 
+@characterisation
 class TestIsostericHeat(object):
     """
     Tests everything related to isosteric heat calculation
