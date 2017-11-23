@@ -236,7 +236,7 @@ def psd_plot(pore_radii, pore_dist, method=None, label=None,
 
     ax1.set_title("PSD plot " + str(method))
     ax1.set_xlabel('Pore width (nm)')
-    ax1.set_ylabel('Pore size')
+    ax1.set_ylabel('Distribution')
     ax1.legend(loc='best')
     ax1.set_ylim(ymin=0)
     ax1.grid(True)
