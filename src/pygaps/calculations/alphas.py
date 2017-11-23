@@ -10,7 +10,7 @@ from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
-from .bet import area_BET
+from .area_bet import area_BET
 
 
 def alpha_s(isotherm, reference_isotherm, reference_area=None,

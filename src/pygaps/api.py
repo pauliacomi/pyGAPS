@@ -3,8 +3,8 @@
 
 from .calculations.alphas import alpha_s
 from .calculations.alphas import alpha_s_raw
-from .calculations.bet import area_BET
-from .calculations.bet import area_BET_raw
+from .calculations.area_bet import area_BET
+from .calculations.area_bet import area_BET_raw
 from .calculations.iast import iast
 from .calculations.iast import iast_binary_svp
 from .calculations.iast import iast_binary_vle
