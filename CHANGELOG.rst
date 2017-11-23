@@ -2,6 +2,17 @@
 Changelog
 =========
 
+0.10.0 ()
+------------------
+
+* Improved unit management by adding a unit/basis for both the
+  adsorbent (ex: amount adsorbed per g, kg or cm3 of material
+  are all valid) and loading (ex: mmol, g, kg of gas adsorbed
+  per amount of material are all valid)
+* Separated isotherm models so that they can now be easily
+  created by the used.
+* Added new models: x.
+
 0.9.3 (2017-10-24)
 ------------------
 
