@@ -278,11 +278,16 @@ def isotherm_from_xl(path, fmt=None):
                 experiment_data_df.rename(
                     index=str, columns={column: loading_key}, inplace=True)
 
-                # Get units
-                units = column[column.find(
-                    '(') + 1:column.rfind(')')].split('/')
-                loading_basis = find_basis(units[0])
-                adsorbent_basis = find_basis(units[1])
+                if not fmt:
+                    # Get units
+                    units = column[column.find(
+                        '(') + 1:column.rfind(')')].split('/')
+                    loading_basis = find_basis(units[0])
+                    adsorbent_basis = find_basis(units[1])
+                elif fmt == 'MADIREL':
+                    units = ['mmol', 'g']
+                    loading_basis = 'molar'
+                    adsorbent_basis = 'mass'
 
             elif s_pressure_key in column.lower():
 
@@ -290,9 +295,14 @@ def isotherm_from_xl(path, fmt=None):
                 experiment_data_df.rename(
                     index=str, columns={column: pressure_key}, inplace=True)
 
-                # Get units
-                pressure_unit = column[column.find('(') + 1:column.rfind(')')]
-                pressure_mode = find_mode(pressure_unit)
+                if not fmt:
+                    # Get units
+                    pressure_unit = column[column.find(
+                        '(') + 1:column.rfind(')')]
+                    pressure_mode = find_mode(pressure_unit)
+                elif fmt == 'MADIREL':
+                    pressure_unit = 'bar'
+                    pressure_mode = 'absolute'
 
             else:
                 other_keys.append(column)
