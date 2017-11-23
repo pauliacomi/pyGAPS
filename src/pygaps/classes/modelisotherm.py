@@ -4,8 +4,6 @@ isotherms from experimental or simulated data.
 """
 
 
-import copy
-
 import matplotlib.pyplot as plt
 import numpy
 import pandas
@@ -18,21 +16,7 @@ from ..utilities.unit_converter import c_adsorbent
 from ..utilities.unit_converter import c_loading
 from ..utilities.unit_converter import c_pressure
 from .isotherm import Isotherm
-
-# ! list of models implemented
-# ! with parameters involved in each model
-_MODELS = {
-    "Langmuir": {"M": numpy.nan, "K": numpy.nan},
-    "Quadratic": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
-    "BET": {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan},
-    "DSLangmuir": {"M1": numpy.nan, "K1": numpy.nan,
-                   "M2": numpy.nan, "K2": numpy.nan},
-    "TSLangmuir": {"M1": numpy.nan, "K1": numpy.nan,
-                   "M2": numpy.nan, "K2": numpy.nan,
-                   "M3": numpy.nan, "K3": numpy.nan},
-    "TemkinApprox": {"M": numpy.nan, "K": numpy.nan, "theta": numpy.nan},
-    "Henry": {"KH": numpy.nan}
-}
+from ..calculations.models_isotherm import _MODELS
 
 
 class ModelIsotherm(Isotherm):
@@ -105,54 +89,9 @@ class ModelIsotherm(Isotherm):
     Notes
     -----
 
-    Models supported are as follows. Here, :math:`L` is the adsorbate uptake,
+    Models supported are found in the :mod:calculations.models_isotherm.
+    Here, :math:`L` is the adsorbate uptake and
     :math:`P` is pressure (fugacity technically).
-
-    * Langmuir isotherm model
-
-    .. math::
-
-        L(P) = M\\frac{KP}{1+KP},
-
-    * Quadratic isotherm model
-
-    .. math::
-
-        L(P) = M \\frac{(K_a + 2 K_b P)P}{1+K_aP+K_bP^2}
-
-    * Brunauer-Emmett-Teller (BET) adsorption isotherm
-
-    .. math::
-
-        L(P) = M\\frac{K_A P}{(1-K_B P)(1-K_B P+ K_A P)}
-
-    * Dual-site Langmuir (DSLangmuir) adsorption isotherm
-
-    .. math::
-
-        L(P) = M_1\\frac{K_1 P}{1+K_1 P} +  M_2\\frac{K_2 P}{1+K_2 P}
-
-    * Triple-site Langmuir (TSLangmuir) adsorption isotherm
-
-    .. math::
-
-        L(P) = M_1\\frac{K_1 P}{1+K_1 P} +  M_2\\frac{K_2 P}{1+K_2 P} + M_3\\frac{K_3 P}{1+K_3 P}
-
-    * Asymptotic approximation to the Temkin Isotherm
-      (see DOI: 10.1039/C3CP55039G)
-
-    .. math::
-
-        L(P) = M\\frac{KP}{1+KP} + M \\theta (\\frac{KP}{1+KP})^2 (\\frac{KP}{1+KP} -1)
-
-    * Henry's law. Only use if your data is linear, and do not necessarily trust
-      IAST results from Henry's law if the result required an extrapolation
-      of your data; Henry's law is unrealistic because the adsorption sites
-      will saturate at higher pressures.
-
-    .. math::
-
-        L(P) = K_H P
 
     """
 
@@ -185,9 +124,9 @@ class ModelIsotherm(Isotherm):
         if model is None:
             raise ParameterError("Specify a model to fit to the pure-component"
                                  " isotherm data. e.g. model=\"Langmuir\"")
-        if model not in _MODELS:
-            raise ParameterError("Model {0} not an option in pyIAST. Viable"
-                                 "models are {1}".format(model, _MODELS))
+        if model not in [model.name for model in _MODELS]:
+            raise ParameterError("Model {0} not an option. Viable models "
+                                 "are {1}".format(model, [model.name for model in _MODELS]))
 
         # We change it to a model
         isotherm_parameters['is_real'] = False
@@ -223,13 +162,15 @@ class ModelIsotherm(Isotherm):
 
         #: Name of analytical model to fit to pure-component isotherm data
         #: adsorption isotherm
-        self.model = model
+        for _model in _MODELS:
+            if _model.name == model:
+                self.model = _model()
 
         # ! root mean square error in fit
         self.rmse = numpy.nan
 
         # ! Dictionary of parameters as a starting point for data fitting
-        self.param_guess = get_default_guess_params(model, isotherm_data, pressure_key,
+        self.param_guess = get_default_guess_params(self.model, isotherm_data, pressure_key,
                                                     loading_key)
 
         # Override defaults if user provides param_guess dictionary
@@ -239,10 +180,6 @@ class ModelIsotherm(Isotherm):
                     raise ParameterError("%s is not a valid parameter"
                                          " in the %s model." % (param, model))
                 self.param_guess[param] = guess_val
-
-        # ! Dictionary of identified model parameters
-        # initialize params as nan
-        self.params = copy.deepcopy(_MODELS[model])
 
         # fit model to isotherm data
         self._fit(data[loading_key].values,
@@ -389,7 +326,7 @@ class ModelIsotherm(Isotherm):
                 isotherm = ModelIsotherm(data,
                                          loading_key=loading_key,
                                          pressure_key=pressure_key,
-                                         model=model,
+                                         model=model.name,
                                          param_guess=None,
                                          optimization_method=optimization_method,
                                          branch=branch,
@@ -401,7 +338,7 @@ class ModelIsotherm(Isotherm):
 
             except CalculationError:
                 if verbose:
-                    print("Modelling using {0} failed".format(model))
+                    print("Modelling using {0} failed".format(model.name))
 
         if not attempts:
             raise CalculationError(
@@ -411,7 +348,7 @@ class ModelIsotherm(Isotherm):
             best_fit = attempts[errors.index(min(errors))]
 
             if verbose:
-                print("Best model fit is {0}".format(best_fit.model))
+                print("Best model fit is {0}".format(best_fit.model.name))
 
             return best_fit
 
@@ -435,10 +372,10 @@ class ModelIsotherm(Isotherm):
             Prints out extra information about steps taken.
         """
         if verbose:
-            print("Attempting to model using {}".format(self.model))
+            print("Attempting to model using {}".format(self.model.name))
 
         # parameter names (cannot rely on order in Dict)
-        param_names = [param for param in self.params.keys()]
+        param_names = [param for param in self.model.params.keys()]
         # guess
         guess = numpy.array([self.param_guess[param] for param in param_names])
 
@@ -448,7 +385,7 @@ class ModelIsotherm(Isotherm):
             """
             # change params to those in x
             for i, _ in enumerate(param_names):
-                self.params[param_names[i]] = params_[i]
+                self.model.params[param_names[i]] = params_[i]
 
             return numpy.sum((loading - self.loading_at(pressure)) ** 2)
 
@@ -463,17 +400,17 @@ class ModelIsotherm(Isotherm):
             by passing a dictionary of parameter guesses, param_guess, to the
             constructor.
             "\n\tDefault starting guess for parameters: {2}"
-            """.format(self.model, opt_res.message, self.param_guess))
+            """.format(self.model.name, opt_res.message, self.param_guess))
 
         # assign params
         for index, _ in enumerate(param_names):
-            self.params[param_names[index]] = opt_res.x[index]
+            self.model.params[param_names[index]] = opt_res.x[index]
 
         self.rmse = numpy.sqrt(opt_res.fun / len(pressure))
 
         if verbose:
             print("Model {0} success, rmse is {1}".format(
-                self.model, self.rmse))
+                self.model.name, self.rmse))
 
 ##########################################################
 #   Methods
@@ -713,47 +650,7 @@ class ModelIsotherm(Isotherm):
                                   temp=self.t_exp)
 
         # Calculate loading using internal model
-        if self.model == "Langmuir":
-            loading = self.params["M"] * self.params["K"] * pressure / \
-                (1.0 + self.params["K"] * pressure)
-
-        elif self.model == "Quadratic":
-            loading = self.params["M"] * (self.params["Ka"] +
-                                          2.0 * self.params["Kb"] * pressure) * pressure / (
-                1.0 + self.params["Ka"] * pressure +
-                self.params["Kb"] * pressure ** 2)
-
-        elif self.model == "BET":
-            loading = self.params["M"] * self.params["Ka"] * pressure / (
-                (1.0 - self.params["Kb"] * pressure) *
-                (1.0 - self.params["Kb"] * pressure +
-                 self.params["Ka"] * pressure))
-
-        elif self.model == "DSLangmuir":
-            # K_i P
-            k1p = self.params["K1"] * pressure
-            k2p = self.params["K2"] * pressure
-            loading = self.params["M1"] * k1p / (1.0 + k1p) + \
-                self.params["M2"] * k2p / (1.0 + k2p)
-
-        elif self.model == "TSLangmuir":
-            # K_i P
-            k1p = self.params["K1"] * pressure
-            k2p = self.params["K2"] * pressure
-            k3p = self.params["K3"] * pressure
-            loading = self.params["M1"] * k1p / (1.0 + k1p) + \
-                self.params["M2"] * k2p / (1.0 + k2p) + \
-                self.params["M3"] * k3p / (1.0 + k3p)
-
-        elif self.model == "Henry":
-            loading = self.params["KH"] * pressure
-
-        elif self.model == "TemkinApprox":
-            langmuir_fractional_loading = self.params["K"] * pressure / \
-                (1.0 + self.params["K"] * pressure)
-            loading = self.params["M"] * (langmuir_fractional_loading +
-                                          self.params["theta"] * langmuir_fractional_loading ** 2 *
-                                          langmuir_fractional_loading)
+        loading = self.model.loading(pressure)
 
         # Ensure loading is in correct units and basis requested
         if adsorbent_basis or adsorbent_unit:
@@ -869,28 +766,8 @@ class ModelIsotherm(Isotherm):
                                 temp=self.t_exp
                                 )
 
-        # Calculate loading using internal model
-        if self.model == "Langmuir":
-            pressure = loading / \
-                (self.params["K"] * (self.params["M"] - loading))
-
-        elif self.model == "Quadratic":
-            raise NotImplementedError
-
-        elif self.model == "BET":
-            raise NotImplementedError
-
-        elif self.model == "DSLangmuir":
-            raise NotImplementedError
-
-        elif self.model == "TSLangmuir":
-            raise NotImplementedError
-
-        elif self.model == "Henry":
-            pressure = loading / self.params["KH"]
-
-        elif self.model == "TemkinApprox":
-            raise NotImplementedError
+        # Calculate pressure using internal model
+        pressure = self.model.pressure(loading)
 
         # Ensure pressure is in correct units and mode requested
         if pressure_mode or pressure_unit:
@@ -969,42 +846,7 @@ class ModelIsotherm(Isotherm):
                                   temp=self.t_exp)
 
         # based on model
-        if self.model == "Langmuir":
-            spreading_p = self.params["M"] * \
-                numpy.log(1.0 + self.params["K"] * pressure)
-
-        elif self.model == "Quadratic":
-            spreading_p = self.params["M"] * numpy.log(1.0 + self.params["Ka"] * pressure +
-                                                       self.params["Kb"] * pressure ** 2)
-
-        elif self.model == "BET":
-            spreading_p = self.params["M"] * numpy.log(
-                (1.0 - self.params["Kb"] * pressure +
-                 self.params["Ka"] * pressure) /
-                (1.0 - self.params["Kb"] * pressure))
-
-        elif self.model == "DSLangmuir":
-            spreading_p = self.params["M1"] * numpy.log(
-                1.0 + self.params["K1"] * pressure) +\
-                self.params["M2"] * numpy.log(
-                1.0 + self.params["K2"] * pressure)
-
-        elif self.model == "TSLangmuir":
-            spreading_p = self.params["M1"] * numpy.log(
-                1.0 + self.params["K1"] * pressure) +\
-                self.params["M2"] * numpy.log(
-                1.0 + self.params["K2"] * pressure) +\
-                self.params["M3"] * numpy.log(
-                1.0 + self.params["K3"] * pressure)
-
-        elif self.model == "Henry":
-            spreading_p = self.params["KH"] * pressure
-
-        elif self.model == "TemkinApprox":
-            one_plus_kp = 1.0 + self.params["K"] * pressure
-            spreading_p = self.params["M"] * (numpy.log(one_plus_kp) +
-                                              self.params["theta"] * (2.0 * self.params["K"] * pressure + 1.0) /
-                                              (2.0 * one_plus_kp ** 2))
+        spreading_p = self.model.spreading_pressure(pressure)
 
         return spreading_p
 
@@ -1022,8 +864,8 @@ class ModelIsotherm(Isotherm):
 
         print(self)
 
-        print("%s identified model parameters:" % self.model)
-        for param, val in self.params.items():
+        print("%s identified model parameters:" % self.model.name)
+        for param, val in self.model.params.items():
             print("\t%s = %f" % (param, val))
         print("RMSE = ", self.rmse)
 
@@ -1059,14 +901,14 @@ def get_default_guess_params(model, data, pressure_key, loading_key):
 
     Parameters
     ----------
-    model: str
-        name of analytical model
+    model: IsothermModel
+        Analytical model
     data: DataFrame
-        adsorption isotherm data
+        Adsorption isotherm data.
     pressure_key: str
-        key for pressure column in data
+        Key for pressure column in data.
     loading_key: str
-        key for loading column in data
+        Key for loading column in data.
 
     Returns
     -------
@@ -1085,32 +927,4 @@ def get_default_guess_params(model, data, pressure_key, loading_key):
         df_nonzero[pressure_key].loc[idx_min] / (
         saturation_loading - df_nonzero[pressure_key].loc[idx_min])
 
-    if model == "Langmuir":
-        return {"M": saturation_loading, "K": langmuir_k}
-
-    if model == "Quadratic":
-        # Quadratic = Langmuir when Kb = Ka^2. This is our default assumption.
-        # Also, M is half of the saturation loading in the Quadratic model.
-        return {"M": saturation_loading / 2.0, "Ka": langmuir_k,
-                "Kb": langmuir_k ** 2.0}
-
-    if model == "BET":
-        # BET = Langmuir when Kb = 0.0. This is our default assumption.
-        return {"M": saturation_loading, "Ka": langmuir_k,
-                "Kb": langmuir_k * 0.01}
-
-    if model == "DSLangmuir":
-        return {"M1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
-                "M2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}
-
-    if model == "TSLangmuir":
-        return {"M1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
-                "M2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k,
-                "M3": 0.5 * saturation_loading, "K3": 0.8 * langmuir_k}
-
-    if model == "Henry":
-        return {"KH": saturation_loading * langmuir_k}
-
-    if model == "TemkinApprox":
-        # equivalent to Langmuir model if theta = 0.0
-        return {"M": saturation_loading, "K": langmuir_k, "theta": 0.0}
+    return model.default_guess(saturation_loading, langmuir_k)
