@@ -11,6 +11,8 @@ import pandas
 
 from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
+from ..utilities.unit_converter import find_basis
+from ..utilities.unit_converter import find_mode
 
 # chose an implementation, depending on os
 if os.name == 'nt':  # sys.platform == 'win32':
@@ -117,11 +119,15 @@ def isotherm_to_xl(isotherm, path, fmt=None):
         data = isotherm.data()[headings]
 
         if fmt == 'MADIREL':
-            headings[0] = 'adsorbed'
-            headings[1] = 'Pressure'
-
-        headings[0] = headings[0] + '(' + isotherm.loading_unit + ')'
-        headings[1] = headings[1] + '(' + isotherm.pressure_unit + ')'
+            headings[0] = 'adsorbed' + '(' + isotherm.loading_unit + ')'
+            headings[1] = 'Pressure' + '(' + isotherm.pressure_unit + ')'
+        else:
+            headings[0] = headings[0] + '(' + isotherm.loading_unit + '/'\
+                                            + isotherm.adsorbent_unit + ')'
+            if isotherm.pressure_mode == 'absolute':
+                headings[1] = headings[1] + '(' + isotherm.pressure_unit + ')'
+            else:
+                headings[1] = headings[1] + '(p/p0)'
 
         sht.range('A' + str(rng_data)).value = headings
         sht.range('A' + str(rng_data + 1)).value = data.as_matrix()
@@ -267,11 +273,27 @@ def isotherm_from_xl(path, fmt=None):
 
         for column in experiment_data_df.columns:
             if s_loading_key in column.lower():
+
+                # Rename with standard name
                 experiment_data_df.rename(
                     index=str, columns={column: loading_key}, inplace=True)
+
+                # Get units
+                units = column[column.find(
+                    '(') + 1:column.rfind(')')].split('/')
+                loading_basis = find_basis(units[0])
+                adsorbent_basis = find_basis(units[1])
+
             elif s_pressure_key in column.lower():
+
+                # Rename with standard name
                 experiment_data_df.rename(
                     index=str, columns={column: pressure_key}, inplace=True)
+
+                # Get units
+                pressure_unit = column[column.find('(') + 1:column.rfind(')')]
+                pressure_mode = find_mode(pressure_unit)
+
             else:
                 other_keys.append(column)
     finally:
@@ -283,6 +305,14 @@ def isotherm_from_xl(path, fmt=None):
         loading_key=loading_key,
         pressure_key=pressure_key,
         other_keys=other_keys,
+
+        pressure_unit=pressure_unit,
+        pressure_mode=pressure_mode,
+        loading_unit=units[0],
+        loading_basis=loading_basis,
+        adsorbent_unit=units[1],
+        adsorbent_basis=adsorbent_basis,
+
         **sample_info)
 
     return isotherm
