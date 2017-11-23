@@ -573,31 +573,32 @@ class PointIsotherm(Isotherm):
         """
         ret = self.data(branch=branch).loc[:, self.pressure_key]
 
-        # Convert if needed
-        if pressure_mode or pressure_unit:
-            if not pressure_mode:
-                pressure_mode = self.pressure_mode
-            if not pressure_unit:
-                pressure_unit = self.pressure_unit
+        if not ret.empty:
+            # Convert if needed
+            if pressure_mode or pressure_unit:
+                if not pressure_mode:
+                    pressure_mode = self.pressure_mode
+                if not pressure_unit:
+                    pressure_unit = self.pressure_unit
 
-            ret = c_pressure(ret,
-                             mode_from=self.pressure_mode,
-                             mode_to=pressure_mode,
-                             unit_from=self.pressure_unit,
-                             unit_to=pressure_unit,
-                             adsorbate_name=self.adsorbate,
-                             temp=self.t_exp
-                             )
+                ret = c_pressure(ret,
+                                 mode_from=self.pressure_mode,
+                                 mode_to=pressure_mode,
+                                 unit_from=self.pressure_unit,
+                                 unit_to=pressure_unit,
+                                 adsorbate_name=self.adsorbate,
+                                 temp=self.t_exp
+                                 )
 
-        # Select required points
-        if max_range is not None or min_range is not None:
-            if min_range is None:
-                min_range = min(ret)
-            if max_range is None:
-                max_range = max(ret)
+            # Select required points
+            if max_range is not None or min_range is not None:
+                if min_range is None:
+                    min_range = min(ret)
+                if max_range is None:
+                    max_range = max(ret)
 
-            ret = ret.loc[lambda x: x >=
-                          min_range].loc[lambda x: x <= max_range]
+                ret = ret.loc[lambda x: x >=
+                              min_range].loc[lambda x: x <= max_range]
 
         if indexed:
             return ret
@@ -643,41 +644,42 @@ class PointIsotherm(Isotherm):
         """
         ret = self.data(branch=branch).loc[:, self.loading_key]
 
-        # Convert if needed
-        if adsorbent_basis or adsorbent_unit:
-            if not adsorbent_basis:
-                adsorbent_basis = self.adsorbent_basis
+        if not ret.empty:
+            # Convert if needed
+            if adsorbent_basis or adsorbent_unit:
+                if not adsorbent_basis:
+                    adsorbent_basis = self.adsorbent_basis
 
-            ret = c_adsorbent(ret,
-                              basis_from=self.adsorbent_basis,
-                              basis_to=adsorbent_basis,
-                              unit_from=self.adsorbent_unit,
-                              unit_to=adsorbent_unit,
-                              sample_name=self.sample_name,
-                              sample_batch=self.sample_batch
-                              )
+                ret = c_adsorbent(ret,
+                                  basis_from=self.adsorbent_basis,
+                                  basis_to=adsorbent_basis,
+                                  unit_from=self.adsorbent_unit,
+                                  unit_to=adsorbent_unit,
+                                  sample_name=self.sample_name,
+                                  sample_batch=self.sample_batch
+                                  )
 
-        if loading_basis or loading_unit:
-            if not loading_basis:
-                loading_basis = self.loading_basis
+            if loading_basis or loading_unit:
+                if not loading_basis:
+                    loading_basis = self.loading_basis
 
-            ret = c_loading(ret,
-                            basis_from=self.loading_basis,
-                            basis_to=loading_basis,
-                            unit_from=self.loading_unit,
-                            unit_to=loading_unit,
-                            adsorbate_name=self.adsorbate,
-                            temp=self.t_exp
-                            )
+                ret = c_loading(ret,
+                                basis_from=self.loading_basis,
+                                basis_to=loading_basis,
+                                unit_from=self.loading_unit,
+                                unit_to=loading_unit,
+                                adsorbate_name=self.adsorbate,
+                                temp=self.t_exp
+                                )
 
-        # Select required points
-        if max_range is not None or min_range is not None:
-            if min_range is None:
-                min_range = min(ret)
-            if max_range is None:
-                max_range = max(ret)
-            ret = ret.loc[lambda x: x >=
-                          min_range].loc[lambda x: x <= max_range]
+            # Select required points
+            if max_range is not None or min_range is not None:
+                if min_range is None:
+                    min_range = min(ret)
+                if max_range is None:
+                    max_range = max(ret)
+                ret = ret.loc[lambda x: x >=
+                              min_range].loc[lambda x: x <= max_range]
 
         if indexed:
             return ret
@@ -712,14 +714,15 @@ class PointIsotherm(Isotherm):
         if key in self.other_keys:
             ret = self.data(branch=branch).loc[:, key]
 
-            # Select required points
-            if max_range is not None or min_range is not None:
-                if min_range is None:
-                    min_range = min(ret)
-                if max_range is None:
-                    max_range = max(ret)
-                ret = ret.loc[lambda x: x >=
-                              min_range].loc[lambda x: x <= max_range]
+            if not ret.empty:
+                # Select required points
+                if max_range is not None or min_range is not None:
+                    if min_range is None:
+                        min_range = min(ret)
+                    if max_range is None:
+                        max_range = max(ret)
+                    ret = ret.loc[lambda x: x >=
+                                  min_range].loc[lambda x: x <= max_range]
 
             if indexed:
                 return ret
