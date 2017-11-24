@@ -16,6 +16,7 @@ from ..utilities.unit_converter import c_adsorbent
 from ..utilities.unit_converter import c_loading
 from ..utilities.unit_converter import c_pressure
 from .isotherm import Isotherm
+from ..calculations.models_isotherm import get_isotherm_model
 from ..calculations.models_isotherm import _MODELS
 
 
@@ -124,11 +125,8 @@ class ModelIsotherm(Isotherm):
         if model is None:
             raise ParameterError("Specify a model to fit to the pure-component"
                                  " isotherm data. e.g. model=\"Langmuir\"")
-        if model not in [model.name for model in _MODELS]:
-            raise ParameterError("Model {0} not an option. Viable models "
-                                 "are {1}".format(model, [model.name for model in _MODELS]))
 
-        # We change it to a model
+        # We change it to a simulated isotherm
         isotherm_parameters['is_real'] = False
 
         # Run base class constructor
@@ -162,9 +160,7 @@ class ModelIsotherm(Isotherm):
 
         #: Name of analytical model to fit to pure-component isotherm data
         #: adsorption isotherm
-        for _model in _MODELS:
-            if _model.name == model:
-                self.model = _model()
+        self.model = get_isotherm_model(model)
 
         # ! root mean square error in fit
         self.rmse = numpy.nan
