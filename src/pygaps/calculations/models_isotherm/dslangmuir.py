@@ -5,6 +5,8 @@ Double Site Langmuir isotherm model
 import numpy
 
 from .model import IsothermModel
+import scipy
+from ...utilities.exceptions import CalculationError
 
 
 class DSLangmuir(IsothermModel):
@@ -29,6 +31,16 @@ class DSLangmuir(IsothermModel):
     def loading(self, pressure):
         """
         Function that calculates loading
+
+        Parameters
+        ----------
+        pressure : float
+            The pressure at which to calculate the loading.
+
+        Returns
+        -------
+        float
+            Loading at specified pressure.
         """
         # K_i P
         k1p = self.params["K1"] * pressure
@@ -39,12 +51,42 @@ class DSLangmuir(IsothermModel):
     def pressure(self, loading):
         """
         Function that calculates pressure
+
+        Parameters
+        ----------
+        loading : float
+            The loading at which to calculate the pressure.
+
+        Returns
+        -------
+        float
+            Pressure at specified loading.
         """
-        raise NotImplementedError
+        def fun(x):
+            return self.loading(x) - loading
+
+        opt_res = scipy.optimize.root(fun, 1, method='hybr')
+
+        if not opt_res.success:
+            raise CalculationError("""
+            Root finding for value {0} failed.
+            """.format(loading))
+
+        return opt_res.x
 
     def spreading_pressure(self, pressure):
         """
         Function that calculates spreading pressure
+
+        Parameters
+        ----------
+        pressure : float
+            The pressure at which to calculate the spreading pressure.
+
+        Returns
+        -------
+        float
+            Spreading pressure at specified pressure.
         """
         return self.params["M1"] * numpy.log(
             1.0 + self.params["K1"] * pressure) +\
@@ -54,6 +96,18 @@ class DSLangmuir(IsothermModel):
     def default_guess(self, saturation_loading, langmuir_k):
         """
         Returns initial guess for fitting
+
+        Parameters
+        ----------
+        saturation_loading : float
+            Loading at the saturation plateau.
+        langmuir_k : float
+            Langmuir calculated constant.
+
+        Returns
+        -------
+        dict
+            Dictionary of initial guesses for the parameters.
         """
         return {"M1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
                 "M2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}

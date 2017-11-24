@@ -5,6 +5,8 @@ Temkin Approximation isotherm model
 import numpy
 
 from .model import IsothermModel
+import scipy
+from ...utilities.exceptions import CalculationError
 
 
 class TemkinApprox(IsothermModel):
@@ -30,22 +32,62 @@ class TemkinApprox(IsothermModel):
     def loading(self, pressure):
         """
         Function that calculates loading
+
+        Parameters
+        ----------
+        pressure : float
+            The pressure at which to calculate the loading.
+
+        Returns
+        -------
+        float
+            Loading at specified pressure.
         """
         langmuir_fractional_loading = self.params["K"] * pressure / \
             (1.0 + self.params["K"] * pressure)
         return self.params["M"] * (langmuir_fractional_loading +
                                    self.params["theta"] * langmuir_fractional_loading ** 2 *
-                                   langmuir_fractional_loading)
+                                   (langmuir_fractional_loading - 1))
 
     def pressure(self, loading):
         """
         Function that calculates pressure
+
+        Parameters
+        ----------
+        loading : float
+            The loading at which to calculate the pressure.
+
+        Returns
+        -------
+        float
+            Pressure at specified loading.
         """
-        raise NotImplementedError
+        def fun(x):
+            return self.loading(x) - loading
+
+        opt_res = scipy.optimize.root(fun, 1, method='hybr')
+
+        if not opt_res.success:
+            raise CalculationError("""
+            Root finding for value {0} failed.
+            """.format(loading))
+
+        return opt_res.x
 
     def spreading_pressure(self, pressure):
         """
         Function that calculates spreading pressure
+
+        Parameters
+        ----------
+        pressure : float
+            The pressure at which to calculate the spreading pressure.
+
+        Returns
+        -------
+        float
+            Spreading pressure at specified pressure.
         """
         one_plus_kp = 1.0 + self.params["K"] * pressure
         return self.params["M"] * (numpy.log(one_plus_kp) +
@@ -55,5 +97,17 @@ class TemkinApprox(IsothermModel):
     def default_guess(self, saturation_loading, langmuir_k):
         """
         Returns initial guess for fitting
+
+        Parameters
+        ----------
+        saturation_loading : float
+            Loading at the saturation plateau.
+        langmuir_k : float
+            Langmuir calculated constant.
+
+        Returns
+        -------
+        dict
+            Dictionary of initial guesses for the parameters.
         """
         return {"M": saturation_loading, "K": langmuir_k, "theta": 0.0}
