@@ -54,3 +54,18 @@ class TestJson(object):
             pygaps.isotherm_from_json(file.read(), fmt='NIST')
 
         return
+
+    def test_isotherm_to_json_nist(self):
+
+        JSON_PATH_NIST = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            'docs', 'examples', 'data', 'parsing', 'nist', 'nist_iso.json')
+
+        with open(JSON_PATH_NIST) as file:
+            json_str = file.read()
+
+        isotherm = pygaps.isotherm_from_json(json_str, fmt='NIST')
+
+        new_json_str = pygaps.isotherm_to_json(isotherm, fmt='NIST')
+
+        return
