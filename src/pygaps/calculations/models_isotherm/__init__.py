@@ -8,11 +8,12 @@ from .tslangmuir import TSLangmuir
 from .quadratic import Quadratic
 from .bet import BET
 from .temkinapprox import TemkinApprox
+from .virial import Virial
 
 from ...utilities.exceptions import ParameterError
 
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-           Quadratic, BET, TemkinApprox]
+           Quadratic, BET, TemkinApprox, Virial]
 
 
 def get_isotherm_model(model_name):
