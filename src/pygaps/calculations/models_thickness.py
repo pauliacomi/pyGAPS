@@ -4,8 +4,6 @@ particular pressure
 """
 import math
 
-from ..classes.adsorbate import Adsorbate
-from ..classes.isotherm import Isotherm
 from ..utilities.exceptions import ParameterError
 
 

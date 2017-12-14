@@ -68,4 +68,4 @@ class TestJson(object):
 
         new_json_str = pygaps.isotherm_to_json(isotherm, fmt='NIST')
 
-        return
+        return new_json_str
