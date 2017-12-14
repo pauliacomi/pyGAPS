@@ -150,10 +150,10 @@ class TestModelIsotherm(object):
             isotherm = pygaps.PointIsotherm.from_json(
                 text_file.read())
 
-        isotherm = pygaps.ModelIsotherm.from_pointisotherm(
+        model_iso = pygaps.ModelIsotherm.from_pointisotherm(
             isotherm, guess_model=True, verbose=True)
 
-        return isotherm
+        return model_iso
 
 ##########################
     def test_isotherm_ret_pressure(self, basic_modelisotherm, use_adsorbate):

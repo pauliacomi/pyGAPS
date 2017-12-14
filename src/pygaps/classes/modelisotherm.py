@@ -16,7 +16,7 @@ from ..utilities.unit_converter import c_loading
 from ..utilities.unit_converter import c_pressure
 from .isotherm import Isotherm
 from ..calculations.models_isotherm import get_isotherm_model
-from ..calculations.models_isotherm import _MODELS
+from ..calculations.models_isotherm import _GUESS_MODELS
 
 
 class ModelIsotherm(Isotherm):
@@ -318,7 +318,7 @@ class ModelIsotherm(Isotherm):
             Any other parameters of the isotherm which should be stored internally.
         """
         attempts = []
-        for model in _MODELS:
+        for model in _GUESS_MODELS:
             try:
                 isotherm = ModelIsotherm(data,
                                          loading_key=loading_key,

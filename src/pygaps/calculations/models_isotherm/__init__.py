@@ -15,6 +15,12 @@ from ...utilities.exceptions import ParameterError
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
            Quadratic, BET, TemkinApprox, Virial]
 
+_GUESS_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
+                 Quadratic, BET, TemkinApprox]
+
+_IAST_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
+                Quadratic, BET, TemkinApprox]
+
 
 def get_isotherm_model(model_name):
     """

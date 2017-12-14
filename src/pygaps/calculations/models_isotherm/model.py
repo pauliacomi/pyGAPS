@@ -147,20 +147,20 @@ class IsothermModel(object):
         opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
                                           method=optimization_method)
         if not opt_res.success:
-            raise CalculationError("""
-            Minimization of RSS for {0} isotherm fitting failed with error:
-            \n\t {1}
-            Try a different starting point in the nonlinear optimization
-            by passing a dictionary of parameter guesses, param_guess, to the
-            constructor.
-            "\n\tDefault starting guess for parameters: {2}"
-            """.format(self.name, opt_res.message, param_guess))
+            raise CalculationError(
+                "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
+                "\n\t\t{1}"
+                "\n\tTry a different starting point in the nonlinear optimization"
+                "\n\tby passing a dictionary of parameter guesses, param_guess, to the"
+                "\n\tconstructor."
+                "\n\tDefault starting guess for parameters:"
+                "\n\t{2}".format(self.name, opt_res.message, param_guess))
 
         # assign params
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        rmse = numpy.sqrt(opt_res.fun / len(pressure))
+        rmse = numpy.sqrt(opt_res.fun / len(loading))
 
         if verbose:
             print("Model {0} success, rmse is {1}".format(
