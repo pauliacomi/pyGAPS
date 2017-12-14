@@ -2,12 +2,12 @@
 Base class for all models
 """
 
+import matplotlib.pyplot as plt
 import numpy
 import scipy
-from .model import IsothermModel
-from ...utilities.exceptions import CalculationError
 
-import matplotlib.pyplot as plt
+from ...utilities.exceptions import CalculationError
+from .model import IsothermModel
 
 
 class Virial(IsothermModel):

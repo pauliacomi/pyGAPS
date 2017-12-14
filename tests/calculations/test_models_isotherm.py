@@ -8,6 +8,7 @@ import pytest
 
 import pygaps.calculations.models_isotherm as mi
 from pygaps.utilities.exceptions import ParameterError
+
 from ..conftest import modelling
 
 MODELS = {

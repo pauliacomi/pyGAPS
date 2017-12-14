@@ -7,6 +7,7 @@ import pytest
 
 import pygaps.calculations.models_kelvin as km
 from pygaps.calculations.models_kelvin import _KELVIN_MODELS
+
 from ..conftest import characterisation
 
 

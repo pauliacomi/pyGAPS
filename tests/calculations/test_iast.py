@@ -9,9 +9,9 @@ import pytest
 import pygaps
 from pygaps.utilities.exceptions import ParameterError
 
+from ..conftest import modelling
 from .conftest import DATA_IAST
 from .conftest import DATA_IAST_PATH
-from ..conftest import modelling
 
 
 @pytest.fixture()

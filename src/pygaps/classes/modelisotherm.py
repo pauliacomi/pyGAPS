@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import numpy
 import pandas
 
+from ..calculations.models_isotherm import _GUESS_MODELS
+from ..calculations.models_isotherm import get_isotherm_model
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -15,8 +17,6 @@ from ..utilities.unit_converter import c_adsorbent
 from ..utilities.unit_converter import c_loading
 from ..utilities.unit_converter import c_pressure
 from .isotherm import Isotherm
-from ..calculations.models_isotherm import get_isotherm_model
-from ..calculations.models_isotherm import _GUESS_MODELS
 
 
 class ModelIsotherm(Isotherm):

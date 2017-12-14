@@ -2,8 +2,8 @@
 Base class for all models
 """
 
-import scipy
 import numpy
+import scipy
 
 from ...utilities.exceptions import CalculationError
 

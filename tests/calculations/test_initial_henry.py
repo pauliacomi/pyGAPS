@@ -3,14 +3,16 @@ This test module has tests relating to initial henry constant
 """
 
 import os
+
 import pytest
 from matplotlib.testing.decorators import cleanup
-import pygaps
 from numpy import isclose
 
+import pygaps
+
+from ..conftest import characterisation
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
-from ..conftest import characterisation
 
 
 @characterisation

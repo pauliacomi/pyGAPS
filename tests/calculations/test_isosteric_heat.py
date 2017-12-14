@@ -11,9 +11,9 @@ from numpy import isclose
 
 import pygaps
 
+from ..conftest import characterisation
 from .conftest import DATA_ISOSTERIC
 from .conftest import DATA_ISOSTERIC_PATH
-from ..conftest import characterisation
 
 
 @characterisation

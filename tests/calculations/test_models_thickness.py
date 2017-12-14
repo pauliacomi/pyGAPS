@@ -7,6 +7,7 @@ import pytest
 
 import pygaps.calculations.models_thickness as mt
 from pygaps.utilities.exceptions import ParameterError
+
 from ..conftest import characterisation
 
 

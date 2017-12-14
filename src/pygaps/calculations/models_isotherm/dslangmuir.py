@@ -3,10 +3,10 @@ Double Site Langmuir isotherm model
 """
 
 import numpy
-
-from .model import IsothermModel
 import scipy
+
 from ...utilities.exceptions import CalculationError
+from .model import IsothermModel
 
 
 class DSLangmuir(IsothermModel):

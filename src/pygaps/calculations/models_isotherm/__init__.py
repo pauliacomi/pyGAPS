@@ -1,16 +1,15 @@
 # pylint: disable=W0614,W0401,W0611,W0622
 # flake8: noqa
 
+from ...utilities.exceptions import ParameterError
+from .bet import BET
+from .dslangmuir import DSLangmuir
 from .henry import Henry
 from .langmuir import Langmuir
-from .dslangmuir import DSLangmuir
-from .tslangmuir import TSLangmuir
 from .quadratic import Quadratic
-from .bet import BET
 from .temkinapprox import TemkinApprox
+from .tslangmuir import TSLangmuir
 from .virial import Virial
-
-from ...utilities.exceptions import ParameterError
 
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
            Quadratic, BET, TemkinApprox, Virial]

@@ -5,8 +5,8 @@ BET isotherm model
 import numpy
 import scipy
 
-from .model import IsothermModel
 from ...utilities.exceptions import CalculationError
+from .model import IsothermModel
 
 
 class BET(IsothermModel):
