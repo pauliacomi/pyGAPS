@@ -94,20 +94,25 @@ class TemkinApprox(IsothermModel):
                                    self.params["theta"] * (2.0 * self.params["K"] * pressure + 1.0) /
                                    (2.0 * one_plus_kp ** 2))
 
-    def default_guess(self, saturation_loading, langmuir_k):
+    def default_guess(self, data, loading_key, pressure_key):
         """
         Returns initial guess for fitting
 
         Parameters
         ----------
-        saturation_loading : float
-            Loading at the saturation plateau.
-        langmuir_k : float
-            Langmuir calculated constant.
+        data : pandas.DataFrame
+            Data of the isotherm.
+        loading_key : str
+            Column with the loading.
+        pressure_key : str
+            Column with the pressure.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
+        saturation_loading, langmuir_k = super(TemkinApprox, self).default_guess(
+            data, loading_key, pressure_key)
+
         return {"M": saturation_loading, "K": langmuir_k, "theta": 0.0}

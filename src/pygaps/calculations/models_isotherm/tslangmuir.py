@@ -98,22 +98,27 @@ class TSLangmuir(IsothermModel):
             self.params["M3"] * numpy.log(
             1.0 + self.params["K3"] * pressure)
 
-    def default_guess(self, saturation_loading, langmuir_k):
+    def default_guess(self, data, loading_key, pressure_key):
         """
         Returns initial guess for fitting
 
         Parameters
         ----------
-        saturation_loading : float
-            Loading at the saturation plateau.
-        langmuir_k : float
-            Langmuir calculated constant.
+        data : pandas.DataFrame
+            Data of the isotherm.
+        loading_key : str
+            Column with the loading.
+        pressure_key : str
+            Column with the pressure.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        return {"M1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
-                "M2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k,
-                "M3": 0.5 * saturation_loading, "K3": 0.8 * langmuir_k}
+        saturation_loading, langmuir_k = super(TSLangmuir, self).default_guess(
+            data, loading_key, pressure_key)
+
+        return {"M1": 0.4 * saturation_loading, "K1": 0.2 * langmuir_k,
+                "M2": 0.4 * saturation_loading, "K2": 0.4 * langmuir_k,
+                "M3": 0.2 * saturation_loading, "K3": 0.4 * langmuir_k}

@@ -2,6 +2,11 @@
 Base class for all models
 """
 
+import scipy
+import numpy
+
+from ...utilities.exceptions import CalculationError
+
 
 class IsothermModel(object):
     """
@@ -11,10 +16,12 @@ class IsothermModel(object):
     #: Name of the class as static
     name = None
 
-    # def __init__(self):
-    #     """
-    #     Instantiation function
-    #     """
+    def __init__(self):
+        """
+        Instantiation function
+        """
+
+        self.params = dict()
 
     def loading(self, pressure):
         """
@@ -64,20 +71,99 @@ class IsothermModel(object):
         """
         return None
 
-    def default_guess(self, saturation_loading, langmuir_k):
+    def default_guess(self, data, loading_key, pressure_key):
         """
         Returns initial guess for fitting
 
         Parameters
         ----------
+        data : pandas.DataFrame
+            Data of the isotherm.
+        loading_key : str
+            Column with the loading.
+        pressure_key : str
+            Column with the pressure.
+
+        Returns
+        -------
         saturation_loading : float
             Loading at the saturation plateau.
         langmuir_k : float
             Langmuir calculated constant.
-
-        Returns
-        -------
-        dict
-            Dictionary of initial guesses for the parameters.
-        return None
         """
+
+        # guess saturation loading to 10% more than highest loading
+        saturation_loading = 1.1 * data[loading_key].max()
+
+        # guess Langmuir K using the guess for saturation loading and lowest
+        # pressure point (but not zero)
+        df_nonzero = data[data[loading_key] != 0.0]
+        idx_min = df_nonzero[loading_key].argmin()
+        langmuir_k = df_nonzero[loading_key].loc[idx_min] / \
+            df_nonzero[pressure_key].loc[idx_min] / (
+            saturation_loading - df_nonzero[pressure_key].loc[idx_min])
+
+        return saturation_loading, langmuir_k
+
+    def fit(self, loading, pressure, param_guess, optimization_method, verbose=False):
+        """
+        Fit model to data using nonlinear optimization with least squares loss
+        function. Assigns parameters to self
+
+        Parameters
+        ----------
+        loading : ndarray
+            The loading for each point.
+        pressure : ndarray
+            The pressures of each point.
+        func : ndarray
+            The pressures of each point.
+        param_guess : ndarray
+            The initial guess for the fitting function.
+        optimization_method : str
+            Method in SciPy minimization function to use in fitting model to data.
+        verbose : bool, optional
+            Prints out extra information about steps taken.
+        """
+        if verbose:
+            print("Attempting to model using {}".format(self.name))
+
+        # parameter names (cannot rely on order in Dict)
+        param_names = [param for param in self.params]
+        # guess
+        guess = numpy.array([param_guess[param] for param in param_names])
+
+        def residual_sum_of_squares(params_):
+            """
+            Residual Sum of Squares between model and data in data
+            """
+            # change params to those in x
+            for i, _ in enumerate(param_names):
+                self.params[param_names[i]] = params_[i]
+
+            return numpy.sum((loading - self.loading(pressure)) ** 2)
+
+        # minimize RSS
+        opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
+                                          method=optimization_method)
+        if not opt_res.success:
+            raise CalculationError("""
+            Minimization of RSS for {0} isotherm fitting failed with error:
+            \n\t {1}
+            Try a different starting point in the nonlinear optimization
+            by passing a dictionary of parameter guesses, param_guess, to the
+            constructor.
+            "\n\tDefault starting guess for parameters: {2}"
+            """.format(self.name, opt_res.message, param_guess))
+
+        # assign params
+        for index, _ in enumerate(param_names):
+            self.params[param_names[index]] = opt_res.x[index]
+
+        rmse = numpy.sqrt(opt_res.fun / len(pressure))
+
+        if verbose:
+            print("Model {0} success, rmse is {1}".format(
+                self.name, rmse))
+
+        return rmse

@@ -227,7 +227,7 @@ class PointIsotherm(Isotherm):
                   comparing a model overlap with the real isotherm.
         """
 
-        if not pressure_points:
+        if pressure_points is None:
             pressure = modelisotherm.pressure()
         elif isinstance(pressure_points, PointIsotherm):
             pressure = pressure_points.pressure(branch=modelisotherm.branch)
