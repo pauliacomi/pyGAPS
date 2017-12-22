@@ -29,11 +29,11 @@ def area_BET(isotherm, limits=None, verbose=False):
     Parameters
     ----------
     isotherm : PointIsotherm
-        The isotherm of which to calculate the BET surface area
+        The isotherm of which to calculate the BET surface area.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
     verbose : bool, optional
-        Prints extra information and plots graphs of the calculation
+        Prints extra information and plots graphs of the calculation.
 
     Returns
     -------
@@ -48,8 +48,8 @@ def area_BET(isotherm, limits=None, verbose=False):
           in mmol
         - ``p_monolayer(float)`` : the pressure at which the statistical monolayer is chosen,
           relative
-        - ``bet_slope(float)`` : slope of the BET plot, in g/mol
-        - ``bet_intercept(float)`` : intercept of the BET plot, in g/mol
+        - ``bet_slope(float)`` : slope of the BET plot
+        - ``bet_intercept(float)`` : intercept of the BET plot
         - ``corr_coef(float)`` : correlation coefficient of the linear region in the BET plot
 
     Notes
@@ -93,10 +93,10 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     While a standard for surface area determinations, the BET area should be used with care,
     as there are many assumptions made in the calculation. To augment the validity of the BET
-    method, Roquerol [#]_ proposed several checks to ensure that the BET region selected is valid
+    method, Rouquerol [#]_ proposed several checks to ensure that the BET region selected is valid
 
         * The BET constant (C) obtained should be positive
-        * In the corresponding Roquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
+        * In the corresponding Rouquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
           with respect to :math:`p/p_0`, the points chosen for BET analysis should be
           strictly increasing
         * The loading at the statistical monolayer should be situated within the
@@ -119,7 +119,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     ----------
     .. [#] “Adsorption of Gases in Multimolecular Layers”, Stephen Brunauer,
        P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
-    .. [#] "Adsorption by Powders & Porous Solids", F. Roquerol, J Roquerol
+    .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
        and K. Sing, Academic Press, 1999
 
     """
@@ -168,7 +168,7 @@ def area_BET(isotherm, limits=None, verbose=False):
                  p_monolayer,
                  bet_transform(n_monolayer, p_monolayer))
 
-        # Generate plot of the Roquerol points chosen
+        # Generate plot of the Rouquerol points chosen
         roq_plot(pressure,
                  roq_transform(loading, pressure),
                  minimum, maximum,
@@ -221,7 +221,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
 
-    # Generate the Roquerol array
+    # Generate the Rouquerol array
     roq_t_array = roq_transform(loading, pressure)
 
     # select the maximum and minimum of the points and the pressure associated
@@ -284,7 +284,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
 
 
 def roq_transform(loading, pressure):
-    """Roquerol transform function"""
+    """Rouquerol transform function"""
     return loading * (1 - pressure)
 
 
