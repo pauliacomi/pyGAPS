@@ -11,12 +11,15 @@ from .model import IsothermModel
 
 class TemkinApprox(IsothermModel):
     """
-    Asymptotic approximation to the Temkin Isotherm
-      (see DOI: 10.1039/C3CP55039G)
+    Asymptotic approximation to the Temkin Isotherm [#]_
 
     .. math::
 
         L(P) = M\\frac{KP}{1+KP} + M \\theta (\\frac{KP}{1+KP})^2 (\\frac{KP}{1+KP} -1)
+
+    References
+    ----------
+    .. [#] Phys. Chem. Chem. Phys., 2014,16, 5499-5513
 
     """
     #: Name of the class as static

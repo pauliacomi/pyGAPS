@@ -16,19 +16,14 @@ from .conftest import DATA_N77_PATH
 
 
 @characterisation
-class TestBET(object):
+class TestAreaBET(object):
     """
     Tests everything related to BET surface area calculation
     """
 
-    def test_BET_checks(self, basic_pointisotherm, basic_sample):
-        """Test checks"""
-
-        return
-
     @pytest.mark.parametrize('file, expected_bet',
                              [(data['file'], data['bet_area']) for data in list(DATA.values())])
-    def test_BET(self, file, expected_bet):
+    def test_area_BET(self, file, expected_bet):
         """Test calculation with several model isotherms"""
 
         filepath = os.path.join(DATA_N77_PATH, file)
@@ -44,7 +39,7 @@ class TestBET(object):
 
         assert isclose(bet_area, expected_bet, err_relative, err_absolute)
 
-    def test_BET_choice(self):
+    def test_area_BET_choice(self):
         """Test choice of points"""
 
         data = DATA['MCM-41']
@@ -65,7 +60,7 @@ class TestBET(object):
                        err_relative, err_absolute)
 
     @cleanup
-    def test_BET_output(self, noplot):
+    def test_area_BET_output(self, noplot):
         """Test verbosity"""
 
         data = DATA['MCM-41']

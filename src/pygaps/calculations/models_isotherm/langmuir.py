@@ -13,8 +13,60 @@ class Langmuir(IsothermModel):
 
     .. math::
 
-        L(P) = M\\frac{KP}{1+KP},
+        L(P) = M\\frac{KP}{1+KP}
+
+    Notes
+    -----
+
+    The Langmuir theory [#]_, proposed at the start of the 20th century, states that
+    adsorption happens on active sites on a surface in a single layer. It is
+    derived based on several assumptions.
+
+        * All sites are equivalent and have the same chance of being occupied
+        * Each adsorbate molecule can occupy one adsorption site
+        * There are no interactions between adsorbed molecules
+        * The rates of adsorption and desorption are proportional to the number
+          of sites currently free and currently occupied, respectively
+        * Adsorption is complete when all sites are filled.
+
+    Using the following assumptions we can define rates for both the adsorption and
+    desorption. The adsorption rate will be proportional to the number of sites available
+    on the surface, as well as the number of molecules in the gas, which is represented by
+    the pressure. The desorption rate, on the other hand, will be proportional to the
+    number of occupied sites and the energy of adsorption.
+    It is also useful to define :math:`\\theta = \\frac{n_a}{M}` as the surface coverage,
+    the number of sites occupied divided by the total sites. Mathematically:
+
+    .. math::
+
+        v_a = k_a p (1 - \\theta)
+
+        v_d = k_d \\theta \\exp{-\\frac{E}{RT}}
+
+    Here, :math:`M` is the moles adsorbed at the completion of the monolayer, and therefore
+    the maximum possible loading. At equilibrium, the rate of adsorption and the rate of
+    desorption are equal, therefore the two equations can be combined.
+
+    .. math::
+
+        k_a p (1 - \\theta) = k_d \\theta \\exp{-\\frac{E}{RT}}
+
+    Rearranging to get an expression for the loading, the Langmuir equation becomes:
+
+    .. math::
+
+        L(P) = M\\frac{KP}{1+KP}
+
+    The Langmuir constant is the product of the individual desorption and adsorption constants
+    :math:`k_a` and :math:`k_d` and exponentially related to the energy of adsorption
+    :math:`\\exp{-\\frac{E}{RT}}`.
+
+    References
+    ----------
+    .. [#] I. Langmuir, J. American Chemical Society 38, 2219(1916); 40, 1368(1918)
+
     """
+
     #: Name of the class as static
     name = 'Langmuir'
 

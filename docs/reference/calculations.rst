@@ -11,8 +11,14 @@ Isotherm analysis
 BET Surface area
 ................
 
-.. automodule:: pygaps.calculations.bet
+.. automodule:: pygaps.calculations.area_bet
     :members: area_BET, area_BET_raw
+
+Langmuir Surface area
+................
+
+.. automodule:: pygaps.calculations.area_langmuir
+    :members: area_langmuir, area_langmuir_raw
 
 t-plot
 ......

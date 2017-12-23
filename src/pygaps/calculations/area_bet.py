@@ -61,7 +61,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     through N2 adsorption at 77K, although other adsorbates (Ar, Kr) have been used.
 
     It assumes that the adsorption happens on the surface of the material in
-    incremental layersm according to the BET theory. Even if the adsorbent is porous,
+    incremental layers according to the BET theory. Even if the adsorbent is porous,
     the initial amount adsorbed (usually between 0.05 - 0.4 :math:`p/p_0`) can be
     modelled through the BET equation:
 
@@ -187,34 +187,34 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
     Parameters
     ----------
     loading : array
-        loadings, in mol/basis
+        Loadings, in mol/basis.
     pressure : array
-        pressures, relative
+        Pressures, relative.
     cross_section : float
-        adsorbed cross-section of the molecule of the adsorbate, in nm
+        Adsorbed cross-section of the molecule of the adsorbate, in nm.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
 
     Returns
     -------
     bet_area : float
-        calculated BET surface area
+        Calculated BET surface area.
     c_const : float
-        C constant from the BET equation
+        C constant from the BET equation.
     n_monolayer : float
-        adsorbed quantity in the statistical monolayer
+        Adsorbed quantity in the statistical monolayer.
     p_monolayer : float
-        pressure at the statistical monolayer
+        Pressure at the statistical monolayer.
     slope : float
-        calculated slope of the BET plot
+        Calculated slope of the BET plot.
     intercept : float
-        calculated intercept of the BET plot
+        Calculated intercept of the BET plot.
     minimum : float
-        miminum loading of the point taken for the linear region
+        Minimum point taken for the linear region.
     maximum : float
-        maximum loading of the point taken for the linear region
+        Maximum point taken for the linear region.
     corr_coef : float
-        correlation coefficient of the straight line in the BET plot
+        Correlation coefficient of the straight line in the BET plot.
 
     """
     if len(pressure) != len(loading):
