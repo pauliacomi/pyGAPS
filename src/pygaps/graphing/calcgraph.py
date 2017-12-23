@@ -56,21 +56,21 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     Parameters
     ----------
     pressure : array
-        Pressure points which will make up the x axix
+        Pressure points which will make up the x axix.
     bet_points : array
-        BET-transformed points which will make up the y axis
+        BET-transformed points which will make up the y axis.
     minimum : int
-        Lower bound of the selected points
+        Lower bound of the selected points.
     maximum : int
-        Higher bound of the selected points
+        Higher bound of the selected points.
     slope : float
-        Slope of the chosen linear region
+        Slope of the chosen linear region.
     intercept : float
-        Intercept of the cosen linear region
+        Intercept of the chosen linear region.
     p_monolayer : float
-        Pressure at which statistical monolayer is achieved
+        Pressure at which statistical monolayer is achieved.
     rol_monolayer : float
-        BET transform of the point at which statistical monolayer is achieved
+        BET transform of the point at which statistical monolayer is achieved.
 
     Returns
     -------
@@ -97,6 +97,54 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     ax1.set_title("BET plot")
     ax1.set_xlabel('p/p°')
     ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
+    ax1.legend(loc='best')
+
+    return ax1
+
+
+def langmuir_plot(pressure, langmuir_points, minimum, maximum,
+                  slope, intercept):
+    """
+    Draws the Langmuir plot
+
+    Parameters
+    ----------
+    pressure : array
+        Pressure points which will make up the x axix.
+    langmuir_points : array
+        Langmuir-transformed points which will make up the y axis.
+    minimum : int
+        Lower bound of the selected points.
+    maximum : int
+        Higher bound of the selected points.
+    slope : float
+        Slope of the chosen linear region.
+    intercept : float
+        Intercept of the chosen linear region.
+
+    Returns
+    -------
+    matplotlib.axes
+        Matplotlib axes of the graph generated. The user can then apply their
+        own styling if desired.
+    """
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    ax1.plot(pressure, langmuir_points,
+             marker='', color='g')
+    ax1.plot(pressure[minimum:maximum], langmuir_points[minimum:maximum],
+             marker='o', linestyle='', color='r', label='chosen points')
+    x_lim = [0, pressure[maximum]]
+    y_lim = [slope * x_lim[0] + intercept,
+             slope * x_lim[1] + intercept]
+    ax1.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
+
+    ax1.set_ylim(ymin=0, ymax=langmuir_points[maximum] * 1.2)
+    ax1.set_xlim(
+        xmin=0, xmax=pressure[maximum] * 1.2)
+    ax1.set_title("Langmuir plot")
+    ax1.set_xlabel('p/p°')
+    ax1.set_ylabel('(p/p°)/n')
     ax1.legend(loc='best')
 
     return ax1

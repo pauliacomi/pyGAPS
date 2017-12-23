@@ -5,6 +5,8 @@ from .calculations.alphas import alpha_s
 from .calculations.alphas import alpha_s_raw
 from .calculations.area_bet import area_BET
 from .calculations.area_bet import area_BET_raw
+from .calculations.area_langmuir import area_langmuir
+from .calculations.area_langmuir import area_langmuir_raw
 from .calculations.iast import iast
 from .calculations.iast import iast_binary_svp
 from .calculations.iast import iast_binary_vle
