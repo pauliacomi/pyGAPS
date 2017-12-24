@@ -33,8 +33,6 @@ class TestInitialHenry(object):
         ihenry_slope = pygaps.calc_initial_henry_slope(
             isotherm, max_adjrms=0.01, verbose=False)
 
-        print(ihenry_slope)
-
         err_relative = 0.1  # 10 percent
         err_absolute = 10   #
 
