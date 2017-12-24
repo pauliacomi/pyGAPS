@@ -1,5 +1,5 @@
 """
-Parsing to and from json file format for isotherms
+Parsing to and from json file format for isotherms.
 """
 
 import json
@@ -25,7 +25,7 @@ def isotherm_to_json(isotherm, fmt=None):
         Isotherm to be written to json.
     fmt : {None, 'NIST'}, optional
         If the format is set to NIST, then the json format a specific version
-        used by the NIST database of adsorbents
+        used by the NIST database of adsorbents.
 
     Returns
     -------
@@ -53,8 +53,8 @@ def isotherm_from_json(json_isotherm, fmt=None,
                        loading_key='loading', pressure_key='pressure',
                        **isotherm_parameters):
     """
-    Converts a json isotherm format to a internal format
-    Structure is inspired by the NIST format
+    Converts a json isotherm format to a internal format.
+    Structure is inspired by the NIST format.
 
     Parameters
     ----------
@@ -136,7 +136,7 @@ NIST_ADSORBATES = {
 
 def _to_json_nist(raw_dict):
     """
-    Converts an internal dictionary format to a NIST format
+    Converts an internal dictionary format to a NIST format.
     """
     nist_dict = dict()
 
@@ -167,7 +167,7 @@ def _to_json_nist(raw_dict):
 
 def _from_json_nist(raw_dict):
     """
-    Converts a NIST dictionary format to a internal format
+    Converts a NIST dictionary format to a internal format.
     """
 
     nist_dict = dict()

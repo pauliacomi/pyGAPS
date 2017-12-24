@@ -192,7 +192,7 @@ def isotherm_from_xl(path, fmt=None):
     Returns
     -------
     PointIsotherm
-        The isotherm contained in the excel file
+        The isotherm contained in the excel file.
     """
 
     if xlwings is None:

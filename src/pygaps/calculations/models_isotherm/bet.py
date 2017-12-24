@@ -36,9 +36,9 @@ class BET(IsothermModel):
 
     .. math::
 
-        k_{a_1} p \\theta_0 &= k_{d_1} \\theta_1 \\exp{-\\frac{E_1}{RT}}
+        k_{a_1} p \\theta_0 &= k_{d_1} \\theta_1 \\exp{(-\\frac{E_1}{RT})}
 
-        k_{a_2} p \\theta_1 &= k_{d_2} \\theta_2 \\exp{-\\frac{E_L}{RT}}
+        k_{a_2} p \\theta_1 &= k_{d_2} \\theta_2 \\exp{(-\\frac{E_L}{RT})}
 
         ...
 
@@ -50,9 +50,9 @@ class BET(IsothermModel):
 
     .. math::
 
-        \\theta_1 &= y \\theta_0, where y = \\frac{k_{a_1}}{k_{d_1}} p \\exp{-\\frac{E_1}{RT}}
+        \\theta_1 &= y \\theta_0 \\quad where \\quad y = \\frac{k_{a_1}}{k_{d_1}} p \\exp{(-\\frac{E_1}{RT})}
 
-        \\theta_2 &= x \\theta_1, where x = \\frac{p}{g} \\exp{-\\frac{E_L}{RT}}
+        \\theta_2 &= x \\theta_1 \\quad where \\quad x = \\frac{p}{g} \\exp{(-\\frac{E_L}{RT})}
 
         \\theta_3 &= x \\theta_2 = x^2 \\theta_1
 
@@ -64,7 +64,7 @@ class BET(IsothermModel):
 
     .. math::
 
-        C = \\frac{y}{x} = \\frac{k_{a_1}}{k_{d_1}} g \\exp{\\frac{E_1 - E_L}{RT}}
+        C = \\frac{y}{x} = \\frac{k_{a_1}}{k_{d_1}} g \\exp{(\\frac{E_1 - E_L}{RT})}
 
         \\theta_i = C x^i \\theta_0
 
@@ -159,9 +159,13 @@ class BET(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
         The integral for the BET model is solved analytically.
+
+        .. math::
+
+            \\pi = M \\ln{\\frac{1 - K_b P + K_a P}{1- K_b P}}
 
         Parameters
         ----------

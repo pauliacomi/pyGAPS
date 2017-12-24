@@ -1,4 +1,6 @@
-"""Module performing the conversions between different units used"""
+"""
+Module performing the conversions between different units used.
+"""
 
 import pygaps
 
@@ -48,7 +50,7 @@ def c_pressure(value,
                adsorbate_name=None, temp=None):
     """
     Converts pressure units and modes.
-    Adsorbate name and temeperature have to be
+    Adsorbate name and temperature have to be
     specified when converting between modes.
 
     Parameters
@@ -65,9 +67,9 @@ def c_pressure(value,
         Unit to which to convert.
     adsorbate_name : str
         Name of the adsorbate on which the pressure is to be
-        converted
+        converted.
     temp : float
-        Temperature at which the pressure is measured, in K
+        Temperature at which the pressure is measured, in K.
 
     Returns
     -------
@@ -109,7 +111,8 @@ def c_loading(value,
               adsorbate_name=None, temp=None):
     """
     Converts loading units and basis.
-    Adsorbate name and temeperature have to be
+
+    Adsorbate name and temperature have to be
     specified when converting between basis.
 
     Parameters
@@ -126,9 +129,9 @@ def c_loading(value,
         Unit to which to convert.
     adsorbate_name : str
         Name of the adsorbate on which the pressure is to be
-        converted
+        converted.
     temp : float
-        Temperature at which the pressure is measured, in K
+        Temperature at which the pressure is measured, in K.
 
     Returns
     -------
@@ -203,6 +206,7 @@ def c_adsorbent(value,
                 sample_name=None, sample_batch=None):
     """
     Converts adsorbent units and basis.
+
     The name and batch of the sample have to be
     specified when converting between basis.
 
@@ -333,7 +337,7 @@ def c_unit(unit_list, value, unit_from, unit_to, sign=1):
 
 
 def find_basis(unit):
-    """Finds the basis of a given unit """
+    """Finds the basis of a given unit."""
 
     if unit in _VOLUME_UNITS:
         basis = 'molar'
@@ -348,7 +352,7 @@ def find_basis(unit):
 
 
 def find_mode(unit):
-    """Finds the mode of a given pressure"""
+    """Finds the mode of a given pressure."""
 
     if unit in _PRESSURE_UNITS:
         mode = 'absolute'

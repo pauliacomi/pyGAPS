@@ -108,9 +108,13 @@ class DSLangmuir(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
         The integral for the Double Site Langmuir model is solved analytically.
+
+        .. math::
+
+            \\pi = M_1 \\log{1 + K_1 P} +  M_2 \\log{1 + K_2 P}
 
         Parameters
         ----------

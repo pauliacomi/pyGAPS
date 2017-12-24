@@ -1,5 +1,5 @@
 """
-This module contains the experimental sample class
+This module contains the sample (or material) class.
 """
 
 import pygaps
@@ -89,19 +89,19 @@ class Sample(object):
         Parameters
         ----------
         sample_name : str
-            the name of the material to search
+            The name of the material to search.
         sample_batch : str
-            the batch of the material to search
+            The batch of the material to search.
 
         Returns
         -------
         Sample
-            instance of class
+            Instance of class.
 
         Raises
         ------
         ``ParameterError``
-            if it does not exist or cannot be calculated
+            if it does not exist or cannot be calculated.
         """
         # Checks to see if sample exists in master list
         sample = next(
@@ -122,7 +122,7 @@ class Sample(object):
 
     def __str__(self):
         '''
-        Prints a short summary of all the sample parameters
+        Prints a short summary of all the sample parameters.
         '''
         string = ""
 
@@ -156,12 +156,12 @@ class Sample(object):
     def to_dict(self):
         """
         Returns a dictionary of the sample class
-        Is the same dictionary that was used to create it
+        Is the same dictionary that was used to create it.
 
         Returns
         -------
         dict
-            dictionary of all parameters
+            Dictionary of all parameters.
         """
 
         parameters_dict = {
@@ -182,22 +182,22 @@ class Sample(object):
 
     def get_prop(self, prop):
         """
-        Returns a property from the 'properties' dictionary
+        Returns a property from the 'properties' dictionary.
 
         Parameters
         ----------
         prop : str
-            property name desired
+            Property name desired.
 
         Returns
         -------
         str/float
-            Value of property in the properties dict
+            Value of property in the properties dict.
 
         Raises
         ------
         ``ParameterError``
-            if it does not exist
+            if it does not exist.
         """
 
         req_prop = self.properties.get(prop)

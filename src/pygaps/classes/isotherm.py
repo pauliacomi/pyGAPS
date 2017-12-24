@@ -1,5 +1,5 @@
 """
-This module contains the main class that describes an isotherm
+This module contains the main class that describes an isotherm.
 """
 
 import pandas
@@ -15,7 +15,7 @@ from ..utilities.unit_converter import _VOLUME_UNITS
 
 class Isotherm(object):
     """
-    Class which contains the general data for an isotherm, real or model
+    Class which contains the general data for an isotherm, real or model.
 
     The isotherm class is the parent class that both PointIsotherm and
     ModelIsotherm inherit. It is designed to contain the information about
@@ -78,8 +78,8 @@ class Isotherm(object):
     implementation additions.
 
     The minimum arguments required to instantiate the class are
-    'sample_name', 'sample_batch', 't_exp', 'adsorbate'. Pass these values in
-    the ``**isotherm_parameters`` dictionary
+    ``sample_name``, ``sample_batch``, ``t_exp', ``adsorbate``. Pass these values in
+    the ``**isotherm_parameters`` dictionary.
     """
 
     def __init__(self,
@@ -152,24 +152,24 @@ class Isotherm(object):
                 "Pass loading_key and pressure_key, the names of the loading and"
                 " pressure columns in the DataFrame, to the constructor.")
 
-        #: basis for the adsorbent
+        #: Basis for the adsorbent.
         self.adsorbent_basis = str(adsorbent_basis)
-        #: unit for the adsorbent
+        #: Unit for the adsorbent.
         self.adsorbent_unit = str(adsorbent_unit)
-        #: basis for the loading
+        #: Basis for the loading.
         self.loading_basis = str(loading_basis)
-        #: units for loading
+        #: Units for loading.
         self.loading_unit = str(loading_unit)
-        #: mode for the pressure
+        #: Mode for the pressure.
         self.pressure_mode = str(pressure_mode)
-        #: units for pressure
+        #: Units for pressure.
         self.pressure_unit = str(pressure_unit)
 
         # Save column names
-        #: Name of column in the dataframe that contains adsorbed amount
+        #: Name of column in the dataframe that contains adsorbed amount.
         self.loading_key = loading_key
 
-        #: Name of column in the dataframe that contains pressure
+        #: Name of column in the dataframe that contains pressure.
         self.pressure_key = pressure_key
 
         # Must-have properties of the isotherm
@@ -178,35 +178,35 @@ class Isotherm(object):
         else:
             self.id = isotherm_parameters.pop('id', None)
 
-        #: Isotherm material name
+        #: Isotherm material name.
         self.sample_name = str(isotherm_parameters.pop('sample_name', None))
-        #: Isotherm material batch
+        #: Isotherm material batch.
         self.sample_batch = str(isotherm_parameters.pop('sample_batch', None))
-        #: Isotherm experimental temperature
+        #: Isotherm experimental temperature.
         self.t_exp = float(isotherm_parameters.pop('t_exp', None))
-        #: Isotherm adsorbate used
+        #: Isotherm adsorbate used.
         self.adsorbate = str(isotherm_parameters.pop('adsorbate', None))
 
         # Good-to-have properties of the isotherm
-        #: Isotherm experiment date
+        #: Isotherm experiment date.
         self.date = None
         date = isotherm_parameters.pop('date', None)
         if date:
             self.date = str(date)
 
-        #: Isotherm sample activation temperature
+        #: Isotherm sample activation temperature.
         self.t_act = None
         t_act = isotherm_parameters.pop('t_act', None)
         if t_act:
             self.t_act = float(t_act)
 
-        #: Isotherm lab
+        #: Isotherm lab.
         self.lab = None
         lab = isotherm_parameters.pop('lab', None)
         if lab:
             self.lab = str(lab)
 
-        #: Isotherm comments
+        #: Isotherm comments.
         self.comment = None
         comment = isotherm_parameters.pop('comment', None)
         if comment:
@@ -214,31 +214,31 @@ class Isotherm(object):
 
         #
         # Other properties
-        #: Isotherm user
+        #: Isotherm user.
         self.user = None
         user = isotherm_parameters.pop('user', None)
         if user:
             self.user = str(user)
 
-        #: Isotherm project
+        #: Isotherm project.
         self.project = None
         project = isotherm_parameters.pop('project', None)
         if project:
             self.project = str(project)
 
-        #: Isotherm machine used
+        #: Isotherm machine used.
         self.machine = None
         machine = isotherm_parameters.pop('machine', None)
         if machine:
             self.machine = str(machine)
 
-        #: Isotherm physicality (real or simulation)
+        #: Isotherm physicality (real or simulation).
         self.is_real = None
         is_real = isotherm_parameters.pop('is_real', None)
         if is_real:
             self.is_real = bool(is_real)
 
-        #: Isotherm type (calorimetry/isotherm)
+        #: Isotherm type (calorimetry/isotherm).
         self.exp_type = None
         exp_type = isotherm_parameters.pop('exp_type', None)
         if exp_type:
@@ -246,7 +246,7 @@ class Isotherm(object):
 
         # Save the rest of the properties as an extra dict
         # now that the named properties were taken out of
-        #: Other properties of the isotherm
+        #: Other properties of the isotherm.
         self.other_properties = isotherm_parameters
 
     ###########################################################
@@ -254,7 +254,7 @@ class Isotherm(object):
 
     def __str__(self):
         '''
-        Prints a short summary of all the isotherm parameters
+        Prints a short summary of all the isotherm parameters.
         '''
         string = ""
 
@@ -301,12 +301,12 @@ class Isotherm(object):
     def to_dict(self):
         """
         Returns a dictionary of the isotherm class
-        Is the same dictionary that was used to create it
+        Is the same dictionary that was used to create it.
 
         Returns
         -------
         dict
-            dictionary of all parameters
+            Dictionary of all parameters.
         """
         parameter_dict = {}
 
@@ -359,7 +359,7 @@ class Isotherm(object):
     def _splitdata(self, _data):
         """
         Splits isotherm data into an adsorption and desorption part and
-        adds a column to mark the transition between the two
+        adds a column to mark the transition between the two.
         """
         increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
         increasing.rename('check', inplace=True)

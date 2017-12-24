@@ -1,6 +1,6 @@
-# # %%
-# import os
-# import numpy
+"""
+Contains functions which plot graphs related to IAST calculations
+"""
 import matplotlib.pyplot as plt
 
 from ..utilities.string_utilities import convert_chemformula
@@ -8,7 +8,7 @@ from ..utilities.string_utilities import convert_chemformula
 
 def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
     """
-    Plots a vapour-adsorbed equilibrium graph from IAST data
+    Plots a vapour-adsorbed equilibrium graph from IAST data.
 
     Paramaters
     ----------
@@ -28,9 +28,9 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
     Returns
     -------
     fig : matplotlib Figure
-        The figure object
+        The figure object.
     ax : matplotlib ax
-        The ax object
+        The ax object.
     """
     # Generate the figure
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -67,7 +67,7 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
 
 def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
     """
-    Plots a selectivity-vs-pressure graph from IAST data
+    Plots a selectivity-vs-pressure graph from IAST data.
 
     Paramaters
     ----------
@@ -87,9 +87,9 @@ def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
     Returns
     -------
     fig : matplotlib Figure
-        The figure object
+        The figure object.
     ax : matplotlib ax
-        The ax object
+        The ax object.
     """
 
     # Generate the figure

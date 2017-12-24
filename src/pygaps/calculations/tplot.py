@@ -1,5 +1,5 @@
 """
-This module contains the t-plot calculation
+This module contains the t-plot calculation.
 """
 
 import warnings
@@ -17,7 +17,7 @@ from .models_thickness import get_thickness_model
 def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False):
     """
     Calculates the external surface area and adsorbed volume
-    using the t-plot method
+    using the t-plot method.
 
 
     Pass an isotherm object to the function to have the t-plot method applied to it.

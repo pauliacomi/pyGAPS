@@ -30,17 +30,17 @@ class ModelIsotherm(Isotherm):
     Parameters
     ----------
     isotherm_data : DataFrame
-        pure-component adsorption isotherm data
+        Pure-component adsorption isotherm data.
     loading_key : str
-        column of the pandas DataFrame where the loading is stored
+        Column of the pandas DataFrame where the loading is stored.
     pressure_key : str
-        column of the pandas DataFrame where the pressure is stored
+        Column of the pandas DataFrame where the pressure is stored.
     model : str
-        the model to be used to describe the isotherm
+        The model to be used to describe the isotherm.
     param_guess : dict
-        starting guess for model parameters in the data fitting routine
+        Starting guess for model parameters in the data fitting routine.
     optimization_method : str
-        method in SciPy minimization function to use in fitting model to data.
+        Method in SciPy minimization function to use in fitting model to data.
         See `here
         <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
     branch : ['ads', 'des'], optional
@@ -118,7 +118,7 @@ class ModelIsotherm(Isotherm):
         """
         Instantiation is done by passing the data to be fitted, model to be
         used and fitting method as well as the parameters required by parent
-        class
+        class.
         """
         # Checks
         if model is None:
@@ -150,21 +150,21 @@ class ModelIsotherm(Isotherm):
         elif branch == 'des':
             data = data.loc[data['check']]
 
-        #: Branch the isotherm model is based on
+        #: Branch the isotherm model is based on.
         self.branch = branch
 
-        #: The pressure range on which the model was built
+        #: The pressure range on which the model was built.
         self.pressure_range = [min(data[pressure_key]),
                                max(data[pressure_key])]
 
         #: Name of analytical model to fit to pure-component isotherm data
-        #: adsorption isotherm
+        #: adsorption isotherm.
         self.model = get_isotherm_model(model)
 
-        # ! root mean square error in fit
+        #: Root mean square error in fit.
         self.rmse = numpy.nan
 
-        # ! Dictionary of parameters as a starting point for data fitting
+        #: Dictionary of parameters as a starting point for data fitting.
         self.param_guess = self.model.default_guess(isotherm_data,
                                                     loading_key,
                                                     pressure_key)
@@ -200,15 +200,15 @@ class ModelIsotherm(Isotherm):
         ----------
 
         isotherm : Isotherm
-            an instance of the Isotherm parent class
+            An instance of the Isotherm parent class.
         isotherm_data : DataFrame
-            pure-component adsorption isotherm data
+            Pure-component adsorption isotherm data.
         model : str
-            the model to be used to describe the isotherm
+            The model to be used to describe the isotherm.
         param_guess : dict
-            starting guess for model parameters in the data fitting routine
+            Starting guess for model parameters in the data fitting routine.
         optimization_method : str
-            method in SciPy minimization function to use in fitting model to data.
+            Method in SciPy minimization function to use in fitting model to data.
             See `here
             <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
         branch : ['ads', 'des'], optional
@@ -247,7 +247,7 @@ class ModelIsotherm(Isotherm):
         isotherm : PointIsotherm
             An instance of the PointIsotherm parent class to model.
         model : str
-            The model to be used to describe the isotherm
+            The model to be used to describe the isotherm.
         guess_model : bool
             Set to true if you want to attemt to guess which model best
             fits the isotherm data. This will mean a calculation of all
@@ -354,7 +354,7 @@ class ModelIsotherm(Isotherm):
 
     def has_branch(self, branch):
         """
-        Returns if the isotherm has an specific branch
+        Returns if the isotherm has an specific branch.
 
         Parameters
         ----------
@@ -364,7 +364,7 @@ class ModelIsotherm(Isotherm):
         Returns
         -------
         bool
-            Whether the data exists or not
+            Whether the data exists or not.
         """
 
         if self.branch == branch:
@@ -385,13 +385,13 @@ class ModelIsotherm(Isotherm):
         points : int
             The number of points to get.
         branch : {None, 'ads', 'des'}
-            The branch of the pressure to return. If None, returns the branch
-            the isotherm is modelled on
+            The branch of the pressure to return. If ``None``, returns the branch
+            the isotherm is modelled on.
         pressure_unit : str, optional
             Unit in which the pressure should be returned. If None
-            it defaults to which pressure unit the isotherm is currently in
+            it defaults to which pressure unit the isotherm is currently in.
         modpressure_modee : {None, 'absolute', 'relative'}
-            The mode in which to return the pressure, if possible. If None,
+            The mode in which to return the pressure, if possible. If ``None``,
             returns mode the isotherm is currently in.
         min_range : float, optional
             The lower limit for the pressure to select.
@@ -459,19 +459,19 @@ class ModelIsotherm(Isotherm):
         points : int
             The number of points to get.
         branch : {None, 'ads', 'des'}
-            The branch of the loading to return. If None, returns entire
-            dataset
+            The branch of the loading to return. If ``None``, returns entire
+            dataset.
         loading_unit : str, optional
             Unit in which the loading should be returned. If None
-            it defaults to which loading unit the isotherm is currently in
+            it defaults to which loading unit the isotherm is currently in.
         loading_basis : {None, 'mass', 'volume'}
-            The basis on which to return the loading, if possible. If None,
+            The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         adsorbent_unit : str, optional
             Unit in which the adsorbent should be returned. If None
-            it defaults to which loading unit the isotherm is currently in
+            it defaults to which loading unit the isotherm is currently in.
         adsorbent_basis : {None, 'mass', 'volume'}
-            The basis on which to return the adsorbent, if possible. If None,
+            The basis on which to return the adsorbent, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         min_range : float, optional
             The lower limit for the loading to select.
@@ -534,30 +534,30 @@ class ModelIsotherm(Isotherm):
             The branch the calculation is based on.
 
         pressure_unit : str
-            Unit the pressure is specified in. If None, it defaults to
+            Unit the pressure is specified in. If ``None``, it defaults to
             internal isotherm units.
         pressure_mode : str
-            The mode the pressure is passed in. If None, it defaults to
+            The mode the pressure is passed in. If ``None``, it defaults to
             internal isotherm mode.
 
         loading_unit : str, optional
             Unit in which the loading should be returned. If None
-            it defaults to which loading unit the isotherm is currently in
+            it defaults to which loading unit the isotherm is currently in.
         loading_basis : {None, 'mass', 'volume'}
-            The basis on which to return the loading, if possible. If None,
+            The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         adsorbent_unit : str, optional
             Unit in which the adsorbent should be returned. If None
-            it defaults to which loading unit the isotherm is currently in
+            it defaults to which loading unit the isotherm is currently in.
         adsorbent_basis : {None, 'mass', 'volume'}
-            The basis on which to return the adsorbent, if possible. If None,
+            The basis on which to return the adsorbent, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
 
         Returns
         -------
         float or array
-            predicted loading at pressure P using fitted model
-            parameters
+            Predicted loading at pressure P using fitted model
+            parameters.
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -636,30 +636,30 @@ class ModelIsotherm(Isotherm):
             The branch the calculation is based on.
 
         pressure_unit : str
-            Unit the pressure is returned in. If None, it defaults to
+            Unit the pressure is returned in. If ``None``, it defaults to
             internal isotherm units.
         pressure_mode : str
-            The mode the pressure is returned in. If None, it defaults to
+            The mode the pressure is returned in. If ``None``, it defaults to
             internal isotherm mode.
 
         loading_unit : str
-            Unit the loading is specified in. If None, it defaults to
+            Unit the loading is specified in. If ``None``, it defaults to
             internal isotherm units.
         loading_basis : {None, 'mass', 'volume'}
-            The basis the loading is specified in. If None,
+            The basis the loading is specified in. If ``None``,
             assumes the basis the isotherm is currently in.
         adsorbent_unit : str, optional
             Unit in which the adsorbent is passed in. If None
             it defaults to which loading unit the isotherm is currently in
         adsorbent_basis : str
-            The basis the loading is passed in. If None, it defaults to
+            The basis the loading is passed in. If ``None``, it defaults to
             internal isotherm basis.
 
         Returns
         -------
         float or array
-            predicted pressure at loading L using fitted model
-            parameters
+            Predicted pressure at loading L using fitted model
+            parameters.
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -743,20 +743,20 @@ class ModelIsotherm(Isotherm):
         Parameters
         ----------
         pressure : float
-            pressure (in corresponding units as data in instantiation)
+            Pressure (in corresponding units as data in instantiation)
         branch : {'ads', 'des'}
             The branch of the use for calculation. Defaults to adsorption.
         pressure_unit : str
-            Unit the pressure is returned in. If None, it defaults to
+            Unit the pressure is returned in. If ``None``, it defaults to
             internal isotherm units.
         pressure_mode : str
-            The mode the pressure is returned in. If None, it defaults to
+            The mode the pressure is returned in. If ``None``, it defaults to
             internal isotherm mode.
 
         Returns
         -------
         float
-            spreading pressure, :math:`\\Pi`
+            Spreading pressure, :math:`\\Pi`.
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -789,14 +789,23 @@ class ModelIsotherm(Isotherm):
 
     def print_info(self, logarithmic=False, show=True):
         """
-        Prints a short summary of all the isotherm parameters
+        Prints a short summary of all the isotherm parameters.
 
         Parameters
         ----------
         logarithmic : bool, optional
-            Specifies if the graph printed is logarithmic or not
+            Specifies if the graph printed is logarithmic or not.
         show : bool, optional
-            Specifies if the graph is shown automatically or not
+            Specifies if the graph is shown automatically or not.
+        
+        Returns
+        -------
+        fig : Matplotlib figure
+            The figure object generated. Only returned if graph is not shown.
+        ax1 : Matplotlib ax
+            Ax object for primary graph. Only returned if graph is not shown.
+        ax2 : Matplotlib ax
+            Ax object for secondary graph. Only returned if graph is not shown.
         """
 
         print(self)
@@ -806,7 +815,7 @@ class ModelIsotherm(Isotherm):
             print("\t%s = %f" % (param, val))
         print("RMSE = ", self.rmse)
 
-        plot_iso([self], plot_type='isotherm',
+        fig, ax1, ax2 = plot_iso([self], plot_type='isotherm',
                  logx=logarithmic,
 
                  adsorbent_basis=self.adsorbent_basis,
@@ -820,5 +829,6 @@ class ModelIsotherm(Isotherm):
 
         if show:
             plt.show()
+            return
 
-        return
+        return fig, ax1, ax2

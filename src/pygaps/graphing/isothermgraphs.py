@@ -1,5 +1,5 @@
 """
-This module contains the functions for plotting and comparing isotherms
+This module contains the functions for plotting and comparing isotherms.
 """
 
 import matplotlib.pyplot as plt
@@ -41,21 +41,21 @@ def plot_iso(isotherms,
              save=False, path=None,
              **other_parameters):
     """
-    Plots the isotherm(s) provided on a single graph
+    Plots the isotherm(s) provided on a single graph.
 
     Parameters
     ----------
     isotherms : list
-        an iterable of the isotherms to be plotted
+        An iterable of the isotherms to be plotted.
     plot_type : {'isotherm', 'property', 'combined'}
         The plot type, to display: isotherm, a property or a combination.
         The 'isotherm' graph type displays only isotherm data and is the standard.
         If other data is recorded in the isotherm object, such as enthalpy, it
         can be displayed at the same time as the isotherm or in a property v
-        loading graph by selecting one of the other graph types
+        loading graph by selecting one of the other graph types.
     secondary_key : 'str'
         The key which has the column with the supplementary data to be plotted.
-        This parameter is only required in the 'property' and 'combined' graphs
+        This parameter is only required in the 'property' and 'combined' graphs.
     branch : list
         List with branches to disply, options: 'ads', 'des'.
     logx : bool
@@ -111,12 +111,12 @@ def plot_iso(isotherms,
     Returns
     -------
 
-    axes1 : Matplotlib figure
-        The figure object generated
+    fig : Matplotlib figure
+        The figure object generated.
     axes1 : Matplotlib ax
-        Ax object for primary graph
+        Ax object for primary graph.
     axes2 : Matplotlib ax
-        Ax object for secondary graph
+        Ax object for secondary graph.
 
     """
 #######################################

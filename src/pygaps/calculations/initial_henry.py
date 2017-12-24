@@ -1,5 +1,5 @@
 """
-This module calculates the initial henry constant based on an isotherm
+This module calculates the initial henry constant based on an isotherm.
 """
 
 import matplotlib.pyplot as plt
@@ -12,12 +12,12 @@ from ..graphing.isothermgraphs import plot_iso
 
 def calc_initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
     """
-    Calculates a henry constant based on initial slope
+    Calculates a henry constant based on the initial slope.
 
     Parameters
     ----------
     isotherm : PointIsotherm
-        Isotherm to use for the calculation
+        Isotherm to use for the calculation.
     max_adjrms : float, optional
         Maximum adjusted root mean square between the linear fit and isotherm data.
     verbose : bool, optional
@@ -26,7 +26,7 @@ def calc_initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
     Returns
     -------
     float
-        Initial Henry's constant
+        Initial Henry's constant.
 
     """
     # get the isotherm data on the adsorption branch
@@ -72,19 +72,19 @@ def calc_initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
 
 def calc_initial_henry_virial(isotherm, verbose=False):
     """
-    Calculates an initial Henry constant based on fitting the virial equation
+    Calculates an initial Henry constant based on fitting the virial equation.
 
     Parameters
     ----------
     isotherm : PointIsotherm
-        Isotherm to use for the calculation
+        Isotherm to use for the calculation.
     verbose : bool, optional
         Whether to print out extra information.
 
     Returns
     -------
     float
-        Initial Henry's constant
+        Initial Henry's constant.
     """
 
     model_isotherm = ModelIsotherm.from_pointisotherm(

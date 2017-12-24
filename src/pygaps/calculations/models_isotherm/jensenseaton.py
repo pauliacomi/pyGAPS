@@ -113,9 +113,10 @@ class JensenSeaton(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
-        The integral for the Jensen-Seaton model cannot be solved analytically.
+        The integral for the Jensen-Seaton model cannot be solved analytically
+        and must be calculated numerically.
 
         Parameters
         ----------

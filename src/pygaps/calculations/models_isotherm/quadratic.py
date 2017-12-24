@@ -101,9 +101,13 @@ class Quadratic(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
         The integral for the Quadratic model is solved analytically.
+
+        .. math::
+
+            \\pi = M \\ln{1+K_a P + K_b P^2}
 
         Parameters
         ----------

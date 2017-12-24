@@ -1,5 +1,5 @@
 """
-Contains dictionaries for use in the Horvath-Kawazoe method
+Contains dictionaries for use in the Horvath-Kawazoe method.
 """
 
 from ..utilities.exceptions import ParameterError
@@ -13,9 +13,9 @@ PROPERTIES_CARBON = dict(
 
 PROPERTIES_OXIDE_ION = dict(
     molecular_diameter=0.276,            # nm
-    polarizability=2.5E-30,            # m3
-    magnetic_susceptibility=1.3E-34,   # m3
-    surface_density=1.315E19,           # molecules/m2
+    polarizability=2.5E-30,              # m3
+    magnetic_susceptibility=1.3E-34,     # m3
+    surface_density=1.315E19,            # molecules/m2
 )
 
 
@@ -25,7 +25,7 @@ _ADSORBENT_MODELS = {'Carbon(HK)': PROPERTIES_CARBON,
 
 def get_hk_model(model):
     """
-    Gets the adsorbent model for HK psd
+    Gets the adsorbent model for HK psd.
 
     The ``model`` parameter is a string which names the parameters which should be returned.
     Alternatively, a user can implement their own adsorbent model, by passing a dict.

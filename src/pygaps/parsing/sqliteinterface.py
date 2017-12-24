@@ -1,9 +1,6 @@
-# %%
 """
-This module contains the sql interface for data manipulation
+This module contains the sql interface for data manipulation.
 """
-
-__author__ = 'Paul A. Iacomi'
 
 import array
 import sqlite3
@@ -20,15 +17,16 @@ from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
 from ..utilities.sqlite_utilities import build_update
 
+
 # ---------------------- Samples
 
 
 def db_upload_sample(pth, sample, overwrite=False):
     """
-    Uploads samples to the database
+    Uploads samples to the database.
     If overwrite is set to true, the sample is overwritten
     Overwrite is done based on sample.name + sample.batch
-    WARNING: Overwrite is done on ALL fields
+    WARNING: Overwrite is done on ALL fields.
     """
 
     # Connect to database
@@ -130,9 +128,9 @@ def db_upload_sample(pth, sample, overwrite=False):
 
 def db_get_samples(pth):
     """
-    Gets all samples and their properties
+    Gets all samples and their properties.
 
-    The number of samples is usually small, so all can be loaded in memory at once
+    The number of samples is usually small, so all can be loaded in memory at once.
     """
 
     # Connect to database
@@ -181,7 +179,7 @@ def db_get_samples(pth):
 
 def db_delete_sample(pth, sample):
     """
-    Delete sample from the database
+    Delete sample from the database.
     """
 
     # Connect to database
@@ -238,7 +236,9 @@ def db_delete_sample(pth, sample):
 
 
 def db_upload_sample_type(pth, sample_type):
-    "Uploads a sample type"
+    """
+    Uploads a sample type.
+    """
 
     # Connect to database
     db = sqlite3.connect(pth)
@@ -275,7 +275,7 @@ def db_upload_sample_type(pth, sample_type):
 
 def db_get_sample_types(pth):
     """
-    Gets all sample types
+    Gets all sample types.
     """
 
     # Connect to database
@@ -307,7 +307,7 @@ def db_get_sample_types(pth):
 
 def db_delete_sample_type(pth, sample_type):
     """
-    Delete sample type in the database
+    Delete sample type in the database.
     """
 
     # Connect to database
@@ -353,7 +353,9 @@ def db_delete_sample_type(pth, sample_type):
 
 
 def db_upload_sample_property_type(pth, property_type):
-    "Uploads a sample property type"
+    """
+    Uploads a sample property type.
+    """
 
     # Connect to database
     db = sqlite3.connect(pth)
@@ -390,7 +392,7 @@ def db_upload_sample_property_type(pth, property_type):
 
 def db_get_sample_property_types(pth):
     """
-    Gets all sample property types
+    Gets all sample property types.
     """
 
     # Connect to database
@@ -422,7 +424,7 @@ def db_get_sample_property_types(pth):
 
 def db_delete_sample_property_type(pth, sample_type):
     """
-    Delete sample property type in the database
+    Delete sample property type in the database.
     """
 
     # Connect to database
@@ -490,9 +492,9 @@ EXP_NAMED_PARAMS = [
 
 def db_upload_experiment(pth, isotherm, overwrite=None):
     """
-    Uploads experiment to the database
+    Uploads experiment to the database.
 
-    Overwrite is the isotherm where the isotherm will be overwritten
+    Overwrite is the isotherm id where the data will be overwritten.
     """
 
     # Connect to database
@@ -572,7 +574,7 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
 
 def db_get_experiments(pth, criteria):
     """
-    Gets experiments with the selected criteria from the database
+    Gets experiments with the selected criteria from the database.
     """
 
     # Connect to database
@@ -645,7 +647,7 @@ def db_get_experiments(pth, criteria):
 
 def db_delete_experiment(pth, isotherm):
     """
-    Delete experiment to the database
+    Delete experiment in the database.
     """
 
     # Connect to database
@@ -701,7 +703,9 @@ def db_delete_experiment(pth, isotherm):
 
 
 def db_upload_experiment_type(pth, experiment_type):
-    "Uploads a experiment type"
+    """
+    Uploads a experiment type.
+    """
 
     # Connect to database
     db = sqlite3.connect(pth)
@@ -738,7 +742,7 @@ def db_upload_experiment_type(pth, experiment_type):
 
 def db_get_experiment_types(pth):
     """
-    Gets all sample types
+    Gets all sample types.
     """
 
     # Connect to database
@@ -770,7 +774,7 @@ def db_get_experiment_types(pth):
 
 def db_delete_experiment_type(pth, exp_type):
     """
-    Delete experiment type in the database
+    Delete experiment type in the database.
     """
 
     # Connect to database
@@ -816,7 +820,9 @@ def db_delete_experiment_type(pth, exp_type):
 
 
 def db_upload_experiment_data_type(pth, data_type):
-    "Uploads a data type"
+    """
+    Uploads a data type.
+    """
 
     # Connect to database
     db = sqlite3.connect(pth)
@@ -853,7 +859,7 @@ def db_upload_experiment_data_type(pth, data_type):
 
 def db_get_experiment_data_types(pth):
     """
-    Gets all experiment data types
+    Gets all experiment data types.
     """
 
     # Connect to database
@@ -885,7 +891,7 @@ def db_get_experiment_data_types(pth):
 
 def db_delete_experiment_data_type(pth, data_type):
     """
-    Delete experiment data type in the database
+    Delete experiment data type in the database.
     """
 
     # Connect to database
@@ -935,7 +941,8 @@ def db_delete_experiment_data_type(pth, data_type):
 
 def db_upload_adsorbate(pth, adsorbate, overwrite=False):
     """
-    Uploads adsorbates to the database
+    Uploads adsorbates to the database.
+
     If overwrite is set to true, the adsorbate is overwritten
     Overwrite is done based on adsorbate.name
     WARNING: Overwrite is done on ALL fields
@@ -1028,10 +1035,10 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
 
 def db_get_adsorbates(pth):
     """
-    Gets all adsorbates and their properties
+    Gets all adsorbates and their properties.
 
     The number of adsorbates is usually small, so all can be
-    loaded in memory at once
+    loaded in memory at once.
     """
 
     # Connect to database
@@ -1080,7 +1087,7 @@ def db_get_adsorbates(pth):
 
 def db_delete_adsorbate(pth, adsorbate):
     """
-    Delete adsorbate from the database
+    Delete adsorbate from the database.
     """
 
     # Connect to database
@@ -1135,7 +1142,9 @@ def db_delete_adsorbate(pth, adsorbate):
 
 
 def db_upload_adsorbate_property_type(pth, property_type):
-    "Uploads a property type"
+    """
+    Uploads an adsorbate property type.
+    """
 
     # Connect to database
     db = sqlite3.connect(pth)
@@ -1172,7 +1181,7 @@ def db_upload_adsorbate_property_type(pth, property_type):
 
 def db_get_adsorbate_property_types(pth):
     """
-    Gets all adsorbate property types
+    Gets all adsorbate property types.
     """
 
     # Connect to database
@@ -1204,7 +1213,7 @@ def db_get_adsorbate_property_types(pth):
 
 def db_delete_adsorbate_property_type(pth, property_type):
     """
-    Delete property type in the database
+    Delete property type in the database.
     """
 
     # Connect to database
@@ -1254,9 +1263,10 @@ def db_delete_adsorbate_property_type(pth, property_type):
 
 def db_upload_contact(pth, contact_dict, overwrite=False):
     """
-    Uploads comtact to the database
-    If overwrite is set to true, the contact is overwritten
-    WARNING: Overwrite is done on ALL fields
+    Uploads comtact to the database.
+
+    If overwrite is set to true, the contact is overwritten.
+    WARNING: Overwrite is done on ALL fields.
     """
 
     # Connect to database
@@ -1303,7 +1313,7 @@ def db_upload_contact(pth, contact_dict, overwrite=False):
 
 def db_get_contacts(pth):
     """
-    Gets all contacts
+    Gets all contacts.
     """
 
     # Connect to database
@@ -1335,7 +1345,7 @@ def db_get_contacts(pth):
 
 def db_delete_contact(pth, contact_nick):
     """
-    Delete contact in the database
+    Delete contact in the database.
     """
 
     # Connect to database
@@ -1384,9 +1394,10 @@ def db_delete_contact(pth, contact_nick):
 
 def db_upload_source(pth, source_dict, overwrite=False):
     """
-    Uploads source to the database
-    If overwrite is set to true, the source is overwritten
-    WARNING: Overwrite is done on ALL fields
+    Uploads source to the database.
+
+    If overwrite is set to true, the source is overwritten.
+    WARNING: Overwrite is done on ALL fields.
     """
 
     # Connect to database
@@ -1431,7 +1442,7 @@ def db_upload_source(pth, source_dict, overwrite=False):
 
 def db_get_sources(pth):
     """
-    Gets all sources
+    Gets all sources.
     """
 
     # Connect to database
@@ -1463,7 +1474,7 @@ def db_get_sources(pth):
 
 def db_delete_source(pth, source_nick):
     """
-    Delete source in the database
+    Delete source in the database.
     """
 
     # Connect to database
@@ -1512,9 +1523,10 @@ def db_delete_source(pth, source_nick):
 
 def db_upload_machine(pth, machine_dict, overwrite=False):
     """
-    Uploads machine to the database
-    If overwrite is set to true, the machine is overwritten
-    WARNING: Overwrite is done on ALL fields
+    Uploads machine to the database.
+
+    If overwrite is set to true, the machine is overwritten.
+    WARNING: Overwrite is done on ALL fields.
     """
 
     # Connect to database
@@ -1560,7 +1572,7 @@ def db_upload_machine(pth, machine_dict, overwrite=False):
 
 def db_get_machines(pth):
     """
-    Gets all machines
+    Gets all machines.
     """
 
     # Connect to database
@@ -1592,7 +1604,7 @@ def db_get_machines(pth):
 
 def db_delete_machine(pth, machine_nick):
     """
-    Delete machine in the database
+    Delete machine in the database.
     """
 
     # Connect to database

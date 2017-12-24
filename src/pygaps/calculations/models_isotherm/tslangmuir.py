@@ -33,7 +33,7 @@ class TSLangmuir(IsothermModel):
         L(P) = \\sum_i M_i\\frac{K_i P}{1+K_i P}
 
     In practice, up to three adsorption sites are considered.
-    This model is the triple-site model (:math:`i=3`)
+    This model is the triple-site model (:math:`i=3`).
 
     References
     ----------
@@ -111,9 +111,13 @@ class TSLangmuir(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
         The integral for the Triple Site Langmuir model is solved analytically.
+
+        .. math::
+
+            \\pi = M_1 \\log{1 + K_1 P} +  M_2 \\log{1 + K_2 P} + M_3 \\log{1 + K_3 P}
 
         Parameters
         ----------

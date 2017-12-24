@@ -104,9 +104,13 @@ class TemkinApprox(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
         The integral for the TemkinApprox model is solved analytically.
+
+        .. math::
+
+            \\pi = M (\\ln{1+KP} \\frac{\\theta (2 K P +1)}{2(1 + KP)^2})
 
         Parameters
         ----------

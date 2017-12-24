@@ -13,32 +13,32 @@ def psd_bjh(loading, pressure, pore_geometry,
             thickness_model, condensation_model,
             liquid_density, adsorbate_molar_mass):
     """
-    Calculates the pore size distribution using the BJH method
+    Calculates the pore size distribution using the BJH method.
 
     Parameters
     ----------
     loading : array
-        adsorbed amount in mmol/g
+        Adsorbed amount in mmol/g.
     pressure : array
-        relative pressure
+        Relative pressure.
     pore_geometry : str
-        the geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'
+        The geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'.
     thickness_model : callable
-        function which returns the thickenss of the adsorbed layer
-        at a pressure p
+        Function which returns the thickness of the adsorbed layer
+        at a pressure p.
     condensation_model : callable
-        function which returns the critical kelvin radius at a pressure p
+        Function which returns the critical kelvin radius at a pressure p.
     liquid_density : float
-        density of the adsorbate in the adsorbed state, in g/cm3
+        Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
-        molar mass of the adsorbate in g/mol
+        Molar mass of the adsorbate in g/mol.
 
     Returns
     -------
     pore widths : array
-        widths of the pores
+        Widths of the pores.
     pore_dist : array
-        amount of each pore width
+        Amount of each pore width.
 
     Notes
     -----
@@ -92,7 +92,7 @@ def psd_bjh(loading, pressure, pore_geometry,
     .. [#] "Adsorption by Powders & Porous Solids", F. Roquerol, J Roquerol
        and K. Sing, Academic Press, 1999
     """
-    # Paramter checks
+    # Parameter checks
     if len(pressure) != len(loading):
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
@@ -153,32 +153,32 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
                        thickness_model, condensation_model,
                        liquid_density, adsorbate_molar_mass):
     """
-    Calculates the pore size distribution using the Dollimore-Heal method
+    Calculates the pore size distribution using the Dollimore-Heal method.
 
     Parameters
     ----------
     loading : array
-        adsorbed amount in mmol/g
+        Adsorbed amount in mmol/g.
     pressure : array
-        relative pressure
+        Relative pressure.
     pore_geometry : str
-        the geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'
+        The geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'.
     thickness_model : callable
-        function which returns the thickenss of the adsorbed layer
-        at a pressure p
+        Function which returns the thickness of the adsorbed layer
+        at a pressure p.
     condensation_model : callable
-        function which returns the critical kelvin radius at a pressure p
+        Function which returns the critical kelvin radius at a pressure p.
     liquid_density : float
-        density of the adsorbate in the adsorbed state, in g/cm3
+        Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
-        molar mass of the adsorbate in g/mol
+        Molar mass of the adsorbate in g/mol.
 
     Returns
     -------
     pore widths : array
-        widths of the pores
+        Widths of the pores.
     pore_dist : array
-        amount of each pore width
+        Amount of each pore width.
 
     Notes
     -----
@@ -232,7 +232,7 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     References
     ----------
     .. [#] D. Dollimore and G. R. Heal, J. Applied Chem. 14, 109 (1964);
-       J. Colloid Interfasce Sci. 33, 508 (1970)
+       J. Colloid Interface Sci. 33, 508 (1970)
     """
     # Checks
     if len(pressure) != len(loading):

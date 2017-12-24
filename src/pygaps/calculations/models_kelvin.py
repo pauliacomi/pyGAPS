@@ -9,19 +9,19 @@ import scipy
 
 def meniscus_geometry(branch, pore_geometry):
     """
-    Function which determines the meniscus geometry
+    Function which determines the meniscus geometry.
 
     Parameters
     ----------
     branch : {'adsorption', 'desorption'}
-        branch of the isotherm used
+        Branch of the isotherm used.
     geometry : {'slit', 'cylinder', 'cylinder'}
-        geometry of the pore
+        Geometry of the pore.
 
     Returns
     -------
     str
-        geometry of the meniscus in the pore
+        Geometry of the meniscus in the pore.
     """
     if branch == 'adsorption':
         if pore_geometry == 'cylinder':
@@ -50,23 +50,24 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     Parameters
     ----------
     pressure :
-        relative, unitless
+        Relative, unitless.
     meniscus_geometry : str
-        geometry of the interface of the vapour and liquid phase
-        **WARNING**: it is not the same as the pore geometry
+        Geometry of the interface of the vapour and liquid phase.
+        **WARNING**: it is not the same as the pore geometry.
     temperature : float
-        in kelvin
+        Temperature in kelvin.
     liquid_density : float
-        g/cm3
+        Density of the adsorbed phase, assuming it can be approximated as a
+        liquid g/cm3.
     adsorbate_molar_mass : float
-        g/mol
+        Molar area of the adsorbate, g/mol.
     adsorbate_surface_tension : float
-        in mN/m
+        Surface tension of the adsorbate, in mN/m.
 
     Returns
     -------
     float
-        radius(nm)
+        Kelving radius(nm).
 
     Notes
     -----

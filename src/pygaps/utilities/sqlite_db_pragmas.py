@@ -1,5 +1,5 @@
 """
-This module contains the sql pragmas to generate the sqlite database
+This module contains the sql pragmas to generate the sqlite database.
 """
 
 

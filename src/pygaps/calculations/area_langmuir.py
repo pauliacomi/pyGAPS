@@ -1,5 +1,5 @@
 """
-This module calculates the Langmuir surface area based on an isotherm
+This module calculates the Langmuir surface area based on an isotherm.
 """
 import warnings
 

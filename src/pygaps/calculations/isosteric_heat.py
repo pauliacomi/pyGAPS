@@ -1,5 +1,5 @@
 """
-This module calculates the isosteric heat for isotherms at different temperatures
+This module calculates the isosteric heat for isotherms at different temperatures.
 """
 
 import numpy

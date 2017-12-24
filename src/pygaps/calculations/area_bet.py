@@ -1,5 +1,5 @@
 """
-This module contains BET surface area calculations
+This module contains BET surface area calculations.
 """
 
 import warnings
@@ -42,7 +42,7 @@ def area_BET(isotherm, limits=None, verbose=False):
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-        - ``bet_area(float)`` : calculated BET surface area, in m2/unit of adsorbent
+        - ``area(float)`` : calculated BET surface area, in m2/unit of adsorbent
         - ``c_const(float)`` : the C constant in the BET equation, unitless
         - ``n_monolayer(float)`` : the amount adsorbed at the statistical monolayer location,
           in mmol
@@ -140,7 +140,7 @@ def area_BET(isotherm, limits=None, verbose=False):
         loading, pressure, cross_section, limits=limits)
 
     result_dict = {
-        'bet_area': bet_area,
+        'area': bet_area,
         'c_const': c_const,
         'n_monolayer': n_monolayer,
         'p_monolayer': p_monolayer,
@@ -197,7 +197,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
 
     Returns
     -------
-    bet_area : float
+    area : float
         Calculated BET surface area.
     c_const : float
         C constant from the BET equation.

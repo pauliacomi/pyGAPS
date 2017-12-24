@@ -9,9 +9,12 @@ from .model import IsothermModel
 
 class Henry(IsothermModel):
     """
-    Henry's law. Only use if your data is linear.
+    Henry's law. Assumes a linear dependence of adsorbed amount with
+    pressure.
+
     Usually, Henry's law is unrealistic because the adsorption sites
     will saturate at higher pressures.
+    Only use if your data is linear.
 
     .. math::
 
@@ -51,6 +54,10 @@ class Henry(IsothermModel):
         For the Henry model, a direct relationship can be found
         by rearranging the function.
 
+        .. math::
+
+            \\P = L / P
+
         Parameters
         ----------
         loading : float
@@ -70,9 +77,13 @@ class Henry(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
         The integral for the Henry model is solved analytically.
+
+        .. math::
+
+            \\pi = K_H P
 
         Parameters
         ----------

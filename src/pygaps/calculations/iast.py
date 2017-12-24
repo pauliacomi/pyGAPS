@@ -29,7 +29,7 @@ def iast_binary_vle(isotherms, pressure,
         e.g. [methane_isotherm, ethane_isotherm]
     pressure : float
         Pressure at which the vapour-liquid equilibrium is to be
-        calculated
+        calculated.
     verbose : bool, optional
         Print off a extra information, as well as a graph.
     warningoff: bool, optional
@@ -177,7 +177,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
         e.g. [methane_isotherm, ethane_isotherm]
     partial_pressures : array or list
         Partial pressures of gas components,
-        e.g. [5.0, 10.0] (bar)
+        e.g. [5.0, 10.0] (bar).
     verbose : bool, optional
         Print off a lot of information.
     warningoff: bool, optional
@@ -221,7 +221,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
         Parameters
         ----------
         adsorbed_mole_fractions : array
-            mole fractions in the adsorbed
+            Mole fractions in the adsorbed
             phase; numpy.size(adsorbed_mole_fractions) = n_components - 1 because
             sum z_i = 1 asserted here automatically.
 
@@ -274,7 +274,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
     if not res.success:
         raise CalculationError(
             """Root finding for adsorbed phase mole fractions failed.
-        This is likely because the default guess in pyIAST is not good enough.
+        This is likely because the default guess is not good enough.
         Try a different starting guess for the adsorbed phase mole fractions by
         passing an array adsorbed_mole_fraction_guess to this function. Scipy error
         message: {}""".format(res.message))
@@ -323,7 +323,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
                 print("""WARNING:
                       Component %d: p^0 = %f > %f, the highest pressure
                       exhibited in the pure-component isotherm data. Thus,
-                      pyIAST had to extrapolate the isotherm data to achieve
+                      pyGAPS had to extrapolate the isotherm data to achieve
                       this IAST result.""" % (i, pressure0[i],
                                               isotherms[i].pressure(branch='ads').max()))
 
@@ -352,14 +352,14 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
     total_pressure : float
         Total bulk gas pressure.
     verbose : bool
-        Print stuff.
+        Print extra information.
     warningoff : bool
         When False, warnings will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data.
     gas_mole_fraction_guess : array or list
         Starting guesses for gas phase mole fractions that
-        `pyiast.reverse_iast` solves for.
+        `iast.reverse_iast` solves for.
 
     Returns
     -------
@@ -401,15 +401,15 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
         Parameters
         ----------
         gas_mole_fractions : array
-            mole fractions in bulk gas phase
+            Mole fractions in bulk gas phase
             numpy.size(y) = n_components - 1 because \sum y_i = 1 asserted here
             automatically.
 
         Returns
         -------
         array
-            spreading pressure difference
-            between component i and i+1
+            Spreading pressure difference
+            between component i and i+1.
         """
         spreading_pressure_diff = numpy.zeros((n_components - 1,))
         for i in range(n_components - 1):
@@ -449,7 +449,7 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
     if not res.success:
         raise CalculationError(
             """Root finding for gas phase mole fractions failed.
-        This is likely because the default guess in pyIAST is not good enough.
+        This is likely because the default guess is not good enough.
         Try a different starting guess for the gas phase mole fractions by
         passing an array or list gas_mole_fraction_guess to this function. Scipy error
         message: {}""".format(res.message))
@@ -501,7 +501,7 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
                 print("""WARNING:
                   Component %d: p0 = %f > %f, the highest pressure
                   exhibited in the pure-component isotherm data. Thus,
-                  pyIAST had to extrapolate the isotherm data to achieve
+                  code had to extrapolate the isotherm data to achieve
                   this IAST result.""" % (i, pressure0[i],
                                           isotherms[i].pressure(branch='ads').max()))
 

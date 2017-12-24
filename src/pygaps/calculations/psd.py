@@ -1,5 +1,5 @@
 """
-Calculation of the pore size distribution based on an isotherm
+Calculation of the pore size distribution based on an isotherm.
 """
 
 from functools import partial
@@ -24,22 +24,23 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
                                verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using a 'classical' model, applicable to mesopores
+    Calculates the pore size distribution using a 'classical' model, applicable to mesopores.
 
-    To use, specify the psd model in the function argument, then pass other
+    To use, specify the psd model in the function argument, then pass the parameters
+    for each model.
 
     Parameters
     ----------
     isotherm : Isotherm
-        isotherm which the pore size distribution will be calculated
+        Isotherm which the pore size distribution will be calculated.
     psd_model : str
-        the pore size distribution model to use
+        The pore size distribution model to use.
     pore_geometry : str
-        the geometry of the adsorbent pores
+        The geometry of the adsorbent pores.
     verbose : bool
-        prints out extra information on the calculation and graphs the results
+        Prints out extra information on the calculation and graphs the results.
     model_parameters : dict
-        a dictionary to override specific settings for each model
+        A dictionary to override specific settings for each model.
 
     Other Parameters
     ----------------
@@ -185,20 +186,20 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
                                 verbose=False, **model_parameters):
     """
-    Calculates the microporous size distribution using a 'classical' model
+    Calculates the microporous size distribution using a 'classical' model.
 
     Parameters
     ----------
     isotherm : Isotherm
-        isotherm which the pore size distribution will be calculated
+        Isotherm which the pore size distribution will be calculated.
     psd_model : str
-        the pore size distribution model to use
+        The pore size distribution model to use.
     pore_geometry : str
-        the geometry of the adsorbent pores
+        The geometry of the adsorbent pores.
     verbose : bool
-        prints out extra information on the calculation and graphs the results
+        Prints out extra information on the calculation and graphs the results.
     model_parameters : dict
-        a dictionary to override specific settings for each model
+        A dictionary to override specific settings for each model.
 
     Other Parameters
     ----------------
@@ -297,14 +298,14 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
 def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using a DFT kernel from a PointIsotherm
+    Calculates the pore size distribution using a DFT kernel from a PointIsotherm.
 
     Parameters
     ----------
     isotherm : PointIsotherm
-        the isotherm to calculate the pore size distribution
+        The isotherm to calculate the pore size distribution.
     kernel_path : str
-        the path to the kernel used
+        The path to the kernel used.
 
     Returns
     -------

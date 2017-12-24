@@ -101,6 +101,10 @@ class Langmuir(IsothermModel):
         For the Langmuir model, a direct relationship can be found
         by rearranging the function.
 
+        .. math::
+
+            \\P = \\frac{L}{K(M-L)}
+
         Parameters
         ----------
         loading : float
@@ -121,9 +125,13 @@ class Langmuir(IsothermModel):
 
         .. math::
 
-            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
 
         The integral for the Langmuir model is solved analytically.
+
+        .. math::
+
+            \\pi = M \\log{1 + KP}
 
         Parameters
         ----------

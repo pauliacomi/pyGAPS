@@ -1,5 +1,5 @@
 """
-This module contains the adsorbate class
+This module contains the adsorbate class.
 """
 
 import CoolProp
@@ -53,6 +53,7 @@ class Adsorbate(object):
         * saturation_pressure
         * surface_tension
         * liquid_density
+        * enthalpy_liquefaction
 
     These properties can be either calculated by CoolProp or taken from the parameters
     dictionary. They are best accessed using the associated function.
@@ -92,7 +93,7 @@ class Adsorbate(object):
     @classmethod
     def from_list(cls, adsorbate_name):
         """
-        Gets the adsorbate from the master list using its name
+        Gets the adsorbate from the master list using its name.
 
         Parameters
         ----------
@@ -122,7 +123,7 @@ class Adsorbate(object):
 
     def __str__(self):
         """
-        Prints a short summary of all the adsorbate parameters
+        Prints a short summary of all the adsorbate parameters.
         """
         string = ""
 
@@ -136,7 +137,7 @@ class Adsorbate(object):
 
     def _get_state(self):
         """
-        Returns the CoolProp state associated with the fluid
+        Returns the CoolProp state associated with the fluid.
         """
         if not self._backend or self._backend != pygaps.COOLPROP_BACKEND:
             self._backend = pygaps.COOLPROP_BACKEND
@@ -147,8 +148,8 @@ class Adsorbate(object):
 
     def to_dict(self):
         """
-        Returns a dictionary of the adsorbate class
-        Is the same dictionary that was used to create it
+        Returns a dictionary of the adsorbate class.
+        Is the same dictionary that was used to create it.
 
         Returns
         -------
@@ -166,7 +167,7 @@ class Adsorbate(object):
 
     def get_prop(self, prop):
         """
-        Returns a property from the 'properties' dictionary
+        Returns a property from the 'properties' dictionary.
 
         Parameters
         ----------
@@ -195,7 +196,7 @@ class Adsorbate(object):
 
     def common_name(self):
         """
-        Gets the common name of the adsorbate from the properties dict
+        Gets the common name of the adsorbate from the properties dict.
 
         Returns
         -------
@@ -223,13 +224,13 @@ class Adsorbate(object):
         Parameters
         ----------
         calculate : bool, optional
-            whether to calculate the property or look it up in the properties
-            dictionary, default - True
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
 
         Returns
         -------
         float
-            molar mass in g/mol
+            Molar mass in g/mol.
 
         Raises
         ------
@@ -257,23 +258,23 @@ class Adsorbate(object):
     def saturation_pressure(self, temp, unit=None, calculate=True):
         """
         Uses an equation of state to determine the
-        saturation pressure at a particular temperature
+        saturation pressure at a particular temperature.
 
         Parameters
         ----------
         temp : float
-            temperature at which the pressure is desired in K
+            Temperature at which the pressure is desired in K.
         unit : str
-            unit in which to return the saturation pressure
-            if not specifies defaults to Pascal
+            Unit in which to return the saturation pressure.
+            If not specifies defaults to Pascal.
         calculate : bool, optional
-            whether to calculate the property or look it up in the properties
-            dictionary, default - True
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
 
         Returns
         -------
         float
-            pressure in unit requested
+            Pressure in unit requested.
 
         Raises
         ------
@@ -307,15 +308,15 @@ class Adsorbate(object):
     def surface_tension(self, temp, calculate=True):
         """
         Uses an equation of state to determine the
-        surface tension at a particular temperature
+        surface tension at a particular temperature.
 
         Parameters
         ----------
         temp : float
-            temperature at which the surface_tension is desired in K
+            Temperature at which the surface_tension is desired in K.
         calculate : bool, optional
-            whether to calculate the property or look it up in the properties
-            dictionary, default - True
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
 
         Returns
         -------
@@ -351,13 +352,13 @@ class Adsorbate(object):
     def liquid_density(self, temp, calculate=True):
         """
         Uses an equation of state to determine the
-        liquid density at a particular temperature
+        liquid density at a particular temperature.
 
         Parameters
         ----------
         temp : float
             Temperature at which the liquid density is desired in K.
-        calculate : bool, optional
+        calculate : bool, optional.
             Whether to calculate the property or look it up in the properties
             dictionary, default - True.
 
@@ -395,7 +396,7 @@ class Adsorbate(object):
     def enthalpy_liquefaction(self, temp, calculate=True):
         """
         Uses an equation of state to determine the
-        enthalpy of liquefaction at a particular temperature
+        enthalpy of liquefaction at a particular temperature.
 
         Parameters
         ----------

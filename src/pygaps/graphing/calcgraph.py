@@ -1,5 +1,5 @@
 """
-This module contains the functions for plotting calculation-specific graphs
+This module contains the functions for plotting calculation-specific graphs.
 """
 
 import matplotlib.pyplot as plt
@@ -9,22 +9,22 @@ import matplotlib.ticker as ticker
 def roq_plot(pressure, roq_points, minimum, maximum,
              p_monolayer, roq_monolayer):
     """
-    Draws the roquerol plot
+    Draws the Roquerol plot.
 
     Parameters
     ----------
     pressure : array
-        Pressure points which will make up the x axix
+        Pressure points which will make up the x axix.
     roq_points : array
-        Roquerol-transformed points which will make up the y axis
+        Roquerol-transformed points which will make up the y axis.
     minimum : int
-        Lower bound of the selected points
+        Lower bound of the selected points.
     maximum : int
-        Higher bound of the selected points
+        Higher bound of the selected points.
     p_monolayer : float
-        Pressure at which statistical monolayer is achieved
+        Pressure at which statistical monolayer is achieved.
     rol_monolayer : float
-        Roquerol transform of the point at which statistical monolayer is achieved
+        Roquerol transform of the point at which statistical monolayer is achieved.
 
     Returns
     -------
@@ -51,7 +51,7 @@ def roq_plot(pressure, roq_points, minimum, maximum,
 def bet_plot(pressure, bet_points, minimum, maximum,
              slope, intercept, p_monolayer, bet_monolayer):
     """
-    Draws the bet plot
+    Draws the BET plot.
 
     Parameters
     ----------
@@ -105,7 +105,7 @@ def bet_plot(pressure, bet_points, minimum, maximum,
 def langmuir_plot(pressure, langmuir_points, minimum, maximum,
                   slope, intercept):
     """
-    Draws the Langmuir plot
+    Draws the Langmuir plot.
 
     Parameters
     ----------
@@ -152,8 +152,8 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
 
 def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=None):
     """
-    Draws the t-plot
-    Also used for alpha-s plot
+    Draws the t-plot.
+    Also used for alpha-s plot.
 
     Parameters
     ----------
@@ -175,9 +175,9 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
             - ``corr_coef(float)`` : correlation coefficient of the linear region
 
     alpha_s : bool
-        Whether the function is used for alpha_s display
+        Whether the function is used for alpha_s display.
     alpha_reducing_p : bool
-        The reducing pressure used for alpha_s
+        The reducing pressure used for alpha_s.
 
     Returns
     -------
@@ -227,24 +227,24 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
 def psd_plot(pore_radii, pore_dist, method=None, label=None,
              log=True, xmax=None, xmin=None):
     """
-    Draws the pore size distribution plot
+    Draws the pore size distribution plot.
 
     Parameters
     ----------
     pore_radii : array
-        Array of the pore radii which will become the x axis
+        Array of the pore radii which will become the x axis.
     pore_dist : array
-        Contribution of each pore radius which will make up the y axis
+        Contribution of each pore radius which will make up the y axis.
     method : str
         The method used. Will be a string part of the title.
     label : str
         The label for the plotted data, which will appear in the legend.
     log : int
-        Whether to display a logarithmic graph
+        Whether to display a logarithmic graph.
     xmax : int
-        Higher bound of the selected pore widths
+        Higher bound of the selected pore widths.
     xmax : int
-        Lower bound of the selected pore widths
+        Lower bound of the selected pore widths.
 
     Returns
     -------
@@ -303,7 +303,7 @@ def isosteric_heat_plot(loading, isosteric_heat, log=False):
     isosteric_heat : array
         The isosteric heat corresponding to each loading.
     log : int
-        Whether to display a logarithmic graph
+        Whether to display a logarithmic graph.
     Returns
     -------
     matplotlib.axes

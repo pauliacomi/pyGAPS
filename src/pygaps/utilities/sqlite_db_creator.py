@@ -1,5 +1,5 @@
 """
-This module contains the functions that generate the sqlite database
+This module contains the functions that generate the sqlite database.
 """
 
 
@@ -11,12 +11,12 @@ from .sqlite_db_pragmas import PRAGMAS
 
 def db_create(pth):
     """
-    Creates the entire database
+    Creates the entire database.
 
     Parameters
     ----------
     pth : str
-        path where the database is created
+        Path where the database is created.
 
     """
     for pragma in PRAGMAS:
@@ -26,14 +26,14 @@ def db_create(pth):
 
 def db_execute_general(pth, statement):
     """
-    A general function that executes SQL statements
+    A general function that executes SQL statements.
 
     Parameters
     ----------
     pth : str
-        path where the database is located
+        Path where the database is located.
     statement : str
-        SQL statement to execute
+        SQL statement to execute.
 
     """
 

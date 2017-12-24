@@ -32,7 +32,7 @@ class TestAreaBET(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        bet_area = pygaps.area_BET(isotherm).get("bet_area")
+        bet_area = pygaps.area_BET(isotherm).get("area")
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2
@@ -51,7 +51,7 @@ class TestAreaBET(object):
                 text_file.read())
 
         bet_area = pygaps.area_BET(
-            isotherm, limits=[0.05, 0.30]).get("bet_area")
+            isotherm, limits=[0.05, 0.30]).get("area")
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2

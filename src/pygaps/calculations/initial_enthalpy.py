@@ -1,5 +1,5 @@
 """
-This module calculates the initial enthalpy of adsorption based on an isotherm
+This module calculates the initial enthalpy of adsorption based on an isotherm.
 """
 
 import numpy
@@ -33,7 +33,7 @@ def calc_initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=Fal
     Returns
     -------
     float
-        Initial Enthalpy.
+        Initial enthalpy.
     """
 
     # Read data in
@@ -124,7 +124,7 @@ def calc_initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=Fa
     Returns
     -------
     float
-        Initial Enthalpy.
+        Initial enthalpy.
     """
 
     # Read data in
