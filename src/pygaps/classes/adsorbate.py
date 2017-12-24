@@ -70,7 +70,7 @@ class Adsorbate(object):
         """
         Instantiation is done by passing a dictionary with the parameters.
         """
-        # Required sample parameters cheks
+        # Required sample parameters checks
         if any(k not in info
                 for k in ('nick', 'formula')):
             raise ParameterError(
@@ -136,7 +136,7 @@ class Adsorbate(object):
 
     def _get_state(self):
         """
-        Returns the CoolProp state asociated with the fluid
+        Returns the CoolProp state associated with the fluid
         """
         if not self._backend or self._backend != pygaps.COOLPROP_BACKEND:
             self._backend = pygaps.COOLPROP_BACKEND
@@ -320,7 +320,7 @@ class Adsorbate(object):
         Returns
         -------
         float
-            surface tension in mN/m
+            Surface tension in mN/m.
 
         Raises
         ------
@@ -356,15 +356,15 @@ class Adsorbate(object):
         Parameters
         ----------
         temp : float
-            temperature at which the liquid density is desired in K
+            Temperature at which the liquid density is desired in K.
         calculate : bool, optional
-            whether to calculate the property or look it up in the properties
-            dictionary, default - True
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
 
         Returns
         -------
         float
-            density in g/cm3
+            Liquid density in g/cm3.
 
         Raises
         ------
@@ -391,3 +391,53 @@ class Adsorbate(object):
                     "liquid_density.".format(self.name))
 
         return liq_d
+
+    def enthalpy_liquefaction(self, temp, calculate=True):
+        """
+        Uses an equation of state to determine the
+        enthalpy of liquefaction at a particular temperature
+
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the enthalpy of liquefaction is desired, in K.
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Enthalpy of liquefaction in kJ/mol.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+
+        """
+        if calculate:
+            try:
+                state = self._get_state()
+
+                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                h_liq = state.hmolar()
+
+                state.update(CoolProp.QT_INPUTS, 1.0, temp)
+                h_vap = state.hmolar()
+
+                enth_liq = (h_vap - h_liq) / 1000
+
+            except Exception as e_info:
+                raise CalculationError from e_info
+        else:
+            enth_liq = self.properties.get("enthalpy_liquefaction")
+            if enth_liq is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "enthalpy_liquefaction.".format(self.name))
+
+        return enth_liq

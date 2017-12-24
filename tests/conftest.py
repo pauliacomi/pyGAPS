@@ -224,6 +224,7 @@ def adsorbate_data():
             'surface_density': 6.71e18,
             'surface_tension': 8.8796,
             'saturation_pressure': 101325,
+            'enthalpy_liquefaction': 5.5796,
         }
     }
 

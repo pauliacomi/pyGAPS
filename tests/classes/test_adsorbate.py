@@ -64,6 +64,8 @@ class TestAdsorbate(object):
             adsorbate_data['properties'].get('surface_tension'), 0.001)
         assert basic_adsorbate.liquid_density(temp, calculate=calculated) == pytest.approx(
             adsorbate_data['properties'].get('liquid_density'), 0.001)
+        assert basic_adsorbate.enthalpy_liquefaction(temp, calculate=calculated) == pytest.approx(
+            adsorbate_data['properties'].get('enthalpy_liquefaction'), 0.001)
 
         return
 
