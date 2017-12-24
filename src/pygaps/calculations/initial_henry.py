@@ -2,9 +2,6 @@
 This module calculates the initial henry constant based on an isotherm
 """
 
-
-# import copy
-
 import matplotlib.pyplot as plt
 import numpy
 import pandas
