@@ -19,7 +19,12 @@ MODELS = {
     'BET': [1.121304791, 2.743535635, pytest.mark.okay],
     'Quadratic': [1.040540541, 2.590241611, pytest.mark.okay],
     'TemkinApprox': [1, 2.6376848, pytest.mark.okay],
+
+    'Jensen-Seaton': [0.91666, 1, pytest.mark.xfail],
+    'Toth': [1, 1, pytest.mark.xfail],
     'Virial': [11, 1, pytest.mark.xfail],
+    'W-VST': [0.9910, 1, pytest.mark.xfail],
+    'FH-VST': [0.9910, 1, pytest.mark.xfail],
 }
 
 
@@ -60,7 +65,7 @@ class TestIsothermModels(object):
 
     @pytest.mark.parametrize("name, loading",
                              [(key, MODELS[key][0]) for key in MODELS])
-    def test_models_pressure(self, name, loading):
+    def test_models_pressure(self, name, loading, capsys):
         "Parametrised test for each model"
 
         model = mi.get_isotherm_model(name)
