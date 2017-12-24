@@ -103,3 +103,37 @@ def calc_initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=Fal
         initial_enthalpy_plot(loading, enthalpy, enthalpy_approx(loading))
 
     return initial_enthalpy
+
+
+def calc_initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
+    """
+    Calculates the initial enthalpy of adsorption by assuming it is the same
+    as the first point in the curve.
+
+    Parameters
+    ----------
+    isotherm : PointIsotherm
+        Isotherm to use for the calculation.
+    enthalpy_key : str
+        The column which stores the enthalpy data.
+    branch : str
+        The isotherm branch to use for the calculation. Default is adsorption branch.
+    verbose : bool, optional
+        Whether to print out extra information.
+
+    Returns
+    -------
+    float
+        Initial Enthalpy.
+    """
+
+    # Read data in
+    enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
+
+    initial_enthalpy = enthalpy[0]
+
+    if verbose:
+        print("The initial enthalpy of adsorption is: \n\tE =",
+              round(initial_enthalpy, 2))
+
+    return initial_enthalpy
