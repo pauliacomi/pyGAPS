@@ -5,9 +5,8 @@ This test module has tests relating to initial enthalpy of adsorption
 import os
 
 import pytest
-
-from numpy import isclose
 from matplotlib.testing.decorators import cleanup
+from numpy import isclose
 
 import pygaps
 

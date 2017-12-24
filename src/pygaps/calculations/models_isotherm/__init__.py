@@ -4,15 +4,15 @@
 from ...utilities.exceptions import ParameterError
 from .bet import BET
 from .dslangmuir import DSLangmuir
+from .fhvst import FHVST
 from .henry import Henry
+from .jensenseaton import JensenSeaton
 from .langmuir import Langmuir
 from .quadratic import Quadratic
 from .temkinapprox import TemkinApprox
+from .toth import Toth
 from .tslangmuir import TSLangmuir
 from .virial import Virial
-from .jensenseaton import JensenSeaton
-from .toth import Toth
-from .fhvst import FHVST
 from .wvst import WVST
 
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
