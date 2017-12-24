@@ -7,6 +7,7 @@ DATA_PATH = os.path.join(
 DATA_N77_PATH = os.path.join(DATA_PATH, 'characterisation')
 DATA_IAST_PATH = os.path.join(DATA_PATH, 'iast')
 DATA_ISOSTERIC_PATH = os.path.join(DATA_PATH, 'isosteric')
+DATA_CALO_PATH = os.path.join(DATA_PATH, 'calorimetry')
 
 DATA = {
     'MCM-41': {
@@ -77,5 +78,16 @@ DATA_ISOSTERIC = {
     },
     't3': {
         'file': 'BAX 1500 - Isosteric Heat - 348.json',
+    },
+}
+
+DATA_CALO = {
+    't1': {
+        'file': 'HKUST-1(Cu) KRICT.json',
+        'ienth': 27,
+    },
+    't2': {
+        'file': 'Takeda 5A Test CO2.json',
+        'ienth': 35,
     },
 }
