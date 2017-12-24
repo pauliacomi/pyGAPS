@@ -32,7 +32,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     Parameters
     ----------
     isotherm : PointIsotherm
-        the isotherm of which to calculate the t-plot parameters.
+        The isotherm of which to calculate the t-plot parameters.
     thickness_model : obj(`str`) or obj(`Isotherm`) or obj(`callable`), optional
         Name of the thickness model to use. Defaults to the Harkins and Jura
         thickness curve.
@@ -174,17 +174,17 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     Parameters
     ----------
     loading : array
-        in mol/g
+        In mol/g.
     pressure : array
-        relative
+        Relative.
     thickness_model : callable
-        function which which returns the thickness of the adsorbed layer at a pressure p
+        Function which which returns the thickness of the adsorbed layer at a pressure p.
     liquid_density : float
-        density of the adsorbate in the adsorbed state, in g/cm3
+        Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
-        molar mass of the adsorbate, in g/mol
+        Molar mass of the adsorbate, in g/mol.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
 
     Returns
     -------
@@ -200,7 +200,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
             - ``corr_coef(float)`` : correlation coefficient of the linear region
 
     thickness_curve : array
-        The generated thickness curve at each point using the thickness model
+        The generated thickness curve at each point using the thickness model.
 
     """
 
@@ -223,7 +223,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     # If not, attempt to find limits manually
     else:
         # Now we need to find the linear regions in the t-plot for the
-        # assesment of surface area.
+        # assessment of surface area.
         linear_sections = find_linear_sections(thickness_curve, loading)
 
         # For each section we compute the linear fit
