@@ -10,12 +10,17 @@ from .quadratic import Quadratic
 from .temkinapprox import TemkinApprox
 from .tslangmuir import TSLangmuir
 from .virial import Virial
+from .jensenseaton import JensenSeaton
+from .toth import Toth
+from .fhvst import FHVST
+from .wvst import WVST
 
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-           Quadratic, BET, TemkinApprox, Virial]
+           Quadratic, BET, TemkinApprox, Virial,
+           Toth, JensenSeaton, FHVST, WVST]
 
 _GUESS_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-                 Quadratic, BET, TemkinApprox]
+                 Quadratic, BET, TemkinApprox, Toth, JensenSeaton]
 
 _IAST_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
                 Quadratic, BET, TemkinApprox]

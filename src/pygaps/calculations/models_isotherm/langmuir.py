@@ -41,7 +41,7 @@ class Langmuir(IsothermModel):
 
         v_a = k_a p (1 - \\theta)
 
-        v_d = k_d \\theta \\exp{-\\frac{E}{RT}}
+        v_d = k_d \\theta \\exp{(-\\frac{E}{RT})}
 
     Here, :math:`M` is the moles adsorbed at the completion of the monolayer, and therefore
     the maximum possible loading. At equilibrium, the rate of adsorption and the rate of
@@ -49,7 +49,7 @@ class Langmuir(IsothermModel):
 
     .. math::
 
-        k_a p (1 - \\theta) = k_d \\theta \\exp{-\\frac{E}{RT}}
+        k_a p (1 - \\theta) = k_d \\theta \\exp{(-\\frac{E}{RT})}
 
     Rearranging to get an expression for the loading, the Langmuir equation becomes:
 
@@ -59,7 +59,7 @@ class Langmuir(IsothermModel):
 
     The Langmuir constant is the product of the individual desorption and adsorption constants
     :math:`k_a` and :math:`k_d` and exponentially related to the energy of adsorption
-    :math:`\\exp{-\\frac{E}{RT}}`.
+    :math:`\\exp{(-\\frac{E}{RT})}`.
 
     References
     ----------
@@ -67,7 +67,7 @@ class Langmuir(IsothermModel):
 
     """
 
-    #: Name of the class as static
+    #: Name of the model
     name = 'Langmuir'
 
     def __init__(self):
@@ -96,7 +96,10 @@ class Langmuir(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Function that calculates pressure as a function
+        of loading.
+        For the Langmuir model, a direct relationship can be found
+        by rearranging the function.
 
         Parameters
         ----------
@@ -113,7 +116,14 @@ class Langmuir(IsothermModel):
 
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Function that calculates spreading pressure by solving the
+        following integral at each point i.
+
+        .. math::
+
+            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+
+        The integral for the Langmuir model is solved analytically.
 
         Parameters
         ----------
@@ -140,7 +150,6 @@ class Langmuir(IsothermModel):
             Column with the loading.
         pressure_key : str
             Column with the pressure.
-
 
         Returns
         -------

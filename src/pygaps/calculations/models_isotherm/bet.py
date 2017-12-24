@@ -36,13 +36,13 @@ class BET(IsothermModel):
 
     .. math::
 
-        k_{a_1} p \\theta_0 = k_{d_1} \\theta_1 \\exp{-\\frac{E_1}{RT}}
+        k_{a_1} p \\theta_0 &= k_{d_1} \\theta_1 \\exp{-\\frac{E_1}{RT}}
 
-        k_{a_2} p \\theta_1 = k_{d_2} \\theta_2 \\exp{-\\frac{E_L}{RT}}
+        k_{a_2} p \\theta_1 &= k_{d_2} \\theta_2 \\exp{-\\frac{E_L}{RT}}
 
         ...
 
-        k_{a_i} p \\theta_{i-1} = k_{d_i} \\theta_i \\exp{-\\frac{E_L}{RT}}
+        k_{a_i} p \\theta_{i-1} &= k_{d_i} \\theta_i \\exp{-\\frac{E_L}{RT}}
 
     Since we are assuming that all layers beside the first have the same properties,
     we can define :math:`g= \\frac{k_{d_2}}{k_{a_2}} = \\frac{k_{d_3}}{k_{a_3}} = ...`.
@@ -50,15 +50,15 @@ class BET(IsothermModel):
 
     .. math::
 
-        \\theta_1 = y \\theta_0, where y = \\frac{k_{a_1}}{k_{d_1}} p \\exp{-\\frac{E_1}{RT}}
+        \\theta_1 &= y \\theta_0, where y = \\frac{k_{a_1}}{k_{d_1}} p \\exp{-\\frac{E_1}{RT}}
 
-        \\theta_2 = x \\theta_1, where x = \\frac{p}{g} \\exp{-\\frac{E_L}{RT}}
+        \\theta_2 &= x \\theta_1, where x = \\frac{p}{g} \\exp{-\\frac{E_L}{RT}}
 
-        \\theta_3 = x \\theta_2 = x^2 \\theta_1
+        \\theta_3 &= x \\theta_2 = x^2 \\theta_1
 
         ...
 
-        \\theta_i = x^{i-1} \\theta_1 = y x^{i-1} \\theta_0
+        \\theta_i &= x^{i-1} \\theta_1 = y x^{i-1} \\theta_0
 
     A constant C may be defined such that
 
@@ -92,8 +92,9 @@ class BET(IsothermModel):
     ----------
     .. [#] “Adsorption of Gases in Multimolecular Layers”, Stephen Brunauer,
        P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
+
     """
-    #: Name of the class as static
+    #: Name of the model
     name = 'BET'
 
     def __init__(self):
@@ -124,7 +125,10 @@ class BET(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Function that calculates pressure as a function
+        of loading.
+        For the BET model, the pressure will
+        be computed numerically as no analytical inversion is possible.
 
         Parameters
         ----------
@@ -150,7 +154,14 @@ class BET(IsothermModel):
 
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Function that calculates spreading pressure by solving the
+        following integral at each point i.
+
+        .. math::
+
+            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+
+        The integral for the BET model is solved analytically.
 
         Parameters
         ----------

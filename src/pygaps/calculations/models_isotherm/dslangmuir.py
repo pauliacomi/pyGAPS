@@ -16,8 +16,32 @@ class DSLangmuir(IsothermModel):
     .. math::
 
         L(P) = M_1\\frac{K_1 P}{1+K_1 P} +  M_2\\frac{K_2 P}{1+K_2 P}
+
+    Notes
+    -----
+
+    An extension to the Langmuir model is to consider the experimental isotherm to be
+    the sum of several Langmuir-type isotherms with different monolayer capacities and affinities [#]_.
+    The assumption is that the adsorbent presents several distinct types of homogeneous adsorption
+    sites, and that separate Langmuir equations should be applied to each. This is particularly
+    applicable in cases where the structure of the adsorbent suggests that different types of
+    sites are present, such as in crystalline materials of variable chemistry like zeolites and MOFs.
+    The resulting isotherm equation is:
+
+    .. math::
+
+        L(P) = \\sum_i M_i\\frac{K_i P}{1+K_i P}
+
+    In practice, up to three adsorption sites are considered.
+    This model is the dual-site model (:math:`i=2`)
+
+    References
+    ----------
+    .. [#] Langmuir, I., The adsorption of gases on plane surfaces of glass, mica and platinum.
+       J. Am. Chem. Soc. 1918, 40, 1361-1402.
+
     """
-    #: Name of the class as static
+    #: Name of the model
     name = 'DSLangmuir'
 
     def __init__(self):
@@ -50,7 +74,10 @@ class DSLangmuir(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Function that calculates pressure as a function
+        of loading.
+        For the Double Site Langmuir model, the pressure will
+        be computed numerically as no analytical inversion is possible.
 
         Parameters
         ----------
@@ -76,7 +103,14 @@ class DSLangmuir(IsothermModel):
 
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Function that calculates spreading pressure by solving the
+        following integral at each point i.
+
+        .. math::
+
+            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+
+        The integral for the Double Site Langmuir model is solved analytically.
 
         Parameters
         ----------

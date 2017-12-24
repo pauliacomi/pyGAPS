@@ -16,8 +16,27 @@ class Quadratic(IsothermModel):
     .. math::
 
         L(P) = M \\frac{(K_a + 2 K_b P)P}{1+K_aP+K_bP^2}
+
+    Notes
+    -----
+
+    The quadratic adsorption isotherm exhibits an inflection point; the loading
+    is convex at low pressures but changes concavity as it saturates, yielding
+    an S-shape. The S-shape can be explained by adsorbate-adsorbate attractive
+    forces; the initial convexity is due to a cooperative
+    effect of adsorbate-adsorbate attractions aiding in the recruitment of
+    additional adsorbate molecules [#]_.
+
+    The parameter :math:`K_a` can be interpreted as the Langmuir constant; the
+    strength of the adsorbate-adsorbate attractive forces is embedded in :math:`K_b`.
+
+    References
+    ----------
+    .. [#]  T. L. Hill, An introduction to statistical thermodynamics, Dover
+       Publications, 1986.
+
     """
-    #: Name of the class as static
+    #: Name of the model
     name = 'Quadratic'
 
     def __init__(self):
@@ -48,7 +67,10 @@ class Quadratic(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Function that calculates pressure as a function
+        of loading.
+        For the Quadratic model, the pressure will
+        be computed numerically as no analytical inversion is possible.
 
         Parameters
         ----------
@@ -74,7 +96,14 @@ class Quadratic(IsothermModel):
 
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Function that calculates spreading pressure by solving the
+        following integral at each point i.
+
+        .. math::
+
+            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+
+        The integral for the Quadratic model is solved analytically.
 
         Parameters
         ----------

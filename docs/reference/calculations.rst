@@ -15,7 +15,7 @@ BET Surface area
     :members: area_BET, area_BET_raw
 
 Langmuir Surface area
-................
+.....................
 
 .. automodule:: pygaps.calculations.area_langmuir
     :members: area_langmuir, area_langmuir_raw

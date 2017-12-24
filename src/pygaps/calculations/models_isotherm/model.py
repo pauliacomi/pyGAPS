@@ -13,7 +13,7 @@ class IsothermModel(object):
     Base class for all models
     """
 
-    #: Name of the class as static
+    #: Name of the model
     name = None
 
     def __init__(self):

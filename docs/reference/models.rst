@@ -9,7 +9,6 @@ Henry
 .. automodule:: pygaps.calculations.models_isotherm.henry
     :members:
 
-
 Langmuir
 --------
 
@@ -46,8 +45,33 @@ Approximation to the Tempkin Isotherm
 .. automodule:: pygaps.calculations.models_isotherm.temkinapprox
     :members:
 
+Toth
+----
+
+.. automodule:: pygaps.calculations.models_isotherm.toth
+    :members:
+
+Jensen-Seaton
+-------------
+
+.. automodule:: pygaps.calculations.models_isotherm.jensenseaton
+    :members:
+
+
 Virial
----------
+------
 
 .. automodule:: pygaps.calculations.models_isotherm.virial
+    :members:
+
+Wilson VST
+----------
+
+.. automodule:: pygaps.calculations.models_isotherm.wvst
+    :members:
+
+Flory-Huggins VST
+-----------------
+
+.. automodule:: pygaps.calculations.models_isotherm.fhvst
     :members:

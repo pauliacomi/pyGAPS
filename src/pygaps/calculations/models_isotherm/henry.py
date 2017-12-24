@@ -9,17 +9,16 @@ from .model import IsothermModel
 
 class Henry(IsothermModel):
     """
-    Henry's law. Only use if your data is linear, and do not necessarily trust
-      IAST results from Henry's law if the result required an extrapolation
-      of your data; Henry's law is unrealistic because the adsorption sites
-      will saturate at higher pressures.
+    Henry's law. Only use if your data is linear.
+    Usually, Henry's law is unrealistic because the adsorption sites
+    will saturate at higher pressures.
 
     .. math::
 
         L(P) = K_H P
 
     """
-    #: Name of the class as static
+    #: Name of the model
     name = 'Henry'
 
     def __init__(self):
@@ -47,7 +46,10 @@ class Henry(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Function that calculates pressure as a function
+        of loading.
+        For the Henry model, a direct relationship can be found
+        by rearranging the function.
 
         Parameters
         ----------
@@ -63,7 +65,14 @@ class Henry(IsothermModel):
 
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Function that calculates spreading pressure by solving the
+        following integral at each point i.
+
+        .. math::
+
+            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+
+        The integral for the Henry model is solved analytically.
 
         Parameters
         ----------

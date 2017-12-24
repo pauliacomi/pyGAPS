@@ -11,18 +11,34 @@ from .model import IsothermModel
 
 class TemkinApprox(IsothermModel):
     """
-    Asymptotic approximation to the Temkin Isotherm [#]_
+    Asymptotic approximation to the Temkin Isotherm
 
     .. math::
 
         L(P) = M\\frac{KP}{1+KP} + M \\theta (\\frac{KP}{1+KP})^2 (\\frac{KP}{1+KP} -1)
 
+    Notes
+    -----
+
+    The Temkin adsorption isotherm [#]_, like the Langmuir model, considers
+    a surface with M identical adsorption sites, but takes into account adsorbate-
+    adsorbate interactions by assuming that the heat of adsorption is a linear
+    function of the coverage. The Temkin isotherm is derived [#]_ using a
+    mean-field argument and used an asymptotic approximation
+    to obtain an explicit equation for the loading.
+
+    Here, M and K have the same physical meaning as in the Langmuir model.
+    The additional parameter :math:`\\theta` describes the strength of the adsorbate-adsorbate
+    interactions (:math:`\\theta < 0` for attractions).
+
     References
     ----------
+    .. [#]  V. P. M.I. Tempkin, Kinetics of ammonia synthesis on promoted iron
+       catalyst, Acta Phys. Chim. USSR 12 (1940) 327–356.
     .. [#] Phys. Chem. Chem. Phys., 2014,16, 5499-5513
 
     """
-    #: Name of the class as static
+    #: Name of the model
     name = 'TemkinApprox'
 
     def __init__(self):
@@ -54,7 +70,10 @@ class TemkinApprox(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Function that calculates pressure as a function
+        of loading.
+        For the TemkinApprox model, the pressure will
+        be computed numerically as no analytical inversion is possible.
 
         Parameters
         ----------
@@ -80,7 +99,14 @@ class TemkinApprox(IsothermModel):
 
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Function that calculates spreading pressure by solving the
+        following integral at each point i.
+
+        .. math::
+
+            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+
+        The integral for the TemkinApprox model is solved analytically.
 
         Parameters
         ----------

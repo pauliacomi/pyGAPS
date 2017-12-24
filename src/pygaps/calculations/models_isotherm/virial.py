@@ -1,5 +1,5 @@
 """
-Base class for all models
+Virial isotherm model
 """
 
 import matplotlib.pyplot as plt
@@ -12,10 +12,38 @@ from .model import IsothermModel
 
 class Virial(IsothermModel):
     """
-    Base class for all models
+
+    A virial isotherm model with 3 factors.
+
+    .. math::
+
+        P = n \\exp{(-\\ln{K_H} + An + Bn^2 + Cn^3)}
+
+    Notes
+    -----
+
+    A virial isotherm model attempts to fit the measured data to a factorized
+    exponent relationship between loading and pressure.
+
+    .. math::
+
+        P = n \\exp{(K_1n^0 + K_2n^1 + K_3n^2 + K_4n^3 + ... + K_i n^{i-1})}
+
+    It has been applied with success to describe the behaviour of standard as
+    well as supercritical isotherms. The factors are usually empirical,
+    although some relationship with physical can be determined:
+    the first constant is related to the Henry constant at zero loading, while
+    the second constant is a measure of the interaction strength with the surface.
+
+    .. math::
+
+        K_1 = -\\ln{K_{H,0}}
+
+    In practice, besides the first constant, only 2-3 factors are used.
+
     """
 
-    #: Name of the class as static
+    #: Name of the model
     name = 'Virial'
 
     def __init__(self):
@@ -28,7 +56,11 @@ class Virial(IsothermModel):
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Function that calculates loading.
+
+        Careful!
+        For the Virial model, the loading has to
+        be computed numerically.
 
         Parameters
         ----------
@@ -67,7 +99,10 @@ class Virial(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Function that calculates pressure as a function
+        of loading.
+
+        The Virial model calculates the pressure directly.
 
         Parameters
         ----------
@@ -84,7 +119,14 @@ class Virial(IsothermModel):
 
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Function that calculates spreading pressure by solving the
+        following integral at each point i.
+
+        .. math::
+
+            \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+
+        The integral for the Virial model cannot be solved analytically.
 
         Parameters
         ----------
