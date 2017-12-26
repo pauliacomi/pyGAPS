@@ -161,7 +161,7 @@ def c_loading(value,
         if basis_from == 'mass':
             if basis_to == 'volume':
                 constant = pygaps.classes.adsorbate.Adsorbate.from_list(
-                    adsorbate_name).liquid_density(temp=temp)
+                    adsorbate_name).gas_density(temp=temp)
                 sign = -1
             elif basis_to == 'molar':
                 constant = pygaps.classes.adsorbate.Adsorbate.from_list(
@@ -170,12 +170,12 @@ def c_loading(value,
         elif basis_from == 'volume':
             if basis_to == 'mass':
                 constant = pygaps.classes.adsorbate.Adsorbate.from_list(
-                    adsorbate_name).liquid_density(temp=temp)
+                    adsorbate_name).gas_density(temp=temp)
                 sign = 1
             elif basis_to == 'molar':
                 adsorbate = pygaps.classes.adsorbate.Adsorbate.from_list(
                     adsorbate_name)
-                constant = adsorbate.liquid_density(
+                constant = adsorbate.gas_density(
                     temp=temp) / adsorbate.molar_mass()
                 sign = -1
         elif basis_from == 'molar':
@@ -186,7 +186,7 @@ def c_loading(value,
             elif basis_to == 'volume':
                 adsorbate = pygaps.classes.adsorbate.Adsorbate.from_list(
                     adsorbate_name)
-                constant = adsorbate.liquid_density(
+                constant = adsorbate.gas_density(
                     temp=temp) / adsorbate.molar_mass()
                 sign = -1
 

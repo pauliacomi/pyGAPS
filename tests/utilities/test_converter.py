@@ -14,17 +14,17 @@ class TestConversions(object):
                              [
                                  (1, 'mass', 'mass', 'g', 'g'),
                                  (0.001, 'mass', 'mass', 'g', 'kg'),
-                                 (1.24, 'mass', 'volume', 'g', 'cm3'),
+                                 (217.078, 'mass', 'volume', 'g', 'cm3'),
                                  (0.0357, 'mass', 'molar', 'g', 'mol'),
                                  (35.7, 'mass', 'molar', 'g', 'mmol'),
 
                                  (1000, 'molar', 'molar', 'mol', 'mmol'),
                                  (28.01, 'molar', 'mass', 'mol', 'g'),
-                                 (34.75, 'molar', 'volume', 'mol', 'cm3'),
+                                 (6081.12, 'molar', 'volume', 'mol', 'cm3'),
 
                                  (1e-6, 'volume', 'volume', 'cm3', 'm3'),
-                                 (0.806, 'volume', 'mass', 'cm3', 'g'),
-                                 (34.75, 'volume', 'molar', 'cm3', 'mol'),
+                                 (4.606E-3, 'volume', 'mass', 'cm3', 'g'),
+                                 (6081.12, 'volume', 'molar', 'cm3', 'mol'),
                              ])
     def test_convert_loading(self, value, basis_from, basis_to,
                              unit_from, unit_to, use_adsorbate):
