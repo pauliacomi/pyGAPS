@@ -53,6 +53,7 @@ class Adsorbate(object):
         * saturation_pressure
         * surface_tension
         * liquid_density
+        * gas_density
         * enthalpy_liquefaction
 
     These properties can be either calculated by CoolProp or taken from the parameters
@@ -392,6 +393,50 @@ class Adsorbate(object):
                     "liquid_density.".format(self.name))
 
         return liq_d
+
+    def gas_density(self, temp, calculate=True):
+        """
+        Uses an equation of state to determine the
+        gas density at a particular temperature.
+
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the gas density is desired in K.
+        calculate : bool, optional.
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Liquid density in g/cm3.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+
+        """
+        if calculate:
+            try:
+                state = self._get_state()
+                state.update(CoolProp.QT_INPUTS, 1.0, temp)
+                gas_d = state.rhomass() / 1000
+
+            except Exception as e_info:
+                raise CalculationError from e_info
+        else:
+            gas_d = self.properties.get("gas_density")
+            if gas_d is None:
+                raise ParameterError(
+                    "Adsorbate {0} does not have a property named "
+                    "gas_density.".format(self.name))
+
+        return gas_d
 
     def enthalpy_liquefaction(self, temp, calculate=True):
         """
