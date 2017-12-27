@@ -98,7 +98,7 @@ class IsothermModel(object):
         # guess Langmuir K using the guess for saturation loading and lowest
         # pressure point (but not zero)
         df_nonzero = data[data[loading_key] != 0.0]
-        idx_min = df_nonzero[loading_key].argmin()
+        idx_min = df_nonzero[loading_key].idxmin()
         langmuir_k = df_nonzero[loading_key].loc[idx_min] / \
             df_nonzero[pressure_key].loc[idx_min] / (
             saturation_loading - df_nonzero[pressure_key].loc[idx_min])
