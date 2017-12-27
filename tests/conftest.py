@@ -177,11 +177,9 @@ def sample_data():
         'form': 'powder',
         'comment': 'test comment',
 
-        'properties': {
-                'density': 10,  # g/cm3
-                'poresize': 14,
-                'molar_mass': 10,  # g/mol
-        }
+        'density': 10,  # g/cm3
+        'poresize': 14,
+        'molar_mass': 10,  # g/mol
     }
 
     return sample_data
@@ -192,7 +190,7 @@ def basic_sample(sample_data):
     """
     Creates an sample from model data
     """
-    sample = pygaps.Sample(sample_data)
+    sample = pygaps.Sample(**sample_data)
 
     return sample
 
@@ -206,26 +204,24 @@ def adsorbate_data():
         'nick': 'TA',
         'formula': 'TA21',
 
-        'properties': {
-            'common_name': 'nitrogen',
-            'molar_mass': 28.01348,
-            'cross_sectional_area': 0.162,
-            'molecular_diameter': 0.3,
-            'polarizability': 1.76E-30,
-            'magnetic_susceptibility': 3.6E-35,
-            'dipole_moment': 0.0,
-            'quadrupole_moment': 1.52,
-            'criticalp_temperature': 77.355,
-            'criticalp_pressure': 34.0,
-            'criticalp_density': 11.2,
-            'triplep_temperature': 63.1,
-            # properties for 1atm/ 77k
-            'liquid_density': 0.806,
-            'surface_density': 6.71e18,
-            'surface_tension': 8.8796,
-            'saturation_pressure': 101325,
-            'enthalpy_liquefaction': 5.5796,
-        }
+        'common_name': 'nitrogen',
+        'molar_mass': 28.01348,
+        'cross_sectional_area': 0.162,
+        'molecular_diameter': 0.3,
+        'polarizability': 1.76E-30,
+        'magnetic_susceptibility': 3.6E-35,
+        'dipole_moment': 0.0,
+        'quadrupole_moment': 1.52,
+        'criticalp_temperature': 77.355,
+        'criticalp_pressure': 34.0,
+        'criticalp_density': 11.2,
+        'triplep_temperature': 63.1,
+        # properties for 1atm/ 77k
+        'liquid_density': 0.806,
+        'surface_density': 6.71e18,
+        'surface_tension': 8.8796,
+        'saturation_pressure': 101325,
+        'enthalpy_liquefaction': 5.5796,
     }
 
     return adsorbate_data
@@ -236,7 +232,7 @@ def basic_adsorbate(adsorbate_data):
     """
     Creates an sample from model data
     """
-    adsorbate = pygaps.Adsorbate(adsorbate_data)
+    adsorbate = pygaps.Adsorbate(**adsorbate_data)
 
     return adsorbate
 

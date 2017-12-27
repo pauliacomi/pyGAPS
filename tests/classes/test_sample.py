@@ -21,9 +21,9 @@ class TestSample(object):
         assert sample_data == basic_sample.to_dict()
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.Sample({})
+            pygaps.Sample()
 
-    def test_sample_retreived_list(self, sample_data, basic_sample):
+    def test_sample_retrieved_list(self, sample_data, basic_sample):
         "Checks sample can be retrieved from master list"
         pygaps.data.SAMPLE_LIST.append(basic_sample)
         uploaded_sample = pygaps.Sample.from_list(
@@ -39,7 +39,7 @@ class TestSample(object):
         "Checks if properties of a sample can be located"
 
         assert basic_sample.get_prop(
-            'density') == sample_data['properties'].get('density')
+            'density') == sample_data.get('density')
 
         density = basic_sample.properties.pop('density')
         with pytest.raises(pygaps.ParameterError):

@@ -128,8 +128,8 @@ class TestDatabase(object):
 
         return
 
-    def test_gasses(self, db_file, adsorbate_data):
-        "Tests functions related to gasses table, then inserts a test gas"
+    def test_adsorbates(self, db_file, adsorbate_data, basic_adsorbate):
+        "Tests functions related to adsorbate table, then inserts a test adsorbate"
 
         # Property type testing
         pygaps.db_upload_adsorbate_property_type(db_file, {
@@ -145,14 +145,14 @@ class TestDatabase(object):
         pygaps.db_delete_adsorbate_property_type(db_file, 'prop')
 
         # Property type upload
-        for prop in adsorbate_data["properties"]:
-            pygaps.db_upload_adsorbate_property_type(db_file, {
-                'type': prop,
-                'unit': "test unit"
-            })
+        for prop in adsorbate_data:
+            if prop not in pygaps.Adsorbate._named_params:
+                pygaps.db_upload_adsorbate_property_type(db_file, {
+                    'type': prop,
+                    'unit': "test unit"
+                })
 
         # Start testing samples table
-        basic_adsorbate = pygaps.Adsorbate(adsorbate_data)
 
         # Assert empty
         assert len(pygaps.db_get_adsorbates(db_file)) == 0
@@ -182,7 +182,7 @@ class TestDatabase(object):
 
         return
 
-    def test_sample(self, db_file, sample_data):
+    def test_sample(self, db_file, sample_data, basic_sample):
         "Tests functions related to samples table, then inserts a test sample"
 
         # Test sample_type table
@@ -212,14 +212,14 @@ class TestDatabase(object):
         pygaps.db_delete_sample_property_type(db_file, 'prop')
 
         # Property type upload
-        for prop in sample_data["properties"]:
-            pygaps.db_upload_sample_property_type(db_file, {
-                'type': prop,
-                'unit': "test unit"
-            })
+        for prop in sample_data:
+            if prop not in pygaps.Sample._named_params:
+                pygaps.db_upload_sample_property_type(db_file, {
+                    'type': prop,
+                    'unit': "test unit"
+                })
 
         # Start testing samples table
-        basic_sample = pygaps.Sample(sample_data)
 
         # Assert empty
         assert len(pygaps.db_get_samples(db_file)) == 0

@@ -13,48 +13,52 @@ from ..utilities.unit_converter import c_unit
 
 
 class Adsorbate(object):
-    '''
+    """
     This class acts as a unified descriptor for an adsorbate.
 
     Its purpose is to expose properties such as adsorbate name,
     and formula, as well as physical properties, such as molar mass
-    vapour pressure, etc
+    vapour pressure, etc.
 
     The properties can be either calculated through a wrapper over
-    CoolProp or supplied in the initial sample dictionary
+    CoolProp or supplied in the initial sample creation.
+    All parameters passed are saved in a self.parameters
+    dictionary.
 
     Parameters
     ----------
-    info : dict
-        To initially construct the class, use a dictionary of the form::
+    nick : str
+        The name which should be used for this adsorbate.
+    formula : str
+        A chemical formula for the adsorbate.
 
-            adsorbate_info = {
-                'nick' : 'nitrogen',
-                'formula' : 'N2',
-                'properties' : {
-                    'x' : 'y'
-                    'z' : 't'
-                }
-            }
+    Other Parameters
+    ----------------
 
-        The info dictionary must contain an entry for 'nick'.
+    common_name : str
+        Used for integration with CoolProp. For a list of names
+        look at the CoolProp `list of fluids
+        <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
+    molar_mass : float
+        A user-provided value for the molar mass.
+    saturation_pressure : float
+        A user-provided value for the saturation pressure.
+    surface_tension : float
+        A user-provided value for the surface tension.
+    liquid_density : float
+        A user-provided value for the liquid density.
+    gas_density : float
+        A user-provided value for the gas density.
+    enthalpy_liquefaction : float
+        A user-provided value for the enthalpy of liquefaction.
 
     Notes
     -----
 
     The members of the properties dictionary are left at the discretion
     of the user, to keep the class extensible. There are, however, some
-    unique properties which are used by calculations in other modules:
-
-        * common_name: used for integration with CoolProp. For a list of names
-          look at the CoolProp `list of fluids
-          <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
-        * molar_mass
-        * saturation_pressure
-        * surface_tension
-        * liquid_density
-        * gas_density
-        * enthalpy_liquefaction
+    unique properties which are used by calculations in other modules
+    listed in the other parameters section above.
 
     These properties can be either calculated by CoolProp or taken from the parameters
     dictionary. They are best accessed using the associated function.
@@ -66,24 +70,26 @@ class Adsorbate(object):
     Value from dictionary::
 
         my_adsorbate.surface_tension(77, calculate=False)
-    '''
+    """
 
-    def __init__(self, info):
+    _named_params = ['nick', 'formula']
+
+    def __init__(self, **properties):
         """
         Instantiation is done by passing a dictionary with the parameters.
         """
         # Required sample parameters checks
-        if any(k not in info
+        if any(k not in properties
                 for k in ('nick', 'formula')):
             raise ParameterError(
                 "Adsorbate class MUST have the following information in the properties dictionary: 'nick', 'formula'")
 
         #: Adsorbate name
-        self.name = info.get('nick')
+        self.name = properties.pop('nick')
         #: Adsorbate formula
-        self.formula = info.get('formula')
+        self.formula = properties.pop('formula')
         #: Adsorbate properties
-        self.properties = info.get('properties')
+        self.properties = properties
 
         # CoolProp interaction variables, only generate when called
         self._backend = None
@@ -161,8 +167,8 @@ class Adsorbate(object):
         parameters_dict = {
             'nick': self.name,
             'formula': self.formula,
-            'properties': self.properties,
         }
+        parameters_dict.update(self.properties)
 
         return parameters_dict
 

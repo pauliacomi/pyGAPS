@@ -161,11 +161,11 @@ def db_get_samples(pth):
                 'sample_id':        sample_params.get('id')
             })
 
-            sample_params['properties'] = {
-                row[0]: row[1] for row in cur_inner}
+            sample_params.update({
+                row[0]: row[1] for row in cur_inner})
 
             # Build sample objects
-            samples.append(Sample(sample_params))
+            samples.append(Sample(**sample_params))
 
     # Close the db connection
     if db:
@@ -1069,11 +1069,11 @@ def db_get_adsorbates(pth):
                 'ads_id': adsorbate_params.get('id')
             })
 
-            adsorbate_params['properties'] = {
-                row[0]: row[1] for row in cur_inner}
+            adsorbate_params.update({
+                row[0]: row[1] for row in cur_inner})
 
             # Build adsorbate objects
-            adsorbates.append(Adsorbate(adsorbate_params))
+            adsorbates.append(Adsorbate(**adsorbate_params))
 
     # Close the db connection
     if db:
