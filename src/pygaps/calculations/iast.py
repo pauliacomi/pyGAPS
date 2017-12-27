@@ -12,6 +12,7 @@ from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from .models_isotherm import is_iast_model
 
+
 def iast_binary_vle(isotherms, pressure,
                     verbose=False, warningoff=False,
                     adsorbed_mole_fraction_guess=None):
@@ -76,11 +77,11 @@ def iast_binary_vle(isotherms, pressure,
     x_data = numpy.concatenate([[0], x_data, [1]])
     y_data = numpy.concatenate([[0], y_data, [1]])
 
-    # Generate the aray of partial pressures
+    # Generate the array of partial pressures
     if verbose:
         plot_iast_vle(x_data, y_data,
                       isotherms[0].adsorbate, isotherms[1].adsorbate,
-                      pressure, isotherms[0].unit_pressure)
+                      pressure, isotherms[0].pressure_unit)
 
     return dict(x=x_data, y=y_data)
 
@@ -153,7 +154,7 @@ def iast_binary_svp(isotherms, mole_fractions, pressure_range,
     if verbose:
         plot_iast_svp(pressure_range, selectivities,
                       isotherms[0].adsorbate, isotherms[1].adsorbate,
-                      mole_fractions[0], isotherms[0].unit_pressure)
+                      mole_fractions[0], isotherms[0].pressure_unit)
 
     return dict(pressure=pressure_range, selectivity=selectivities)
 
@@ -197,7 +198,8 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
     for isotherm in isotherms:
         if hasattr(isotherm, 'model'):
             if not is_iast_model(isotherm.model.name):
-                raise ParameterError("One or more of the models cannot be used with IAST")
+                raise ParameterError(
+                    "One or more of the models cannot be used with IAST")
 
     partial_pressures = numpy.array(partial_pressures)
     n_components = len(isotherms)  # number of components in the mixture
@@ -377,7 +379,8 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
     for isotherm in isotherms:
         if hasattr(isotherm, 'model'):
             if not is_iast_model(isotherm.model.name):
-                raise ParameterError("One or more of the models cannot be used with IAST")
+                raise ParameterError(
+                    "One or more of the models cannot be used with IAST")
 
     n_components = len(isotherms)  # number of components in the mixture
     adsorbed_mole_fractions = numpy.array(adsorbed_mole_fractions)
