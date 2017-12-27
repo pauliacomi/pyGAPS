@@ -168,7 +168,6 @@ def sample_data():
     sample_data = {
         'name': 'TEST',
         'batch': 'TB',
-        'owner': 'TU',
         'contact': 'TU',
         'source': 'TL',
         'project': 'TP',

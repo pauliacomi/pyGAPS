@@ -23,10 +23,8 @@ class Sample(object):
 
     Other Parameters
     ----------------
-    owner : str
-        Sample owner nickname.
     contact : str
-        Sample contact nickname.
+        Sample contact name.
     source : str
         Sample source laboratory.
     project : str
@@ -53,7 +51,6 @@ class Sample(object):
 
     '''
     _named_params = [
-        'owner',
         'contact',
         'source',
         'project',
@@ -169,9 +166,8 @@ class Sample(object):
         }
 
         for parameter in self._named_params:
-            value = getattr(self, parameter)
-            if value:
-                parameters_dict.update({parameter: value})
+            if hasattr(self, parameter):
+                parameters_dict.update({parameter: getattr(self, parameter)})
 
         parameters_dict.update(self.properties)
 

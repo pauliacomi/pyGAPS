@@ -39,29 +39,23 @@ def db_upload_sample(pth, sample, overwrite=False):
 
             if overwrite:
                 sql_com = build_update(table="samples",
-                                       to_set=['project', 'struct', 'type',
-                                               'contact', 'form', 'source', 'comment'],
+                                       to_set=Sample._named_params,
                                        where=['name', 'batch'])
             else:
+                to_insert = ['name', 'batch'] + Sample._named_params
                 sql_com = build_insert(table="samples",
-                                       to_insert=['name', 'batch', 'project', 'struct', 'type',
-                                                  'contact', 'form', 'source', 'comment'])
+                                       to_insert=to_insert)
+
+            sample_dict = sample.to_dict()
+            upload_dict = {'name': sample.name, 'batch': sample.batch}
+            for prop in Sample._named_params:
+                if prop in sample_dict:
+                    upload_dict.update({prop: sample_dict[prop]})
+                else:
+                    upload_dict.update({prop: ""})
 
             # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'name':         sample.name,
-                'batch':        sample.batch,
-
-                'contact':      sample.contact,
-                'source':       sample.source,
-                'type':         sample.type,
-
-                'project':      sample.project,
-                'struct':       sample.struct,
-                'form':         sample.form,
-                'comment':      sample.comment,
-            }
-            )
+            cursor.execute(sql_com, upload_dict)
 
             # Upload or modify data in sample_properties table
             if sample.properties and len(sample.properties) > 0:
