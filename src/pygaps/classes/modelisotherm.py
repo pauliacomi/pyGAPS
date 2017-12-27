@@ -55,16 +55,6 @@ class ModelIsotherm(Isotherm):
         The adsorbate used in the experiment.
     t_exp : float
         Experiment temperature.
-    isotherm_parameters : dict
-        Any other parameters of the isotherm which should be stored
-        internally. Pass a dictionary of the form::
-
-            isotherm_params = {
-                'user' : 'John Doe',
-                'doi' : '10.0000/',
-                'x' : 'y',
-                }
-            }
 
     Other Parameters
     ----------------

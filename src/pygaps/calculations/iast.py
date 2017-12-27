@@ -10,7 +10,7 @@ from ..graphing.iastgraphs import plot_iast_svp
 from ..graphing.iastgraphs import plot_iast_vle
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-
+from .models_isotherm import is_iast_model
 
 def iast_binary_vle(isotherms, pressure,
                     verbose=False, warningoff=False,
@@ -194,6 +194,10 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
         Predicted uptakes of each component.
 
     """
+    for isotherm in isotherms:
+        if hasattr(isotherm, 'model'):
+            if not is_iast_model(isotherm.model.name):
+                raise ParameterError("One or more of the models cannot be used with IAST")
 
     partial_pressures = numpy.array(partial_pressures)
     n_components = len(isotherms)  # number of components in the mixture
@@ -370,6 +374,11 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
         Adsorbed component loadings according to reverse IAST.
 
     """
+    for isotherm in isotherms:
+        if hasattr(isotherm, 'model'):
+            if not is_iast_model(isotherm.model.name):
+                raise ParameterError("One or more of the models cannot be used with IAST")
+
     n_components = len(isotherms)  # number of components in the mixture
     adsorbed_mole_fractions = numpy.array(adsorbed_mole_fractions)
     if n_components == 1:

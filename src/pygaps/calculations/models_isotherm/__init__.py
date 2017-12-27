@@ -67,3 +67,22 @@ def get_isotherm_model(model_name):
     for _model in _MODELS:
         if model_name == _model.name:
             return _model()
+
+def is_iast_model(model_name):
+    """
+    Checks whether specified model can be used
+    with IAST/
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model
+
+    Returns
+    -------
+    bool
+        Whether it is applicable or not.
+
+    """
+
+    return model_name in [model.name for model in _IAST_MODELS]

@@ -26,10 +26,11 @@ of the method and to conform it to the rest of the code. A tutorial of IAST with
 IAST calculations in pyGAPS
 ---------------------------
 
-To use the IAST functionality, a list of isotherms is needed. The isotherms can be either:
+To use the IAST functionality, a list of pure component isotherms is needed. The isotherms can be either:
 
-    - A ModelIsotherm class, where the model will be used for the calculation
-    - A PointIsotherm class, where the data will instead be interpolated
+    - A ModelIsotherm class, where the model will be used for the calculation of spreading pressure.
+      Some models cannot be used for IAST calculations.
+    - A PointIsotherm class, where the spreading pressure calculation will use interpolated data.
 
 The original pyIAST functions still exist, as :func:`~pygaps.calculations.iast.iast`
 and :func:`~pygaps.calculations.iast.reverse_iast`. They can be used to determine the

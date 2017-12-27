@@ -41,7 +41,7 @@ class PointIsotherm(Isotherm):
         Pure-component adsorption isotherm data.
     loading_key : str
         The title of the pressure data in the DataFrame provided.
-    pressure_key
+    pressure_key : str
         The title of the loading data in the DataFrame provided.
     other_keys : iterable
         Other pandas DataFrame columns which contain data to be stored.
@@ -53,16 +53,6 @@ class PointIsotherm(Isotherm):
         The adsorbate used in the experiment.
     t_exp : float
         Experiment temperature.
-    isotherm_parameters : dict
-        Any other parameters of the isotherm which should be stored
-        internally. Pass a dictionary of the form::
-
-            isotherm_params = {
-                'user' : 'John Doe',
-                'doi' : '10.0000/',
-                'x' : 'y',
-                }
-            }
 
     Other Parameters
     ----------------
@@ -266,29 +256,29 @@ class PointIsotherm(Isotherm):
         object.__setattr__(self, name, value)
 
         if self._instantiated and name in [
-            'sample_name',
-            'sample_batch',
-            'adsorbent',
-            't_exp',
+                'sample_name',
+                'sample_batch',
+                'adsorbent',
+                't_exp',
 
-            'date',
-            't_act',
-            'lab',
-            'comment',
-            'user',
-            'project',
-            'machine',
-            'is_real',
-            'exp_type',
+                'date',
+                't_act',
+                'lab',
+                'comment',
+                'user',
+                'project',
+                'machine',
+                'is_real',
+                'exp_type',
 
-            'other_properties',
-            '_data',
-            'pressure_unit',
-            'adsorbent_unit',
-            'loading_unit'
-            'pressure_mode'
-            'adsorbent_basis'
-            'loading_basis'
+                'other_properties',
+                '_data',
+                'pressure_unit',
+                'adsorbent_unit',
+                'loading_unit'
+                'pressure_mode'
+                'adsorbent_basis'
+                'loading_basis'
         ]:
             # Generate the unique id using md5
             self.id = None
@@ -323,6 +313,8 @@ class PointIsotherm(Isotherm):
             The mode in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal pressure should be converted to.
+        verbose : bool
+            Print out steps taken.
         """
 
         if mode_to == self.pressure_mode and unit_to == self.pressure_unit:
@@ -379,6 +371,8 @@ class PointIsotherm(Isotherm):
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal loading should be converted to.
+        verbose : bool
+            Print out steps taken.
 
         """
 
@@ -434,6 +428,8 @@ class PointIsotherm(Isotherm):
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal loading should be converted to.
+        verbose : bool
+            Print out steps taken.
 
         """
 
@@ -1064,8 +1060,8 @@ class PointIsotherm(Isotherm):
 
         References
         ----------
-        ..[#] C. Simon, B. Smit, M. Haranczyk. pyIAST: Ideal Adsorbed Solution
-          Theory (IAST) Python Package. Computer Physics Communications.
+        .. [#] C. Simon, B. Smit, M. Haranczyk. pyIAST: Ideal Adsorbed Solution
+           Theory (IAST) Python Package. Computer Physics Communications.
         """
         # Get all data points
         pressures = self.pressure(branch=branch,

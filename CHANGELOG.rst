@@ -11,7 +11,9 @@ Changelog
   per amount of material are all valid)
 * Separated isotherm models so that they can now be easily
   created by the used.
-* Added new models: x.
+* Added new isotherm models: Toth, Jensen-Seaton, W-VST, FH-VST.
+* Made creation of classes (Adsorbate/Sample/Isotherms) more
+  intuitive.
 
 0.9.3 (2017-10-24)
 ------------------

@@ -1,7 +1,7 @@
 .. _calculations-ref:
 
-Calculations
-============
+Characterisation
+================
 
 .. _analysis-ref:
 
@@ -65,15 +65,14 @@ Isosteric heat of adsorption
 .. automodule:: pygaps.calculations.isosteric_heat
     :members:
 
+Initial Henry constant
+......................
 
-.. _modelling-ref:
+.. automodule:: pygaps.calculations.initial_henry
+    :members:
 
+Initial heat of adsorption
+..........................
 
-Adsorption modelling
---------------------
-
-IAST
-....
-
-.. automodule:: pygaps.calculations.iast
+.. automodule:: pygaps.calculations.initial_enthalpy
     :members:

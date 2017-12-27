@@ -25,7 +25,7 @@ Sqlite parsing
 
 Since pyGAPS includes an internal sqlite database, isotherms which are imported can be saved for later use, as
 well as samples, adsorbates, contacts etc.
-The sqlite functionality is an integral part of the framework, and it has its own
+The sqlite functionality is an extensive part of the framework, and it has its own
 :ref:`section <sqlite-manual>` of the manual.
 
 
@@ -57,11 +57,18 @@ An example JSON isotherm can be found :download:`here <../files/isotherm.json>`.
 
     json_string = pygaps.isotherm_to_json(my_isotherm)
 
+
 To convert the json back into an isotherm, use the *from* function.
 
 ::
 
     my_isotherm = pygaps.isotherm_from_json(json_string)
+
+Or alternatively with the class method:
+
+::
+
+    my_isotherm = pygaps.PointIsotherm.from_json(json_string)
 
 For more info about JSON parsing, check out the :mod:`~pygaps.parsing.jsoninterface` reference.
 
@@ -121,7 +128,7 @@ should be created.
 ::
 
     # create the path
-    filename = 'myisotherm.csv'
+    filename = 'my_isotherm.csv'
     path = 'C:\\' + filename
 
     # export the isotherm

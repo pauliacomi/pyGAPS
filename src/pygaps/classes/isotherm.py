@@ -29,7 +29,7 @@ class Isotherm(object):
 
     loading_key : str
         The title of the pressure data in the DataFrame provided.
-    pressure_key
+    pressure_key : str
         The title of the loading data in the DataFrame provided.
     sample_name : str
         Name of the sample on which the isotherm is measured.
@@ -39,17 +39,6 @@ class Isotherm(object):
         The adsorbate used in the experiment.
     t_exp : float
         Experiment temperature.
-    isotherm_parameters : dict
-        Any other parameters of the isotherm which should be stored
-        internally. Pass a dictionary of the form::
-
-            isotherm_params = {
-                'user' : 'John Doe',
-                'doi' : '10.0000/',
-                'x' : 'y',
-                }
-            }
-
 
     Other Parameters
     ----------------
@@ -78,8 +67,7 @@ class Isotherm(object):
     implementation additions.
 
     The minimum arguments required to instantiate the class are
-    ``sample_name``, ``sample_batch``, ``t_exp', ``adsorbate``. Pass these values in
-    the ``**isotherm_parameters`` dictionary.
+    ``sample_name``, ``sample_batch``, ``t_exp', ``adsorbate``.
     """
 
     def __init__(self,
@@ -144,7 +132,7 @@ class Isotherm(object):
         if adsorbent_unit not in _VOLUME_UNITS and adsorbent_unit not in _MASS_UNITS:
             raise ParameterError(
                 "Unit selected for adsorbent is not an option. See viable"
-                "values: {0} {1}".format(_VOLUME_UNITS,  _MASS_UNITS))
+                "values: {0} {1}".format(_VOLUME_UNITS, _MASS_UNITS))
 
         # Column titles
         if None in [loading_key, pressure_key]:

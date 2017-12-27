@@ -75,3 +75,15 @@ Flory-Huggins VST
 
 .. automodule:: pygaps.calculations.models_isotherm.fhvst
     :members:
+
+
+.. _modelling-ref:
+
+Multi-component Adsorption modelling
+====================================
+
+IAST
+----
+
+.. automodule:: pygaps.calculations.iast
+    :members:

@@ -10,7 +10,7 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
     """
     Plots a vapour-adsorbed equilibrium graph from IAST data.
 
-    Paramaters
+    Parameters
     ----------
     x_data : array or list
         The molar fraction in the adsorbed phase.
@@ -18,7 +18,7 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
         The molar fraction in the gas phase.
     adsorbate1 : str
         Name of the adsorbate which is regarded as the main component.
-    adsorbate1 : str
+    adsorbate2 : str
         Name of the adsorbate which is regarded as the secondary component.
     pressure : float
         Pressure at which the vle is plotted.
@@ -69,7 +69,7 @@ def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
     """
     Plots a selectivity-vs-pressure graph from IAST data.
 
-    Paramaters
+    Parameters
     ----------
     p_data : array or list
         The pressures at which selectivity is calculated.
@@ -77,7 +77,7 @@ def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
         The selectivity towards the main component as a function of pressure.
     adsorbate1 : str
         Name of the adsorbate which is regarded as the main component.
-    adsorbate1 : str
+    adsorbate2 : str
         Name of the adsorbate which is regarded as the secondary component.
     fraction : float
         Molar fraction of the main component in the mixture.

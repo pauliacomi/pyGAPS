@@ -230,7 +230,7 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
                                                adsorbate_molar_mass, liquid_density))
     else:
         # Now we need to find the linear regions in the alpha-s for the
-        # assesment of surface area.
+        # assessment of surface area.
         linear_sections = find_linear_sections(alpha_curve, loading)
 
         # For each section we compute the linear fit
