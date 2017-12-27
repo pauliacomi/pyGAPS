@@ -239,7 +239,7 @@ class ModelIsotherm(Isotherm):
         model : str
             The model to be used to describe the isotherm.
         guess_model : bool
-            Set to true if you want to attemt to guess which model best
+            Set to true if you want to attempt to guess which model best
             fits the isotherm data. This will mean a calculation of all
             models available, so it will take a longer time.
         branch : {None, 'ads', 'des'}, optional
