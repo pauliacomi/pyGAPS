@@ -170,7 +170,7 @@ class TestPointIsotherm(object):
 
         # Loading basis specified
         assert basic_pointisotherm.loading(branch='ads', loading_basis='volume')[
-            0] == pytest.approx(0.0406, 1e-3)
+            0] == pytest.approx(0.8764, 1e-3)
 
         # Adsorbent unit specified
         assert basic_pointisotherm.loading(branch='ads', adsorbent_unit='kg')[
@@ -252,7 +252,7 @@ class TestPointIsotherm(object):
         # Loading basis specified
         loading_lbasis = basic_pointisotherm.loading_at(
             1, loading_basis='volume')
-        assert numpy.isclose(loading_lbasis, 0.0406, 1e-4, 1e-4)
+        assert numpy.isclose(loading_lbasis, 0.8764, 1e-4, 1e-4)
 
         # Adsorbent unit specified
         loading_uads = basic_pointisotherm.loading_at(
