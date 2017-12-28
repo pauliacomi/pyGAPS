@@ -31,12 +31,23 @@ def basic_isotherm_json(basic_pointisotherm):
 
 @parsing
 class TestJson(object):
-    def test_isotherm_to_json(self, basic_pointisotherm, basic_isotherm_json):
+    def test_isotherm_to_json(self, basic_isotherm, isotherm_parameters):
+        """Tests the parsing of an isotherm to json"""
+
+        test_isotherm_json = pygaps.isotherm_to_json(basic_isotherm)
+        isotherm_parameters.update({'id': basic_isotherm.id})
+        raw_json = json.dumps(isotherm_parameters, sort_keys=True)
+
+        assert raw_json == test_isotherm_json
+
+        return
+
+    def test_pointisotherm_to_json(self, basic_pointisotherm, basic_isotherm_json):
         """Tests the parsing of an isotherm to json"""
 
         test_isotherm_json = pygaps.isotherm_to_json(basic_pointisotherm)
 
-        assert basic_isotherm_json == test_isotherm_json
+        assert basic_pointisotherm == test_isotherm_json
 
         return
 

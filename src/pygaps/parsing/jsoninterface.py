@@ -42,12 +42,15 @@ def isotherm_to_json(isotherm, fmt=None):
         raw_dict = _to_json_nist(raw_dict)
 
     # Isotherm data
-    if(isinstance(isotherm, PointIsotherm)):
+    if isinstance(isotherm, PointIsotherm):
         isotherm_data_dict = isotherm.data().to_dict(orient='index')
         raw_dict["isotherm_data"] = [{p: str(t) for p, t in v.items()}
                                      for k, v in isotherm_data_dict.items()]
     elif isinstance(isotherm, ModelIsotherm):
-        pass
+        raw_dict["isotherm_model"] = {
+            'model': isotherm.model.name,
+            'parameters': isotherm.model.params,
+        }
 
     json_isotherm = json.dumps(raw_dict, sort_keys=True)
 
@@ -88,7 +91,8 @@ def isotherm_from_json(json_isotherm, fmt=None,
     raw_dict.update(isotherm_parameters)
 
     data = raw_dict.pop("isotherm_data", None)
-    
+    model = raw_dict.pop("isotherm_model", None)
+
     if data:
         # Build pandas dataframe of data
         data = pandas.DataFrame(data, dtype='float64')
@@ -109,7 +113,8 @@ def isotherm_from_json(json_isotherm, fmt=None,
                                  pressure_key=pressure_key,
                                  other_keys=other_keys,
                                  **raw_dict)
-
+    elif model:
+        pass
     else:
         # generate the isotherm
         isotherm = Isotherm(**raw_dict)
