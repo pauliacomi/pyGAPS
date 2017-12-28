@@ -47,7 +47,7 @@ class TestJson(object):
 
         test_isotherm_json = pygaps.isotherm_to_json(basic_pointisotherm)
 
-        assert basic_pointisotherm == test_isotherm_json
+        assert basic_isotherm_json == test_isotherm_json
 
         return
 

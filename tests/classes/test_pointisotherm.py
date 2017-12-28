@@ -42,7 +42,7 @@ class TestPointIsotherm(object):
         iso_id = isotherm.id
         isotherm.nothing = 'changed'
         assert iso_id == isotherm.id
-        isotherm._data = isotherm_data.head(3)
+        isotherm._data = isotherm._data[:5]
         assert iso_id != isotherm.id
 
     def test_isotherm_equality(self, isotherm_parameters, isotherm_data, basic_pointisotherm):
