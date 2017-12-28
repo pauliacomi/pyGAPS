@@ -9,6 +9,8 @@ import pytest
 
 import pygaps
 
+from ..conftest import parsing
+
 
 @pytest.fixture
 def basic_isotherm_json(basic_pointisotherm):
@@ -27,6 +29,7 @@ def basic_isotherm_json(basic_pointisotherm):
     return json.dumps(isotherm_dict, sort_keys=True)
 
 
+@parsing
 class TestJson(object):
     def test_isotherm_to_json(self, basic_pointisotherm, basic_isotherm_json):
         """Tests the parsing of an isotherm to json"""

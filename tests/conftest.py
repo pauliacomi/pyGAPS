@@ -22,6 +22,9 @@ characterisation = pytest.mark.characterisation
 # Modelling functionality
 modelling = pytest.mark.modelling
 
+# Parsing functionality
+parsing = pytest.mark.parsing
+
 # Incremental tests
 
 

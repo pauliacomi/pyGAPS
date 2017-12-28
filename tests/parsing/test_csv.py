@@ -4,7 +4,10 @@ Tests csv interaction
 
 import pygaps
 
+from ..conftest import parsing
 
+
+@parsing
 class TestCSV(object):
 
     def test_csv(self, basic_pointisotherm, tmpdir_factory):
