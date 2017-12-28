@@ -10,6 +10,8 @@ import pygaps
 from pygaps.utilities.sqlite_db_creator import db_create
 from pygaps.utilities.sqlite_db_creator import db_execute_general
 
+from ..conftest import parsing
+
 
 @pytest.fixture(scope='session')
 def db_file(tmpdir_factory):
@@ -21,6 +23,7 @@ def db_file(tmpdir_factory):
     return str(pth)
 
 
+@parsing
 @pytest.mark.incremental
 class TestDatabase(object):
     def test_db_create(self, db_file):
@@ -249,7 +252,7 @@ class TestDatabase(object):
 
         return
 
-    def test_experiment(self, db_file, basic_pointisotherm):
+    def test_experiment(self, db_file, isotherm_parameters, basic_pointisotherm):
         "Tests functions related to experiments table, then inserts a test experiment"
 
         isotherm = basic_pointisotherm
@@ -266,6 +269,27 @@ class TestDatabase(object):
         pygaps.db_delete_experiment_type(db_file, isotherm.exp_type)
         pygaps.db_upload_experiment_type(db_file, {'type': isotherm.exp_type,
                                                    'name': 'test type'})
+
+        # Property type testing
+        pygaps.db_upload_experiment_property_type(db_file, {
+            'type': 'prop',
+            'unit': "test unit"
+        })
+        assert len(pygaps.db_get_experiment_property_types(db_file)) == 1
+        with pytest.raises(pygaps.ParsingError):
+            pygaps.db_upload_experiment_property_type(db_file, {
+                'type': 'prop',
+                'unit': "test unit"
+            })
+        pygaps.db_delete_experiment_property_type(db_file, 'prop')
+
+        # Property type upload
+        for prop in isotherm_parameters:
+            if prop not in pygaps.classes.isotherm.Isotherm._db_columns:
+                pygaps.db_upload_experiment_property_type(db_file, {
+                    'type': prop,
+                    'unit': "test unit"
+                })
 
         # Test experiment_data_type table
         pygaps.db_upload_experiment_data_type(db_file, {

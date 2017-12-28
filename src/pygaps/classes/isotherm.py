@@ -70,6 +70,40 @@ class Isotherm(object):
     ``sample_name``, ``sample_batch``, ``t_exp', ``adsorbate``.
     """
 
+    _id_params = [
+        'id',
+    ]
+
+    _named_params = [
+        # required
+        'sample_name',
+        'sample_batch',
+        't_exp',
+        'adsorbate',
+
+        # others
+        'user',
+        'machine',
+        'exp_type',
+        'date',
+        'is_real',
+        't_act',
+        'lab',
+        'project',
+        'comment',
+    ]
+
+    _db_columns = _id_params + _named_params
+
+    _unit_params = [
+        'pressure_unit',
+        'adsorbent_unit',
+        'loading_unit'
+        'pressure_mode'
+        'adsorbent_basis'
+        'loading_basis'
+    ]
+
     def __init__(self,
                  loading_key=None,
                  pressure_key=None,

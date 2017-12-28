@@ -107,6 +107,32 @@ PRAGMA_EXPERIMENT_TYPE = """
                 `name`          TEXT
                 );
 """
+PRAGMA_EXPERIMENT_PROPERTIES = """
+
+            DROP TABLE IF EXISTS "experiment_properties";
+
+            CREATE TABLE "experiment_properties" (
+                `id`            INTEGER         NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                `exp_id` INTEGER         NOT NULL,
+                `type`          TEXT            NOT NULL,
+                `value`         TEXT            NOT NULL,
+
+                FOREIGN KEY(`exp_id`)    REFERENCES `experiments`(`id`),
+                FOREIGN KEY(`type`)             REFERENCES 'experiment_properties_type'('type')
+                );
+"""
+
+PRAGMA_EXPERIMENT_PROPERTY_TYPE = """
+
+            DROP TABLE IF EXISTS "experiment_properties_type";
+
+            CREATE TABLE "experiment_properties_type" (
+                `id`            INTEGER         NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                `type`          TEXT            NOT NULL UNIQUE,
+                `unit`          TEXT
+                );
+"""
+
 
 PRAGMA_EXPERIMENT_DATA = """
             DROP TABLE IF EXISTS "experiment_data";
@@ -215,6 +241,8 @@ PRAGMAS = [
 
     PRAGMA_EXPERIMENT_TYPE,
     PRAGMA_EXPERIMENTS,
+    PRAGMA_EXPERIMENT_PROPERTY_TYPE,
+    PRAGMA_EXPERIMENT_PROPERTIES,
     PRAGMA_EXPERIMENT_DATA_TYPE,
     PRAGMA_EXPERIMENT_DATA,
 

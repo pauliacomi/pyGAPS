@@ -255,30 +255,9 @@ class PointIsotherm(Isotherm):
         """
         object.__setattr__(self, name, value)
 
-        if self._instantiated and name in [
-                'sample_name',
-                'sample_batch',
-                'adsorbent',
-                't_exp',
-
-                'date',
-                't_act',
-                'lab',
-                'comment',
-                'user',
-                'project',
-                'machine',
-                'is_real',
-                'exp_type',
-
+        if self._instantiated and name in self._named_params + self._unit_params + [
                 'other_properties',
                 '_data',
-                'pressure_unit',
-                'adsorbent_unit',
-                'loading_unit'
-                'pressure_mode'
-                'adsorbent_basis'
-                'loading_basis'
         ]:
             # Generate the unique id using md5
             self.id = None
@@ -504,17 +483,17 @@ class PointIsotherm(Isotherm):
             plot_type = 'isotherm'
             secondary_key = None
 
-        fig, ax1, ax2 = plot_iso([self], plot_type=plot_type, branch=["ads", "des"],
-                                 logx=logarithmic, secondary_key=secondary_key,
+        fig, ax1, ax2 = plot_iso(
+            [self], plot_type=plot_type, branch=["ads", "des"],
+            logx=logarithmic, secondary_key=secondary_key,
 
-                                 adsorbent_basis=self.adsorbent_basis,
-                                 adsorbent_unit=self.adsorbent_unit,
-                                 loading_basis=self.loading_basis,
-                                 loading_unit=self.loading_unit,
-                                 pressure_unit=self.pressure_unit,
-                                 pressure_mode=self.pressure_mode,
-
-                                 )
+            adsorbent_basis=self.adsorbent_basis,
+            adsorbent_unit=self.adsorbent_unit,
+            loading_basis=self.loading_basis,
+            loading_unit=self.loading_unit,
+            pressure_unit=self.pressure_unit,
+            pressure_mode=self.pressure_mode,
+        )
 
         if show:
             plt.show()
