@@ -39,7 +39,28 @@ class TestPointIsotherm(object):
             **isotherm_param
         )
 
-        return isotherm
+        iso_id = isotherm.id
+        isotherm.nothing = 'changed'
+        assert iso_id == isotherm.id
+        isotherm._data = isotherm_data.head(3)
+        assert iso_id != isotherm.id
+
+    def test_isotherm_equality(self, isotherm_parameters, isotherm_data, basic_pointisotherm):
+        "Checks isotherm id's are unique"
+
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data,
+            loading_key='loading',
+            pressure_key='pressure',
+            other_keys=['enthalpy'],
+            **isotherm_parameters
+        )
+
+        assert isotherm == basic_pointisotherm
+
+        isotherm.t_act = 0
+
+        assert isotherm != basic_pointisotherm
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
@@ -55,7 +76,7 @@ class TestPointIsotherm(object):
             isotherm_data,
         )
 
-        return isotherm
+        assert isotherm != basic_isotherm
 
     def test_isotherm_create_from_modelisotherm(self, basic_modelisotherm, basic_pointisotherm):
         "Checks isotherm can be created from isotherm"
@@ -78,7 +99,7 @@ class TestPointIsotherm(object):
             pressure_points=basic_pointisotherm
         )
 
-        return isotherm
+        assert isotherm != basic_modelisotherm
 
 ##########################
     def test_isotherm_ret_has_branch(self, basic_pointisotherm):
@@ -224,141 +245,72 @@ class TestPointIsotherm(object):
         return
 
 ##########################
-    def test_isotherm_ret_loading_at(self, basic_pointisotherm, use_sample, use_adsorbate):
+
+    @pytest.mark.parametrize('inp, expected, parameters', [
+        (1, 1, dict()),
+        (1, 1, dict(branch='ads')),
+        (100000, 1, dict(pressure_unit='Pa')),
+        (0.5, 3.89137, dict(pressure_mode='relative')),
+        (1, 0.001, dict(loading_unit='mol')),
+        (1, 0.87648, dict(loading_basis='volume')),
+        (1, 1000, dict(adsorbent_unit='kg')),
+        (1, 10, dict(adsorbent_basis='volume')),
+        (0.5, 1090.11, dict(pressure_unit='Pa',
+                            pressure_mode='relative',
+                            loading_unit='kg',
+                            loading_basis='mass',
+                            adsorbent_unit='m3',
+                            adsorbent_basis='volume')),
+        (10, 20.0, dict(interp_fill=(0, 20))),
+        (1, 1, dict(interpolation_type='slinear')),
+    ])
+    def test_isotherm_ret_loading_at(self, basic_pointisotherm, use_sample, use_adsorbate,
+                                     inp, parameters, expected):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
-        # Standard return
-        loading = basic_pointisotherm.loading_at(1)
-        assert numpy.isclose(loading, 1.0, 1e-5)
-
-        # Branch specified
-        loading_branch = basic_pointisotherm.loading_at(1, branch='ads')
-        assert numpy.isclose(loading_branch, 1.0, 1e-5)
-
-        # Pressure unit specified
-        loading_punit = basic_pointisotherm.loading_at(
-            100000, pressure_unit='Pa')
-        assert numpy.isclose(loading_punit, 1.0, 1e-5)
-
-        # Presure mode specified
-        loading_mode = basic_pointisotherm.loading_at(
-            0.5, pressure_mode='relative')
-        assert numpy.isclose(loading_mode, 3.89137, 1e-5)
-
-        # Loading unit specified
-        loading_lunit = basic_pointisotherm.loading_at(1, loading_unit='mol')
-        assert numpy.isclose(loading_lunit, 0.001, 1e-5)
-
-        # Loading basis specified
-        loading_lbasis = basic_pointisotherm.loading_at(
-            1, loading_basis='volume')
-        assert numpy.isclose(loading_lbasis, 0.8764, 1e-4, 1e-4)
-
-        # Adsorbent unit specified
-        loading_uads = basic_pointisotherm.loading_at(
-            1, adsorbent_unit='kg')
-        assert numpy.isclose(loading_uads, 1000, 1e-5)
-
-        # Adsorbent basis specified
-        loading_bads = basic_pointisotherm.loading_at(
-            1, adsorbent_basis='volume')
-        assert numpy.isclose(loading_bads, 10, 1e-5)
-
-        # Everything specified
-        loading_all = basic_pointisotherm.loading_at(0.5,
-                                                     pressure_unit='Pa',
-                                                     pressure_mode='relative',
-                                                     loading_unit='kg',
-                                                     loading_basis='mass',
-                                                     adsorbent_unit='m3',
-                                                     adsorbent_basis='volume')
-        assert numpy.isclose(loading_all, 1090.11, 1e-2, 1e-2)
-
-        # Interp_fill specified
-        loading_fill = basic_pointisotherm.loading_at(
-            10, interp_fill=(0, 20))
-        assert numpy.isclose(loading_fill, 20.0, 1e-5)
-
-        # Interp_type specified
-        loading_type = basic_pointisotherm.loading_at(
-            1, interpolation_type='slinear')
-        assert loading_type == pytest.approx(1.0, 1e-5)
+        assert numpy.isclose(basic_pointisotherm.loading_at(
+            inp, **parameters), expected, 1e-5)
 
         return
 
-    def test_isotherm_ret_pressure_at(self, basic_pointisotherm, use_sample, use_adsorbate):
+    @pytest.mark.parametrize('inp, expected, parameters', [
+        (1, 1, dict()),
+        (4, 4, dict(branch='des')),
+        (1, 100000, dict(pressure_unit='Pa')),
+        (3.89137, 0.5, dict(pressure_mode='relative')),
+        (0.02808, 1.00237, dict(loading_basis='mass', loading_unit='g')),
+        (1000, 1, dict(adsorbent_unit='kg')),
+        (10, 1, dict(adsorbent_basis='volume', adsorbent_unit='cm3')),
+        (1.08948, 0.499711, dict(pressure_unit='Pa',
+                                 pressure_mode='relative',
+                                 loading_unit='g',
+                                 loading_basis='mass',
+                                 adsorbent_unit='cm3',
+                                 adsorbent_basis='volume')),
+        (10, 20.0, dict(interp_fill=(0, 20))),
+        (1, 1, dict(interpolation_type='slinear')),
+    ])
+    def test_isotherm_ret_pressure_at(self, basic_pointisotherm, use_sample, use_adsorbate,
+                                      inp, parameters, expected):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
-        # Standard return
-        pressure = basic_pointisotherm.pressure_at(1)
-        assert pressure == pytest.approx(1.0, 1e-5)
-
-        # Branch specified
-        pressure_branch = basic_pointisotherm.pressure_at(4.0, branch='des')
-        assert pressure_branch == pytest.approx(4.0, 1e-5)
-
-        # Pressure unit specified
-        pressure_punit = basic_pointisotherm.pressure_at(
-            1.0, pressure_unit='Pa')
-        assert pressure_punit == pytest.approx(100000, 0.1)
-
-        # Pressure mode specified
-        pressure_mode = basic_pointisotherm.pressure_at(
-            3.89137, pressure_mode='relative')
-        assert pressure_mode == pytest.approx(0.5, 1e-5)
-
-        # Loading unit specified
-        pressure_lunit = basic_pointisotherm.pressure_at(
-            0.001, loading_unit='mol')
-        assert pressure_lunit == pytest.approx(1, 1e-5)
-
-        # Loading basis specified
-        pressure_lbasis = basic_pointisotherm.pressure_at(
-            0.02808, loading_basis='mass', loading_unit='g')
-        assert pressure_lbasis == pytest.approx(1, 1e-2)
-
-        # Adsorbent unit specified
-        pressure_bunit = basic_pointisotherm.pressure_at(
-            1000, adsorbent_unit='kg')
-        assert pressure_bunit == pytest.approx(1.0, 1e-5)
-
-        # Adsorbent basis specified
-        pressure_bads = basic_pointisotherm.pressure_at(
-            10, adsorbent_basis='volume', adsorbent_unit='cm3')
-        assert pressure_bads == pytest.approx(1.0, 1e-5)
-
-        # Everything specified
-        pressure_all = basic_pointisotherm.pressure_at(1.08948,
-                                                       pressure_unit='Pa',
-                                                       pressure_mode='relative',
-                                                       loading_unit='g',
-                                                       loading_basis='mass',
-                                                       adsorbent_unit='cm3',
-                                                       adsorbent_basis='volume')
-        assert numpy.isclose(pressure_all, 0.5, 1e-2)
+        assert numpy.isclose(basic_pointisotherm.pressure_at(
+            inp, **parameters), expected, 1e-5)
 
         return
 
-    def test_isotherm_spreading_pressure_at(self, basic_pointisotherm, use_adsorbate):
+    @pytest.mark.parametrize('inp, expected, parameters', [
+        (1, 1, dict()),
+        (1, 1, dict(branch='ads')),
+        (100000, 1, dict(pressure_unit='Pa')),
+        (0.5, 3.89137, dict(pressure_mode='relative')),
+    ])
+    def test_isotherm_spreading_pressure_at(self, basic_pointisotherm, use_adsorbate,
+                                            inp, parameters, expected):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
-        # Standard return
-        spressure = basic_pointisotherm.spreading_pressure_at(1)
-        assert spressure == pytest.approx(1.0, 1e-5)
-
-        # Branch specified
-        bpressure = basic_pointisotherm.spreading_pressure_at(1, branch='ads')
-        assert bpressure == pytest.approx(1.0, 1e-5)
-
-        # Pressure unit specified
-        spressure_punit = basic_pointisotherm.spreading_pressure_at(
-            100000, pressure_unit='Pa')
-        assert spressure_punit == pytest.approx(1.0, 1e-5)
-
-        # Pressure mode specified
-        spressure_mode = basic_pointisotherm.spreading_pressure_at(
-            0.5, pressure_mode='relative')
-        assert spressure_mode == pytest.approx(3.89137, 1e-5)
+        assert numpy.isclose(basic_pointisotherm.spreading_pressure_at(
+            inp, **parameters), expected, 1e-5)
 
         return
 

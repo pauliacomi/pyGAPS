@@ -118,6 +118,9 @@ class ModelIsotherm(Isotherm):
         # We change it to a simulated isotherm
         isotherm_parameters['is_real'] = False
 
+        # Start construction process
+        self._instantiated = False
+        
         # Run base class constructor
         Isotherm.__init__(self,
                           pressure_key=pressure_key,
@@ -174,6 +177,13 @@ class ModelIsotherm(Isotherm):
                                    optimization_method,
                                    verbose)
 
+        # Finish instantiation process
+        self._instantiated = True
+
+        # Now that all data has been saved, generate the unique id if needed.
+        if self.id is None:
+            self._check_if_hash(True, [True])
+
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
                       model=None,
@@ -208,6 +218,9 @@ class ModelIsotherm(Isotherm):
         verbose : bool
             Prints out extra information about steps taken.
         """
+        iso_params = isotherm.to_dict()
+        iso_params.pop('id', None)
+
         return cls(isotherm_data,
                    model=model,
                    param_guess=param_guess,
@@ -217,7 +230,7 @@ class ModelIsotherm(Isotherm):
 
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
-                   **isotherm.to_dict())
+                   **iso_params)
 
     @classmethod
     def from_pointisotherm(cls,
@@ -251,6 +264,8 @@ class ModelIsotherm(Isotherm):
         verbose : bool
             Prints out extra information about steps taken.
         """
+        iso_params = isotherm.to_dict()
+        iso_params.pop('id', None)
         if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
                                        optimization_method=optimization_method,
@@ -259,7 +274,7 @@ class ModelIsotherm(Isotherm):
 
                                        loading_key=isotherm.loading_key,
                                        pressure_key=isotherm.pressure_key,
-                                       **isotherm.to_dict())
+                                       **iso_params)
 
         return cls(isotherm.data(branch=branch),
                    model=model,
@@ -270,7 +285,7 @@ class ModelIsotherm(Isotherm):
 
                    loading_key=isotherm.loading_key,
                    pressure_key=isotherm.pressure_key,
-                   **isotherm.to_dict())
+                   **iso_params)
 
     @classmethod
     def guess(cls, data,
@@ -340,6 +355,23 @@ class ModelIsotherm(Isotherm):
             return best_fit
 
 ##########################################################
+#   Overloaded and private functions
+
+    def __setattr__(self, name, value):
+        """
+        We overload the usual class setter to make sure that the id is always
+        representative of the data inside the isotherm.
+
+        The '_instantiated' attribute gets set to true after isotherm __init__
+        From then afterwards, each call to modify the isotherm properties
+        recalculates the md5 hash.
+        This is done to ensure uniqueness and also to allow isotherm objects to
+        be easily compared to each other.
+        """
+        object.__setattr__(self, name, value)
+        self._check_if_hash(name, ['model'])
+
+##########################################################
 #   Methods
 
     def has_branch(self, branch):
@@ -380,7 +412,7 @@ class ModelIsotherm(Isotherm):
         pressure_unit : str, optional
             Unit in which the pressure should be returned. If None
             it defaults to which pressure unit the isotherm is currently in.
-        modpressure_modee : {None, 'absolute', 'relative'}
+        pressure_mode : {None, 'absolute', 'relative'}
             The mode in which to return the pressure, if possible. If ``None``,
             returns mode the isotherm is currently in.
         min_range : float, optional

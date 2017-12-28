@@ -31,7 +31,13 @@ class TestIsotherm(object):
             pressure_key='pressure',
             ** isotherm_param)
 
-        return isotherm
+        iso_id = isotherm.id
+        isotherm.nothing = 'changed'
+        assert iso_id == isotherm.id
+        isotherm.t_act = 123
+        assert iso_id != isotherm.id
+
+        return
 
     @pytest.mark.parametrize('missing_key',
                              ['loading_key', 'pressure_key'])
@@ -94,7 +100,9 @@ class TestIsotherm(object):
     def test_isotherm_get_parameters(self, isotherm_parameters, basic_isotherm):
         "Checks isotherm returns the same dict as was used to create it"
 
-        assert isotherm_parameters == basic_isotherm.to_dict()
+        iso_dict = basic_isotherm.to_dict()
+        del iso_dict['id']
+        assert isotherm_parameters == iso_dict
 
     def test_isotherm_print_parameters(self, basic_isotherm):
         "Checks isotherm can print its own info"

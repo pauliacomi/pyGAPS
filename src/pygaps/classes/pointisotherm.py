@@ -3,8 +3,6 @@ This module contains the main class that describes an isotherm through discrete 
 """
 
 
-import hashlib
-
 import matplotlib.pyplot as plt
 import numpy
 import pandas
@@ -147,14 +145,28 @@ class PointIsotherm(Isotherm):
                                                         branch=interp_branch),
                                                     interp_branch=interp_branch)
 
+        # Finish instantiation process
+        self._instantiated = True
+
         # Now that all data has been saved, generate the unique id if needed.
         if self.id is None:
-            # Generate the unique id using md5
-            sha_hasher = hashlib.md5(
-                pygaps.isotherm_to_json(self).encode('utf-8'))
-            self.id = sha_hasher.hexdigest()
+            self._check_if_hash(True, [True])
 
-        self._instantiated = True
+    @classmethod
+    def from_json(cls, json_string, **isotherm_parameters):
+        """
+        Constructs a PointIsotherm from a standard json-represented isotherm.
+        This function is just a wrapper around the more powerful .isotherm_from_json
+        function.
+
+        Parameters
+        ----------
+        json_string : str
+            A json standard isotherm representation.
+        isotherm_parameters :
+            Any other options to be passed to the isotherm creation, like mode, basis or unit.
+        """
+        return pygaps.isotherm_from_json(json_string, **isotherm_parameters)
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
@@ -174,28 +186,14 @@ class PointIsotherm(Isotherm):
         pressure_key : str
             Column of the pandas DataFrame where the pressure is stored.
         """
+        iso_params = isotherm.to_dict()
+        iso_params.pop('id', None)
         return cls(isotherm_data,
                    other_keys=other_keys,
 
                    pressure_key=isotherm.pressure_key,
                    loading_key=isotherm.loading_key,
-                   **isotherm.to_dict())
-
-    @classmethod
-    def from_json(cls, json_string, **isotherm_parameters):
-        """
-        Constructs a PointIsotherm from a standard json-represented isotherm.
-        This function is just a wrapper around the more powerful .isotherm_from_json
-        function.
-
-        Parameters
-        ----------
-        json_string : str
-            A json standard isotherm representation.
-        isotherm_parameters :
-            Any other options to be passed to the isotherm creation, like mode, basis or unit.
-        """
-        return pygaps.isotherm_from_json(json_string, **isotherm_parameters)
+                   **iso_params)
 
     @classmethod
     def from_modelisotherm(cls, modelisotherm, pressure_points=None):
@@ -234,10 +232,12 @@ class PointIsotherm(Isotherm):
             }
         )
 
+        iso_params = modelisotherm.to_dict()
+        iso_params.pop('id', None)
         return PointIsotherm(iso_data,
                              loading_key=modelisotherm.loading_key,
                              pressure_key=modelisotherm.pressure_key,
-                             **modelisotherm.to_dict())
+                             **iso_params)
 
 ##########################################################
 #   Overloaded and private functions
@@ -254,25 +254,7 @@ class PointIsotherm(Isotherm):
         be easily compared to each other.
         """
         object.__setattr__(self, name, value)
-
-        if self._instantiated and name in self._named_params + self._unit_params + [
-                'other_properties',
-                '_data',
-        ]:
-            # Generate the unique id using md5
-            self.id = None
-            md_hasher = hashlib.md5(
-                pygaps.isotherm_to_json(self).encode('utf-8'))
-            self.id = md_hasher.hexdigest()
-
-    def __eq__(self, other_isotherm):
-        """
-        We overload the equality operator of the isotherm. Since id's should be unique and
-        representative of the data inside the isotherm, all we need to ensure equality
-        is to compare the two hashes of the isotherms.
-        """
-
-        return self.id == other_isotherm.id
+        self._check_if_hash(name, ['_data'])
 
 
 ##########################################################

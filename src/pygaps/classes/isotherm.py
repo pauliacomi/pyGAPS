@@ -2,7 +2,11 @@
 This module contains the main class that describes an isotherm.
 """
 
+import hashlib
+
 import pandas
+
+import pygaps
 
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _MASS_UNITS
@@ -70,10 +74,6 @@ class Isotherm(object):
     ``sample_name``, ``sample_batch``, ``t_exp', ``adsorbate``.
     """
 
-    _id_params = [
-        'id',
-    ]
-
     _named_params = [
         # required
         'sample_name',
@@ -93,16 +93,17 @@ class Isotherm(object):
         'comment',
     ]
 
-    _db_columns = _id_params + _named_params
-
     _unit_params = [
         'pressure_unit',
+        'pressure_mode',
         'adsorbent_unit',
-        'loading_unit'
-        'pressure_mode'
-        'adsorbent_basis'
-        'loading_basis'
+        'adsorbent_basis',
+        'loading_unit',
+        'loading_basis',
     ]
+
+    _db_columns = ['id'] + _named_params
+    _id_params = _named_params + _unit_params + ['other_properties']
 
     def __init__(self,
                  loading_key=None,
@@ -195,11 +196,10 @@ class Isotherm(object):
         self.pressure_key = pressure_key
 
         # Must-have properties of the isotherm
-        if 'id' not in isotherm_parameters:
-            self.id = None
-        else:
-            self.id = isotherm_parameters.pop('id', None)
+        #
 
+        # ID
+        self.id = isotherm_parameters.pop('id', None)
         #: Isotherm material name.
         self.sample_name = str(isotherm_parameters.pop('sample_name', None))
         #: Isotherm material batch.
@@ -271,6 +271,48 @@ class Isotherm(object):
         #: Other properties of the isotherm.
         self.other_properties = isotherm_parameters
 
+        # Finish instantiation process
+        # (check if none in case its part of a Point/Model Isotherm instantiation)
+        if not hasattr(self, '_instantiated'):
+            self._instantiated = True
+            if self.id is None:
+                self._check_if_hash(True, [True])
+
+    ##########################################################
+    #   Overloaded and private functions
+
+    def __setattr__(self, name, value):
+        """
+        We overload the usual class setter to make sure that the id is always
+        representative of the data inside the isotherm.
+
+        The '_instantiated' attribute gets set to true after isotherm __init__
+        From then afterwards, each call to modify the isotherm properties
+        recalculates the md5 hash.
+        This is done to ensure uniqueness and also to allow isotherm objects to
+        be easily compared to each other.
+        """
+        object.__setattr__(self, name, value)
+        self._check_if_hash(name)
+
+    def _check_if_hash(self, name, extra_params=[]):
+        """Checks if the hash needs to be generated"""
+        if getattr(self, '_instantiated', False) and name in self._id_params + extra_params:
+            # Generate the unique id using md5
+            self.id = None        # set the id to none for repeatability of json
+            md_hasher = hashlib.md5(
+                pygaps.isotherm_to_json(self).encode('utf-8'))
+            self.id = md_hasher.hexdigest()
+
+    def __eq__(self, other_isotherm):
+        """
+        We overload the equality operator of the isotherm. Since id's should be unique and
+        representative of the data inside the isotherm, all we need to ensure equality
+        is to compare the two hashes of the isotherms.
+        """
+
+        return self.id == other_isotherm.id
+
     ###########################################################
     #   Info functions
 
@@ -332,45 +374,10 @@ class Isotherm(object):
         """
         parameter_dict = {}
 
-        # Get the named properties
-        if self.id:
-            parameter_dict.update({'id': self.id})
-        if self.sample_name:
-            parameter_dict.update({'sample_name': self.sample_name})
-        if self.sample_batch:
-            parameter_dict.update({'sample_batch': self.sample_batch})
-        if self.t_exp:
-            parameter_dict.update({'t_exp': self.t_exp})
-        if self.adsorbate:
-            parameter_dict.update({'adsorbate': self.adsorbate})
-
-        if self.date:
-            parameter_dict.update({'date': str(self.date)})
-        if self.t_act:
-            parameter_dict.update({'t_act': self.t_act})
-        if self.lab:
-            parameter_dict.update({'lab': self.lab})
-        if self.comment:
-            parameter_dict.update({'comment': self.comment})
-
-        if self.user:
-            parameter_dict.update({'user': self.user})
-        if self.project:
-            parameter_dict.update({'project': self.project})
-        if self.machine:
-            parameter_dict.update({'machine': self.machine})
-        if self.is_real:
-            parameter_dict.update({'is_real': self.is_real})
-        if self.exp_type:
-            parameter_dict.update({'exp_type': self.exp_type})
-
-        # Get the units
-        parameter_dict.update({'pressure_unit': self.pressure_unit})
-        parameter_dict.update({'pressure_mode': self.pressure_mode})
-        parameter_dict.update({'adsorbent_unit': self.adsorbent_unit})
-        parameter_dict.update({'adsorbent_basis': self.adsorbent_basis})
-        parameter_dict.update({'loading_unit': self.loading_unit})
-        parameter_dict.update({'loading_basis': self.loading_basis})
+        # Add named parameters
+        for param in self._named_params + self._unit_params + ['id']:
+            if hasattr(self, param):
+                parameter_dict.update({param: getattr(self, param)})
 
         # Now add the rest
         parameter_dict.update(self.other_properties)
