@@ -6,7 +6,9 @@ import json
 
 import pandas
 
+from ..classes.isotherm import Isotherm
 from ..classes.pointisotherm import PointIsotherm
+from ..classes.modelisotherm import ModelIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _MOLAR_UNITS
@@ -40,9 +42,12 @@ def isotherm_to_json(isotherm, fmt=None):
         raw_dict = _to_json_nist(raw_dict)
 
     # Isotherm data
-    isotherm_data_dict = isotherm.data().to_dict(orient='index')
-    raw_dict["isotherm_data"] = [{p: str(t) for p, t in v.items()}
-                                 for k, v in isotherm_data_dict.items()]
+    if(isinstance(isotherm, PointIsotherm)):
+        isotherm_data_dict = isotherm.data().to_dict(orient='index')
+        raw_dict["isotherm_data"] = [{p: str(t) for p, t in v.items()}
+                                     for k, v in isotherm_data_dict.items()]
+    elif isinstance(isotherm, ModelIsotherm):
+        pass
 
     json_isotherm = json.dumps(raw_dict, sort_keys=True)
 
@@ -82,25 +87,32 @@ def isotherm_from_json(json_isotherm, fmt=None,
     # Update dictionary with passed parameters
     raw_dict.update(isotherm_parameters)
 
-    # Build pandas dataframe of data
-    data = pandas.DataFrame(raw_dict.pop("isotherm_data"), dtype='float64')
+    data = raw_dict.pop("isotherm_data", None)
+    
+    if data:
+        # Build pandas dataframe of data
+        data = pandas.DataFrame(data, dtype='float64')
 
-    # Rename keys and get units if needed depending on format
-    if fmt == 'NIST':
-        loading_key = 'adsorption'
-        pressure_key = 'pressure'
-        raw_dict = _from_json_nist(raw_dict)
+        # Rename keys and get units if needed depending on format
+        if fmt == 'NIST':
+            loading_key = 'adsorption'
+            pressure_key = 'pressure'
+            raw_dict = _from_json_nist(raw_dict)
 
-    # get the other data in the json
-    other_keys = [column for column in data.columns.values
-                  if column not in [loading_key, pressure_key]]
+        # get the other data in the json
+        other_keys = [column for column in data.columns.values
+                      if column not in [loading_key, pressure_key]]
 
-    # generate the isotherm
-    isotherm = PointIsotherm(data,
-                             loading_key=loading_key,
-                             pressure_key=pressure_key,
-                             other_keys=other_keys,
-                             **raw_dict)
+        # generate the isotherm
+        isotherm = PointIsotherm(data,
+                                 loading_key=loading_key,
+                                 pressure_key=pressure_key,
+                                 other_keys=other_keys,
+                                 **raw_dict)
+
+    else:
+        # generate the isotherm
+        isotherm = Isotherm(**raw_dict)
 
     return isotherm
 
@@ -217,7 +229,7 @@ def _from_json_nist(raw_dict):
         adsorbent_basis = "molar"
     else:
         raise ParsingError("Isotherm cannot be parsed due to adsorbent basis")
-    
+
     # Get pressure mode and unit
     pressure_mode = "absolute"
     pressure_string = raw_dict.pop("pressureUnits")
