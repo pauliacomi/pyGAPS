@@ -205,16 +205,17 @@ def db_upload_sample(pth, sample, overwrite=False):
                     updates = [elt[0] for elt in cursor.fetchall()]
 
                 for prop in sample.properties:
-                    if prop in updates:
-                        sql_com_prop = sql_update
-                    else:
-                        sql_com_prop = sql_insert
+                    if prop is not None:
+                        if prop in updates:
+                            sql_com_prop = sql_update
+                        else:
+                            sql_com_prop = sql_insert
 
-                    cursor.execute(sql_com_prop, {
-                        'sample_id':        sample_id,
-                        'type':             prop,
-                        'value':            sample.properties[prop]
-                    })
+                        cursor.execute(sql_com_prop, {
+                            'sample_id':        sample_id,
+                            'type':             prop,
+                            'value':            sample.properties[prop]
+                        })
 
         # Print success
         print("Sample uploaded", sample.name, sample.batch)
@@ -552,7 +553,7 @@ def db_get_experiments(pth, criteria):
             exp_params = dict(zip(row.keys(), row))
 
             cur_inner = db.cursor()
-            
+
             # Get the properties from the experiment_properties table
 
             cur_inner.execute(build_select(table='experiment_properties',
@@ -562,7 +563,7 @@ def db_get_experiments(pth, criteria):
             })
 
             exp_params.update({row[0]: row[1] for row in cur_inner})
-            
+
             # Get the data from the experiment_data table
 
             cur_inner.execute(build_select(table='experiment_data',
@@ -639,7 +640,7 @@ def db_delete_experiment(pth, isotherm):
             # Delete data from experiment_data table
             cursor.execute(build_delete(table='experiment_properties',
                                         where=['exp_id']), {'exp_id': isotherm.id})
-                                        
+
             # Delete experiment info in experiments table
             cursor.execute(build_delete(table='experiments',
                                         where=['id']), {'id': isotherm.id})
@@ -829,7 +830,7 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
             }
             )
 
-            # Upload or modify data in sample_properties table
+            # Upload or modify data in the table
             if len(adsorbate.properties) > 0:
                 # Get id of adsorbate
                 ads_id = cursor.execute(

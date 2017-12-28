@@ -139,9 +139,9 @@ class Sample(object):
             string += ("Batch:" + self.batch + '\n')
 
         for parameter in self._named_params:
-            value = getattr(self, parameter)
-            if value:
-                string += (parameter.title() + ":" + value + '\n')
+            if hasattr(self, parameter):
+                string += (parameter.title() + ":" +
+                           getattr(self, parameter) + '\n')
 
         if self.properties:
             for prop in self.properties:

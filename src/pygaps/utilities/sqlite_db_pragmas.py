@@ -47,7 +47,7 @@ PRAGMA_SAMPLE_PROPERTIES = """
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `sample_id`     INTEGER     NOT NULL,
                 `type`          TEXT        NOT NULL,
-                `value`         REAL        NOT NULL,
+                `value`         TEXT,
 
                 FOREIGN KEY(`sample_id`)    REFERENCES `samples`(`id`),
                 FOREIGN KEY(`type`)         REFERENCES 'sample_properties_type'('type')
@@ -215,7 +215,7 @@ PRAGMA_MACHINES = """
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `nick`          TEXT        NOT NULL UNIQUE,
                 `name`          TEXT,
-                `type`          INTEGER
+                `type`          TEXT
                 );
 """
 
@@ -234,10 +234,10 @@ PRAGMA_SOURCES = """
 # List of pragmas
 
 PRAGMAS = [
-    PRAGMA_SAMPLE_TYPE,
     PRAGMA_SAMPLES,
-    PRAGMA_SAMPLE_PROPERTY_TYPE,
     PRAGMA_SAMPLE_PROPERTIES,
+    PRAGMA_SAMPLE_TYPE,
+    PRAGMA_SAMPLE_PROPERTY_TYPE,
 
     PRAGMA_EXPERIMENT_TYPE,
     PRAGMA_EXPERIMENTS,
