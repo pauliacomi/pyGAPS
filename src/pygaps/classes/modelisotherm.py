@@ -39,10 +39,6 @@ class ModelIsotherm(Isotherm):
         The model to be used to describe the isotherm.
     param_guess : dict
         Starting guess for model parameters in the data fitting routine.
-    optimization_method : str
-        Method in SciPy minimization function to use in fitting model to data.
-        See `here
-        <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
     branch : ['ads', 'des'], optional
         The branch on which the model isotherm is based on. It is assumed to be the
         adsorption branch, as it is the most commonly modelled part, although may
@@ -58,6 +54,10 @@ class ModelIsotherm(Isotherm):
 
     Other Parameters
     ----------------
+    optimization_params : dict
+        Dictionary to be passed to the minimization function to use in fitting model to data.
+        See `here
+        <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
@@ -93,7 +93,7 @@ class ModelIsotherm(Isotherm):
                  pressure_key=None,
                  model=None,
                  param_guess=None,
-                 optimization_method="Nelder-Mead",
+                 optimization_params=dict(method='Nelder-Mead'),
                  branch='ads',
                  verbose=False,
 
@@ -178,7 +178,7 @@ class ModelIsotherm(Isotherm):
         self.rmse = self.model.fit(data[loading_key].values,
                                    data[pressure_key].values,
                                    self.param_guess,
-                                   optimization_method,
+                                   optimization_params,
                                    verbose)
 
         # Finish instantiation process
@@ -192,7 +192,7 @@ class ModelIsotherm(Isotherm):
     def from_isotherm(cls, isotherm, isotherm_data,
                       model=None,
                       param_guess=None,
-                      optimization_method="Nelder-Mead",
+                      optimization_params=dict(method='Nelder-Mead'),
                       branch='ads',
                       verbose=False,
                       ):
@@ -211,10 +211,11 @@ class ModelIsotherm(Isotherm):
             The model to be used to describe the isotherm.
         param_guess : dict
             Starting guess for model parameters in the data fitting routine.
-        optimization_method : str
-            Method in SciPy minimization function to use in fitting model to data.
+        optimization_params : dict
+            Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
             <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+            Defaults to "Nelder-Mead".
         branch : ['ads', 'des'], optional
             The branch on which the model isotherm is based on. It is assumed to be the
             adsorption branch, as it is the most commonly modelled part, although may
@@ -228,7 +229,7 @@ class ModelIsotherm(Isotherm):
         return cls(isotherm_data,
                    model=model,
                    param_guess=param_guess,
-                   optimization_method=optimization_method,
+                   optimization_params=optimization_params,
                    branch=branch,
                    verbose=verbose,
 
@@ -243,7 +244,7 @@ class ModelIsotherm(Isotherm):
                            guess_model=False,
                            branch='ads',
                            param_guess=None,
-                           optimization_method="Nelder-Mead",
+                           optimization_params=dict(method='Nelder-Mead'),
                            verbose=False):
         """
         Constructs a ModelIsotherm using a the data from a PointIsotherm
@@ -263,8 +264,10 @@ class ModelIsotherm(Isotherm):
             Branch of isotherm to model. Defaults to adsorption branch.
         param_guess : dict, optional
             Starting guess for model parameters in the data fitting routine.
-        optimization_method : str, optional
-            Method in SciPy minimization function to use in fitting model to data.
+        optimization_params : dict, optional
+            Dictionary to be passed to the minimization function to use in fitting model to data.
+            See `here
+            <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
         verbose : bool
             Prints out extra information about steps taken.
         """
@@ -272,7 +275,7 @@ class ModelIsotherm(Isotherm):
         iso_params.pop('id', None)
         if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
-                                       optimization_method=optimization_method,
+                                       optimization_params=optimization_params,
                                        branch=branch,
                                        verbose=verbose,
 
@@ -283,7 +286,7 @@ class ModelIsotherm(Isotherm):
         return cls(isotherm.data(branch=branch),
                    model=model,
                    param_guess=param_guess,
-                   optimization_method=optimization_method,
+                   optimization_params=optimization_params,
                    branch=branch,
                    verbose=verbose,
 
@@ -295,7 +298,7 @@ class ModelIsotherm(Isotherm):
     def guess(cls, data,
               loading_key=None,
               pressure_key=None,
-              optimization_method="Nelder-Mead",
+              optimization_params=dict(method='Nelder-Mead'),
               branch='ads',
               verbose=False,
 
@@ -315,8 +318,10 @@ class ModelIsotherm(Isotherm):
         pressure_key : str
             Column of the pandas DataFrame where the pressure is stored.
 
-        optimization_method : str
-            Method in SciPy minimization function to use in fitting model to data.
+        optimization_params : dict
+            Dictionary to be passed to the minimization function to use in fitting model to data.
+            See `here
+            <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
         branch : ['ads', 'des'], optional
             The branch on which the model isotherm is based on. It is assumed to be the
             adsorption branch, as it is the most commonly modelled part, although may
@@ -334,7 +339,7 @@ class ModelIsotherm(Isotherm):
                                          pressure_key=pressure_key,
                                          model=model.name,
                                          param_guess=None,
-                                         optimization_method=optimization_method,
+                                         optimization_params=optimization_params,
                                          branch=branch,
                                          verbose=verbose,
 

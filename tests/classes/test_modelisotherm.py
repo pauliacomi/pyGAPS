@@ -42,8 +42,6 @@ class TestModelIsotherm(object):
                 isotherm_data,
                 loading_key='loading',
                 pressure_key='pressure',
-                param_guess=None,
-                optimization_method="Nelder-Mead",
                 **isotherm_param
             )
 
@@ -54,8 +52,6 @@ class TestModelIsotherm(object):
                 loading_key='loading',
                 pressure_key='pressure',
                 model='Wrong',
-                param_guess=None,
-                optimization_method="Nelder-Mead",
                 **isotherm_param
             )
 
@@ -67,7 +63,6 @@ class TestModelIsotherm(object):
                 pressure_key='pressure',
                 model='Henry',
                 param_guess={'K9': 'woof'},
-                optimization_method="Nelder-Mead",
                 **isotherm_param
             )
 
@@ -77,8 +72,6 @@ class TestModelIsotherm(object):
             loading_key='loading',
             pressure_key='pressure',
             model='Henry',
-            param_guess=None,
-            optimization_method="Nelder-Mead",
             **isotherm_param
         )
 
@@ -89,8 +82,6 @@ class TestModelIsotherm(object):
             pressure_key='pressure',
             model='Henry',
             branch='des',
-            param_guess=None,
-            optimization_method="Nelder-Mead",
             **isotherm_param
         )
 
@@ -101,7 +92,6 @@ class TestModelIsotherm(object):
             pressure_key='pressure',
             model='Henry',
             param_guess={'KH': 1.0},
-            optimization_method="Nelder-Mead",
             **isotherm_param
         )
 
@@ -120,8 +110,6 @@ class TestModelIsotherm(object):
             basic_isotherm,
             isotherm_data,
             model='Henry',
-            param_guess=None,
-            optimization_method="Nelder-Mead",
         )
 
         return isotherm
@@ -133,8 +121,6 @@ class TestModelIsotherm(object):
         isotherm = pygaps.ModelIsotherm.from_pointisotherm(
             basic_pointisotherm,
             model='Henry',
-            param_guess=None,
-            optimization_method="Nelder-Mead"
         )
 
         return isotherm

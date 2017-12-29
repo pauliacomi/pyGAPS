@@ -167,7 +167,7 @@ class Virial(IsothermModel):
         return {"KH": saturation_loading * langmuir_k,
                 "A": 0, "B": 0, "C": 0}
 
-    def fit(self, loading, pressure, param_guess, optimization_method, verbose=False):
+    def fit(self, loading, pressure, param_guess, optimization_method=None, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss
         function. Assigns parameters to self

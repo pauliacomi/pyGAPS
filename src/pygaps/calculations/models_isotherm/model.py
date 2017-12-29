@@ -106,7 +106,7 @@ class IsothermModel(object):
 
         return saturation_loading, langmuir_k
 
-    def fit(self, loading, pressure, param_guess, optimization_method, verbose=False):
+    def fit(self, loading, pressure, param_guess, optimization_params=dict(method="Nelder-Mead"), verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss
         function. Assigns parameters to self
@@ -121,8 +121,8 @@ class IsothermModel(object):
             The pressures of each point.
         param_guess : ndarray
             The initial guess for the fitting function.
-        optimization_method : str
-            Method in SciPy minimization function to use in fitting model to data.
+        optimization_params : dict
+            Dictionary to be passed to the minimization function to use in fitting model to data.
         verbose : bool, optional
             Prints out extra information about steps taken.
         """
@@ -146,7 +146,7 @@ class IsothermModel(object):
 
         # minimize RSS
         opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
-                                          method=optimization_method)
+                                          **optimization_params)
         if not opt_res.success:
             raise CalculationError(
                 "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
