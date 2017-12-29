@@ -43,7 +43,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False):
                                loading_basis='molar')
     enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
 
-    if not enthalpy:
+    if enthalpy is None:
         raise ParameterError('Could not find enthalpy column in isotherm')
 
     # get adsorbate properties
@@ -134,7 +134,7 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
     # Read data in
     enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
 
-    if not enthalpy:
+    if enthalpy is None:
         raise ParameterError('Could not find enthalpy column in isotherm')
 
     initial_enthalpy = enthalpy[0]
