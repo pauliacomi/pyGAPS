@@ -72,6 +72,7 @@ class WVST(IsothermModel):
     """
     #: Name of the model
     name = 'W-VST'
+    calculates = 'pressure'
 
     def __init__(self):
         """

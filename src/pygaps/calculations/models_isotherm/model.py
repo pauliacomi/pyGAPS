@@ -15,6 +15,7 @@ class IsothermModel(object):
 
     #: Name of the model
     name = None
+    calculates = None  # loading/pressure
 
     def __init__(self):
         """

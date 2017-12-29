@@ -120,7 +120,7 @@ class ModelIsotherm(Isotherm):
 
         # Start construction process
         self._instantiated = False
-        
+
         # Run base class constructor
         Isotherm.__init__(self,
                           pressure_key=pressure_key,
@@ -149,6 +149,10 @@ class ModelIsotherm(Isotherm):
         #: The pressure range on which the model was built.
         self.pressure_range = [min(data[pressure_key]),
                                max(data[pressure_key])]
+
+        #: The loading range on which the model was built.
+        self.loading_range = [min(data[loading_key]),
+                              max(data[loading_key])]
 
         #: Name of analytical model to fit to pure-component isotherm data
         #: adsorption isotherm.
@@ -434,25 +438,32 @@ class ModelIsotherm(Isotherm):
                 "ModelIsotherm is not based off this isotherm branch")
 
         # Generate pressure points
-        ret = numpy.linspace(self.pressure_range[0],
-                             self.pressure_range[1],
-                             points)
+        if self.model.calculates == 'loading':
+            ret = numpy.linspace(self.pressure_range[0],
+                                 self.pressure_range[1],
+                                 points)
 
-        # Convert if needed
-        if pressure_mode or pressure_unit:
-            if not pressure_mode:
-                pressure_mode = self.pressure_mode
-            if not pressure_unit:
-                pressure_unit = self.pressure_unit
+            # Convert if needed
+            if pressure_mode or pressure_unit:
+                if not pressure_mode:
+                    pressure_mode = self.pressure_mode
+                if not pressure_unit:
+                    pressure_unit = self.pressure_unit
 
-            ret = c_pressure(ret,
-                             mode_from=self.pressure_mode,
-                             mode_to=pressure_mode,
-                             unit_from=self.pressure_unit,
-                             unit_to=pressure_unit,
-                             adsorbate_name=self.adsorbate,
-                             temp=self.t_exp
-                             )
+                ret = c_pressure(ret,
+                                 mode_from=self.pressure_mode,
+                                 mode_to=pressure_mode,
+                                 unit_from=self.pressure_unit,
+                                 unit_to=pressure_unit,
+                                 adsorbate_name=self.adsorbate,
+                                 temp=self.t_exp
+                                 )
+        else:
+            ret = self.pressure_at(
+                self.loading(points),
+                pressure_mode=pressure_mode,
+                pressure_unit=pressure_unit,
+            )
 
         # Select required points
         if max_range is not None or min_range is not None:
@@ -513,13 +524,44 @@ class ModelIsotherm(Isotherm):
             raise ParameterError(
                 "ModelIsotherm is not based off this isotherm branch")
 
-        ret = self.loading_at(
-            self.pressure(points),
-            loading_unit=loading_unit,
-            loading_basis=loading_basis,
-            adsorbent_unit=adsorbent_unit,
-            adsorbent_basis=adsorbent_basis,
-        )
+        if self.model.calculates == 'pressure':
+            ret = numpy.linspace(self.loading_range[0],
+                                 self.loading_range[1],
+                                 points)
+
+            if adsorbent_basis or adsorbent_unit:
+                if not adsorbent_basis:
+                    adsorbent_basis = self.adsorbent_basis
+
+                ret = c_adsorbent(ret,
+                                  basis_from=self.adsorbent_basis,
+                                  basis_to=adsorbent_basis,
+                                  unit_from=self.adsorbent_unit,
+                                  unit_to=adsorbent_unit,
+                                  sample_name=self.sample_name,
+                                  sample_batch=self.sample_batch
+                                  )
+
+            if loading_basis or loading_unit:
+                if not loading_basis:
+                    loading_basis = self.loading_basis
+
+                ret = c_loading(ret,
+                                basis_from=self.loading_basis,
+                                basis_to=loading_basis,
+                                unit_from=self.loading_unit,
+                                unit_to=loading_unit,
+                                adsorbate_name=self.adsorbate,
+                                temp=self.t_exp
+                                )
+        else:
+            ret = self.loading_at(
+                self.pressure(points),
+                loading_unit=loading_unit,
+                loading_basis=loading_basis,
+                adsorbent_unit=adsorbent_unit,
+                adsorbent_basis=adsorbent_basis,
+            )
 
         # Select required points
         if max_range is not None or min_range is not None:

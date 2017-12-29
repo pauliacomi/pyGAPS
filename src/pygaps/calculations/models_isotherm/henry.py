@@ -23,6 +23,7 @@ class Henry(IsothermModel):
     """
     #: Name of the model
     name = 'Henry'
+    calculates = 'loading'
 
     def __init__(self):
         """

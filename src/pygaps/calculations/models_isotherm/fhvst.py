@@ -79,6 +79,7 @@ class FHVST(IsothermModel):
     """
     #: Name of the model
     name = 'FH-VST'
+    calculates = 'pressure'
 
     def __init__(self):
         """

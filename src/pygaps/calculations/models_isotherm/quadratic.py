@@ -38,6 +38,7 @@ class Quadratic(IsothermModel):
     """
     #: Name of the model
     name = 'Quadratic'
+    calculates = 'loading'
 
     def __init__(self):
         """

@@ -43,6 +43,7 @@ class DSLangmuir(IsothermModel):
     """
     #: Name of the model
     name = 'DSLangmuir'
+    calculates = 'loading'
 
     def __init__(self):
         """

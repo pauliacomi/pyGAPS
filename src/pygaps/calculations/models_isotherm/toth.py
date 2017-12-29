@@ -32,6 +32,7 @@ class Toth(IsothermModel):
     """
     #: Name of the model
     name = 'Toth'
+    calculates = 'loading'
 
     def __init__(self):
         """

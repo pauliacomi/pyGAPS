@@ -40,6 +40,7 @@ class TemkinApprox(IsothermModel):
     """
     #: Name of the model
     name = 'TemkinApprox'
+    calculates = 'loading'
 
     def __init__(self):
         """

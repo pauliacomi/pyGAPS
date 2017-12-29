@@ -45,6 +45,7 @@ class Virial(IsothermModel):
 
     #: Name of the model
     name = 'Virial'
+    calculates = 'pressure'
 
     def __init__(self):
         """

@@ -49,6 +49,7 @@ class JensenSeaton(IsothermModel):
     """
     #: Name of the model
     name = 'Jensen-Seaton'
+    calculates = 'loading'
 
     def __init__(self):
         """
