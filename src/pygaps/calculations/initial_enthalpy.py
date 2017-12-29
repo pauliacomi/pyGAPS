@@ -10,7 +10,7 @@ from ..graphing.calcgraph import initial_enthalpy_plot
 from ..utilities.exceptions import CalculationError
 
 
-def calc_initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False):
+def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False):
     """
     Calculates an initial enthalpy based on a compound
     method with three separate contributions:
@@ -105,7 +105,7 @@ def calc_initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=Fal
     return initial_enthalpy
 
 
-def calc_initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
+def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
     """
     Calculates the initial enthalpy of adsorption by assuming it is the same
     as the first point in the curve.

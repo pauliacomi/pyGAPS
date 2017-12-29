@@ -32,7 +32,7 @@ class TestInitialEnthalpy(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(text_file.read())
 
-        ienth_poly = pygaps.calc_initial_enthalpy_comp(
+        ienth_poly = pygaps.initial_enthalpy_comp(
             isotherm, 'enthalpy', verbose=True)
 
         err_relative = 0.1  # 10 percent
@@ -50,7 +50,7 @@ class TestInitialEnthalpy(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(text_file.read())
 
-        ienth_poly = pygaps.calc_initial_enthalpy_point(
+        ienth_poly = pygaps.initial_enthalpy_point(
             isotherm, 'enthalpy', verbose=True)
 
         err_relative = 0.1  # 10 percent

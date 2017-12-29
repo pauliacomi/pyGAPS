@@ -8,9 +8,10 @@ import pandas
 
 from ..classes.modelisotherm import ModelIsotherm
 from ..graphing.isothermgraphs import plot_iso
+from ..utilities.exceptions import CalculationError
 
 
-def calc_initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
+def initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
     """
     Calculates a henry constant based on the initial slope.
 
@@ -56,10 +57,11 @@ def calc_initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
 
     # logging for debugging
     if verbose:
+        print("Calculated K =", model_isotherm.model.params["KH"])
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
         print("Final adjusted root mean square difference:", adjrmsd)
-        model_isotherm.sample_name = 'model'
+        model_isotherm.sample_name = 'Henry model'
         plot_iso([isotherm, model_isotherm],
                  plot_type='isotherm', branch=['ads'], logx=True,
                  legend_list=['sample_name'])
@@ -70,7 +72,7 @@ def calc_initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
     return model_isotherm.model.params["KH"]
 
 
-def calc_initial_henry_virial(isotherm, verbose=False):
+def initial_henry_virial(isotherm, verbose=False):
     """
     Calculates an initial Henry constant based on fitting the virial equation.
 
@@ -92,10 +94,14 @@ def calc_initial_henry_virial(isotherm, verbose=False):
 
     if verbose:
         model_isotherm.sample_name = 'model'
-        plot_iso([isotherm, model_isotherm],
-                 plot_type='isotherm', branch=['ads'], logx=False,
-                 legend_list=['sample_name'])
+        try:
+            plot_iso([isotherm, model_isotherm],
+                     plot_type='isotherm', branch=['ads'], logx=False,
+                     legend_list=['sample_name'])
 
-        plt.show()
+            plt.show()
+        except CalculationError as err:
+            plt.close()
+            print('Cannot plot comparison due to model instability')
 
     return model_isotherm.model.params['KH']

@@ -30,7 +30,7 @@ class TestInitialHenry(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(text_file.read())
 
-        ihenry_slope = pygaps.calc_initial_henry_slope(
+        ihenry_slope = pygaps.initial_henry_slope(
             isotherm, max_adjrms=0.01, verbose=False)
 
         err_relative = 0.1  # 10 percent
@@ -48,7 +48,7 @@ class TestInitialHenry(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(text_file.read())
 
-        ihenry_virial = pygaps.calc_initial_henry_virial(
+        ihenry_virial = pygaps.initial_henry_virial(
             isotherm, verbose=False)
 
         err_relative = 0.1  # 10 percent
