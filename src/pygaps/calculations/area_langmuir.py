@@ -128,13 +128,13 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
         print("The slope of the Langmuir line: s =", round(slope, 3))
         print("The intercept of the Langmuir line: i =", round(intercept, 3))
-        print("Langmuir K =", int(round(langmuir_const, 3)))
+        print("K =", int(round(langmuir_const, 3)))
         print("Amount for a monolayer: n =",
-              round(n_monolayer, 5), "mol/unit")
+              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
         print("Minimum pressure point chosen is {0} and maximum is {1}".format(
             round(pressure[minimum], 3), round(pressure[maximum], 3)))
         print("Langmuir surface area: a =", int(
-            round(langmuir_area, 0)), "m²/unit")
+            round(langmuir_area, 0)), "m²/{}".format(isotherm.adsorbent_unit))
 
         # Generate plot of the langmuir points chosen
         langmuir_plot(pressure,
@@ -205,7 +205,7 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
             break
 
     if maximum - minimum < 3:
-        raise CalculationError("The isotherm does not have enough points in the chosen"
+        raise CalculationError("The isotherm does not have enough points in the chosen "
                                "region. Unable to calculate Langmuir area.")
 
     # calculate the Langmuir slope and intercept

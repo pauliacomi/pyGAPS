@@ -8,6 +8,7 @@ import scipy
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import initial_enthalpy_plot
 from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 
 
 def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False):
@@ -41,6 +42,9 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False):
                                loading_unit='mmol',
                                loading_basis='molar')
     enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
+
+    if not enthalpy:
+        raise ParameterError('Could not find enthalpy column in isotherm')
 
     # get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
@@ -129,6 +133,9 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
 
     # Read data in
     enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
+
+    if not enthalpy:
+        raise ParameterError('Could not find enthalpy column in isotherm')
 
     initial_enthalpy = enthalpy[0]
 

@@ -148,16 +148,18 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
             print('Could not find linear regions, attempt a manual limit')
         else:
             for index, result in enumerate(results):
-                print("For linear region {0}".format(index))
+                print("For linear region {0}".format(index + 1))
                 print("The slope is {0} and the intercept is {1}"
-                      " With a correlation coefficient of {2}".format(
+                      ", with a correlation coefficient of {2}".format(
                           round(result.get('slope'), 4),
                           round(result.get('intercept'), 4),
                           round(result.get('corr_coef'), 4)
                       ))
-                print("The adsorbed volume is {0} and the area is {1}".format(
+                print("The adsorbed volume is {} cm3/{} and the area is {} m2/{}".format(
                     round(result.get('adsorbed_volume'), 4),
-                    round(result.get('area'), 4)
+                    isotherm.adsorbent_unit,
+                    round(result.get('area'), 3),
+                    isotherm.adsorbent_unit,
                 ))
 
             plot_tp(t_curve, loading, results)

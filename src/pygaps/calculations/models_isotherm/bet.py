@@ -96,6 +96,7 @@ class BET(IsothermModel):
     """
     #: Name of the model
     name = 'BET'
+    calculates = 'loading'
 
     def __init__(self):
         """

@@ -70,7 +70,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     material with the same surface characteristics and with the same adsorbate.
     The :math:`\\alpha_s` values are obtained from this isotherm by regularisation with
     an adsorption amount at a specific relative pressure, usually taken as 0.4 since
-    nitrogen hysterisis loops theoretically close at this value
+    nitrogen hysteresis loops theoretically close at this value
 
     .. math::
 
@@ -157,7 +157,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
             for index, result in enumerate(results):
                 print("For linear region {0}".format(index))
                 print("The slope is {0} and the intercept is {1}"
-                      " With a correlation coefficient of {2}".format(
+                      ", with a correlation coefficient of {2}".format(
                           round(result.get('slope'), 4),
                           round(result.get('intercept'), 4),
                           round(result.get('corr_coef'), 4)

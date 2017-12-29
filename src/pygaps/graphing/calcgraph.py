@@ -194,7 +194,7 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
         label3 = '$\\alpha_s$ method'
     else:
         label1 = 't transform'
-        label2 = 'layer thickness (nm)'
+        label2 = 'Layer thickness (nm)'
         label3 = 't-plot method'
     ax1.plot(thickness_curve, loading,
              marker='', color='g', label=label1)
@@ -212,13 +212,13 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
                  result.get('slope') * max_lim + result.get('intercept')]
 
         ax1.plot(x_lim, y_lim, linestyle='--',
-                 color='black', label='linear' + str(index))
+                 color='black', label='linear' + str(index + 1))
 
     ax1.set_title(label3)
     ax1.set_xlim(xmin=0)
     ax1.set_ylim(ymin=0)
     ax1.set_xlabel(label2)
-    ax1.set_ylabel('amount adsorbed (mol/g)')
+    ax1.set_ylabel('Loading')
     ax1.legend(loc='best')
 
     return ax1
