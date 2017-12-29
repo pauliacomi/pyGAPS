@@ -7,8 +7,8 @@ import json
 import pandas
 
 from ..classes.isotherm import Isotherm
-from ..classes.pointisotherm import PointIsotherm
 from ..classes.modelisotherm import ModelIsotherm
+from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _MOLAR_UNITS

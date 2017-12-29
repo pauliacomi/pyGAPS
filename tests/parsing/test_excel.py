@@ -6,8 +6,8 @@ import pytest
 
 import pygaps
 
-from ..conftest import windows
 from ..conftest import parsing
+from ..conftest import windows
 
 
 @windows

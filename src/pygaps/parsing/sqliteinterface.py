@@ -18,7 +18,6 @@ from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
 from ..utilities.sqlite_utilities import build_update
 
-
 # ---------------------- General functions
 
 def _upload_one_all_columns(pth, table_id, columns, overwrite,
