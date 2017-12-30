@@ -24,17 +24,10 @@ before_install:
   - python --version
   - uname -a
   - lsb_release -a
-  # We can't rely on installed pandas/scipy/etc because they are usually out of date
-  # Install miniconda instead
-  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
-  - export PATH=/home/travis/miniconda/bin:$PATH
-  - conda update --yes conda
+  - pip install --upgrade pip setuptools wheel
+  - pip install --only-binary=numpy,scipy numpy scipy
 
 install:
-  # first install deps with conda
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas matplotlib
   # install tox
   - pip install tox
   # display versions of installed components
