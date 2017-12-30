@@ -390,7 +390,20 @@ class Isotherm(object):
         Splits isotherm data into an adsorption and desorption part and
         adds a column to mark the transition between the two.
         """
+        # Get a column where all increasing are False and all decreasing are True
         increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
-        increasing.rename('check', inplace=True)
+        # Get the first inflexion point (assume where des starts)
+        inflexion = increasing.idxmax()
 
-        return pandas.concat([_data, increasing], axis=1)
+        # If there is an inflexion point
+        if inflexion != 0:
+            # If the first point is where the isotherm starts decreasing
+            # Then it is a complete desorption curve
+            if inflexion == 1:
+                inflexion = 0
+
+            # Set all instances after the inflexion point to True
+            increasing[inflexion:] = True
+
+        # Return the new array with the branch column
+        return pandas.concat([_data, increasing.rename('branch')], axis=1)

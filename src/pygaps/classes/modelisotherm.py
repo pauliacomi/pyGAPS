@@ -139,9 +139,12 @@ class ModelIsotherm(Isotherm):
         data = self._splitdata(isotherm_data)
 
         if branch == 'ads':
-            data = data.loc[~data['check']]
+            data = data.loc[~data['branch']]
         elif branch == 'des':
-            data = data.loc[data['check']]
+            data = data.loc[data['branch']]
+
+        if data.empty:
+            raise ParameterError("The isotherm branch does not contain enough points")
 
         #: Branch the isotherm model is based on.
         self.branch = branch
@@ -223,7 +226,9 @@ class ModelIsotherm(Isotherm):
         verbose : bool
             Prints out extra information about steps taken.
         """
+        # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
+        # remove ID - a new one will be generated
         iso_params.pop('id', None)
 
         return cls(isotherm_data,
@@ -271,8 +276,11 @@ class ModelIsotherm(Isotherm):
         verbose : bool
             Prints out extra information about steps taken.
         """
+        # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
+        # remove ID - a new one will be generated
         iso_params.pop('id', None)
+
         if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
                                        optimization_params=optimization_params,

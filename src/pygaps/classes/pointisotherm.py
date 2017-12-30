@@ -43,6 +43,14 @@ class PointIsotherm(Isotherm):
         The title of the loading data in the DataFrame provided.
     other_keys : iterable
         Other pandas DataFrame columns which contain data to be stored.
+    branch : ['guess', ads', 'des', iterable], optional
+        The branch of the isotherm. The code will automatically attempt to
+        guess if there's an adsorption and desorption branch.
+        The user can instead tell the framework that all points are
+        part of an adsorption ('ads') or desorption ('des') curve.
+        Alternatively, an iterable can be passed which contains
+        detailed info for each data point if adsorption points ('False')
+        or desorption points ('True'). eg: [False, False, True, True...]
     sample_name : str
         Name of the sample on which the isotherm is measured.
     sample_batch : str
@@ -87,6 +95,7 @@ class PointIsotherm(Isotherm):
                  loading_key=None,
                  pressure_key=None,
                  other_keys=None,
+                 branch='guess',
 
                  adsorbent_basis="mass",
                  adsorbent_unit="g",
@@ -125,10 +134,30 @@ class PointIsotherm(Isotherm):
         #: List of column in the dataframe that contains other points.
         self.other_keys = other_keys
 
-        # Split the data in adsorption/desorption
-        self._data = self._splitdata(self._data)
+        # Deal with the branches
+        if branch == 'guess':
+            # Split the data in adsorption/desorption
+            self._data = self._splitdata(self._data)
+            if self.has_branch('ads'):
+                interp_branch = 'ads'
+            else:
+                interp_branch = 'des'
+        elif branch == 'ads':
+            self._data.insert(len(self._data.columns), 'branch', False)
+            interp_branch = 'ads'
+        elif branch == 'des':
+            self._data.insert(len(self._data.columns), 'branch', True)
+            interp_branch = 'des'
+        else:
+            try:
+                self._data.insert(len(self._data.columns), 'branch', branch)
+                if self.has_branch('ads'):
+                    interp_branch = 'ads'
+                else:
+                    interp_branch = 'des'
+            except Exception as e_info:
+                raise ParameterError(e_info)
 
-        interp_branch = 'ads'
         #: The internal interpolator for loading given pressure.
         self.l_interpolator = isotherm_interpolator('loading',
                                                     self.pressure(
@@ -504,11 +533,11 @@ class PointIsotherm(Isotherm):
 
         """
         if branch is None:
-            return self._data.drop('check', axis=1)
+            return self._data.drop('branch', axis=1)
         elif branch == 'ads':
-            return self._data.loc[~self._data['check']].drop('check', axis=1)
+            return self._data.loc[~self._data['branch']].drop('branch', axis=1)
         elif branch == 'des':
-            return self._data.loc[self._data['check']].drop('check', axis=1)
+            return self._data.loc[self._data['branch']].drop('branch', axis=1)
         else:
             return None
 
@@ -717,8 +746,7 @@ class PointIsotherm(Isotherm):
         bool
             Whether the data exists or not.
         """
-
-        if self.data(branch=branch) is None:
+        if self.data(branch=branch).empty:
             return False
         else:
             return True

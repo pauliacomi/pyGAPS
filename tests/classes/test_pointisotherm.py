@@ -45,6 +45,25 @@ class TestPointIsotherm(object):
         isotherm._data = isotherm._data[:5]
         assert iso_id != isotherm.id
 
+    @pytest.mark.parametrize('branch, expected', [
+        ('guess', 4.5),
+        ('des', 1.0),
+        ([False, False, True, True, True, True, True, True], 3.0),
+    ])
+    def test_isotherm_create_branches(self, isotherm_parameters, isotherm_data, branch, expected):
+        "Tests if isotherm branches are well specified"
+
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data,
+            loading_key='loading',
+            pressure_key='pressure',
+            other_keys=['enthalpy'],
+            branch=branch,
+            ** isotherm_parameters
+        )
+
+        assert isotherm.pressure(branch='des')[0] == expected
+
     def test_isotherm_equality(self, isotherm_parameters, isotherm_data, basic_pointisotherm):
         "Checks isotherm id's are unique"
 
