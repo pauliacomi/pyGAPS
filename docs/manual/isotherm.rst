@@ -78,6 +78,19 @@ supported.
         'xrd_peak_1' : [0, 0, 1, 2, 2, 1, 0],
     })
 
+
+The code does its best to attempt to guess whether the data passed is part of
+an adsorption branch, desorption branch or has both. It does this by looking
+at whether pressure is increasing or decreasing between two consecutive points.
+It then marks the particular branch internally.
+
+If the data isn't well conditioned, this functionality will likely not produce
+good results. In this case, the user can specify whether the data passed in is
+an adsorption or desorption branch by using the ``branch`` argument.
+
+What's more, the user can specify where the branches are located by passing
+an iterable as the ``branch`` parameter. See more in the reference.
+
 .. caution::
 
     The data in the columns is assumed to be free of errors and anomalies. Negative
@@ -172,6 +185,8 @@ instantiation is below, with explanations.
         'DOI'   : '10.000/mydoi',       # Unknown / user specific
         'something' : 'something',      # Unknown / user specific
     )
+
+
 
 Creating a ModelIsotherm
 ::::::::::::::::::::::::
