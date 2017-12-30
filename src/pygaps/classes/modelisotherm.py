@@ -649,11 +649,9 @@ class ModelIsotherm(Isotherm):
         if pressure_mode or pressure_unit:
             if not pressure_mode:
                 pressure_mode = self.pressure_mode
-            if not pressure_unit:
-                pressure_unit = self.pressure_unit
-            if not pressure_unit and self.pressure_mode == 'relative':
-                raise ParameterError("Must specify a pressure unit if the input"
-                                     " is in an absolute mode")
+            if pressure_mode == 'absolute' and not pressure_unit:
+                    raise ParameterError("Must specify a pressure unit if the input"
+                                         " is in an absolute mode")
 
             pressure = c_pressure(pressure,
                                   mode_from=pressure_mode,

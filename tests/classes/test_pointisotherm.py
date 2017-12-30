@@ -209,16 +209,18 @@ class TestPointIsotherm(object):
             0] == pytest.approx(0.001, 1e-5)
 
         # Loading basis specified
-        assert basic_pointisotherm.loading(branch='ads', loading_basis='volume')[
-            0] == pytest.approx(0.8764, 1e-3)
+        assert basic_pointisotherm.loading(branch='ads',
+                                           loading_basis='volume',
+                                           loading_unit='cm3')[0] == pytest.approx(0.8764, 1e-3)
 
         # Adsorbent unit specified
         assert basic_pointisotherm.loading(branch='ads', adsorbent_unit='kg')[
             0] == pytest.approx(1000, 1e-3)
 
         # Adsorbent basis specified
-        assert basic_pointisotherm.loading(branch='ads', adsorbent_basis='volume')[
-            0] == pytest.approx(10, 1e-3)
+        assert basic_pointisotherm.loading(branch='ads',
+                                           adsorbent_basis='volume',
+                                           adsorbent_unit='cm3')[0] == pytest.approx(10, 1e-3)
 
         # All specified
         assert numpy.isclose(basic_pointisotherm.loading(branch='ads',
@@ -271,9 +273,9 @@ class TestPointIsotherm(object):
         (100000, 1, dict(pressure_unit='Pa')),
         (0.5, 3.89137, dict(pressure_mode='relative')),
         (1, 0.001, dict(loading_unit='mol')),
-        (1, 0.87648, dict(loading_basis='volume')),
+        (1, 0.87648, dict(loading_basis='volume', loading_unit='cm3')),
         (1, 1000, dict(adsorbent_unit='kg')),
-        (1, 10, dict(adsorbent_basis='volume')),
+        (1, 10, dict(adsorbent_basis='volume', adsorbent_unit='cm3')),
         (0.5, 1090.11, dict(pressure_unit='Pa',
                             pressure_mode='relative',
                             loading_unit='kg',
@@ -394,18 +396,18 @@ class TestPointIsotherm(object):
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
-    @pytest.mark.parametrize('basis, multiplier', [
-                            ('molar', 1),
-                            ('mass', 0.028),
-        pytest.param("bad_mode", 1,
+    @pytest.mark.parametrize('basis, unit,multiplier', [
+                            ('molar', 'mmol', 1),
+                            ('mass', 'g', 0.028),
+        pytest.param("bad_mode", 'unit', 1,
                                 marks=pytest.mark.xfail),
     ])
     def test_isotherm_convert_loading_basis(self, basic_pointisotherm, use_sample,
-                                            isotherm_data, basis, multiplier):
+                                            isotherm_data, basis, unit, multiplier):
         """Checks that the loading basis conversion function work as expected"""
 
         # Do the conversion
-        basic_pointisotherm.convert_loading(basis_to=basis)
+        basic_pointisotherm.convert_loading(basis_to=basis, unit_to=unit)
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.loading_key] * multiplier
@@ -433,18 +435,18 @@ class TestPointIsotherm(object):
         # Check if one datapoint is now as expected
         assert iso_converted[0] == pytest.approx(converted[0], 0.01)
 
-    @pytest.mark.parametrize('basis, multiplier', [
-                            ('mass', 1),
-                            ('volume', 10),
-        pytest.param("bad_mode", 1,
+    @pytest.mark.parametrize('basis, unit, multiplier', [
+                            ('mass', 'g', 1),
+                            ('volume', 'cm3', 10),
+        pytest.param("bad_mode", 'unit', 1,
                                 marks=pytest.mark.xfail),
     ])
     def test_isotherm_convert_adsorbent_basis(self, basic_pointisotherm, use_sample,
-                                              isotherm_data, basis, multiplier):
+                                              isotherm_data, basis, unit, multiplier):
         """Checks that the loading basis conversion function work as expected"""
 
         # Do the conversion
-        basic_pointisotherm.convert_adsorbent(basis_to=basis)
+        basic_pointisotherm.convert_adsorbent(basis_to=basis, unit_to=unit)
 
         # Convert initial data
         converted = isotherm_data[basic_pointisotherm.loading_key] * multiplier

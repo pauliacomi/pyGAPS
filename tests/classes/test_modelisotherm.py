@@ -188,15 +188,15 @@ class TestModelIsotherm(object):
 
         # Loading basis specified
         assert numpy.isclose(basic_modelisotherm.loading(
-            5, loading_basis='mass')[0], 0.02801, 1e-4, 1e-4)
+            5, loading_basis='mass', loading_unit='g')[0], 0.02801, 1e-4, 1e-4)
 
         # Adsorbent unit specified
         assert basic_modelisotherm.loading(5, adsorbent_unit='kg')[
             0] == pytest.approx(1000, 1e-5)
 
         # Adsorbent basis specified
-        assert basic_modelisotherm.loading(5, adsorbent_basis='volume')[
-            0] == pytest.approx(10, 1e-5)
+        assert basic_modelisotherm.loading(5, adsorbent_basis='volume',
+                                           adsorbent_unit='cm3')[0] == pytest.approx(10, 1e-5)
 
         # Range specified
         assert basic_modelisotherm.loading(5, min_range=2, max_range=5)[
@@ -236,7 +236,7 @@ class TestModelIsotherm(object):
 
         # Loading basis specified
         loading_lbasis = basic_modelisotherm.loading_at(
-            1, loading_basis='mass')
+            1, loading_basis='mass', loading_unit='g')
         # Loading basis specified
         assert numpy.isclose(loading_lbasis, 0.02801, 1e-4, 1e-4)
 
@@ -247,7 +247,7 @@ class TestModelIsotherm(object):
 
         # Adsorbent basis specified
         loading_bads = basic_modelisotherm.loading_at(
-            1, adsorbent_basis='volume')
+            1, adsorbent_basis='volume', adsorbent_unit='cm3')
         assert loading_bads == pytest.approx(10, 1e-5)
 
         return

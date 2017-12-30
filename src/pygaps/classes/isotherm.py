@@ -136,37 +136,37 @@ class Isotherm(object):
 
         if adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for adsorbent is not an option. See viable"
+                "Basis selected for adsorbent is not an option. See viable "
                 "values: {0}".format(_MATERIAL_MODE))
 
         if loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for loading is not an option. See viable"
+                "Basis selected for loading is not an option. See viable "
                 "values: {0}".format(_MATERIAL_MODE))
 
         if pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
-                "Mode selected for pressure is not an option. See viable"
+                "Mode selected for pressure is not an option. See viable "
                 "values: {0}".format(_PRESSURE_MODE))
 
         # Units
-        if loading_unit is None or pressure_unit is None or adsorbent_unit is None:
+        if loading_unit is None or adsorbent_unit is None:
             raise ParameterError(
                 "One of the units is not specified.")
 
-        if loading_unit not in _MOLAR_UNITS:
+        if loading_unit not in _MATERIAL_MODE[loading_basis]:
             raise ParameterError(
-                "Unit selected for loading is not an option. See viable"
+                "Unit selected for loading is not an option. See viable "
                 "values: {0}".format(_MOLAR_UNITS))
 
-        if pressure_unit not in _PRESSURE_UNITS:
+        if pressure_mode == 'absolute' and pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
-                "Unit selected for pressure is not an option. See viable"
+                "Unit selected for pressure is not an option. See viable "
                 "values: {0}".format(_PRESSURE_UNITS))
 
-        if adsorbent_unit not in _VOLUME_UNITS and adsorbent_unit not in _MASS_UNITS:
+        if adsorbent_unit not in _MATERIAL_MODE[adsorbent_basis]:
             raise ParameterError(
-                "Unit selected for adsorbent is not an option. See viable"
+                "Unit selected for adsorbent is not an option. See viable "
                 "values: {0} {1}".format(_VOLUME_UNITS, _MASS_UNITS))
 
         # Column titles
@@ -185,8 +185,12 @@ class Isotherm(object):
         self.loading_unit = str(loading_unit)
         #: Mode for the pressure.
         self.pressure_mode = str(pressure_mode)
-        #: Units for pressure.
-        self.pressure_unit = str(pressure_unit)
+        if pressure_mode == 'relative':
+            #: Units for pressure.
+            self.pressure_unit = None
+        else:
+            #: Units for pressure.
+            self.pressure_unit = str(pressure_unit)
 
         # Save column names
         #: Name of column in the dataframe that contains adsorbed amount.

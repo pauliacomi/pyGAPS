@@ -314,8 +314,6 @@ class PointIsotherm(Isotherm):
         else:
             if not mode_to:
                 mode_to = self.pressure_mode
-            if not unit_to:
-                unit_to = self.pressure_unit
 
             self._data[self.pressure_key] = c_pressure(
                 self._data[self.pressure_key],
@@ -326,8 +324,10 @@ class PointIsotherm(Isotherm):
                 adsorbate_name=self.adsorbate,
                 temp=self.t_exp)
 
-            if unit_to != self.pressure_unit:
+            if unit_to != self.pressure_unit and mode_to == 'absolute':
                 self.pressure_unit = unit_to
+            else:
+                self.pressure_unit = None
             if mode_to != self.pressure_mode:
                 self.pressure_mode = mode_to
 
@@ -827,9 +827,7 @@ class PointIsotherm(Isotherm):
         if pressure_mode or pressure_unit:
             if not pressure_mode:
                 pressure_mode = self.pressure_mode
-            if not pressure_unit:
-                pressure_unit = self.pressure_unit
-            if not pressure_unit and self.pressure_mode == 'relative':
+            if pressure_mode == 'absolute' and not pressure_unit:
                 raise ParameterError("Must specify a pressure unit if the input"
                                      " is in an absolute mode")
 

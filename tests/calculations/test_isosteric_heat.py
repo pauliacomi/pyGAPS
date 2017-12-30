@@ -52,7 +52,7 @@ class TestIsostericHeat(object):
         isotherms[0].sample_name = isotherms[1].sample_name
 
         # Check same basis
-        isotherms[0].convert_adsorbent(basis_to='volume')
+        isotherms[0].convert_adsorbent(basis_to='volume', unit_to='cm3')
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.isosteric_heat(isotherms)
