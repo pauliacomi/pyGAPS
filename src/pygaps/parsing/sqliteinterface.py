@@ -20,6 +20,7 @@ from ..utilities.sqlite_utilities import build_update
 
 # ---------------------- General functions
 
+
 def _upload_one_all_columns(pth, table_id, columns, overwrite,
                             table_name, input_dict, name_string):
 
