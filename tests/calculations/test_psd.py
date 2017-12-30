@@ -60,7 +60,7 @@ class TestPSD(object):
         result_dict = pygaps.mesopore_size_distribution(
             isotherm,
             psd_model=method,
-            branch='desorption',
+            branch='des',
             verbose=True)
 
         # max_error = 0.1  # 10 percent

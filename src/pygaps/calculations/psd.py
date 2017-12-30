@@ -44,7 +44,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     Other Parameters
     ----------------
-    branch : {'adsorption', 'desorption'}, optional
+    branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to desorption.
     kelvin_model : callable, optional
         A custom user kelvin model. It should be a callable that only takes
@@ -109,10 +109,10 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     branch = model_parameters.get('branch')
     if branch is None:
-        branch = 'desorption'
-    if branch not in ['adsorption', 'desorption']:
+        branch = 'des'
+    if branch not in ['ads', 'des']:
         raise ParameterError("Branch {} not an option for psd.".format(branch),
-                             "Select either 'adsorption' or 'desorption'")
+                             "Select either 'ads' or 'des'")
 
     # Default thickness model
     thickness_model = model_parameters.get('thickness_model')
@@ -126,14 +126,14 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     surface_tension = adsorbate.surface_tension(isotherm.t_exp)
 
     # Read data in, depending on branch requested
-    if branch == 'adsorption':
+    # If on an adsorption branch, data will be reversed
+    if branch == 'ads':
         loading = isotherm.loading(branch='ads',
                                    loading_basis='molar',
                                    loading_unit='mmol')[::-1]
         pressure = isotherm.pressure(branch='ads',
                                      pressure_mode='relative')[::-1]
-    # If on desorption branch, data will be reversed
-    elif branch == 'desorption':
+    elif branch == 'des':
         loading = isotherm.loading(branch='ads',
                                    loading_basis='molar',
                                    loading_unit='mmol')
@@ -204,7 +204,8 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     Other Parameters
     ----------------
     adsorbate_model : obj('dict')
-        The adsorbate model to use for PSD, If null, properties are taken from the adsorbate in the list.
+        The adsorbate model to use for PSD, If null, properties are taken 
+        from the adsorbate in the list.
     adsorbent_model : obj('str') or obj('dict')
         The adsorbent model to use for PSD, It defaults to Carbon(HK).
 

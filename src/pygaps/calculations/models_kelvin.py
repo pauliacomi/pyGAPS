@@ -13,7 +13,7 @@ def meniscus_geometry(branch, pore_geometry):
 
     Parameters
     ----------
-    branch : {'adsorption', 'desorption'}
+    branch : {'ads', 'des'}
         Branch of the isotherm used.
     geometry : {'slit', 'cylinder', 'cylinder'}
         Geometry of the pore.
@@ -23,14 +23,14 @@ def meniscus_geometry(branch, pore_geometry):
     str
         Geometry of the meniscus in the pore.
     """
-    if branch == 'adsorption':
+    if branch == 'ads':
         if pore_geometry == 'cylinder':
             m_geometry = 'cylinder'
         elif pore_geometry == 'sphere':
             m_geometry = 'sphere'
         elif pore_geometry == 'slit':
             m_geometry = 'cylinder'
-    if branch == 'desorption':
+    if branch == 'des':
         if pore_geometry == 'cylinder':
             m_geometry = 'sphere'
         elif pore_geometry == 'sphere':
@@ -67,7 +67,7 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     Returns
     -------
     float
-        Kelving radius(nm).
+        Kelvin radius(nm).
 
     Notes
     -----

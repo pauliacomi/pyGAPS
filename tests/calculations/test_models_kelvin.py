@@ -18,12 +18,12 @@ class TestKelvinModels(object):
     """
 
     @pytest.mark.parametrize('branch, pore, geometry', [
-        ('adsorption', 'slit', 'cylinder'),
-        ('adsorption', 'cylinder', 'cylinder'),
-        ('adsorption', 'sphere', 'sphere'),
-        ('desorption', 'slit', 'slit'),
-        ('desorption', 'cylinder', 'sphere'),
-        ('desorption', 'sphere', 'sphere'),
+        ('ads', 'slit', 'cylinder'),
+        ('ads', 'cylinder', 'cylinder'),
+        ('ads', 'sphere', 'sphere'),
+        ('des', 'slit', 'slit'),
+        ('des', 'cylinder', 'sphere'),
+        ('des', 'sphere', 'sphere'),
     ])
     def test_meniscus_geometry(self, branch, pore, geometry):
 
