@@ -30,7 +30,8 @@ before_install:
   - uname -a
   - lsb_release -a
   - pip install --upgrade pip setuptools wheel
-  - pip install --only-binary=numpy,scipy numpy>=1.13 scipy
+  - pip install --only-binary=numpy 'numpy>=1.13' --force-reinstall
+  - pip install --only-binary=scipy scipy
 
 install:
   # install tox
