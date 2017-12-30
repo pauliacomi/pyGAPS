@@ -32,7 +32,7 @@ before_install:
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy 'numpy>=1.13' --force-reinstall
   - pip install --only-binary=scipy scipy
-  - pip install --only-binary=pandas pandas
+  - pip install --only-binary=pandas 'pandas>=0.21' -- force-reinstall
 
 install:
   # install tox
