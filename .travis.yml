@@ -40,6 +40,8 @@ install:
   - easy_install --version
   - pip --version
   - tox --version
+  - pip freeze | grep numpy
+  - pip freeze | grep scipy
 
 before_script:
   - export DISPLAY=:99.0
