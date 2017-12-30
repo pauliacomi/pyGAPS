@@ -134,10 +134,10 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         pressure = isotherm.pressure(branch='ads',
                                      pressure_mode='relative')[::-1]
     elif branch == 'des':
-        loading = isotherm.loading(branch='ads',
+        loading = isotherm.loading(branch='des',
                                    loading_basis='molar',
                                    loading_unit='mmol')
-        pressure = isotherm.pressure(branch='ads',
+        pressure = isotherm.pressure(branch='des',
                                      pressure_mode='relative')
     if loading is None:
         raise ParameterError("The isotherm does not have the required branch for"
@@ -178,7 +178,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist, method=psd_model)
+        psd_plot(pore_widths, pore_dist, method=psd_model, xmin=1.5)
 
     return result_dict
 
@@ -204,7 +204,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     Other Parameters
     ----------------
     adsorbate_model : obj('dict')
-        The adsorbate model to use for PSD, If null, properties are taken 
+        The adsorbate model to use for PSD, If null, properties are taken
         from the adsorbate in the list.
     adsorbent_model : obj('str') or obj('dict')
         The adsorbent model to use for PSD, It defaults to Carbon(HK).
