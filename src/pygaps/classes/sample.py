@@ -1,12 +1,10 @@
 """
-This module contains the experimental sample class
+This module contains the sample (or material) class.
 """
 
 import pygaps
 
 from ..utilities.exceptions import ParameterError
-
-_MATERIAL_MODE = ["mass", "volume", "molar"]
 
 
 class Sample(object):
@@ -15,71 +13,78 @@ class Sample(object):
     Its purpose is to store properties such as adsorbent name,
     and batch.
 
+
     Parameters
     ----------
-    info : dict
-        To initially construct the class, use a dictionary of the form::
+    name : str
+        The name of the sample.
+    batch : str
+        A batch number or secondary identifier for the material.
 
-            adsorbent_info = {
-                'name' : 'Zeolite-1',
-                'batch' : '1234',
-
-                'owner' : 'John Doe',
-                'properties' : {
-                    'density' : 1.5
-                    'x' : 'y'
-                }
-            }
-
-        The info dictionary must contain an entry for 'name' and 'batch'.
+    Other Parameters
+    ----------------
+    contact : str
+        Sample contact name.
+    source : str
+        Sample source laboratory.
+    project : str
+        Sample associated project.
+    struct : str
+        Sample structure.
+    type : str
+        Sample type (MOF/carbon/zeolite etc).
+    form : str
+        Sample form (powder/ pellet etc).
+    comment : str
+        Sample comments.
+    density : float
+        Sample density.
+    molar_mass
+        Sample molar mass.
 
     Notes
     -----
 
-    The members of the properties dictionary are left at the discretion
-    of the user. There are, however, some unique properties which are used
-    by calculations in other modules:
-
-        * density
+    The members of the properties are left at the discretion
+    of the user. There are, however, some unique properties
+    which can be set as seen above.
 
     '''
+    _named_params = [
+        'contact',
+        'source',
+        'project',
+        'struct',
+        'type',
+        'form',
+        'comment',
+    ]
 
-    def __init__(self, sample_info):
+    def __init__(self, **sample_info):
         """
-        Instantiation is done by passing a dictionary with the parameters.
+        Instantiation is done by passing all the parameters.
         """
         # TODO Should make the sample unique using
         # some sort of convention id
 
-        # Required sample parameters cheks
+        # Required sample parameters checks
         if any(k not in sample_info
-                for k in ('name', 'batch')):
+               for k in ('name', 'batch')):
             raise ParameterError(
-                "Sample class MUST have the following information in the properties dictionary: 'name', 'batch'")
+                "Sample class MUST have the following information in the "
+                "properties dictionary: 'name', 'batch'")
 
         #: Sample name
-        self.name = sample_info.get('name')
+        self.name = sample_info.pop('name')
         #: Sample batch
-        self.batch = sample_info.get('batch')
+        self.batch = sample_info.pop('batch')
 
-        #: Sample owner nickname
-        self.owner = sample_info.get('owner')
-        #: Sample contact nickname
-        self.contact = sample_info.get('contact')
-        #: Sample source laboratory
-        self.source = sample_info.get('source')
-        #: Sample project
-        self.project = sample_info.get('project')
-        #: Sample structure
-        self.struct = sample_info.get('struct')
-        #: Sample type (MOF/carbon/zeolite etc)
-        self.type = sample_info.get('type')
-        #: Sample form (powder/ pellet etc)
-        self.form = sample_info.get('form')
-        #: Sample comments
-        self.comment = sample_info.get('comment')
-        #: Sample properties
-        self.properties = sample_info.get('properties')
+        for parameter in self._named_params:
+            if parameter in sample_info:
+                setattr(self, parameter, sample_info.pop(parameter))
+
+        #: Rest of sample properties
+        self.properties = sample_info
 
         return
 
@@ -91,19 +96,19 @@ class Sample(object):
         Parameters
         ----------
         sample_name : str
-            the name of the material to search
+            The name of the material to search.
         sample_batch : str
-            the batch of the material to search
+            The batch of the material to search.
 
         Returns
         -------
         Sample
-            instance of class
+            Instance of class.
 
         Raises
         ------
         ``ParameterError``
-            if it does not exist or cannot be calculated
+            if it does not exist or cannot be calculated.
         """
         # Checks to see if sample exists in master list
         sample = next(
@@ -124,7 +129,7 @@ class Sample(object):
 
     def __str__(self):
         '''
-        Prints a short summary of all the sample parameters
+        Prints a short summary of all the sample parameters.
         '''
         string = ""
 
@@ -132,22 +137,11 @@ class Sample(object):
             string += ("Sample:" + self.name + '\n')
         if self.batch:
             string += ("Batch:" + self.batch + '\n')
-        if self.owner:
-            string += ("Owner:" + self.owner + '\n')
-        if self.contact:
-            string += ("Contact:" + self.contact + '\n')
-        if self.source:
-            string += ("Source:" + self.source + '\n')
-        if self.project:
-            string += ("Project:" + self.project + '\n')
-        if self.struct:
-            string += ("Structure:" + self.struct + '\n')
-        if self.type:
-            string += ("Type:" + self.type + '\n')
-        if self.form:
-            string += ("Form:" + self.form + '\n')
-        if self.comment:
-            string += ("Comments:" + self.comment + '\n')
+
+        for parameter in self._named_params:
+            if hasattr(self, parameter):
+                string += (parameter.title() + ":" +
+                           getattr(self, parameter) + '\n')
 
         if self.properties:
             for prop in self.properties:
@@ -158,94 +152,56 @@ class Sample(object):
     def to_dict(self):
         """
         Returns a dictionary of the sample class
-        Is the same dictionary that was used to create it
+        Is the same dictionary that was used to create it.
 
         Returns
         -------
         dict
-            dictionary of all parameters
+            Dictionary of all parameters.
         """
 
         parameters_dict = {
             'name': self.name,
-            'batch': self.batch,
-            'owner': self.owner,
-            'contact': self.contact,
-            'source': self.source,
-            'project': self.project,
-            'struct': self.struct,
-            'type': self.type,
-            'form': self.form,
-            'comment': self.comment,
-            'properties': self.properties,
+            'batch': self.batch
         }
+
+        for parameter in self._named_params:
+            if hasattr(self, parameter):
+                parameters_dict.update({parameter: getattr(self, parameter)})
+
+        parameters_dict.update(self.properties)
 
         return parameters_dict
 
     def get_prop(self, prop):
         """
-        Returns a property from the 'properties' dictionary
+        Returns a property from the 'properties' dictionary.
+        Or a named property if requested.
 
         Parameters
         ----------
         prop : str
-            property name desired
+            Property name desired.
 
         Returns
         -------
         str/float
-            Value of property in the properties dict
+            Value of property in the properties dict.
 
         Raises
         ------
         ``ParameterError``
-            if it does not exist
+            if it does not exist.
         """
 
         req_prop = self.properties.get(prop)
         if req_prop is None:
-            raise ParameterError("The {0} entry was not found in the "
-                                 "sample.properties dictionary "
-                                 "for sample {1} {2}".format(
-                                     prop, self.name, self.batch))
+            try:
+                req_prop = getattr(self, prop)
+            except AttributeError:
+                raise ParameterError("The {0} entry was not found in the "
+                                     "sample properties "
+                                     "for sample {1} {2}".format(
+                                         prop, self.name, self.batch))
 
         return req_prop
-
-    def convert_basis(self, basis_to, basis_value, unit=None):
-        """
-        Converts mass to volume of adsorbent and vice-versa.
-        Requires a `density` key in the sample properties dictionary.
-
-        Parameters
-        ----------
-        basis_to : {'mass', 'volume'}
-            Whether to convert to a mass basis from a volume basis or
-            to a volume basis from a mass basis
-        basis_value : float
-            The weight or the volume of the sample, respectively
-        unit : str, optional
-            Unit in which the basis is to be returned. Defaults to
-            grams for mass and to cm3 for volume
-
-        Returns
-        -------
-        float
-            Value in the basis requested.
-
-        Raises
-        ------
-        ``ParameterError``
-            If the mode selected is not an option.
-        """
-
-        if basis_to not in _MATERIAL_MODE:
-            raise ParameterError(
-                "Mode selected for adsorbent is not an option. Viable"
-                "modes are {}".format(_MATERIAL_MODE))
-
-        if basis_to == 'mass':
-            sign = 1
-        elif basis_to == 'volume':
-            sign = -1
-
-        return basis_value * self.get_prop('density') ** sign

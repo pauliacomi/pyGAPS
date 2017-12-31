@@ -62,7 +62,7 @@ project = 'pygaps'
 year = '2017'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '0.9.3'
+version = release = '1.0.0'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.']

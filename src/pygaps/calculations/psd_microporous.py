@@ -18,18 +18,18 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     Parameters
     ----------
     loading : array
-        adsorbed amount in mmol/g
+        Adsorbed amount in mmol/g.
     pressure : array
-        relative pressure
+        Relative pressure.
     temperature : float
-        temperature of the experiment, in K
+        Temperature of the experiment, in K.
     pore_geometry : str
-        the geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'
+        The geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'.
     maximum_adsorbed : float
         The amount of adsorbate filling the micropores. If the material
-        has only micropores, it is taken as the volume adsorbed at p/p0 = 0.9
+        has only micropores, it is taken as the volume adsorbed at p/p0 = 0.9.
     adsorbate_properties : dict
-        properties for the adsorbate in the form of::
+        Properties for the adsorbate in the form of::
 
             adsorbate_properties = dict(
                 'molecular_diameter'=0,           # nm
@@ -39,22 +39,22 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
             )
 
     adsorbent_properties : dict
-        properties for the adsorbate in the same form
+        Properties for the adsorbate in the same form
         as 'adsorbate_properties'. A list of common models
-        can be found in .calculations.adsorbent_parameters
+        can be found in .calculations.adsorbent_parameters.
 
     Returns
     -------
     pore widths : array
-        the widths of the pores
+        The widths of the pores.
     pore_dist : array
-        the distributions for each width
+        The distributions for each width.
 
     Notes
     -----
 
     *Description*
-    The H-K method [#]_ attempts to desribe the adsorption within pores by calculation
+    The H-K method [#]_ attempts to describe the adsorption within pores by calculation
     of the average potential energy for a pore. The method starts by assuming the
     relationship between the gas phase as being:
 
@@ -136,7 +136,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     """
 
-    # Paramter checks
+    # Parameter checks
     if pore_geometry == 'slit':
         pass
     elif pore_geometry == 'cylinder':

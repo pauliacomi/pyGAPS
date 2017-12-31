@@ -1,21 +1,21 @@
 """
-This module contains general functions for string transformations
+This module contains general functions for string transformations.
 """
 
 
 def convert_chemformula(string):
     """
-    Converts a chemical formula string to a matplotlib parsable format (latex)
+    Converts a chemical formula string to a matplotlib parsable format (latex).
 
     Parameters
     ----------
     string : str
-        string to process
+        String to process.
 
     Returns
     -------
     str
-        processed string
+        Processed string.
     """
 
     inner = []

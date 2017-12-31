@@ -11,6 +11,7 @@ Reference
 
    classes
    calculations
+   models
    interfaces
    plotting
    utilities

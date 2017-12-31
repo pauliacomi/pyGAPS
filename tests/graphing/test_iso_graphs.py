@@ -8,10 +8,11 @@ from matplotlib.testing.decorators import cleanup
 import pygaps
 
 
-@cleanup
 @pytest.mark.slowtest
 class TestIsothermGraphs(object):
+    """Tests regular isotherm graphs"""
 
+    @cleanup
     def test_checks(self, basic_pointisotherm, basic_adsorbate):
 
         pygaps.ADSORBATE_LIST.append(basic_adsorbate)
@@ -35,7 +36,11 @@ class TestIsothermGraphs(object):
 
         pygaps.plot_iso([basic_pointisotherm], x_range=(0, 4))
 
-        pygaps.plot_iso([basic_pointisotherm], y1_range=(3, 6))
+        pygaps.plot_iso([basic_pointisotherm], x_range=(0, None))
+
+        pygaps.plot_iso([basic_pointisotherm], y1_range=(3, None))
+
+        pygaps.plot_iso([basic_pointisotherm], y1_range=(3, None))
 
         pygaps.plot_iso([basic_pointisotherm], legend_list=[
                         'sample_name', 'sample_batch', 'adsorbate', 't_exp'])
@@ -48,6 +53,6 @@ class TestIsothermGraphs(object):
                         plot_type='property', secondary_key='enthalpy')
 
         pygaps.plot_iso([basic_pointisotherm],
-                        plot_type='combo', secondary_key='enthalpy')
+                        plot_type='combined', secondary_key='enthalpy')
 
         return

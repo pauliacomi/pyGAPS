@@ -1,5 +1,5 @@
 """
-This module calculates the isosteric heat for isotherms at different temperatures
+This module calculates the isosteric heat for isotherms at different temperatures.
 """
 
 import numpy
@@ -86,13 +86,15 @@ def isosteric_heat(isotherms, loading_points=None, verbose=False):
             'Isotherms passed are not measured on the same material and batch.')
 
     # Check same basis
-    if not all(x.basis_adsorbent == isotherms[0].basis_adsorbent for x in isotherms):
+    if not all(x.adsorbent_basis == isotherms[0].adsorbent_basis for x in isotherms):
         raise ParameterError(
             'Isotherm passed are in a different adsorbent basis.')
 
     # Get minimum and maximum loading for each isotherm
-    min_loading = max([min(x.loading(unit='mmol')) for x in isotherms])
-    max_loading = min([max(x.loading(unit='mmol')) for x in isotherms])
+    min_loading = max(
+        [min(x.loading(loading_basis='molar', loading_unit='mmol')) for x in isotherms])
+    max_loading = min(
+        [max(x.loading(loading_basis='molar', loading_unit='mmol')) for x in isotherms])
 
     # Get temperatures
     temperatures = list(x.t_exp for x in isotherms)

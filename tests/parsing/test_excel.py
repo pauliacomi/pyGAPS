@@ -6,10 +6,12 @@ import pytest
 
 import pygaps
 
+from ..conftest import parsing
 from ..conftest import windows
 
 
 @windows
+@parsing
 @pytest.mark.slowtest
 class TestExcel(object):
 

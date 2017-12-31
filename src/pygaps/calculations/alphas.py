@@ -1,5 +1,5 @@
 """
-This module contains the alpha-s calculation
+This module contains the alpha-s calculation.
 """
 
 import warnings
@@ -10,13 +10,13 @@ from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
-from .bet import area_BET
+from .area_bet import area_BET
 
 
 def alpha_s(isotherm, reference_isotherm, reference_area=None,
             reducing_pressure=0.4, limits=None, verbose=False):
     """
-    Calculates the external surface area and adsorbed volume using the alpha s method
+    Calculates the external surface area and adsorbed volume using the alpha s method.
 
 
     Pass an isotherm object to the function to have the alpha-s method applied to it.
@@ -28,25 +28,25 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     Parameters
     ----------
     isotherm : PointIsotherm
-        the isotherm of which to calculate the alpha-s plot parameters
+        The isotherm of which to calculate the alpha-s plot parameters.
     reference_isotherm : PointIsotherm or ModelIsotherm
-        the isotherm to use as reference
+        The isotherm to use as reference.
     reference_area : str, optional
-        area of the reference material
-        if not specified, the BET method is used to calculate it
+        Area of the reference material.
+        If not specified, the BET method is used to calculate it.
     reducing_pressure : float, optional
-        p/p0 value at which the loading is reduced
-        default is 0.4 as it is the closing point for the nitrogen
-        hysteresis loop
+        p/p0 value at which the loading is reduced.
+        Default is 0.4 as it is the closing point for the nitrogen
+        hysteresis loop.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
     verbose : bool, optional
-        prints extra information and plots graphs of the calculation
+        Prints extra information and plots graphs of the calculation.
 
     Returns
     -------
     list
-        a list of dictionaries containing the calculated parameters for each
+        A list of dictionaries containing the calculated parameters for each
         straight section, with each dictionary of the form. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
@@ -70,7 +70,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     material with the same surface characteristics and with the same adsorbate.
     The :math:`\\alpha_s` values are obtained from this isotherm by regularisation with
     an adsorption amount at a specific relative pressure, usually taken as 0.4 since
-    nitrogen hysterisis loops theoretically close at this value
+    nitrogen hysteresis loops theoretically close at this value
 
     .. math::
 
@@ -121,7 +121,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
         raise ParameterError(
             "The reducing pressure is outside the bounds of 0-1")
     if reference_area is None:
-        reference_area = area_BET(reference_isotherm).get('bet_area')
+        reference_area = area_BET(reference_isotherm).get('area')
 
     # Get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
@@ -129,10 +129,12 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
     # Read data in
-    loading = isotherm.loading(unit='mol', branch='ads')
+    loading = isotherm.loading(branch='ads',
+                               loading_unit='mol',
+                               loading_basis='molar')
     reference_loading = reference_isotherm.loading_at(
-        isotherm.pressure(branch='ads', unit=isotherm.unit_pressure),
-        pressure_unit=isotherm.unit_pressure,
+        isotherm.pressure(branch='ads', pressure_unit=isotherm.pressure_unit),
+        pressure_unit=isotherm.pressure_unit,
         loading_unit='mol', branch='ads')
     alpha_s_point = reference_isotherm.loading_at(
         0.4, loading_unit='mol', pressure_mode='relative', branch='ads')
@@ -155,7 +157,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
             for index, result in enumerate(results):
                 print("For linear region {0}".format(index))
                 print("The slope is {0} and the intercept is {1}"
-                      " With a correlation coefficient of {2}".format(
+                      ", with a correlation coefficient of {2}".format(
                           round(result.get('slope'), 4),
                           round(result.get('intercept'), 4),
                           round(result.get('corr_coef'), 4)
@@ -180,24 +182,24 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
     Parameters
     ----------
     loading : array
-        amount adsorbed at the surface, in mol/g
+        Amount adsorbed at the surface, in mol/g.
     alpha_curve : callable
-        function which which returns the alpha_s value at a pressure p
+        Function which which returns the alpha_s value at a pressure p.
     alpha_s_point : float
-        p/p0 value at which the loading is reduced
+        p/p0 value at which the loading is reduced.
     reference_area : float
-        area of the surface on which the reference isotherm is taken
+        Area of the surface on which the reference isotherm is taken.
     liquid_density : float
-        density of the adsorbate in the adsorbed state, in g/cm3
+        Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
-        molar mass of the adsorbate, in g/mol
+        Molar mass of the adsorbate, in g/mol.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
 
     Returns
     -------
     results : dict
-        A dictionary of results with the following components
+        A dictionary of results with the following components:
 
             - ``section(array)`` : the points of the plot chosen for the line
             - ``area(float)`` : calculated surface area, from the section parameters
@@ -208,7 +210,7 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
             - ``corr_coef(float)`` : correlation coefficient of the linear region
 
     thickness_curve : array
-        The generated thickness curve at each point using the thickness model
+        The generated thickness curve at each point using the thickness model.
     """
 
     if len(loading) != len(alpha_curve):
@@ -228,7 +230,7 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
                                                adsorbate_molar_mass, liquid_density))
     else:
         # Now we need to find the linear regions in the alpha-s for the
-        # assesment of surface area.
+        # assessment of surface area.
         linear_sections = find_linear_sections(alpha_curve, loading)
 
         # For each section we compute the linear fit

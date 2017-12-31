@@ -37,6 +37,9 @@ from .sqliteinterface import db_delete_experiment
 from .sqliteinterface import db_upload_experiment_type
 from .sqliteinterface import db_get_experiment_types
 from .sqliteinterface import db_delete_experiment_type
+from .sqliteinterface import db_upload_experiment_property_type
+from .sqliteinterface import db_get_experiment_property_types
+from .sqliteinterface import db_delete_experiment_property_type
 from .sqliteinterface import db_upload_experiment_data_type
 from .sqliteinterface import db_get_experiment_data_types
 from .sqliteinterface import db_delete_experiment_data_type

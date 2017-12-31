@@ -11,10 +11,12 @@ from numpy import isclose
 
 import pygaps
 
+from ..conftest import characterisation
 from .conftest import DATA_ISOSTERIC
 from .conftest import DATA_ISOSTERIC_PATH
 
 
+@characterisation
 class TestIsostericHeat(object):
     """
     Tests everything related to isosteric heat calculation
@@ -50,7 +52,7 @@ class TestIsostericHeat(object):
         isotherms[0].sample_name = isotherms[1].sample_name
 
         # Check same basis
-        isotherms[0].convert_basis_adsorbent('volume')
+        isotherms[0].convert_adsorbent(basis_to='volume', unit_to='cm3')
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.isosteric_heat(isotherms)

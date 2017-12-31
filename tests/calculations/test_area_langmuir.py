@@ -1,5 +1,5 @@
 """
-This test module has tests relating to BET area calculations
+This test module has tests relating to Langmuir area calculations
 """
 
 import os
@@ -10,23 +10,20 @@ from numpy import isclose
 
 import pygaps
 
+from ..conftest import characterisation
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
 
-class TestBET(object):
+@characterisation
+class TestAreaLangmuir(object):
     """
-    Tests everything related to BET surface area calculation
+    Tests everything related to Langmuir surface area calculation
     """
 
-    def test_BET_checks(self, basic_pointisotherm, basic_sample):
-        """Test checks"""
-
-        return
-
-    @pytest.mark.parametrize('file, expected_bet',
-                             [(data['file'], data['bet_area']) for data in list(DATA.values())])
-    def test_BET(self, file, expected_bet):
+    @pytest.mark.parametrize('file, expected_langmuir',
+                             [(data['file'], data['langmuir_area']) for data in list(DATA.values())])
+    def test_area_langmuir(self, file, expected_langmuir):
         """Test calculation with several model isotherms"""
 
         filepath = os.path.join(DATA_N77_PATH, file)
@@ -35,14 +32,15 @@ class TestBET(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        bet_area = pygaps.area_BET(isotherm).get("bet_area")
+        langmuir_area = pygaps.area_langmuir(isotherm).get("area")
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2
 
-        assert isclose(bet_area, expected_bet, err_relative, err_absolute)
+        assert isclose(langmuir_area, expected_langmuir,
+                       err_relative, err_absolute)
 
-    def test_BET_choice(self):
+    def test_area_langmuir_choice(self):
         """Test choice of points"""
 
         data = DATA['MCM-41']
@@ -53,17 +51,17 @@ class TestBET(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        bet_area = pygaps.area_BET(
-            isotherm, limits=[0.05, 0.30]).get("bet_area")
+        langmuir_area = pygaps.area_langmuir(
+            isotherm, limits=[0.05, 0.30]).get("area")
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2
 
-        assert isclose(bet_area, data['s_bet_area'],
+        assert isclose(langmuir_area, data['s_langmuir_area'],
                        err_relative, err_absolute)
 
     @cleanup
-    def test_BET_output(self, noplot):
+    def test_area_langmuir_output(self):
         """Test verbosity"""
 
         data = DATA['MCM-41']
@@ -74,4 +72,4 @@ class TestBET(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        pygaps.area_BET(isotherm, verbose=True)
+        pygaps.area_langmuir(isotherm, verbose=True)

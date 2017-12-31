@@ -1,5 +1,5 @@
 """
-Utilities for different function-independent mathematical calculations
+Utilities for different function-independent mathematical calculations.
 """
 
 from itertools import groupby
@@ -8,7 +8,7 @@ import numpy
 
 
 def find_linear_sections(xdata, ydata):
-    """Finds all sections of a plot which are linear"""
+    """Finds all sections of a plot which are linear."""
     linear_sections = []
 
     # To do this we calculate the second

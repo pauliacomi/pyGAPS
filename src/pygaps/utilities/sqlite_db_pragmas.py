@@ -1,5 +1,5 @@
 """
-This module contains the sql pragmas to generate the sqlite database
+This module contains the sql pragmas to generate the sqlite database.
 """
 
 
@@ -47,7 +47,7 @@ PRAGMA_SAMPLE_PROPERTIES = """
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `sample_id`     INTEGER     NOT NULL,
                 `type`          TEXT        NOT NULL,
-                `value`         REAL        NOT NULL,
+                `value`         TEXT,
 
                 FOREIGN KEY(`sample_id`)    REFERENCES `samples`(`id`),
                 FOREIGN KEY(`type`)         REFERENCES 'sample_properties_type'('type')
@@ -107,6 +107,32 @@ PRAGMA_EXPERIMENT_TYPE = """
                 `name`          TEXT
                 );
 """
+PRAGMA_EXPERIMENT_PROPERTIES = """
+
+            DROP TABLE IF EXISTS "experiment_properties";
+
+            CREATE TABLE "experiment_properties" (
+                `id`            INTEGER         NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                `exp_id` INTEGER         NOT NULL,
+                `type`          TEXT            NOT NULL,
+                `value`         TEXT            NOT NULL,
+
+                FOREIGN KEY(`exp_id`)    REFERENCES `experiments`(`id`),
+                FOREIGN KEY(`type`)             REFERENCES 'experiment_properties_type'('type')
+                );
+"""
+
+PRAGMA_EXPERIMENT_PROPERTY_TYPE = """
+
+            DROP TABLE IF EXISTS "experiment_properties_type";
+
+            CREATE TABLE "experiment_properties_type" (
+                `id`            INTEGER         NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                `type`          TEXT            NOT NULL UNIQUE,
+                `unit`          TEXT
+                );
+"""
+
 
 PRAGMA_EXPERIMENT_DATA = """
             DROP TABLE IF EXISTS "experiment_data";
@@ -189,7 +215,7 @@ PRAGMA_MACHINES = """
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `nick`          TEXT        NOT NULL UNIQUE,
                 `name`          TEXT,
-                `type`          INTEGER
+                `type`          TEXT
                 );
 """
 
@@ -208,13 +234,15 @@ PRAGMA_SOURCES = """
 # List of pragmas
 
 PRAGMAS = [
-    PRAGMA_SAMPLE_TYPE,
     PRAGMA_SAMPLES,
-    PRAGMA_SAMPLE_PROPERTY_TYPE,
     PRAGMA_SAMPLE_PROPERTIES,
+    PRAGMA_SAMPLE_TYPE,
+    PRAGMA_SAMPLE_PROPERTY_TYPE,
 
     PRAGMA_EXPERIMENT_TYPE,
     PRAGMA_EXPERIMENTS,
+    PRAGMA_EXPERIMENT_PROPERTY_TYPE,
+    PRAGMA_EXPERIMENT_PROPERTIES,
     PRAGMA_EXPERIMENT_DATA_TYPE,
     PRAGMA_EXPERIMENT_DATA,
 

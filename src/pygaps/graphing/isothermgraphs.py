@@ -1,5 +1,5 @@
 """
-This module contains the functions for plotting and comparing isotherms
+This module contains the functions for plotting and comparing isotherms.
 """
 
 import matplotlib.pyplot as plt
@@ -23,12 +23,12 @@ def plot_iso(isotherms,
              branch=_BRANCH_TYPES, logx=False, color=True,
              match_points=False,
 
-             basis_adsorbent="mass",
-             unit_adsorbent="g",
-             basis_loading="molar",
-             unit_loading="mmol",
-             mode_pressure="absolute",
-             unit_pressure="bar",
+             adsorbent_basis="mass",
+             adsorbent_unit="g",
+             loading_basis="molar",
+             loading_unit="mmol",
+             pressure_mode="absolute",
+             pressure_unit="bar",
 
              x_range=(None, None),
              y1_range=(None, None),
@@ -41,21 +41,21 @@ def plot_iso(isotherms,
              save=False, path=None,
              **other_parameters):
     """
-    Plots the isotherm(s) provided on a single graph
+    Plots the isotherm(s) provided on a single graph.
 
     Parameters
     ----------
     isotherms : list
-        an iterable of the isotherms to be plotted
+        An iterable of the isotherms to be plotted.
     plot_type : {'isotherm', 'property', 'combined'}
         The plot type, to display: isotherm, a property or a combination.
         The 'isotherm' graph type displays only isotherm data and is the standard.
         If other data is recorded in the isotherm object, such as enthalpy, it
         can be displayed at the same time as the isotherm or in a property v
-        loading graph by selecting one of the other graph types
+        loading graph by selecting one of the other graph types.
     secondary_key : 'str'
         The key which has the column with the supplementary data to be plotted.
-        This parameter is only required in the 'property' and 'combined' graphs
+        This parameter is only required in the 'property' and 'combined' graphs.
     branch : list
         List with branches to disply, options: 'ads', 'des'.
     logx : bool
@@ -67,19 +67,19 @@ def plot_iso(isotherms,
         Whether the plotting should attempt to match all the pressure
         points with the first passed isotherm.
 
-    basis_adsorbent : str, optional
+    adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         or 'per mass'.
-    unit_adsorbent : str, optional
+    adsorbent_unit : str, optional
         Unit of loading.
-    basis_loading : str, optional
+    loading_basis : str, optional
         Loading basis.
-    unit_loading : str, optional
+    loading_unit : str, optional
         Unit of loading.
-    mode_pressure : str, optional
+    pressure_mode : str, optional
         The pressure mode, either absolute pressures or relative in
         the form of p/p0.
-    unit_pressure : str, optional
+    pressure_unit : str, optional
         Unit of pressure.
 
     x_range : tuple
@@ -111,12 +111,12 @@ def plot_iso(isotherms,
     Returns
     -------
 
-    axes1 : Matplotlib figure
-        The figure object generated
+    fig : Matplotlib figure
+        The figure object generated.
     axes1 : Matplotlib ax
-        Ax object for primary graph
+        Ax object for primary graph.
     axes2 : Matplotlib ax
-        Ax object for secondary graph
+        Ax object for secondary graph.
 
     """
 #######################################
@@ -177,12 +177,12 @@ def plot_iso(isotherms,
         text_y2axis = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
     else:
         text_y2axis = secondary_key
-    if mode_pressure == "absolute":
-        text_xaxis = text_xaxis + ' ($' + unit_pressure + '$)'
-    elif mode_pressure == "relative":
+    if pressure_mode == "absolute":
+        text_xaxis = text_xaxis + ' ($' + pressure_unit + '$)'
+    elif pressure_mode == "relative":
         text_xaxis = "Relative " + text_xaxis
     text_yaxis = text_yaxis + \
-        ' ($' + unit_loading + '/' + unit_adsorbent + '$)'
+        ' ($' + loading_unit + '/' + adsorbent_unit + '$)'
 
     # Set the colours of the graph
     number_of_lines = 6
@@ -314,8 +314,8 @@ def plot_iso(isotherms,
         def pressure():
             return isotherm.pressure(
                 branch=plot_branch,
-                unit=unit_pressure,
-                mode=mode_pressure,
+                pressure_unit=pressure_unit,
+                pressure_mode=pressure_mode,
                 min_range=range_pressure[0],
                 max_range=range_pressure[1],
                 indexed=True,
@@ -324,8 +324,10 @@ def plot_iso(isotherms,
         def loading():
             return isotherm.loading(
                 branch=plot_branch,
-                unit=unit_loading,
-                basis=basis_adsorbent,
+                loading_unit=loading_unit,
+                loading_basis=loading_basis,
+                adsorbent_unit=adsorbent_unit,
+                adsorbent_basis=adsorbent_basis,
                 min_range=range_loading[0],
                 max_range=range_loading[1],
                 indexed=True,
@@ -433,6 +435,11 @@ def plot_iso(isotherms,
     else:
         axes.set_xscale('linear')
         axes.set_xlim(xmin=0)
+
+    axes.set_xlim(x_range)
+    axes.set_ylim(y1_range)
+    if axes2:
+        axes2.set_ylim(y2_range)
 
     # Add the legend
     lines, labels = axes.get_legend_handles_labels()

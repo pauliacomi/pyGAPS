@@ -9,15 +9,15 @@ Overview
 --------
 
 In order for many of the calculations included in pyGAPS to be performed, properties of the adsorbate used
-in the isotherm must be known. To make the process as simple and as painless as possible, the Adsorbate
-class is used.
+to measure isotherm must be known. To make the process as simple and as painless as possible, the Adsorbate
+class is provided.
 
 Each isotherm must contain a required property (string) called ``adsorbate``. The adsorbate class also
 contains a property called ``name``. If the two are identical, this connects the isotherm object and the
 particular adsorbate class associated to it.
 
 Each time an adsorbate property is needed, pyGAPS looks in the main adsorbate list (``pygaps.ADSORBATE_LIST``)
-for an object which corresponds to the isotherm adsorbate property.
+for an object which corresponds to the ``isotherm.adsorbate`` property.
 This list is populated as import-time with the adsorbates stored in the internal database. The user can also
 add their own adsorbate to the list, or upload it to the database for permanent storage.
 
@@ -29,24 +29,22 @@ reference.
 Creating an Adsorbate
 ---------------------
 
-The creation process of an adsorbate is similar to that of other pyGAPS classes, done by passing a
-dictionary of parameters. Some parameters are strictly required for instantiation, while others are
-recognised and can then be accessed by names. All other parameters passed are saved as well in an
-internal dictionary called ``properties``.
+The creation process of an adsorbate is similar to that of other pyGAPS classes, done by
+directly passing the parameters. Some parameters are strictly required for instantiation,
+while others are recognised and can then be accessed by class members.
+All other parameters passed are saved as well in an internal dictionary called ``properties``.
 
 An example of how to create an adsorbate:
 
 ::
 
-    adsorbate_info = {
-        'name' : 'butane',                  # Required
-        'formula' : 'C4H10',                # Required
-        'common_name' : 'butane',           # Recognised, Required for CoolProp interaction
-        'saturation_pressure' : 3,          # Recognised
-        'carbon_number' : 4,                # Unknown / user specific
-    }
-
-    my_adsorbate = pygaps.Adsorbate(adsorbate_info)
+    my_adsorbate = pygaps.Adsorbate(
+        name = 'butane',                  # Required
+        formula = 'C4H10',                # Required
+        common_name = 'butane',           # Recognised, Required for CoolProp interaction
+        saturation_pressure = 3,          # Recognised
+        carbon_number = 4,                # Unknown / user specific
+    )
 
 To view a summary of the sample properties, the standard python print function can be used.
 
@@ -67,6 +65,7 @@ The properties which can be calculated are:
     - Saturation Pressure
     - Surface Tension
     - Liquid Density
+    - Gas Density
 
 For example, for the Adsorbate created above, to get the vapour pressure at 25 degrees in bar.
 
@@ -87,7 +86,7 @@ properties dictionary. Here the value is static and the temperature and unit mus
 ::
 
     my_adsorbate.saturation_pressure(298, calculate=False)
-    33
+    3
 
 
 For all the adsorbate methods, see the :class:`~pygaps.classes.adsorbate.Adsorbate` reference
@@ -105,8 +104,14 @@ adsorbate class method with the name as the parameter:
 
 ::
 
-    my_adsorbate = pygaps.Adsorbate.from_list('butane')
+    my_adsorbate2 = pygaps.Adsorbate.from_list('CO2')
 
-The user can also generate their own adsorbates, or modify the ones that are in memory. To store a custom
-adsorbate for later use, the user can upload it to the database. For more info, check out the
-:ref:`sqlite <sqlite-manual>` section of the manual.
+The user can also generate their own adsorbates, or modify the ones that are in memory.
+
+::
+
+    # To store in the main list
+    pyGAPS.ADSORBATE_LIST.append(my_adsorbate)
+
+To permanently store a custom adsorbate for later use, the user can upload it to the database.
+For info on how to do this, check out the :ref:`sqlite <sqlite-manual>` section of the manual.

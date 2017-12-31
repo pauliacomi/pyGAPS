@@ -1,7 +1,7 @@
 """
 Module contains methods of calculating a pore size distribution starting from a DFT
 kernel. Please note that calculation of the DFT/NLDFT/QSDFT kernels are outside the
-scope of this program
+scope of this program.
 """
 
 import os
@@ -20,23 +20,23 @@ INTERNAL = os.path.join(os.path.dirname(__file__),
 
 def psd_dft_kernel_fit(pressure, loading, kernel_path):
     """
-    Fits a DFT kernel on experimental adsorption data
+    Fits a DFT kernel on experimental adsorption data.
 
     Parameters
     ----------
     loading : array
-        adsorbed amount in mmol/g
+        Adsorbed amount in mmol/g.
     pressure : array
-        relative pressure
+        Relative pressure.
     kernel_path : str
-        the location of the kernel to use
+        The location of the kernel to use.
 
     Returns
     -------
     pore widths : array
-        the widths of the pores
+        The widths of the pores.
     pore_dist : array
-        the distributions for each width
+        The distributions for each width.
 
     Notes
     -----
@@ -110,17 +110,17 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
 
 def _load_kernel(path):
     """
-    Loads a kernel from disk or from memory
+    Loads a kernel from disk or from memory.
 
     Parameters
     ----------
     path : str
-        path to the kernel to load in .csv form
+        Path to the kernel to load in .csv form.
 
     Returns
     -------
     array
-        kernel
+        The kernel.
     """
     if path == 'internal':
         path = INTERNAL

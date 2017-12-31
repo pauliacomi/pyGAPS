@@ -1,5 +1,5 @@
 """
-Calculation of the pore size distribution based on an isotherm
+Calculation of the pore size distribution based on an isotherm.
 """
 
 from functools import partial
@@ -7,14 +7,14 @@ from functools import partial
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
 from ..utilities.exceptions import ParameterError
-from .adsorbent_models import get_adsorbent_model
-from .kelvin_models import kelvin_radius_std
-from .kelvin_models import meniscus_geometry
+from .models_hk import get_hk_model
+from .models_kelvin import kelvin_radius_std
+from .models_kelvin import meniscus_geometry
+from .models_thickness import get_thickness_model
 from .psd_dft import psd_dft_kernel_fit
 from .psd_mesoporous import psd_bjh
 from .psd_mesoporous import psd_dollimore_heal
 from .psd_microporous import psd_horvath_kawazoe
-from .thickness_models import get_thickness_model
 
 _MESO_PSD_MODELS = ['BJH', 'DH']
 _MICRO_PSD_MODELS = ['HK']
@@ -24,26 +24,27 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
                                verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using a 'classical' model, applicable to mesopores
+    Calculates the pore size distribution using a 'classical' model, applicable to mesopores.
 
-    To use, specify the psd model in the function argument, then pass other
+    To use, specify the psd model in the function argument, then pass the parameters
+    for each model.
 
     Parameters
     ----------
     isotherm : Isotherm
-        isotherm which the pore size distribution will be calculated
+        Isotherm which the pore size distribution will be calculated.
     psd_model : str
-        the pore size distribution model to use
+        The pore size distribution model to use.
     pore_geometry : str
-        the geometry of the adsorbent pores
+        The geometry of the adsorbent pores.
     verbose : bool
-        prints out extra information on the calculation and graphs the results
+        Prints out extra information on the calculation and graphs the results.
     model_parameters : dict
-        a dictionary to override specific settings for each model
+        A dictionary to override specific settings for each model.
 
     Other Parameters
     ----------------
-    branch : {'adsorption', 'desorption'}, optional
+    branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to desorption.
     kelvin_model : callable, optional
         A custom user kelvin model. It should be a callable that only takes
@@ -108,10 +109,10 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     branch = model_parameters.get('branch')
     if branch is None:
-        branch = 'desorption'
-    if branch not in ['adsorption', 'desorption']:
+        branch = 'des'
+    if branch not in ['ads', 'des']:
         raise ParameterError("Branch {} not an option for psd.".format(branch),
-                             "Select either 'adsorption' or 'desorption'")
+                             "Select either 'ads' or 'des'")
 
     # Default thickness model
     thickness_model = model_parameters.get('thickness_model')
@@ -125,13 +126,19 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     surface_tension = adsorbate.surface_tension(isotherm.t_exp)
 
     # Read data in, depending on branch requested
-    if branch == 'adsorption':
-        loading = isotherm.loading(unit='mmol', branch='ads')[::-1]
-        pressure = isotherm.pressure(branch='ads', mode='relative')[::-1]
-    # If on desorption branch, data will be reversed
-    elif branch == 'desorption':
-        loading = isotherm.loading(unit='mmol', branch='des')
-        pressure = isotherm.pressure(branch='des', mode='relative')
+    # If on an adsorption branch, data will be reversed
+    if branch == 'ads':
+        loading = isotherm.loading(branch='ads',
+                                   loading_basis='molar',
+                                   loading_unit='mmol')[::-1]
+        pressure = isotherm.pressure(branch='ads',
+                                     pressure_mode='relative')[::-1]
+    elif branch == 'des':
+        loading = isotherm.loading(branch='des',
+                                   loading_basis='molar',
+                                   loading_unit='mmol')
+        pressure = isotherm.pressure(branch='des',
+                                     pressure_mode='relative')
     if loading is None:
         raise ParameterError("The isotherm does not have the required branch for"
                              " this calculation")
@@ -171,7 +178,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist, method=psd_model)
+        psd_plot(pore_widths, pore_dist, method=psd_model, xmin=1.5)
 
     return result_dict
 
@@ -179,25 +186,26 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
                                 verbose=False, **model_parameters):
     """
-    Calculates the microporous size distribution using a 'classical' model
+    Calculates the microporous size distribution using a 'classical' model.
 
     Parameters
     ----------
     isotherm : Isotherm
-        isotherm which the pore size distribution will be calculated
+        Isotherm which the pore size distribution will be calculated.
     psd_model : str
-        the pore size distribution model to use
+        The pore size distribution model to use.
     pore_geometry : str
-        the geometry of the adsorbent pores
+        The geometry of the adsorbent pores.
     verbose : bool
-        prints out extra information on the calculation and graphs the results
+        Prints out extra information on the calculation and graphs the results.
     model_parameters : dict
-        a dictionary to override specific settings for each model
+        A dictionary to override specific settings for each model.
 
     Other Parameters
     ----------------
     adsorbate_model : obj('dict')
-        The adsorbate model to use for PSD, If null, properties are taken from the adsorbate in the list.
+        The adsorbate model to use for PSD, If null, properties are taken
+        from the adsorbate in the list.
     adsorbent_model : obj('str') or obj('dict')
         The adsorbent model to use for PSD, It defaults to Carbon(HK).
 
@@ -261,12 +269,15 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
         )
 
     # Read data in
-    loading = isotherm.loading(unit='mmol', branch='ads')
-    pressure = isotherm.pressure(branch='ads', mode='relative')
+    loading = isotherm.loading(branch='ads',
+                               loading_basis='molar',
+                               loading_unit='mmol')
+    pressure = isotherm.pressure(branch='ads',
+                                 pressure_mode='relative')
     maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
-    adsorbent_properties = get_adsorbent_model(adsorbent_model)
+    adsorbent_properties = get_hk_model(adsorbent_model)
 
     # Call specified pore size distribution function
     if psd_model == 'HK':
@@ -288,14 +299,14 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
 def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using a DFT kernel from a PointIsotherm
+    Calculates the pore size distribution using a DFT kernel from a PointIsotherm.
 
     Parameters
     ----------
     isotherm : PointIsotherm
-        the isotherm to calculate the pore size distribution
+        The isotherm to calculate the pore size distribution.
     kernel_path : str
-        the path to the kernel used
+        The path to the kernel used.
 
     Returns
     -------
@@ -378,8 +389,11 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
             "Use 'internal' to use the internal kernel (USE JUDICIOUSLY).")
 
     # Read data in
-    loading = isotherm.loading(unit='mmol', branch='ads')
-    pressure = isotherm.pressure(branch='ads', mode='relative')
+    loading = isotherm.loading(branch='ads',
+                               loading_basis='molar',
+                               loading_unit='mmol')
+    pressure = isotherm.pressure(branch='ads',
+                                 pressure_mode='relative')
 
     # Call the DFT function
     pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)

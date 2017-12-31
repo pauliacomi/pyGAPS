@@ -8,14 +8,14 @@ The Sample class
 Overview
 --------
 
-For simplicity, the isotherm class only contains the name and batch of the sample it is measured on.
-However, the user might want to store a list of samples in the database, as well as to add other information
-regarding the adsorbent used, such as the date of synthesis, its density, the machine used, etc. For this
-case, pyGAPS provides the Sample class.
+While the isotherm classes only contain the name and batch of the sample they are measured on,
+the user might want to store a list of samples in the database, as well as to add other information.
+This can range from the date of synthesis, the material density, the machine used to make the
+measurement, etc. For this case, pyGAPS provides the Sample class.
 
-The isotherm required properties of ``sample_name`` and ``sample_batch`` are used to connect it to a
-specific Sample. The adsorbate class also contains two properties called ``name`` and ``batch``. If these
-are identical, this connects the isotherm object and the particular sample class.
+The isotherm required properties of ``sample_name`` and ``sample_batch`` are used to connect
+an Isotherm instance to a specific Sample. The adsorbate class also contains two properties
+called ``name`` and ``batch`` which should be identical for a successful match.
 
 Each time an adsorbate property is needed, pyGAPS looks in the main sample list (``pygaps.SAMPLE_LIST``)
 for an object which corresponds to the criteria above.
@@ -30,23 +30,22 @@ reference.
 Creating a Sample
 -----------------
 
-To create an instance of the Sample class, a dictionary with the sample parameters is required. The dictionary
-has to contain a value for ``name`` and ``batch``, with the rest of the parameters being optional.
+To create an instance of the Sample class, the sample parameters are passed directly. The parameters
+must contain a value for ``name`` and ``batch``, with the rest of the parameters being optional.
 
 An example of how to create a sample:
 
 ::
 
-    sample_info = {
-        'name' : 'carbon',              # Required
-        'batch' : 'X1',                 # Required
-        'owner' : 'Test User',          # Recognised
-        'type' : 'powder',              # Recognised
-        'density' : 1,                  # Recognised
-        `treatment` : 'acid etching'    # Unknown / User specific
-    }
+    my_sample = pygaps.Sample(
+        name='carbon',              # Required
+        batch='X1',                 # Required
+        owner='Test User',          # Recognised
+        type='powder',              # Recognised
+        density=1,                  # Recognised
+        treatment='acid etching'    # Unknown / User specific
+    )
 
-    my_sample = pygaps.Sample(sample_info)
 
 To view a summary of the sample properties, the standard python print function can be used.
 
@@ -67,8 +66,14 @@ sample name and sample batch as parameters.
 
 ::
 
-    my_sample = pygaps.Sample.from_list('carbon', 'X1')
+    my_sample2 = pygaps.Sample.from_list('carbon', 'X1')
 
-However, at first use the database will be empty. To populate the database with samples, the user should
-create the samples one by one and then upload them to the database. For more info, check out the
-:ref:`sqlite <sqlite-manual>` section of the manual.
+At first use the database will be empty. To populate the database with samples, the user should
+create the samples first and then upload them to the list for temporary storage, or to database for permanent storage.
+
+::
+
+    # To store in the main list
+    pyGAPS.SAMPLE_LIST.append(my_sample)
+
+For more info, check out the :ref:`sqlite <sqlite-manual>` section of the manual.

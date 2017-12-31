@@ -1,5 +1,5 @@
 """
-This module contains general functions for folder stepping
+This module contains general functions for folder stepping.
 """
 
 import os.path
@@ -14,14 +14,14 @@ def util_get_file_paths(folder, extension=None):
     Parameters
     ----------
     folder : str
-        folder where the function will look in, recursively
+        Folder where the function will look in, recursively.
     extension : str
-        the extension of the files to look for
+        The extension of the files to look for.
 
     Returns
     -------
     list
-        paths of each file
+        Paths of each file.
 
     '''
     if extension is None:

@@ -5,22 +5,25 @@ This test module has tests relating to kelvin model validations
 import numpy
 import pytest
 
-import pygaps.calculations.kelvin_models as km
-from pygaps.calculations.kelvin_models import _KELVIN_MODELS
+import pygaps.calculations.models_kelvin as km
+from pygaps.calculations.models_kelvin import _KELVIN_MODELS
+
+from ..conftest import characterisation
 
 
+@characterisation
 class TestKelvinModels(object):
     """
     Tests the thickness models
     """
 
     @pytest.mark.parametrize('branch, pore, geometry', [
-        ('adsorption', 'slit', 'cylinder'),
-        ('adsorption', 'cylinder', 'cylinder'),
-        ('adsorption', 'sphere', 'sphere'),
-        ('desorption', 'slit', 'slit'),
-        ('desorption', 'cylinder', 'sphere'),
-        ('desorption', 'sphere', 'sphere'),
+        ('ads', 'slit', 'cylinder'),
+        ('ads', 'cylinder', 'cylinder'),
+        ('ads', 'sphere', 'sphere'),
+        ('des', 'slit', 'slit'),
+        ('des', 'cylinder', 'sphere'),
+        ('des', 'sphere', 'sphere'),
     ])
     def test_meniscus_geometry(self, branch, pore, geometry):
 

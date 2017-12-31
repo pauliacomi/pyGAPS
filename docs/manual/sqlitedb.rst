@@ -12,8 +12,8 @@ The framework provides capabilities to interact with an sqlite database, in orde
 isotherms, samples, adsorbates and so on.
 
 The database was initially envisioned as a centralised data storage for the MADIREL Laboratory in
-Marseille, at Philip Llewellyn's request. To generalize the concept for a this framework, the
-database has been simplified to what the authors consider a barebones, but still extensible, functionality.
+Marseilles. To generalize the concept for a this framework, the
+database has been simplified to what the authors consider a bare bones, but still extensible, functionality.
 Suggests for further improvements are welcome.
 
 .. note::
@@ -40,11 +40,11 @@ A diagram of the database schema can be seen below:
     :alt: Database schema.
     :align: center
 
+
 .. _sqlite-manual-methods:
 
 Database methods
 ----------------
-
 
 All the functions which interact with a database, take the database path as their first argument. If the
 internal database is to be used, the parameter passed should be the ``pygaps.DATABASE`` constant.

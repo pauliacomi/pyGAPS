@@ -1,5 +1,5 @@
 """
-This module contains BET surface area calculations
+This module contains BET surface area calculations.
 """
 
 import warnings
@@ -29,11 +29,11 @@ def area_BET(isotherm, limits=None, verbose=False):
     Parameters
     ----------
     isotherm : PointIsotherm
-        The isotherm of which to calculate the BET surface area
+        The isotherm of which to calculate the BET surface area.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
     verbose : bool, optional
-        Prints extra information and plots graphs of the calculation
+        Prints extra information and plots graphs of the calculation.
 
     Returns
     -------
@@ -42,14 +42,14 @@ def area_BET(isotherm, limits=None, verbose=False):
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-        - ``bet_area(float)`` : calculated BET surface area, in m2/unit of adsorbent
+        - ``area(float)`` : calculated BET surface area, in m2/unit of adsorbent
         - ``c_const(float)`` : the C constant in the BET equation, unitless
         - ``n_monolayer(float)`` : the amount adsorbed at the statistical monolayer location,
           in mmol
         - ``p_monolayer(float)`` : the pressure at which the statistical monolayer is chosen,
           relative
-        - ``bet_slope(float)`` : slope of the BET plot, in g/mol
-        - ``bet_intercept(float)`` : intercept of the BET plot, in g/mol
+        - ``bet_slope(float)`` : slope of the BET plot
+        - ``bet_intercept(float)`` : intercept of the BET plot
         - ``corr_coef(float)`` : correlation coefficient of the linear region in the BET plot
 
     Notes
@@ -61,7 +61,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     through N2 adsorption at 77K, although other adsorbates (Ar, Kr) have been used.
 
     It assumes that the adsorption happens on the surface of the material in
-    incremental layersm according to the BET theory. Even if the adsorbent is porous,
+    incremental layers according to the BET theory. Even if the adsorbent is porous,
     the initial amount adsorbed (usually between 0.05 - 0.4 :math:`p/p_0`) can be
     modelled through the BET equation:
 
@@ -93,10 +93,10 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     While a standard for surface area determinations, the BET area should be used with care,
     as there are many assumptions made in the calculation. To augment the validity of the BET
-    method, Roquerol [#]_ proposed several checks to ensure that the BET region selected is valid
+    method, Rouquerol [#]_ proposed several checks to ensure that the BET region selected is valid
 
         * The BET constant (C) obtained should be positive
-        * In the corresponding Roquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
+        * In the corresponding Rouquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
           with respect to :math:`p/p_0`, the points chosen for BET analysis should be
           strictly increasing
         * The loading at the statistical monolayer should be situated within the
@@ -119,7 +119,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     ----------
     .. [#] “Adsorption of Gases in Multimolecular Layers”, Stephen Brunauer,
        P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
-    .. [#] "Adsorption by Powders & Porous Solids", F. Roquerol, J Roquerol
+    .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
        and K. Sing, Academic Press, 1999
 
     """
@@ -128,8 +128,11 @@ def area_BET(isotherm, limits=None, verbose=False):
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in
-    loading = isotherm.loading(unit='mol', branch='ads')
-    pressure = isotherm.pressure(mode='relative', branch='ads')
+    loading = isotherm.loading(branch='ads',
+                               loading_unit='mol',
+                               loading_basis='molar')
+    pressure = isotherm.pressure(branch='ads',
+                                 pressure_mode='relative')
 
     # use the bet function
     (bet_area, c_const, n_monolayer, p_monolayer, slope,
@@ -137,7 +140,7 @@ def area_BET(isotherm, limits=None, verbose=False):
         loading, pressure, cross_section, limits=limits)
 
     result_dict = {
-        'bet_area': bet_area,
+        'area': bet_area,
         'c_const': c_const,
         'n_monolayer': n_monolayer,
         'p_monolayer': p_monolayer,
@@ -148,14 +151,15 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     if verbose:
 
-        print("The slope of the BET line: s =", round(slope, 3))
-        print("The intercept of the BET line: i =", round(intercept, 3))
+        print("The slope of the BET fit: s =", round(slope, 3))
+        print("The intercept of the BET fit: i =", round(intercept, 3))
         print("C =", int(round(c_const, 1)))
         print("Amount for a monolayer: n =",
-              round(n_monolayer, 5), "mol/unit")
+              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
         print("Minimum pressure point chosen is {0} and maximum is {1}".format(
             round(pressure[minimum], 3), round(pressure[maximum], 3)))
-        print("BET surface area: a =", int(round(bet_area, 0)), "m²/unit")
+        print("BET surface area: a =", int(round(bet_area, 0)),
+              "m²/{}".format(isotherm.adsorbent_unit))
 
         # Generate plot of the BET points chosen
         bet_plot(pressure,
@@ -165,7 +169,7 @@ def area_BET(isotherm, limits=None, verbose=False):
                  p_monolayer,
                  bet_transform(n_monolayer, p_monolayer))
 
-        # Generate plot of the Roquerol points chosen
+        # Generate plot of the Rouquerol points chosen
         roq_plot(pressure,
                  roq_transform(loading, pressure),
                  minimum, maximum,
@@ -184,41 +188,41 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
     Parameters
     ----------
     loading : array
-        loadings, in mol/basis
+        Loadings, in mol/basis.
     pressure : array
-        pressures, relative
+        Pressures, relative.
     cross_section : float
-        adsorbed cross-section of the molecule of the adsorbate, in nm
+        Adsorbed cross-section of the molecule of the adsorbate, in nm.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
 
     Returns
     -------
-    bet_area : float
-        calculated BET surface area
+    area : float
+        Calculated BET surface area.
     c_const : float
-        C constant from the BET equation
+        C constant from the BET equation.
     n_monolayer : float
-        adsorbed quantity in the statistical monolayer
+        Adsorbed quantity in the statistical monolayer.
     p_monolayer : float
-        pressure at the statistical monolayer
+        Pressure at the statistical monolayer.
     slope : float
-        calculated slope of the BET plot
+        Calculated slope of the BET plot.
     intercept : float
-        calculated intercept of the BET plot
+        Calculated intercept of the BET plot.
     minimum : float
-        miminum loading of the point taken for the linear region
+        Minimum point taken for the linear region.
     maximum : float
-        maximum loading of the point taken for the linear region
+        Maximum point taken for the linear region.
     corr_coef : float
-        correlation coefficient of the straight line in the BET plot
+        Correlation coefficient of the straight line in the BET plot.
 
     """
     if len(pressure) != len(loading):
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
 
-    # Generate the Roquerol array
+    # Generate the Rouquerol array
     roq_t_array = roq_transform(loading, pressure)
 
     # select the maximum and minimum of the points and the pressure associated
@@ -255,7 +259,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
                 break
 
     if maximum - minimum < 3:
-        raise CalculationError("The isotherm does not have enough points in the BET"
+        raise CalculationError("The isotherm does not have enough points in the BET "
                                "region. Unable to calculate BET area.")
 
     # calculate the BET transform, slope and intercept
@@ -281,7 +285,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
 
 
 def roq_transform(loading, pressure):
-    """Roquerol transform function"""
+    """Rouquerol transform function"""
     return loading * (1 - pressure)
 
 

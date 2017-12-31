@@ -1,5 +1,5 @@
 """
-This module contains the csv interface for returning data such as sample names
+This module contains the csv interface.
 """
 
 import pandas
@@ -10,16 +10,17 @@ from ..classes.pointisotherm import PointIsotherm
 def isotherm_to_csv(isotherm, path, separator=','):
     '''
 
-    A function that turns the isotherm into an excel file with the data and properties.
+    A function that turns the isotherm into a csv
+    file with the data and properties.
 
     Parameters
     ----------
     isotherm : PointIsotherm
-        Isotherm to be written to excel.
+        Isotherm to be written to csv.
     path : str
         Path to the file to be written.
     separator : str, optional
-        Separator used int the csv file. Defaults to comma.
+        Separator used int the csv file. Defaults to '',''.
 
     '''
 
@@ -40,12 +41,13 @@ def isotherm_to_csv(isotherm, path, separator=','):
         data = isotherm.data()[headings]
 
         headings[0] = isotherm.loading_key + \
-            '(' + isotherm.unit_loading + ')'
+            '(' + isotherm.loading_unit + ')'
         headings[1] = isotherm.pressure_key + \
-            '(' + isotherm.unit_pressure + ')'
+            '(' + isotherm.pressure_unit + ')'
 
         file.write(separator.join(headings) + '\n')
         data.to_csv(file, sep=separator, index=False, header=False)
+
     return
 
 
@@ -59,12 +61,12 @@ def isotherm_from_csv(path, separator=','):
     path : str
         Path to the file to be read.
     separator : str, optional
-        Separator used int the csv file. Defaults to comma.
+        Separator used int the csv file. Defaults to '',''.
 
     Returns
     -------
     PointIsotherm
-        The isotherm contained in the excel file
+        The isotherm contained in the csv file.
     """
 
     with open(path) as file:

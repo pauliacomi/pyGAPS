@@ -22,7 +22,7 @@ def read(*names, **kwargs):
 
 setup(
     name='pygaps',
-    version='0.9.3',
+    version='1.0.0',
     license='MIT license',
     description='',
     long_description='%s\n%s' % (
@@ -46,8 +46,6 @@ setup(
         'Operating System :: Unix',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         # 'Programming Language :: Python :: Implementation :: CPython',
@@ -60,9 +58,9 @@ setup(
     # setup_requires=[],
     install_requires=[
         'numpy >= 1.13',
-        'scipy >= 0.18.0',
-        'pandas >= 0.18.1',
-        'matplotlib >= 2.0',
+        'scipy >= 1.0.0',
+        'pandas >= 0.21.1',
+        'matplotlib >= 2.1',
         'xlwings;platform_system=="Windows"',
         'coolprop >= 6.0',
     ],

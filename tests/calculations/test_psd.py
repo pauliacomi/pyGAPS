@@ -9,10 +9,12 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
+from ..conftest import characterisation
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
 
+@characterisation
 class TestPSD(object):
     """
     Tests everything related to pore size distribution calculation
@@ -58,7 +60,7 @@ class TestPSD(object):
         result_dict = pygaps.mesopore_size_distribution(
             isotherm,
             psd_model=method,
-            branch='desorption',
+            branch='des',
             verbose=True)
 
         # max_error = 0.1  # 10 percent

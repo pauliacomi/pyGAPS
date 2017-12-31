@@ -1,7 +1,7 @@
 .. _calculations-ref:
 
-Calculations
-============
+Characterisation
+================
 
 .. _analysis-ref:
 
@@ -11,8 +11,14 @@ Isotherm analysis
 BET Surface area
 ................
 
-.. automodule:: pygaps.calculations.bet
+.. automodule:: pygaps.calculations.area_bet
     :members: area_BET, area_BET_raw
+
+Langmuir Surface area
+.....................
+
+.. automodule:: pygaps.calculations.area_langmuir
+    :members: area_langmuir, area_langmuir_raw
 
 t-plot
 ......
@@ -59,15 +65,14 @@ Isosteric heat of adsorption
 .. automodule:: pygaps.calculations.isosteric_heat
     :members:
 
+Initial Henry constant
+......................
 
-.. _modelling-ref:
+.. automodule:: pygaps.calculations.initial_henry
+    :members:
 
+Initial heat of adsorption
+..........................
 
-Adsorption modelling
---------------------
-
-IAST
-....
-
-.. automodule:: pygaps.calculations.iast
+.. automodule:: pygaps.calculations.initial_enthalpy
     :members:

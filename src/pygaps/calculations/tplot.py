@@ -1,5 +1,5 @@
 """
-This module contains the t-plot calculation
+This module contains the t-plot calculation.
 """
 
 import warnings
@@ -11,13 +11,13 @@ from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
-from .thickness_models import get_thickness_model
+from .models_thickness import get_thickness_model
 
 
 def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False):
     """
     Calculates the external surface area and adsorbed volume
-    using the t-plot method
+    using the t-plot method.
 
 
     Pass an isotherm object to the function to have the t-plot method applied to it.
@@ -32,7 +32,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     Parameters
     ----------
     isotherm : PointIsotherm
-        the isotherm of which to calculate the t-plot parameters.
+        The isotherm of which to calculate the t-plot parameters.
     thickness_model : obj(`str`) or obj(`Isotherm`) or obj(`callable`), optional
         Name of the thickness model to use. Defaults to the Harkins and Jura
         thickness curve.
@@ -125,8 +125,11 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
     # Read data in
-    loading = isotherm.loading(unit='mol', branch='ads')
-    pressure = isotherm.pressure(branch='ads', mode='relative')
+    loading = isotherm.loading(branch='ads',
+                               loading_unit='mol',
+                               loading_basis='molar')
+    pressure = isotherm.pressure(branch='ads',
+                                 pressure_mode='relative')
 
     # Get thickness model
     t_model = get_thickness_model(thickness_model)
@@ -145,16 +148,18 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
             print('Could not find linear regions, attempt a manual limit')
         else:
             for index, result in enumerate(results):
-                print("For linear region {0}".format(index))
+                print("For linear region {0}".format(index + 1))
                 print("The slope is {0} and the intercept is {1}"
-                      " With a correlation coefficient of {2}".format(
+                      ", with a correlation coefficient of {2}".format(
                           round(result.get('slope'), 4),
                           round(result.get('intercept'), 4),
                           round(result.get('corr_coef'), 4)
                       ))
-                print("The adsorbed volume is {0} and the area is {1}".format(
+                print("The adsorbed volume is {} cm3/{} and the area is {} m2/{}".format(
                     round(result.get('adsorbed_volume'), 4),
-                    round(result.get('area'), 4)
+                    isotherm.adsorbent_unit,
+                    round(result.get('area'), 3),
+                    isotherm.adsorbent_unit,
                 ))
 
             plot_tp(t_curve, loading, results)
@@ -171,17 +176,17 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     Parameters
     ----------
     loading : array
-        in mol/g
+        In mol/g.
     pressure : array
-        relative
+        Relative.
     thickness_model : callable
-        function which which returns the thickness of the adsorbed layer at a pressure p
+        Function which which returns the thickness of the adsorbed layer at a pressure p.
     liquid_density : float
-        density of the adsorbate in the adsorbed state, in g/cm3
+        Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
-        molar mass of the adsorbate, in g/mol
+        Molar mass of the adsorbate, in g/mol.
     limits : [:obj:`float`, :obj:`float`], optional
-        manual limits for region selection
+        Manual limits for region selection.
 
     Returns
     -------
@@ -197,7 +202,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
             - ``corr_coef(float)`` : correlation coefficient of the linear region
 
     thickness_curve : array
-        The generated thickness curve at each point using the thickness model
+        The generated thickness curve at each point using the thickness model.
 
     """
 
@@ -220,7 +225,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     # If not, attempt to find limits manually
     else:
         # Now we need to find the linear regions in the t-plot for the
-        # assesment of surface area.
+        # assessment of surface area.
         linear_sections = find_linear_sections(thickness_curve, loading)
 
         # For each section we compute the linear fit

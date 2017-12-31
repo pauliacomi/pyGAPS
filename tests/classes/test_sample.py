@@ -6,7 +6,10 @@ import pytest
 
 import pygaps
 
+from ..conftest import basic
 
+
+@basic
 class TestSample(object):
     """
     Tests the sample class
@@ -18,9 +21,9 @@ class TestSample(object):
         assert sample_data == basic_sample.to_dict()
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.Sample({})
+            pygaps.Sample()
 
-    def test_sample_retreived_list(self, sample_data, basic_sample):
+    def test_sample_retrieved_list(self, sample_data, basic_sample):
         "Checks sample can be retrieved from master list"
         pygaps.data.SAMPLE_LIST.append(basic_sample)
         uploaded_sample = pygaps.Sample.from_list(
@@ -36,26 +39,12 @@ class TestSample(object):
         "Checks if properties of a sample can be located"
 
         assert basic_sample.get_prop(
-            'density') == sample_data['properties'].get('density')
+            'density') == sample_data.get('density')
 
         density = basic_sample.properties.pop('density')
         with pytest.raises(pygaps.ParameterError):
             basic_sample.get_prop('density')
         basic_sample.properties['density'] = density
-
-    def test_sample_basis_conversion(self, basic_sample):
-        """Tests the conversion between relative and absolute pressure"""
-
-        mass = 10
-        volume = 1
-
-        assert basic_sample.convert_basis(
-            'volume', mass) == pytest.approx(volume, 0.1)
-
-        assert basic_sample.convert_basis(
-            'mass', volume) == pytest.approx(mass, 0.1)
-
-        return
 
     def test_sample_print(self, basic_sample):
         """Checks the printing is done"""

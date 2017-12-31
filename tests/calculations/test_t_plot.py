@@ -10,10 +10,12 @@ from numpy import isclose
 
 import pygaps
 
+from ..conftest import characterisation
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
 
+@characterisation
 class TestTPlot(object):
     """
     Tests everything related to tplot calculation

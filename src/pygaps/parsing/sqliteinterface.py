@@ -1,9 +1,6 @@
-# %%
 """
-This module contains the sql interface for data manipulation
+This module contains the sql interface for data manipulation.
 """
-
-__author__ = 'Paul A. Iacomi'
 
 import array
 import sqlite3
@@ -12,6 +9,7 @@ import numpy
 import pandas
 
 from ..classes.adsorbate import Adsorbate
+from ..classes.pointisotherm import Isotherm
 from ..classes.pointisotherm import PointIsotherm
 from ..classes.sample import Sample
 from ..utilities.exceptions import ParsingError
@@ -20,15 +18,129 @@ from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
 from ..utilities.sqlite_utilities import build_update
 
+# ---------------------- General functions
+
+
+def _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, input_dict, name_string):
+
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            to_insert = [table_id] + columns
+
+            if overwrite:
+                sql_com = build_update(table=table_name,
+                                       to_set=columns,
+                                       where=[table_id])
+            else:
+                sql_com = build_insert(table=table_name,
+                                       to_insert=to_insert)
+
+            # Upload or modify data in machines table
+            insert_dict = {key: input_dict.get(key) for key in to_insert}
+            cursor.execute(sql_com, insert_dict)
+
+        # Print success
+        print(name_string, "uploaded", insert_dict.get(table_id))
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on:", "\n",
+              input_dict.get(table_id),
+              "\n", e)
+        raise ParsingError from e
+
+    # Close the db connection
+    if db:
+        db.close()
+
+
+def _get_all_no_id(pth, table_id, table_name, name_string):
+    """Gets all elements from a table as a dictionary, excluding id"""
+    # Connect to database
+    with sqlite3.connect(pth) as db:
+
+        # Set row factory
+        db.row_factory = sqlite3.Row
+        # Get a cursor object
+        cursor = db.cursor()
+        cursor.execute('PRAGMA foreign_keys = ON')
+
+        # Execute the query
+        cursor.execute('''SELECT * FROM ''' + table_name)
+
+        # Get the types
+        types = []
+        for row in cursor:
+            unit = dict(zip(row.keys(), row))
+            unit.pop(table_id)
+            types.append(unit)
+
+    # Close the db connection
+    if db:
+        db.close()
+
+    # Print success
+    print("Selected", len(types), name_string)
+    return types
+
+
+def _delete_one_by_id(pth, table_name, table_id, element_id, name_string):
+    """Gets all elements from a table as a dictionary, excluding id"""
+    # Connect to database
+    db = sqlite3.connect(pth)
+    try:
+        with db:
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            # Check if exists
+            ids = cursor.execute(
+                build_select(table=table_name,
+                             to_select=[table_id],
+                             where=[table_id]),
+                {table_id:        element_id}
+            ).fetchone()
+
+            if ids is None:
+                raise sqlite3.IntegrityError(
+                    "Element to delete does not exist in database")
+
+            sql_com = build_delete(table=table_name,
+                                   where=[table_id])
+
+            cursor.execute(sql_com, {table_id: element_id})
+
+            # Print success
+            print("Success, deleted", name_string, element_id)
+
+    # Catch the exception
+    except sqlite3.IntegrityError as e:
+        print("Error on:", "\n",
+              element_id,
+              "\n", e)
+        raise ParsingError from e
+
+    # Close the db connection
+    if db:
+        db.close()
+
 # ---------------------- Samples
 
 
 def db_upload_sample(pth, sample, overwrite=False):
     """
-    Uploads samples to the database
+    Uploads samples to the database.
     If overwrite is set to true, the sample is overwritten
     Overwrite is done based on sample.name + sample.batch
-    WARNING: Overwrite is done on ALL fields
+    WARNING: Overwrite is done on ALL fields.
     """
 
     # Connect to database
@@ -41,29 +153,23 @@ def db_upload_sample(pth, sample, overwrite=False):
 
             if overwrite:
                 sql_com = build_update(table="samples",
-                                       to_set=['project', 'struct', 'type',
-                                               'contact', 'form', 'source', 'comment'],
+                                       to_set=Sample._named_params,
                                        where=['name', 'batch'])
             else:
+                to_insert = ['name', 'batch'] + Sample._named_params
                 sql_com = build_insert(table="samples",
-                                       to_insert=['name', 'batch', 'project', 'struct', 'type',
-                                                  'contact', 'form', 'source', 'comment'])
+                                       to_insert=to_insert)
+
+            sample_dict = sample.to_dict()
+            upload_dict = {'name': sample.name, 'batch': sample.batch}
+            for prop in Sample._named_params:
+                if prop in sample_dict:
+                    upload_dict.update({prop: sample_dict[prop]})
+                else:
+                    upload_dict.update({prop: ""})
 
             # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'name':         sample.name,
-                'batch':        sample.batch,
-
-                'contact':      sample.contact,
-                'source':       sample.source,
-                'type':         sample.type,
-
-                'project':      sample.project,
-                'struct':       sample.struct,
-                'form':         sample.form,
-                'comment':      sample.comment,
-            }
-            )
+            cursor.execute(sql_com, upload_dict)
 
             # Upload or modify data in sample_properties table
             if sample.properties and len(sample.properties) > 0:
@@ -99,16 +205,17 @@ def db_upload_sample(pth, sample, overwrite=False):
                     updates = [elt[0] for elt in cursor.fetchall()]
 
                 for prop in sample.properties:
-                    if prop in updates:
-                        sql_com_prop = sql_update
-                    else:
-                        sql_com_prop = sql_insert
+                    if prop is not None:
+                        if prop in updates:
+                            sql_com_prop = sql_update
+                        else:
+                            sql_com_prop = sql_insert
 
-                    cursor.execute(sql_com_prop, {
-                        'sample_id':        sample_id,
-                        'type':             prop,
-                        'value':            sample.properties[prop]
-                    })
+                        cursor.execute(sql_com_prop, {
+                            'sample_id':        sample_id,
+                            'type':             prop,
+                            'value':            sample.properties[prop]
+                        })
 
         # Print success
         print("Sample uploaded", sample.name, sample.batch)
@@ -130,9 +237,9 @@ def db_upload_sample(pth, sample, overwrite=False):
 
 def db_get_samples(pth):
     """
-    Gets all samples and their properties
+    Gets all samples and their properties.
 
-    The number of samples is usually small, so all can be loaded in memory at once
+    The number of samples is usually small, so all can be loaded in memory at once.
     """
 
     # Connect to database
@@ -160,14 +267,14 @@ def db_get_samples(pth):
             cur_inner.execute(build_select(table='sample_properties',
                                            to_select=['type', 'value'],
                                            where=['sample_id']), {
-                'sample_id':        sample_params.get('id')
+                'sample_id':        sample_params.pop('id')
             })
 
-            sample_params['properties'] = {
-                row[0]: row[1] for row in cur_inner}
+            sample_params.update({
+                row[0]: row[1] for row in cur_inner})
 
             # Build sample objects
-            samples.append(Sample(sample_params))
+            samples.append(Sample(**sample_params))
 
     # Close the db connection
     if db:
@@ -181,7 +288,7 @@ def db_get_samples(pth):
 
 def db_delete_sample(pth, sample):
     """
-    Delete experiment to the database
+    Delete sample from the database.
     """
 
     # Connect to database
@@ -237,232 +344,86 @@ def db_delete_sample(pth, sample):
     return
 
 
-def db_upload_sample_type(pth, sample_type):
-    "Uploads a sample type"
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            sql_com = build_insert(table="sample_type",
-                                   to_insert=['type', 'name'])
-
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'type':         sample_type.get('type'),
-                'name':         sample_type.get('name'),
-            }
-            )
-
-        # Print success
-        print("Sample type uploaded", sample_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample type:", "\n",
-              sample_type['type'],
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-
-def db_get_sample_types(pth):
+def db_upload_sample_type(pth, type_dict, overwrite=False):
     """
-    Gets all sample types
+    Uploads a sample type.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table_name = 'sample_type'
+    name_string = 'Sample type'
+    table_id = 'type'
+    columns = ['name']
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM sample_type''')
-
-        # Get the types
-        types = []
-        for row in cursor:
-            types.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(types), "sample types")
-
-    return types
-
-
-def db_delete_sample_type(pth, sample_type):
-    """
-    Delete sample type in the database
-    """
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            # Check if source exists
-            ids = cursor.execute(
-                build_select(table='sample_type',
-                             to_select=['type'],
-                             where=['type']),
-                {'type':        sample_type}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Property type to delete does not exist in database")
-
-            sql_com = build_delete(table='sample_type',
-                                   where=['type'])
-
-            cursor.execute(sql_com, {'type': sample_type})
-
-            # Print success
-            print("Success", sample_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample type:", "\n",
-              sample_type,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, type_dict, name_string)
 
     return
 
 
-def db_upload_sample_property_type(pth, property_type):
-    "Uploads a sample property type"
+def db_get_sample_types(pth):
+    """
+    Gets all sample types.
+    """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table = 'sample_type'
+    name_string = 'sample types'
+    table_id = 'id'
 
-            sql_com = build_insert(table="sample_properties_type",
-                                   to_insert=['type', 'unit'])
+    return _get_all_no_id(pth, table_id, table, name_string)
 
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'type':         property_type.get('type'),
-                'unit':         property_type.get('unit'),
-            }
-            )
 
-        # Print success
-        print("Property type uploaded", property_type)
+def db_delete_sample_type(pth, sample_type):
+    """
+    Delete sample type in the database.
+    """
 
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample property type:", "\n",
-              property_type,
-              "\n", e)
-        raise ParsingError from e
+    table_id = 'type'
+    table_name = 'sample_type'
+    name_string = 'sample types'
 
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, sample_type, name_string)
+
+    return
+
+
+def db_upload_sample_property_type(pth, type_dict, overwrite=False):
+    """
+    Uploads a sample property type.
+    """
+
+    table_name = 'sample_properties_type'
+    name_string = 'Sample properties type'
+    table_id = 'type'
+    columns = ['unit']
+
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, type_dict, name_string)
+
+    return
 
 
 def db_get_sample_property_types(pth):
     """
-    Gets all sample property types
+    Gets all sample property types.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table = 'sample_properties_type'
+    name_string = 'sample property types'
+    table_id = 'id'
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM sample_properties_type''')
-
-        # Get the types
-        types = []
-        for row in cursor:
-            types.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(types), "sample property types")
-
-    return types
+    return _get_all_no_id(pth, table_id, table, name_string)
 
 
-def db_delete_sample_property_type(pth, sample_type):
+def db_delete_sample_property_type(pth, sample_prop_type):
     """
-    Delete sample property type in the database
+    Delete sample property type in the database.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_id = 'type'
+    table_name = 'sample_properties_type'
+    name_string = 'sample property types'
 
-            # Check if source exists
-            ids = cursor.execute(
-                build_select(table='sample_properties_type',
-                             to_select=['type'],
-                             where=['type']),
-                {'type':        sample_type}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Property type to delete does not exist in database")
-
-            sql_com = build_delete(table='sample_properties_type',
-                                   where=['type'])
-
-            cursor.execute(sql_com, {'type': sample_type})
-
-            # Print success
-            print("Success", sample_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample property type:", "\n",
-              sample_type,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, sample_prop_type, name_string)
 
     return
 
@@ -470,29 +431,11 @@ def db_delete_sample_property_type(pth, sample_type):
 # ---------------------- Experiments
 
 
-EXP_NAMED_PARAMS = [
-                'id',
-                'sample_name',
-                'sample_batch',
-                't_exp',
-                'adsorbate',
-                'user',
-                'machine',
-                'exp_type',
-                'date',
-                'is_real',
-                't_act',
-                'lab',
-                'project',
-                'comment',
-]
-
-
 def db_upload_experiment(pth, isotherm, overwrite=None):
     """
-    Uploads experiment to the database
+    Uploads experiment to the database.
 
-    Overwrite is the isotherm where the isotherm will be overwritten
+    Overwrite is the isotherm id where the data will be overwritten.
     """
 
     # Connect to database
@@ -510,13 +453,13 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
             # Then, the sample is going to be inserted into the database
             # Build SQL request
             sql_com = build_insert(table='experiments',
-                                   to_insert=EXP_NAMED_PARAMS)
+                                   to_insert=Isotherm._db_columns)
 
             # Build upload dict
             upload_dict = {}
             iso_dict = isotherm.to_dict()
-            for param in EXP_NAMED_PARAMS:
-                upload_dict.update({param: iso_dict.get(param)})
+            for param in Isotherm._db_columns:
+                upload_dict.update({param: iso_dict.pop(param, None)})
 
             # Upload experiment info to database
             cursor.execute(sql_com, upload_dict)
@@ -546,6 +489,17 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
                                 'data': isotherm.other_data(key).tobytes()}
                                )
 
+            # Upload the remaining data from the isotherm
+            # Build sql request
+            sql_insert = build_insert(table='experiment_properties',
+                                      to_insert=['exp_id', 'type', 'value'])
+            for key in iso_dict:
+                cursor.execute(sql_insert,
+                               {'exp_id': isotherm.id,
+                                'type': key,
+                                'value': iso_dict[key]
+                                })
+
         # Print success
         print("Success:", isotherm)
 
@@ -572,7 +526,7 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
 
 def db_get_experiments(pth, criteria):
     """
-    Gets experiments with the selected criteria from the database
+    Gets experiments with the selected criteria from the database.
     """
 
     # Connect to database
@@ -586,7 +540,7 @@ def db_get_experiments(pth, criteria):
 
         # Build SQL request
         sql_com = build_select(table='experiments',
-                               to_select=EXP_NAMED_PARAMS,
+                               to_select=Isotherm._db_columns,
                                where=criteria.keys())
 
         # Get experiment info from database
@@ -598,13 +552,24 @@ def db_get_experiments(pth, criteria):
         for row in cursor:
             exp_params = dict(zip(row.keys(), row))
 
-            # Get the extra data from the experiment_data table
             cur_inner = db.cursor()
+
+            # Get the properties from the experiment_properties table
+
+            cur_inner.execute(build_select(table='experiment_properties',
+                                           to_select=['type', 'value'],
+                                           where=['exp_id']), {
+                'exp_id':        exp_params.get('id')
+            })
+
+            exp_params.update({row[0]: row[1] for row in cur_inner})
+
+            # Get the data from the experiment_data table
 
             cur_inner.execute(build_select(table='experiment_data',
                                            to_select=['type', 'data'],
                                            where=['exp_id']),
-                              {'exp_id': str(exp_params['id'])}
+                              {'exp_id': exp_params.pop('id')}
                               )
 
             # Generate the array for the pandas dataframe
@@ -645,7 +610,7 @@ def db_get_experiments(pth, criteria):
 
 def db_delete_experiment(pth, isotherm):
     """
-    Delete experiment to the database
+    Delete experiment in the database.
     """
 
     # Connect to database
@@ -670,6 +635,10 @@ def db_delete_experiment(pth, isotherm):
 
             # Delete data from experiment_data table
             cursor.execute(build_delete(table='experiment_data',
+                                        where=['exp_id']), {'exp_id': isotherm.id})
+
+            # Delete data from experiment_data table
+            cursor.execute(build_delete(table='experiment_properties',
                                         where=['exp_id']), {'exp_id': isotherm.id})
 
             # Delete experiment info in experiments table
@@ -700,232 +669,128 @@ def db_delete_experiment(pth, isotherm):
     return
 
 
-def db_upload_experiment_type(pth, experiment_type):
-    "Uploads a experiment type"
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            sql_com = build_insert(table="experiment_type",
-                                   to_insert=['type', 'name'])
-
-            # Upload or modify data in experiment table
-            cursor.execute(sql_com, {
-                'type':         experiment_type.get('type'),
-                'name':         experiment_type.get('name'),
-            }
-            )
-
-        # Print success
-        print("Experiment type uploaded", experiment_type['type'])
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on experiment type:", "\n",
-              experiment_type['type'],
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-
-def db_get_experiment_types(pth):
+def db_upload_experiment_type(pth, type_dict, overwrite=False):
     """
-    Gets all sample types
+    Uploads a experiment type.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table_name = 'experiment_type'
+    name_string = 'Experiment type'
+    table_id = 'type'
+    columns = ['name']
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM experiment_type''')
-
-        # Get the types
-        types = []
-        for row in cursor:
-            types.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(types), "experiment types")
-
-    return types
-
-
-def db_delete_experiment_type(pth, exp_type):
-    """
-    Delete experiment type in the database
-    """
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            # Check if source exists
-            ids = cursor.execute(
-                build_select(table='experiment_type',
-                             to_select=['type'],
-                             where=['type']),
-                {'type':        exp_type}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Property type to delete does not exist in database")
-
-            sql_com = build_delete(table='experiment_type',
-                                   where=['type'])
-
-            cursor.execute(sql_com, {'type': exp_type})
-
-            # Print success
-            print("Success", exp_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on experiment type:", "\n",
-              exp_type,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, type_dict, name_string)
 
     return
 
 
-def db_upload_experiment_data_type(pth, data_type):
-    "Uploads a data type"
+def db_get_experiment_types(pth):
+    """
+    Gets all sample types.
+    """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table = 'experiment_type'
+    name_string = 'experiment types'
+    table_id = 'id'
 
-            sql_com = build_insert(table="experiment_data_type",
-                                   to_insert=['type', 'unit'])
+    return _get_all_no_id(pth, table_id, table, name_string)
 
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'type':         data_type.get('type'),
-                'unit':         data_type.get('unit'),
-            }
-            )
 
-        # Print success
-        print("Data type uploaded", data_type)
+def db_delete_experiment_type(pth, exp_type):
+    """
+    Delete experiment type in the database.
+    """
 
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
-              data_type,
-              "\n", e)
-        raise ParsingError from e
+    table_id = 'type'
+    table_name = 'experiment_type'
+    name_string = 'experiment types'
 
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, exp_type, name_string)
+
+    return
+
+
+def db_upload_experiment_property_type(pth, type_dict, overwrite=False):
+    """
+    Uploads a property type.
+    """
+
+    table_name = 'experiment_properties_type'
+    name_string = 'Experiment property type'
+    table_id = 'type'
+    columns = ['unit']
+
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, type_dict, name_string)
+
+    return
+
+
+def db_get_experiment_property_types(pth):
+    """
+    Gets all experiment property types.
+    """
+
+    table = 'experiment_properties_type'
+    name_string = 'experiment property types'
+    table_id = 'id'
+
+    return _get_all_no_id(pth, table_id, table, name_string)
+
+
+def db_delete_experiment_property_type(pth, property_type):
+    """
+    Delete experiment property type in the propertybase.
+    """
+
+    table_id = 'type'
+    table_name = 'experiment_properties_type'
+    name_string = 'experiment property types'
+
+    _delete_one_by_id(pth, table_name, table_id, property_type, name_string)
+
+    return
+
+
+def db_upload_experiment_data_type(pth, type_dict, overwrite=False):
+    """
+    Uploads a data type.
+    """
+
+    table_name = 'experiment_data_type'
+    name_string = 'Experiment data type'
+    table_id = 'type'
+    columns = ['unit']
+
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, type_dict, name_string)
+
+    return
 
 
 def db_get_experiment_data_types(pth):
     """
-    Gets all experiment data types
+    Gets all experiment data types.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table = 'experiment_data_type'
+    name_string = 'experiment data types'
+    table_id = 'id'
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM experiment_data_type''')
-
-        # Get the types
-        types = []
-        for row in cursor:
-            types.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(types), "experiment data types")
-
-    return types
+    return _get_all_no_id(pth, table_id, table, name_string)
 
 
 def db_delete_experiment_data_type(pth, data_type):
     """
-    Delete experiment data type in the database
+    Delete experiment data type in the database.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_id = 'type'
+    table_name = 'experiment_data_type'
+    name_string = 'experiment data types'
 
-            # Check if source exists
-            ids = cursor.execute(
-                build_select(table='experiment_data_type',
-                             to_select=['type'],
-                             where=['type']),
-                {'type':        data_type}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Property type to delete does not exist in database")
-
-            sql_com = build_delete(table='experiment_data_type',
-                                   where=['type'])
-
-            cursor.execute(sql_com, {'type': data_type})
-
-            # Print success
-            print("Success", data_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on experiment data type:", "\n",
-              data_type,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, data_type, name_string)
 
     return
 
@@ -935,7 +800,8 @@ def db_delete_experiment_data_type(pth, data_type):
 
 def db_upload_adsorbate(pth, adsorbate, overwrite=False):
     """
-    Uploads adsorbates to the database
+    Uploads adsorbates to the database.
+
     If overwrite is set to true, the adsorbate is overwritten
     Overwrite is done based on adsorbate.name
     WARNING: Overwrite is done on ALL fields
@@ -964,7 +830,7 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
             }
             )
 
-            # Upload or modify data in sample_properties table
+            # Upload or modify data in the table
             if len(adsorbate.properties) > 0:
                 # Get id of adsorbate
                 ads_id = cursor.execute(
@@ -1014,7 +880,7 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
 
     # Catch the exception
     except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
+        print("Error on adsorbate:", "\n",
               adsorbate.name,
               "\n", e)
         raise ParsingError from e
@@ -1028,10 +894,10 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
 
 def db_get_adsorbates(pth):
     """
-    Gets all adsorbates and their properties
+    Gets all adsorbates and their properties.
 
     The number of adsorbates is usually small, so all can be
-    loaded in memory at once
+    loaded in memory at once.
     """
 
     # Connect to database
@@ -1056,17 +922,18 @@ def db_get_adsorbates(pth):
             # Get the extra data from the adsorbate_properties table
             cur_inner = db.cursor()
 
-            cur_inner.execute(build_select(table='adsorbate_properties',
-                                           to_select=['type', 'value'],
-                                           where=['ads_id']), {
-                'ads_id': adsorbate_params.get('id')
-            })
+            cur_inner.execute(
+                build_select(table='adsorbate_properties',
+                             to_select=['type', 'value'],
+                             where=['ads_id']),
+                {'ads_id': adsorbate_params.pop('id')}
+            )
 
-            adsorbate_params['properties'] = {
-                row[0]: row[1] for row in cur_inner}
+            adsorbate_params.update({
+                row[0]: row[1] for row in cur_inner})
 
             # Build adsorbate objects
-            adsorbates.append(Adsorbate(adsorbate_params))
+            adsorbates.append(Adsorbate(**adsorbate_params))
 
     # Close the db connection
     if db:
@@ -1080,7 +947,7 @@ def db_get_adsorbates(pth):
 
 def db_delete_adsorbate(pth, adsorbate):
     """
-    Delete adsorbate from the database
+    Delete adsorbate from the database.
     """
 
     # Connect to database
@@ -1134,117 +1001,44 @@ def db_delete_adsorbate(pth, adsorbate):
     return
 
 
-def db_upload_adsorbate_property_type(pth, property_type):
-    "Uploads a property type"
+def db_upload_adsorbate_property_type(pth, type_dict, overwrite=False):
+    """
+    Uploads an adsorbate property type.
+    """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_name = 'adsorbate_properties_type'
+    name_string = 'Property type'
+    table_id = 'type'
+    columns = ['unit']
 
-            sql_com = build_insert(table="adsorbate_properties_type",
-                                   to_insert=['type', 'unit'])
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, type_dict, name_string)
 
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'type':         property_type.get('type'),
-                'unit':         property_type.get('unit'),
-            }
-            )
-
-        # Print success
-        print("Property type uploaded", property_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
-              property_type,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    return
 
 
 def db_get_adsorbate_property_types(pth):
     """
-    Gets all adsorbate property types
+    Gets all adsorbate property types.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table = 'adsorbate_properties_type'
+    name_string = 'adsorbate property types'
+    table_id = 'id'
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM adsorbate_properties_type''')
-
-        # Get the types
-        types = []
-        for row in cursor:
-            types.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(types), "adsorbate property types")
-
-    return types
+    return _get_all_no_id(pth, table_id, table, name_string)
 
 
 def db_delete_adsorbate_property_type(pth, property_type):
     """
-    Delete property type in the database
+    Delete property type in the database.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_id = 'type'
+    table_name = 'adsorbate_properties_type'
+    name_string = 'adsorbate property types'
 
-            # Check if source exists
-            ids = cursor.execute(
-                build_select(table='adsorbate_properties_type',
-                             to_select=['type'],
-                             where=['type']),
-                {'type':        property_type}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Property type to delete does not exist in database")
-
-            sql_com = build_delete(table='adsorbate_properties_type',
-                                   where=['type'])
-
-            cursor.execute(sql_com, {'type': property_type})
-
-            # Print success
-            print("Success", property_type)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on type:", "\n",
-              property_type,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, property_type, name_string)
 
     return
 
@@ -1254,128 +1048,45 @@ def db_delete_adsorbate_property_type(pth, property_type):
 
 def db_upload_contact(pth, contact_dict, overwrite=False):
     """
-    Uploads comtact to the database
-    If overwrite is set to true, the contact is overwritten
-    WARNING: Overwrite is done on ALL fields
+    Uploads comtact to the database.
+
+    If overwrite is set to true, the contact is overwritten.
+    WARNING: Overwrite is done on ALL fields.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_name = 'contacts'
+    name_string = 'Contact'
+    table_id = 'nick'
+    columns = ['name', 'email', 'phone']
 
-            if overwrite:
-                sql_com = build_update(table="contacts",
-                                       to_set=['name', 'email', 'phone'],
-                                       where=['nick'])
-            else:
-                sql_com = build_insert(table="contacts",
-                                       to_insert=['nick', 'name', 'email', 'phone'])
-
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'nick':          contact_dict.get('nick'),
-                'name':          contact_dict.get('name'),
-                'email':         contact_dict.get('email'),
-                'phone':         contact_dict.get('phone'),
-            }
-            )
-
-        # Print success
-        print("Contact uploaded", contact_dict.get('nick'))
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on contact:", "\n",
-              contact_dict.get('nick'),
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, contact_dict, name_string)
 
     return
 
 
 def db_get_contacts(pth):
     """
-    Gets all contacts
+    Gets all contacts.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table = 'contacts'
+    name_string = 'contacts'
+    table_id = 'id'
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM contacts''')
-
-        # Get the contacts
-        contacts = []
-        for row in cursor:
-            contacts.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(contacts))
-
-    return contacts
+    return _get_all_no_id(pth, table_id, table, name_string)
 
 
 def db_delete_contact(pth, contact_nick):
     """
-    Delete contact in the database
+    Delete contact in the database.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_id = 'nick'
+    table_name = 'contacts'
+    name_string = 'contact'
 
-            # Check if contact exists
-            ids = cursor.execute(
-                build_select(table='contacts',
-                             to_select=['nick'],
-                             where=['nick']),
-                {'nick':        contact_nick}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Contact to delete does not exist in database")
-
-            sql_com = build_delete(table='contacts',
-                                   where=['nick'])
-
-            cursor.execute(sql_com, {'nick': contact_nick})
-
-            # Print success
-            print("Success", contact_nick)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
-              contact_nick,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, contact_nick, name_string)
 
     return
 
@@ -1384,254 +1095,92 @@ def db_delete_contact(pth, contact_nick):
 
 def db_upload_source(pth, source_dict, overwrite=False):
     """
-    Uploads source to the database
-    If overwrite is set to true, the source is overwritten
-    WARNING: Overwrite is done on ALL fields
+    Uploads source to the database.
+
+    If overwrite is set to true, the source is overwritten.
+    WARNING: Overwrite is done on ALL fields.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_name = 'sources'
+    name_string = 'Source'
+    table_id = 'nick'
+    columns = ['name']
 
-            if overwrite:
-                sql_com = build_update(table="sources",
-                                       to_set=['name'],
-                                       where=['nick'])
-            else:
-                sql_com = build_insert(table="sources",
-                                       to_insert=['nick', 'name'])
-
-            # Upload or modify data in sources table
-            cursor.execute(sql_com, {
-                'nick':         source_dict.get('nick'),
-                'name':         source_dict.get('name'),
-            }
-            )
-
-        # Print success
-        print("Source uploaded", source_dict.get('nick'))
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on source:", "\n",
-              source_dict.get('nick'),
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, source_dict, name_string)
 
     return
 
 
 def db_get_sources(pth):
     """
-    Gets all sources
+    Gets all sources.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table = 'sources'
+    name_string = 'sources'
+    table_id = 'id'
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM sources''')
-
-        # Get the sources
-        sources = []
-        for row in cursor:
-            sources.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(sources))
-
-    return sources
+    return _get_all_no_id(pth, table_id, table, name_string)
 
 
 def db_delete_source(pth, source_nick):
     """
-    Delete source in the database
+    Delete source in the database.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_id = 'nick'
+    table_name = 'sources'
+    name_string = 'source'
 
-            # Check if source exists
-            ids = cursor.execute(
-                build_select(table='sources',
-                             to_select=['nick'],
-                             where=['nick']),
-                {'nick':        source_nick}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Source to delete does not exist in database")
-
-            sql_com = build_delete(table='sources',
-                                   where=['nick'])
-
-            cursor.execute(sql_com, {'nick': source_nick})
-
-            # Print success
-            print("Success", source_nick)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on source:", "\n",
-              source_nick,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, source_nick, name_string)
 
     return
+
 
 # ---------------------- Machines
 
 
 def db_upload_machine(pth, machine_dict, overwrite=False):
     """
-    Uploads machine to the database
-    If overwrite is set to true, the machine is overwritten
-    WARNING: Overwrite is done on ALL fields
+    Uploads machine to the database.
+
+    If overwrite is set to true, the machine is overwritten.
+    WARNING: Overwrite is done on ALL fields.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_name = 'machines'
+    name_string = 'Machine'
+    table_id = 'nick'
+    columns = ['name', 'type']
 
-            if overwrite:
-                sql_com = build_update(table="machines",
-                                       to_set=['name', 'type'],
-                                       where=['nick'])
-            else:
-                sql_com = build_insert(table="machines",
-                                       to_insert=['nick', 'name', 'type'])
-
-            # Upload or modify data in machines table
-            cursor.execute(sql_com, {
-                'nick':         machine_dict.get('nick'),
-                'name':         machine_dict.get('name'),
-                'type':         machine_dict.get('type'),
-            }
-            )
-
-        # Print success
-        print("Machine uploaded", machine_dict.get('nick'))
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on machine:", "\n",
-              machine_dict.get('nick'),
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _upload_one_all_columns(pth, table_id, columns, overwrite,
+                            table_name, machine_dict, name_string)
 
     return
 
 
 def db_get_machines(pth):
     """
-    Gets all machines
+    Gets all machines.
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    table = 'machines'
+    name_string = 'machines'
+    table_id = 'id'
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM machines''')
-
-        # Get the machines
-        machines = []
-        for row in cursor:
-            machines.append(dict(zip(row.keys(), row)))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(machines))
-
-    return machines
+    return _get_all_no_id(pth, table_id, table, name_string)
 
 
 def db_delete_machine(pth, machine_nick):
     """
-    Delete machine in the database
+    Delete machine in the database.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    table_id = 'nick'
+    table_name = 'machines'
+    name_string = 'machine'
 
-            # Check if machine exists
-            ids = cursor.execute(
-                build_select(table='machines',
-                             to_select=['nick'],
-                             where=['nick']),
-                {'nick':        machine_nick}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Machine to delete does not exist in database")
-
-            sql_com = build_delete(table='machines',
-                                   where=['nick'])
-
-            cursor.execute(sql_com, {'nick': machine_nick})
-
-            # Print success
-            print("Success", machine_nick)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on machine:", "\n",
-              machine_nick,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    _delete_one_by_id(pth, table_name, table_id, machine_nick, name_string)
 
     return

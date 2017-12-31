@@ -24,4 +24,4 @@ To go back to the standard CoolProp backend, use:
 .. warning::
 
     If REFPROP is not previously installed and configured on the user's computer, calculations
-    will fail
+    will fail.
