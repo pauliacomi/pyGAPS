@@ -35,10 +35,11 @@ If you are proposing a feature:
 Development
 ===========
 
-To set up `pygaps` for local development:
+To set up `pyGAPS` for local development:
 
-1. Fork `pygaps <https://github.com/pauliacomi/pygaps>`_
+1. Fork `pyGAPS <https://github.com/pauliacomi/pygaps>`_
    (look for the "Fork" button).
+
 2. Clone your fork locally::
 
     git clone git@github.com:your_name_here/pygaps.git
@@ -49,9 +50,15 @@ To set up `pygaps` for local development:
 
    Now you can make your changes locally.
 
-4. When you're done making changes, run all the checks, doc builder and spell checker with `tox <http://tox.readthedocs.io/en/latest/install.html>`_ one command::
+4. When you're done making changes, run all the checks, doc builder and
+   spell checker with `tox <http://tox.readthedocs.io/en/latest/install.html>`_ one command::
 
     tox
+
+   Or you could run the tests with only your own environment by running::
+
+    pytest
+
 
 5. Commit your changes and push your branch to GitHub::
 
@@ -74,7 +81,7 @@ For merging, you should:
 4. Add yourself to ``AUTHORS.rst``.
 
 .. [1] If you don't have all the necessary python versions available locally you can rely on Travis - it will
-       `run the tests <https://travis-ci.org/pauliacomi/pygaps/pull_requests>`_ for each change you add in the pull request.
+       `run the tests <https://travis-ci.org/pauliacomi/pyGAPS/pull_requests>`_ for each change you add in the pull request.
 
        It will be slower though ...
 
