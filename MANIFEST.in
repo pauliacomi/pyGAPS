@@ -3,6 +3,7 @@ graft src
 graft ci
 graft tests
 
+include .build.info
 include .bumpversion.cfg
 include .coveragerc
 include .pylintrc
