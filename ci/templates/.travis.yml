@@ -11,6 +11,7 @@ env:
   matrix:
     - TOXENV=check
     - TOXENV=docs
+
 matrix:
   include:
 {%- for env, config in tox_environments|dictsort %}{{ '' }}
@@ -24,8 +25,6 @@ before_install:
   - python --version
   - uname -a
   - lsb_release -a
-  - pip install --upgrade pip setuptools wheel
-  - pip install --only-binary=numpy,scipy numpy scipy
 
 install:
   # install tox
@@ -35,8 +34,6 @@ install:
   - easy_install --version
   - pip --version
   - tox --version
-  - pip freeze | grep numpy
-  - pip freeze | grep scipy
 
 before_script:
   - export DISPLAY=:99.0
