@@ -3,7 +3,7 @@
 
 __author__ = 'Paul A. Iacomi'
 __docformat__ = 'restructuredtext'
-__version__ = '0.9.3'
+__version__ = '1.0.0'
 
 # isort:skip_file
 

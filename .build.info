@@ -1,0 +1,13 @@
+## Increase version
+bumpversion
+
+## Clean things from ancient builds
+rm -rf build
+rm -rf src/*.egg-info
+
+## Build sdist and wheels
+python setup.py clean --all sdist bdist_wheel
+
+## Now upload to PyPi
+# twine register dist/* # If package needs registering
+twine upload --skip-existing dist/*.whl dist/*.gz dist/*.zip
