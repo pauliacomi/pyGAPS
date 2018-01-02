@@ -2,7 +2,7 @@
 Changelog
 =========
 
-0.10.0 ()
+0.10.0 (2018-01-01)
 ------------------
 
 * Improved unit management by adding a unit/basis for both the
