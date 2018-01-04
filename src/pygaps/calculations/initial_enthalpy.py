@@ -4,6 +4,7 @@ This module calculates the initial enthalpy of adsorption based on an isotherm.
 
 import numpy
 import scipy
+import warnings
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import initial_enthalpy_plot
@@ -48,7 +49,12 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False):
 
     # get adsorbate properties
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
-    enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
+    try:
+        enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
+    except CalculationError as e_info:
+        warnings.warn(
+            "Could not calculate liquid enthalpy, perhaps in supercritical regime")
+        enth_liq = 0
 
     params = {
         'const': (enth_liq, (enth_liq, None)),
