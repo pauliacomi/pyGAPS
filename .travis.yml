@@ -1,6 +1,7 @@
 language: python
 sudo: false
 cache: pip
+
 # We need to install pandoc separately to deal with the
 # jupyter translation of docs
 addons:
@@ -11,54 +12,52 @@ env:
   global:
     - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
     - SEGFAULT_SIGNALS=all
-  # Two jobs created here, one for checks one for docs
+  # Two jobs created here, in the test job, one for code checks, one for docs
   matrix:
     - TOXENV=check
     - TOXENV=docs
 
-# Create an test job for each python version specified
-matrix:
-  include:
-    - python: '3.5'
-      env:
-        - TOXENV=3.5-cover,report,codecov
-    - python: '3.6'
-      env:
-        - TOXENV=3.6-cover,report,codecov
-
-
-before_install:
-  - python --version
-  - uname -a
-  - lsb_release -a
-
-install:
-  # install tox
-  - pip install tox
-  # display versions of installed components
-  - virtualenv --version
-  - easy_install --version
-  - pip --version
-  - tox --version
-
-before_script:
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3 # give xvfb some time to start
-
-script:
-  # start tox to do the testing
-  - tox -v
-
-after_failure:
-  - more .tox/log/* | cat
-  - more .tox/*/log/* | cat
-
-# If all goes well, we want to deploy to PyPi
-# Use build stages to specify a deploy stage
-# if tests are ran successfully
 jobs:
   include:
+    - stage: test
+      # Create an test job for each python version specified
+      matrix:
+        include:
+            - python: '3.5'
+            env:
+                - TOXENV=3.5-cover,report,codecov
+            - python: '3.6'
+            env:
+                - TOXENV=3.6-cover,report,codecov
+
+      before_install:
+      - python --version
+      - uname -a
+      - lsb_release -a
+
+      install:
+      # install tox
+      - pip install tox
+      # display versions of installed components
+      - virtualenv --version
+      - easy_install --version
+      - pip --version
+      - tox --version
+
+      before_script:
+      - export DISPLAY=:99.0
+      - sh -e /etc/init.d/xvfb start
+      - sleep 3 # give xvfb some time to start
+
+      script:
+      # start tox to do the testing
+      - tox -v
+
+      after_failure:
+      - more .tox/log/* | cat
+      - more .tox/*/log/* | cat
+
+    # If all goes well, we want to deploy to PyPi
     - stage: deploy
       script: skip      # run no tests
       deploy: &pypi     # instead deploy on pypi
@@ -71,6 +70,7 @@ jobs:
           python: '3.6'
           branch: master
           tags: true
+
 
 notifications:
   email:
