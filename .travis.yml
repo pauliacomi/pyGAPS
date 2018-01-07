@@ -60,6 +60,7 @@ jobs:
     - stage: deploy
       python: '3.6'     # specify python 3.6
       env: TOXENV=none  # overwrite environment var
+      install: skip     # no need to install tox
       script: skip      # run no tests
       deploy: &pypi     # instead deploy on pypi
         provider: pypi
