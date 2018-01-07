@@ -1,6 +1,8 @@
 language: python
 sudo: false
 cache: pip
+# We need to install pandoc separately to deal with the
+# jupyter translation of docs
 addons:
   apt_packages:
     - pandoc
@@ -9,10 +11,12 @@ env:
   global:
     - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
     - SEGFAULT_SIGNALS=all
+  # Two jobs created here, one for checks one for docs
   matrix:
     - TOXENV=check
     - TOXENV=docs
 
+# Create an test job for each python version specified
 matrix:
   include:
     - python: '3.5'
@@ -21,6 +25,7 @@ matrix:
     - python: '3.6'
       env:
         - TOXENV=3.6-cover,report,codecov
+
 
 before_install:
   - python --version
@@ -49,7 +54,29 @@ after_failure:
   - more .tox/log/* | cat
   - more .tox/*/log/* | cat
 
+# If all goes well, we want to deploy to PyPi
+# Use build stages to specify a deploy stage
+# if tests are ran successfully
+jobs:
+  include:
+    - stage: deploy
+      script: skip      # run no tests
+      deploy: &pypi     # instead deploy on pypi
+        provider: pypi
+        user: pauliacomi
+        password:
+            secure:
+            n0/j7ueOm8N0frKsRtEOqWvY1I02iu08dNS3ylK+8q+78PrQwB9xQUlH8QRQselMrkobas9e2l9x8eglYNmN1yYata0mT/UexIy+h1CmHTt6oMxE6TSEiCRuyQ73TwV5F36eOOGLwYYzRLMOYjVaHC5E3f0W1RzGcWstrgZWRtVhHNZ+3IxYW+sqb2+JVeKlhqQgmZY2+LRkwf7UXgoNeYHElKB0WnoPNiK2UpYYm8Et4IWFs7BBQfFBTiHmvmsk2DVwBPUWfju0CLoGFKrf/7Z4polSgo88WIBMtW2vPq3JU7uGr3Bqc/XNs+atc0AT9/eqb7x7DogeikSagJa1dx1h///C90as5FV4pSSHRILTCV5quTl9IFKltefxcNPbQuDtwano7wYIxbU4fbGjb8kGOCzTd2IWaz9oy9XtpC6xLuxBxlG4IphD3qQPtvGqi5udHlC3PX7GTgnQ6ySPuZ6EqhHmTFcpbaT8AXp5jfi2LqHllIo/+PcTv3Bm1/89qEfwcm6biE8O41ejOyjb3WKiB2etOMkw7O0tZE9Ub2LrPFohcCQVJgKFcewKrb5zCtmN61m+S3IFu3tOrean3De13ycD1oYSLbwMxU3Cc2bvRoQ+JcnRSIiNcu4ujaHL7uANQClHTByhUa61PNgWVOH3P6YWU572khCEUzF8cEA=
+        distributions: "sdist bdist_wheel"
+        on:
+          python: '3.6'
+          branch: master
+          tags: true
+
 notifications:
   email:
     on_success: change
     on_failure: change
+  slack:
+    secure: Jf9r/+kMz8rnfu/H22vL+k0lCWiGQIQofbpfBQ37L2aqJ8Fzo1I76ptjoIATDpaGaHtsPVtbK6m6hZ3a9VGwKBvAIDE4L+hJRpA+KzolZRzsF4RidoTvgs3MxOOg44E+S7A7v1b+peNHtXyO18s/1i72Q1ALJBU5rGaqH4z5NGD8EIwePgk4G02tKnELM3Uv1/1ekcvKBjFnuyVQbSLlLsnxbnIITVxP3J7skq9x9jFBFfTuLJsMhSpO0l5MmyujKF/TpYEDen581ZPAUF79H8G63DqZSlS/SwnW3aByb5Vr95dOJrvmjQjcOZVhWaRK/c7PARrSpKybURya1R6dwiqLmxKkZKcYLho4NcEDs8QXuZ60GnZzoUXPKop4SzTDPxOXxr+3+ef5VINvUlIEVDmvDLjnPRrhhXu+n6Et2BfgRu7t1CBWtm3tWo3Of84AO/A2jid3++nI0RQkpfAX0+xuxUBJHfyibWAvmQiHl6ALJnfYxsB0Kvz2Hi9G6PuS2QisLnvr03WRnyXniUpRAUznTfm62DbBXu31hM9jOHtMDKL4CNf3scz8CGQHErV9ksdBbU7wa4JF6GxYyrIgxfuieOQYoSyQH+2dQxZQcQE1CP6T8U8qR2Emtrs4Gtjqos0OxDlUcJbC0Bc8eyAe/W1rVUgmwq4LEGI3eEhPX6s=
+
