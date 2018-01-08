@@ -2,9 +2,10 @@
 This module calculates the initial enthalpy of adsorption based on an isotherm.
 """
 
+import warnings
+
 import numpy
 import scipy
-import warnings
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import initial_enthalpy_plot
