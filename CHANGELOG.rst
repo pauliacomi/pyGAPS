@@ -2,6 +2,10 @@
 Changelog
 =========
 
+1.1.0 ()
+------------------
+* Automatic travis deployment to PyPI
+
 0.10.0 ()
 ------------------
 
