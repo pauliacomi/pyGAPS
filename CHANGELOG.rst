@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.0.1 (2018-01-08)
+------------------
+* Fixed wrong value of polarizability for nitrogen in database
+* Added a check for initial enthalpy when the isotherm is measured in supercritical mode
+
 1.0.0 (2018-01-01)
 ------------------
 
