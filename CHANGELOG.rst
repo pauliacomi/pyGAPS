@@ -2,7 +2,12 @@
 Changelog
 =========
 
-0.10.0 ()
+1.0.1 (2018-01-08)
+------------------
+* Fixed wrong value of polarizability for nitrogen in database
+* Added a check for initial enthalpy when the isotherm is measured in supercritical mode
+
+1.0.0 (2018-01-01)
 ------------------
 
 * Improved unit management by adding a unit/basis for both the
@@ -14,6 +19,7 @@ Changelog
 * Added new isotherm models: Toth, Jensen-Seaton, W-VST, FH-VST.
 * Made creation of classes (Adsorbate/Sample/Isotherms) more
   intuitive.
+* Many small fixes and improvements
 
 0.9.3 (2017-10-24)
 ------------------
