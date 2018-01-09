@@ -157,10 +157,13 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     bounds['powa_max'] = 20
     bounds['powr_max'] = 20
 
+    # We set the attraction term between 0 and a reasonable final constant
     bounds['prepowa_min'] = 0
-    bounds['prepowa_max'] = numpy.inf
-    bounds['prepowr_min'] = -numpy.inf
+    bounds['prepowa_max'] = 50
+    # We set the repulsion term between 0 and a reasonable final constant
+    bounds['prepowr_min'] = -50
     bounds['prepowr_max'] = 0
+
     # ###############
     # Update with user values
     bounds.update(param_guess)
@@ -190,7 +193,11 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         return params_[0] - params_[1] * 1 / (1 + numpy.exp(params[2] * (loading - params[3]))) \
             - params_[4] * loading ** params_[5] - \
             params_[6] * loading ** params_[7]
-    constr = ()  # {'type': 'ineq', 'fun': maximize_constant})
+
+    def repulsion_dominates(params_):
+        return params_[7] - params_[5]
+
+    constr = ({'type': 'ineq', 'fun': repulsion_dominates})
 
     ##################################
     ##################################
