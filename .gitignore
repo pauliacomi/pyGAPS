@@ -99,4 +99,5 @@ ENV/
 .mypy_cache/
 
 # VS code
-.vscode
+.vscode/*
+!.vscode/settings.json
