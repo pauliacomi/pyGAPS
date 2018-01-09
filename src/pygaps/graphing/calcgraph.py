@@ -374,8 +374,8 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
     ax1.set_xlabel('Loading')
     ax1.set_ylabel('Enthalpy')
     ax1.legend(loc='best')
+    ax1.set_ylim(ymin=0, ymax=(max(enthalpy) * 1.2))
     ax1.set_xlim(xmin=0)
-    ax1.set_ylim(ymin=0)
     ax1.grid(True)
 
     return ax1

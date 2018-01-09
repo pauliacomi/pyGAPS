@@ -62,7 +62,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     ##################################
     # First define the parameters
 
-    param_names = ['const', 'preexp', 'exp',
+    param_names = ['const', 'preexp', 'exp', 'exploc',
                    'prepowa', 'powa', 'prepowr', 'powr']
     params = {name: numpy.nan for name in param_names}
 
@@ -71,7 +71,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         return params['const']
 
     def exponential_term(l):
-        return params['preexp'] * numpy.exp(params['exp'] * l)
+        return params['preexp'] * 1 / (1 + numpy.exp(params['exp'] * (l - params['exploc'])))
 
     def power_term_repulsive(l):
         return params['prepowr'] * l ** params['powr']
@@ -129,8 +129,8 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # The contribution should always lead to a decreasing
     # enthalpy of adsorption. Therefore:
     # The exponential term cannot be positive
-    bounds['exp_min'] = -numpy.inf
-    bounds['exp_max'] = 0
+    bounds['exp_min'] = 0
+    bounds['exp_max'] = numpy.inf
 
     # The preexponential term cannot be negative
     bounds['preexp_min'] = 0
@@ -139,6 +139,11 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # Physically, there must be a limit for this interaction
     # even for chemisorption. We set a conservative limit.
     bounds['preexp_max'] = 150
+
+    # Since the pressure is scaled, the location can only be between 0 and 1
+    # We do this to avoid weird behaviour at high loadings
+    bounds['exploc_min'] = 0
+    bounds['exploc_max'] = 0.5
 
     ##################################
     # The power term
@@ -149,8 +154,8 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     bounds['powa_min'] = 1
     bounds['powr_min'] = 1
     # We set a realistic upper limit on the number of interactions
-    bounds['powa_max'] = 50
-    bounds['powr_max'] = 50
+    bounds['powa_max'] = 20
+    bounds['powr_max'] = 20
 
     bounds['prepowa_min'] = 0
     bounds['prepowa_max'] = numpy.inf
@@ -165,6 +170,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         (bounds.get('const_min'), bounds.get('const_max')),
         (bounds.get('preexp_min'), bounds.get('preexp_max')),
         (bounds.get('exp_min'), bounds.get('exp_max')),
+        (bounds.get('exploc_min'), bounds.get('exploc_max')),
         (bounds.get('prepowa_min'), bounds.get('prepowa_max')),
         (bounds.get('powa_min'), bounds.get('powa_max')),
         (bounds.get('prepowr_min'), bounds.get('prepowr_max')),
@@ -172,16 +178,19 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     )
 
     if verbose:
-        print('Bounds: \n\tconst =', (bounds_arr[0]), ', preexp =', bounds_arr[1],
-              ', exp =', bounds_arr[2], ', prepowa =', bounds_arr[3], ', powa =', bounds_arr[4],
-              ', prepowr =', bounds_arr[5], ', powr =', bounds_arr[6])
+        print('Bounds: \n\tconst =', (bounds_arr[0]),
+              ', preexp =', bounds_arr[1], ', exp =', bounds_arr[2], ', exploc =', bounds_arr[3],
+              ', prepowa =', bounds_arr[4], ', powa =', bounds_arr[5],
+              ', prepowr =', bounds_arr[6], ', powr =', bounds_arr[7])
 
     ##################################
     ##################################
     # Constraints on the parameters
     def maximize_constant(params_):
-        return params_[0] - params_[1] * numpy.exp(params_[2] * loading) - params_[3] * loading ** params_[4] - params_[5] * loading ** params_[6]
-    constr = ({'type': 'ineq', 'fun': maximize_constant})
+        return params_[0] - params_[1] * 1 / (1 + numpy.exp(params[2] * (loading - params[3]))) \
+            - params_[4] * loading ** params_[5] - \
+            params_[6] * loading ** params_[7]
+    constr = ()  # {'type': 'ineq', 'fun': maximize_constant})
 
     ##################################
     ##################################
@@ -193,20 +202,20 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     dep_last = min(max(enthalpy[-1], 0), 150) - const_avg
     guesses = (
         # Starting from a constant value
-        numpy.array([const_avg, 0, 0, 0, 1, 0, 1]),
+        numpy.array([const_avg, 0, 0, 0, 0, 1, 0, 1]),
         # Starting from an adjusted start and end
         numpy.array([const_avg,
-                     dep_first, 0,
+                     dep_first, 0, 0.1,
                      dep_last, 1,
                      dep_last, 1]),
         # Starting from a large exponent and gentle power increase
         numpy.array([const_avg,
-                     1.5 * dep_first, -10,
+                     1.5 * dep_first, -10, 0.1,
                      0.01, 3,
                      0, 1]),
         # Starting from no exponent and gentle power decrease
         numpy.array([const_avg,
-                     0, 0,
+                     0, 0, 0.1,
                      0, 3,
                      -0.01, 3]),
     )
@@ -223,9 +232,10 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
 
     for guess in guesses:
         if verbose:
-            print('Initial guesses: \n\tconst =', guess[0], ', preexp =', guess[1],
-                  ', exp =', guess[2], ', prepowa =', guess[3], ', powa =', guess[4],
-                  ', prepowr =', guess[5], ', powr =', guess[6])
+            print('Initial guesses: \n\tconst =', guess[0],
+                  ', preexp =', guess[1], ', exp =', guess[2], ', exploc =', guess[3],
+                  ', prepowa =', guess[4], ', powa =', guess[5],
+                  ', prepowr =', guess[6], ', powr =', guess[7])
         opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
                                           bounds=bounds_arr, constraints=constr,
                                           method='SLSQP', options=options)
@@ -256,7 +266,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         print("The constant contribution is \n\t{:.2f}".format(
             params['const']))
         print("The exponential contribution is \n\t{:.2f} * exp({:.2E} * n)".format(
-            params['preexp'], params['exp']))
+            params['preexp'], params['exp']), "with the limit at {:.2f}".format(params['exploc']))
         print("The guest-guest attractive contribution is \n\t{:.2g} * n^{:.2}".format(
             params['prepowa'], params['powa']))
         print("The guest-guest repulsive contribution is \n\t{:.2g} * n^{:.2}".format(
