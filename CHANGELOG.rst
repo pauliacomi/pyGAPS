@@ -2,17 +2,19 @@
 Changelog
 =========
 
+1.1.0 ()
+------------------
+
+* Automatic travis deployment to PyPI
+* Improved enthalpy modelling for initial enthalpy determination
+
 1.0.1 (2018-01-08)
 ------------------
+
 * Fixed wrong value of polarizability for nitrogen in database
 * Added a check for initial enthalpy when the isotherm is measured in supercritical mode
 
 1.0.0 (2018-01-01)
-1.1.0 ()
-------------------
-* Automatic travis deployment to PyPI
-
-0.10.0 ()
 ------------------
 
 * Improved unit management by adding a unit/basis for both the
