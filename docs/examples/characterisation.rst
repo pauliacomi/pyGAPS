@@ -18,5 +18,6 @@ A complete applicability guide and info on each function parameters can be found
     psd
     isostericheat
     henryc
+    initialenthalpy
 
 
