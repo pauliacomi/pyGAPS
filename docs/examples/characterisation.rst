@@ -12,7 +12,8 @@ A complete applicability guide and info on each function parameters can be found
     :glob:
 
     inspection
-    bet
+    area_bet
+    area_langmuir
     tplot
     alphas
     psd
