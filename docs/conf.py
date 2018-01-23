@@ -83,6 +83,10 @@ extlinks = {
     'pr': ('https://github.com/pauliacomi/pygaps/pull/%s', 'PR #'),
 }
 
+linkcheck_ignore = [
+    r'https://github.com/pauliacomi/pygaps/compare/.+/',
+]
+
 # Checking for internal links
 nitpicky = True
 
