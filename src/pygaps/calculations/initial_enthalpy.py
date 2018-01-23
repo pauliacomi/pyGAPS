@@ -16,11 +16,20 @@ from ..utilities.exceptions import ParameterError
 def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess):
     """
     Calculates an initial enthalpy based on a compound
-    method with three separate contributions:
+    method with separate contributions:
 
         * A constant contribution
         * An 'active site' decaying exponential contribution
-        * A power contribution to model adsorbate-adsorbate interactions
+        * A power contribution to model adsorbate-adsorbate attraction
+        * A power contribution to model adsorbate-adsorbate repulsion
+
+    It can be represented by the following equation:
+
+    .. math::
+
+        \\Delta H(n) = K_{const}+\\frac{K_{exp}}{1+\\exp(E*(n-n_{loc})))}+K_{pa}*n^{p_a}+K_{pr}*n^{p_r}
+
+    Enthalpy data should be in KJ/mmol and positive.
 
     Parameters
     ----------
@@ -32,6 +41,44 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         The isotherm branch to use for the calculation. Default is adsorption branch.
     verbose : bool, optional
         Whether to print out extra information.
+
+    Other Parameters
+    ----------------
+    const_min : float
+        Lower limit for constant contribution.
+    const_max : float
+        Upper limit for constant contribution.
+
+    exp_min : float
+        Lower limit for exponential contribution.
+    exp_max : float
+        Upper limit for exponential contribution.
+    preexp_min : float
+        Lower limit for exponential contribution coefficient.
+    preexp_max : float
+        Upper limit for exponential contribution coefficient.
+    exploc_min : float
+        Lower limit for location of inflexion point.
+    exploc_max : float
+        Upper limit for location of inflexion point.
+
+    powa_min : float
+        Lower limit for power attraction contribution.
+    powa_max : float
+        Upper limit for power attraction contribution.
+    prepowa_min : float
+        Lower limit for power attraction contribution coefficient.
+    prepowa_max : float
+        Upper limit for power attraction contribution coefficient.
+    powr_min : float
+        Lower limit for power repulsion contribution.
+    powr_max : float
+        Upper limit for power repulsion contribution.
+    prepowr_min : float
+        Lower limit for power repulsion contribution coefficient.
+    prepowr_max : float
+        Upper limit for power repulsion contribution coefficient.
+
 
     Returns
     -------
@@ -54,7 +101,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     for i, point in enumerate(enthalpy):
         if point < 0 or point > 400:
             index.append(i)
-    if len(index) > 0:
+    if index:
         loading = numpy.delete(loading, index)
         enthalpy = numpy.delete(enthalpy, index)
 
@@ -123,8 +170,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # The exponential term
 
     # The constant term is meant to model the active sites or defects
-    # in the material. It is composed of an exponential and
-    # preexponential term
+    # in the material. It is represented as a logistic function.
 
     # The contribution should always lead to a decreasing
     # enthalpy of adsorption. Therefore:
@@ -141,7 +187,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     bounds['preexp_max'] = 150
 
     # Since the pressure is scaled, the location can only be between 0 and 1
-    # We do this to avoid weird behaviour at high loadings
+    # We set the maximum at 0.5 do this to avoid weird behaviour at high loadings
     bounds['exploc_min'] = 0
     bounds['exploc_max'] = 0.5
 
@@ -153,7 +199,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # The power should be at least 1 (1-1 interactions)
     bounds['powa_min'] = 1
     bounds['powr_min'] = 1
-    # We set a realistic upper limit on the number of interactions
+    # We set a realistic upper limit on the power of interactions
     bounds['powa_max'] = 20
     bounds['powr_max'] = 20
 
@@ -197,7 +243,10 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     def repulsion_dominates(params_):
         return params_[7] - params_[5]
 
-    constr = ({'type': 'ineq', 'fun': repulsion_dominates})
+    constr = (
+        # {'type': 'ineq', 'fun': maximize_constant},
+        {'type': 'ineq', 'fun': repulsion_dominates},
+    )
 
     ##################################
     ##################################
