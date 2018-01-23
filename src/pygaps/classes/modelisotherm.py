@@ -57,7 +57,7 @@ class ModelIsotherm(Isotherm):
     optimization_params : dict
         Dictionary to be passed to the minimization function to use in fitting model to data.
         See `here
-        <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+        <https://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
@@ -144,7 +144,8 @@ class ModelIsotherm(Isotherm):
             data = data.loc[data['branch']]
 
         if data.empty:
-            raise ParameterError("The isotherm branch does not contain enough points")
+            raise ParameterError(
+                "The isotherm branch does not contain enough points")
 
         #: Branch the isotherm model is based on.
         self.branch = branch
@@ -217,7 +218,7 @@ class ModelIsotherm(Isotherm):
         optimization_params : dict
             Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
-            <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+            <https://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
             Defaults to "Nelder-Mead".
         branch : ['ads', 'des'], optional
             The branch on which the model isotherm is based on. It is assumed to be the
@@ -272,7 +273,7 @@ class ModelIsotherm(Isotherm):
         optimization_params : dict, optional
             Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
-            <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+            <https://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
         verbose : bool
             Prints out extra information about steps taken.
         """
@@ -329,7 +330,7 @@ class ModelIsotherm(Isotherm):
         optimization_params : dict
             Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
-            <http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+            <https://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
         branch : ['ads', 'des'], optional
             The branch on which the model isotherm is based on. It is assumed to be the
             adsorption branch, as it is the most commonly modelled part, although may
@@ -650,8 +651,8 @@ class ModelIsotherm(Isotherm):
             if not pressure_mode:
                 pressure_mode = self.pressure_mode
             if pressure_mode == 'absolute' and not pressure_unit:
-                    raise ParameterError("Must specify a pressure unit if the input"
-                                         " is in an absolute mode")
+                raise ParameterError("Must specify a pressure unit if the input"
+                                     " is in an absolute mode")
 
             pressure = c_pressure(pressure,
                                   mode_from=pressure_mode,
