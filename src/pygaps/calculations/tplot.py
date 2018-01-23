@@ -36,7 +36,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     thickness_model : obj(`str`) or obj(`Isotherm`) or obj(`callable`), optional
         Name of the thickness model to use. Defaults to the Harkins and Jura
         thickness curve.
-    limits : [:obj:`float`, :obj:`float`], optional
+    limits : [float, float], optional
         Manual limits for region selection.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
@@ -185,7 +185,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
         Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
         Molar mass of the adsorbate, in g/mol.
-    limits : [:obj:`float`, :obj:`float`], optional
+    limits : [float, float], optional
         Manual limits for region selection.
 
     Returns

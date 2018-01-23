@@ -90,8 +90,8 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     See Also
     --------
-    psd_bjh : the BJH or Barrett, Joyner and Halenda method
-    psd_dollimore_heal : the DH or Dollimore-Heal method
+    pygaps.calculations.psd_mesoporous.psd_bjh : the BJH or Barrett, Joyner and Halenda method
+    pygaps.calculations.psd_mesoporous.psd_dollimore_heal : the DH or Dollimore-Heal method
 
     """
 
@@ -235,7 +235,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
     See Also
     --------
-    psd_microporous.psd_horvath_kawazoe : the HK, of Horvath-Kawazoe method
+    pygaps.calculations.psd_microporous.psd_horvath_kawazoe : the HK, of Horvath-Kawazoe method
 
     """
 
@@ -371,7 +371,7 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
 
     See Also
     --------
-    psd_dft.psd_dft_kernel_fit : fitting of isotherm data with a DFT kernel
+    pygaps.calculations.psd_dft.psd_dft_kernel_fit : fitting of isotherm data with a DFT kernel
 
     References
     ----------

@@ -83,6 +83,8 @@ extlinks = {
     'pr': ('https://github.com/pauliacomi/pygaps/pull/%s', 'PR #'),
 }
 
+# Checking for internal links
+nitpicky = True
 
 # -- Options for HTML output ---------------------------------------------------
 
