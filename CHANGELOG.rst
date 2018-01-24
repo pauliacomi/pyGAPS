@@ -2,7 +2,7 @@
 Changelog
 =========
 
-1.1.0 ()
+1.1.0 (18-01-24)
 ------------------
 
 * Automatic travis deployment to PyPI
