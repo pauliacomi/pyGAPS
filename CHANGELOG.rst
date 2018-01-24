@@ -7,6 +7,7 @@ Changelog
 
 * Automatic travis deployment to PyPI
 * Improved enthalpy modelling for initial enthalpy determination
+* Improved documentation
 
 1.0.1 (2018-01-08)
 ------------------
