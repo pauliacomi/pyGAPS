@@ -84,7 +84,7 @@ extlinks = {
 }
 
 linkcheck_ignore = [
-    r'https://github.com/pauliacomi/pygaps/compare/.+/',
+    r'https://github.com/pauliacomi/pygaps/compare/.+',
 ]
 
 # Checking for internal links
