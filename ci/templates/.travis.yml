@@ -68,7 +68,6 @@ jobs:
         distributions: "sdist bdist_wheel"
         on:
           branch: master
-          tags: true
 
 
 notifications:
