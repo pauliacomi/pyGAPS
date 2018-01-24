@@ -330,7 +330,8 @@ def isosteric_heat_plot(loading, isosteric_heat, log=False):
     return ax1
 
 
-def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False):
+def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
+                          title=None, extras=None):
     """
     Draws the initial enthalpy calculation plot.
 
@@ -344,6 +345,9 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False):
         The predicted enthalpy corresponding to each loading.
     log : int
         Whether to display a logarithmic graph
+    title : str
+        Name of the sample to put in the title.
+
     Returns
     -------
     matplotlib.axes
@@ -354,19 +358,24 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False):
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(loading, enthalpy,
-             marker='o', color='g', label='original')
+             marker='o', color='black', label='original', linestyle='')
     ax1.plot(loading, fitted_enthalpy,
-             marker='x', color='r', label='fitted')
+             color='r', label='fitted', linestyle='-')
+
+    if extras is not None:
+        for param in extras:
+            ax1.plot(param[0], param[1], label=param[2], linestyle='--')
     if(log):
         ax1.set_xscale('log')
         ax1.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
-    ax1.set_title("Initial enthalpy calculation")
+
+    ax1.set_title(title + " initial enthalpy fit")
     ax1.set_xlabel('Loading')
     ax1.set_ylabel('Enthalpy')
     ax1.legend(loc='best')
+    ax1.set_ylim(ymin=0, ymax=(max(enthalpy) * 1.2))
     ax1.set_xlim(xmin=0)
-    ax1.set_ylim(ymin=0)
     ax1.grid(True)
 
     return ax1

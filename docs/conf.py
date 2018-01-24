@@ -62,7 +62,7 @@ project = 'pygaps'
 year = '2017'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '1.0.1'
+version = release = '1.1.0'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.']
@@ -83,6 +83,12 @@ extlinks = {
     'pr': ('https://github.com/pauliacomi/pygaps/pull/%s', 'PR #'),
 }
 
+linkcheck_ignore = [
+    r'https://github.com/pauliacomi/pygaps/compare/.+',
+]
+
+# Checking for internal links
+nitpicky = True
 
 # -- Options for HTML output ---------------------------------------------------
 

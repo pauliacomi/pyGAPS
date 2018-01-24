@@ -21,7 +21,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
     ----------
     isotherm : PointIsotherm
         The isotherm of which to calculate the Langmuir surface area.
-    limits : [:obj:`float`, :obj:`float`], optional
+    limits : [float, float], optional
         Manual limits for region selection.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
@@ -159,7 +159,7 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
         Pressures, relative.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
-    limits : [:obj:`float`, :obj:`float`], optional
+    limits : [float, float], optional
         Manual limits for region selection.
 
     Returns

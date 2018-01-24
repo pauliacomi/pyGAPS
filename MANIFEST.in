@@ -10,6 +10,7 @@ include .pylintrc
 include .cookiecutterrc
 include .editorconfig
 include .isort.cfg
+include .vscode/settings.json
 
 include AUTHORS.rst
 include CHANGELOG.rst

@@ -38,7 +38,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
         p/p0 value at which the loading is reduced.
         Default is 0.4 as it is the closing point for the nitrogen
         hysteresis loop.
-    limits : [:obj:`float`, :obj:`float`], optional
+    limits : [float, float], optional
         Manual limits for region selection.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
@@ -193,7 +193,7 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
         Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
         Molar mass of the adsorbate, in g/mol.
-    limits : [:obj:`float`, :obj:`float`], optional
+    limits : [float, float], optional
         Manual limits for region selection.
 
     Returns
