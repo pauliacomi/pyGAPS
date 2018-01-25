@@ -152,19 +152,20 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # although it depends on the strength of the interaction with the
     # active site.
 
-    bounds['const_min'] = enth_avg - 2 * enth_stdev
     # We check enthalpy of liquefaction
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     try:
-        bounds['const_min'] = max(adsorbate.enthalpy_liquefaction(
-            isotherm.t_exp), bounds['const_min'])
+        enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
     except CalculationError as e_info:
+        enth_liq = 0
         warnings.warn(
             "Could not calculate liquid enthalpy, perhaps in supercritical regime")
 
+    bounds['const_min'] = max(enth_liq, enth_avg) - 2 * enth_stdev
+
     # The maximum constant contribution is taken similar to the minimum
     const_avg = max(enth_avg, bounds['const_min'])
-    bounds['const_max'] = const_avg
+    bounds['const_max'] = const_avg + 2 * enth_stdev
 
     ##################################
     # The exponential term
@@ -261,13 +262,13 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         # Starting from a constant value
         numpy.array([const_avg, 0, 0, 0, 0, 1, 0, 1]),
         # Starting from an adjusted start and end
-        numpy.array([const_avg,
-                     dep_first, 0, 0.1,
-                     dep_last, 1,
-                     dep_last, 1]),
+        numpy.array([0.5 * const_avg,
+                     dep_first, 0, 0,
+                     max(dep_last, 0), 1,
+                     min(dep_last, 0), 1]),
         # Starting from a large exponent and gentle power increase
         numpy.array([const_avg,
-                     1.5 * dep_first, -10, 0.1,
+                     1.5 * dep_first, 10, 0.1,
                      0.01, 3,
                      0, 1]),
         # Starting from no exponent and gentle power decrease
@@ -328,6 +329,9 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
               round(initial_enthalpy, 2))
         print("The constant contribution is \n\t{:.2f}".format(
             params['const']))
+        if params['const'] < enth_liq:
+            warnings.warn(
+                'CARE: Base enthalpy of adsorption is lower than enthalpy of liquefaction.')
         print("The exponential contribution is \n\t{:.2f} * exp({:.2E} * n)".format(
             params['preexp'], params['exp']), "with the limit at {:.2f}".format(params['exploc']))
         print("The guest-guest attractive contribution is \n\t{:.2g} * n^{:.2}".format(
