@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.x.x ()
+------------------
+
+* Allowed for branch selection for isosteric heat and fixed an error where this was an issue.
+
+
 1.1.0 (18-01-24)
 ------------------
 

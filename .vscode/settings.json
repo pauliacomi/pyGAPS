@@ -1,6 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "restructuredtext.confPath": "${workspaceRoot}/docs",
+    "restructuredtext.confPath": "c:\\Users\\pauli\\Git\\pyGAPS/docs",
     "restructuredtext.builtDocumentationPath": "${workspaceRoot}/dist/docs",
 
     "python.unitTest.pyTestEnabled": true,
