@@ -363,7 +363,7 @@ def plot_iso(isotherms,
                                   l_points,
                                   label, styles_dict=styles)
 
-            if secondary_prop is not None:
+            if secondary_prop is not None and secondary_key in isotherm.other_keys:
                 p_points, o_points = pressure().align(secondary_prop(), join='inner')
                 property_graph(axes2,
                                p_points,

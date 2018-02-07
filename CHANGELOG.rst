@@ -5,7 +5,13 @@ Changelog
 1.x.x ()
 ------------------
 
+Features:
+
 * Allowed for branch selection for isosteric heat and fixed an error where this was an issue.
+
+Bugfixes:
+
+* Fixed an issue when plotting isotherms with and without secondary data simultaneously
 
 
 1.1.0 (18-01-24)
