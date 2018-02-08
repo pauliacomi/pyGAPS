@@ -262,7 +262,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
         adsorbate = Adsorbate.from_list(isotherm.adsorbate)
         adsorbate_properties = dict(
             molecular_diameter=adsorbate.get_prop('molecular_diameter'),
-            polarizability=adsorbate.get_prop('polarizability'),
+            polarizability=adsorbate.get_prop('polarizability') / 1e31,
             magnetic_susceptibility=adsorbate.get_prop(
                 'magnetic_susceptibility'),
             surface_density=adsorbate.get_prop('surface_density'),
