@@ -90,7 +90,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     * :math:`l` -- width of pore
     * :math:`d` -- defined as :math:`d=d_a+d_A` the sum of the diameters of the adsorbate and
       adsorbent molecules
-    * :math:`N_A` -- avogadro's number
+    * :math:`N_A` -- Avogadro's number
     * :math:`n_a` -- number of molecules of adsorbent
     * :math:`A_a` -- the Lennard-Jones potential constant of the adsorbent molecule defined as
 
@@ -114,7 +114,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     The assumptions made by using the H-K method are:
 
-        - It does not have a description of capilary condensation. This means that the
+        - It does not have a description of capillary condensation. This means that the
           pore size distribution can only be considered accurate up to a maximum of 5 nm.
 
         - Each pore is uniform and of infinite length. Materials with varying pore
@@ -132,7 +132,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     References
     ----------
     .. [#] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
-       Carbon-dioxide Adsorpton Isoterms, 86
+       Carbon-dioxide Adsorption Isoterms, 86
 
     """
 
