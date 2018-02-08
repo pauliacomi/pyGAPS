@@ -75,7 +75,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     A common mantra of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
 
-    According to Roquerol [#]_, in adopting this approach, it is assumed that:
+    According to Rouquerol [#]_, in adopting this approach, it is assumed that:
 
         - The Kelvin equation is applicable over the pore range (mesopores). Therefore
           in pores which are below a certain size (around 2.5 nm), the granularity
