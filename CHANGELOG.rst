@@ -5,13 +5,17 @@ Changelog
 1.x.x ()
 ------------------
 
+Features:
+
+* The plotting legend now works with any isotherm attribute specified
+* Changed model parent class to print out model name when displayed
 
 1.1.1 (11-02-24)
 ------------------
 
 Features:
 
-* Allowed for branch selection for isosteric heat and fixed an error where this was an issue.
+* Allowed for branch selection for isosteric heat and fixed an error where this was an issue
 
 Bugfixes:
 

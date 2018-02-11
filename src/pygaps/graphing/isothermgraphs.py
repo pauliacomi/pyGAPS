@@ -248,15 +248,14 @@ def plot_iso(isotherms,
         if lbl_components is None:
             return isotherm.sample_name + ' ' + convert_chemformula(isotherm.adsorbate)
         else:
-            parameters = isotherm.to_dict()
             text = []
             for selected in lbl_components:
-                if selected in parameters:
+                val = getattr(isotherm, selected)
+                if val:
                     if selected == 'adsorbate':
-                        text.append(convert_chemformula(
-                            parameters.get(selected)))
+                        text.append(convert_chemformula(val))
                     else:
-                        text.append(str(parameters.get(selected)))
+                        text.append(str(val))
 
             return " ".join(text)
 ###########################################
