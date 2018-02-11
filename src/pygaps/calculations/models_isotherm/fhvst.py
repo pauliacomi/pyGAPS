@@ -179,7 +179,7 @@ class FHVST(IsothermModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["KH"] * pressure
+        return NotImplementedError
 
     def default_guess(self, data, loading_key, pressure_key):
         """
