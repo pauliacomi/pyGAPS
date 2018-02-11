@@ -2,6 +2,19 @@
 Changelog
 =========
 
+1.1.1 (11-02-24)
+------------------
+
+Features:
+
+* Allowed for branch selection for isosteric heat and fixed an error where this was an issue.
+
+Bugfixes:
+
+* Fixed an issue when plotting isotherms with and without secondary data simultaneously
+* Fixed error with magnitude of polarizability of adsorbate from database in microporous PSD
+
+
 1.1.0 (18-01-24)
 ------------------
 

@@ -75,7 +75,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     A common mantra of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
 
-    According to Roquerol [#]_, in adopting this approach, it is assumed that:
+    According to Rouquerol [#]_, in adopting this approach, it is assumed that:
 
         - The Kelvin equation is applicable over the pore range (mesopores). Therefore
           in pores which are below a certain size (around 2.5 nm), the granularity
@@ -262,7 +262,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
         adsorbate = Adsorbate.from_list(isotherm.adsorbate)
         adsorbate_properties = dict(
             molecular_diameter=adsorbate.get_prop('molecular_diameter'),
-            polarizability=adsorbate.get_prop('polarizability'),
+            polarizability=adsorbate.get_prop('polarizability') / 1e31,
             magnetic_susceptibility=adsorbate.get_prop(
                 'magnetic_susceptibility'),
             surface_density=adsorbate.get_prop('surface_density'),

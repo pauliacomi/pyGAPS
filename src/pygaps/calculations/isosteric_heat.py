@@ -10,7 +10,7 @@ from ..graphing.calcgraph import isosteric_heat_plot
 from ..utilities.exceptions import ParameterError
 
 
-def isosteric_heat(isotherms, loading_points=None, verbose=False):
+def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
     """
     Calculation of the isosteric heat of adsorption using several isotherms
     taken at different temperatures on the same material.
@@ -24,6 +24,10 @@ def isosteric_heat(isotherms, loading_points=None, verbose=False):
         The loading points at which the isosteric heat should be calculated. Take care,
         as the points must be within the range of loading of all passed isotherms, or
         else the calculation cannot complete.
+    branch : str
+        The branch of the isotherms to take, defaults to adsorption branch.
+    verbose : bool
+        Whether to print out extra information and generate a graph.
 
     Returns
     -------
@@ -36,7 +40,7 @@ def isosteric_heat(isotherms, loading_points=None, verbose=False):
     Notes
     -----
 
-    *Desription*
+    *Description*
 
     The isosteric heats are calculated from experimental data using the Clausius-Clapeyron
     equation as the starting point:
@@ -47,7 +51,7 @@ def isosteric_heat(isotherms, loading_points=None, verbose=False):
 
     Where :math:`\\Delta H_{ads}` is the enthalpy of adsorption. In order to approximate the
     partial differential, two or more isotherms are measured at different temperatures. The
-    assumption made is that the heat of asdsorption does not vary in the temperature range
+    assumption made is that the heat of adsorption does not vary in the temperature range
     chosen. Therefore, the isosteric heat of adsorption can be calculated by using the pressures
     at which the loading is identical using the following equation for each point:
 
@@ -92,9 +96,9 @@ def isosteric_heat(isotherms, loading_points=None, verbose=False):
 
     # Get minimum and maximum loading for each isotherm
     min_loading = max(
-        [min(x.loading(loading_basis='molar', loading_unit='mmol')) for x in isotherms])
+        [min(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
     max_loading = min(
-        [max(x.loading(loading_basis='molar', loading_unit='mmol')) for x in isotherms])
+        [max(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
 
     # Get temperatures
     temperatures = list(x.t_exp for x in isotherms)
@@ -108,7 +112,7 @@ def isosteric_heat(isotherms, loading_points=None, verbose=False):
     # Get pressure point for each isotherm at loading
     pressures = numpy.array([[i.pressure_at(l, pressure_unit='bar',
                                             pressure_mode='absolute',
-                                            loading_unit='mmol') for i in isotherms]
+                                            loading_unit='mmol', branch=branch) for i in isotherms]
                              for l in loading])
 
     iso_heat, slopes, correlation = isosteric_heat_raw(pressures, temperatures)
@@ -152,7 +156,7 @@ def isosteric_heat_raw(pressures, temperatures):
 
     """
 
-    # Check same lenghts
+    # Check same lengths
     if len(pressures[0]) != len(temperatures):
         raise ParameterError(
             "There are a different number of pressure points than temperature points")

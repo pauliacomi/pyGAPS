@@ -9,14 +9,14 @@ import matplotlib.ticker as ticker
 def roq_plot(pressure, roq_points, minimum, maximum,
              p_monolayer, roq_monolayer):
     """
-    Draws the Roquerol plot.
+    Draws the Rouquerol plot.
 
     Parameters
     ----------
     pressure : array
-        Pressure points which will make up the x axix.
+        Pressure points which will make up the x axis.
     roq_points : array
-        Roquerol-transformed points which will make up the y axis.
+        Rouquerol-transformed points which will make up the y axis.
     minimum : int
         Lower bound of the selected points.
     maximum : int
@@ -24,7 +24,7 @@ def roq_plot(pressure, roq_points, minimum, maximum,
     p_monolayer : float
         Pressure at which statistical monolayer is achieved.
     rol_monolayer : float
-        Roquerol transform of the point at which statistical monolayer is achieved.
+        Rouquerol transform of the point at which statistical monolayer is achieved.
 
     Returns
     -------
@@ -40,7 +40,7 @@ def roq_plot(pressure, roq_points, minimum, maximum,
              marker='o', linestyle='', color='r', label='chosen points')
     ax1.plot(p_monolayer, roq_monolayer,
              marker='x', linestyle='', color='black', label='monolayer point')
-    ax1.set_title("Roquerol plot")
+    ax1.set_title("Rouquerol plot")
     ax1.set_xlabel('p/p°')
     ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
     ax1.legend(loc='best')
@@ -56,7 +56,7 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     Parameters
     ----------
     pressure : array
-        Pressure points which will make up the x axix.
+        Pressure points which will make up the x axis.
     bet_points : array
         BET-transformed points which will make up the y axis.
     minimum : int
