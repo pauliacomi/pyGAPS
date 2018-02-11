@@ -250,6 +250,8 @@ def plot_iso(isotherms,
         else:
             text = []
             for selected in lbl_components:
+                if selected == 'branch':
+                    continue
                 val = getattr(isotherm, selected)
                 if val:
                     if selected == 'adsorbate':
@@ -392,7 +394,9 @@ def plot_iso(isotherms,
             if isotherm.has_branch(branch=plot_branch):
 
                 # Label the branch
-                lbl = line_label + ' ads'
+                lbl = line_label
+                if legend_list is not None and 'branch' in legend_list:
+                    lbl += ' ads'
 
                 # Call the plotting function
                 line = graph_caller(axes, axes2,
@@ -406,7 +410,9 @@ def plot_iso(isotherms,
             if isotherm.has_branch(branch=plot_branch):
 
                 # Label the branch
-                lbl = line_label + ' des'
+                lbl = line_label
+                if legend_list is not None and 'branch' in legend_list:
+                    lbl += ' ads'
 
                 # Set marker fill to empty, and match the colour from desorption
                 styles['line_style']['mfc'] = 'none'
