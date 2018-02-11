@@ -86,7 +86,7 @@ def iast_binary_vle(isotherms, pressure,
     return dict(x=x_data, y=y_data)
 
 
-def iast_binary_svp(isotherms, mole_fractions, pressure,
+def iast_binary_svp(isotherms, mole_fractions, pressures,
                     verbose=False, warningoff=False,
                     adsorbed_mole_fraction_guess=None):
     """
@@ -104,7 +104,7 @@ def iast_binary_svp(isotherms, mole_fractions, pressure,
     mole_fractions : float
         Fraction of the gas phase for each component. Must add to 1.
         e.g. [0.1, 0.9]
-    pressure : list
+    pressures : list
         Pressure values at which the selectivity should be calculated.
     verbose : bool, optional
         Print off a extra information, as well as a graph.
@@ -136,13 +136,13 @@ def iast_binary_svp(isotherms, mole_fractions, pressure,
         )
 
     # Convert to numpy arrays just in case
-    pressure = numpy.array(pressure)
+    pressures = numpy.array(pressures)
     mole_fractions = numpy.array(mole_fractions)
 
-    # Generate the aray of partial pressures
-    component_loadings = numpy.zeros((len(pressure), 2))
+    # Generate the array of partial pressures
+    component_loadings = numpy.zeros((len(pressures), 2))
 
-    for index, pressure in enumerate(pressure):
+    for index, pressure in enumerate(pressures):
         partial_pressures = pressure * mole_fractions
         component_loadings[index, :] = iast(
             isotherms, partial_pressures, warningoff=warningoff,
@@ -152,11 +152,11 @@ def iast_binary_svp(isotherms, mole_fractions, pressure,
                      (x[1] / mole_fractions[1]) for x in component_loadings]
 
     if verbose:
-        plot_iast_svp(pressure, selectivities,
+        plot_iast_svp(pressures, selectivities,
                       isotherms[0].adsorbate, isotherms[1].adsorbate,
                       mole_fractions[0], isotherms[0].pressure_unit)
 
-    return dict(pressure=pressure, selectivity=selectivities)
+    return dict(pressure=pressures, selectivity=selectivities)
 
 
 def iast(isotherms, partial_pressures, verbose=False, warningoff=False,

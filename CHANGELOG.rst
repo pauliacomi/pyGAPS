@@ -10,6 +10,10 @@ Features:
 * The plotting legend now works with any isotherm attribute specified
 * Changed model parent class to print out model name when displayed
 
+Bugfixes:
+
+* Fixed an issue where the returned IAST selectivity v pressure data would not include all pressures
+
 1.1.1 (11-02-24)
 ------------------
 
