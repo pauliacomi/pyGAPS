@@ -91,6 +91,37 @@ def build_select(table, to_select, where):
     return sql_q
 
 
+def build_select_unnamed(table, to_select, where, join='AND'):
+    """
+    Builds an select request with multiple parameters.
+
+    Parameters
+    ----------
+    table : str
+        Table where query will be directed.
+    to_set : iterable
+        The list of columns to select
+    where : iterable
+        The list of conditions to constrain the query.
+    join : str
+        The joining clause of the parameters.
+
+    Returns
+    -------
+    str
+        Built query.
+    """
+
+    sql_q = "SELECT "
+    sql_q += ', '.join('{0}'.format(w) for w in to_select)
+    sql_q += ' FROM \"' + table + '\"'
+    if len(where) > 0:
+        sql_q += ' WHERE '
+        sql_q += (' ' + join + ' ').join('{0} = ?'.format(w) for w in where)
+
+    return sql_q
+
+
 def build_delete(table, where):
     """
     Builds a delete request.

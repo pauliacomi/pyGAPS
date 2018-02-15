@@ -16,6 +16,7 @@ from ..utilities.exceptions import ParsingError
 from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
+from ..utilities.sqlite_utilities import build_select_unnamed
 from ..utilities.sqlite_utilities import build_update
 
 # ---------------------- General functions
@@ -534,69 +535,79 @@ def db_get_experiments(pth, criteria):
 
         # Set row factory
         db.row_factory = sqlite3.Row
+
         # Get a cursor object
         cursor = db.cursor()
         cursor.execute('PRAGMA foreign_keys = ON')
 
-        # Build SQL request
-        sql_com = build_select(table='experiments',
+        # Get experiment info from database
+        sql_exp = build_select(table='experiments',
                                to_select=Isotherm._db_columns,
                                where=criteria.keys())
 
-        # Get experiment info from database
-        cursor.execute(sql_com, criteria)
+        cursor.execute(sql_exp, criteria)
+        experiments = cursor.fetchall()
 
-        # Create the isotherms
+        # Create the isotherm list
         isotherms = []
 
-        for row in cursor:
-            exp_params = dict(zip(row.keys(), row))
+        if len(experiments) > 0:
 
-            cur_inner = db.cursor()
+            ids = tuple(exp['id'] for exp in experiments)
+
+            # Get experiment properties from database
+            sql_exp_props = build_select_unnamed(table='experiment_properties',
+                                                 to_select=[
+                                                     'exp_id', 'type', 'value'],
+                                                 where=['exp_id' for exp_id in ids], join='OR')
+
+            cursor.execute(sql_exp_props, ids)
+            experiment_props = cursor.fetchall()
 
             # Get the properties from the experiment_properties table
+            sql_exp_data = build_select_unnamed(table='experiment_data',
+                                                to_select=[
+                                                    'exp_id', 'type', 'data'],
+                                                where=['exp_id' for exp_id in ids], join='OR')
+            cursor.execute(sql_exp_data, ids)
+            experiment_data = cursor.fetchall()
 
-            cur_inner.execute(build_select(table='experiment_properties',
-                                           to_select=['type', 'value'],
-                                           where=['exp_id']), {
-                'exp_id':        exp_params.get('id')
-            })
+            for exp in experiments:
 
-            exp_params.update({row[0]: row[1] for row in cur_inner})
+                # Generate the array for the pandas dataframe
+                columns = []
+                other_keys = []
+                data_arr = None
+                for data in experiment_data:
+                    if data[0] == exp['id']:
 
-            # Get the data from the experiment_data table
+                        columns.append(data[1])
+                        raw = array.array('d', data[2])
+                        if data_arr is None:
+                            data_arr = numpy.expand_dims(
+                                numpy.array(raw), axis=1)
+                        else:
+                            data_arr = numpy.hstack(
+                                (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
 
-            cur_inner.execute(build_select(table='experiment_data',
-                                           to_select=['type', 'data'],
-                                           where=['exp_id']),
-                              {'exp_id': exp_params.pop('id')}
-                              )
+                        if data[1] not in ('pressure', 'loading'):
+                            other_keys.append(data[1])
 
-            # Generate the array for the pandas dataframe
-            columns = []
-            other_keys = []
-            data_arr = None
-            for row in cur_inner:
-                columns.append(row[0])
+                exp_data = pandas.DataFrame(data_arr, columns=columns)
 
-                raw = array.array('d', row[1])
-                if data_arr is None:
-                    data_arr = numpy.expand_dims(numpy.array(raw), axis=1)
-                else:
-                    data_arr = numpy.hstack(
-                        (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
+                # Generate the experiment parameters dictionary
+                exp_params = dict(zip(exp.keys(), exp))
+                exp_params.update(
+                    {prop[1]: prop[2]
+                        for prop in experiment_props if prop[0] == exp['id']})
+                exp_params.update({'other_keys': other_keys})
+                exp_params.pop('id')
 
-            if row[0] not in ('pressure', 'loading'):
-                other_keys.append(row[0])
-
-            exp_data = pandas.DataFrame(data_arr, columns=columns)
-
-            # build isotherm object
-            isotherms.append(PointIsotherm(exp_data,
-                                           pressure_key="pressure",
-                                           loading_key="loading",
-                                           other_keys=other_keys,
-                                           ** exp_params))
+                # build isotherm object
+                isotherms.append(PointIsotherm(exp_data,
+                                               pressure_key="pressure",
+                                               loading_key="loading",
+                                               ** exp_params))
 
     # Close the db connection
     if db:

@@ -30,6 +30,14 @@ def test_select():
     assert select == squ.build_select(tb, s1, s2)
 
 
+def test_select_unnamed():
+    select = r'SELECT a, b FROM "table" WHERE x = ? AND y = ?'
+    assert select == squ.build_select_unnamed(tb, s1, s2)
+
+    select = r'SELECT a, b FROM "table" WHERE x = ? OR y = ?'
+    assert select == squ.build_select_unnamed(tb, s1, s2, join='OR')
+
+
 def test_delete():
     delete = r'DELETE FROM "table" WHERE a = :a AND b = :b'
     assert delete == squ.build_delete(tb, s1)
