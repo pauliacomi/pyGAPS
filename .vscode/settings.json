@@ -36,5 +36,6 @@
         "nelder",
         "pointisotherm",
         "scipy"
-    ]
+    ],
+    "restructuredtext.workspaceRoot": "c:\\Users\\pauli\\Git\\pyGAPS"
 }

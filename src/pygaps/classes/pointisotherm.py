@@ -138,41 +138,23 @@ class PointIsotherm(Isotherm):
         if branch == 'guess':
             # Split the data in adsorption/desorption
             self._data = self._splitdata(self._data)
-            if self.has_branch('ads'):
-                interp_branch = 'ads'
-            else:
-                interp_branch = 'des'
         elif branch == 'ads':
             self._data.insert(len(self._data.columns), 'branch', False)
-            interp_branch = 'ads'
         elif branch == 'des':
             self._data.insert(len(self._data.columns), 'branch', True)
-            interp_branch = 'des'
         else:
             try:
                 self._data.insert(len(self._data.columns), 'branch', branch)
-                if self.has_branch('ads'):
-                    interp_branch = 'ads'
-                else:
-                    interp_branch = 'des'
             except Exception as e_info:
                 raise ParameterError(e_info)
 
         #: The internal interpolator for loading given pressure.
-        self.l_interpolator = isotherm_interpolator('loading',
-                                                    self.pressure(
-                                                        branch=interp_branch),
-                                                    self.loading(
-                                                        branch=interp_branch),
-                                                    interp_branch=interp_branch)
+        self.l_interpolator = isotherm_interpolator('loading', None, None,
+                                                    interp_branch=None)
 
         #: The internal interpolator for pressure given loading.
-        self.p_interpolator = isotherm_interpolator('pressure',
-                                                    self.loading(
-                                                        branch=interp_branch),
-                                                    self.pressure(
-                                                        branch=interp_branch),
-                                                    interp_branch=interp_branch)
+        self.p_interpolator = isotherm_interpolator('pressure', None, None,
+                                                    interp_branch=None)
 
         # Finish instantiation process
         self._instantiated = True
