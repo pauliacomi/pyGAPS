@@ -13,6 +13,7 @@ Features:
 Bugfixes:
 
 * Fixed an issue where the returned IAST selectivity v pressure data would not include all pressures
+* Changed sqlite retrieval order to improve performance (#2)
 
 1.1.1 (11-02-24)
 ------------------
