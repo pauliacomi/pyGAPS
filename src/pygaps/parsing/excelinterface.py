@@ -53,7 +53,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     sht = wb.sheets[0]
 
     try:
-        # write the isotherm paramterers
+        # write the isotherm parameters
         if isotherm.is_real is True:
             is_real = "Experience"
         else:
@@ -207,7 +207,7 @@ def isotherm_from_xl(path, fmt=None):
     try:
         sample_info = {}
 
-        # read the isotherm paramterers
+        # read the isotherm parameters
         exp_type = sht.range('B1').value
         sample_info["exp_type"] = exp_type
 
