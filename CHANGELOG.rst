@@ -14,13 +14,14 @@ Bugfixes:
 
 * Fixed an issue where the returned IAST selectivity v pressure data would not include all pressures
 * Changed sqlite retrieval order to improve performance (:issue:`2`)
+* Fixed an error where IAST vle data was plotted opposite to the graph axes
 
 1.1.1 (11-02-24)
 ------------------
 
 Features:
 
-* Allowed for branch selection for isosteric heat and fixed an error where this was an issue
+* Allowed for branch selection for isosteric heat and fixed an error where this was an issue (:issue:`3`)
 
 Bugfixes:
 

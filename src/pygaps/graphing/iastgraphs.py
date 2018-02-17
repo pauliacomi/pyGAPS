@@ -49,7 +49,7 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
     ax.set_ylabel(text_y, fontsize=15)
 
     # Regular data
-    ax.plot(x_data, y_data, label=label)
+    ax.plot(y_data, x_data, label=label)
 
     # Straight line
     line = [0, 1]
