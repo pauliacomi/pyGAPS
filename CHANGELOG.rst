@@ -2,7 +2,7 @@
 Changelog
 =========
 
-1.x.x ()
+1.x.x (2018-02-)
 ------------------
 
 Features:
@@ -18,7 +18,7 @@ Bugfixes:
 * Changed sqlite retrieval order to improve performance (:issue:`2`)
 * Fixed an error where IAST vle data was plotted opposite to the graph axes
 
-1.1.1 (11-02-24)
+1.1.1 (2018-02-11)
 ------------------
 
 Features:
@@ -31,7 +31,7 @@ Bugfixes:
 * Fixed error with magnitude of polarizability of adsorbate from database in microporous PSD
 
 
-1.1.0 (18-01-24)
+1.1.0 (2018-01-24)
 ------------------
 
 * Automatic travis deployment to PyPI
