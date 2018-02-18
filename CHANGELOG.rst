@@ -9,6 +9,8 @@ Features:
 
 * The plotting legend now works with any isotherm attribute specified
 * Changed model parent class to print out model name when displayed
+* Added Toth and Jensen-Seaton models to the IAST calculation (spreading pressure is computed
+  numerically using scipy.integrate.quad, :issue:`7`)
 
 Bugfixes:
 

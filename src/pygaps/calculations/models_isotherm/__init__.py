@@ -36,7 +36,7 @@ _GUESS_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
 # This is required as some models (such as Freundlich)
 # are not thermodynamically consistent.
 _IAST_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-                Quadratic, BET, TemkinApprox]
+                Quadratic, BET, TemkinApprox, Toth, JensenSeaton]
 
 
 def get_isotherm_model(model_name):
@@ -67,6 +67,7 @@ def get_isotherm_model(model_name):
     for _model in _MODELS:
         if model_name == _model.name:
             return _model()
+
 
 def is_iast_model(model_name):
     """

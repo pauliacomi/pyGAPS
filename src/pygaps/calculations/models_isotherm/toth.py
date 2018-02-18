@@ -110,7 +110,7 @@ class Toth(IsothermModel):
         float
             Spreading pressure at specified pressure.
         """
-        return NotImplementedError
+        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def default_guess(self, data, loading_key, pressure_key):
         """
