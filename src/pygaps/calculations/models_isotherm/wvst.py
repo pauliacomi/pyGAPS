@@ -100,30 +100,18 @@ class WVST(IsothermModel):
         float
             Loading at specified pressure.
         """
-        pressure = numpy.array(pressure)
 
-        def fit(p_point):
-            def fun(x):
-                return (self.pressure(x) - p_point)**2
+        def fun(x):
+            return self.pressure(x) - pressure
 
-            guess = p_point
-            opt_res = scipy.optimize.minimize(fun, guess, method='Nelder-Mead')
+        opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
-            if not opt_res.success:
-                raise CalculationError("""
-                Root finding for failed. Error: \n\t{}
-                """.format(opt_res.message))
+        if not opt_res.success:
+            raise CalculationError("""
+            Root finding for value {0} failed.
+            """.format(pressure))
 
-            return opt_res.x
-
-        if len(numpy.atleast_1d(pressure)) == 1:
-            return fit(pressure)
-
-        else:
-            loading = []
-            for p_point in pressure:
-                loading.append(fit(p_point))
-            return loading
+        return opt_res.x
 
     def pressure(self, loading):
         """
