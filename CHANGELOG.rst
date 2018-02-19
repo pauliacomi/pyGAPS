@@ -2,12 +2,30 @@
 Changelog
 =========
 
-1.1.1 (11-02-24)
+1.2.0 (2018-02-19)
 ------------------
 
 Features:
 
-* Allowed for branch selection for isosteric heat and fixed an error where this was an issue.
+* The plotting legend now works with any isotherm attribute specified
+* Changed model parent class to print out model name when displayed
+* Added Toth and Jensen-Seaton models to the IAST calculation (spreading pressure is computed
+  numerically using scipy.integrate.quad, :issue:`7`)
+
+Bugfixes:
+
+* Fixed an issue where the returned IAST selectivity v pressure data would not include all pressures
+* Changed sqlite retrieval order to improve performance (:issue:`2`)
+* Fixed an error where IAST vle data was plotted opposite to the graph axes
+* Fixed a mistake in the Jensen-Seaton equation
+* Fixed a mistake in the FH-VST equation
+
+1.1.1 (2018-02-11)
+------------------
+
+Features:
+
+* Allowed for branch selection for isosteric heat and fixed an error where this was an issue (:issue:`3`)
 
 Bugfixes:
 
@@ -15,7 +33,7 @@ Bugfixes:
 * Fixed error with magnitude of polarizability of adsorbate from database in microporous PSD
 
 
-1.1.0 (18-01-24)
+1.1.0 (2018-01-24)
 ------------------
 
 * Automatic travis deployment to PyPI

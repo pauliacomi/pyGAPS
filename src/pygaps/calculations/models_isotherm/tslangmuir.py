@@ -96,7 +96,7 @@ class TSLangmuir(IsothermModel):
         def fun(x):
             return self.loading(x) - loading
 
-        opt_res = scipy.optimize.root(fun, 1, method='hybr')
+        opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError("""

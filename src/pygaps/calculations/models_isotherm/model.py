@@ -24,6 +24,12 @@ class IsothermModel(object):
 
         self.params = dict()
 
+    def __str__(self):
+        """
+        Prints model name
+        """
+        return self.name
+
     def loading(self, pressure):
         """
         Function that calculates loading

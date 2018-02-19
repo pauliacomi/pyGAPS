@@ -644,7 +644,7 @@ class ModelIsotherm(Isotherm):
             branch = self.branch
 
         # Convert to numpy array just in case
-        pressure = numpy.array(pressure)
+        pressure = numpy.array(pressure, ndmin=1)
 
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:
@@ -663,7 +663,7 @@ class ModelIsotherm(Isotherm):
                                   temp=self.t_exp)
 
         # Calculate loading using internal model
-        loading = self.model.loading(pressure)
+        loading = numpy.apply_along_axis(self.model.loading, 0, pressure)
 
         # Ensure loading is in correct units and basis requested
         if adsorbent_basis or adsorbent_unit:
@@ -744,7 +744,7 @@ class ModelIsotherm(Isotherm):
             branch = self.branch
 
         # Convert to numpy array just in case
-        loading = numpy.array(loading)
+        loading = numpy.array(loading, ndmin=1)
 
         # Ensure loading is in correct units and basis for the internal model
         if adsorbent_basis or adsorbent_unit:
@@ -780,7 +780,7 @@ class ModelIsotherm(Isotherm):
                                 )
 
         # Calculate pressure using internal model
-        pressure = self.model.pressure(loading)
+        pressure = numpy.apply_along_axis(self.model.pressure, 0, loading)
 
         # Ensure pressure is in correct units and mode requested
         if pressure_mode or pressure_unit:
@@ -840,6 +840,8 @@ class ModelIsotherm(Isotherm):
         else:
             branch = self.branch
 
+        pressure = numpy.array(pressure, ndmin=1)
+
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:
             if not pressure_mode:
@@ -859,7 +861,8 @@ class ModelIsotherm(Isotherm):
                                   temp=self.t_exp)
 
         # based on model
-        spreading_p = self.model.spreading_pressure(pressure)
+        spreading_p = numpy.apply_along_axis(
+            self.model.spreading_pressure, 0, pressure)
 
         return spreading_p
 

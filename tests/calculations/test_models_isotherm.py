@@ -19,9 +19,9 @@ MODELS = {
     'BET': [1.121304791, 2.743535635, pytest.mark.okay],
     'Quadratic': [1.040540541, 2.590241611, pytest.mark.okay],
     'TemkinApprox': [1, 2.6376848, pytest.mark.okay],
+    'Jensen-Seaton': [1.692307, 3.071936612, pytest.mark.okay],
+    'Toth': [1, 2.6376848, pytest.mark.okay],
 
-    'Jensen-Seaton': [0.91666, 1, pytest.mark.xfail],
-    'Toth': [1, 1, pytest.mark.xfail],
     'Virial': [11, 1, pytest.mark.xfail],
     'W-VST': [0.9910, 1, pytest.mark.xfail],
     'FH-VST': [0.9910, 1, pytest.mark.xfail],

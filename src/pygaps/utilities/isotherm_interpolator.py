@@ -51,6 +51,9 @@ class isotherm_interpolator(object):
         #: The internal interpolator function. This is generated
         #: the first time it is needed to make calculations faster.
 
+        if known_data is None:
+            return
+
         if interp_fill is None:
             self.interp_fun = interp1d(known_data, interp_data,
                                        kind=interp_kind)
