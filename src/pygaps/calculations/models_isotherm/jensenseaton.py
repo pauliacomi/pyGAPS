@@ -73,10 +73,10 @@ class JensenSeaton(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["KH"] * pressure / (1 + (
-            self.params["KH"] * pressure /
-            (self.params["a"] * (1 + self.params["b"] * pressure))
-        )**self.params['c'])**(1 / self.params['c'])
+        return self.params["KH"] * pressure * \
+            (1 + (self.params["KH"] * pressure /
+                  (self.params["a"] * (1 + self.params["b"] * pressure))
+                  )**self.params['c'])**(- 1 / self.params['c'])
 
     def pressure(self, loading):
         """
@@ -98,7 +98,7 @@ class JensenSeaton(IsothermModel):
         def fun(x):
             return self.loading(x) - loading
 
-        opt_res = scipy.optimize.root(fun, 1, method='hybr')
+        opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError("""

@@ -17,6 +17,7 @@ Bugfixes:
 * Fixed an issue where the returned IAST selectivity v pressure data would not include all pressures
 * Changed sqlite retrieval order to improve performance (:issue:`2`)
 * Fixed an error where IAST vle data was plotted opposite to the graph axes
+* Fixed a mistake in the Jensen-Seaton equation
 
 1.1.1 (2018-02-11)
 ------------------
