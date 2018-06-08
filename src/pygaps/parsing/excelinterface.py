@@ -13,6 +13,7 @@ from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import find_basis
 from ..utilities.unit_converter import find_mode
+from micromeriticsinterface import read_mic_report
 
 # chose an implementation, depending on os
 if os.name == 'nt':  # sys.platform == 'win32':
@@ -176,6 +177,76 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     return
 
 
+_fields = {
+    'exp_type': {
+        'name': 'surface area',
+        'row': 0,
+        'column': 1,
+        'type': 'number'
+    },
+    'sample:': {
+        'name': 'sample',
+        'row': 0,
+        'column': 1,
+        'type': 'string'
+    },
+    'sample mass': {
+        'name': 'mass',
+        'row': 0,
+        'column': 1,
+        'type': 'number'
+    },
+    'comments': {
+        'name': 'comments',
+        'row': 0,
+        'column': 0,
+        'type': 'string'
+    },
+    'analysis ads': {
+        'name': 'gas',
+        'row': 0,
+        'column': 1,
+        'type': 'string'
+    },
+    'analysis bath': {
+        'name': 'temperature',
+        'row': 0,
+        'column': 1,
+        'type': 'number'
+    },
+    'started': {
+        'name': 'date',
+        'row': 0,
+        'column': 1,
+        'type': 'string'
+    },
+    'isotherm tabular': {
+        'type': 'isotherm report',
+        'labels': {
+            'Relative': 'relative',
+            'Absolute': 'absolute',
+            'Quantity': 'uptake',
+            'Elapsed': 'time',
+            'Saturation': 'saturation'
+        }
+    },
+    'primary data': {
+        'type': 'error',
+        'row': 1,
+        'column': 0,
+        'name': 'errors'
+    },
+    'cell_value': {
+        'header': {
+            'row': 2
+        },
+        'datapoints': {
+            'row': 3
+        }
+    }
+}
+
+
 def isotherm_from_xl(path, fmt=None):
     """
     A function that will get the experiment and sample data from a excel parser
@@ -185,9 +256,8 @@ def isotherm_from_xl(path, fmt=None):
     ----------
     path : str
         Path to the file to be read.
-    fmt : {None, 'MADIREL'}, optional
-        If the format is set to MADIREL, then the excel file is a specific version
-        used by the MADIREL lab for internal processing.
+    fmt : {None, 'MADIREL', 'micromeritics'}, optional
+        The format of the import for the isotherm.
 
     Returns
     -------
