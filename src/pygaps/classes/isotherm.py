@@ -348,6 +348,9 @@ class Isotherm(object):
         if self.t_act:
             string += ("Activation temperature: " +
                        str(self.t_act) + "°C" + '\n')
+        if self.lab:
+            string += ("Source: " +
+                       str(self.lab) + '\n')
         if self.comment:
             string += ("Isotherm comments: " + str(self.comment) + '\n')
 
