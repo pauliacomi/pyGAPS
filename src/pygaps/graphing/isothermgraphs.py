@@ -62,7 +62,7 @@ def plot_iso(isotherms,
         Whether the graph x axis should be logarithmic.
     color : bool, optional
         Whether the graph should be coloured or grayscale. Grayscale graphs
-        are usually preffered for publications or print media.
+        are usually preferred for publications or print media.
     match_points : bool, optional
         Whether the plotting should attempt to match all the pressure
         points with the first passed isotherm.
