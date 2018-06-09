@@ -2,6 +2,17 @@
 Changelog
 =========
 
+
+1.x.x ()
+------------------
+
+Features:
+
+Bugfixes:
+
+* Fixed 'source' not being recognised as an isotherm field
+
+
 1.2.0 (2018-02-19)
 ------------------
 
