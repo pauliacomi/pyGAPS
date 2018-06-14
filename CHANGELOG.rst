@@ -11,6 +11,7 @@ Features:
 Bugfixes:
 
 * Fixed 'source' not being recognised as an isotherm field
+* Added correct common name for ethylene, propylene, methanol and ethanol in the database
 
 
 1.2.0 (2018-02-19)
