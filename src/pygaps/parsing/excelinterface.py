@@ -13,7 +13,8 @@ from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import find_basis
 from ..utilities.unit_converter import find_mode
-from micromeriticsinterface import read_mic_report
+from excel_mic_parser import read_mic_report
+from excel_bel_parser import read_bel_report
 
 # chose an implementation, depending on os
 if os.name == 'nt':  # sys.platform == 'win32':
@@ -177,76 +178,6 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     return
 
 
-_fields = {
-    'exp_type': {
-        'name': 'surface area',
-        'row': 0,
-        'column': 1,
-        'type': 'number'
-    },
-    'sample:': {
-        'name': 'sample',
-        'row': 0,
-        'column': 1,
-        'type': 'string'
-    },
-    'sample mass': {
-        'name': 'mass',
-        'row': 0,
-        'column': 1,
-        'type': 'number'
-    },
-    'comments': {
-        'name': 'comments',
-        'row': 0,
-        'column': 0,
-        'type': 'string'
-    },
-    'analysis ads': {
-        'name': 'gas',
-        'row': 0,
-        'column': 1,
-        'type': 'string'
-    },
-    'analysis bath': {
-        'name': 'temperature',
-        'row': 0,
-        'column': 1,
-        'type': 'number'
-    },
-    'started': {
-        'name': 'date',
-        'row': 0,
-        'column': 1,
-        'type': 'string'
-    },
-    'isotherm tabular': {
-        'type': 'isotherm report',
-        'labels': {
-            'Relative': 'relative',
-            'Absolute': 'absolute',
-            'Quantity': 'uptake',
-            'Elapsed': 'time',
-            'Saturation': 'saturation'
-        }
-    },
-    'primary data': {
-        'type': 'error',
-        'row': 1,
-        'column': 0,
-        'name': 'errors'
-    },
-    'cell_value': {
-        'header': {
-            'row': 2
-        },
-        'datapoints': {
-            'row': 3
-        }
-    }
-}
-
-
 def isotherm_from_xl(path, fmt=None):
     """
     A function that will get the experiment and sample data from a excel parser
@@ -256,7 +187,7 @@ def isotherm_from_xl(path, fmt=None):
     ----------
     path : str
         Path to the file to be read.
-    fmt : {None, 'MADIREL', 'micromeritics'}, optional
+    fmt : {None, 'micromeritics', 'bel', 'MADIREL'}, optional
         The format of the import for the isotherm.
 
     Returns
@@ -265,120 +196,133 @@ def isotherm_from_xl(path, fmt=None):
         The isotherm contained in the excel file.
     """
 
-    if xlwings is None:
-        raise ParsingError(
-            "xlwings functionality disabled on this platform ( {0} )".format(os.name))
+    sample_info = {}
 
-    # Get excel workbook, sheet and range
-    wb = xlwings.Book(path)
-    wb.app.screen_updating = False
-    sht = wb.sheets[0]
+    if fmt == 'micromeritics':
+        sample_info = read_mic_report(path)
+        sample_info['sample_batch'] = 'mic'
 
-    try:
-        sample_info = {}
+        experiment_data_df = pandas.DataFrame({
+            'pressure': sample_info.pop('pressure')['relative'],
+            'loading': sample_info.pop('uptake'),
+            'time': sample_info.pop('time')
+        })
+    elif fmt == 'bel':
+        pass
+    else:
+        if xlwings is None:
+            raise ParsingError(
+                "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
-        # read the isotherm parameters
-        exp_type = sht.range('B1').value
-        sample_info["exp_type"] = exp_type
+        # Get excel workbook, sheet and range
+        wb = xlwings.Book(path)
+        wb.app.screen_updating = False
+        sht = wb.sheets[0]
 
-        if fmt == 'MADIREL':
-            if exp_type == "Isotherme":
-                sample_info["exp_type"] = 'isotherm'
-            elif exp_type == "Calorimetrie":
-                sample_info["exp_type"] = 'calorimetry'
-            else:
-                raise ParsingError("Unknown experiment type")
+        try:
 
-        is_real = sht.range('B2').value
+            # read the isotherm parameters
+            exp_type = sht.range('B1').value
+            sample_info["exp_type"] = exp_type
 
-        if is_real == "Experience":
-            sample_info['is_real'] = True
-        if is_real == "Simulation":
-            sample_info['is_real'] = False
+            if fmt == 'MADIREL':
+                if exp_type == "Isotherme":
+                    sample_info["exp_type"] = 'isotherm'
+                elif exp_type == "Calorimetrie":
+                    sample_info["exp_type"] = 'calorimetry'
+                else:
+                    raise ParsingError("Unknown experiment type")
 
-        sample_info['date'] = sht.range('B3').value
-        sample_info['sample_name'] = sht.range('B4').value
-        sample_info['sample_batch'] = sht.range('B5').value
-        sample_info['t_act'] = sht.range('B6').value
-        sample_info['machine'] = sht.range('B7').value
-        sample_info['t_exp'] = sht.range('B8').value
-        sample_info['adsorbate'] = sht.range('B9').value
-        sample_info['user'] = sht.range('B10').value
-        sample_info['lab'] = sht.range('B11').value
-        sample_info['project'] = sht.range('B12').value
+            is_real = sht.range('B2').value
 
-        sample_info['comment'] = sht.range('E2').value
+            if is_real == "Experience":
+                sample_info['is_real'] = True
+            if is_real == "Simulation":
+                sample_info['is_real'] = False
 
-        rng_prop = 4
-        while True:
-            prop = sht.range((5, rng_prop)).value
-            if prop is None:
-                break
-            sample_info[prop] = sht.range((6, rng_prop)).value
-            rng_prop += 1
+            sample_info['date'] = sht.range('B3').value
+            sample_info['sample_name'] = sht.range('B4').value
+            sample_info['sample_batch'] = sht.range('B5').value
+            sample_info['t_act'] = sht.range('B6').value
+            sample_info['machine'] = sht.range('B7').value
+            sample_info['t_exp'] = sht.range('B8').value
+            sample_info['adsorbate'] = sht.range('B9').value
+            sample_info['user'] = sht.range('B10').value
+            sample_info['lab'] = sht.range('B11').value
+            sample_info['project'] = sht.range('B12').value
 
-        # read the data in
+            sample_info['comment'] = sht.range('E2').value
 
-        if fmt is None:
-            rng_data = 14
-        elif fmt == 'MADIREL':
-            if exp_type == "Isotherme":
-                rng_data = 30
-            elif exp_type == "Calorimetrie":
-                rng_data = 39
-            else:
-                raise ParsingError("Unknown data type")
+            rng_prop = 4
+            while True:
+                prop = sht.range((5, rng_prop)).value
+                if prop is None:
+                    break
+                sample_info[prop] = sht.range((6, rng_prop)).value
+                rng_prop += 1
 
-        experiment_data_df = sht.range('A' + str(rng_data)).options(
-            pandas.DataFrame, expand='table', index=0).value
+            # read the data in
 
-        loading_key = 'loading'
-        pressure_key = 'pressure'
-        s_loading_key = loading_key
-        s_pressure_key = pressure_key
-        if fmt == 'MADIREL':
-            s_loading_key = 'adsorbed'
-            s_pressure_key = 'pressure'
-        other_keys = []
+            if fmt is None:
+                rng_data = 14
+            elif fmt == 'MADIREL':
+                if exp_type == "Isotherme":
+                    rng_data = 30
+                elif exp_type == "Calorimetrie":
+                    rng_data = 39
+                else:
+                    raise ParsingError("Unknown data type")
 
-        for column in experiment_data_df.columns:
-            if s_loading_key in column.lower():
+            experiment_data_df = sht.range('A' + str(rng_data)).options(
+                pandas.DataFrame, expand='table', index=0).value
 
-                # Rename with standard name
-                experiment_data_df.rename(
-                    index=str, columns={column: loading_key}, inplace=True)
+            loading_key = 'loading'
+            pressure_key = 'pressure'
+            s_loading_key = loading_key
+            s_pressure_key = pressure_key
+            if fmt == 'MADIREL':
+                s_loading_key = 'adsorbed'
+                s_pressure_key = 'pressure'
+            other_keys = []
 
-                if not fmt:
-                    # Get units
-                    units = column[column.find(
-                        '(') + 1:column.rfind(')')].split('/')
-                    loading_basis = find_basis(units[0])
-                    adsorbent_basis = find_basis(units[1])
-                elif fmt == 'MADIREL':
-                    units = ['mmol', 'g']
-                    loading_basis = 'molar'
-                    adsorbent_basis = 'mass'
+            for column in experiment_data_df.columns:
+                if s_loading_key in column.lower():
 
-            elif s_pressure_key in column.lower():
+                    # Rename with standard name
+                    experiment_data_df.rename(
+                        index=str, columns={column: loading_key}, inplace=True)
 
-                # Rename with standard name
-                experiment_data_df.rename(
-                    index=str, columns={column: pressure_key}, inplace=True)
+                    if not fmt:
+                        # Get units
+                        units = column[column.find(
+                            '(') + 1:column.rfind(')')].split('/')
+                        loading_basis = find_basis(units[0])
+                        adsorbent_basis = find_basis(units[1])
+                    elif fmt == 'MADIREL':
+                        units = ['mmol', 'g']
+                        loading_basis = 'molar'
+                        adsorbent_basis = 'mass'
 
-                if not fmt:
-                    # Get units
-                    pressure_unit = column[column.find(
-                        '(') + 1:column.rfind(')')]
-                    pressure_mode = find_mode(pressure_unit)
-                elif fmt == 'MADIREL':
-                    pressure_unit = 'bar'
-                    pressure_mode = 'absolute'
+                elif s_pressure_key in column.lower():
 
-            else:
-                other_keys.append(column)
-    finally:
-        wb.app.screen_updating = True
-        wb.app.quit()
+                    # Rename with standard name
+                    experiment_data_df.rename(
+                        index=str, columns={column: pressure_key}, inplace=True)
+
+                    if not fmt:
+                        # Get units
+                        pressure_unit = column[column.find(
+                            '(') + 1:column.rfind(')')]
+                        pressure_mode = find_mode(pressure_unit)
+                    elif fmt == 'MADIREL':
+                        pressure_unit = 'bar'
+                        pressure_mode = 'absolute'
+
+                else:
+                    other_keys.append(column)
+        finally:
+            wb.app.screen_updating = True
+            wb.app.quit()
 
     isotherm = PointIsotherm(
         experiment_data_df,
