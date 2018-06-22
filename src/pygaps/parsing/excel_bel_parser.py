@@ -13,56 +13,56 @@ _number_regex = re.compile(r'^(-)?\d+(.|,)?\d+')
 
 _fields = {
     'sample:': {
-        'text': ['COMMENT1'],
+        'text': ['comment1'],
         'name': 'sample_name',
         'row': 0,
-        'column': 1,
+        'column': 2,
         'type': 'string'
     },
     'adsorbate': {
         'text': ['adsorptive'],
         'name': 'adsorbate',
         'row': 0,
-        'column': 1,
+        'column': 2,
         'type': 'string'
     },
     'temperature': {
         'text': ['adsorption temp'],
         'name': 't_exp',
         'row': 0,
-        'column': 1,
+        'column': 2,
         'type': 'number'
     },
     'user': {
-        'text': ['COMMENT2'],
+        'text': ['comment2'],
         'name': 'user',
         'row': 0,
-        'column': 1,
+        'column': 2,
         'type': 'string'
     },
     'date': {
         'text': ['date of measurement'],
         'name': 'date',
         'row': 0,
-        'column': 1,
-        'type': 'string'
+        'column': 2,
+        'type': 'date'
     },
     'sample mass': {
-        'text': ['sample mass'],
+        'text': ['sample weight'],
         'name': 'mass',
         'row': 0,
-        'column': 1,
+        'column': 2,
         'type': 'number'
     },
     'comments': {
-        'text': ['COMMENT3'],
-        'name': 'comments',
+        'text': ['comment3'],
+        'name': 'comment',
         'row': 0,
-        'column': 0,
+        'column': 2,
         'type': 'string'
     },
     'isotherm tabular': {
-        'text': ['isotherm tabular'],
+        'text': ['no'],
         'type': 'isotherm report',
         'labels': {
             'Relative': 'relative',
@@ -118,7 +118,12 @@ def read_bel_report(path):
             continue
         if field['type'] == 'number':
             val = sheet.cell(row + field['row'], col + field['column']).value
-            data[field['name']] = _handle_numbers(val)
+            data[field['name']] = val
+        if field['type'] == 'date':
+            day = sheet.cell(row + field['row'], col + field['column']).value
+            time = sheet.cell(
+                row + 1 + field['row'], col + field['column']).value
+            data[field['name']] = _handle_date(day + time)
         elif field['type'] == 'string':
             val = sheet.cell(row + field['row'], col + field['column']).value
             data[field['name']] = _handle_string(val)
@@ -135,12 +140,11 @@ def read_bel_report(path):
     return data
 
 
-def _handle_numbers(val):
-    """Input is a cell of type 'number'. Removes any extra information (such as
-    units) to return only the number as a float.
+def _handle_date(val):
+    """Input is a cell of type 'date'. Converts it to a string.
     """
     if val:
-        return float(_number_regex.search(val.replace(',', '')).group())
+        return xlrd.xldate.xldate_as_datetime(val, 0).strftime("%Y-%m-%d %H:%M:%S")
     else:
         return None
 
@@ -177,14 +181,14 @@ def _get_data_labels(sheet, row, col):
 
 def _get_datapoints(sheet, row, col):
     """Returns all collected data points for a given column."""
-    row = _fields['cell_value']['datapoints']['row']
+    rowc = _fields['cell_value']['datapoints']['row']
     # Data can start on two different rows. Try first option and then next row.
-    if sheet.cell(row + row, col).value:
-        start_row = row + row
-        final_row = row + row
+    if sheet.cell(row + rowc, col).value:
+        start_row = row + rowc
+        final_row = row + rowc
     else:
-        start_row = row + (row + 1)
-        final_row = row + (row + 1)
+        start_row = row + (rowc + 1)
+        final_row = row + (rowc + 1)
     point = sheet.cell(final_row, col).value
     while point:
         final_row += 1
@@ -199,8 +203,8 @@ def _assign_data(item, field, data, points):
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'time':
         data['time'] = _convert_time(points)
-    elif field['labels'][name] == 'uptake':
-        data['uptake'] = points
+    elif field['labels'][name] == 'loading':
+        data['loading'] = points
     elif field['labels'][name] in ['relative', 'absolute', 'saturation']:
         data['pressure'][field['labels'][name]] = points
     else:
@@ -230,7 +234,7 @@ def _check(data, path):
     warning for errors found in file.
     """
 
-    if 'uptake' in data:
+    if 'loading' in data:
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
             logging.info('No data collected for {} in file {}.'

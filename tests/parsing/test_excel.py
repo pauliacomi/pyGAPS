@@ -2,12 +2,13 @@
 Tests excel interaction
 """
 
+import os
 import pytest
 
 import pygaps
 
-from .conftest import DATA_PATH
 from .conftest import DATA_EXCEL_PATH
+from .conftest import DATA_EXCEL_MIC
 from ..conftest import parsing
 from ..conftest import windows
 
@@ -50,13 +51,11 @@ class TestExcel(object):
     def test_read_excel_micromeritics(self):
         """Tests reading of micromeritics report files"""
 
-        try:
-            pygaps.isotherm_to_xl(basic_pointisotherm,
-                                  path=os.path.join(DATA_EXCEL_PATH, DATA_EXCEL_MIC[0]), fmt='micromeritics')
-        except SystemError as e_info:
-            # Excel is not installed
-            return
+        for path in DATA_EXCEL_MIC:
+            isotherm = pygaps.isotherm_from_xl(path=path,
+                                               fmt='micromeritics')
 
-        isotherm = pygaps.isotherm_from_xl(path, fmt='MADIREL')
+            json_path = path.replace('.xls', '.json')
 
-        assert isotherm == basic_pointisotherm
+            with open(json_path, 'r') as file:
+                assert pygaps.isotherm_to_json(isotherm) == file.read()

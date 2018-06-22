@@ -55,9 +55,9 @@ _fields = {
         'column': 1,
         'type': 'number'
     },
-    'comments': {
+    'comment': {
         'text': ['comments'],
-        'name': 'comments',
+        'name': 'comment',
         'row': 0,
         'column': 0,
         'type': 'string'
@@ -75,7 +75,7 @@ _fields = {
         'labels': {
             'Relative': 'relative',
             'Absolute': 'absolute',
-            'Quantity': 'uptake',
+            'Quantity': 'loading',
             'Elapsed': 'time',
             'Saturation': 'saturation'
         }
@@ -185,14 +185,14 @@ def _get_data_labels(sheet, row, col):
 
 def _get_datapoints(sheet, row, col):
     """Returns all collected data points for a given column."""
-    row = _fields['cell_value']['datapoints']['row']
+    rowc = _fields['cell_value']['datapoints']['row']
     # Data can start on two different rows. Try first option and then next row.
-    if sheet.cell(row + row, col).value:
-        start_row = row + row
-        final_row = row + row
+    if sheet.cell(row + rowc, col).value:
+        start_row = row + rowc
+        final_row = row + rowc
     else:
-        start_row = row + (row + 1)
-        final_row = row + (row + 1)
+        start_row = row + (rowc + 1)
+        final_row = row + (rowc + 1)
     point = sheet.cell(final_row, col).value
     while point:
         final_row += 1
@@ -207,8 +207,8 @@ def _assign_data(item, field, data, points):
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'time':
         data['time'] = _convert_time(points)
-    elif field['labels'][name] == 'uptake':
-        data['uptake'] = points
+    elif field['labels'][name] == 'loading':
+        data['loading'] = points
     elif field['labels'][name] in ['relative', 'absolute', 'saturation']:
         data['pressure'][field['labels'][name]] = points
     else:
@@ -238,7 +238,7 @@ def _check(data, path):
     warning for errors found in file.
     """
 
-    if 'uptake' in data:
+    if 'loading' in data:
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
             logging.info('No data collected for {} in file {}.'

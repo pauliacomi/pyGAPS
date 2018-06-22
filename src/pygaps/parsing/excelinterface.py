@@ -9,12 +9,12 @@ import os
 
 import pandas
 
+from .excel_mic_parser import read_mic_report
+from .excel_bel_parser import read_bel_report
 from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import find_basis
 from ..utilities.unit_converter import find_mode
-from excel_mic_parser import read_mic_report
-from excel_bel_parser import read_bel_report
 
 # chose an implementation, depending on os
 if os.name == 'nt':  # sys.platform == 'win32':
@@ -197,15 +197,23 @@ def isotherm_from_xl(path, fmt=None):
     """
 
     sample_info = {}
+    loading_key = 'loading'
+    pressure_key = 'pressure'
+    other_keys = []
 
     if fmt == 'micromeritics':
         sample_info = read_mic_report(path)
         sample_info['sample_batch'] = 'mic'
 
+        pressure_mode = 'relative'
+        pressure_unit = 'kPa'
+        loading_basis = 'molar'
+        adsorbent_basis = 'mass'
+        units = ['cm3(STP)', 'g']
+
         experiment_data_df = pandas.DataFrame({
-            'pressure': sample_info.pop('pressure')['relative'],
-            'loading': sample_info.pop('uptake'),
-            'time': sample_info.pop('time')
+            pressure_key: sample_info.pop(pressure_key)['relative'],
+            loading_key: sample_info.pop(loading_key),
         })
     elif fmt == 'bel':
         pass
