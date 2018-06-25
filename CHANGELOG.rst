@@ -7,11 +7,14 @@ Changelog
 ------------------
 
 Features:
+* Added an excel import which can take Micromeritics or
+  Belsorp report (.xls) files.
 
 Bugfixes:
 
 * Fixed 'source' not being recognised as an isotherm field
-* Added correct common name for ethylene, propylene, methanol and ethanol in the database
+* Added correct common name for ethylene, propylene, methanol
+  and ethanol in the database
 
 
 1.2.0 (2018-02-19)
