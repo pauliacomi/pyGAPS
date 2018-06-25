@@ -2,12 +2,6 @@ language: python
 sudo: false
 cache: pip
 
-# We need to install pandoc separately to deal with the
-# jupyter translation of docs
-addons:
-  apt_packages:
-    - pandoc
-
 env:
   global:
     - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
