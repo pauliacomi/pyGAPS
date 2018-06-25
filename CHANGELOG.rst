@@ -7,6 +7,7 @@ Changelog
 ------------------
 
 Features:
+
 * Added an excel import which can take Micromeritics or
   Belsorp report (.xls) files.
 
