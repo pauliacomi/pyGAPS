@@ -53,7 +53,7 @@ setup(
         'Topic :: Utilities',
     ],
     keywords=[
-        # eg: 'keyword1', 'keyword2', 'keyword3',
+        'adsorption', 'science', 'porous materials'
     ],
     # setup_requires=[],
     install_requires=[

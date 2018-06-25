@@ -2,20 +2,20 @@ language: python
 sudo: false
 cache: pip
 
-# We need to install pandoc separately to deal with the
-# jupyter translation of docs
-addons:
-  apt_packages:
-    - pandoc
-
 env:
   global:
     - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
     - SEGFAULT_SIGNALS=all
   # Two jobs created here, in the test job, one for code checks, one for docs
   matrix:
-    - TOXENV=check
-    - TOXENV=docs
+    include:
+        - env: TOXENV=check
+        - env: TOXENV=docs
+            # We need to install pandoc separately to deal with the
+            # jupyter translation of docs
+          addons:
+          apt_packages:
+            - pandoc
 
 before_install:
   - python --version
@@ -61,8 +61,8 @@ jobs:
       python: '3.6'     # specify python 3.6
       env: TOXENV=none  # overwrite environment var
       install: skip     # no need to install tox
-      script: skip      # run no tests
-      deploy: &pypi     # instead deploy on pypi
+      script: skip      # no need to run any tests
+      deploy: &pypi     # just deploy on pypi
         provider: pypi
         user: paul.iacomi
         password:
