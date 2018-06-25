@@ -8,17 +8,10 @@ env:
     - SEGFAULT_SIGNALS=all
   matrix:
     - TOXENV=check
+    - TOXENV=docs
 
 matrix:
     include:
-    - python: '3.6'
-      env:
-        - TOXENV=docs
-      addons:
-        apt_packages:
-        # We need to install pandoc separately to deal
-        # with translation of docs to jupyter
-        - pandoc
     - python: '3.5'
       env:
         - TOXENV=3.5-cover,report,codecov
@@ -55,7 +48,6 @@ after_failure:
 
 jobs:
   include:
-
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.6'     # specify python 3.6
