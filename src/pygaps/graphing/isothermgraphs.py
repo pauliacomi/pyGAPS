@@ -21,7 +21,7 @@ _BRANCH_TYPES = ("ads", "des")
 def plot_iso(isotherms,
              plot_type='isotherm', secondary_key=None,
              branch=_BRANCH_TYPES, logx=False, color=True,
-             match_points=False,
+             points_visible=True,
 
              adsorbent_basis="mass",
              adsorbent_unit="g",
@@ -63,9 +63,9 @@ def plot_iso(isotherms,
     color : bool, optional
         Whether the graph should be coloured or grayscale. Grayscale graphs
         are usually preferred for publications or print media.
-    match_points : bool, optional
-        Whether the plotting should attempt to match all the pressure
-        points with the first passed isotherm.
+    points_visible : bool, optional
+        Whether the plotting should display individual points for
+        the curves.
 
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
@@ -130,7 +130,6 @@ def plot_iso(isotherms,
     if plot_type not in _PLOT_TYPES:
         raise ParameterError("Plot type {0} not an option. Viable plot"
                              "types are {1}".format(plot_type, _PLOT_TYPES))
-
     if plot_type == 'property' or plot_type == 'combined':
         if secondary_key is None:
             raise ParameterError("No secondary_key parameter specified")
@@ -165,7 +164,7 @@ def plot_iso(isotherms,
 #
 # Settings and graph generation
     #
-    # Generate the graph iself
+    # Generate the graph itself
     fig, axes = plt.subplots(1, 1, figsize=(8, 8))
     if plot_type == 'combined':
         axes2 = axes.twinx()
@@ -262,7 +261,7 @@ def plot_iso(isotherms,
             return " ".join(text)
 ###########################################
 #
-# Individual raphing functions
+# Individual graphing functions
     #
 
     def isotherm_graph(axes, data_x, data_y, line_label, styles_dict):
