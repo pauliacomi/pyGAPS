@@ -1,32 +1,32 @@
 language: python
 sudo: false
 cache: pip
-python: 3.6
 
 env:
   global:
     - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
     - SEGFAULT_SIGNALS=all
-    matrix:
-        include:
-        # Create test jobs for checks
-        - python: '3.6'
-        env:
-            - TOXENV=check
-        - python: '3.6'
-        env:
-            - TOXENV=docs
-        addons:
-            apt_packages:
-            # We need to install pandoc separately to deal
-            # with translation of docs to jupyter
-            - pandoc
-        - python: '3.5'
-        env:
-            - TOXENV=3.5-cover,report,codecov
-        - python: '3.6'
-        env:
-            - TOXENV=3.6-cover,report,codecov
+
+matrix:
+    include:
+    # Create test jobs for checks
+    - python: '3.6'
+      env:
+        - TOXENV=check
+    - python: '3.6'
+      env:
+        - TOXENV=docs
+      addons:
+        apt_packages:
+        # We need to install pandoc separately to deal
+        # with translation of docs to jupyter
+        - pandoc
+    - python: '3.5'
+      env:
+        - TOXENV=3.5-cover,report,codecov
+    - python: '3.6'
+      env:
+        - TOXENV=3.6-cover,report,codecov
 
 before_install:
   - lsb_release -a      # print linux version
