@@ -66,12 +66,13 @@ _fields = {
         'type': 'isotherm data',
         'labels': {
             'No': 'measurement',
-            'p/p0': 'relative',
-            'pe/': 'absolute',
             'pi/': 'internal',
+            'pe/': 'absolute',
             'pe2/': 'absolute2',
+            'p0/': 'saturation',
+            'p/p0': 'relative',
             'Va/': 'loading',
-            'p0/': 'saturation'
+            'na/': 'loading',
         }
     },
     'primary data': {
@@ -199,7 +200,7 @@ def _find_datapoints(sheet, row, col):
 
         point = sheet.cell(des_final_row, col).value
 
-        while point:
+        while str(point).strip():
             des_final_row += 1
             if des_final_row < sheet.nrows:
                 point = sheet.cell(des_final_row, col).value
@@ -216,6 +217,10 @@ def _assign_data(item, field, data, ads_points, des_points):
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'loading':
         data['loading'] = ads_points + des_points
+        if name.startswith('Va'):
+            data['units'] = ['cm3(STP)', 'g']
+        elif name.startswith('na'):
+            data['units'] = ['mol', 'g']
     elif field['labels'][name] == 'measurement':
         data['measurement'] = [False] * \
             len(ads_points) + [True] * len(des_points)

@@ -8,4 +8,5 @@ DATA_EXCEL_PATH = os.path.join(DATA_PATH, 'excel')
 DATA_EXCEL_MIC = [os.path.join(DATA_EXCEL_PATH, 'mic', 'Sample_A.xls'),
                   os.path.join(DATA_EXCEL_PATH, 'mic', 'Sample_B.xls')]
 
-DATA_EXCEL_BEL = [os.path.join(DATA_EXCEL_PATH, 'bel', 'Sample_C.xls')]
+DATA_EXCEL_BEL = [os.path.join(DATA_EXCEL_PATH, 'bel', 'Sample_C.xls'),
+                  os.path.join(DATA_EXCEL_PATH, 'bel', 'Sample_D.xls')]

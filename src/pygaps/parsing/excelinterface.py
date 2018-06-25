@@ -224,7 +224,7 @@ def isotherm_from_xl(path, fmt=None):
         pressure_unit = 'kPa'
         loading_basis = 'molar'
         adsorbent_basis = 'mass'
-        units = ['cm3(STP)', 'g']
+        units = sample_info.pop('units')
 
         experiment_data_df = pandas.DataFrame({
             pressure_key: sample_info.pop(pressure_key)['relative'],
