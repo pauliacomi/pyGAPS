@@ -38,9 +38,11 @@ jobs:
   include:
     # Checks and docks
     - stage: test
+      python: '3.6'
       env:
         - TOXENV=check
     - stage: test
+      python: '3.6'
       env:
         - TOXENV=docs
       addons:
