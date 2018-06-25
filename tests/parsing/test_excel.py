@@ -6,10 +6,10 @@ import pytest
 
 import pygaps
 
-from .conftest import DATA_EXCEL_MIC
-from .conftest import DATA_EXCEL_BEL
 from ..conftest import parsing
 from ..conftest import windows
+from .conftest import DATA_EXCEL_BEL
+from .conftest import DATA_EXCEL_MIC
 
 
 @windows

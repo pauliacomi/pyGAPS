@@ -4,10 +4,11 @@ Function to parse bel xls output files
 @author Chris Murdock
 @modified Paul Iacomi
 """
-import xlrd
-from itertools import product
-import re
 import logging
+import re
+from itertools import product
+
+import xlrd
 
 _rem_space_regex = re.compile(r'\s+')
 

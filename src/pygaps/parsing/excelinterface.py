@@ -9,12 +9,12 @@ import os
 
 import pandas
 
-from .excel_mic_parser import read_mic_report
-from .excel_bel_parser import read_bel_report
 from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import find_basis
 from ..utilities.unit_converter import find_mode
+from .excel_bel_parser import read_bel_report
+from .excel_mic_parser import read_mic_report
 
 # chose an implementation, depending on os
 if os.name == 'nt':  # sys.platform == 'win32':

@@ -5,10 +5,11 @@ Function to parse micromeritics xls output files
 @modified Paul Iacomi
 """
 
-import xlrd
-from itertools import product
-import re
 import logging
+import re
+from itertools import product
+
+import xlrd
 
 _number_regex = re.compile(r'^(-)?\d+(.|,)?\d+')
 
