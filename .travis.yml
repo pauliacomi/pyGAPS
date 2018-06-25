@@ -9,12 +9,12 @@ env:
   # Two jobs created here, in the test job, one for code checks, one for docs
   matrix:
     include:
-        - env: TOXENV=check
-        - env: TOXENV=docs
+    - env: TOXENV=check
+    - env: TOXENV=docs
             # We need to install pandoc separately to deal with the
             # jupyter translation of docs
-          addons:
-          apt_packages:
+      addons:
+        apt_packages:
             - pandoc
 
 before_install:
