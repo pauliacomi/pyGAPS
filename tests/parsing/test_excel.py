@@ -6,6 +6,8 @@ import pytest
 
 import pygaps
 
+from .conftest import DATA_EXCEL_MIC
+from .conftest import DATA_EXCEL_BEL
 from ..conftest import parsing
 from ..conftest import windows
 
@@ -44,3 +46,27 @@ class TestExcel(object):
         isotherm = pygaps.isotherm_from_xl(path, fmt='MADIREL')
 
         assert isotherm == basic_pointisotherm
+
+    def test_read_excel_mic(self):
+        """Tests reading of micromeritics report files"""
+
+        for path in DATA_EXCEL_MIC:
+            isotherm = pygaps.isotherm_from_xl(path=path,
+                                               fmt='mic')
+
+            json_path = path.replace('.xls', '.json')
+
+            with open(json_path, 'r') as file:
+                assert pygaps.isotherm_to_json(isotherm) == file.read()
+
+    def test_read_excel_bel(self):
+        """Tests reading of bel report files"""
+
+        for path in DATA_EXCEL_BEL:
+            isotherm = pygaps.isotherm_from_xl(path=path,
+                                               fmt='bel')
+
+            json_path = path.replace('.xls', '.json')
+
+            with open(json_path, 'r') as file:
+                assert pygaps.isotherm_to_json(isotherm) == file.read()

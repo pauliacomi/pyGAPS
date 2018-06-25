@@ -9,6 +9,8 @@ import os
 
 import pandas
 
+from .excel_mic_parser import read_mic_report
+from .excel_bel_parser import read_bel_report
 from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import find_basis
@@ -185,9 +187,8 @@ def isotherm_from_xl(path, fmt=None):
     ----------
     path : str
         Path to the file to be read.
-    fmt : {None, 'MADIREL'}, optional
-        If the format is set to MADIREL, then the excel file is a specific version
-        used by the MADIREL lab for internal processing.
+    fmt : {None, 'mic', 'bel', 'MADIREL'}, optional
+        The format of the import for the isotherm.
 
     Returns
     -------
@@ -195,120 +196,157 @@ def isotherm_from_xl(path, fmt=None):
         The isotherm contained in the excel file.
     """
 
-    if xlwings is None:
-        raise ParsingError(
-            "xlwings functionality disabled on this platform ( {0} )".format(os.name))
+    sample_info = {}
+    loading_key = 'loading'
+    pressure_key = 'pressure'
+    other_keys = []
+    branch_data = 'guess'
 
-    # Get excel workbook, sheet and range
-    wb = xlwings.Book(path)
-    wb.app.screen_updating = False
-    sht = wb.sheets[0]
+    if fmt == 'mic':
+        sample_info = read_mic_report(path)
+        sample_info['sample_batch'] = 'mic'
 
-    try:
-        sample_info = {}
+        pressure_mode = 'relative'
+        pressure_unit = 'kPa'
+        loading_basis = 'molar'
+        adsorbent_basis = 'mass'
+        units = ['cm3(STP)', 'g']
 
-        # read the isotherm parameters
-        exp_type = sht.range('B1').value
-        sample_info["exp_type"] = exp_type
+        experiment_data_df = pandas.DataFrame({
+            pressure_key: sample_info.pop(pressure_key)['relative'],
+            loading_key: sample_info.pop(loading_key),
+        })
+    elif fmt == 'bel':
+        sample_info = read_bel_report(path)
+        sample_info['sample_batch'] = 'bel'
 
-        if fmt == 'MADIREL':
-            if exp_type == "Isotherme":
-                sample_info["exp_type"] = 'isotherm'
-            elif exp_type == "Calorimetrie":
-                sample_info["exp_type"] = 'calorimetry'
-            else:
-                raise ParsingError("Unknown experiment type")
+        pressure_mode = 'relative'
+        pressure_unit = 'kPa'
+        loading_basis = 'molar'
+        adsorbent_basis = 'mass'
+        units = sample_info.pop('units')
 
-        is_real = sht.range('B2').value
+        experiment_data_df = pandas.DataFrame({
+            pressure_key: sample_info.pop(pressure_key)['relative'],
+            loading_key: sample_info.pop(loading_key),
+        })
 
-        if is_real == "Experience":
-            sample_info['is_real'] = True
-        if is_real == "Simulation":
-            sample_info['is_real'] = False
+        branch_data = sample_info.pop('measurement')
 
-        sample_info['date'] = sht.range('B3').value
-        sample_info['sample_name'] = sht.range('B4').value
-        sample_info['sample_batch'] = sht.range('B5').value
-        sample_info['t_act'] = sht.range('B6').value
-        sample_info['machine'] = sht.range('B7').value
-        sample_info['t_exp'] = sht.range('B8').value
-        sample_info['adsorbate'] = sht.range('B9').value
-        sample_info['user'] = sht.range('B10').value
-        sample_info['lab'] = sht.range('B11').value
-        sample_info['project'] = sht.range('B12').value
+    else:
+        if xlwings is None:
+            raise ParsingError(
+                "xlwings functionality disabled on this platform ( {0} )".format(os.name))
 
-        sample_info['comment'] = sht.range('E2').value
+        # Get excel workbook, sheet and range
+        wb = xlwings.Book(path)
+        wb.app.screen_updating = False
+        sht = wb.sheets[0]
 
-        rng_prop = 4
-        while True:
-            prop = sht.range((5, rng_prop)).value
-            if prop is None:
-                break
-            sample_info[prop] = sht.range((6, rng_prop)).value
-            rng_prop += 1
+        try:
 
-        # read the data in
+            # read the isotherm parameters
+            exp_type = sht.range('B1').value
+            sample_info["exp_type"] = exp_type
 
-        if fmt is None:
-            rng_data = 14
-        elif fmt == 'MADIREL':
-            if exp_type == "Isotherme":
-                rng_data = 30
-            elif exp_type == "Calorimetrie":
-                rng_data = 39
-            else:
-                raise ParsingError("Unknown data type")
+            if fmt == 'MADIREL':
+                if exp_type == "Isotherme":
+                    sample_info["exp_type"] = 'isotherm'
+                elif exp_type == "Calorimetrie":
+                    sample_info["exp_type"] = 'calorimetry'
+                else:
+                    raise ParsingError("Unknown experiment type")
 
-        experiment_data_df = sht.range('A' + str(rng_data)).options(
-            pandas.DataFrame, expand='table', index=0).value
+            is_real = sht.range('B2').value
 
-        loading_key = 'loading'
-        pressure_key = 'pressure'
-        s_loading_key = loading_key
-        s_pressure_key = pressure_key
-        if fmt == 'MADIREL':
-            s_loading_key = 'adsorbed'
-            s_pressure_key = 'pressure'
-        other_keys = []
+            if is_real == "Experience":
+                sample_info['is_real'] = True
+            if is_real == "Simulation":
+                sample_info['is_real'] = False
 
-        for column in experiment_data_df.columns:
-            if s_loading_key in column.lower():
+            sample_info['date'] = sht.range('B3').value
+            sample_info['sample_name'] = sht.range('B4').value
+            sample_info['sample_batch'] = sht.range('B5').value
+            sample_info['t_act'] = sht.range('B6').value
+            sample_info['machine'] = sht.range('B7').value
+            sample_info['t_exp'] = sht.range('B8').value
+            sample_info['adsorbate'] = sht.range('B9').value
+            sample_info['user'] = sht.range('B10').value
+            sample_info['lab'] = sht.range('B11').value
+            sample_info['project'] = sht.range('B12').value
 
-                # Rename with standard name
-                experiment_data_df.rename(
-                    index=str, columns={column: loading_key}, inplace=True)
+            sample_info['comment'] = sht.range('E2').value
 
-                if not fmt:
-                    # Get units
-                    units = column[column.find(
-                        '(') + 1:column.rfind(')')].split('/')
-                    loading_basis = find_basis(units[0])
-                    adsorbent_basis = find_basis(units[1])
-                elif fmt == 'MADIREL':
-                    units = ['mmol', 'g']
-                    loading_basis = 'molar'
-                    adsorbent_basis = 'mass'
+            rng_prop = 4
+            while True:
+                prop = sht.range((5, rng_prop)).value
+                if prop is None:
+                    break
+                sample_info[prop] = sht.range((6, rng_prop)).value
+                rng_prop += 1
 
-            elif s_pressure_key in column.lower():
+            # read the data in
 
-                # Rename with standard name
-                experiment_data_df.rename(
-                    index=str, columns={column: pressure_key}, inplace=True)
+            if fmt is None:
+                rng_data = 14
+            elif fmt == 'MADIREL':
+                if exp_type == "Isotherme":
+                    rng_data = 30
+                elif exp_type == "Calorimetrie":
+                    rng_data = 39
+                else:
+                    raise ParsingError("Unknown data type")
 
-                if not fmt:
-                    # Get units
-                    pressure_unit = column[column.find(
-                        '(') + 1:column.rfind(')')]
-                    pressure_mode = find_mode(pressure_unit)
-                elif fmt == 'MADIREL':
-                    pressure_unit = 'bar'
-                    pressure_mode = 'absolute'
+            experiment_data_df = sht.range('A' + str(rng_data)).options(
+                pandas.DataFrame, expand='table', index=0).value
 
-            else:
-                other_keys.append(column)
-    finally:
-        wb.app.screen_updating = True
-        wb.app.quit()
+            loading_key = 'loading'
+            pressure_key = 'pressure'
+            s_loading_key = loading_key
+            s_pressure_key = pressure_key
+            if fmt == 'MADIREL':
+                s_loading_key = 'adsorbed'
+                s_pressure_key = 'pressure'
+            other_keys = []
+
+            for column in experiment_data_df.columns:
+                if s_loading_key in column.lower():
+
+                    # Rename with standard name
+                    experiment_data_df.rename(
+                        index=str, columns={column: loading_key}, inplace=True)
+
+                    if not fmt:
+                        # Get units
+                        units = column[column.find(
+                            '(') + 1:column.rfind(')')].split('/')
+                        loading_basis = find_basis(units[0])
+                        adsorbent_basis = find_basis(units[1])
+                    elif fmt == 'MADIREL':
+                        units = ['mmol', 'g']
+                        loading_basis = 'molar'
+                        adsorbent_basis = 'mass'
+
+                elif s_pressure_key in column.lower():
+
+                    # Rename with standard name
+                    experiment_data_df.rename(
+                        index=str, columns={column: pressure_key}, inplace=True)
+
+                    if not fmt:
+                        # Get units
+                        pressure_unit = column[column.find(
+                            '(') + 1:column.rfind(')')]
+                        pressure_mode = find_mode(pressure_unit)
+                    elif fmt == 'MADIREL':
+                        pressure_unit = 'bar'
+                        pressure_mode = 'absolute'
+
+                else:
+                    other_keys.append(column)
+        finally:
+            wb.app.screen_updating = True
+            wb.app.quit()
 
     isotherm = PointIsotherm(
         experiment_data_df,
@@ -322,6 +360,7 @@ def isotherm_from_xl(path, fmt=None):
         loading_basis=loading_basis,
         adsorbent_unit=units[1],
         adsorbent_basis=adsorbent_basis,
+        branch=branch_data,
 
         **sample_info)
 
