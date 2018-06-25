@@ -6,8 +6,10 @@ Function to parse bel xls output files
 """
 import xlrd
 from itertools import product
+import re
 import logging
 
+_rem_space_regex = re.compile(r'\s+')
 
 _fields = {
     'sample:': {
@@ -65,11 +67,11 @@ _fields = {
         'labels': {
             'No': 'measurement',
             'p/p0': 'relative',
-            ' pe /': 'absolute',
-            ' pi /': 'internal',
-            ' pe2 /': 'absolute2',
+            'pe/': 'absolute',
+            'pi/': 'internal',
+            'pe2/': 'absolute2',
             'Va/': 'loading',
-            ' p0 /': 'saturation'
+            'p0/': 'saturation'
         }
     },
     'primary data': {
@@ -162,13 +164,16 @@ def _get_data_labels(sheet, row, col):
     final_column = col
     header_row = _fields['cell_value']['header']['row']
     # Abstract this sort of thing
-    header = sheet.cell(row + header_row, final_column).value
+    header = re.sub(_rem_space_regex, '',
+                    sheet.cell(row + header_row, final_column).value)
     while any(header.startswith(label) for label
               in _fields['isotherm data']['labels']):
         final_column += 1
-        header = sheet.cell(row + header_row, final_column).value
-    return [sheet.cell(row + header_row, i).value for i in
-            range(col, final_column)]
+        header = re.sub(_rem_space_regex, '',
+                        sheet.cell(row + header_row, final_column).value)
+    return [re.sub(_rem_space_regex, '',
+                   sheet.cell(row + header_row, i).value)
+            for i in range(col, final_column)]
 
 
 def _find_datapoints(sheet, row, col):
