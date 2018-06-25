@@ -1,6 +1,7 @@
 language: python
 sudo: false
 cache: pip
+python: 3.6
 
 env:
   global:
@@ -8,16 +9,24 @@ env:
     - SEGFAULT_SIGNALS=all
   # Two jobs created here, one for code checks, one for docs
   matrix:
+    - TOXENV=check
+
+matrix:
     include:
-    - python: 3.6
-      env: TOXENV=check
-    - python: 3.6
-      env: TOXENV=docs
-      addons:
-        apt_packages:
-            # We need to install pandoc separately to deal with the
-            # jupyter translation of docs
-            - pandoc
+        - env: TOXENV=docs
+          addons:
+            apt_packages:
+                # We need to install pandoc separately to deal
+                # with translation of docs to jupyter
+                - pandoc
+
+            # Create an test job on the test stage for each python version
+        - python: '3.5'
+          env:
+            - TOXENV=3.5-cover,report,codecov
+        - python: '3.6'
+          env:
+            - TOXENV=3.6-cover,report,codecov
 
 before_install:
   - lsb_release -a      # print linux version
@@ -48,16 +57,6 @@ after_failure:
 
 jobs:
   include:
-    # Create an test job on the test stage for each python version
-    - stage: test
-      python: '3.5'
-      env:
-        - TOXENV=3.5-cover,report,codecov
-    - stage: test
-      python: '3.6'
-      env:
-        - TOXENV=3.6-cover,report,codecov
-
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.6'     # specify python 3.6
