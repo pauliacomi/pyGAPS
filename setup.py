@@ -61,6 +61,7 @@ setup(
         'scipy >= 1.0.0',
         'pandas >= 0.21.1',
         'matplotlib >= 2.1',
+        'xlrd >= 1.1',
         'xlwings;platform_system=="Windows"',
         'coolprop >= 6.0',
     ],
