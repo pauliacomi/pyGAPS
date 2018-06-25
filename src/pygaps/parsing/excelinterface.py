@@ -187,7 +187,7 @@ def isotherm_from_xl(path, fmt=None):
     ----------
     path : str
         Path to the file to be read.
-    fmt : {None, 'micromeritics', 'bel', 'MADIREL'}, optional
+    fmt : {None, 'mic', 'bel', 'MADIREL'}, optional
         The format of the import for the isotherm.
 
     Returns
@@ -202,7 +202,7 @@ def isotherm_from_xl(path, fmt=None):
     other_keys = []
     branch_data = 'guess'
 
-    if fmt == 'micromeritics':
+    if fmt == 'mic':
         sample_info = read_mic_report(path)
         sample_info['sample_batch'] = 'mic'
 
@@ -217,7 +217,7 @@ def isotherm_from_xl(path, fmt=None):
             loading_key: sample_info.pop(loading_key),
         })
     elif fmt == 'bel':
-        sample_info = read_mic_report(path)
+        sample_info = read_bel_report(path)
         sample_info['sample_batch'] = 'bel'
 
         pressure_mode = 'relative'
