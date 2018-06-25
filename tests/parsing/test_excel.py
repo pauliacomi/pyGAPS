@@ -52,7 +52,7 @@ class TestExcel(object):
 
         for path in DATA_EXCEL_MIC:
             isotherm = pygaps.isotherm_from_xl(path=path,
-                                               fmt='micromeritics')
+                                               fmt='mic')
 
             json_path = path.replace('.xls', '.json')
 
