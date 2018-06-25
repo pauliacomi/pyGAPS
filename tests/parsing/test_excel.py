@@ -59,7 +59,7 @@ class TestExcel(object):
             with open(json_path, 'r') as file:
                 assert pygaps.isotherm_to_json(isotherm) == file.read()
 
-    def test_read_excel_brl(self):
+    def test_read_excel_bel(self):
         """Tests reading of bel report files"""
 
         for path in DATA_EXCEL_BEL:
