@@ -2,12 +2,10 @@
 Tests excel interaction
 """
 
-import os
 import pytest
 
 import pygaps
 
-from .conftest import DATA_EXCEL_PATH
 from .conftest import DATA_EXCEL_MIC
 from ..conftest import parsing
 from ..conftest import windows

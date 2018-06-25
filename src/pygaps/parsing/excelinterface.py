@@ -200,6 +200,7 @@ def isotherm_from_xl(path, fmt=None):
     loading_key = 'loading'
     pressure_key = 'pressure'
     other_keys = []
+    branch_data = 'guess'
 
     if fmt == 'micromeritics':
         sample_info = read_mic_report(path)
@@ -216,7 +217,22 @@ def isotherm_from_xl(path, fmt=None):
             loading_key: sample_info.pop(loading_key),
         })
     elif fmt == 'bel':
-        pass
+        sample_info = read_mic_report(path)
+        sample_info['sample_batch'] = 'bel'
+
+        pressure_mode = 'relative'
+        pressure_unit = 'kPa'
+        loading_basis = 'molar'
+        adsorbent_basis = 'mass'
+        units = ['cm3(STP)', 'g']
+
+        experiment_data_df = pandas.DataFrame({
+            pressure_key: sample_info.pop(pressure_key)['relative'],
+            loading_key: sample_info.pop(loading_key),
+        })
+
+        branch_data = sample_info.pop('measurement')
+
     else:
         if xlwings is None:
             raise ParsingError(
@@ -344,6 +360,7 @@ def isotherm_from_xl(path, fmt=None):
         loading_basis=loading_basis,
         adsorbent_unit=units[1],
         adsorbent_basis=adsorbent_basis,
+        branch=branch_data,
 
         **sample_info)
 

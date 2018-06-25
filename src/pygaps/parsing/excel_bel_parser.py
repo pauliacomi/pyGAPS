@@ -4,10 +4,11 @@ Function to parse belsorp xls output files
 @author Paul Iacomi
 """
 
-import xlrd
-from itertools import product
-import re
 import logging
+import re
+from itertools import product
+
+import xlrd
 
 _number_regex = re.compile(r'^(-)?\d+(.|,)?\d+')
 
