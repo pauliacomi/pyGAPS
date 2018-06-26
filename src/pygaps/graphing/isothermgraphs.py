@@ -21,7 +21,6 @@ _BRANCH_TYPES = ("ads", "des")
 def plot_iso(isotherms,
              plot_type='isotherm', secondary_key=None,
              branch=_BRANCH_TYPES, logx=False, color=True,
-             points_visible=True,
 
              adsorbent_basis="mass",
              adsorbent_unit="g",
@@ -34,11 +33,11 @@ def plot_iso(isotherms,
              y1_range=(None, None),
              y2_range=(None, None),
 
-             legend_list=None,
              fig_title=None,
+             legend_list=None,
              legend_bottom=False,
 
-             save=False, path=None,
+             save_path=None,
              **other_parameters):
     """
     Plots the isotherm(s) provided on a single graph.
@@ -63,9 +62,6 @@ def plot_iso(isotherms,
     color : bool, optional
         Whether the graph should be coloured or grayscale. Grayscale graphs
         are usually preferred for publications or print media.
-    points_visible : bool, optional
-        Whether the plotting should display individual points for
-        the curves.
 
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
@@ -103,14 +99,33 @@ def plot_iso(isotherms,
         when plotting a lot of data, the legend is best displayed separately to the
         side of the graph. In that case, set this to False.
 
-    save : bool, optional
+    save_path : str, optional
         Whether to save the graph or not.
-    path : str, optional
-        The path where the graph will be saved.
+        If a path is provided, then that is where the graph will be saved.
+
+    Other Parameters
+    ----------------
+    title_style : dict
+        A dictionary that will be passed into the matplotlib set_title() function.
+
+    label_style : dict
+        A dictionary that will be passed into the matplotlib set_label() function.
+
+    line_style : dict
+        A dictionary that will be passed into the matplotlib plot() function.
+
+    tick_style : dict
+        A dictionary that will be passed into the matplotlib tick_params() function.
+
+    legend_style : dict
+        A dictionary that will be passed into the matplotlib legend() function.
+
+    save_style : dict
+        A dictionary that will be passed into the matplotlib savefig() function
+        if the saving of the figure is selected.
 
     Returns
     -------
-
     fig : Matplotlib figure
         The figure object generated.
     axes1 : Matplotlib ax
@@ -184,22 +199,27 @@ def plot_iso(isotherms,
         ' ($' + loading_unit + '/' + adsorbent_unit + '$)'
 
     # Set the colours of the graph
-    number_of_lines = 6
-    cm_subsection = linspace(0, 1, number_of_lines)
-    colors = [cm.jet(x) for x in cm_subsection]
     cy1 = cycler('marker', ['o', 's'])
     cy2 = cycler('marker', ['v', '^'])
-    cy3 = cycler('color', colors)
     cy4 = cycler('marker', ['v', '^', '<', '>'])
-    cy5 = cycler('linestyle', ['-', '--', ':', '-.'])
-    cy6 = cycler('color', ['black', 'grey', 'silver'])
 
     if color:
-        pc_iso = (cy1 * cy3)
-        pc_prop = (cy2 * cy3)
+        number_of_lines = 6
+        if isinstance(color, int):
+            number_of_lines = color
+
+        colors = [cm.jet(x) for x in linspace(0, 1, number_of_lines)]
+        if isinstance(color, list):
+            colors = color
+
+        polychrome_cy = cycler('color', colors)
+        pc_iso = (cy1 * polychrome_cy)
+        pc_prop = (cy2 * polychrome_cy)
     else:
-        pc_iso = (cy1 * cy5 * cy6)
-        pc_prop = (cy4 * cy5 * cy6)
+        monochrome_cy = cycler('color', ['black', 'grey', 'silver'])
+        linestyle_cy = cycler('linestyle', ['-', '--', ':', '-.'])
+        pc_iso = (cy1 * linestyle_cy * monochrome_cy)
+        pc_prop = (cy4 * linestyle_cy * monochrome_cy)
 
     # Set the colours and ranges for the axes
     if plot_type == 'isotherm':
@@ -220,14 +240,14 @@ def plot_iso(isotherms,
         range_property = y2_range
 
     # Styles in the graph
-    title_style = dict(horizontalalignment='center',
-                       fontsize=25, fontdict={'family': 'monospace'})
-    label_style = dict(horizontalalignment='center',
-                       fontsize=20, fontdict={'family': 'monospace'})
-    line_style = dict(linewidth=2, markersize=4)
-    tick_style = dict(labelsize=17)
-    styles = dict(title_style=title_style, label_style=label_style,
-                  line_style=line_style, tick_style=tick_style)
+    styles = dict(title_style=dict(horizontalalignment='center',
+                                   fontsize=25, fontdict={'family': 'monospace'}),
+                  label_style=dict(horizontalalignment='center',
+                                   fontsize=20, fontdict={'family': 'monospace'}),
+                  line_style=dict(linewidth=2, markersize=8),
+                  tick_style=dict(labelsize=17),
+                  legend_style=dict(handlelength=3, fontsize=15, loc='best'),
+                  )
 
     styles.update(other_parameters)  # Update with any user provided styles
 
@@ -237,7 +257,7 @@ def plot_iso(isotherms,
     # Graph title
     if fig_title is None:
         fig_title = plot_type.capitalize() + ' Graph'
-    axes.set_title(fig_title, **title_style)
+    axes.set_title(fig_title, **styles['title_style'])
 
     # Graph legend builder
     def build_label(lbl_components, isotherm):
@@ -273,13 +293,9 @@ def plot_iso(isotherms,
         axes.tick_params(axis='both', which='major',
                          **styles_dict['tick_style'])
 
-        # Generate a linestyle from the incoming dictionary
-        line_style = styles_dict['line_style']
-        specific_line_style = dict(linewidth=2, markersize=8)
-        line_style.update(specific_line_style)
-
         # Plot line
-        line, = axes.plot(data_x, data_y, label=line_label, **line_style)
+        line, = axes.plot(data_x, data_y, label=line_label,
+                          **styles_dict['line_style'])
 
         return line
 
@@ -294,12 +310,12 @@ def plot_iso(isotherms,
         axes.set_ymargin(1)
 
         # Generate a linestyle from the incoming dictionary
-        line_style = styles_dict['line_style']
-        specific_line_style = dict(linewidth=0, markersize=8)
-        line_style.update(specific_line_style)
+        specific_line_style = styles_dict['line_style']
+        specific_line_style.update(dict(linewidth=0))
 
         # Plot line
-        line, = axes.plot(data_x, data_y, label=line_label, **line_style)
+        line, = axes.plot(data_x, data_y, label=line_label,
+                          **specific_line_style)
 
         return line
 
@@ -385,7 +401,7 @@ def plot_iso(isotherms,
         line_label = build_label(legend_list, isotherm)
 
         # Colour of the line, now empty
-        color = None
+        line_color = None
 
         # If there's an adsorption branch, plot it
         if ads:
@@ -402,7 +418,7 @@ def plot_iso(isotherms,
                                     isotherm, plot_branch,
                                     lbl, plot_type, styles)
 
-                color = line.get_color()
+                line_color = line.get_color()
 
         if des:
             plot_branch = 'des'
@@ -411,12 +427,12 @@ def plot_iso(isotherms,
                 # Label the branch
                 lbl = line_label
                 if legend_list is not None and 'branch' in legend_list:
-                    lbl += ' ads'
+                    lbl += ' des'
 
                 # Set marker fill to empty, and match the colour from desorption
                 styles['line_style']['mfc'] = 'none'
-                if color is not None:
-                    styles['line_style']['c'] = color
+                if line_color is not None:
+                    styles['line_style']['c'] = line_color
 
                 # Call the plotting function
                 line = graph_caller(axes, axes2,
@@ -425,7 +441,7 @@ def plot_iso(isotherms,
 
                 # Delete the colour changes to go back to original settings
                 del styles['line_style']['mfc']
-                if color is not None:
+                if line_color is not None:
                     del styles['line_style']['c']
 
 
@@ -452,22 +468,24 @@ def plot_iso(isotherms,
         lines = lines + lines2
         labels = labels + labels2
 
-    legend_style = dict(handlelength=3, fontsize=15, loc='best')
     if legend_bottom:
-        legend_style['bbox_to_anchor'] = (0.5, -0.1)
-        legend_style['ncol'] = 2
-        legend_style['loc'] = 'upper center'
+        styles['legend_style']['bbox_to_anchor'] = (0.5, -0.1)
+        styles['legend_style']['ncol'] = 2
+        styles['legend_style']['loc'] = 'upper center'
     elif len(lines) > 5:
-        legend_style['bbox_to_anchor'] = (1.15, 0.5)
-        legend_style['loc'] = 'center left'
+        styles['legend_style']['bbox_to_anchor'] = (1.15, 0.5)
+        styles['legend_style']['loc'] = 'center left'
 
-    lgd = axes.legend(lines, labels, **legend_style)
+    lgd = axes.legend(lines, labels, **styles['legend_style'])
 
     # Fix size of graphs
     plt.tight_layout()
 
-    if save is True:
-        fig.savefig(path, bbox_extra_artists=(lgd,),
-                    bbox_inches='tight', transparent=False)
+    if save_path:
+        fig.savefig(save_path,
+                    bbox_extra_artists=(lgd,),
+                    bbox_inches='tight',
+                    **styles['save_style'],
+                    )
 
     return fig, axes, axes2

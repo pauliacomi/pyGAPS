@@ -10,6 +10,8 @@ Features:
 
 * Added an excel import which can take Micromeritics or
   Belsorp report (.xls) files.
+* Improved plotting function to allow for more customisation
+  over how the graph looks.
 
 Bugfixes:
 
