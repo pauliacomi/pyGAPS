@@ -11,9 +11,9 @@ from itertools import product
 
 import xlrd
 
-_number_regex = re.compile(r'^(-)?\d+(.|,)?\d+')
+_NUMBER_REGEX = re.compile(r'^(-)?\d+(.|,)?\d+')
 
-_fields = {
+_FIELDS = {
     'sample:': {
         'text': ['sample:', 'echantillon:'],
         'name': 'sample_name',
@@ -120,7 +120,7 @@ def read_mic_report(path):
     for row, col in product(range(sheet.nrows), range(sheet.ncols)):
         cell_value = str(sheet.cell(row, col).value).lower()
         try:
-            field = next(v for k, v in _fields.items() if
+            field = next(v for k, v in _FIELDS.items() if
                          any([cell_value.startswith(n) for
                               n in v.get('text')]))
         except StopIteration:
@@ -149,7 +149,7 @@ def _handle_numbers(val):
     units) to return only the number as a float.
     """
     if val:
-        return float(_number_regex.search(val.replace(',', '')).group())
+        return float(_NUMBER_REGEX.search(val.replace(',', '')).group())
     else:
         return None
 
@@ -173,11 +173,11 @@ def _convert_time(points):
 def _get_data_labels(sheet, row, col):
     """Locates all column labels for data collected during the experiment."""
     final_column = col
-    header_row = _fields['cell_value']['header']['row']
+    header_row = _FIELDS['cell_value']['header']['row']
     # Abstract this sort of thing
     header = sheet.cell(row + header_row, final_column).value
     while any(header.startswith(label) for label
-              in _fields['isotherm tabular']['labels']):
+              in _FIELDS['isotherm tabular']['labels']):
         final_column += 1
         header = sheet.cell(row + header_row, final_column).value
     return [sheet.cell(row + header_row, i).value for i in
@@ -186,7 +186,7 @@ def _get_data_labels(sheet, row, col):
 
 def _get_datapoints(sheet, row, col):
     """Returns all collected data points for a given column."""
-    rowc = _fields['cell_value']['datapoints']['row']
+    rowc = _FIELDS['cell_value']['datapoints']['row']
     # Data can start on two different rows. Try first option and then next row.
     if sheet.cell(row + rowc, col).value:
         start_row = row + rowc
@@ -221,7 +221,7 @@ def _get_errors(sheet, row, col):
     """Looks for all cells that contain errors (are below a cell
     labelled primary data).
     """
-    field = _fields['primary data']
+    field = _FIELDS['primary data']
     val = sheet.cell(row + field['row'], col + field['column']).value
     if not val:
         return []
