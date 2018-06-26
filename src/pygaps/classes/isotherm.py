@@ -326,9 +326,9 @@ class Isotherm(object):
         '''
         string = ""
 
-        if self.is_real:
+        if self.is_real is True:
             string += ("Experimental isotherm" + '\n')
-        else:
+        elif self.is_real is False:
             string += ("Simulated isotherm" + '\n')
 
         # Required
