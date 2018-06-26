@@ -78,9 +78,8 @@ For more info about JSON parsing, check out the :mod:`~pygaps.parsing.jsoninterf
 Excel parsing
 -------------
 
-The isotherms can also be imported or exported in an Excel format, if required. This is done with the help
-of the xlwings python package and is, of course, only available on the systems where Excel is already
-installed.
+The isotherms can also be imported or exported in an Excel format,
+if required. This is done with the help of the xlrd/xlwt python packages.
 An example excel isotherm can be found :download:`here <../files/isotherm.xlsx>`.
 
 The framework provides two functions for Excel files:
