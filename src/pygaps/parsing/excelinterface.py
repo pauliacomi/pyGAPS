@@ -11,8 +11,6 @@ import xlwt
 
 from ..classes.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
-from ..utilities.unit_converter import find_basis
-from ..utilities.unit_converter import find_mode
 from .excel_bel_parser import read_bel_report
 from .excel_mic_parser import read_mic_report
 
@@ -174,6 +172,15 @@ _FIELDS_MADIREL_ENTH = {
 }
 
 
+def _update_recurs(dict1, dict2):
+    "Update a dictionary with one level down"
+    for f in dict2:
+        if f in dict1:
+            dict1[f].update(dict2[f])
+        else:
+            dict1[f] = dict2[f]
+
+
 def isotherm_to_xl(isotherm, path, fmt=None):
     '''
 
@@ -192,34 +199,27 @@ def isotherm_to_xl(isotherm, path, fmt=None):
 
     # create a new workbook and select first sheet
     wb = xlwt.Workbook()
-    sht = wb.add_sheet('Data')
+    sht = wb.add_sheet('data')
 
     # get the required dictionaries
     fields = _FIELDS.copy()
     iso_dict = isotherm.to_dict()
+    iso_dict.pop('id', None)         # make sure id is not passed
 
     if fmt == 'MADIREL':
-        def update_recurs(dict1, dict2):
-            "Update a dictionary with one level down"
-            for f in dict2:
-                if f in dict1:
-                    dict1[f].update(dict2[f])
-                else:
-                    dict1[f] = dict2[f]
-
-        update_recurs(fields, _FIELDS_MADIREL)
+        _update_recurs(fields, _FIELDS_MADIREL)
 
         if 'exp_type' in fields:
             if isotherm.exp_type.lower() == "isotherm":
                 iso_dict['exp_type'] = 'Isotherme'
             elif isotherm.exp_type.lower() == "calorimetry":
                 iso_dict['exp_type'] = 'Calorimetrie'
-                update_recurs(fields, _FIELDS_MADIREL_ENTH)
+                _update_recurs(fields, _FIELDS_MADIREL_ENTH)
         if 'is_real' in fields:
             if isotherm.is_real is True:
-                iso_dict['is_real'] = 'Simulation'
-            elif isotherm.is_real is False:
                 iso_dict['is_real'] = 'Experience'
+            elif isotherm.is_real is False:
+                iso_dict['is_real'] = 'Simulation'
 
     # Add the required named properties
     prop_style = xlwt.easyxf(
@@ -259,7 +259,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
                       datapoint)
 
     # Now add the other keys
-    sht = wb.add_sheet('OtherData')
+    sht = wb.add_sheet('otherdata')
     row = 0
     col = 0
     for prop in iso_dict:
@@ -328,97 +328,82 @@ def isotherm_from_xl(path, fmt=None):
         branch_data = sample_info.pop('measurement')
 
     else:
-
         # Get excel workbook and sheet
         wb = xlrd.open_workbook(path)
-        sht = wb.sheet_by_index(0)
+        sht = wb.sheet_by_name('data')
 
-        for field in fields.keys():
-            sample_info[field] = sht.cell(fields[field]['row'],
-                                          fields[field]['col']).value
-
-        # read the isotherm parameters
+        # get the required dictionaries
+        fields = _FIELDS.copy()
 
         if fmt == 'MADIREL':
-            if sample_info['exp_type'] == "Isotherme":
-                sample_info["exp_type"] = 'isotherm'
-            elif sample_info['exp_type'] == "Calorimetrie":
-                sample_info["exp_type"] = 'calorimetry'
-            else:
-                raise ParsingError("Unknown experiment type")
+            _update_recurs(fields, _FIELDS_MADIREL)
 
-        if sample_info['is_real'] == "Experience":
-            sample_info['is_real'] = True
-        if sample_info['is_real'] == "Simulation":
-            sample_info['is_real'] = False
+            if sht.cell(fields['exp_type']['row'],
+                        fields['exp_type']['column'] + 1).value == 'Calorimetrie':
+                _update_recurs(fields, _FIELDS_MADIREL_ENTH)
 
-        rng_prop = 4
-        while True:
-            prop = sht.range((5, rng_prop)).value
-            if prop is None:
+        # read the main isotherm parameters
+        for field in fields:
+            sample_info[field] = sht.cell(fields[field]['row'],
+                                          fields[field]['column'] + 1).value
+
+        # find data limits
+        header_row = fields['isotherm data']['row'] + 1
+        start_row = header_row + 1
+        final_row = start_row
+
+        while final_row < sht.nrows:
+            point = sht.cell(final_row, 0).value
+            if not point:
                 break
-            sample_info[prop] = sht.range((6, rng_prop)).value
-            rng_prop += 1
+            final_row += 1
 
         # read the data in
+        header_col = 0
+        headers = []
+        experiment_data = {}
+        while header_col < sht.ncols:
+            header = sht.cell(header_row, header_col).value
+            if not header:
+                break
+            headers.append(header)
+            experiment_data[header] = [sht.cell(i, header_col).value for i in range(start_row, final_row)]
+            header_col += 1
+        loading_key = headers[0]
+        pressure_key = headers[1]
+        other_keys = headers[2:]
 
-        if fmt is None:
-            rng_data = 14
-        elif fmt == 'MADIREL':
-            if exp_type == "Isotherme":
-                rng_data = 30
-            elif exp_type == "Calorimetrie":
-                rng_data = 39
-            else:
-                raise ParsingError("Unknown data type")
+        experiment_data_df = pandas.DataFrame(experiment_data)
 
-        experiment_data_df = sht.range('A' + str(rng_data)).options(
-            pandas.DataFrame, expand='table', index=0).value
+        # read the secondary isotherm parameters
+        sht = wb.sheet_by_name('otherdata')
+        row_index = 0
+        while row_index < sht.nrows:
+            prop = sht.cell(row_index, 0).value
+            if not prop:
+                break
+            sample_info[prop] = sht.cell(row_index, 1).value
+            row_index += 1
 
-        loading_key = 'loading'
-        pressure_key = 'pressure'
-        s_loading_key = loading_key
-        s_pressure_key = pressure_key
+        # Put data in order
+        sample_info.pop('isotherm data')    # remove useless field
+        sample_info.pop('id', None)         # make sure id is not passed
+        pressure_mode = sample_info.pop('pressure_mode')
+        pressure_unit = sample_info.pop('pressure_unit')
+        loading_basis = sample_info.pop('loading_basis')
+        adsorbent_basis = sample_info.pop('adsorbent_basis')
+        units = [sample_info.pop('loading_unit'),
+                 sample_info.pop('adsorbent_unit')]
+
         if fmt == 'MADIREL':
-            s_loading_key = 'adsorbed'
-            s_pressure_key = 'pressure'
-        other_keys = []
-
-        for column in experiment_data_df.columns:
-            if s_loading_key in column.lower():
-
-                # Rename with standard name
-                experiment_data_df.rename(
-                    index=str, columns={column: loading_key}, inplace=True)
-
-                if not fmt:
-                    # Get units
-                    units = column[column.find(
-                        '(') + 1:column.rfind(')')].split('/')
-                    loading_basis = find_basis(units[0])
-                    adsorbent_basis = find_basis(units[1])
-                elif fmt == 'MADIREL':
-                    units = ['mmol', 'g']
-                    loading_basis = 'molar'
-                    adsorbent_basis = 'mass'
-
-            elif s_pressure_key in column.lower():
-
-                # Rename with standard name
-                experiment_data_df.rename(
-                    index=str, columns={column: pressure_key}, inplace=True)
-
-                if not fmt:
-                    # Get units
-                    pressure_unit = column[column.find(
-                        '(') + 1:column.rfind(')')]
-                    pressure_mode = find_mode(pressure_unit)
-                elif fmt == 'MADIREL':
-                    pressure_unit = 'bar'
-                    pressure_mode = 'absolute'
-
-            else:
-                other_keys.append(column)
+            if sample_info['is_real'] == "Experience":
+                sample_info['is_real'] = True
+            elif sample_info['is_real'] == "Simulation":
+                sample_info['is_real'] = False
+            if sample_info['exp_type'] == 'Isotherme':
+                sample_info['exp_type'] = 'isotherm'
+            elif sample_info['exp_type'] == 'Calorimetrie':
+                sample_info['exp_type'] = 'calorimetry'
 
     isotherm = PointIsotherm(
         experiment_data_df,
