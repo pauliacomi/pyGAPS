@@ -27,11 +27,14 @@ def isotherm_to_csv(isotherm, path, separator=','):
     with open(path, mode='w') as file:
 
         isotherm_data = isotherm.to_dict()
+        isotherm_data.pop('id', None)         # make sure id is not passed
+
         file.writelines([x + separator + str(y) + '\n'
                          for (x, y) in isotherm_data.items()])
 
         file.write('data\n')
 
+        # get headings in an ordered way
         headings = [
             isotherm.loading_key,
             isotherm.pressure_key,
@@ -40,13 +43,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
         data = isotherm.data()[headings]
 
-        headings[0] = isotherm.loading_key + \
-            '(' + isotherm.loading_unit + ')'
-        headings[1] = isotherm.pressure_key + \
-            '(' + isotherm.pressure_unit + ')'
-
-        file.write(separator.join(headings) + '\n')
-        data.to_csv(file, sep=separator, index=False, header=False)
+        file.write(isotherm.data().to_csv(None, sep=separator, index=False, header=True))
 
     return
 
