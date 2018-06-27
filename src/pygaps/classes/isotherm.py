@@ -9,12 +9,9 @@ import pandas
 import pygaps
 
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _MATERIAL_MODE
-from ..utilities.unit_converter import _MOLAR_UNITS
 from ..utilities.unit_converter import _PRESSURE_MODE
 from ..utilities.unit_converter import _PRESSURE_UNITS
-from ..utilities.unit_converter import _VOLUME_UNITS
 
 
 class Isotherm(object):

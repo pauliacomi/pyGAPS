@@ -40,10 +40,9 @@ def isotherm_to_csv(isotherm, path, separator=','):
             isotherm.pressure_key,
         ]
         headings.extend(isotherm.other_keys)
-
         data = isotherm.data()[headings]
 
-        file.write(isotherm.data().to_csv(None, sep=separator, index=False, header=True))
+        file.write(data.to_csv(None, sep=separator, index=False, header=True))
 
     return
 
