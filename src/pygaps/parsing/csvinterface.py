@@ -32,14 +32,15 @@ def isotherm_to_csv(isotherm, path, separator=','):
         file.writelines([x + separator + str(y) + '\n'
                          for (x, y) in isotherm_data.items()])
 
-        file.write('data\n')
+        file.write('data:[pressure, loading, other...]\n')
 
         # get headings in an ordered way
         headings = [
-            isotherm.loading_key,
             isotherm.pressure_key,
+            isotherm.loading_key,
         ]
-        headings.extend(isotherm.other_keys)
+        if isotherm.other_keys:
+            headings.extend(isotherm.other_keys)
         data = isotherm.data()[headings]
 
         file.write(data.to_csv(None, sep=separator, index=False, header=True))
@@ -69,32 +70,18 @@ def isotherm_from_csv(path, separator=','):
         line = file.readline().rstrip()
         sample_info = {}
 
-        while line != 'data':
+        while not line.startswith('data'):
             values = line.split(sep=separator)
             sample_info.update({values[0]: values[1]})
             line = file.readline().rstrip()
 
         data_df = pandas.read_csv(file, sep=separator)
 
-        loading_key = 'loading'
-        pressure_key = 'pressure'
-        other_keys = []
-
-        for column in data_df.columns:
-            if loading_key in column:
-                data_df.rename(
-                    index=str, columns={column: loading_key}, inplace=True)
-            elif pressure_key in column:
-                data_df.rename(
-                    index=str, columns={column: pressure_key}, inplace=True)
-            else:
-                other_keys.append(column)
-
     isotherm = PointIsotherm(
         data_df,
-        loading_key=loading_key,
-        pressure_key=pressure_key,
-        other_keys=other_keys,
+        loading_key=data_df.columns[0],
+        pressure_key=data_df.columns[1],
+        other_keys=list(data_df.columns[2:]),
         **sample_info)
 
     return isotherm

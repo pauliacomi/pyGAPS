@@ -380,8 +380,12 @@ class Isotherm(object):
 
         # Add named parameters
         for param in self._named_params + self._unit_params + ['id']:
-            if hasattr(self, param):
-                parameter_dict.update({param: getattr(self, param)})
+            try:
+                val = getattr(self, param)
+                if val:
+                    parameter_dict.update({param: val})
+            except AttributeError:
+                pass
 
         # Now add the rest
         parameter_dict.update(self.other_properties)

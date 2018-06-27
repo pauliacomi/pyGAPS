@@ -57,22 +57,20 @@ class TestExcel(object):
         """Tests reading of micromeritics report files"""
 
         for path in DATA_EXCEL_MIC:
-            isotherm = pygaps.isotherm_from_xl(path=path,
-                                               fmt='mic')
+            isotherm = pygaps.isotherm_from_xl(path=path, fmt='mic')
 
             json_path = path.replace('.xls', '.json')
 
             with open(json_path, 'r') as file:
-                assert pygaps.isotherm_to_json(isotherm) == file.read()
+                assert isotherm == pygaps.isotherm_from_json(file.read())
 
     def test_read_excel_bel(self):
         """Tests reading of bel report files"""
 
         for path in DATA_EXCEL_BEL:
-            isotherm = pygaps.isotherm_from_xl(path=path,
-                                               fmt='bel')
+            isotherm = pygaps.isotherm_from_xl(path=path, fmt='bel')
 
             json_path = path.replace('.xls', '.json')
 
             with open(json_path, 'r') as file:
-                assert pygaps.isotherm_to_json(isotherm) == file.read()
+                assert isotherm == pygaps.isotherm_from_json(file.read())

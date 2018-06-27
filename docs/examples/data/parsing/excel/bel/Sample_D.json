@@ -1,1 +1,449 @@
-{"adsorbate": "H2O", "adsorbent_basis": "mass", "adsorbent_unit": "g", "comment": null, "date": "2017-09-12 07:47:47", "exp_type": null, "id": "55b114be8ca84f028fbace19cdbaad26", "is_real": null, "isotherm_data": [{"loading": "3.4931e-07", "pressure": "0.00031243"}, {"loading": "9.2768e-07", "pressure": "0.00041622"}, {"loading": "2.2685e-06", "pressure": "0.00038435"}, {"loading": "5.4109e-06", "pressure": "0.00030279"}, {"loading": "1.1118e-05", "pressure": "0.00028019"}, {"loading": "2.4132e-05", "pressure": "0.00026888"}, {"loading": "6.0833e-05", "pressure": "0.00030906"}, {"loading": "0.00012606", "pressure": "0.00042263"}, {"loading": "0.00037989", "pressure": "0.00074992"}, {"loading": "0.0011167", "pressure": "0.0022079"}, {"loading": "0.0018741", "pressure": "0.0046134"}, {"loading": "0.0025138", "pressure": "0.008758"}, {"loading": "0.002752", "pressure": "0.010351"}, {"loading": "0.0034121", "pressure": "0.022092"}, {"loading": "0.0035773", "pressure": "0.024752"}, {"loading": "0.0042165", "pressure": "0.046649"}, {"loading": "0.0043019", "pressure": "0.048261"}, {"loading": "0.0048523", "pressure": "0.077169"}, {"loading": "0.00524", "pressure": "0.1006"}, {"loading": "0.0056853", "pressure": "0.1297"}, {"loading": "0.0059963", "pressure": "0.1503"}, {"loading": "0.0063581", "pressure": "0.1745"}, {"loading": "0.0067552", "pressure": "0.1995"}, {"loading": "0.0071915", "pressure": "0.2254"}, {"loading": "0.0076657", "pressure": "0.2474"}, {"loading": "0.0086205", "pressure": "0.2676"}, {"loading": "0.0097024", "pressure": "0.2752"}, {"loading": "0.010757", "pressure": "0.28"}, {"loading": "0.0118", "pressure": "0.2839"}, {"loading": "0.012824", "pressure": "0.2871"}, {"loading": "0.013975", "pressure": "0.2908"}, {"loading": "0.015108", "pressure": "0.2941"}, {"loading": "0.016697", "pressure": "0.2989"}, {"loading": "0.018269", "pressure": "0.3032"}, {"loading": "0.019809", "pressure": "0.3079"}, {"loading": "0.021317", "pressure": "0.3138"}, {"loading": "0.022859", "pressure": "0.3569"}, {"loading": "0.022901", "pressure": "0.3598"}, {"loading": "0.023298", "pressure": "0.3884"}, {"loading": "0.0253", "pressure": "0.4073"}, {"loading": "0.027337", "pressure": "0.4179"}, {"loading": "0.029707", "pressure": "0.4336"}, {"loading": "0.032068", "pressure": "0.4613"}, {"loading": "0.033274", "pressure": "0.4836"}, {"loading": "0.034461", "pressure": "0.5127"}, {"loading": "0.035279", "pressure": "0.5375"}, {"loading": "0.036088", "pressure": "0.5626"}, {"loading": "0.036881", "pressure": "0.5877"}, {"loading": "0.037661", "pressure": "0.6169"}, {"loading": "0.037935", "pressure": "0.6242"}, {"loading": "0.038719", "pressure": "0.6716"}, {"loading": "0.039253", "pressure": "0.7269"}, {"loading": "0.039564", "pressure": "0.7586"}, {"loading": "0.039731", "pressure": "0.7755"}, {"loading": "0.04006", "pressure": "0.8112"}, {"loading": "0.040418", "pressure": "0.8519"}, {"loading": "0.040762", "pressure": "0.8914"}, {"loading": "0.041106", "pressure": "0.9309"}, {"loading": "0.04191", "pressure": "1.0111"}, {"loading": "0.041854", "pressure": "0.9747"}, {"loading": "0.041787", "pressure": "0.9405"}, {"loading": "0.0416", "pressure": "0.8719"}, {"loading": "0.041529", "pressure": "0.8511"}, {"loading": "0.041348", "pressure": "0.8039"}, {"loading": "0.041162", "pressure": "0.7648"}, {"loading": "0.04099", "pressure": "0.7332"}, {"loading": "0.040649", "pressure": "0.6772"}, {"loading": "0.040326", "pressure": "0.6313"}, {"loading": "0.039793", "pressure": "0.5638"}, {"loading": "0.039324", "pressure": "0.5126"}, {"loading": "0.038893", "pressure": "0.4654"}, {"loading": "0.038312", "pressure": "0.407"}, {"loading": "0.03778", "pressure": "0.3866"}, {"loading": "0.034876", "pressure": "0.364"}, {"loading": "0.032256", "pressure": "0.3531"}, {"loading": "0.029716", "pressure": "0.3433"}, {"loading": "0.028237", "pressure": "0.3376"}, {"loading": "0.026083", "pressure": "0.3278"}, {"loading": "0.024008", "pressure": "0.315"}, {"loading": "0.022157", "pressure": "0.2891"}, {"loading": "0.020481", "pressure": "0.2824"}, {"loading": "0.018843", "pressure": "0.2781"}, {"loading": "0.017364", "pressure": "0.2743"}, {"loading": "0.016032", "pressure": "0.2715"}, {"loading": "0.014721", "pressure": "0.2688"}, {"loading": "0.013553", "pressure": "0.2657"}, {"loading": "0.012516", "pressure": "0.263"}, {"loading": "0.011565", "pressure": "0.2598"}, {"loading": "0.010641", "pressure": "0.2549"}, {"loading": "0.0097618", "pressure": "0.2447"}, {"loading": "0.0092415", "pressure": "0.2343"}, {"loading": "0.0085442", "pressure": "0.2149"}, {"loading": "0.0083555", "pressure": "0.2089"}, {"loading": "0.0076702", "pressure": "0.1811"}, {"loading": "0.0072151", "pressure": "0.1568"}, {"loading": "0.006769", "pressure": "0.1304"}, {"loading": "0.006313", "pressure": "0.1035"}, {"loading": "0.0058843", "pressure": "0.079098"}, {"loading": "0.0058481", "pressure": "0.077917"}, {"loading": "0.0053859", "pressure": "0.054938"}, {"loading": "0.0053181", "pressure": "0.052278"}, {"loading": "0.0048711", "pressure": "0.03568"}, {"loading": "0.0045369", "pressure": "0.026339"}, {"loading": "0.004515", "pressure": "0.025929"}, {"loading": "0.0040677", "pressure": "0.016485"}, {"loading": "0.0036827", "pressure": "0.010641"}, {"loading": "0.0036523", "pressure": "0.010315"}, {"loading": "0.0033977", "pressure": "0.0073869"}], "lab": null, "loading_basis": "molar", "loading_unit": "mol", "machine": null, "mass": 0.0543, "pressure_mode": "relative", "pressure_unit": null, "project": null, "sample_batch": "bel", "sample_name": "Sample_D", "t_act": null, "t_exp": 298.15, "user": "User"}
+{
+    "adsorbate": "H2O",
+    "adsorbent_basis": "mass",
+    "adsorbent_unit": "g",
+    "date": "2017-09-12 07:47:47",
+    "isotherm_data": [
+        {
+            "loading": "3.4931e-07",
+            "pressure": "0.00031243"
+        },
+        {
+            "loading": "9.2768e-07",
+            "pressure": "0.00041622"
+        },
+        {
+            "loading": "2.2685e-06",
+            "pressure": "0.00038435"
+        },
+        {
+            "loading": "5.4109e-06",
+            "pressure": "0.00030279"
+        },
+        {
+            "loading": "1.1118e-05",
+            "pressure": "0.00028019"
+        },
+        {
+            "loading": "2.4132e-05",
+            "pressure": "0.00026888"
+        },
+        {
+            "loading": "6.0833e-05",
+            "pressure": "0.00030906"
+        },
+        {
+            "loading": "0.00012606",
+            "pressure": "0.00042263"
+        },
+        {
+            "loading": "0.00037989",
+            "pressure": "0.00074992"
+        },
+        {
+            "loading": "0.0011167",
+            "pressure": "0.0022079"
+        },
+        {
+            "loading": "0.0018741",
+            "pressure": "0.0046134"
+        },
+        {
+            "loading": "0.0025138",
+            "pressure": "0.008758"
+        },
+        {
+            "loading": "0.002752",
+            "pressure": "0.010351"
+        },
+        {
+            "loading": "0.0034121",
+            "pressure": "0.022092"
+        },
+        {
+            "loading": "0.0035773",
+            "pressure": "0.024752"
+        },
+        {
+            "loading": "0.0042165",
+            "pressure": "0.046649"
+        },
+        {
+            "loading": "0.0043019",
+            "pressure": "0.048261"
+        },
+        {
+            "loading": "0.0048523",
+            "pressure": "0.077169"
+        },
+        {
+            "loading": "0.00524",
+            "pressure": "0.1006"
+        },
+        {
+            "loading": "0.0056853",
+            "pressure": "0.1297"
+        },
+        {
+            "loading": "0.0059963",
+            "pressure": "0.1503"
+        },
+        {
+            "loading": "0.0063581",
+            "pressure": "0.1745"
+        },
+        {
+            "loading": "0.0067552",
+            "pressure": "0.1995"
+        },
+        {
+            "loading": "0.0071915",
+            "pressure": "0.2254"
+        },
+        {
+            "loading": "0.0076657",
+            "pressure": "0.2474"
+        },
+        {
+            "loading": "0.0086205",
+            "pressure": "0.2676"
+        },
+        {
+            "loading": "0.0097024",
+            "pressure": "0.2752"
+        },
+        {
+            "loading": "0.010757",
+            "pressure": "0.28"
+        },
+        {
+            "loading": "0.0118",
+            "pressure": "0.2839"
+        },
+        {
+            "loading": "0.012824",
+            "pressure": "0.2871"
+        },
+        {
+            "loading": "0.013975",
+            "pressure": "0.2908"
+        },
+        {
+            "loading": "0.015108",
+            "pressure": "0.2941"
+        },
+        {
+            "loading": "0.016697",
+            "pressure": "0.2989"
+        },
+        {
+            "loading": "0.018269",
+            "pressure": "0.3032"
+        },
+        {
+            "loading": "0.019809",
+            "pressure": "0.3079"
+        },
+        {
+            "loading": "0.021317",
+            "pressure": "0.3138"
+        },
+        {
+            "loading": "0.022859",
+            "pressure": "0.3569"
+        },
+        {
+            "loading": "0.022901",
+            "pressure": "0.3598"
+        },
+        {
+            "loading": "0.023298",
+            "pressure": "0.3884"
+        },
+        {
+            "loading": "0.0253",
+            "pressure": "0.4073"
+        },
+        {
+            "loading": "0.027337",
+            "pressure": "0.4179"
+        },
+        {
+            "loading": "0.029707",
+            "pressure": "0.4336"
+        },
+        {
+            "loading": "0.032068",
+            "pressure": "0.4613"
+        },
+        {
+            "loading": "0.033274",
+            "pressure": "0.4836"
+        },
+        {
+            "loading": "0.034461",
+            "pressure": "0.5127"
+        },
+        {
+            "loading": "0.035279",
+            "pressure": "0.5375"
+        },
+        {
+            "loading": "0.036088",
+            "pressure": "0.5626"
+        },
+        {
+            "loading": "0.036881",
+            "pressure": "0.5877"
+        },
+        {
+            "loading": "0.037661",
+            "pressure": "0.6169"
+        },
+        {
+            "loading": "0.037935",
+            "pressure": "0.6242"
+        },
+        {
+            "loading": "0.038719",
+            "pressure": "0.6716"
+        },
+        {
+            "loading": "0.039253",
+            "pressure": "0.7269"
+        },
+        {
+            "loading": "0.039564",
+            "pressure": "0.7586"
+        },
+        {
+            "loading": "0.039731",
+            "pressure": "0.7755"
+        },
+        {
+            "loading": "0.04006",
+            "pressure": "0.8112"
+        },
+        {
+            "loading": "0.040418",
+            "pressure": "0.8519"
+        },
+        {
+            "loading": "0.040762",
+            "pressure": "0.8914"
+        },
+        {
+            "loading": "0.041106",
+            "pressure": "0.9309"
+        },
+        {
+            "loading": "0.04191",
+            "pressure": "1.0111"
+        },
+        {
+            "loading": "0.041854",
+            "pressure": "0.9747"
+        },
+        {
+            "loading": "0.041787",
+            "pressure": "0.9405"
+        },
+        {
+            "loading": "0.0416",
+            "pressure": "0.8719"
+        },
+        {
+            "loading": "0.041529",
+            "pressure": "0.8511"
+        },
+        {
+            "loading": "0.041348",
+            "pressure": "0.8039"
+        },
+        {
+            "loading": "0.041162",
+            "pressure": "0.7648"
+        },
+        {
+            "loading": "0.04099",
+            "pressure": "0.7332"
+        },
+        {
+            "loading": "0.040649",
+            "pressure": "0.6772"
+        },
+        {
+            "loading": "0.040326",
+            "pressure": "0.6313"
+        },
+        {
+            "loading": "0.039793",
+            "pressure": "0.5638"
+        },
+        {
+            "loading": "0.039324",
+            "pressure": "0.5126"
+        },
+        {
+            "loading": "0.038893",
+            "pressure": "0.4654"
+        },
+        {
+            "loading": "0.038312",
+            "pressure": "0.407"
+        },
+        {
+            "loading": "0.03778",
+            "pressure": "0.3866"
+        },
+        {
+            "loading": "0.034876",
+            "pressure": "0.364"
+        },
+        {
+            "loading": "0.032256",
+            "pressure": "0.3531"
+        },
+        {
+            "loading": "0.029716",
+            "pressure": "0.3433"
+        },
+        {
+            "loading": "0.028237",
+            "pressure": "0.3376"
+        },
+        {
+            "loading": "0.026083",
+            "pressure": "0.3278"
+        },
+        {
+            "loading": "0.024008",
+            "pressure": "0.315"
+        },
+        {
+            "loading": "0.022157",
+            "pressure": "0.2891"
+        },
+        {
+            "loading": "0.020481",
+            "pressure": "0.2824"
+        },
+        {
+            "loading": "0.018843",
+            "pressure": "0.2781"
+        },
+        {
+            "loading": "0.017364",
+            "pressure": "0.2743"
+        },
+        {
+            "loading": "0.016032",
+            "pressure": "0.2715"
+        },
+        {
+            "loading": "0.014721",
+            "pressure": "0.2688"
+        },
+        {
+            "loading": "0.013553",
+            "pressure": "0.2657"
+        },
+        {
+            "loading": "0.012516",
+            "pressure": "0.263"
+        },
+        {
+            "loading": "0.011565",
+            "pressure": "0.2598"
+        },
+        {
+            "loading": "0.010641",
+            "pressure": "0.2549"
+        },
+        {
+            "loading": "0.0097618",
+            "pressure": "0.2447"
+        },
+        {
+            "loading": "0.0092415",
+            "pressure": "0.2343"
+        },
+        {
+            "loading": "0.0085442",
+            "pressure": "0.2149"
+        },
+        {
+            "loading": "0.0083555",
+            "pressure": "0.2089"
+        },
+        {
+            "loading": "0.0076702",
+            "pressure": "0.1811"
+        },
+        {
+            "loading": "0.0072151",
+            "pressure": "0.1568"
+        },
+        {
+            "loading": "0.006769",
+            "pressure": "0.1304"
+        },
+        {
+            "loading": "0.006313",
+            "pressure": "0.1035"
+        },
+        {
+            "loading": "0.0058843",
+            "pressure": "0.079098"
+        },
+        {
+            "loading": "0.0058481",
+            "pressure": "0.077917"
+        },
+        {
+            "loading": "0.0053859",
+            "pressure": "0.054938"
+        },
+        {
+            "loading": "0.0053181",
+            "pressure": "0.052278"
+        },
+        {
+            "loading": "0.0048711",
+            "pressure": "0.03568"
+        },
+        {
+            "loading": "0.0045369",
+            "pressure": "0.026339"
+        },
+        {
+            "loading": "0.004515",
+            "pressure": "0.025929"
+        },
+        {
+            "loading": "0.0040677",
+            "pressure": "0.016485"
+        },
+        {
+            "loading": "0.0036827",
+            "pressure": "0.010641"
+        },
+        {
+            "loading": "0.0036523",
+            "pressure": "0.010315"
+        },
+        {
+            "loading": "0.0033977",
+            "pressure": "0.0073869"
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "mol",
+    "mass": 0.0543,
+    "pressure_mode": "relative",
+    "pressure_unit": null,
+    "sample_batch": "bel",
+    "sample_name": "Sample_D",
+    "t_exp": 298.15,
+    "user": "User"
+}
