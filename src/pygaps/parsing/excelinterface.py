@@ -5,8 +5,6 @@ This module contains the excel interface for returning data in all formats
 used, such as the parser file.
 """
 
-import os
-
 import pandas
 import xlrd
 import xlwt
@@ -45,37 +43,37 @@ _FIELDS = {
     },
     'pressure_mode': {
         'text': ['Pressure mode'],
-        'name': 'adsorbate',
+        'name': 'pressure_mode',
         'row': 4,
         'column': 0,
     },
     'pressure_unit': {
         'text': ['Pressure unit'],
-        'name': 'adsorbate',
+        'name': 'pressure_unit',
         'row': 5,
         'column': 0,
     },
     'loading_basis': {
         'text': ['Loading basis'],
-        'name': 'adsorbate',
+        'name': 'loading_basis',
         'row': 6,
         'column': 0,
     },
     'loading_unit': {
         'text': ['Loading unit'],
-        'name': 'adsorbate',
+        'name': 'loading_unit',
         'row': 7,
         'column': 0,
     },
     'adsorbent_basis': {
         'text': ['Adsorbent basis'],
-        'name': 'adsorbate',
+        'name': 'adsorbent_basis',
         'row': 8,
         'column': 0,
     },
     'adsorbent_unit': {
         'text': ['Adsorbent unit'],
-        'name': 'adsorbate',
+        'name': 'adsorbent_unit',
         'row': 9,
         'column': 0,
     },
@@ -106,18 +104,8 @@ _FIELDS_MADIREL = {
         'row': 2,
         'column': 0,
     },
-    'sample_name': {
-        'text': ['Sample name', "Nom de l'échantillon"],
-        'name': 'sample_name',
-        'row': 3,
-        'column': 0,
-    },
-    'sample_batch': {
-        'text': ['Sample batch', "Lot de l'échantillon"],
-        'name': 'sample_batch',
-        'row': 4,
-        'column': 0,
-    },
+    'sample_name': {'row': 3, 'column': 0},
+    'sample_batch': {'row': 4, 'column': 0},
     't_act': {
         'text': ['Activation temperature (°C)', "Température d'activation (°C)"],
         'name': 't_act',
@@ -130,18 +118,8 @@ _FIELDS_MADIREL = {
         'row': 6,
         'column': 0,
     },
-    't_exp': {
-        'text': ['Experiment temperature (K)', "Température de l'expérience (K))"],
-        'name': 't_exp',
-        'row': 7,
-        'column': 0,
-    },
-    'adsorbate': {
-        'text': ['Adsorbate used', "Formule chimique du gaz"],
-        'name': 'adsorbate',
-        'row': 8,
-        'column': 0,
-    },
+    't_exp': {'row': 7, 'column': 0},
+    'adsorbate': {'row': 8, 'column': 0},
     'user': {
         'text': ['User', "Surnom du contact"],
         'name': 'user',
@@ -160,27 +138,39 @@ _FIELDS_MADIREL = {
         'row': 11,
         'column': 0,
     },
-    'comment': {
-        'text': ['Comments', "Commentaires"],
-        'name': 'comment',
-        'row': 12,
-        'column': 1,
-    },
-    'henry_constant':   {'col': 1, 'row': 0, 'text': ["Constante d'Henry"]},
-    'langmuir_n1':      {'col': 1, 'row': 0, 'text': ["Langmuir N1"]},
-    'langmuir_b1':      {'col': 1, 'row': 0, 'text': ["Langmuir B1"]},
-    'langmuir_n2':      {'col': 1, 'row': 0, 'text': ["Langmuir N2"]},
-    'langmuir_b2':      {'col': 1, 'row': 0, 'text': ["Langmuir B2"]},
-    'langmuir_n3':      {'col': 1, 'row': 0, 'text': ["Langmuir N3"]},
-    'langmuir_b3':      {'col': 1, 'row': 0, 'text': ["Langmuir B3"]},
-    'langmuir_r2':      {'col': 1, 'row': 0, 'text': ["Langmuir R2"]},
-    'c1':               {'col': 1, 'row': 0, 'text': ["C1"]},
-    'c2':               {'col': 1, 'row': 0, 'text': ["C2"]},
-    'c3':               {'col': 1, 'row': 0, 'text': ["C3"]},
-    'c4':               {'col': 1, 'row': 0, 'text': ["C4"]},
-    'c5':               {'col': 1, 'row': 0, 'text': ["C5"]},
-    'c6':               {'col': 1, 'row': 0, 'text': ["C6"]},
-    'c_m':              {'col': 1, 'row': 0, 'text': ["C_m"]},
+    'pressure_mode':    {'row': 0, 'column': 2},
+    'pressure_unit':    {'row': 1, 'column': 2},
+    'loading_basis':    {'row': 2, 'column': 2},
+    'loading_unit':     {'row': 3, 'column': 2},
+    'adsorbent_basis':  {'row': 4, 'column': 2},
+    'adsorbent_unit':   {'row': 5, 'column': 2},
+    'henry_constant':   {'row': 13, 'column': 0, 'text': ["Constante d'Henry"]},
+    'langmuir_n1':      {'row': 14, 'column': 0, 'text': ["Langmuir N1"]},
+    'langmuir_b1':      {'row': 15, 'column': 0, 'text': ["Langmuir B1"]},
+    'langmuir_n2':      {'row': 16, 'column': 0, 'text': ["Langmuir N2"]},
+    'langmuir_b2':      {'row': 17, 'column': 0, 'text': ["Langmuir B2"]},
+    'langmuir_n3':      {'row': 18, 'column': 0, 'text': ["Langmuir N3"]},
+    'langmuir_b3':      {'row': 19, 'column': 0, 'text': ["Langmuir B3"]},
+    'langmuir_r2':      {'row': 20, 'column': 0, 'text': ["Langmuir R2"]},
+    'c1':               {'row': 21, 'column': 0, 'text': ["C1"]},
+    'c2':               {'row': 22, 'column': 0, 'text': ["C2"]},
+    'c3':               {'row': 23, 'column': 0, 'text': ["C3"]},
+    'c4':               {'row': 24, 'column': 0, 'text': ["C4"]},
+    'c5':               {'row': 25, 'column': 0, 'text': ["C5"]},
+    'c6':               {'row': 26, 'column': 0, 'text': ["C6"]},
+    'c_m':              {'row': 27, 'column': 0, 'text': ["C_m"]},
+    'isotherm data':    {'row': 28, 'column': 0},
+}
+_FIELDS_MADIREL_ENTH = {
+    'enth_0':           {'row': 29, 'column': 0, 'text': ["Enthalpie à zéro"]},
+    'enth_a':           {'row': 30, 'column': 0, 'text': ["Polynome Enthalpie A"]},
+    'enth_b':           {'row': 31, 'column': 0, 'text': ["Polynome Enthalpie B"]},
+    'enth_c':           {'row': 32, 'column': 0, 'text': ["Polynome Enthalpie C"]},
+    'enth_d':           {'row': 33, 'column': 0, 'text': ["Polynome Enthalpie D"]},
+    'enth_e':           {'row': 34, 'column': 0, 'text': ["Polynome Enthalpie E"]},
+    'enth_f':           {'row': 35, 'column': 0, 'text': ["Polynome Enthalpie F"]},
+    'enth_r2':          {'row': 36, 'column': 0, 'text': ["Polynome Enthalpie R2"]},
+    'isotherm data':    {'row': 37, 'column': 0},
 }
 
 
@@ -202,166 +192,84 @@ def isotherm_to_xl(isotherm, path, fmt=None):
 
     # create a new workbook and select first sheet
     wb = xlwt.Workbook()
+    sht = wb.add_sheet('Data')
 
-    if fmt is None:
-        sht = wb.add_sheet('Data')
+    # get the required dictionaries
+    fields = _FIELDS.copy()
+    iso_dict = isotherm.to_dict()
 
-        iso_dict = isotherm.to_dict()
+    if fmt == 'MADIREL':
+        def update_recurs(dict1, dict2):
+            "Update a dictionary with one level down"
+            for f in dict2:
+                if f in dict1:
+                    dict1[f].update(dict2[f])
+                else:
+                    dict1[f] = dict2[f]
 
-        # Add the required named properties
-        for field in _FIELDS:
-            val = iso_dict.pop(field, None)
-            sht.write(_FIELDS[field]['row'],
-                      _FIELDS[field]['column'],
-                      _FIELDS[field]['text'][0])
-            sht.write(_FIELDS[field]['row'],
-                      _FIELDS[field]['column'] + 1,
-                      val)
+        update_recurs(fields, _FIELDS_MADIREL)
 
-        # Find the data row
-        data_row = max([_FIELDS[f]['row'] for f in _FIELDS]) + 1
+        if 'exp_type' in fields:
+            if isotherm.exp_type.lower() == "isotherm":
+                iso_dict['exp_type'] = 'Isotherme'
+            elif isotherm.exp_type.lower() == "calorimetry":
+                iso_dict['exp_type'] = 'Calorimetrie'
+                update_recurs(fields, _FIELDS_MADIREL_ENTH)
+        if 'is_real' in fields:
+            if isotherm.is_real is True:
+                iso_dict['is_real'] = 'Simulation'
+            elif isotherm.is_real is False:
+                iso_dict['is_real'] = 'Experience'
 
-        # Generate the headings
-        headings = [isotherm.loading_key, isotherm.pressure_key]
-        headings.extend(isotherm.other_keys)
+    # Add the required named properties
+    prop_style = xlwt.easyxf(
+        'align: horiz left; pattern: pattern solid, fore_colour grey25;')
+    for field in fields:
+        val = iso_dict.pop(field, None)
+        sht.write(fields[field]['row'],
+                  fields[field]['column'],
+                  fields[field]['text'][0],
+                  prop_style)
+        sht.write(fields[field]['row'],
+                  fields[field]['column'] + 1,
+                  val, prop_style)
 
-        # Write all data
-        for col_index, heading in enumerate(headings):
-            sht.write(data_row,
+    # Find the data row
+    data_row = max([fields[f]['row'] for f in fields]) + 1
+
+    # Generate the headings
+    headings = [isotherm.loading_key, isotherm.pressure_key]
+    headings.extend(isotherm.other_keys)
+
+    # if fmt == 'MADIREL':
+    #     headings = ['Pressure(bar)', 'Qte adsorbed(mmol/g)']
+    #     if any(x.lower().startswith('enthalpy') for x in isotherm.other_keys):
+    #         headings.append('Enthalpy(kJ/mol)')
+
+    # Write all data
+    col_width = 256 * 25              # 25 characters wide (-ish)
+    for col_index, heading in enumerate(headings):
+        sht.write(data_row,
+                  col_index,
+                  heading)
+        sht.col(col_index).width = col_width
+        for row_index, datapoint in enumerate(isotherm.data()[heading]):
+            sht.write(data_row + row_index + 1,
                       col_index,
-                      heading)
-            for row_index, datapoint in enumerate(isotherm.data()[heading]):
-                sht.write(data_row + row_index + 1,
-                          col_index,
-                          datapoint)
+                      datapoint)
 
-        # Now add the other keys
-        sht = wb.add_sheet('OtherData')
-        row = 0
-        col = 0
-        for prop in iso_dict:
-            sht.write(row, col, prop)
-            sht.write(row, col + 1, iso_dict[prop])
-            row += 1
+    # Now add the other keys
+    sht = wb.add_sheet('OtherData')
+    row = 0
+    col = 0
+    for prop in iso_dict:
+        sht.write(row, col, prop)
+        sht.write(row, col + 1, iso_dict[prop])
+        row += 1
 
     wb.save(path)
 
     return
-    # try:
-    #     # write the isotherm parameters
-    #     if isotherm.is_real is True:
-    #         is_real = "Experience"
-    #     else:
-    #         is_real = "Simulation"
-
-    #     exp_type = isotherm.exp_type
-    #     if fmt == 'MADIREL':
-    #         if isotherm.exp_type == "isotherm":
-    #             exp_type = 'Isotherme'
-    #         elif isotherm.exp_type == "calorimetry":
-    #             exp_type = 'Calorimetrie'
-    #         else:
-    #             raise ParsingError("Unknown experiment type")
-
-    #     sht.range('A1').value = [
-    #         ["Type manip", exp_type],
-    #         ["Experience ou Simulation", is_real],
-    #         ["Date de l'expérience", isotherm.date],
-    #         ["Nom de l'échantillon", isotherm.sample_name],
-    #         ["Lot de l'échantillon", isotherm.sample_batch],
-    #         ["Température d'activation (°C)", isotherm.t_act],
-    #         ["Surnom de l'appareil", isotherm.machine],
-    #         ["Température de l'expérience (K)", isotherm.t_exp],
-    #         ["Formule chimique du gaz", isotherm.adsorbate],
-    #         ["Surnom du contact", isotherm.user],
-    #         ["Nom du labo", isotherm.lab],
-    #         ["Nom du projet", isotherm.project],
-    #     ]
-    #     sht.range('E1').value = 'Comments'
-    #     sht.range('E2').value = isotherm.comment
-
-    #     sht.range('E1').value = 'Properties'
-    #     rng_prop = 4
-    #     for index, prop in enumerate(isotherm.other_properties):
-    #         sht.range((5, rng_prop + index)).value = prop
-    #         sht.range((6, rng_prop + index)
-    #                   ).value = isotherm.other_properties.get(prop)
-
-    #     delimiter_colour = (217, 217, 217)
-    #     user_cells = (255, 199, 206)
-    #     xlwings.Range('A1:B2').column_width = 30
-    #     xlwings.Range('B1:B12').color = user_cells
-    #     xlwings.Range('A13:B13').color = delimiter_colour
-
-    #     # Write data
-    #     if fmt is None:
-    #         rng_data = 14
-    #     elif fmt == 'MADIREL':
-    #         if exp_type == "Isotherme":
-    #             rng_data = 30
-    #         elif exp_type == "Calorimetrie":
-    #             rng_data = 39
-    #         else:
-    #             raise ParsingError("Unknown experiment type")
-
-    #     headings = [
-    #         isotherm.loading_key,
-    #         isotherm.pressure_key,
-    #     ]
-    #     headings.extend(isotherm.other_keys)
-
-    #     # Gets the data sorted in the correct order
-    #     data = isotherm.data()[headings]
-
-    #     if fmt == 'MADIREL':
-    #         headings[0] = 'adsorbed' + '(' + isotherm.loading_unit + ')'
-    #         headings[1] = 'Pressure' + '(' + isotherm.pressure_unit + ')'
-    #     else:
-    #         headings[0] = headings[0] + '(' + isotherm.loading_unit + '/'\
-    #                                         + isotherm.adsorbent_unit + ')'
-    #         if isotherm.pressure_mode == 'absolute':
-    #             headings[1] = headings[1] + '(' + isotherm.pressure_unit + ')'
-    #         else:
-    #             headings[1] = headings[1] + '(p/p0)'
-
-    #     sht.range('A' + str(rng_data)).value = headings
-    #     sht.range('A' + str(rng_data + 1)).value = data.as_matrix()
-
-    #     # MADIREL specific
-    #     if fmt == 'MADIREL':
-    #         sht.range('A14').value = [
-    #             ["Constante d'Henry", ],
-    #             ["Langmuir N1", ],
-    #             ["Langmuir B1", ],
-    #             ["Langmuir N2", ],
-    #             ["Langmuir B2", ],
-    #             ["Langmuir N3", ],
-    #             ["Langmuir B3", ],
-    #             ["Langmuir R2", ],
-    #             ["C1", ],
-    #             ["C2", ],
-    #             ["C3", ],
-    #             ["C4", ],
-    #             ["C5", ],
-    #             ["C6", ],
-    #             ["C_m", ],
-    #         ]
-    #         xlwings.Range('A29:B29').color = delimiter_colour
-
-    #         if exp_type == "Calorimetrie":
-    #             sht.range('A30').value = [
-    #                 ["Enthalpie à zéro", ],
-    #                 ["Polynome Enthalpie A", ],
-    #                 ["Polynome Enthalpie B", ],
-    #                 ["Polynome Enthalpie C", ],
-    #                 ["Polynome Enthalpie D", ],
-    #                 ["Polynome Enthalpie E", ],
-    #                 ["Polynome Enthalpie F", ],
-    #                 ["Polynome Enthalpie R2", ],
-    #             ]
-    #             xlwings.Range('A38:C38').color = delimiter_colour
-    #         else:
-    #             raise ParsingError("Unknown data type")
 
 
 def isotherm_from_xl(path, fmt=None):
@@ -381,9 +289,6 @@ def isotherm_from_xl(path, fmt=None):
     PointIsotherm
         The isotherm contained in the excel file.
     """
-    if xlrd is None:
-        raise ParsingError(
-            "Excel functionality disabled on this platform ( {0} )".format(os.name))
 
     sample_info = {}
     loading_key = 'loading'
@@ -428,9 +333,9 @@ def isotherm_from_xl(path, fmt=None):
         wb = xlrd.open_workbook(path)
         sht = wb.sheet_by_index(0)
 
-        for field in _FIELDS.keys():
-            sample_info[field] = sht.cell(_FIELDS[field]['row'],
-                                          _FIELDS[field]['col']).value
+        for field in fields.keys():
+            sample_info[field] = sht.cell(fields[field]['row'],
+                                          fields[field]['col']).value
 
         # read the isotherm parameters
 
