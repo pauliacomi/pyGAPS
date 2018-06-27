@@ -171,6 +171,8 @@ _FIELDS_MADIREL_ENTH = {
     'isotherm data':    {'row': 37, 'column': 0},
 }
 
+_FORMATS = ['bel', 'mic', 'MADIREL']
+
 
 def _update_recurs(dict1, dict2):
     "Update a dictionary with one level down"
@@ -196,6 +198,10 @@ def isotherm_to_xl(isotherm, path, fmt=None):
         If the format is set to MADIREL, then the excel file is a specific version
         used by the MADIREL lab for internal processing.
     '''
+
+    if fmt:
+        if fmt not in _FORMATS:
+            raise ParsingError('Format not supported')
 
     # create a new workbook and select first sheet
     wb = xlwt.Workbook()
@@ -289,6 +295,10 @@ def isotherm_from_xl(path, fmt=None):
     PointIsotherm
         The isotherm contained in the excel file.
     """
+
+    if fmt:
+        if fmt not in _FORMATS:
+            raise ParsingError('Format not supported')
 
     sample_info = {}
     loading_key = 'loading'
