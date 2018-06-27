@@ -55,7 +55,9 @@ setup(
     keywords=[
         'adsorption', 'science', 'porous materials'
     ],
-    # setup_requires=[],
+    setup_requires=[
+        'pytest-runner',
+    ],
     install_requires=[
         'numpy >= 1.13',
         'scipy >= 1.0.0',
@@ -64,6 +66,12 @@ setup(
         'xlrd >= 1.1',
         'xlwt >= 1.3',
         'coolprop >= 6.0',
+    ],
+    tests_require=[
+        'pytest',
+        'pytest-cov',
+        'coverage',
+        'nose',
     ],
     extras_require={
         # eg:
