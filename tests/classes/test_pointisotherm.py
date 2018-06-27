@@ -136,24 +136,26 @@ class TestPointIsotherm(object):
         other_key = "enthalpy"
 
         # all data
-        assert basic_pointisotherm.data().equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        data = basic_pointisotherm.data()
+        data2 = pandas.DataFrame({
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
-        }))
+            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        })
+        assert data.equals(data2)
 
         # adsorption branch
         assert basic_pointisotherm.data(branch='ads').equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         }))
 
         # desorption branch
         assert basic_pointisotherm.data(branch='des').equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [4.5, 2.5],
-            basic_pointisotherm.loading_key: [4.5, 2.5],
             other_key: [4.0, 4.0],
+            basic_pointisotherm.loading_key: [4.5, 2.5],
+            basic_pointisotherm.pressure_key: [4.5, 2.5],
         }, index=[6, 7]))
 
         return
