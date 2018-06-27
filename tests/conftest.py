@@ -1,17 +1,11 @@
 """
 Configuration file for pytest and commonly used fixtures
 """
-import sys
-
 import matplotlib.pyplot as plt
 import pandas
 import pytest
 
 import pygaps
-
-# Run only on windows
-windows = pytest.mark.skipif(
-    sys.platform != 'win32', reason="requires windows")
 
 # Basic functionality
 basic = pytest.mark.basic

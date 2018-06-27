@@ -9,12 +9,9 @@ import pandas
 import pygaps
 
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _MATERIAL_MODE
-from ..utilities.unit_converter import _MOLAR_UNITS
 from ..utilities.unit_converter import _PRESSURE_MODE
 from ..utilities.unit_converter import _PRESSURE_UNITS
-from ..utilities.unit_converter import _VOLUME_UNITS
 
 
 class Isotherm(object):
@@ -136,18 +133,18 @@ class Isotherm(object):
 
         if adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for adsorbent is not an option. See viable "
-                "values: {0}".format(_MATERIAL_MODE))
+                "Basis selected for adsorbent ({}) is not an option. See viable "
+                "values: {}".format(adsorbent_basis, list(_MATERIAL_MODE.keys())))
 
         if loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for loading is not an option. See viable "
-                "values: {0}".format(_MATERIAL_MODE))
+                "Basis selected for loading ({}) is not an option. See viable "
+                "values: {}".format(loading_basis, list(_MATERIAL_MODE.keys())))
 
         if pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
-                "Mode selected for pressure is not an option. See viable "
-                "values: {0}".format(_PRESSURE_MODE))
+                "Mode selected for pressure ({}) is not an option. See viable "
+                "values: {}".format(pressure_mode, list(_PRESSURE_MODE.keys())))
 
         # Units
         if loading_unit is None or adsorbent_unit is None:
@@ -156,18 +153,18 @@ class Isotherm(object):
 
         if loading_unit not in _MATERIAL_MODE[loading_basis]:
             raise ParameterError(
-                "Unit selected for loading is not an option. See viable "
-                "values: {0}".format(_MOLAR_UNITS))
+                "Unit selected for loading ({}) is not an option. See viable "
+                "values: {}".format(loading_unit, list(_MATERIAL_MODE[loading_basis].keys())))
 
         if pressure_mode == 'absolute' and pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
-                "Unit selected for pressure is not an option. See viable "
-                "values: {0}".format(_PRESSURE_UNITS))
+                "Unit selected for pressure ({}) is not an option. See viable "
+                "values: {}".format(pressure_unit, list(_PRESSURE_UNITS.keys())))
 
         if adsorbent_unit not in _MATERIAL_MODE[adsorbent_basis]:
             raise ParameterError(
-                "Unit selected for adsorbent is not an option. See viable "
-                "values: {0} {1}".format(_VOLUME_UNITS, _MASS_UNITS))
+                "Unit selected for adsorbent ({}) is not an option. See viable "
+                "values: {}".format(adsorbent_unit, list(_MATERIAL_MODE[loading_basis].keys())))
 
         # Column titles
         if None in [loading_key, pressure_key]:
@@ -326,9 +323,9 @@ class Isotherm(object):
         '''
         string = ""
 
-        if self.is_real:
+        if self.is_real is True:
             string += ("Experimental isotherm" + '\n')
-        else:
+        elif self.is_real is False:
             string += ("Simulated isotherm" + '\n')
 
         # Required

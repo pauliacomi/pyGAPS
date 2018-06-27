@@ -17,7 +17,7 @@ if sys.version_info[0] != 3:
 
 # Let users know if they're missing any of our hard dependencies
 hard_dependencies = ("numpy", "pandas", "scipy",
-                     "matplotlib", "sqlite3", "CoolProp")
+                     "matplotlib", "CoolProp")
 missing_dependencies = []
 dependency = None
 

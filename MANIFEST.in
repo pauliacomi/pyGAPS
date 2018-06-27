@@ -4,12 +4,9 @@ graft ci
 graft tests
 
 include .build.info
-include .bumpversion.cfg
-include .coveragerc
 include .pylintrc
 include .cookiecutterrc
 include .editorconfig
-include .isort.cfg
 include .vscode/settings.json
 
 include AUTHORS.rst
@@ -21,4 +18,3 @@ include README.rst
 include tox.ini .travis.yml appveyor.yml
 
 global-exclude *.py[cod] __pycache__ *.so *.dylib
-

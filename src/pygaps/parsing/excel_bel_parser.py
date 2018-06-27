@@ -10,9 +10,9 @@ from itertools import product
 
 import xlrd
 
-_rem_space_regex = re.compile(r'\s+')
+_RSPACE_REGEX = re.compile(r'\s+')
 
-_fields = {
+_FIELDS = {
     'sample:': {
         'text': ['comment1'],
         'name': 'sample_name',
@@ -110,7 +110,7 @@ def read_bel_report(path):
     for row, col in product(range(sheet.nrows), range(sheet.ncols)):
         cell_value = str(sheet.cell(row, col).value).lower()
         try:
-            field = next(v for k, v in _fields.items() if
+            field = next(v for k, v in _FIELDS.items() if
                          any([cell_value.startswith(n) for
                               n in v.get('text')]))
         except StopIteration:
@@ -164,23 +164,23 @@ def _handle_string(val):
 def _get_data_labels(sheet, row, col):
     """Locates all column labels for data collected during the experiment."""
     final_column = col
-    header_row = _fields['cell_value']['header']['row']
+    header_row = _FIELDS['cell_value']['header']['row']
     # Abstract this sort of thing
-    header = re.sub(_rem_space_regex, '',
+    header = re.sub(_RSPACE_REGEX, '',
                     sheet.cell(row + header_row, final_column).value)
     while any(header.startswith(label) for label
-              in _fields['isotherm data']['labels']):
+              in _FIELDS['isotherm data']['labels']):
         final_column += 1
-        header = re.sub(_rem_space_regex, '',
+        header = re.sub(_RSPACE_REGEX, '',
                         sheet.cell(row + header_row, final_column).value)
-    return [re.sub(_rem_space_regex, '',
+    return [re.sub(_RSPACE_REGEX, '',
                    sheet.cell(row + header_row, i).value)
             for i in range(col, final_column)]
 
 
 def _find_datapoints(sheet, row, col):
     """Returns start and stop points for adsorption and desorption."""
-    rowc = _fields['cell_value']['datapoints']['row']
+    rowc = _FIELDS['cell_value']['datapoints']['row']
 
     # Check for adsorption branch
     if sheet.cell(row + rowc, col).value == 'ADS':
@@ -237,7 +237,7 @@ def _get_errors(sheet, row, col):
     """Looks for all cells that contain errors (are below a cell
     labelled primary data).
     """
-    field = _fields['primary data']
+    field = _FIELDS['primary data']
     val = sheet.cell(row + field['row'], col + field['column']).value
     if not val:
         return []

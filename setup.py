@@ -50,20 +50,28 @@ setup(
         'Programming Language :: Python :: 3.6',
         # 'Programming Language :: Python :: Implementation :: CPython',
         # 'Programming Language :: Python :: Implementation :: PyPy3',
-        'Topic :: Utilities',
+        'Topic :: Scientific/Engineering :: Physics',
     ],
     keywords=[
         'adsorption', 'science', 'porous materials'
     ],
-    # setup_requires=[],
+    setup_requires=[
+        'pytest-runner',
+    ],
     install_requires=[
         'numpy >= 1.13',
         'scipy >= 1.0.0',
         'pandas >= 0.21.1',
         'matplotlib >= 2.1',
         'xlrd >= 1.1',
-        'xlwings;platform_system=="Windows"',
+        'xlwt >= 1.3',
         'coolprop >= 6.0',
+    ],
+    tests_require=[
+        'pytest',
+        'pytest-cov',
+        'coverage',
+        'nose',
     ],
     extras_require={
         # eg:

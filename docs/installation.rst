@@ -36,7 +36,7 @@ The main packages that pyGAPS depends on are
     - The common data science packages `numpy`, `scipy`, `pandas` and `matplotlib`
     - The `CoolProp <http://www.coolprop.org/>`__ backend for physical properties calculation
       (can also be connected to `REFPROP <https://www.nist.gov/srd/refprop>`__ if locally available)
-    - The `xlwings <https://www.xlwings.org/>`__ package for parsing to and from Excel files
+    - The `xlutils <https://github.com/python-excel/xlwt>`__ packages for parsing to and from Excel files
 
 The `pyIAST <https://github.com/CorySimon/pyIAST>`__ package used to be a required dependency, but
 has since been integrated in the pyGAPS framework. More info about pyIAST can be found at
