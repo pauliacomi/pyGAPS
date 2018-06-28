@@ -117,7 +117,7 @@ Make sure that you have `numpy`, `scipy`, `pandas` and `matplotlib` already inst
 
 On Windows, `Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
 environments for you.
-First create a new environment and use conda to install the dependencies (or start with one 
+First create a new environment and use conda to install the dependencies (or start with one
 that already has a full instalation). Then use pip inside your environment.
 
 .. code-block:: bat
@@ -127,7 +127,7 @@ that already has a full instalation). Then use pip inside your environment.
     pip install pygaps
 
 Alternatively, to install the development branch, clone the repository from Github.
-Then install the package with setuptools, either in regular or developer mode
+Then install the package with setuptools, either in regular or developer mode.
 
 .. code-block:: bash
 
@@ -135,11 +135,11 @@ Then install the package with setuptools, either in regular or developer mode
 
     # then install
 
-    setup.py install
+    python setup.py install
 
     # or developer mode
 
-    setup.py develop
+    python setup.py develop
 
 Development
 ===========
@@ -166,9 +166,15 @@ Note, to combine the coverage data from all the tox environments run:
 
             PYTEST_ADDOPTS=--cov-append tox
 
-For testing only with the environment you are currently on, run pytest instead::
+For testing only with the environment you are currently on, run instead
 
-    py.test --cov
+.. code-block:: bash
+
+    python setup.py test
+
+    # or run pytest
+
+    pytest
 
 Alternatively, you can depend on travisCI for the testing, which will be slower overall
 but should have all the environments required.
