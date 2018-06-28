@@ -217,7 +217,9 @@ def plot_iso(isotherms,
         if not isinstance(color, bool):
             number_of_lines = color
 
-        colors = [cm.jet(x) for x in linspace(0, 1, number_of_lines)]
+        if isinstance(color, int):
+            colors = [cm.jet(x) for x in linspace(0, 1, number_of_lines)]
+
         if isinstance(color, list):
             colors = color
 

@@ -20,6 +20,8 @@ class TestIsothermGraphs(object):
         pygaps.plot_iso(basic_pointisotherm)
         pygaps.plot_iso(basic_pointisotherm, logx=True)
         pygaps.plot_iso(basic_pointisotherm, color=False)
+        pygaps.plot_iso(basic_pointisotherm, color=3)
+        pygaps.plot_iso(basic_pointisotherm, color=['red'])
         pygaps.plot_iso(basic_pointisotherm, branch=['des'])
         pygaps.plot_iso(basic_pointisotherm, unit_pressure='Pa')
         pygaps.plot_iso(basic_pointisotherm, unit_loading='mol')
