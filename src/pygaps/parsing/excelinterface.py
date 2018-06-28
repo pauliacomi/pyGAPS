@@ -314,7 +314,6 @@ def isotherm_from_xl(path, fmt=None):
         pressure_unit = 'kPa'
         loading_basis = 'molar'
         adsorbent_basis = 'mass'
-        units = ['cm3(STP)', 'g']
 
         experiment_data_df = pandas.DataFrame({
             pressure_key: sample_info.pop(pressure_key)['relative'],
@@ -328,7 +327,6 @@ def isotherm_from_xl(path, fmt=None):
         pressure_unit = 'kPa'
         loading_basis = 'molar'
         adsorbent_basis = 'mass'
-        units = sample_info.pop('units')
 
         experiment_data_df = pandas.DataFrame({
             pressure_key: sample_info.pop(pressure_key)['relative'],
@@ -402,8 +400,6 @@ def isotherm_from_xl(path, fmt=None):
         pressure_unit = sample_info.pop('pressure_unit')
         loading_basis = sample_info.pop('loading_basis')
         adsorbent_basis = sample_info.pop('adsorbent_basis')
-        units = [sample_info.pop('loading_unit'),
-                 sample_info.pop('adsorbent_unit')]
 
         if fmt == 'MADIREL':
             if sample_info['is_real'] == "Experience":
@@ -423,9 +419,7 @@ def isotherm_from_xl(path, fmt=None):
 
         pressure_unit=pressure_unit,
         pressure_mode=pressure_mode,
-        loading_unit=units[0],
         loading_basis=loading_basis,
-        adsorbent_unit=units[1],
         adsorbent_basis=adsorbent_basis,
         branch=branch_data,
 

@@ -8,6 +8,7 @@ Function to parse micromeritics xls output files
 import logging
 import re
 from itertools import product
+from ..utilities.unit_converter import _MOLAR_UNITS
 
 import xlrd
 
@@ -210,6 +211,12 @@ def _assign_data(item, field, data, points):
         data['time'] = _convert_time(points)
     elif field['labels'][name] == 'loading':
         data['loading'] = points
+        for (u, c) in (('(mmol/', 'mmol'), ('(mol/', 'mol'), ('(cm³/', 'cm3(STP)')):
+            if u in item:
+                data['loading_unit'] = c
+        for (u, c) in (('/g', 'g'), ('/kg', 'kg')):
+            if u in item:
+                data['adsorbent_unit'] = c
     elif field['labels'][name] in ['relative', 'absolute', 'saturation']:
         data['pressure'][field['labels'][name]] = points
     else:

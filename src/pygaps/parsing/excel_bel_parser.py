@@ -1,8 +1,6 @@
 """
 Function to parse bel xls output files
 
-@author Chris Murdock
-@modified Paul Iacomi
 """
 import logging
 import re
@@ -218,10 +216,12 @@ def _assign_data(item, field, data, ads_points, des_points):
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'loading':
         data['loading'] = ads_points + des_points
-        if name.startswith('Va'):
-            data['units'] = ['cm3(STP)', 'g']
-        elif name.startswith('na'):
-            data['units'] = ['mol', 'g']
+        for (u, c) in (('/mmol', 'mmol'), ('/mol', 'mol'), ('/cm3(STP)', 'cm3(STP)')):
+            if u in item:
+                data['loading_unit'] = c
+        for (u, c) in (('g-1', 'g'), ('kg-1', 'kg')):
+            if u in item:
+                data['adsorbent_unit'] = c
     elif field['labels'][name] == 'measurement':
         data['measurement'] = [False] * \
             len(ads_points) + [True] * len(des_points)
