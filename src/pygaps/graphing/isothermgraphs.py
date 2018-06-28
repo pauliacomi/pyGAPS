@@ -507,7 +507,7 @@ def plot_iso(isotherms,
     if save_path:
         fig.savefig(save_path,
                     bbox_extra_artists=[lgd],
-                    # bbox_inches='tight',
+                    bbox_inches='tight',
                     **styles['save_style'],
                     )
 
