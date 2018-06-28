@@ -63,13 +63,6 @@ _FIELDS = {
         'column': 0,
         'type': 'string'
     },
-    'bet surface area': {
-        'text': ['bet surface area'],
-        'name': 'bet_area',
-        'row': 0,
-        'column': 1,
-        'type': 'number'
-    },
     'isotherm tabular': {
         'text': ['isotherm tabular'],
         'type': 'isotherm report',
@@ -127,7 +120,7 @@ def read_mic_report(path):
             continue
         if field['type'] == 'number':
             val = sheet.cell(row + field['row'], col + field['column']).value
-            data[field['name']] = _handle_numbers(val)
+            data[field['name']] = _handle_numbers(field, val)
         elif field['type'] == 'string':
             val = sheet.cell(row + field['row'], col + field['column']).value
             data[field['name']] = _handle_string(val)
@@ -144,12 +137,16 @@ def read_mic_report(path):
     return data
 
 
-def _handle_numbers(val):
+def _handle_numbers(field, val):
     """Input is a cell of type 'number'. Removes any extra information (such as
     units) to return only the number as a float.
     """
     if val:
-        return float(_NUMBER_REGEX.search(val.replace(',', '')).group())
+        ret = float(_NUMBER_REGEX.search(val.replace(',', '')).group())
+        if field['name'] == 't_exp':
+            if '°C' in val:
+                ret = ret + 273.15
+        return ret
     else:
         return None
 
