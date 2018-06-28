@@ -8,7 +8,6 @@ Function to parse micromeritics xls output files
 import logging
 import re
 from itertools import product
-from ..utilities.unit_converter import _MOLAR_UNITS
 
 import xlrd
 
