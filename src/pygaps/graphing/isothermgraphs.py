@@ -204,8 +204,8 @@ def plot_iso(isotherms,
     cy4 = cycler('marker', ['v', '^', '<', '>'])
 
     if color:
-        number_of_lines = 6
-        if isinstance(color, int):
+        number_of_lines = 7
+        if not isinstance(color, bool):
             number_of_lines = color
 
         colors = [cm.jet(x) for x in linspace(0, 1, number_of_lines)]
