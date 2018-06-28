@@ -31,6 +31,7 @@ def plot_iso(isotherms,
              pressure_mode="absolute",
              pressure_unit="bar",
 
+             figsize=(8, 8),
              x_range=(None, None),
              y1_range=(None, None),
              y2_range=(None, None),
@@ -80,6 +81,8 @@ def plot_iso(isotherms,
     pressure_unit : str, optional
         Unit of pressure.
 
+    figsize : tuple
+        Size of figure to be passed to matplotlib.figure. eg: (0, 1).
     x_range : tuple
         Range for data on the x axis. eg: (0, 1). Is applied to each
         isotherm, in the unit/mode/basis requested.
@@ -185,7 +188,8 @@ def plot_iso(isotherms,
 # Settings and graph generation
     #
     # Generate the graph itself
-    fig, axes = plt.subplots(1, 1, figsize=(8, 8))
+    fig = plt.figure(figsize=figsize)
+    axes = plt.subplot(111)
     if plot_type == 'combined':
         axes2 = axes.twinx()
 
@@ -255,7 +259,11 @@ def plot_iso(isotherms,
                   save_style=dict(),
                   )
 
-    styles.update(other_parameters)  # Update with any user provided styles
+    # Update with any user provided styles
+    for st in ['title_style', 'label_style', 'line_style', 'tick_style', 'save_style']:
+        new_st = other_parameters.get(st)
+        if new_st:
+            styles[st].update(new_st)
 
     # Put grid on plot
     axes.grid(True, zorder=5)
@@ -476,21 +484,30 @@ def plot_iso(isotherms,
 
     if legend_bottom:
         styles['legend_style']['bbox_to_anchor'] = (0.5, -0.1)
+        styles['legend_style']['loc'] = 'lower center'
+        styles['legend_style']['bbox_transform'] = fig.transFigure
         styles['legend_style']['ncol'] = 2
-        styles['legend_style']['loc'] = 'upper center'
     elif len(lines) > 5:
-        styles['legend_style']['bbox_to_anchor'] = (1.15, 0.5)
-        styles['legend_style']['loc'] = 'center left'
+        styles['legend_style']['bbox_to_anchor'] = (1.3, 0.5)
+        styles['legend_style']['loc'] = 'center right'
 
-    lgd = axes.legend(lines, labels, **styles['legend_style'])
+    # Update with any user provided styles
+    new_st = other_parameters.get('legend_style')
+    if new_st:
+        styles['legend_style'].update(new_st)
+
+    if legend_bottom or len(lines) > 4:
+        lgd = fig.legend(lines, labels, **styles['legend_style'])
+    else:
+        lgd = axes.legend(lines, labels, **styles['legend_style'])
 
     # Fix size of graphs
-    plt.tight_layout()
+    fig.tight_layout()
 
     if save_path:
         fig.savefig(save_path,
-                    bbox_extra_artists=(lgd,),
-                    bbox_inches='tight',
+                    bbox_extra_artists=[lgd],
+                    # bbox_inches='tight',
                     **styles['save_style'],
                     )
 
