@@ -74,8 +74,11 @@ setup(
         'nose',
     ],
     extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
+        'reST': [
+            'docutils>=0.11'
+            'doc9',
+            'pandoc',
+            'restructuredtext-lint',
+        ],
     },
 )
