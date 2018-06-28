@@ -316,7 +316,7 @@ def plot_iso(isotherms,
         axes.set_ymargin(1)
 
         # Generate a linestyle from the incoming dictionary
-        specific_line_style = styles_dict['line_style']
+        specific_line_style = styles_dict['line_style'].copy()
         specific_line_style.update(dict(linewidth=0))
 
         # Plot line
