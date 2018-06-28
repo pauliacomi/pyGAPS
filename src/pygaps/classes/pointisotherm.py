@@ -445,17 +445,20 @@ class PointIsotherm(Isotherm):
 ###########################################################
 #   Info function
 
-    def print_info(self, logarithmic=False, show=True):
+    def print_info(self, show=True, **plot_iso_args):
         """
         Prints a short summary of all the isotherm parameters and a
         graph of the isotherm.
 
         Parameters
         ----------
-        logarithmic : bool, optional
-            Specifies if the graph printed is logarithmic or not.
         show : bool, optional
             Specifies if the graph is shown automatically or not.
+
+        Other Parameters
+        ----------------
+        plot_iso_args : dict
+            options to be passed to pygaps.plot_iso()
 
         Returns
         -------
@@ -477,8 +480,9 @@ class PointIsotherm(Isotherm):
             secondary_key = None
 
         fig, ax1, ax2 = plot_iso(
-            [self], plot_type=plot_type, branch=["ads", "des"],
-            logx=logarithmic, secondary_key=secondary_key,
+            [self],
+            plot_type=plot_type,
+            secondary_key=secondary_key,
 
             adsorbent_basis=self.adsorbent_basis,
             adsorbent_unit=self.adsorbent_unit,
@@ -486,6 +490,7 @@ class PointIsotherm(Isotherm):
             loading_unit=self.loading_unit,
             pressure_unit=self.pressure_unit,
             pressure_mode=self.pressure_mode,
+            **plot_iso_args
         )
 
         if show:

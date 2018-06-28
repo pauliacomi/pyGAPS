@@ -866,16 +866,23 @@ class ModelIsotherm(Isotherm):
 
         return spreading_p
 
-    def print_info(self, logarithmic=False, show=True):
+###########################################################
+#   Info function
+
+    def print_info(self, show=True, **plot_iso_args):
         """
-        Prints a short summary of all the isotherm parameters.
+        Prints a short summary of all the isotherm parameters and a
+        graph of the isotherm.
 
         Parameters
         ----------
-        logarithmic : bool, optional
-            Specifies if the graph printed is logarithmic or not.
         show : bool, optional
             Specifies if the graph is shown automatically or not.
+
+        Other Parameters
+        ----------------
+        plot_iso_args : dict
+            options to be passed to pygaps.plot_iso()
 
         Returns
         -------
@@ -894,17 +901,18 @@ class ModelIsotherm(Isotherm):
             print("\t%s = %f" % (param, val))
         print("RMSE = ", self.rmse)
 
-        fig, ax1, ax2 = plot_iso([self], plot_type='isotherm',
-                                 logx=logarithmic,
+        fig, ax1, ax2 = plot_iso(
+            [self],
+            plot_type='isotherm',
 
-                                 adsorbent_basis=self.adsorbent_basis,
-                                 adsorbent_unit=self.adsorbent_unit,
-                                 loading_basis=self.loading_basis,
-                                 loading_unit=self.loading_unit,
-                                 pressure_unit=self.pressure_unit,
-                                 pressure_mode=self.pressure_mode,
-
-                                 )
+            adsorbent_basis=self.adsorbent_basis,
+            adsorbent_unit=self.adsorbent_unit,
+            loading_basis=self.loading_basis,
+            loading_unit=self.loading_unit,
+            pressure_unit=self.pressure_unit,
+            pressure_mode=self.pressure_mode,
+            **plot_iso_args
+        )
 
         if show:
             plt.show()
