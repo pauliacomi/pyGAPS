@@ -2,6 +2,8 @@
 This module contains the functions for plotting and comparing isotherms.
 """
 
+import collections
+
 import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib import cm
@@ -44,8 +46,8 @@ def plot_iso(isotherms,
 
     Parameters
     ----------
-    isotherms : list
-        An iterable of the isotherms to be plotted.
+    isotherms : PointIsotherms or list of Pointisotherms
+        An isotherm or iterable of isotherms to be plotted.
     plot_type : {'isotherm', 'property', 'combined'}
         The plot type, to display: isotherm, a property or a combination.
         The 'isotherm' graph type displays only isotherm data and is the standard.
@@ -137,7 +139,10 @@ def plot_iso(isotherms,
 #######################################
 #
 # Initial checks
-    #
+    # Make iterable if not already
+    if not isinstance(isotherms, collections.Iterable):
+        isotherms = [isotherms]
+
     # Check for plot type validity
     if plot_type is None:
         raise ParameterError("Specify a plot type to graph"
@@ -247,6 +252,7 @@ def plot_iso(isotherms,
                   line_style=dict(linewidth=2, markersize=8),
                   tick_style=dict(labelsize=17),
                   legend_style=dict(handlelength=3, fontsize=15, loc='best'),
+                  save_style=dict(),
                   )
 
     styles.update(other_parameters)  # Update with any user provided styles
