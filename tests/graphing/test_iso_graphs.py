@@ -37,7 +37,7 @@ class TestIsothermGraphs(object):
 
         pygaps.plot_iso(
             [basic_pointisotherm, basic_pointisotherm, basic_pointisotherm],
-            legend_bottom=False)
+            legend_force='bottom')
 
         pygaps.plot_iso(basic_pointisotherm,
                         plot_type='property', secondary_key='enthalpy')

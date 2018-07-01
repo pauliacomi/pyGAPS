@@ -38,7 +38,7 @@ def plot_iso(isotherms,
 
              fig_title=None,
              legend_list=None,
-             legend_bottom=False,
+             legend_force=None,
 
              save_path=None,
              **other_parameters):
@@ -99,10 +99,8 @@ def plot_iso(isotherms,
         two components. Defaults to the sample name and adsorbate.
     fig_title : str
         Title of the graph. Defaults to type of graph.
-    legend_bottom : bool
-        Specify as True to have the legend at the bottom of the graph. Alternatively,
-        when plotting a lot of data, the legend is best displayed separately to the
-        side of the graph. In that case, set this to False.
+    legend_force : ['bottom', 'right']
+        Specify to have the legend forced to the bottom or the right of the graph.
 
     save_path : str, optional
         Whether to save the graph or not.
@@ -484,12 +482,12 @@ def plot_iso(isotherms,
         lines = lines + lines2
         labels = labels + labels2
 
-    if legend_bottom:
+    if legend_force == 'bottom':
         styles['legend_style']['bbox_to_anchor'] = (0.5, -0.1)
         styles['legend_style']['loc'] = 'lower center'
         styles['legend_style']['bbox_transform'] = fig.transFigure
         styles['legend_style']['ncol'] = 2
-    elif len(lines) > 5:
+    elif legend_force == 'right' or len(lines) > 5:
         styles['legend_style']['bbox_to_anchor'] = (1.3, 0.5)
         styles['legend_style']['loc'] = 'center right'
 
@@ -498,7 +496,7 @@ def plot_iso(isotherms,
     if new_st:
         styles['legend_style'].update(new_st)
 
-    if legend_bottom or len(lines) > 4:
+    if legend_force == 'right' or len(lines) > 4:
         lgd = fig.legend(lines, labels, **styles['legend_style'])
     else:
         lgd = axes.legend(lines, labels, **styles['legend_style'])
