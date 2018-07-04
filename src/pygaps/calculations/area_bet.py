@@ -110,7 +110,7 @@ def area_BET(isotherm, limits=None, verbose=False):
         * Adsorption takes place on the pore surface. Microporous materials which have pores
           in similar size as the molecule adsorbed cannot have a realistic surface area
         * The cross-sectional area of the molecule on the surface cannot be guaranteed
-          For example, nitrogen has been know to adopt a different conformation on the
+          For example, nitrogen has been known to adopt a different conformation on the
           surface of some materials, due to inter-molecular forces, which effectively
           lowers its cross-sectional area.
         * No account is made for adsorbate-adsorbent interaction in BET theory
