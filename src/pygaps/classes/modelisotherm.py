@@ -10,6 +10,7 @@ import pandas
 
 from ..calculations.models_isotherm import _GUESS_MODELS
 from ..calculations.models_isotherm import get_isotherm_model
+from ..calculations.models_isotherm import is_base_model
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -115,11 +116,11 @@ class ModelIsotherm(Isotherm):
             raise ParameterError("Specify a model to fit to the pure-component"
                                  " isotherm data. e.g. model=\"Langmuir\"")
 
-        # We change it to a simulated isotherm
-        isotherm_parameters['is_real'] = False
-
         # Start construction process
         self._instantiated = False
+
+        # We change it to a simulated isotherm
+        isotherm_parameters['is_real'] = False
 
         # Run base class constructor
         Isotherm.__init__(self,
@@ -135,55 +136,65 @@ class ModelIsotherm(Isotherm):
 
                           **isotherm_parameters)
 
-        # Get required branch
-        data = self._splitdata(isotherm_data)
+        if is_base_model(model):
+            self.model = model
 
-        if branch == 'ads':
-            data = data.loc[~data['branch']]
-        elif branch == 'des':
-            data = data.loc[data['branch']]
+            self.rmse = 0
+            self.branch = 'ads'
+            self.pressure_range = [0, 1]
+            self.loading_range = [0, 1]
 
-        if data.empty:
-            raise ParameterError(
-                "The isotherm branch does not contain enough points")
+        else:
 
-        #: Branch the isotherm model is based on.
-        self.branch = branch
+            # Get required branch
+            data = self._splitdata(isotherm_data)
 
-        #: The pressure range on which the model was built.
-        self.pressure_range = [min(data[pressure_key]),
-                               max(data[pressure_key])]
+            if branch == 'ads':
+                data = data.loc[~data['branch']]
+            elif branch == 'des':
+                data = data.loc[data['branch']]
 
-        #: The loading range on which the model was built.
-        self.loading_range = [min(data[loading_key]),
-                              max(data[loading_key])]
+            if data.empty:
+                raise ParameterError(
+                    "The isotherm branch does not contain enough points")
 
-        #: Name of analytical model to fit to pure-component isotherm data
-        #: adsorption isotherm.
-        self.model = get_isotherm_model(model)
+            #: Branch the isotherm model is based on.
+            self.branch = branch
 
-        #: Root mean square error in fit.
-        self.rmse = numpy.nan
+            #: The pressure range on which the model was built.
+            self.pressure_range = [min(data[pressure_key]),
+                                   max(data[pressure_key])]
 
-        #: Dictionary of parameters as a starting point for data fitting.
-        self.param_guess = self.model.default_guess(isotherm_data,
-                                                    loading_key,
-                                                    pressure_key)
+            #: The loading range on which the model was built.
+            self.loading_range = [min(data[loading_key]),
+                                  max(data[loading_key])]
 
-        # Override defaults if user provides param_guess dictionary
-        if param_guess is not None:
-            for param, guess_val in param_guess.items():
-                if param not in self.param_guess.keys():
-                    raise ParameterError("%s is not a valid parameter"
-                                         " in the %s model." % (param, model))
-                self.param_guess[param] = guess_val
+            #: Name of analytical model to fit to pure-component isotherm data
+            #: adsorption isotherm.
+            self.model = get_isotherm_model(model)
 
-        # fit model to isotherm data
-        self.rmse = self.model.fit(data[loading_key].values,
-                                   data[pressure_key].values,
-                                   self.param_guess,
-                                   optimization_params,
-                                   verbose)
+            #: Dictionary of parameters as a starting point for data fitting.
+            self.param_guess = self.model.default_guess(isotherm_data,
+                                                        loading_key,
+                                                        pressure_key)
+
+            # Override defaults if user provides param_guess dictionary
+            if param_guess is not None:
+                for param, guess_val in param_guess.items():
+                    if param not in self.param_guess.keys():
+                        raise ParameterError("%s is not a valid parameter"
+                                             " in the %s model." % (param, model))
+                    self.param_guess[param] = guess_val
+
+            #: Root mean square error in fit.
+            self.rmse = numpy.nan
+
+            # fit model to isotherm data
+            self.rmse = self.model.fit(data[loading_key].values,
+                                       data[pressure_key].values,
+                                       self.param_guess,
+                                       optimization_params,
+                                       verbose)
 
         # Finish instantiation process
         self._instantiated = True
