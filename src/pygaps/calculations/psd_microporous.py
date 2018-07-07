@@ -41,7 +41,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     adsorbent_properties : dict
         Properties for the adsorbate in the same form
         as 'adsorbate_properties'. A list of common models
-        can be found in .calculations.adsorbent_parameters.
+        can be found in .calculations.models_hk.
 
     Returns
     -------
@@ -54,6 +54,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     -----
 
     *Description*
+
     The H-K method [#]_ attempts to describe the adsorption within pores by calculation
     of the average potential energy for a pore. The method starts by assuming the
     relationship between the gas phase as being:

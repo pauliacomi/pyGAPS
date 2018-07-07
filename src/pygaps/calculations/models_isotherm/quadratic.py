@@ -15,7 +15,7 @@ class Quadratic(IsothermModel):
 
     .. math::
 
-        L(P) = M \\frac{(K_a + 2 K_b P)P}{1+K_aP+K_bP^2}
+        L(P) = M \\frac{(K_a + 2 K_b P)P}{1 + K_{aP} + K_{bP}^2}
 
     Notes
     -----
