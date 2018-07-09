@@ -23,7 +23,7 @@ class Toth(IsothermModel):
     The Toth model is an empirical modification to the Langmuir equation.
     The parameter :math:`t` is a measure of the system heterogeneity.
 
-    Thanks to this addition parameter, the Toth equation can accurately describe a
+    Thanks to this additional parameter, the Toth equation can accurately describe a
     large number of adsorbent/adsorbate systems and is recommended as the first
     choice of isotherm equation for fitting isotherms of many adsorbents such as
     hydrocarbons, carbon oxides, hydrogen sulphide and alcohols on activated carbons

@@ -15,7 +15,7 @@ class JensenSeaton(IsothermModel):
 
     .. math::
 
-        L(P) = K_H P (1 + \\frac{K_H P}{(a (1+(b p))))^c})^{(-1/c)}
+        L(P) = K_H P (1 + \\frac{K_H P}{(a (1+(b p)))^c})^{(-1/c)}
 
     Notes
     -----
