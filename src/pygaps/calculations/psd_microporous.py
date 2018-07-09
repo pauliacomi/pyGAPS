@@ -132,7 +132,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     References
     ----------
     .. [#] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
-       Carbon-dioxide Adsorption Isoterms, 86
+       Carbon-dioxide Adsorption Isotherms, 86
 
     """
 
