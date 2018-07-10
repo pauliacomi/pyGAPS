@@ -61,7 +61,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     .. math::
 
-        R_g T ln(\\frac{p}{p_0}) = U_0 + P_a
+        R_g T \\ln(\\frac{p}{p_0}) = U_0 + P_a
 
     Here :math:`U_0` is the potential function describing the surface to adsorbent
     interactions and :math:`P_a` is the potential function describing the adsorbate-
@@ -75,7 +75,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     .. math::
 
-        RTln(p/p_0) =   & N_A\\frac{n_a A_a + n_A A_A}{2 \\sigma^{4}(l-d)} \\\\
+        RT\\ln(p/p_0) =   & N_A\\frac{n_a A_a + n_A A_A}{2 \\sigma^{4}(l-d)} \\\\
                         & \\times \\int_{d/_2}^{1-d/_2}
                             \\Big[
                             - \\Big(\\frac{\\sigma}{r}\\Big)^{4}

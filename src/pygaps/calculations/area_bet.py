@@ -151,15 +151,15 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     if verbose:
 
-        print("The slope of the BET fit: s =", round(slope, 3))
-        print("The intercept of the BET fit: i =", round(intercept, 3))
-        print("C =", int(round(c_const, 1)))
-        print("Amount for a monolayer: n =",
-              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
-        print("Minimum pressure point chosen is {0} and maximum is {1}".format(
-            round(pressure[minimum], 3), round(pressure[maximum], 3)))
         print("BET surface area: a =", int(round(bet_area, 0)),
               "m²/{}".format(isotherm.adsorbent_unit))
+        print("Minimum pressure point chosen is {0} and maximum is {1}".format(
+            round(pressure[minimum], 3), round(pressure[maximum], 3)))
+        print("The slope of the BET fit: s =", round(slope, 3))
+        print("The intercept of the BET fit: i =", round(intercept, 3))
+        print("The BET constant is: C =", int(round(c_const, 1)))
+        print("Amount for a monolayer: n =",
+              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
 
         # Generate plot of the BET points chosen
         bet_plot(pressure,

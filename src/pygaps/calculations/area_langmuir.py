@@ -126,15 +126,15 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
     if verbose:
 
-        print("The slope of the Langmuir line: s =", round(slope, 3))
-        print("The intercept of the Langmuir line: i =", round(intercept, 3))
-        print("K =", int(round(langmuir_const, 3)))
-        print("Amount for a monolayer: n =",
-              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
-        print("Minimum pressure point chosen is {0} and maximum is {1}".format(
-            round(pressure[minimum], 3), round(pressure[maximum], 3)))
         print("Langmuir surface area: a =", int(
             round(langmuir_area, 0)), "m²/{}".format(isotherm.adsorbent_unit))
+        print("Minimum pressure point chosen is {0} and maximum is {1}".format(
+            round(pressure[minimum], 3), round(pressure[maximum], 3)))
+        print("The slope of the Langmuir line: s =", round(slope, 3))
+        print("The intercept of the Langmuir line: i =", round(intercept, 3))
+        print("The Langmuir constant is: K =", int(round(langmuir_const, 3)))
+        print("Amount for a monolayer: n =",
+              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
 
         # Generate plot of the langmuir points chosen
         langmuir_plot(pressure,
