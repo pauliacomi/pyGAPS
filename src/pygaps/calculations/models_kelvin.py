@@ -73,8 +73,11 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     -----
     *Description*
 
-    The standard kelvin equation for determining critical pore radius for condensation or
-    evaporation.
+    The standard kelvin equation for determining critical pore radius
+    for condensation or evaporation.
+
+    .. math::
+        \\ln\\Big(\\frac{p}{p_0}\Big) = -\\frac{2 \\cos\\theta M_m \\gamma}{r_K\\rho_l RT}
 
     *Limitations*
 
@@ -87,16 +90,17 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     """
 
     if meniscus_geometry == 'cylinder':
-        geometry_factor = 1.0
-    elif meniscus_geometry == 'sphere':
         geometry_factor = 2.0
+    elif meniscus_geometry == 'sphere':
+        geometry_factor = 1.0
     elif meniscus_geometry == 'slit':
-        geometry_factor = 0.5
+        geometry_factor = 4.0
 
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
-    coefficient = (geometry_factor * adsorbate_surface_tension *
-                   adsorbate_molar_density) / (scipy.constants.gas_constant * temperature)
+    coefficient = (2 * adsorbate_surface_tension *
+                   adsorbate_molar_density) / (geometry_factor *
+                                               scipy.constants.gas_constant * temperature)
 
     radius = - coefficient / numpy.log(pressure)
 

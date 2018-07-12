@@ -15,7 +15,7 @@ class BET(IsothermModel):
 
     .. math::
 
-        L(P) = M\\frac{K_A P}{(1-K_B P)(1-K_B P+ K_A P)}
+        L(P) = M\\frac{C P}{(1-K_B P)(1-K_B P+ C P)}
 
     Notes
     -----
@@ -86,7 +86,7 @@ class BET(IsothermModel):
 
     .. math::
 
-        L(P) = \\frac{n}{n_m} = M\\frac{K_A P}{(1-K_B P)(1-K_B P+ K_A P)}
+        L(P) = \\frac{n}{n_m} = M\\frac{C P}{(1-K_B P)(1-K_B P+ C P)}
 
     References
     ----------
@@ -103,7 +103,7 @@ class BET(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan}
+        self.params = {"M": numpy.nan, "C": numpy.nan, "Kb": numpy.nan}
 
     def loading(self, pressure):
         """
@@ -119,10 +119,10 @@ class BET(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["M"] * self.params["Ka"] * pressure / (
+        return self.params["M"] * self.params["C"] * pressure / (
             (1.0 - self.params["Kb"] * pressure) *
             (1.0 - self.params["Kb"] * pressure +
-             self.params["Ka"] * pressure))
+             self.params["C"] * pressure))
 
     def pressure(self, loading):
         """
@@ -166,7 +166,7 @@ class BET(IsothermModel):
 
         .. math::
 
-            \\pi = M \\ln{\\frac{1 - K_b P + K_a P}{1- K_b P}}
+            \\pi = M \\ln{\\frac{1 - K_b P + C P}{1- K_b P}}
 
         Parameters
         ----------
@@ -180,7 +180,7 @@ class BET(IsothermModel):
         """
         return self.params["M"] * numpy.log(
             (1.0 - self.params["Kb"] * pressure +
-             self.params["Ka"] * pressure) /
+             self.params["C"] * pressure) /
             (1.0 - self.params["Kb"] * pressure))
 
     def default_guess(self, data, loading_key, pressure_key):
@@ -205,5 +205,5 @@ class BET(IsothermModel):
             data, loading_key, pressure_key)
 
         # BET = Langmuir when Kb = 0.0. This is our default assumption.
-        return {"M": saturation_loading, "Ka": langmuir_k,
+        return {"M": saturation_loading, "C": langmuir_k,
                 "Kb": langmuir_k * 0.01}

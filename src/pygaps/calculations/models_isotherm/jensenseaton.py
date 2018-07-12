@@ -56,7 +56,7 @@ class JensenSeaton(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"KH": numpy.nan, 'a': numpy.nan,
+        self.params = {"K": numpy.nan, 'a': numpy.nan,
                        'b': numpy.nan, 'c': numpy.nan}
 
     def loading(self, pressure):
@@ -73,8 +73,8 @@ class JensenSeaton(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["KH"] * pressure * \
-            (1 + (self.params["KH"] * pressure /
+        return self.params["K"] * pressure * \
+            (1 + (self.params["K"] * pressure /
                   (self.params["a"] * (1 + self.params["b"] * pressure))
                   )**self.params['c'])**(- 1 / self.params['c'])
 
@@ -152,7 +152,7 @@ class JensenSeaton(IsothermModel):
         saturation_loading, langmuir_k = super(JensenSeaton, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"KH": saturation_loading * langmuir_k,
+        return {"K": saturation_loading * langmuir_k,
                 "a": 1,
                 "b": 1,
                 "c": 1, }

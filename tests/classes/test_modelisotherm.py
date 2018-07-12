@@ -91,7 +91,7 @@ class TestModelIsotherm(object):
             loading_key='loading',
             pressure_key='pressure',
             model='Henry',
-            param_guess={'KH': 1.0},
+            param_guess={'K': 1.0},
             **isotherm_param
         )
 

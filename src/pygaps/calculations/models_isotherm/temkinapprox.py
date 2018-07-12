@@ -15,7 +15,7 @@ class TemkinApprox(IsothermModel):
 
     .. math::
 
-        L(P) = M\\frac{KP}{1+KP} + M \\theta (\\frac{KP}{1+KP})^2 (\\frac{KP}{1+KP} -1)
+        L(P) = M\\frac{KP}{1+KP} + M \\tht (\\frac{KP}{1+KP})^2 (\\frac{KP}{1+KP} -1)
 
     Notes
     -----
@@ -28,8 +28,8 @@ class TemkinApprox(IsothermModel):
     to obtain an explicit equation for the loading.
 
     Here, M and K have the same physical meaning as in the Langmuir model.
-    The additional parameter :math:`\\theta` describes the strength of the adsorbate-adsorbate
-    interactions (:math:`\\theta < 0` for attractions).
+    The additional parameter :math:`\\tht` describes the strength of the adsorbate-adsorbate
+    interactions (:math:`\\tht < 0` for attractions).
 
     References
     ----------
@@ -47,7 +47,7 @@ class TemkinApprox(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"M": numpy.nan, "K": numpy.nan, "theta": numpy.nan}
+        self.params = {"M": numpy.nan, "K": numpy.nan, "tht": numpy.nan}
 
     def loading(self, pressure):
         """
@@ -66,7 +66,7 @@ class TemkinApprox(IsothermModel):
         langmuir_fractional_loading = self.params["K"] * pressure / \
             (1.0 + self.params["K"] * pressure)
         return self.params["M"] * (langmuir_fractional_loading +
-                                   self.params["theta"] * langmuir_fractional_loading ** 2 *
+                                   self.params["tht"] * langmuir_fractional_loading ** 2 *
                                    (langmuir_fractional_loading - 1))
 
     def pressure(self, loading):
@@ -111,7 +111,7 @@ class TemkinApprox(IsothermModel):
 
         .. math::
 
-            \\pi = M (\\ln{1+KP} \\frac{\\theta (2 K P +1)}{2(1 + KP)^2})
+            \\pi = M (\\ln{1+KP} \\frac{\\tht (2 K P +1)}{2(1 + KP)^2})
 
         Parameters
         ----------
@@ -125,7 +125,7 @@ class TemkinApprox(IsothermModel):
         """
         one_plus_kp = 1.0 + self.params["K"] * pressure
         return self.params["M"] * (numpy.log(one_plus_kp) +
-                                   self.params["theta"] * (2.0 * self.params["K"] * pressure + 1.0) /
+                                   self.params["tht"] * (2.0 * self.params["K"] * pressure + 1.0) /
                                    (2.0 * one_plus_kp ** 2))
 
     def default_guess(self, data, loading_key, pressure_key):
@@ -149,4 +149,4 @@ class TemkinApprox(IsothermModel):
         saturation_loading, langmuir_k = super(TemkinApprox, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"M": saturation_loading, "K": langmuir_k, "theta": 0.0}
+        return {"M": saturation_loading, "K": langmuir_k, "tht": 0.0}
