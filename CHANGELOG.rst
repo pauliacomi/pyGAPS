@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-1.x.x ()
+1.3.0 ()
 ------------------
 
 Features:
@@ -21,6 +21,8 @@ Bugfixes:
 * Fixed 'source' not being recognised as an isotherm field
 * Added correct common name for ethylene, propylene, methanol
   and ethanol in the database
+* Renamed some model parameters for consistency
+* A lot of typo fixes
 
 
 1.2.0 (2018-02-19)
