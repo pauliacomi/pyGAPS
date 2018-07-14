@@ -479,19 +479,19 @@ class PointIsotherm(Isotherm):
             plot_type = 'isotherm'
             secondary_key = None
 
-        fig, ax1, ax2 = plot_iso(
-            [self],
+        plot_dict = dict(
             plot_type=plot_type,
             secondary_key=secondary_key,
-
             adsorbent_basis=self.adsorbent_basis,
             adsorbent_unit=self.adsorbent_unit,
             loading_basis=self.loading_basis,
             loading_unit=self.loading_unit,
             pressure_unit=self.pressure_unit,
             pressure_mode=self.pressure_mode,
-            **plot_iso_args
         )
+        plot_dict.update(plot_iso_args)
+
+        fig, ax1, ax2 = plot_iso(self, **plot_dict)
 
         if show:
             plt.show()
