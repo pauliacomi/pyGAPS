@@ -30,7 +30,7 @@ class Henry(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"KH": numpy.nan}
+        self.params = {"K": numpy.nan}
 
     def loading(self, pressure):
         """
@@ -46,7 +46,7 @@ class Henry(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["KH"] * pressure
+        return self.params["K"] * pressure
 
     def pressure(self, loading):
         """
@@ -69,7 +69,7 @@ class Henry(IsothermModel):
         float
             Pressure at specified loading.
         """
-        return loading / self.params["KH"]
+        return loading / self.params["K"]
 
     def spreading_pressure(self, pressure):
         """
@@ -96,7 +96,7 @@ class Henry(IsothermModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["KH"] * pressure
+        return self.params["K"] * pressure
 
     def default_guess(self, data, loading_key, pressure_key):
         """
@@ -120,4 +120,4 @@ class Henry(IsothermModel):
         saturation_loading, langmuir_k = super(Henry, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"KH": saturation_loading * langmuir_k}
+        return {"K": saturation_loading * langmuir_k}

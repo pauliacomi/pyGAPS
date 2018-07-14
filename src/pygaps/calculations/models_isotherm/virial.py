@@ -52,7 +52,7 @@ class Virial(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"KH": numpy.nan, "A": numpy.nan,
+        self.params = {"K": numpy.nan, "A": numpy.nan,
                        "B": numpy.nan, "C": numpy.nan}
 
     def loading(self, pressure):
@@ -103,7 +103,7 @@ class Virial(IsothermModel):
         float
             Pressure at specified loading.
         """
-        return loading * numpy.exp(-numpy.log(self.params['KH']) + self.params['A'] * loading
+        return loading * numpy.exp(-numpy.log(self.params['K']) + self.params['A'] * loading
                                    + self.params['B'] * loading**2 + self.params['C'] * loading**3)
 
     def spreading_pressure(self, pressure):
@@ -152,7 +152,7 @@ class Virial(IsothermModel):
         saturation_loading, langmuir_k = super(Virial, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"KH": saturation_loading * langmuir_k,
+        return {"K": saturation_loading * langmuir_k,
                 "A": 0, "B": 0, "C": 0}
 
     def fit(self, loading, pressure, param_guess, optimization_method=None, verbose=False):
@@ -179,7 +179,7 @@ class Virial(IsothermModel):
         full_info = numpy.polyfit(loading, ln_p_over_n, 3, full=True)
         virial_constants = full_info[0]
 
-        self.params['KH'] = numpy.exp(-virial_constants[3])
+        self.params['K'] = numpy.exp(-virial_constants[3])
         self.params['A'] = virial_constants[2]
         self.params['B'] = virial_constants[1]
         self.params['C'] = virial_constants[0]

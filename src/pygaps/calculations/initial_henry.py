@@ -57,7 +57,7 @@ def initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
 
     # logging for debugging
     if verbose:
-        print("Calculated K =", model_isotherm.model.params["KH"])
+        print("Calculated K =", model_isotherm.model.params["K"])
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
         print("Final adjusted root mean square difference:", adjrmsd)
@@ -69,7 +69,7 @@ def initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
         plt.show()
 
     # return the henry constant
-    return model_isotherm.model.params["KH"]
+    return model_isotherm.model.params["K"]
 
 
 def initial_henry_virial(isotherm, verbose=False):
@@ -104,4 +104,4 @@ def initial_henry_virial(isotherm, verbose=False):
             plt.close()
             print('Cannot plot comparison due to model instability')
 
-    return model_isotherm.model.params['KH']
+    return model_isotherm.model.params['K']
