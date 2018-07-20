@@ -5,22 +5,20 @@ Tests bel file read
 import pygaps
 
 from ..conftest import parsing
-
-from .conftest import DATA_EXCEL_BEL
+from .conftest import DATA_BEL
 
 
 @parsing
-class TestCSV(object):
+class TestBEL(object):
 
-    def test_bel(self, basic_pointisotherm, tmpdir_factory):
-        """Tests creation of the regular csv file"""
+    def test_read_bel(self):
+        """Tests reading of a bel data file"""
 
-        for path in DATA_EXCEL_BEL:
-            dat_path = path.replace('.xls', '.dat')
+        for path in DATA_BEL:
 
-            isotherm = pygaps.isotherm_from_bel(path=dat_path)
+            isotherm = pygaps.isotherm_from_bel(path=path)
 
-            json_path = path.replace('.dat', '.json')
+            json_path = path.replace('.DAT', '.json')
 
             with open(json_path, 'r') as file:
                 assert isotherm == pygaps.isotherm_from_json(file.read())

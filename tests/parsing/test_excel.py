@@ -2,8 +2,6 @@
 Tests excel interaction
 """
 
-import pytest
-
 import pygaps
 
 from ..conftest import parsing
@@ -13,7 +11,6 @@ from .conftest import DATA_EXCEL_STD
 
 
 @parsing
-@pytest.mark.slowtest
 class TestExcel(object):
 
     def test_read_create_excel(self, basic_pointisotherm, tmpdir_factory):

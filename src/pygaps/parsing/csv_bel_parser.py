@@ -9,7 +9,7 @@ from io import StringIO
 from ..classes.pointisotherm import PointIsotherm
 
 _DATA = {
-    'adsorptive': 'adsorbent',
+    'adsorptive': 'adsorbate',
     'meas. temp': 't_exp',
     'sample weight': 'mass',
     'comment1': 'sample_name',
@@ -18,6 +18,15 @@ _DATA = {
     'comment4': 'exp_param',
     'date of measurement': 'date',
     'time of measurement': 'time',
+    'vs/': 'cell_volume',
+    'isotherm_data': {
+        'no.': 'measurement',
+        'pe/': 'pressure',
+        'p0/': 'saturation',
+        'vd/': 'deadvolume',
+        'v/': 'loading',
+        'n/': 'loading',
+    }
 }
 
 
@@ -51,15 +60,49 @@ def isotherm_from_bel(path):
                 if values[0].strip().lower().startswith('adsorption data'):
                     line = file.readline()          # header
                     line = line.replace('"', '')    # remove quotes
+                    headers = line.split('\t')
+                    new_headers = ['br']
+
+                    for h in headers:
+                        txt = next(_DATA['isotherm_data'][a]
+                                   for a in _DATA['isotherm_data']
+                                   if h.lower().startswith(a))
+                        new_headers.append(txt)
+
+                        if txt == 'loading':
+                            sample_info['loading_basis'] = 'molar'
+                            for (u, c) in (('/mmol', 'mmol'),
+                                           ('/mol', 'mol'),
+                                           ('/ml(STP)', 'cm3(STP)'),
+                                           ('/cm3(STP)', 'cm3(STP)')):
+                                if u in h:
+                                    sample_info['loading_unit'] = c
+                            sample_info['adsorbent_basis'] = 'mass'
+                            for (u, c) in (('g-1', 'g'),
+                                           ('kg-1', 'kg')):
+                                if u in h:
+                                    sample_info['adsorbent_unit'] = c
+
+                        if txt == 'pressure':
+                            sample_info['pressure_mode'] = 'absolute'
+                            for (u, c) in (('/kPa', 'kPa'),
+                                           ('/Pa', 'Pa')):
+                                if u in h:
+                                    sample_info['pressure_unit'] = c
+
+                    adsdata.write('\t'.join(new_headers) + '\n')
+
+                    line = file.readline()          # firstline
                     while not line.startswith('0'):
-                        adsdata.write(line)
+                        adsdata.write('False\t' + line)
                         line = file.readline()
                 if values[0].strip().lower().startswith('desorption data'):
                     file.readline()                 # header - discard
                     line = file.readline()          # firstline
                     while not line.startswith('0'):
-                        adsdata.write(line)
+                        adsdata.write('True\t' + line)
                         line = file.readline()
+                    adsdata.seek(0)                 # Reset string buffer to 0
                 else:
                     continue
             else:
@@ -68,19 +111,23 @@ def isotherm_from_bel(path):
                     if values[0].lower().startswith(n):
                         sample_info.update({_DATA[n]: values[1]})
 
+        data_df = pandas.read_table(adsdata,
+                                    sep='\t')
         sample_info['date'] = (sample_info['date']
                                + ' ' +
-                               sample_info['time'])
+                               sample_info.pop('time'))
+        sample_info['sample_batch'] = 'mic'
+        sample_info['loading_key'] = 'loading'
+        sample_info['pressure_key'] = 'pressure'
+        sample_info['other_keys'] = [a for a in new_headers
+                                     if a != 'loading'
+                                     and a != 'pressure'
+                                     and a != 'measurement'
+                                     and a != 'br']
 
-        with open('./data.txt', 'w') as file:
-            file.write(adsdata.getvalue())
-        data_df = pandas.read_table(adsdata, sep='\t')
-
-    isotherm = PointIsotherm(
-        data_df,
-        loading_key=data_df.columns[0],
-        pressure_key=data_df.columns[1],
-        other_keys=list(data_df.columns[2:]),
-        **sample_info)
+        isotherm = PointIsotherm(
+            data_df,
+            branch=data_df['br'].tolist(),
+            **sample_info)
 
     return isotherm
