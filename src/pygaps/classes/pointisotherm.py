@@ -129,7 +129,8 @@ class PointIsotherm(Isotherm):
                           **isotherm_parameters)
 
         #: Pandas DataFrame that stores the data.
-        self._data = isotherm_data.sort_index(axis=1)
+        self._data = isotherm_data[[pressure_key,
+                                    loading_key] + other_keys].sort_index(axis=1)
 
         #: List of column in the dataframe that contains other points.
         self.other_keys = other_keys
