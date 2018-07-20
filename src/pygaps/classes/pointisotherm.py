@@ -94,7 +94,7 @@ class PointIsotherm(Isotherm):
                  isotherm_data,
                  loading_key=None,
                  pressure_key=None,
-                 other_keys=None,
+                 other_keys=[],
                  branch='guess',
 
                  adsorbent_basis="mass",
@@ -182,7 +182,7 @@ class PointIsotherm(Isotherm):
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
-                      other_keys=None):
+                      other_keys=[]):
         """
         Constructs a point isotherm using a parent isotherm as the template for
         all the parameters.
