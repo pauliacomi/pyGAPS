@@ -65,11 +65,9 @@ def isotherm_from_bel(path):
                     new_headers = ['br']
 
                     for h in headers:
-                        if not h:
-                            continue
-                        txt = next(_DATA['isotherm_data'][a]
-                                   for a in _DATA['isotherm_data']
-                                   if h.lower().startswith(a))
+                        txt = next((_DATA['isotherm_data'][a]
+                                    for a in _DATA['isotherm_data']
+                                    if h.lower().startswith(a)), h)
                         new_headers.append(txt)
 
                         if txt == 'loading':
@@ -99,13 +97,13 @@ def isotherm_from_bel(path):
                     while not line.startswith('0'):
                         adsdata.write('False\t' + line)
                         line = file.readline()
+
                 if values[0].strip().lower().startswith('desorption data'):
                     file.readline()                 # header - discard
                     line = file.readline()          # firstline
                     while not line.startswith('0'):
                         adsdata.write('True\t' + line)
                         line = file.readline()
-                    adsdata.seek(0)                 # Reset string buffer to 0
                 else:
                     continue
             else:
@@ -114,15 +112,17 @@ def isotherm_from_bel(path):
                     if values[0].lower().startswith(n):
                         sample_info.update({_DATA[n]: values[1]})
 
+        adsdata.seek(0)                 # Reset string buffer to 0
         data_df = pandas.read_table(adsdata,
                                     sep='\t')
+        data_df.dropna(inplace=True, how='all', axis='columns')
         sample_info['date'] = (sample_info['date']
                                + ' ' +
                                sample_info.pop('time'))
         sample_info['sample_batch'] = 'mic'
         sample_info['loading_key'] = 'loading'
         sample_info['pressure_key'] = 'pressure'
-        sample_info['other_keys'] = [a for a in new_headers
+        sample_info['other_keys'] = [a for a in data_df.columns
                                      if a != 'loading'
                                      and a != 'pressure'
                                      and a != 'measurement'
