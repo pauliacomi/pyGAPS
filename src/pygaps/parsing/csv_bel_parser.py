@@ -60,10 +60,13 @@ def isotherm_from_bel(path):
                 if values[0].strip().lower().startswith('adsorption data'):
                     line = file.readline()          # header
                     line = line.replace('"', '')    # remove quotes
+                    line = line.replace('\n', '')   # remove endline
                     headers = line.split('\t')
                     new_headers = ['br']
 
                     for h in headers:
+                        if not h:
+                            continue
                         txt = next(_DATA['isotherm_data'][a]
                                    for a in _DATA['isotherm_data']
                                    if h.lower().startswith(a))
