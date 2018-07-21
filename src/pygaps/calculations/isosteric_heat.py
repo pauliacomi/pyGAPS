@@ -95,13 +95,10 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
             'Isotherm passed are in a different adsorbent basis.')
 
     # Get minimum and maximum loading for each isotherm
-    min_loading = max(
+    min_loading = 1.01 * max(
         [min(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
-    max_loading = min(
+    max_loading = 0.99 * min(
         [max(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
-
-    min_loading = 1.01 * min_loading
-    max_loading = 0.99 * max_loading
 
     # Get temperatures
     temperatures = list(x.t_exp for x in isotherms)
