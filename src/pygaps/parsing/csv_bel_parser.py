@@ -1,10 +1,10 @@
 """
-This module contains the csv interface.
+This module contains the bel interface.
 """
 
-import pandas
-
 from io import StringIO
+
+import pandas
 
 from ..classes.pointisotherm import PointIsotherm
 
