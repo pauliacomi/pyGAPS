@@ -87,6 +87,16 @@ class PointIsotherm(Isotherm):
 
     """
 
+    _reserved_params = [
+        '_instantiated',
+        '_data',
+        'l_interpolator',
+        'p_interpolator',
+        'loading_key',
+        'pressure_key',
+        'other_keys',
+    ]
+
 ##########################################################
 #   Instantiation and classmethods
 
@@ -116,8 +126,6 @@ class PointIsotherm(Isotherm):
 
         # Run base class constructor
         Isotherm.__init__(self,
-                          loading_key=loading_key,
-                          pressure_key=pressure_key,
 
                           adsorbent_basis=adsorbent_basis,
                           adsorbent_unit=adsorbent_unit,
@@ -128,9 +136,23 @@ class PointIsotherm(Isotherm):
 
                           **isotherm_parameters)
 
+        # Column titles
+        if None in [loading_key, pressure_key]:
+            raise ParameterError(
+                "Pass loading_key and pressure_key, the names of the loading and"
+                " pressure columns in the DataFrame, to the constructor.")
+
+        # Save column names
+        #: Name of column in the dataframe that contains adsorbed amount.
+        self.loading_key = loading_key
+
+        #: Name of column in the dataframe that contains pressure.
+        self.pressure_key = pressure_key
+
         #: Pandas DataFrame that stores the data.
-        self._data = isotherm_data[[pressure_key,
-                                    loading_key] + other_keys].sort_index(axis=1)
+        columns = [pressure_key, loading_key]
+        columns.extend(other_keys)
+        self._data = isotherm_data[columns].sort_index(axis=1)
 
         #: List of column in the dataframe that contains other points.
         self.other_keys = other_keys
@@ -138,7 +160,7 @@ class PointIsotherm(Isotherm):
         # Deal with the branches
         if branch == 'guess':
             # Split the data in adsorption/desorption
-            self._data = self._splitdata(self._data)
+            self._data = self._splitdata(self._data, pressure_key)
         elif branch == 'ads':
             self._data.insert(len(self._data.columns), 'branch', False)
         elif branch == 'des':
@@ -182,6 +204,8 @@ class PointIsotherm(Isotherm):
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
+                      loading_key=None,
+                      pressure_key=None,
                       other_keys=[]):
         """
         Constructs a point isotherm using a parent isotherm as the template for
@@ -198,17 +222,22 @@ class PointIsotherm(Isotherm):
         pressure_key : str
             Column of the pandas DataFrame where the pressure is stored.
         """
+        # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
+        # remove ID - a new one will be generated
         iso_params.pop('id', None)
-        return cls(isotherm_data,
-                   other_keys=other_keys,
+        # insert or update values
+        iso_params['loading_key'] = loading_key
+        iso_params['pressure_key'] = pressure_key
+        iso_params['other_keys'] = other_keys
 
-                   pressure_key=isotherm.pressure_key,
-                   loading_key=isotherm.loading_key,
-                   **iso_params)
+        return cls(isotherm_data, **iso_params)
 
     @classmethod
-    def from_modelisotherm(cls, modelisotherm, pressure_points=None):
+    def from_modelisotherm(cls, modelisotherm, pressure_points=None,
+                           pressure_key='pressure',
+                           loading_key='loading',
+                           ):
         """
         Constructs a PointIsotherm from a ModelIsothem class.
         This class method allows for the model to be converted into
@@ -228,6 +257,11 @@ class PointIsotherm(Isotherm):
                 - If a PointIsotherm is passed, the values will be calculated at each
                   of the pressure points in the passed isotherm. This is useful for
                   comparing a model overlap with the real isotherm.
+
+        loading_key : str, optional
+            The title of the pressure data in the DataFrame provided.
+        pressure_key : str, optional
+            The title of the loading data in the DataFrame provided.
         """
 
         if pressure_points is None:
@@ -239,16 +273,16 @@ class PointIsotherm(Isotherm):
 
         iso_data = pandas.DataFrame(
             {
-                modelisotherm.pressure_key: pressure,
-                modelisotherm.loading_key: modelisotherm.loading_at(pressure)
+                pressure_key: pressure,
+                loading_key: modelisotherm.loading_at(pressure)
             }
         )
 
         iso_params = modelisotherm.to_dict()
         iso_params.pop('id', None)
         return PointIsotherm(iso_data,
-                             loading_key=modelisotherm.loading_key,
-                             pressure_key=modelisotherm.pressure_key,
+                             loading_key=loading_key,
+                             pressure_key=pressure_key,
                              **iso_params)
 
 ##########################################################

@@ -18,6 +18,14 @@ Features:
 * The extra arguments to print_info() are now passed to the plotting
   function.
 
+Breaking changes:
+
+* The unique isotherm ID is now generated only on a small subset of
+  properties instead of all isotherm properties.
+* The isotherm 'other_properties' subdictionary has been removed.
+  Instead, all isotherm properties are now direct members of the
+  class.
+
 Bugfixes:
 
 * Fixed 'source' not being recognised as an isotherm field

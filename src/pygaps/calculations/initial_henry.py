@@ -46,6 +46,8 @@ def initial_henry_slope(isotherm, max_adjrms=0.02, verbose=False):
     while rows_taken != 1:
         model_isotherm = ModelIsotherm.from_isotherm(isotherm,
                                                      data.head(rows_taken),
+                                                     pressure_key=isotherm.pressure_key,
+                                                     loading_key=isotherm.loading_key,
                                                      model="Henry")
         adjrmsd = model_isotherm.rmse / numpy.ptp(data[isotherm.loading_key])
 

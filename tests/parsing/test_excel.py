@@ -32,22 +32,6 @@ class TestExcel(object):
                               path=path, fmt='MADIREL')
 
         isotherm = pygaps.isotherm_from_xl(path, fmt='MADIREL')
-        new_props = basic_pointisotherm.other_properties.copy()
-        new_props.update({
-            'henry_constant': '',
-            'langmuir_n1': '', 'langmuir_b1': '',
-            'langmuir_n2': '', 'langmuir_b2': '',
-            'langmuir_n3': '', 'langmuir_b3': '',
-            'langmuir_r2': '',
-            'c1': '', 'c2': '', 'c3': '',
-            'c4': '', 'c5': '', 'c6': '',
-            'c_m': '',
-            'enth_0': '', 'enth_a': '',
-            'enth_b': '', 'enth_c': '',
-            'enth_d': '', 'enth_e': '',
-            'enth_f': '', 'enth_r2': '',
-        })
-        basic_pointisotherm.other_properties = new_props.copy()
         assert isotherm == basic_pointisotherm
 
     def test_read_excel_mic(self):

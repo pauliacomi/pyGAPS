@@ -86,6 +86,11 @@ class ModelIsotherm(Isotherm):
 
     """
 
+    _reserved_params = [
+        '_instantiated',
+        'model',
+    ]
+
 ##########################################################
 #   Instantiation and classmethods
 
@@ -124,9 +129,6 @@ class ModelIsotherm(Isotherm):
 
         # Run base class constructor
         Isotherm.__init__(self,
-                          pressure_key=pressure_key,
-                          loading_key=loading_key,
-
                           adsorbent_basis=adsorbent_basis,
                           adsorbent_unit=adsorbent_unit,
                           loading_basis=loading_basis,
@@ -135,6 +137,12 @@ class ModelIsotherm(Isotherm):
                           pressure_unit=pressure_unit,
 
                           **isotherm_parameters)
+
+        # Column titles
+        if None in [loading_key, pressure_key]:
+            raise ParameterError(
+                "Pass loading_key and pressure_key, the names of the loading and"
+                " pressure columns in the DataFrame, to the constructor.")
 
         if is_base_model(model):
             self.model = model
@@ -147,7 +155,7 @@ class ModelIsotherm(Isotherm):
         else:
 
             # Get required branch
-            data = self._splitdata(isotherm_data)
+            data = self._splitdata(isotherm_data, pressure_key)
 
             if branch == 'ads':
                 data = data.loc[~data['branch']]
@@ -205,6 +213,8 @@ class ModelIsotherm(Isotherm):
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
+                      loading_key=None,
+                      pressure_key=None,
                       model=None,
                       param_guess=None,
                       optimization_params=dict(method='Nelder-Mead'),
@@ -222,6 +232,10 @@ class ModelIsotherm(Isotherm):
             An instance of the Isotherm parent class.
         isotherm_data : DataFrame
             Pure-component adsorption isotherm data.
+        loading_key : str
+            Column of the pandas DataFrame where the loading is stored.
+        pressure_key : str
+            Column of the pandas DataFrame where the pressure is stored.
         model : str
             The model to be used to describe the isotherm.
         param_guess : dict
@@ -242,17 +256,16 @@ class ModelIsotherm(Isotherm):
         iso_params = isotherm.to_dict()
         # remove ID - a new one will be generated
         iso_params.pop('id', None)
+        # insert or update values
+        iso_params['loading_key'] = loading_key
+        iso_params['pressure_key'] = pressure_key
+        iso_params['model'] = model
+        iso_params['param_guess'] = param_guess
+        iso_params['optimization_params'] = optimization_params
+        iso_params['branch'] = branch
+        iso_params['verbose'] = verbose
 
-        return cls(isotherm_data,
-                   model=model,
-                   param_guess=param_guess,
-                   optimization_params=optimization_params,
-                   branch=branch,
-                   verbose=verbose,
-
-                   loading_key=isotherm.loading_key,
-                   pressure_key=isotherm.pressure_key,
-                   **iso_params)
+        return cls(isotherm_data, **iso_params)
 
     @classmethod
     def from_pointisotherm(cls,
@@ -295,23 +308,21 @@ class ModelIsotherm(Isotherm):
 
         if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
+                                       loading_key=isotherm.loading_key,
+                                       pressure_key=isotherm.pressure_key,
                                        optimization_params=optimization_params,
                                        branch=branch,
                                        verbose=verbose,
-
-                                       loading_key=isotherm.loading_key,
-                                       pressure_key=isotherm.pressure_key,
                                        **iso_params)
 
         return cls(isotherm.data(branch=branch),
+                   loading_key=isotherm.loading_key,
+                   pressure_key=isotherm.pressure_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_params=optimization_params,
                    branch=branch,
                    verbose=verbose,
-
-                   loading_key=isotherm.loading_key,
-                   pressure_key=isotherm.pressure_key,
                    **iso_params)
 
     @classmethod
