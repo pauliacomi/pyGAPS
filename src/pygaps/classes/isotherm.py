@@ -335,17 +335,17 @@ class Isotherm(object):
 
         # Units/basis
         string += ("Units: \n")
-        string += ("Unit for loading: " + str(self.loading_unit) +
+        string += ("\tUnit for loading: " + str(self.loading_unit) +
                    "/" + str(self.adsorbent_unit) + '\n')
         if self.pressure_mode == 'relative':
-            string += ("Relative pressure \n")
+            string += ("\tRelative pressure \n")
         else:
-            string += ("Unit for pressure: " + str(self.pressure_unit) + '\n')
+            string += ("\tUnit for pressure: " + str(self.pressure_unit) + '\n')
 
         string += ("Other properties: \n")
         for prop in vars(self):
             if prop not in self._named_params + self._unit_params + self._reserved_params:
-                string += (prop + ": " + str(getattr(self, prop)) + '\n')
+                string += ('\t' + prop + ": " + str(getattr(self, prop)) + '\n')
 
         return string
 
