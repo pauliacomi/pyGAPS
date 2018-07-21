@@ -100,6 +100,9 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
     max_loading = min(
         [max(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
 
+    min_loading = 1.01 * min_loading
+    max_loading = 0.99 * max_loading
+
     # Get temperatures
     temperatures = list(x.t_exp for x in isotherms)
 
