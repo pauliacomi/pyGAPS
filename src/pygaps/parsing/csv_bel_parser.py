@@ -119,7 +119,7 @@ def isotherm_from_bel(path):
         sample_info['date'] = (sample_info['date']
                                + ' ' +
                                sample_info.pop('time'))
-        sample_info['sample_batch'] = 'mic'
+        sample_info['sample_batch'] = 'bel'
         sample_info['loading_key'] = 'loading'
         sample_info['pressure_key'] = 'pressure'
         sample_info['other_keys'] = [a for a in data_df.columns
