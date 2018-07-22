@@ -447,6 +447,7 @@ def plot_iso(isotherms,
                 styles['line_style']['mfc'] = 'none'
                 if line_color is not None:
                     styles['line_style']['c'] = line_color
+                    styles['line_style']['linestyle'] = '--'
 
                 # Call the plotting function
                 line = graph_caller(axes, axes2,
@@ -457,6 +458,7 @@ def plot_iso(isotherms,
                 del styles['line_style']['mfc']
                 if line_color is not None:
                     del styles['line_style']['c']
+                    del styles['line_style']['linestyle']
 
 
 #####################################
