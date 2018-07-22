@@ -498,7 +498,9 @@ def plot_iso(isotherms,
     if new_st:
         styles['legend_style'].update(new_st)
 
-    if legend_force == 'right' or len(lines) > 5:
+    if legend_force == 'bottom':
+        lgd = fig.legend(lines, labels, **styles['legend_style'])
+    elif legend_force == 'right' or len(lines) > 5:
         lgd = fig.legend(lines, labels, **styles['legend_style'])
     else:
         lgd = axes.legend(lines, labels, **styles['legend_style'])
