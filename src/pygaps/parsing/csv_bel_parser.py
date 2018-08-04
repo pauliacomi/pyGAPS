@@ -122,11 +122,11 @@ def isotherm_from_bel(path):
         sample_info['sample_batch'] = 'bel'
         sample_info['loading_key'] = 'loading'
         sample_info['pressure_key'] = 'pressure'
-        sample_info['other_keys'] = [a for a in data_df.columns
-                                     if a != 'loading'
-                                     and a != 'pressure'
-                                     and a != 'measurement'
-                                     and a != 'br']
+        sample_info['other_keys'] = sorted([a for a in data_df.columns
+                                            if a != 'loading'
+                                            and a != 'pressure'
+                                            and a != 'measurement'
+                                            and a != 'br'])
 
         isotherm = PointIsotherm(
             data_df,

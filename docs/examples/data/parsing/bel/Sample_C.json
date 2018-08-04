@@ -139,7 +139,7 @@
     "mass": "0.0740",
     "pressure_mode": "absolute",
     "pressure_unit": "kPa",
-    "sample_batch": "mic",
+    "sample_batch": "bel",
     "sample_name": "Sample_C",
     "t_exp": 303.0,
     "user": "User"
