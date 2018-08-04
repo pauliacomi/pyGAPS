@@ -99,8 +99,9 @@ def plot_iso(isotherms,
         two components. Defaults to the sample name and adsorbate.
     fig_title : str
         Title of the graph. Defaults to type of graph.
-    legend_force : ['bottom', 'right']
-        Specify to have the legend forced to the bottom or the right of the graph.
+    legend_force : ['bottom', 'right', 'inner']
+        Specify to have the legend forced to the bottom, the right of the graph
+        or inside the plot area itself.
 
     save_path : str, optional
         Whether to save the graph or not.
@@ -484,7 +485,9 @@ def plot_iso(isotherms,
         lines = lines + lines2
         labels = labels + labels2
 
-    if legend_force == 'bottom':
+    if legend_force == 'inner':
+        pass
+    elif legend_force == 'bottom':
         styles['legend_style']['bbox_to_anchor'] = (0.5, -0.1)
         styles['legend_style']['loc'] = 'lower center'
         styles['legend_style']['bbox_transform'] = fig.transFigure
@@ -498,7 +501,9 @@ def plot_iso(isotherms,
     if new_st:
         styles['legend_style'].update(new_st)
 
-    if legend_force == 'bottom':
+    if legend_force == 'inner':
+        lgd = axes.legend(lines, labels, **styles['legend_style'])
+    elif legend_force == 'bottom':
         lgd = fig.legend(lines, labels, **styles['legend_style'])
     elif legend_force == 'right' or len(lines) > 5:
         lgd = fig.legend(lines, labels, **styles['legend_style'])
