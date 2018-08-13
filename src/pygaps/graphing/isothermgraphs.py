@@ -99,7 +99,7 @@ def plot_iso(isotherms,
         two components. Defaults to the sample name and adsorbate.
     fig_title : str
         Title of the graph. Defaults to type of graph.
-    legend_force : ['bottom', 'right', 'inner']
+    legend_force : ['none', 'bottom', 'right', 'inner']
         Specify to have the legend forced to the bottom, the right of the graph
         or inside the plot area itself.
 
@@ -501,7 +501,9 @@ def plot_iso(isotherms,
     if new_st:
         styles['legend_style'].update(new_st)
 
-    if legend_force == 'inner':
+    if legend_force == 'none':
+        pass
+    elif legend_force == 'inner':
         lgd = axes.legend(lines, labels, **styles['legend_style'])
     elif legend_force == 'bottom':
         lgd = fig.legend(lines, labels, **styles['legend_style'])
