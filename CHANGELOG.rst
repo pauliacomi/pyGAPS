@@ -16,7 +16,7 @@ Features:
 * Improved plotting functions to allow for more customisation
   over how the graph looks.
 * The extra arguments to print_info() are now passed to the plotting
-  function.
+  function allowing for styles such as :issue:`8`.
 
 Breaking changes:
 
