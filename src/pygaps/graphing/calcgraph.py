@@ -224,14 +224,14 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
     return ax1
 
 
-def psd_plot(pore_radii, pore_dist, method=None, label=None,
+def psd_plot(pore_widths, pore_dist, method=None, label=None,
              log=True, xmax=None, xmin=None):
     """
     Draws the pore size distribution plot.
 
     Parameters
     ----------
-    pore_radii : array
+    pore_widths : array
         Array of the pore radii which will become the x axis.
     pore_dist : array
         Contribution of each pore radius which will make up the y axis.
@@ -265,7 +265,7 @@ def psd_plot(pore_radii, pore_dist, method=None, label=None,
     def formatter(x, pos):
         return "{0:g}".format(x)
 
-    if(log):
+    if log:
 
         ax1.set_xscale('log')
         ax1.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
