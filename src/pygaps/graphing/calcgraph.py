@@ -258,7 +258,7 @@ def psd_plot(pore_widths, pore_dist, method=None, label=None,
 
     fig = plt.figure(figsize=(15, 5))
     ax1 = fig.add_subplot(111)
-    ax1.plot(pore_radii, pore_dist,
+    ax1.plot(pore_widths, pore_dist,
              marker='', color='g', label=label)
 
     # Func formatter
@@ -365,7 +365,7 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
     if extras is not None:
         for param in extras:
             ax1.plot(param[0], param[1], label=param[2], linestyle='--')
-    if(log):
+    if log:
         ax1.set_xscale('log')
         ax1.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
