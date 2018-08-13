@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-1.3.0 ()
+1.3.0 (2018-08-13)
 ------------------
 
 Features:
@@ -13,7 +13,7 @@ Features:
   taken from the `official python repo <https://github.com/Micromeritics/micromeritics>`_.
 * Added an import option which can read and import Belsorp
   data (.DAT) files.
-* Improved plotting function to allow for more customisation
+* Improved plotting functions to allow for more customisation
   over how the graph looks.
 * The extra arguments to print_info() are now passed to the plotting
   function.
