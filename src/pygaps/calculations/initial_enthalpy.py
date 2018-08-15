@@ -140,7 +140,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # We need to set some limits for the parameters to make sure
     # the solver returns realistic values
 
-    bounds = dict()
+    bounds = {}
     ##################################
     # The constant term
 
@@ -156,7 +156,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     try:
         enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
-    except CalculationError as e_info:
+    except (ParameterError, CalculationError) as e_info:
         enth_liq = 0
         warnings.warn(
             "Could not calculate liquid enthalpy, perhaps in supercritical regime")
