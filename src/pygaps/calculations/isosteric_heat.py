@@ -110,10 +110,12 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
         loading = loading_points
 
     # Get pressure point for each isotherm at loading
-    pressures = numpy.array([[i.pressure_at(l, pressure_unit='bar',
-                                            pressure_mode='absolute',
-                                            loading_unit='mmol', branch=branch) for i in isotherms]
-                             for l in loading])
+    pressures = numpy.array(
+        [[numpy.asscalar(i.pressure_at(
+            l, pressure_unit='bar',
+            pressure_mode='absolute',
+            loading_unit='mmol', branch=branch)) for i in isotherms]
+            for l in loading])
 
     iso_heat, slopes, correlation = isosteric_heat_raw(pressures, temperatures)
 
