@@ -79,8 +79,8 @@ def isotherm_from_csv(path, separator=','):
 
     isotherm = PointIsotherm(
         data_df,
-        loading_key=data_df.columns[0],
-        pressure_key=data_df.columns[1],
+        pressure_key=data_df.columns[0],
+        loading_key=data_df.columns[1],
         other_keys=list(data_df.columns[2:]),
         **sample_info)
 
