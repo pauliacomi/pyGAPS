@@ -384,14 +384,15 @@ def isotherm_from_xl(path, fmt=None):
         experiment_data_df = pandas.DataFrame(experiment_data)
 
         # read the secondary isotherm parameters
-        sht = wb.sheet_by_name('otherdata')
-        row_index = 0
-        while row_index < sht.nrows:
-            prop = sht.cell(row_index, 0).value
-            if not prop:
-                break
-            sample_info[prop] = sht.cell(row_index, 1).value
-            row_index += 1
+        if fmt != 'MADIREL':
+            sht = wb.sheet_by_name('otherdata')
+            row_index = 0
+            while row_index < sht.nrows:
+                prop = sht.cell(row_index, 0).value
+                if not prop:
+                    break
+                sample_info[prop] = sht.cell(row_index, 1).value
+                row_index += 1
 
         # Put data in order
         sample_info.pop('isotherm data')    # remove useless field
