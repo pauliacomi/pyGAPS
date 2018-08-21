@@ -274,7 +274,9 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
                                loading_unit='mmol')
     pressure = isotherm.pressure(branch='ads',
                                  pressure_mode='relative')
-    maximum_adsorbed = isotherm.loading_at(0.9)
+    maximum_adsorbed = model_parameters.get('max_adsorbed')
+    if maximum_adsorbed is None:
+        maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
     adsorbent_properties = get_hk_model(adsorbent_model)
