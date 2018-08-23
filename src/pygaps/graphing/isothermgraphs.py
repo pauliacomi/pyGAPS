@@ -17,12 +17,12 @@ from ..utilities.string_utilities import convert_chemformula
 _PLOT_TYPES = ("isotherm", "property", "combined")
 
 # ! list of branch types
-_BRANCH_TYPES = ("ads", "des")
+_BRANCH_TYPES = ("ads", "des", "all", "all-nol")
 
 
 def plot_iso(isotherms,
              plot_type='isotherm', secondary_key=None,
-             branch=_BRANCH_TYPES, logx=False, color=True,
+             branch="all", logx=False, color=True,
 
              adsorbent_basis="mass",
              adsorbent_unit="g",
@@ -58,8 +58,9 @@ def plot_iso(isotherms,
     secondary_key : 'str'
         The key which has the column with the supplementary data to be plotted.
         This parameter is only required in the 'property' and 'combined' graphs.
-    branch : list
-        List with branches to disply, options: 'ads', 'des'.
+    branch : str
+        Which branch to display, adsorption ('ads'), desorption ('des'),
+        both ('all') or both with a single legend entry ('all-nol').
     logx : bool
         Whether the graph x axis should be logarithmic.
     color : bool, optional
@@ -163,15 +164,18 @@ def plot_iso(isotherms,
     if branch is None:
         raise ParameterError("Specify a branch to display"
                              " e.g. branch=\'ads\'")
-    if not [i for i in branch if i in _BRANCH_TYPES]:
-        raise GraphingError("One of the supplied branch types is not valid."
+    if branch not in _BRANCH_TYPES:
+        raise GraphingError("The supplied branch type is not valid."
                             "Viable types are {}".format(_BRANCH_TYPES))
 
     ads = False
     des = False
-    if 'ads' in branch:
+    if branch == 'ads':
         ads = True
-    if 'des' in branch:
+    elif branch == 'des':
+        des = True
+    else:
+        ads = True
         des = True
 
     # Create empty axes object
@@ -440,9 +444,12 @@ def plot_iso(isotherms,
             if isotherm.has_branch(branch=plot_branch):
 
                 # Label the branch
-                lbl = line_label
-                if legend_list is not None and 'branch' in legend_list:
-                    lbl += ' des'
+                if branch == 'all-nol':
+                    lbl = ''
+                else:
+                    lbl = line_label
+                    if legend_list is not None and 'branch' in legend_list:
+                        lbl += ' des'
 
                 # Set marker fill to empty, and match the colour from desorption
                 styles['line_style']['mfc'] = 'none'
@@ -501,6 +508,8 @@ def plot_iso(isotherms,
     if new_st:
         styles['legend_style'].update(new_st)
 
+    lgd = None
+
     if legend_force == 'none':
         pass
     elif legend_force == 'inner':
@@ -512,12 +521,16 @@ def plot_iso(isotherms,
     else:
         lgd = axes.legend(lines, labels, **styles['legend_style'])
 
+    bbox_extra_artists = []
+    if lgd:
+        bbox_extra_artists.append(lgd)
+
     # Fix size of graphs
     fig.tight_layout()
 
     if save_path:
         fig.savefig(save_path,
-                    bbox_extra_artists=[lgd],
+                    bbox_extra_artists=bbox_extra_artists,
                     bbox_inches='tight',
                     **styles['save_style'],
                     )
