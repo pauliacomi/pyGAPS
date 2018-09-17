@@ -35,6 +35,7 @@ Breaking changes:
 Bugfixes:
 
 * Fixed 'source' not being recognised as an isotherm field
+* Re-worked isotherm color selection to avoid errors (:issue:`10`).
 * Added correct common name for ethylene, propylene, methanol
   and ethanol in the database
 * Renamed some model parameters for consistency

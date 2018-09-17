@@ -3,12 +3,13 @@ This module contains the functions for plotting and comparing isotherms.
 """
 
 import collections
+import warnings
+from itertools import cycle
 
 import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib import cm
 from numpy import linspace
-import warnings
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
@@ -270,18 +271,13 @@ def plot_iso(isotherms,
             colors = color
 
         polychrome_cy = cycler('color', colors)
-        pc_primary = (cy1 * polychrome_cy)
-        pc_secondary = (cy2 * polychrome_cy)
+        pc_primary = cycle(cy1 * polychrome_cy)
+        pc_secondary = cycle(cy2 * polychrome_cy)
     else:
         monochrome_cy = cycler('color', ['black', 'grey', 'silver'])
         linestyle_cy = cycler('linestyle', ['-', '--', ':', '-.'])
-        pc_primary = (cy1 * linestyle_cy * monochrome_cy)
-        pc_secondary = (cy4 * linestyle_cy * monochrome_cy)
-
-    # Set the colours and ranges for the axes
-    ax1.set_prop_cycle(pc_primary)
-    if y2_data:
-        ax2.set_prop_cycle(pc_secondary)
+        pc_primary = cycle(cy1 * linestyle_cy * monochrome_cy)
+        pc_secondary = cycle(cy4 * linestyle_cy * monochrome_cy)
 
     # Put grid on plot
     ax1.grid(True, zorder=5)
@@ -311,23 +307,11 @@ def plot_iso(isotherms,
                         text.append(str(val))
 
             return " ".join(text)
+
 ###########################################
 #
-# Individual graphing functions
+# Getting specific data from an isotherm
     #
-
-    def graph(ax, data_x, data_y, line_label, text, tick, label, line):
-        "Plot a graph"
-
-        # Labels and ticks
-        ax.set_xlabel(text_xaxis, **label)
-        ax.set_ylabel(text, **label)
-        ax.tick_params(axis='both', which='major', **tick)
-
-        # Plot line
-        line, = ax.plot(data_x, data_y, label=line_label, **line)
-
-        return line
 
     def get_data(isotherm, data_name, data_range, branch):
         if data_name == 'pressure':
@@ -360,33 +344,35 @@ def plot_iso(isotherms,
             )
         return data
 
-    def graph_caller(axes, axes2, isotherm, branch, label):
+###########################################
+#
+# Generic ax1/ax2 graphing function
+    #
+
+    def graph_caller(isotherm, branch, label, y1_style, y2_style):
         """
         Convenience function to call other graphing functions
         """
 
-        line = None
+        # Labels and ticks
+        ax1.set_xlabel(text_xaxis, **styles['label_style'])
+        ax1.set_ylabel(text_yaxis, **styles['label_style'])
+        ax1.tick_params(axis='both', which='major', **styles['tick_style'])
 
+        # Plot line 1
         x_p, y_p = get_data(isotherm, x_data, x_range, branch).align(
             get_data(isotherm, y1_data, y1_range, branch), join='inner')
-        line = graph(axes, x_p, y_p,
-                     label, text_yaxis,
-                     styles['tick_style'],
-                     styles['label_style'],
-                     styles['y1_line_style']
-                     )
+        ax1.plot(x_p, y_p, label=label, **y1_style)
 
+        # Plot line 2 (if applicable)
         if y2_data and y2_data in keys(isotherm):
             x_p, y2_p = get_data(isotherm, x_data, x_range, branch).align(
                 get_data(isotherm, y2_data, y2_range, branch), join='inner')
-            graph(axes2, x_p, y2_p,
-                  label, text_y2axis,
-                  styles['tick_style'],
-                  styles['label_style'],
-                  styles['y2_line_style']
-                  )
 
-        return line
+            ax2.set_ylabel(text_y2axis, **styles['label_style'])
+            ax2.tick_params(axis='both', which='major', **styles['tick_style'])
+            ax2.plot(x_p, y2_p, label=label, **y2_style)
+
 
 #####################################
 #
@@ -398,8 +384,11 @@ def plot_iso(isotherms,
         # First build the label of the isotherm for the legend
         line_label = build_label(legend_list, isotherm)
 
-        # Colour of the line, now empty
-        line_color = None
+        # Line styles for the current isotherm
+        y1_line_style = next(pc_primary)
+        y2_line_style = next(pc_secondary)
+        y1_line_style.update(styles['y1_line_style'])
+        y2_line_style.update(styles['y2_line_style'])
 
         # If there's an adsorption branch, plot it
         if ads:
@@ -412,11 +401,15 @@ def plot_iso(isotherms,
                     lbl += ' ads'
 
                 # Call the plotting function
-                line = graph_caller(ax1, ax2,
-                                    isotherm, plot_branch, lbl)
+                graph_caller(isotherm, plot_branch, lbl,
+                             y1_line_style, y2_line_style)
 
-                line_color = line.get_color()
+        # Switch to desorption linestyle (dotted, open marker)
+        y1_line_style['markerfacecolor'] = 'none'
+        y1_line_style['linestyle'] = '--'
+        y2_line_style['markerfacecolor'] = 'none'
 
+        # If there's a desorption branch, plot it
         if des:
             plot_branch = 'des'
             if isotherm.has_branch(branch=plot_branch):
@@ -429,25 +422,9 @@ def plot_iso(isotherms,
                     if legend_list is not None and 'branch' in legend_list:
                         lbl += ' des'
 
-                # Set marker fill to empty, and match the colour from desorption
-                styles['y1_line_style']['mfc'] = 'none'
-                styles['y2_line_style']['mfc'] = 'none'
-                if line_color is not None:
-                    styles['y1_line_style']['c'] = line_color
-                    styles['y2_line_style']['c'] = line_color
-                    styles['y1_line_style']['linestyle'] = '--'
-
                 # Call the plotting function
-                line = graph_caller(ax1, ax2,
-                                    isotherm, plot_branch, lbl)
-
-                # Delete the colour changes to go back to original settings
-                del styles['y1_line_style']['mfc']
-                del styles['y2_line_style']['mfc']
-                if line_color is not None:
-                    del styles['y1_line_style']['c']
-                    del styles['y2_line_style']['c']
-                    del styles['y1_line_style']['linestyle']
+                graph_caller(isotherm, plot_branch, lbl,
+                             y1_line_style, y2_line_style)
 
 
 #####################################
