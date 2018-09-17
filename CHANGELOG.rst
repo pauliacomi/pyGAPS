@@ -25,6 +25,12 @@ Breaking changes:
 * The isotherm 'other_properties' subdictionary has been removed.
   Instead, all isotherm properties are now direct members of the
   class.
+* When plotting, isotherm branches are now defined as 'ads', 'des'
+  'all' (both branches) and 'all-nol' (both branches without
+  legend entry) instead of a list of branches.
+* Plot types are now universal. Any property can be plotted
+  against any other property by specifying the x_data,
+  y1_data and y2_data.
 
 Bugfixes:
 

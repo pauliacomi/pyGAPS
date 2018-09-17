@@ -507,16 +507,12 @@ class PointIsotherm(Isotherm):
 
         print(self)
 
+        secondary_data = None
         if self.other_keys:
-            plot_type = 'combined'
-            secondary_key = self.other_keys[0]
-        else:
-            plot_type = 'isotherm'
-            secondary_key = None
+            secondary_data = self.other_keys[0]
 
         plot_dict = dict(
-            plot_type=plot_type,
-            secondary_key=secondary_key,
+            secondary_data=secondary_data,
             adsorbent_basis=self.adsorbent_basis,
             adsorbent_unit=self.adsorbent_unit,
             loading_basis=self.loading_basis,
