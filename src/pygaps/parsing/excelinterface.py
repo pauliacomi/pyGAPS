@@ -384,8 +384,8 @@ def isotherm_from_xl(path, fmt=None):
         experiment_data_df = pandas.DataFrame(experiment_data)
 
         # read the secondary isotherm parameters
-        if fmt != 'MADIREL':
-            sht = wb.sheet_by_name('otherdata')
+        sht = wb.sheet_by_name('otherdata')
+        if sht:
             row_index = 0
             while row_index < sht.nrows:
                 prop = sht.cell(row_index, 0).value
