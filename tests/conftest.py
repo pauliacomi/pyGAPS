@@ -7,20 +7,8 @@ import pytest
 
 import pygaps
 
-# Basic functionality
-basic = pytest.mark.basic
-
-# Characterisation functionality
-characterisation = pytest.mark.characterisation
-
-# Modelling functionality
-modelling = pytest.mark.modelling
-
-# Parsing functionality
-parsing = pytest.mark.parsing
 
 # Incremental tests
-
 
 def pytest_runtest_makereport(item, call):
     if "incremental" in item.keywords:

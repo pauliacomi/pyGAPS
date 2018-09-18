@@ -35,7 +35,8 @@ Breaking changes:
 Bugfixes:
 
 * Fixed 'source' not being recognised as an isotherm field
-* Re-worked isotherm color selection to avoid errors (:issue:`10`)
+* Re-worked plot_iso color selection to avoid errors (:issue:`10`)
+* Re-worked plot_isp legend placement to ensure no overlap
 * Added correct common name for ethylene, propylene, methanol
   and ethanol in the database
 * Renamed some model parameters for consistency

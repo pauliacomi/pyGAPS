@@ -4,7 +4,6 @@ Tests for the isotherm graphs
 
 import pytest
 from matplotlib.testing.decorators import cleanup
-from matplotlib.testing.decorators import image_comparison
 
 import pygaps
 
@@ -13,7 +12,7 @@ import pygaps
 class TestIsothermGraphs(object):
     """Tests regular isotherm graphs"""
 
-    @image_comparison(baseline_images=['basic'], extensions=['png'])
+    @cleanup
     def test_basic_plot(self, basic_pointisotherm):
         pygaps.plot_iso(basic_pointisotherm)
 
