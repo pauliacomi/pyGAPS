@@ -7,8 +7,8 @@ import pytest
 
 import pygaps
 
-
 # Incremental tests
+
 
 def pytest_runtest_makereport(item, call):
     if "incremental" in item.keywords:

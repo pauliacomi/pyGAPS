@@ -9,7 +9,6 @@ import pytest
 import pygaps.calculations.models_isotherm as mi
 from pygaps.utilities.exceptions import ParameterError
 
-
 MODELS = {
     'Henry': [11, 11, pytest.mark.okay],
     'Langmuir': [1, 2.6376848, pytest.mark.okay],
