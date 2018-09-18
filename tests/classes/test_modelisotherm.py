@@ -13,10 +13,9 @@ import pygaps
 
 from ..calculations.conftest import DATA
 from ..calculations.conftest import DATA_N77_PATH
-from ..conftest import basic
 
 
-@basic
+@pytest.mark.core
 class TestModelIsotherm(object):
     """
     Tests the pointisotherm class

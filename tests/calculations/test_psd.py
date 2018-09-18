@@ -9,12 +9,11 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
-from ..conftest import characterisation
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
 
-@characterisation
+@pytest.mark.characterisation
 class TestPSD(object):
     """
     Tests everything related to pore size distribution calculation

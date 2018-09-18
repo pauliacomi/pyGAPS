@@ -8,10 +8,8 @@ import pytest
 import pygaps.calculations.models_thickness as mt
 from pygaps.utilities.exceptions import ParameterError
 
-from ..conftest import characterisation
 
-
-@characterisation
+@pytest.mark.characterisation
 class TestThicknessModels(object):
     """
     Tests the thickness models

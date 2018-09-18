@@ -9,7 +9,6 @@ import pytest
 import pygaps.calculations.models_isotherm as mi
 from pygaps.utilities.exceptions import ParameterError
 
-from ..conftest import modelling
 
 MODELS = {
     'Henry': [11, 11, pytest.mark.okay],
@@ -28,7 +27,7 @@ MODELS = {
 }
 
 
-@modelling
+@pytest.mark.modelling
 class TestIsothermModels(object):
     """
     Tests the isotherm models

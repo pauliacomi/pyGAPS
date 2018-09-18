@@ -9,7 +9,6 @@ import pytest
 import pygaps
 from pygaps.utilities.exceptions import ParameterError
 
-from ..conftest import modelling
 from .conftest import DATA_IAST
 from .conftest import DATA_IAST_PATH
 
@@ -49,7 +48,7 @@ def load_iast_models(load_iast):
     return ch4_model, c2h6_model
 
 
-@modelling
+@pytest.mark.modelling
 class TestIAST(object):
     """Tests IAST calculations"""
 

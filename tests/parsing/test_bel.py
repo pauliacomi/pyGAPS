@@ -2,13 +2,14 @@
 Tests bel file read
 """
 
+import pytest
+
 import pygaps
 
-from ..conftest import parsing
 from .conftest import DATA_BEL
 
 
-@parsing
+@pytest.mark.parsing
 class TestBEL(object):
 
     def test_read_bel(self):

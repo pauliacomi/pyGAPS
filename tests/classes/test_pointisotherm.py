@@ -8,10 +8,8 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
-from ..conftest import basic
 
-
-@basic
+@pytest.mark.core
 class TestPointIsotherm(object):
     """
     Tests the pointisotherm class

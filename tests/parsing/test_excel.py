@@ -1,16 +1,16 @@
 """
 Tests excel interaction
 """
+import pytest
 
 import pygaps
 
-from ..conftest import parsing
 from .conftest import DATA_EXCEL_BEL
 from .conftest import DATA_EXCEL_MIC
 from .conftest import DATA_EXCEL_STD
 
 
-@parsing
+@pytest.mark.parsing
 class TestExcel(object):
 
     def test_read_create_excel(self, basic_pointisotherm, tmpdir_factory):
