@@ -50,15 +50,13 @@ def plot_iso(isotherms,
     ----------
     isotherms : PointIsotherms or list of Pointisotherms
         An isotherm or iterable of isotherms to be plotted.
-    plot_type : {'isotherm', 'property', 'combined'}
-        The plot type, to display: isotherm, a property or a combination.
-        The 'isotherm' graph type displays only isotherm data and is the standard.
-        If other data is recorded in the isotherm object, such as enthalpy, it
-        can be displayed at the same time as the isotherm or in a property v
-        loading graph by selecting one of the other graph types.
-    secondary_key : 'str'
-        The key which has the column with the supplementary data to be plotted.
-        This parameter is only required in the 'property' and 'combined' graphs.
+
+    x_data : str
+        Key of data to plot on the x axis. Defaults to 'pressure'.
+    y1_data : tuple
+        Key of data to plot on the left y axis. Defaults to 'loading'.
+    y2_data : tuple
+        Key of data to plot on the right y axis. Defaults to None.
     branch : str
         Which branch to display, adsorption ('ads'), desorption ('des'),
         both ('all') or both with a single legend entry ('all-nol').
@@ -140,9 +138,9 @@ def plot_iso(isotherms,
     fig : Matplotlib figure
         The figure object generated.
     axes1 : Matplotlib ax
-        Ax object for primary graph.
+        Ax object for left y1 axis.
     axes2 : Matplotlib ax
-        Ax object for secondary graph.
+        Ax object for right y2 axis (if applicable).
 
     """
 #######################################

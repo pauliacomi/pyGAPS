@@ -39,13 +39,11 @@ def isotherm_from_bel(path):
     ----------
     path : str
         Path to the file to be read.
-    separator : str, optional
-        Separator used int the csv file. Defaults to '',''.
 
     Returns
     -------
     PointIsotherm
-        The isotherm contained in the csv file.
+        The isotherm contained in the dat file.
     """
 
     with open(path) as file:
