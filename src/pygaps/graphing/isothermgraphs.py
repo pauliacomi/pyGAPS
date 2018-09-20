@@ -256,11 +256,7 @@ def plot_iso(isotherms,
     if y2_data:
         text_y2axis = get_name(y2_data)
 
-    # Set the colours of the graph
-    cy1 = cycler('marker', ['o', 's'])
-    cy2 = cycler('marker', ['v', '^'])
-    cy4 = cycler('marker', ['v', '^', '<', '>'])
-
+    # Get a cycling style for the graph
     if color:
         number_of_lines = 7
         if not isinstance(color, bool):
@@ -273,13 +269,18 @@ def plot_iso(isotherms,
             colors = color
 
         polychrome_cy = cycler('color', colors)
-        pc_primary = cycle(cy1 * polychrome_cy)
-        pc_secondary = cycle(cy2 * polychrome_cy)
+        y1_marker_cy = cycler('marker', ['o', 's'])
+        y2_marker_cy = cycler('marker', ['v', '^'])
+
+        pc_primary = cycle(y1_marker_cy * polychrome_cy)
+        pc_secondary = cycle(y2_marker_cy * polychrome_cy)
     else:
+        y1_marker_cy = cycler('marker', ['o', 's'])
+        y2_marker_cy = cycler('marker', ['v', '^', '<', '>'])
         monochrome_cy = cycler('color', ['black', 'grey', 'silver'])
-        linestyle_cy = cycler('linestyle', ['-', '--', ':', '-.'])
-        pc_primary = cycle(cy1 * linestyle_cy * monochrome_cy)
-        pc_secondary = cycle(cy4 * linestyle_cy * monochrome_cy)
+
+        pc_primary = cycle(y1_marker_cy * monochrome_cy)
+        pc_secondary = cycle(y2_marker_cy * monochrome_cy)
 
     # Put grid on plot
     ax1.grid(True, zorder=5)
@@ -379,6 +380,7 @@ def plot_iso(isotherms,
                 get_data(isotherm, y2_data, y2_range, iso_branch), join='inner')
 
             label = build_label(isotherm, lgd_keys, iso_branch, y2_data)
+            print(label)
             ax2.set_ylabel(text_y2axis, **styles['label_style'])
             ax2.tick_params(axis='both', which='major', **styles['tick_style'])
             ax2.plot(x_p, y2_p, label=label, **y2_style)
