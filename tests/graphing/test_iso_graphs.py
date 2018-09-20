@@ -73,4 +73,4 @@ class TestIsothermGraphs(object):
     @cleanup
     def test_legend_plot(self, basic_pointisotherm):
         pygaps.plot_iso(basic_pointisotherm,
-                        legend_list=['sample_name', 'sample_batch', 'adsorbate', 't_exp'])
+                        lgd_keys=['sample_name', 'sample_batch', 'adsorbate', 't_exp'])

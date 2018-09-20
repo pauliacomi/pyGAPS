@@ -92,7 +92,7 @@ def initial_henry_slope(isotherm,
         plot_iso([isotherm, model_isotherm],
                  plot_type='isotherm',
                  branch='ads',
-                 legend_list=['sample_name'],
+                 lgd_keys=['sample_name'],
                  **plot_parameters)
 
         plt.show()
@@ -126,7 +126,7 @@ def initial_henry_virial(isotherm, verbose=False):
         try:
             plot_iso([isotherm, model_isotherm],
                      plot_type='isotherm', branch='ads', logx=False,
-                     legend_list=['sample_name'])
+                     lgd_keys=['sample_name'])
 
             plt.show()
         except CalculationError as err:
