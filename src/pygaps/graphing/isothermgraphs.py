@@ -432,7 +432,7 @@ def plot_iso(isotherms,
         ax1.set_xscale('log')
     else:
         ax1.set_xscale('linear')
-        ax1.set_xlim(xmin=0)
+        ax1.set_xlim(left=0)
 
     ax1.set_xlim(x_range)
     ax1.set_ylim(y1_range)

@@ -58,8 +58,8 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
     ax.legend(fontsize=15, loc='best')
 
     ax.grid(True, zorder=5)
-    ax.set_xlim(xmin=0, xmax=1)
-    ax.set_ylim(ymin=0, ymax=1)
+    ax.set_xlim(left=0, right=1)
+    ax.set_ylim(bottom=0, top=1)
     ax.set_xscale('linear')
 
     return fig, ax
@@ -115,7 +115,7 @@ def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
     ax.legend(fontsize=15, loc='best')
 
     ax.grid(True, zorder=5)
-    ax.set_ylim(ymin=0)
+    ax.set_ylim(bottom=0)
     ax.set_xscale('linear')
 
     return fig, ax

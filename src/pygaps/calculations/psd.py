@@ -178,7 +178,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist, method=psd_model, xmin=1.5)
+        psd_plot(pore_widths, pore_dist, method=psd_model, left=1.5)
 
     return result_dict
 
@@ -294,7 +294,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     }
 
     if verbose:
-        psd_plot(pore_widths, pore_dist, log=False, xmax=2.5, method=psd_model)
+        psd_plot(pore_widths, pore_dist, log=False, right=2.5, method=psd_model)
 
     return result_dict
 
