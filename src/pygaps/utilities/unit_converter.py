@@ -28,6 +28,7 @@ _VOLUME_UNITS = {
 _PRESSURE_UNITS = {
     "bar": 100000,
     "Pa": 1,
+    "kPa": 1000,
     "atm": 101325,
     "mmHg": 133.322
 }

@@ -91,5 +91,5 @@ have been introduced which make it easier to do common calculations and generate
 IAST example
 ------------
 
-Check it out in the ipython notebook in the :ref:`examples <examples/iast.ipynb>` section for a
+Check it out in the ipython notebook in the `examples <../examples/iast.ipynb>`_ section for a
 demonstration.

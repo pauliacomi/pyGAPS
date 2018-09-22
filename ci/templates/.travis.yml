@@ -2,29 +2,18 @@ language: python
 sudo: false
 cache: pip
 
-# We need to install pandoc separately to deal with the
-# jupyter translation of docs
-addons:
-  apt_packages:
-    - pandoc
-
 env:
   global:
     - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
     - SEGFAULT_SIGNALS=all
-  # Two jobs created here, in the test job, one for code checks, one for docs
-  matrix:
-    - TOXENV=check
-    - TOXENV=docs
 
 before_install:
-  - python --version
-  - uname -a
-  - lsb_release -a
+  - lsb_release -a      # print linux version
+  - uname -a            # print machine info
+  - python --version    # print python version
 
 install:
-  # install tox
-  - pip install tox
+  - pip install tox     # install tox
   # display versions of installed components
   - virtualenv --version
   - easy_install --version
@@ -32,9 +21,10 @@ install:
   - tox --version
 
 before_script:
+    # some tests require a GUI, so use xvfb
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - sleep 3 # give xvfb some time to start
+  - sleep 3             # give xvfb some time to start
 
 script:
   # start tox to do the testing
@@ -46,10 +36,28 @@ after_failure:
 
 jobs:
   include:
+    # Checks and docks
+    - stage: test
+      python: '3.6'     # specify python 3.6
+      env:
+        - TOXENV=check
+    - stage: test
+      python: '3.6'     # specify python 3.6
+      env:
+        - TOXENV=docs
+      addons:
+        apt_packages:
+        # We need to install pandoc separately to deal
+        # with translation of docs to jupyter
+        - pandoc
     # Create an test job on the test stage for each python version
 {%- for env, config in tox_environments|dictsort %}{{ '' }}
     - stage: test
       python: '{{ '{0[0]}-5.4'.format(env.split('-')) if env.startswith('pypy') else env.split('-')[0] }}'
+      {% if env.startswith('3.7') %}
+      dist: xenial
+      sudo: required
+      {% endif %}
       env:
         - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
 {% endfor %}

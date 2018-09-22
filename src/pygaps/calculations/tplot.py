@@ -65,7 +65,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     The t-plot method [#]_ attempts to relate the adsorption on a material with an ideal
     curve which describes the thickness of the adsorbed layer on a surface. A plot is
     constructed, with the isotherm  loading data is plotted versus thickness values obtained
-    therough the model.
+    through the model.
     It stands to reason that, in the case that the experimental adsorption curve follows
     the model, a straight line will be obtained with its intercept through the origin.
     However, since in most cases there are differences between adsorption in the pores

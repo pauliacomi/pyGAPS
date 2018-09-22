@@ -23,3 +23,8 @@ CSV
 ---
 .. automodule:: pygaps.parsing.csvinterface
     :members:
+
+Apparatus
+---------
+.. automodule:: pygaps.parsing.csv_bel_parser
+    :members:

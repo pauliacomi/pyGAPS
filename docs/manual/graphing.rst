@@ -23,7 +23,7 @@ The function can take many parameters which will modify the graph style, colours
 also accepts keywords to specify the unit, pressure mode and basis of the graphs. A complete list
 of parameters can be found in the :ref:`reference <plotting-ref>`.
 
-The function also returns the ``matplotlib`` figure and ax, to allow for further customisation for the
+The function also returns the ``matplotlib`` Figure and Axes, to allow for further customisation for the
 resulting plot.
 
 
@@ -32,4 +32,4 @@ resulting plot.
 Examples
 --------
 
-Check it out in the ipython notebook in the :ref:`examples <examples/plotting.ipynb>` section.
+Check it out in the ipython notebook in the `examples <../examples/plotting.ipynb>`_ section.

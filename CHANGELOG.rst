@@ -2,6 +2,47 @@
 Changelog
 =========
 
+
+1.3.0 (2018-08-13)
+------------------
+
+Features:
+
+* Added an excel import which can take Micromeritics or
+  Belsorp report (.xls) files. Micromeritics code was
+  taken from the `official python repo <https://github.com/Micromeritics/micromeritics>`_.
+* Added an import option which can read and import Belsorp
+  data (.DAT) files.
+* Improved plotting functions to allow for more customisation
+  over how the graph looks.
+* The extra arguments to print_info() are now passed to the plotting
+  function allowing for styles such as :issue:`8`.
+
+Breaking changes:
+
+* The unique isotherm ID is now generated only on a small subset of
+  properties instead of all isotherm properties.
+* The isotherm 'other_properties' subdictionary has been removed.
+  Instead, all isotherm properties are now direct members of the
+  class.
+* When plotting, isotherm branches are now defined as 'ads', 'des'
+  'all' (both branches) and 'all-nol' (both branches without
+  legend entry) instead of a list of branches.
+* Plot types are now universal. Any property can be plotted
+  against any other property by specifying the x_data,
+  y1_data and y2_data.
+
+Bugfixes:
+
+* Fixed 'source' not being recognised as an isotherm field
+* Re-worked plot_iso color selection to avoid errors (:issue:`10`)
+* Re-worked plot_isp legend placement to ensure no overlap
+* Added correct common name for ethylene, propylene, methanol
+  and ethanol in the database
+* Renamed some model parameters for consistency
+* A lot of typo fixes
+
+
 1.2.0 (2018-02-19)
 ------------------
 

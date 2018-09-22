@@ -4,10 +4,8 @@ import pytest
 
 import pygaps
 
-from ..conftest import basic
 
-
-@basic
+@pytest.mark.core
 class TestConversions(object):
 
     @pytest.mark.parametrize('value, basis_from, basis_to, unit_from, unit_to',

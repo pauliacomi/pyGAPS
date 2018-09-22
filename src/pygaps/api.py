@@ -29,6 +29,7 @@ from .classes.sample import Sample
 from .graphing.iastgraphs import plot_iast_vle
 from .graphing.isothermgraphs import plot_iso
 from .parsing import *
+from .parsing.csv_bel_parser import isotherm_from_bel
 from .parsing.csvinterface import isotherm_from_csv
 from .parsing.csvinterface import isotherm_to_csv
 from .parsing.excelinterface import isotherm_from_xl

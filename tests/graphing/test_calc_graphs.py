@@ -2,11 +2,13 @@
 Tests calculation graphs such as PSD/t_plot/BET etc
 """
 
+import pytest
 from matplotlib.testing.decorators import cleanup
 
 import pygaps.graphing.calcgraph as graphing
 
 
+@pytest.mark.graphing
 class TestCalcGraphs(object):
     """Tests all calculation graphs"""
 

@@ -3,7 +3,7 @@
 
 __author__ = 'Paul A. Iacomi'
 __docformat__ = 'restructuredtext'
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 
 # isort:skip_file
 
@@ -17,7 +17,7 @@ if sys.version_info[0] != 3:
 
 # Let users know if they're missing any of our hard dependencies
 hard_dependencies = ("numpy", "pandas", "scipy",
-                     "matplotlib", "sqlite3", "CoolProp")
+                     "matplotlib", "CoolProp")
 missing_dependencies = []
 dependency = None
 

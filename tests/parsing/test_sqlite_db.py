@@ -10,8 +10,6 @@ import pygaps
 from pygaps.utilities.sqlite_db_creator import db_create
 from pygaps.utilities.sqlite_db_creator import db_execute_general
 
-from ..conftest import parsing
-
 
 @pytest.fixture(scope='session')
 def db_file(tmpdir_factory):
@@ -23,7 +21,7 @@ def db_file(tmpdir_factory):
     return str(pth)
 
 
-@parsing
+@pytest.mark.parsing
 @pytest.mark.incremental
 class TestDatabase(object):
     def test_db_create(self, db_file):

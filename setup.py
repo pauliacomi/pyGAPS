@@ -22,9 +22,9 @@ def read(*names, **kwargs):
 
 setup(
     name='pygaps',
-    version='1.2.0',
+    version='1.3.0',
     license='MIT license',
-    description='',
+    description='A framework for processing adsorption data for porous materials',
     long_description='%s\n%s' % (
         re.compile('^.. start-badges.*^.. end-badges',
                    re.M | re.S).sub('', read('README.rst')),
@@ -48,25 +48,38 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         # 'Programming Language :: Python :: Implementation :: CPython',
         # 'Programming Language :: Python :: Implementation :: PyPy3',
-        'Topic :: Utilities',
+        'Topic :: Scientific/Engineering :: Physics',
     ],
     keywords=[
-        # eg: 'keyword1', 'keyword2', 'keyword3',
+        'adsorption', 'science', 'porous materials'
     ],
-    # setup_requires=[],
+    setup_requires=[
+        'pytest-runner',
+    ],
     install_requires=[
         'numpy >= 1.13',
         'scipy >= 1.0.0',
         'pandas >= 0.21.1',
         'matplotlib >= 2.1',
-        'xlwings;platform_system=="Windows"',
+        'xlrd >= 1.1',
+        'xlwt >= 1.3',
         'coolprop >= 6.0',
     ],
+    tests_require=[
+        'pytest',
+        'pytest-cov',
+        'coverage',
+        'nose',
+    ],
     extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
+        'reST': [
+            'docutils>=0.11'
+            'doc9',
+            'pandoc',
+            'restructuredtext-lint',
+        ],
     },
 )

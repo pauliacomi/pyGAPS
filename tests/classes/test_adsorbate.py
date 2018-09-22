@@ -6,10 +6,8 @@ import pytest
 
 import pygaps
 
-from ..conftest import basic
 
-
-@basic
+@pytest.mark.core
 class TestAdsorbate(object):
     """
     Tests the adsorbate class

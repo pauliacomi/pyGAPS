@@ -176,14 +176,14 @@ instantiation is below, with explanations.
         # Finally the isotherm description parameters
         # must be passed.
 
-        'sample_name' : 'carbon',       # Required
-        'sample_batch' : 'X1',          # Required
-        'adsorbate' : 'nitrogen',       # Required
-        't_exp' : 77,                   # Required
-        't_act' : 150,                  # Recognised / named
-        'user'  : 'John',               # Recognised / named
-        'DOI'   : '10.000/mydoi',       # Unknown / user specific
-        'something' : 'something',      # Unknown / user specific
+        sample_name='carbon',           # Required
+        sample_batch='X1',              # Required
+        adsorbate='nitrogen',           # Required
+        t_exp=77,                       # Required
+        t_act=150,                      # Recognised / named
+        user='John',                    # Recognised / named
+        DOI='10.000/mydoi',             # Unknown / user specific
+        something='something',          # Unknown / user specific
     )
 
 
@@ -248,14 +248,14 @@ The code to generate a ModelIsotherm is then:
         # Finally the isotherm description parameters
         # must be passed.
 
-        'sample_name' : 'carbon',       # Required
-        'sample_batch' : 'X1',          # Required
-        'adsorbate' : 'nitrogen',       # Required
-        't_exp' : 77,                   # Required
-        't_act' : 150,                  # Recognised / named
-        'user'  : 'John',               # Recognised / named
-        'DOI'   : '10.000/mydoi',       # Unknown / user specific
-        'something' : 'something',      # Unknown / user specific
+        sample_name='carbon',           # Required
+        sample_batch='X1',              # Required
+        adsorbate='nitrogen',           # Required
+        t_exp=77,                       # Required
+        t_act=150,                      # Recognised / named
+        user='John',                    # Recognised / named
+        DOI='10.000/mydoi',             # Unknown / user specific
+        something='something',          # Unknown / user specific
     )
 
 ModelIsotherms can also be constructed from PointIsotherms and vice-versa. The model can also be
@@ -501,7 +501,8 @@ It can be read directly from the isotherm using the following code but should ne
 
 .. note::
 
-    The ModelIsotherm class does not currently contain an ID. Therefore it cannot be checked for uniqueness.
+    Both ModelIsotherm and PointIsotherm classes are supported and contain an ID.
+    They are based on different data so cannot be compared.
 
 
 .. _isotherms-manual-export:

@@ -1,15 +1,12 @@
 """
 This test module has tests relating to parser classes
 """
-
 import json
 import os
 
 import pytest
 
 import pygaps
-
-from ..conftest import parsing
 
 
 @pytest.fixture
@@ -29,7 +26,7 @@ def basic_isotherm_json(basic_pointisotherm):
     return json.dumps(isotherm_dict, sort_keys=True)
 
 
-@parsing
+@pytest.mark.parsing
 class TestJson(object):
     def test_isotherm_to_json(self, basic_isotherm, isotherm_parameters):
         """Tests the parsing of an isotherm to json"""

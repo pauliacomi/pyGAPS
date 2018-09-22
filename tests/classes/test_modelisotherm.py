@@ -13,10 +13,9 @@ import pygaps
 
 from ..calculations.conftest import DATA
 from ..calculations.conftest import DATA_N77_PATH
-from ..conftest import basic
 
 
-@basic
+@pytest.mark.core
 class TestModelIsotherm(object):
     """
     Tests the pointisotherm class
@@ -25,6 +24,8 @@ class TestModelIsotherm(object):
     def test_isotherm_create(self):
         "Checks isotherm can be created from basic data"
         isotherm_param = {
+            'loading_key': 'loading',
+            'pressure_key': 'pressure',
             'sample_name': 'carbon',
             'sample_batch': 'X1',
             'adsorbate': 'nitrogen',
@@ -40,8 +41,6 @@ class TestModelIsotherm(object):
         with pytest.raises(pygaps.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data,
-                loading_key='loading',
-                pressure_key='pressure',
                 **isotherm_param
             )
 
@@ -49,8 +48,6 @@ class TestModelIsotherm(object):
         with pytest.raises(pygaps.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data,
-                loading_key='loading',
-                pressure_key='pressure',
                 model='Wrong',
                 **isotherm_param
             )
@@ -59,8 +56,6 @@ class TestModelIsotherm(object):
         with pytest.raises(pygaps.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data,
-                loading_key='loading',
-                pressure_key='pressure',
                 model='Henry',
                 param_guess={'K9': 'woof'},
                 **isotherm_param
@@ -69,8 +64,6 @@ class TestModelIsotherm(object):
         # regular creation
         isotherm = pygaps.ModelIsotherm(
             isotherm_data,
-            loading_key='loading',
-            pressure_key='pressure',
             model='Henry',
             **isotherm_param
         )
@@ -78,8 +71,6 @@ class TestModelIsotherm(object):
         # regular creation, desorption
         isotherm = pygaps.ModelIsotherm(
             isotherm_data,
-            loading_key='loading',
-            pressure_key='pressure',
             model='Henry',
             branch='des',
             **isotherm_param
@@ -88,10 +79,8 @@ class TestModelIsotherm(object):
         # regular creation, guessed parameters
         isotherm = pygaps.ModelIsotherm(
             isotherm_data,
-            loading_key='loading',
-            pressure_key='pressure',
             model='Henry',
-            param_guess={'KH': 1.0},
+            param_guess={'K': 1.0},
             **isotherm_param
         )
 
@@ -100,15 +89,15 @@ class TestModelIsotherm(object):
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
 
-        isotherm_data = pandas.DataFrame({
-            'pressure': [1, 2, 3, 4, 5, 3, 2],
-            'loading': [1, 2, 3, 4, 5, 3, 2]
-        })
-
         # regular creation
         isotherm = pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
-            isotherm_data,
+            pandas.DataFrame({
+                'pressure': [1, 2, 3, 4, 5, 3, 2],
+                'loading': [1, 2, 3, 4, 5, 3, 2]
+            }),
+            pressure_key='pressure',
+            loading_key='loading',
             model='Henry',
         )
 
@@ -228,7 +217,7 @@ class TestModelIsotherm(object):
         # Pressure mode specified
         loading_mode = basic_modelisotherm.loading_at(
             0.5, pressure_mode='relative')
-        assert loading_mode == pytest.approx(3.89137, 1e-5)
+        assert loading_mode == pytest.approx(3.89137, 1e-4)
 
         # Loading unit specified
         loading_lunit = basic_modelisotherm.loading_at(1, loading_unit='mol')
@@ -243,12 +232,12 @@ class TestModelIsotherm(object):
         # Adsorbent unit specified
         loading_bunit = basic_modelisotherm.loading_at(
             1, adsorbent_unit='kg')
-        assert loading_bunit == pytest.approx(1000, 1e-5)
+        assert loading_bunit == pytest.approx(1000, 0.1)
 
         # Adsorbent basis specified
         loading_bads = basic_modelisotherm.loading_at(
             1, adsorbent_basis='volume', adsorbent_unit='cm3')
-        assert loading_bads == pytest.approx(10, 1e-5)
+        assert loading_bads == pytest.approx(10, 1e-3)
 
         return
 
@@ -266,7 +255,7 @@ class TestModelIsotherm(object):
         # Pressure unit specified
         pressure_punit = basic_modelisotherm.pressure_at(
             1.0, pressure_unit='Pa')
-        assert pressure_punit == pytest.approx(100000, 0.1)
+        assert pressure_punit == pytest.approx(100000, 1)
 
         # Pressure mode specified
         pressure_mode = basic_modelisotherm.pressure_at(
@@ -314,7 +303,7 @@ class TestModelIsotherm(object):
         # Mode specified
         spressure_mode = basic_modelisotherm.spreading_pressure_at(
             0.5, pressure_mode='relative')
-        assert spressure_mode == pytest.approx(3.89137, 1e-5)
+        assert spressure_mode == pytest.approx(3.89137, 1e-2)
 
         return
 

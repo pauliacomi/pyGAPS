@@ -7,10 +7,8 @@ import pytest
 import pygaps.calculations.models_hk as hk
 from pygaps.utilities.exceptions import ParameterError
 
-from ..conftest import characterisation
 
-
-@characterisation
+@pytest.mark.characterisation
 class TestHKModels(object):
     """
     Tests the HK models

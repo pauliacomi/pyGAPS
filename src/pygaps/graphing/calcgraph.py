@@ -91,9 +91,9 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     ax1.plot(p_monolayer, bet_monolayer,
              marker='x', linestyle='', color='black', label='monolayer point')
 
-    ax1.set_ylim(ymin=0, ymax=bet_points[maximum] * 1.2)
+    ax1.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
     ax1.set_xlim(
-        xmin=0, xmax=pressure[maximum] * 1.2)
+        left=0, right=pressure[maximum] * 1.2)
     ax1.set_title("BET plot")
     ax1.set_xlabel('p/p°')
     ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
@@ -139,9 +139,9 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
              slope * x_lim[1] + intercept]
     ax1.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
 
-    ax1.set_ylim(ymin=0, ymax=langmuir_points[maximum] * 1.2)
+    ax1.set_ylim(bottom=0, top=langmuir_points[maximum] * 1.2)
     ax1.set_xlim(
-        xmin=0, xmax=pressure[maximum] * 1.2)
+        left=0, right=pressure[maximum] * 1.2)
     ax1.set_title("Langmuir plot")
     ax1.set_xlabel('p/p°')
     ax1.set_ylabel('(p/p°)/n')
@@ -215,8 +215,8 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
                  color='black', label='linear' + str(index + 1))
 
     ax1.set_title(label3)
-    ax1.set_xlim(xmin=0)
-    ax1.set_ylim(ymin=0)
+    ax1.set_xlim(left=0)
+    ax1.set_ylim(bottom=0)
     ax1.set_xlabel(label2)
     ax1.set_ylabel('Loading')
     ax1.legend(loc='best')
@@ -224,14 +224,14 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
     return ax1
 
 
-def psd_plot(pore_radii, pore_dist, method=None, label=None,
-             log=True, xmax=None, xmin=None):
+def psd_plot(pore_widths, pore_dist, method=None, label=None,
+             log=True, right=None, left=None):
     """
     Draws the pore size distribution plot.
 
     Parameters
     ----------
-    pore_radii : array
+    pore_widths : array
         Array of the pore radii which will become the x axis.
     pore_dist : array
         Contribution of each pore radius which will make up the y axis.
@@ -241,9 +241,9 @@ def psd_plot(pore_radii, pore_dist, method=None, label=None,
         The label for the plotted data, which will appear in the legend.
     log : int
         Whether to display a logarithmic graph.
-    xmax : int
+    right : int
         Higher bound of the selected pore widths.
-    xmax : int
+    right : int
         Lower bound of the selected pore widths.
 
     Returns
@@ -258,14 +258,14 @@ def psd_plot(pore_radii, pore_dist, method=None, label=None,
 
     fig = plt.figure(figsize=(15, 5))
     ax1 = fig.add_subplot(111)
-    ax1.plot(pore_radii, pore_dist,
+    ax1.plot(pore_widths, pore_dist,
              marker='', color='g', label=label)
 
     # Func formatter
     def formatter(x, pos):
         return "{0:g}".format(x)
 
-    if(log):
+    if log:
 
         ax1.set_xscale('log')
         ax1.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
@@ -276,17 +276,17 @@ def psd_plot(pore_radii, pore_dist, method=None, label=None,
                         length=2.5, labelsize=10)
         ax1.tick_params(axis='x', which='major',
                         width=2, length=10, labelsize=10)
-        ax1.set_xlim(xmin=xmin, xmax=xmax)
+        ax1.set_xlim(left=left, right=right)
     else:
-        if not xmin:
-            xmin = 0
-        ax1.set_xlim(xmin=xmin, xmax=xmax)
+        if not left:
+            left = 0
+        ax1.set_xlim(left=left, right=right)
 
     ax1.set_title("PSD plot " + str(method))
     ax1.set_xlabel('Pore width (nm)')
     ax1.set_ylabel('Distribution')
     ax1.legend(loc='best')
-    ax1.set_ylim(ymin=0)
+    ax1.set_ylim(bottom=0)
     ax1.grid(True)
 
     return ax1
@@ -323,8 +323,8 @@ def isosteric_heat_plot(loading, isosteric_heat, log=False):
     ax1.set_xlabel('Loading')
     ax1.set_ylabel('Isosteric heat')
     ax1.legend(loc='best')
-    ax1.set_xlim(xmin=0)
-    ax1.set_ylim(ymin=0)
+    ax1.set_xlim(left=0)
+    ax1.set_ylim(bottom=0)
     ax1.grid(True)
 
     return ax1
@@ -365,7 +365,7 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
     if extras is not None:
         for param in extras:
             ax1.plot(param[0], param[1], label=param[2], linestyle='--')
-    if(log):
+    if log:
         ax1.set_xscale('log')
         ax1.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
@@ -374,8 +374,8 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
     ax1.set_xlabel('Loading')
     ax1.set_ylabel('Enthalpy')
     ax1.legend(loc='best')
-    ax1.set_ylim(ymin=0, ymax=(max(enthalpy) * 1.2))
-    ax1.set_xlim(xmin=0)
+    ax1.set_ylim(bottom=0, top=(max(enthalpy) * 1.2))
+    ax1.set_xlim(left=0)
     ax1.grid(True)
 
     return ax1

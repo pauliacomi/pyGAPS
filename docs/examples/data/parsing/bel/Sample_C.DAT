@@ -1,0 +1,63 @@
+====================
+ Instrument ID
+====================
+"Instrument S/N:"	00345
+"Vs/ml:"	9.057
+====================
+ Measurement condition
+====================
+"Adsorptive:"	C3H8
+"Meas. Temp./K:"	303.00
+"Molecular cross-sectional area:"	0
+"Molecular weight of adsorbate:"	0.00
+"Equilibrium time/sec:"	0
+"Measurement mode:"	1
+====================
+ Sample information
+====================
+"Sample weight/g:"	0.0740
+"Comment1:"	"Sample_C"
+"Comment2:"	"User"
+"Comment3:"	"Comment number 1"
+"Comment4:"	"Leak amount 1.177Pa/min"
+"as/m2 g-1:"	0.0000
+"Molecular weight of adsorbent:"	0.00
+====================
+ Time and dead volume
+====================
+"Date of measurement:"	18/06/11
+"Time of measurement:"	19:42:27
+"Slope of dead volume:"	6.6298E-8
+"Intercept of dead volume:"	1.1242E+1
+"Initial dead volume/ml:"	11.242
+====================
+ Adsorption data
+====================
+"No."	"Pe/kPa"	"P0/kPa"	"Vd/ml"	"V/ml(STP) g-1"
+1	2.1973E-1	1079.0	11.242	7.4821
+2	1.1963	1079.0	11.242	15.194
+3	2.2014	1079.0	11.242	21.402
+4	3.3895	1079.0	11.243	27.150
+5	4.7119	1079.0	11.243	31.806
+6	6.6203	1079.0	11.243	36.369
+7	8.8380	1079.0	11.243	40.230
+8	11.263	1079.0	11.243	43.389
+9	13.961	1079.0	11.243	46.390
+10	16.113	1079.0	11.243	48.444
+11	19.771	1079.0	11.244	51.312
+12	22.429	1079.0	11.244	53.170
+13	26.034	1079.0	11.244	55.357
+14	30.843	1079.0	11.244	57.831
+15	44.332	1079.0	11.245	62.823
+16	51.111	1079.0	11.246	64.822
+17	60.714	1079.0	11.246	66.918
+18	71.021	1079.0	11.247	68.712
+19	81.023	1079.0	11.248	70.084
+20	91.016	1079.0	11.248	71.236
+21	100.97	1079.0	11.249	72.251
+0	0	0	0	0
+====================
+ Desorption data
+====================
+"No."	"Pe/kPa"	"P0/kPa"	"Vd/ml"	"V/ml(STP) g-1"
+0	0	0	0	0

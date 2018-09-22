@@ -8,10 +8,8 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
-from ..conftest import basic
 
-
-@basic
+@pytest.mark.core
 class TestPointIsotherm(object):
     """
     Tests the pointisotherm class
@@ -20,30 +18,52 @@ class TestPointIsotherm(object):
 
     def test_isotherm_create(self):
         "Checks isotherm can be created from basic data"
-        isotherm_param = {
-            'sample_name': 'carbon',
-            'sample_batch': 'X1',
-            'adsorbate': 'nitrogen',
-            't_exp': 77,
-        }
 
-        isotherm_data = pandas.DataFrame({
-            'pressure': [1, 2, 3, 4, 5, 3, 2],
-            'loading': [1, 2, 3, 4, 5, 3, 2]
-        })
-
-        isotherm = pygaps.PointIsotherm(
-            isotherm_data,
+        pygaps.PointIsotherm(
+            pandas.DataFrame({
+                'pressure': [1, 2, 3, 4, 5, 3, 2],
+                'loading': [1, 2, 3, 4, 5, 3, 2]
+            }),
             loading_key='loading',
             pressure_key='pressure',
-            **isotherm_param
+            sample_name='carbon',
+            sample_batch='X1',
+            adsorbate='nitrogen',
+            t_exp=77,
+        )
+        return
+
+    def test_isotherm_id(self, basic_pointisotherm):
+        "Checks isotherm id works as intended"
+
+        iso_id = basic_pointisotherm.id
+        basic_pointisotherm.nothing = 'changed'
+        assert iso_id == basic_pointisotherm.id
+        basic_pointisotherm._data = basic_pointisotherm._data[:5]
+        assert iso_id != basic_pointisotherm.id
+
+        return
+
+    @pytest.mark.parametrize('missing_key',
+                             ['loading_key', 'pressure_key'])
+    def test_isotherm_miss_key(self, isotherm_parameters, isotherm_data, missing_key):
+        "Tests exception throw for missing data primary key (loading/pressure)"
+
+        keys = dict(
+            pressure_key="pressure",
+            loading_key="loading",
         )
 
-        iso_id = isotherm.id
-        isotherm.nothing = 'changed'
-        assert iso_id == isotherm.id
-        isotherm._data = isotherm._data[:5]
-        assert iso_id != isotherm.id
+        del keys[missing_key]
+
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.PointIsotherm(
+                isotherm_data,
+                loading_key=keys.get('loading_key'),
+                pressure_key=keys.get('pressure_key'),
+                **isotherm_parameters)
+
+        return
 
     @pytest.mark.parametrize('branch, expected', [
         ('guess', 4.5),
@@ -84,15 +104,15 @@ class TestPointIsotherm(object):
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
 
-        isotherm_data = pandas.DataFrame({
-            'pressure': [1, 2, 3, 4, 5, 3, 2],
-            'loading': [1, 2, 3, 4, 5, 3, 2]
-        })
-
         # regular creation
         isotherm = pygaps.PointIsotherm.from_isotherm(
             basic_isotherm,
-            isotherm_data,
+            pandas.DataFrame({
+                'pressure': [1, 2, 3, 4, 5, 3, 2],
+                'loading': [1, 2, 3, 4, 5, 3, 2]
+            }),
+            pressure_key='pressure',
+            loading_key='loading',
         )
 
         assert isotherm != basic_isotherm
@@ -136,24 +156,26 @@ class TestPointIsotherm(object):
         other_key = "enthalpy"
 
         # all data
-        assert basic_pointisotherm.data().equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        data = basic_pointisotherm.data()
+        data2 = pandas.DataFrame({
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
-        }))
+            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        })
+        assert data.equals(data2)
 
         # adsorption branch
         assert basic_pointisotherm.data(branch='ads').equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+            basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         }))
 
         # desorption branch
         assert basic_pointisotherm.data(branch='des').equals(pandas.DataFrame({
-            basic_pointisotherm.pressure_key: [4.5, 2.5],
-            basic_pointisotherm.loading_key: [4.5, 2.5],
             other_key: [4.0, 4.0],
+            basic_pointisotherm.loading_key: [4.5, 2.5],
+            basic_pointisotherm.pressure_key: [4.5, 2.5],
         }, index=[6, 7]))
 
         return

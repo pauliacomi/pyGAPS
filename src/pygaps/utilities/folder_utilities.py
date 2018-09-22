@@ -33,7 +33,7 @@ def util_get_file_paths(folder, extension=None):
         for file in files:
             fullpath = os.path.join(root, file)
             ext = os.path.splitext(fullpath)[-1].lower()
-            if ext == extension:
+            if ext == extension.lower():
                 paths.append(fullpath)
 
     return paths

@@ -10,12 +10,11 @@ from numpy import isclose
 
 import pygaps
 
-from ..conftest import characterisation
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
 
-@characterisation
+@pytest.mark.characterisation
 class TestAreaLangmuir(object):
     """
     Tests everything related to Langmuir surface area calculation

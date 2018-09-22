@@ -6,10 +6,8 @@ import pytest
 
 import pygaps
 
-from ..conftest import basic
 
-
-@basic
+@pytest.mark.core
 class TestIsotherm(object):
     """
     Tests the parent isotherm object
@@ -18,44 +16,24 @@ class TestIsotherm(object):
     def test_isotherm_create(self):
         "Checks isotherm can be created from test data"
 
-        isotherm_param = {
-            'is_real': False,
-            'sample_name': 'carbon',
-            'sample_batch': 'X1',
-            'adsorbate': 'nitrogen',
-            't_exp': 77,
-        }
-
-        isotherm = pygaps.classes.isotherm.Isotherm(
-            loading_key='loading',
-            pressure_key='pressure',
-            ** isotherm_param)
-
-        iso_id = isotherm.id
-        isotherm.nothing = 'changed'
-        assert iso_id == isotherm.id
-        isotherm.t_act = 123
-        assert iso_id != isotherm.id
-
+        pygaps.classes.isotherm.Isotherm(
+            is_real=False,
+            sample_name='carbon',
+            sample_batch='X1',
+            adsorbate='nitrogen',
+            t_exp=77,
+        )
         return
 
-    @pytest.mark.parametrize('missing_key',
-                             ['loading_key', 'pressure_key'])
-    def test_isotherm_miss_key(self, isotherm_parameters, missing_key):
-        "Tests exception throw for missing data primary key (loading/pressure)"
+    def test_isotherm_id(self, basic_isotherm):
+        "Checks isotherm id works as intended"
 
-        keys = dict(
-            pressure_key="pressure",
-            loading_key="loading",
-        )
+        iso_id = basic_isotherm.id
 
-        del keys[missing_key]
-
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.classes.isotherm.Isotherm(
-                loading_key=keys.get('loading_key'),
-                pressure_key=keys.get('pressure_key'),
-                **isotherm_parameters)
+        basic_isotherm.new_param = 'changed'
+        assert iso_id == basic_isotherm.id
+        basic_isotherm.t_act = 123
+        assert iso_id != basic_isotherm.id
 
         return
 
@@ -68,10 +46,7 @@ class TestIsotherm(object):
         del data[missing_param]
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.classes.isotherm.Isotherm(
-                pressure_key="pressure",
-                loading_key="loading",
-                **isotherm_parameters)
+            pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
 
         return
 
@@ -84,15 +59,12 @@ class TestIsotherm(object):
         ({'adsorbent_basis': 'mass', 'adsorbent_unit': 'kg'}),
         ({'adsorbent_basis': 'volume', 'adsorbent_unit': 'cm3'}),
     ])
-    def test_isotherm_mode_and_units(self, isotherm_parameters, update, use_adsorbate, use_sample):
+    def test_isotherm_mode_and_units(self, isotherm_parameters, update):
         "Tests exception throw for missing or wrong unit"
 
         isotherm_parameters.update(update)
 
-        pygaps.classes.isotherm.Isotherm(
-            pressure_key="pressure",
-            loading_key="loading",
-            **isotherm_parameters)
+        pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
 
         return
 
@@ -115,10 +87,7 @@ class TestIsotherm(object):
         isotherm_parameters[prop] = set_to
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.classes.isotherm.Isotherm(
-                pressure_key="pressure",
-                loading_key="loading",
-                **isotherm_parameters)
+            pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
 
         return
 
