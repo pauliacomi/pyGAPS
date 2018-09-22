@@ -122,8 +122,8 @@ that already has a full instalation). Then use pip inside your environment.
 
 .. code-block:: bat
 
-    conda create -n py36 python=3.6 numpy scipy pandas matplotlib
-    activate py36
+    conda create -n py3 python=3 numpy scipy pandas matplotlib
+    activate py3
     pip install pygaps
 
 Alternatively, to install the development branch, clone the repository from Github.

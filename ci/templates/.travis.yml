@@ -52,6 +52,10 @@ jobs:
 {%- for env, config in tox_environments|dictsort %}{{ '' }}
     - stage: test
       python: '{{ '{0[0]}-5.4'.format(env.split('-')) if env.startswith('pypy') else env.split('-')[0] }}'
+      {% if env.startswith('py37') %}
+      dist: xenial
+      sudo: required
+      {% endif %}
       env:
         - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
 {% endfor %}

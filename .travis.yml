@@ -59,6 +59,12 @@ jobs:
       python: '3.6'
       env:
         - TOXENV=3.6-cover,report,codecov
+    - stage: test
+      python: '3.7'
+      dist: xenial
+      sudo: required
+      env:
+        - TOXENV=3.7-cover,report,codecov
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.6'     # specify python 3.6
