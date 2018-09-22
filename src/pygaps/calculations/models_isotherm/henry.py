@@ -9,16 +9,37 @@ from .model import IsothermModel
 
 class Henry(IsothermModel):
     """
-    Henry's law. Assumes a linear dependence of adsorbed amount with
-    pressure.
+    Henry's law.
+    Assumes a linear dependence of adsorbed amount with pressure.
+
+    .. math::
+
+        n(p) = K_H p
+
+    Notes
+    -----
+
+    The simplest method of describing adsorption on a
+    surface is Henry’s law. It assumes only interactions
+    with the adsorbate surface and is described by a
+    linear dependence of adsorbed amount with
+    increasing pressure.
+
+    It is derived from the Gibbs isotherm, by substituting
+    a two dimensional analogue to the ideal gas law.
+    From a physical standpoint, Henry's law is unrealistic as
+    adsorption sites
+    will saturate at higher pressures. However, the constant kH,
+    or Henry’s constant, can be thought of as a measure of the strength
+    of the interaction of the probe gas with the surface. At very
+    low concentrations of gas there is a
+    thermodynamic requirement for the applicability of Henry's law.
+    Therefore, most models reduce to the Henry equation
+    as :math:`\\lim_{p \\to 0} n(p)`.
 
     Usually, Henry's law is unrealistic because the adsorption sites
     will saturate at higher pressures.
     Only use if your data is linear.
-
-    .. math::
-
-        L(P) = K_H P
 
     """
     #: Name of the model
@@ -57,7 +78,7 @@ class Henry(IsothermModel):
 
         .. math::
 
-            \\P = L / P
+            p = n / K_H
 
         Parameters
         ----------
@@ -78,13 +99,13 @@ class Henry(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Henry model is solved analytically.
 
         .. math::
 
-            \\pi = K_H P
+            \\pi = K_H p
 
         Parameters
         ----------

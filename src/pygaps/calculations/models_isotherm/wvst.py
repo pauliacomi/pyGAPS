@@ -49,7 +49,7 @@ class WVST(IsothermModel):
 
     .. math::
 
-        P = \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} f(\\theta)
+        p = \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} f(\\theta)
 
     The general VST equation requires an expression for the activity coefficients.
     The Wilson equation can be used, which expresses the activity coefficient in terms
@@ -58,7 +58,7 @@ class WVST(IsothermModel):
 
     .. math::
 
-        P = \\bigg( \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} \\bigg)
+        p = \\bigg( \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} \\bigg)
             \\bigg( \\Lambda_{1v} \\frac{1-(1-\\Lambda_{v1})\\theta}{\\Lambda_{1v}+(1-\\Lambda_{1v})\\theta} \\bigg)
             \\exp{\\bigg( -\\frac{\\Lambda_{v1}(1-\\Lambda_{v1})\\theta}{1-(1-\\Lambda_{v1})\\theta}
             -\\frac{(1 - \\Lambda_{1v})\\theta}{\\Lambda_{1v} + (1-\\Lambda_{1v}\\theta)} \\bigg)}
@@ -79,7 +79,7 @@ class WVST(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"M": numpy.nan, "K": numpy.nan,
+        self.params = {"n": numpy.nan, "K": numpy.nan,
                        "L1v": numpy.nan, "Lv1": numpy.nan}
 
     def loading(self, pressure):
@@ -130,7 +130,7 @@ class WVST(IsothermModel):
         float
             Pressure at specified loading.
         """
-        cov = loading / self.params["M"]
+        cov = loading / self.params["n"]
 
         coef = self.params["L1v"] * (1 - (1 - self.params["Lv1"]) * cov) / \
             (self.params["L1v"] + (1 - self.params["L1v"]) * cov)
@@ -140,7 +140,7 @@ class WVST(IsothermModel):
                   - (((1 - self.params["L1v"]) * cov) /
                      (self.params["L1v"] + (1 - self.params["L1v"]) * cov))
 
-        res = (self.params["M"] / self.params["K"] * cov / (1 - cov)) * \
+        res = (self.params["n"] / self.params["K"] * cov / (1 - cov)) * \
             coef * numpy.exp(expcoef)
 
         return res
@@ -152,7 +152,7 @@ class WVST(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the W-VST model cannot be solved analytically
         and must be calculated numerically.
@@ -191,5 +191,5 @@ class WVST(IsothermModel):
         saturation_loading, langmuir_k = super(WVST, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"M": saturation_loading, "K": langmuir_k,
+        return {"n": saturation_loading, "K": langmuir_k,
                 "L1v": 1, "Lv1": 1}

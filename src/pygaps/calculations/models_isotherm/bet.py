@@ -15,34 +15,42 @@ class BET(IsothermModel):
 
     .. math::
 
-        L(P) = M\\frac{C P}{(1-K_B P)(1-K_B P+ C P)}
+        n(p) = n_m \\frac{C p}{(1 - N p)(1 - N p + C p)}
 
     Notes
     -----
 
-    The BET model [#]_ assumes that adsorption happens on the surface of the material in
-    incremental layers according to several assumptions:
+    Like the Langmuir model, the BET model [#]_
+    assumes that adsorption is kinetically driven and takes place on
+    adsorption sites at the material surface. However, each adsorbed
+    molecule becomes, in itself, a secondary adsorption site, such
+    that incremental layers are formed. The conditions imagined by
+    the BET model are:
 
         * The adsorption sites are equivalent, and therefore the surface is heterogeneous
         * There are no lateral interactions between adsorbed molecules
-        * The adsorption happens in layers, with adsorbed molecules acting as adsorption
-          sites for new molecules
-        * The adsorption energy of a molecule on the second and higher layers equals
-          the condensation energy of the adsorbent :math:`E_L`.
+        * The adsorption occurs in layers, with adsorbed molecules acting
+          as adsorption sites for new molecules
+        * The adsorption energy of a molecule on the second and higher
+          layers equals the condensation energy of the adsorbent :math:`E_L`.
 
     A particular surface percentage :math:`\\theta_x` is occupied with x layers.
     For each layer at equilibrium, the adsorption and desorption rates must be equal. We can
     then apply the Langmuir theory for each layer.
+    It is assumed
+    that the adsorption energy of a molecule on the second
+    and higher layers is just the condensation energy of the
+    adsorbent :math:`E_{i>1} = E_L`.
 
     .. math::
 
-        k_{a_1} p \\theta_0 &= k_{d_1} \\theta_1 \\exp{(-\\frac{E_1}{RT})}
+        k_{a_1} p \\theta_0 &= k_{d_1} \\theta_1 \\exp{(-\\frac{E_1}{R_gT})}
 
-        k_{a_2} p \\theta_1 &= k_{d_2} \\theta_2 \\exp{(-\\frac{E_L}{RT})}
+        k_{a_2} p \\theta_1 &= k_{d_2} \\theta_2 \\exp{(-\\frac{E_L}{R_gT})}
 
         ...
 
-        k_{a_i} p \\theta_{i-1} &= k_{d_i} \\theta_i \\exp{-\\frac{E_L}{RT}}
+        k_{a_i} p \\theta_{i-1} &= k_{d_i} \\theta_i \\exp{-\\frac{E_L}{R_gT}}
 
     Since we are assuming that all layers beside the first have the same properties,
     we can define :math:`g= \\frac{k_{d_2}}{k_{a_2}} = \\frac{k_{d_3}}{k_{a_3}} = ...`.
@@ -50,9 +58,9 @@ class BET(IsothermModel):
 
     .. math::
 
-        \\theta_1 &= y \\theta_0 \\quad where \\quad y = \\frac{k_{a_1}}{k_{d_1}} p \\exp{(-\\frac{E_1}{RT})}
+        \\theta_1 &= y \\theta_0 \\quad where \\quad y = \\frac{k_{a_1}}{k_{d_1}} p \\exp{(-\\frac{E_1}{R_gT})}
 
-        \\theta_2 &= x \\theta_1 \\quad where \\quad x = \\frac{p}{g} \\exp{(-\\frac{E_L}{RT})}
+        \\theta_2 &= x \\theta_1 \\quad where \\quad x = \\frac{p}{g} \\exp{(-\\frac{E_L}{R_gT})}
 
         \\theta_3 &= x \\theta_2 = x^2 \\theta_1
 
@@ -64,7 +72,7 @@ class BET(IsothermModel):
 
     .. math::
 
-        C = \\frac{y}{x} = \\frac{k_{a_1}}{k_{d_1}} g \\exp{(\\frac{E_1 - E_L}{RT})}
+        C = \\frac{y}{x} = \\frac{k_{a_1}}{k_{d_1}} g \\exp{(\\frac{E_1 - E_L}{R_gT})}
 
         \\theta_i = C x^i \\theta_0
 
@@ -86,7 +94,13 @@ class BET(IsothermModel):
 
     .. math::
 
-        L(P) = \\frac{n}{n_m} = M\\frac{C P}{(1-K_B P)(1-K_B P+ C P)}
+        n(p) = \\frac{n}{n_m} = n_m\\frac{C p}{(1-N p)(1-N p+ C p)}
+
+    The BET constant C is exponentially proportional to the
+    difference between the surface adsorption energy and the
+    intermolecular attraction, and can be seen to influence the knee
+    a BET-type isotherm has at low pressure, before statistical
+    monolayer formation.
 
     References
     ----------
@@ -103,7 +117,7 @@ class BET(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"M": numpy.nan, "C": numpy.nan, "Kb": numpy.nan}
+        self.params = {"n_m": numpy.nan, "C": numpy.nan, "N": numpy.nan}
 
     def loading(self, pressure):
         """
@@ -119,9 +133,9 @@ class BET(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["M"] * self.params["C"] * pressure / (
-            (1.0 - self.params["Kb"] * pressure) *
-            (1.0 - self.params["Kb"] * pressure +
+        return self.params["n_m"] * self.params["C"] * pressure / (
+            (1.0 - self.params["N"] * pressure) *
+            (1.0 - self.params["N"] * pressure +
              self.params["C"] * pressure))
 
     def pressure(self, loading):
@@ -160,13 +174,13 @@ class BET(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the BET model is solved analytically.
 
         .. math::
 
-            \\pi = M \\ln{\\frac{1 - K_b P + C P}{1- K_b P}}
+            \\pi = n_m \\ln{\\frac{1 - K_b p + C p}{1- K_b p}}
 
         Parameters
         ----------
@@ -178,10 +192,10 @@ class BET(IsothermModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["M"] * numpy.log(
-            (1.0 - self.params["Kb"] * pressure +
+        return self.params["n_m"] * numpy.log(
+            (1.0 - self.params["N"] * pressure +
              self.params["C"] * pressure) /
-            (1.0 - self.params["Kb"] * pressure))
+            (1.0 - self.params["N"] * pressure))
 
     def default_guess(self, data, loading_key, pressure_key):
         """
@@ -204,6 +218,6 @@ class BET(IsothermModel):
         saturation_loading, langmuir_k = super(BET, self).default_guess(
             data, loading_key, pressure_key)
 
-        # BET = Langmuir when Kb = 0.0. This is our default assumption.
-        return {"M": saturation_loading, "C": langmuir_k,
-                "Kb": langmuir_k * 0.01}
+        # BET = Langmuir when N = 0.0. This is our default assumption.
+        return {"n_m": saturation_loading, "C": langmuir_k,
+                "N": langmuir_k * 0.01}

@@ -15,7 +15,7 @@ class JensenSeaton(IsothermModel):
 
     .. math::
 
-        L(P) = K_H P (1 + \\frac{K_H P}{(a (1+(b p)))^c})^{(-1/c)}
+        n(p) = K_H p (1 + \\frac{K_H p}{(a (1+(b p)))^c})^{(-1/c)}
 
     Notes
     -----
@@ -114,7 +114,7 @@ class JensenSeaton(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Jensen-Seaton model cannot be solved analytically
         and must be calculated numerically.

@@ -17,7 +17,7 @@ class Virial(IsothermModel):
 
     .. math::
 
-        P = n \\exp{(-\\ln{K_H} + An + Bn^2 + Cn^3)}
+        p = n \\exp{(-\\ln{K_H} + An + Bn^2 + Cn^3)}
 
     Notes
     -----
@@ -27,7 +27,7 @@ class Virial(IsothermModel):
 
     .. math::
 
-        P = n \\exp{(K_1n^0 + K_2n^1 + K_3n^2 + K_4n^3 + ... + K_i n^{i-1})}
+        p = n \\exp{(K_1n^0 + K_2n^1 + K_3n^2 + K_4n^3 + ... + K_i n^{i-1})}
 
     It has been applied with success to describe the behaviour of standard as
     well as supercritical isotherms. The factors are usually empirical,
@@ -113,7 +113,7 @@ class Virial(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Virial model cannot be solved analytically
         and must be calculated numerically.
