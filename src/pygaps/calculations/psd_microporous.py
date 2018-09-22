@@ -33,8 +33,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
             adsorbate_properties = dict(
                 'molecular_diameter'=0,           # nm
-                'polarizability'=0,               # m3
-                'magnetic_susceptibility'=0,      # m3
+                'polarizability'=0,               # nm3
+                'magnetic_susceptibility'=0,      # nm3
                 'surface_density'=0,              # molecules/m2
             )
 
@@ -101,10 +101,10 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     * :math:`A_A` -- the Lennard-Jones potential constant of the adsorbate molecule defined as
 
         .. math::
-            A_a = \\frac{3mc^2\\alpha_A\\varkappa_A}{2}
+            A_a = \\frac{3 m_e c_l ^2\\alpha_A\\varkappa_A}{2}
 
-    * :math:`m` -- mass of an electron
-    * :math:`c` -- speed of light in vacuum
+    * :math:`m_e` -- mass of an electron
+    * :math:`c_l` -- speed of light in vacuum
     * :math:`\\alpha_a` -- polarizability of the adsorbate molecule
     * :math:`\\alpha_A` -- polarizability of the adsorbent molecule
     * :math:`\\varkappa_a` -- magnetic susceptibility of the adsorbate molecule
@@ -181,23 +181,23 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     # dictionary unpacking
     d_adsorbate = adsorbate_properties.get('molecular_diameter')
     d_adsorbent = adsorbent_properties.get('molecular_diameter')
-    p_adsorbate = adsorbate_properties.get('polarizability')
-    p_adsorbent = adsorbent_properties.get('polarizability')
-    m_adsorbate = adsorbate_properties.get('magnetic_susceptibility')
-    m_adsorbent = adsorbent_properties.get('magnetic_susceptibility')
+    p_adsorbate = adsorbate_properties.get('polarizability') * 1e-27            # to m3
+    p_adsorbent = adsorbent_properties.get('polarizability') * 1e-27            # to m3
+    m_adsorbate = adsorbate_properties.get('magnetic_susceptibility') * 1e-27   # to m3
+    m_adsorbent = adsorbent_properties.get('magnetic_susceptibility') * 1e-27   # to m3
     n_adsorbate = adsorbate_properties.get('surface_density')
     n_adsorbent = adsorbent_properties.get('surface_density')
 
     # calculation of constants and terms
     e_m = scipy.constants.electron_mass
-    c = scipy.constants.speed_of_light
+    c_l = scipy.constants.speed_of_light
     effective_diameter = d_adsorbate + d_adsorbent
     sigma = (2 / 5)**(1 / 6) * effective_diameter / 2
     sigma_si = sigma * 1e-9
 
-    a_adsorbent = 6 * e_m * c ** 2 * p_adsorbate * p_adsorbent /\
+    a_adsorbent = 6 * e_m * c_l ** 2 * p_adsorbate * p_adsorbent /\
         (p_adsorbate / m_adsorbate + p_adsorbent / m_adsorbent)
-    a_adsorbate = 3 * e_m * c**2 * p_adsorbate * m_adsorbate / 2
+    a_adsorbate = 3 * e_m * c_l**2 * p_adsorbate * m_adsorbate / 2
 
     constant_coefficient = scipy.constants.Avogadro / \
         (scipy.constants.gas_constant * temperature) * \
@@ -218,7 +218,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     p_w = []
 
-    for index, p_point in enumerate(pressure):
+    for p_point in pressure:
         # minimise to find pore length
         def h_k_minimization(l_pore):
             return numpy.abs(h_k_pressure(l_pore) - p_point)
