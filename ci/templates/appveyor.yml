@@ -49,12 +49,13 @@ install:
   - activate testenv
   - pip install -U "pytest>=3.1.0" --ignore-installed
   - pip install coverage
+  - pip install pytest-cov
 
   # Now build the module
   - '%WITH_COMPILER% pip install -ve .'
 
 test_script:
-  - pytest
+  - pytest --cov --cov-report=term-missing -vv
 
 
 after_test:
