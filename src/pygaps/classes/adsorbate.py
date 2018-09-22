@@ -8,6 +8,7 @@ import CoolProp
 
 import pygaps
 
+from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _PRESSURE_UNITS
 from ..utilities.unit_converter import c_unit
@@ -73,6 +74,7 @@ class Adsorbate(object):
         my_adsorbate.surface_tension(77, calculate=False)
     """
 
+    _required_params = ['nick', 'formula']
     _named_params = ['nick', 'formula']
 
     def __init__(self, **properties):
@@ -81,9 +83,10 @@ class Adsorbate(object):
         """
         # Required sample parameters checks
         if any(k not in properties
-                for k in ('nick', 'formula')):
+               for k in self._required_params):
             raise ParameterError(
-                "Adsorbate class MUST have the following information in the properties dictionary: 'nick', 'formula'")
+                "Adsorbate class must have the following information "
+                "in the properties dictionary: {}".format(self._required_params))
 
         #: Adsorbate name
         self.name = properties.pop('nick')
@@ -255,7 +258,10 @@ class Adsorbate(object):
             except Exception as e_info:
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
-                return self.molar_mass(calculate=False)
+                try:
+                    return self.molar_mass(calculate=False)
+                except ParameterError as e_info:
+                    raise CalculationError
 
         else:
             mol_m = self.properties.get("molar_mass")
@@ -305,8 +311,11 @@ class Adsorbate(object):
             except Exception as e_info:
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
-                return self.saturation_pressure(temp, unit=unit,
-                                                calculate=False)
+                try:
+                    sat_p = self.saturation_pressure(temp, unit=unit,
+                                                     calculate=False)
+                except ParameterError as e_info:
+                    raise CalculationError
 
             if unit is not None:
                 sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
@@ -355,7 +364,10 @@ class Adsorbate(object):
             except Exception as e_info:
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
-                return self.surface_tension(temp, calculate=False)
+                try:
+                    return self.surface_tension(temp, calculate=False)
+                except ParameterError as e_info:
+                    raise CalculationError
 
         else:
             surf_t = self.properties.get("surface_tension")
@@ -402,7 +414,10 @@ class Adsorbate(object):
             except Exception as e_info:
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
-                return self.liquid_density(temp, calculate=False)
+                try:
+                    return self.liquid_density(temp, calculate=False)
+                except ParameterError as e_info:
+                    raise CalculationError
 
         else:
             liq_d = self.properties.get("liquid_density")
@@ -429,7 +444,7 @@ class Adsorbate(object):
         Returns
         -------
         float
-            Liquid density in g/cm3.
+            Gas density in g/cm3.
 
         Raises
         ------
@@ -449,7 +464,10 @@ class Adsorbate(object):
             except Exception as e_info:
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
-                return self.gas_density(temp, calculate=False)
+                try:
+                    return self.gas_density(temp, calculate=False)
+                except ParameterError as e_info:
+                    raise CalculationError
 
         else:
             gas_d = self.properties.get("gas_density")
@@ -502,7 +520,10 @@ class Adsorbate(object):
             except Exception as e_info:
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
-                return self.enthalpy_liquefaction(temp, calculate=False)
+                try:
+                    return self.enthalpy_liquefaction(temp, calculate=False)
+                except ParameterError as e_info:
+                    raise CalculationError
 
         else:
             enth_liq = self.properties.get("enthalpy_liquefaction")

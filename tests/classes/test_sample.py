@@ -13,7 +13,7 @@ class TestSample(object):
     Tests the sample class
     """
 
-    def test_sample_created(self, sample_data, basic_sample):
+    def test_sample_create(self, sample_data, basic_sample):
         "Checks sample can be created from test data"
 
         assert sample_data == basic_sample.to_dict()

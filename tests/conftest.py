@@ -203,6 +203,7 @@ def adsorbate_data():
         'criticalp_density': 11.2,
         'triplep_temperature': 63.1,
         # properties for 1atm/ 77k
+        'gas_density': 0.00461214,
         'liquid_density': 0.806,
         'surface_density': 6.71e18,
         'surface_tension': 8.8796,

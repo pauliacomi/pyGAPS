@@ -50,6 +50,7 @@ class Sample(object):
     which can be set as seen above.
 
     '''
+    _required_params = ['name', 'batch']
     _named_params = [
         'contact',
         'source',
@@ -64,15 +65,12 @@ class Sample(object):
         """
         Instantiation is done by passing all the parameters.
         """
-        # TODO Should make the sample unique using
-        # some sort of convention id
-
         # Required sample parameters checks
         if any(k not in sample_info
-               for k in ('name', 'batch')):
+               for k in self._required_params):
             raise ParameterError(
-                "Sample class MUST have the following information in the "
-                "properties dictionary: 'name', 'batch'")
+                "Sample class must have the following information in the "
+                "properties dictionary: {}".format(self._required_params))
 
         #: Sample name
         self.name = sample_info.pop('name')
