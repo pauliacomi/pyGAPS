@@ -36,7 +36,7 @@ _FIELDS = {
         'type': 'number'
     },
     'user': {
-        'text': ['user', 'analyste'],
+        'text': ['operator', 'analyste'],
         'name': 'user',
         'row': 0,
         'column': 1,
