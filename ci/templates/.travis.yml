@@ -38,9 +38,11 @@ jobs:
   include:
     # Checks and docks
     - stage: test
+      python: '3.6'     # specify python 3.6
       env:
         - TOXENV=check
     - stage: test
+      python: '3.6'     # specify python 3.6
       env:
         - TOXENV=docs
       addons:
@@ -52,6 +54,10 @@ jobs:
 {%- for env, config in tox_environments|dictsort %}{{ '' }}
     - stage: test
       python: '{{ '{0[0]}-5.4'.format(env.split('-')) if env.startswith('pypy') else env.split('-')[0] }}'
+      {% if env.startswith('3.7') %}
+      dist: xenial
+      sudo: required
+      {% endif %}
       env:
         - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
 {% endfor %}

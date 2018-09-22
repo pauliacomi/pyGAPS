@@ -2,11 +2,12 @@
 This module contains the adsorbate class.
 """
 
+import warnings
+
 import CoolProp
 
 import pygaps
 
-from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.unit_converter import _PRESSURE_UNITS
 from ..utilities.unit_converter import c_unit
@@ -252,7 +253,10 @@ class Adsorbate(object):
                 mol_m = self._get_state().molar_mass() * 1000
 
             except Exception as e_info:
-                raise CalculationError from e_info
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                return self.molar_mass(calculate=False)
+
         else:
             mol_m = self.properties.get("molar_mass")
             if mol_m is None:
@@ -299,7 +303,10 @@ class Adsorbate(object):
                 sat_p = state.p()
 
             except Exception as e_info:
-                raise CalculationError from e_info
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                return self.saturation_pressure(temp, unit=unit,
+                                                calculate=False)
 
             if unit is not None:
                 sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
@@ -346,7 +353,10 @@ class Adsorbate(object):
                 surf_t = state.surface_tension() * 1000
 
             except Exception as e_info:
-                raise CalculationError from e_info
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                return self.surface_tension(temp, calculate=False)
+
         else:
             surf_t = self.properties.get("surface_tension")
             if surf_t is None:
@@ -390,7 +400,10 @@ class Adsorbate(object):
                 liq_d = state.rhomass() / 1000
 
             except Exception as e_info:
-                raise CalculationError from e_info
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                return self.liquid_density(temp, calculate=False)
+
         else:
             liq_d = self.properties.get("liquid_density")
             if liq_d is None:
@@ -434,7 +447,10 @@ class Adsorbate(object):
                 gas_d = state.rhomass() / 1000
 
             except Exception as e_info:
-                raise CalculationError from e_info
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                return self.gas_density(temp, calculate=False)
+
         else:
             gas_d = self.properties.get("gas_density")
             if gas_d is None:
@@ -484,7 +500,10 @@ class Adsorbate(object):
                 enth_liq = (h_vap - h_liq) / 1000
 
             except Exception as e_info:
-                raise CalculationError from e_info
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                return self.enthalpy_liquefaction(temp, calculate=False)
+
         else:
             enth_liq = self.properties.get("enthalpy_liquefaction")
             if enth_liq is None:

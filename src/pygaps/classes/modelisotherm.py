@@ -10,6 +10,7 @@ import pandas
 
 from ..calculations.models_isotherm import _GUESS_MODELS
 from ..calculations.models_isotherm import get_isotherm_model
+from ..calculations.models_isotherm import is_base_model
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -85,6 +86,11 @@ class ModelIsotherm(Isotherm):
 
     """
 
+    _reserved_params = [
+        '_instantiated',
+        'model',
+    ]
+
 ##########################################################
 #   Instantiation and classmethods
 
@@ -115,17 +121,14 @@ class ModelIsotherm(Isotherm):
             raise ParameterError("Specify a model to fit to the pure-component"
                                  " isotherm data. e.g. model=\"Langmuir\"")
 
-        # We change it to a simulated isotherm
-        isotherm_parameters['is_real'] = False
-
         # Start construction process
         self._instantiated = False
 
+        # We change it to a simulated isotherm
+        isotherm_parameters['is_real'] = False
+
         # Run base class constructor
         Isotherm.__init__(self,
-                          pressure_key=pressure_key,
-                          loading_key=loading_key,
-
                           adsorbent_basis=adsorbent_basis,
                           adsorbent_unit=adsorbent_unit,
                           loading_basis=loading_basis,
@@ -135,55 +138,71 @@ class ModelIsotherm(Isotherm):
 
                           **isotherm_parameters)
 
-        # Get required branch
-        data = self._splitdata(isotherm_data)
-
-        if branch == 'ads':
-            data = data.loc[~data['branch']]
-        elif branch == 'des':
-            data = data.loc[data['branch']]
-
-        if data.empty:
+        # Column titles
+        if None in [loading_key, pressure_key]:
             raise ParameterError(
-                "The isotherm branch does not contain enough points")
+                "Pass loading_key and pressure_key, the names of the loading and"
+                " pressure columns in the DataFrame, to the constructor.")
 
-        #: Branch the isotherm model is based on.
-        self.branch = branch
+        if is_base_model(model):
+            self.model = model
 
-        #: The pressure range on which the model was built.
-        self.pressure_range = [min(data[pressure_key]),
-                               max(data[pressure_key])]
+            self.rmse = 0
+            self.branch = 'ads'
+            self.pressure_range = [0, 1]
+            self.loading_range = [0, 1]
 
-        #: The loading range on which the model was built.
-        self.loading_range = [min(data[loading_key]),
-                              max(data[loading_key])]
+        else:
 
-        #: Name of analytical model to fit to pure-component isotherm data
-        #: adsorption isotherm.
-        self.model = get_isotherm_model(model)
+            # Get required branch
+            data = self._splitdata(isotherm_data, pressure_key)
 
-        #: Root mean square error in fit.
-        self.rmse = numpy.nan
+            if branch == 'ads':
+                data = data.loc[~data['branch']]
+            elif branch == 'des':
+                data = data.loc[data['branch']]
 
-        #: Dictionary of parameters as a starting point for data fitting.
-        self.param_guess = self.model.default_guess(isotherm_data,
-                                                    loading_key,
-                                                    pressure_key)
+            if data.empty:
+                raise ParameterError(
+                    "The isotherm branch does not contain enough points")
 
-        # Override defaults if user provides param_guess dictionary
-        if param_guess is not None:
-            for param, guess_val in param_guess.items():
-                if param not in self.param_guess.keys():
-                    raise ParameterError("%s is not a valid parameter"
-                                         " in the %s model." % (param, model))
-                self.param_guess[param] = guess_val
+            #: Branch the isotherm model is based on.
+            self.branch = branch
 
-        # fit model to isotherm data
-        self.rmse = self.model.fit(data[loading_key].values,
-                                   data[pressure_key].values,
-                                   self.param_guess,
-                                   optimization_params,
-                                   verbose)
+            #: The pressure range on which the model was built.
+            self.pressure_range = [min(data[pressure_key]),
+                                   max(data[pressure_key])]
+
+            #: The loading range on which the model was built.
+            self.loading_range = [min(data[loading_key]),
+                                  max(data[loading_key])]
+
+            #: Name of analytical model to fit to pure-component isotherm data
+            #: adsorption isotherm.
+            self.model = get_isotherm_model(model)
+
+            #: Dictionary of parameters as a starting point for data fitting.
+            self.param_guess = self.model.default_guess(isotherm_data,
+                                                        loading_key,
+                                                        pressure_key)
+
+            # Override defaults if user provides param_guess dictionary
+            if param_guess is not None:
+                for param, guess_val in param_guess.items():
+                    if param not in self.param_guess.keys():
+                        raise ParameterError("%s is not a valid parameter"
+                                             " in the %s model." % (param, model))
+                    self.param_guess[param] = guess_val
+
+            #: Root mean square error in fit.
+            self.rmse = numpy.nan
+
+            # fit model to isotherm data
+            self.rmse = self.model.fit(data[loading_key].values,
+                                       data[pressure_key].values,
+                                       self.param_guess,
+                                       optimization_params,
+                                       verbose)
 
         # Finish instantiation process
         self._instantiated = True
@@ -194,6 +213,8 @@ class ModelIsotherm(Isotherm):
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
+                      loading_key=None,
+                      pressure_key=None,
                       model=None,
                       param_guess=None,
                       optimization_params=dict(method='Nelder-Mead'),
@@ -211,6 +232,10 @@ class ModelIsotherm(Isotherm):
             An instance of the Isotherm parent class.
         isotherm_data : DataFrame
             Pure-component adsorption isotherm data.
+        loading_key : str
+            Column of the pandas DataFrame where the loading is stored.
+        pressure_key : str
+            Column of the pandas DataFrame where the pressure is stored.
         model : str
             The model to be used to describe the isotherm.
         param_guess : dict
@@ -231,17 +256,16 @@ class ModelIsotherm(Isotherm):
         iso_params = isotherm.to_dict()
         # remove ID - a new one will be generated
         iso_params.pop('id', None)
+        # insert or update values
+        iso_params['loading_key'] = loading_key
+        iso_params['pressure_key'] = pressure_key
+        iso_params['model'] = model
+        iso_params['param_guess'] = param_guess
+        iso_params['optimization_params'] = optimization_params
+        iso_params['branch'] = branch
+        iso_params['verbose'] = verbose
 
-        return cls(isotherm_data,
-                   model=model,
-                   param_guess=param_guess,
-                   optimization_params=optimization_params,
-                   branch=branch,
-                   verbose=verbose,
-
-                   loading_key=isotherm.loading_key,
-                   pressure_key=isotherm.pressure_key,
-                   **iso_params)
+        return cls(isotherm_data, **iso_params)
 
     @classmethod
     def from_pointisotherm(cls,
@@ -284,23 +308,21 @@ class ModelIsotherm(Isotherm):
 
         if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
+                                       loading_key=isotherm.loading_key,
+                                       pressure_key=isotherm.pressure_key,
                                        optimization_params=optimization_params,
                                        branch=branch,
                                        verbose=verbose,
-
-                                       loading_key=isotherm.loading_key,
-                                       pressure_key=isotherm.pressure_key,
                                        **iso_params)
 
         return cls(isotherm.data(branch=branch),
+                   loading_key=isotherm.loading_key,
+                   pressure_key=isotherm.pressure_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_params=optimization_params,
                    branch=branch,
                    verbose=verbose,
-
-                   loading_key=isotherm.loading_key,
-                   pressure_key=isotherm.pressure_key,
                    **iso_params)
 
     @classmethod
@@ -866,16 +888,23 @@ class ModelIsotherm(Isotherm):
 
         return spreading_p
 
-    def print_info(self, logarithmic=False, show=True):
+###########################################################
+#   Info function
+
+    def print_info(self, show=True, **plot_iso_args):
         """
-        Prints a short summary of all the isotherm parameters.
+        Prints a short summary of all the isotherm parameters and a
+        graph of the isotherm.
 
         Parameters
         ----------
-        logarithmic : bool, optional
-            Specifies if the graph printed is logarithmic or not.
         show : bool, optional
             Specifies if the graph is shown automatically or not.
+
+        Other Parameters
+        ----------------
+        plot_iso_args : dict
+            options to be passed to pygaps.plot_iso()
 
         Returns
         -------
@@ -894,17 +923,18 @@ class ModelIsotherm(Isotherm):
             print("\t%s = %f" % (param, val))
         print("RMSE = ", self.rmse)
 
-        fig, ax1, ax2 = plot_iso([self], plot_type='isotherm',
-                                 logx=logarithmic,
+        plot_dict = dict(
+            plot_type='isotherm',
+            adsorbent_basis=self.adsorbent_basis,
+            adsorbent_unit=self.adsorbent_unit,
+            loading_basis=self.loading_basis,
+            loading_unit=self.loading_unit,
+            pressure_unit=self.pressure_unit,
+            pressure_mode=self.pressure_mode,
+        )
+        plot_dict.update(plot_iso_args)
 
-                                 adsorbent_basis=self.adsorbent_basis,
-                                 adsorbent_unit=self.adsorbent_unit,
-                                 loading_basis=self.loading_basis,
-                                 loading_unit=self.loading_unit,
-                                 pressure_unit=self.pressure_unit,
-                                 pressure_mode=self.pressure_mode,
-
-                                 )
+        fig, ax1, ax2 = plot_iso(self, **plot_dict)
 
         if show:
             plt.show()

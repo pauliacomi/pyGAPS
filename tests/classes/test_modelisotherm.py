@@ -13,10 +13,9 @@ import pygaps
 
 from ..calculations.conftest import DATA
 from ..calculations.conftest import DATA_N77_PATH
-from ..conftest import basic
 
 
-@basic
+@pytest.mark.core
 class TestModelIsotherm(object):
     """
     Tests the pointisotherm class
@@ -25,6 +24,8 @@ class TestModelIsotherm(object):
     def test_isotherm_create(self):
         "Checks isotherm can be created from basic data"
         isotherm_param = {
+            'loading_key': 'loading',
+            'pressure_key': 'pressure',
             'sample_name': 'carbon',
             'sample_batch': 'X1',
             'adsorbate': 'nitrogen',
@@ -40,8 +41,6 @@ class TestModelIsotherm(object):
         with pytest.raises(pygaps.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data,
-                loading_key='loading',
-                pressure_key='pressure',
                 **isotherm_param
             )
 
@@ -49,8 +48,6 @@ class TestModelIsotherm(object):
         with pytest.raises(pygaps.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data,
-                loading_key='loading',
-                pressure_key='pressure',
                 model='Wrong',
                 **isotherm_param
             )
@@ -59,8 +56,6 @@ class TestModelIsotherm(object):
         with pytest.raises(pygaps.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data,
-                loading_key='loading',
-                pressure_key='pressure',
                 model='Henry',
                 param_guess={'K9': 'woof'},
                 **isotherm_param
@@ -69,8 +64,6 @@ class TestModelIsotherm(object):
         # regular creation
         isotherm = pygaps.ModelIsotherm(
             isotherm_data,
-            loading_key='loading',
-            pressure_key='pressure',
             model='Henry',
             **isotherm_param
         )
@@ -78,8 +71,6 @@ class TestModelIsotherm(object):
         # regular creation, desorption
         isotherm = pygaps.ModelIsotherm(
             isotherm_data,
-            loading_key='loading',
-            pressure_key='pressure',
             model='Henry',
             branch='des',
             **isotherm_param
@@ -88,10 +79,8 @@ class TestModelIsotherm(object):
         # regular creation, guessed parameters
         isotherm = pygaps.ModelIsotherm(
             isotherm_data,
-            loading_key='loading',
-            pressure_key='pressure',
             model='Henry',
-            param_guess={'KH': 1.0},
+            param_guess={'K': 1.0},
             **isotherm_param
         )
 
@@ -100,15 +89,15 @@ class TestModelIsotherm(object):
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
 
-        isotherm_data = pandas.DataFrame({
-            'pressure': [1, 2, 3, 4, 5, 3, 2],
-            'loading': [1, 2, 3, 4, 5, 3, 2]
-        })
-
         # regular creation
         isotherm = pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
-            isotherm_data,
+            pandas.DataFrame({
+                'pressure': [1, 2, 3, 4, 5, 3, 2],
+                'loading': [1, 2, 3, 4, 5, 3, 2]
+            }),
+            pressure_key='pressure',
+            loading_key='loading',
             model='Henry',
         )
 

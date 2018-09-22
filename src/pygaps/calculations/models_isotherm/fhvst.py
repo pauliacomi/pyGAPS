@@ -50,7 +50,7 @@ class FHVST(IsothermModel):
 
     .. math::
 
-        P = \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} f(\\theta)
+        p = \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} f(\\theta)
 
     The general VST equation requires an expression for the activity coefficients.
     Cochran [#]_ developed a simpler, three
@@ -59,7 +59,7 @@ class FHVST(IsothermModel):
 
     .. math::
 
-        P &= \\bigg( \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} \\bigg)
+        p &= \\bigg( \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} \\bigg)
             \\exp{\\frac{\\alpha^2_{1v}\\theta}{1+\\alpha_{1v}\\theta}}
 
         with
@@ -86,7 +86,7 @@ class FHVST(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"M": numpy.nan, "K": numpy.nan,
+        self.params = {"n": numpy.nan, "K": numpy.nan,
                        "a1v": numpy.nan}
 
     def loading(self, pressure):
@@ -137,9 +137,9 @@ class FHVST(IsothermModel):
         float
             Pressure at specified loading.
         """
-        cov = loading / self.params["M"]
+        cov = loading / self.params["n"]
 
-        res = (self.params["M"] / self.params["K"]) * (cov / (1 - cov)) * \
+        res = (self.params["n"] / self.params["K"]) * (cov / (1 - cov)) * \
             numpy.exp(self.params["a1v"]**2 * cov /
                       (1 + self.params["a1v"] * cov))
 
@@ -152,7 +152,7 @@ class FHVST(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the FH-VST model cannot be solved analytically
         and must be calculated numerically.
@@ -191,5 +191,5 @@ class FHVST(IsothermModel):
         saturation_loading, langmuir_k = super(FHVST, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"M": saturation_loading, "K": langmuir_k,
+        return {"n": saturation_loading, "K": langmuir_k,
                 "a1v": 0}

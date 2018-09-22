@@ -14,6 +14,7 @@ from .fhvst import FHVST
 from .henry import Henry
 from .jensenseaton import JensenSeaton
 from .langmuir import Langmuir
+from .model import IsothermModel
 from .quadratic import Quadratic
 from .temkinapprox import TemkinApprox
 from .toth import Toth
@@ -72,7 +73,7 @@ def get_isotherm_model(model_name):
 def is_iast_model(model_name):
     """
     Checks whether specified model can be used
-    with IAST/
+    with IAST.
 
     Parameters
     ----------
@@ -87,3 +88,22 @@ def is_iast_model(model_name):
     """
 
     return model_name in [model.name for model in _IAST_MODELS]
+
+
+def is_base_model(model):
+    """
+    Checks whether it is a model.
+
+    Parameters
+    ----------
+    model : Model
+        A derived IsothermModel class
+
+    Returns
+    -------
+    bool
+        True or false.
+
+    """
+
+    return isinstance(model, IsothermModel)

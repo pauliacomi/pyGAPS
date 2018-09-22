@@ -9,12 +9,11 @@ from numpy import isclose
 
 import pygaps
 
-from ..conftest import characterisation
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
 
-@characterisation
+@pytest.mark.characterisation
 class TestInitialHenry(object):
     """
     Tests all initial henry methods
@@ -48,8 +47,7 @@ class TestInitialHenry(object):
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(text_file.read())
 
-        ihenry_virial = pygaps.initial_henry_virial(
-            isotherm, verbose=False)
+        ihenry_virial = pygaps.initial_henry_virial(isotherm, verbose=False)
 
         err_relative = 0.1  # 10 percent
         err_absolute = 10   #

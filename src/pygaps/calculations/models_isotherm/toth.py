@@ -15,7 +15,7 @@ class Toth(IsothermModel):
 
     .. math::
 
-        L(P) = M \\frac{K P}{(1 + (K P)^t)^(1/t)}
+        n(p) = n_M \\frac{K p}{(1 + (K p)^t)^(1/t)}
 
     Notes
     -----
@@ -23,7 +23,7 @@ class Toth(IsothermModel):
     The Toth model is an empirical modification to the Langmuir equation.
     The parameter :math:`t` is a measure of the system heterogeneity.
 
-    Thanks to this addition parameter, the Toth equation can accurately describe a
+    Thanks to this additional parameter, the Toth equation can accurately describe a
     large number of adsorbent/adsorbate systems and is recommended as the first
     choice of isotherm equation for fitting isotherms of many adsorbents such as
     hydrocarbons, carbon oxides, hydrogen sulphide and alcohols on activated carbons
@@ -39,7 +39,7 @@ class Toth(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"M": numpy.nan, "K": numpy.nan, "t": numpy.nan}
+        self.params = {"n_M": numpy.nan, "K": numpy.nan, "t": numpy.nan}
 
     def loading(self, pressure):
         """
@@ -55,7 +55,7 @@ class Toth(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["M"] * self.params["K"] * pressure / \
+        return self.params["n_M"] * self.params["K"] * pressure / \
             (1.0 + (self.params["K"] * pressure)**self.params["t"]) \
             ** (1 / self.params["t"])
 
@@ -95,7 +95,7 @@ class Toth(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Toth model cannot be solved analytically
         and must be calculated numerically.
@@ -133,4 +133,4 @@ class Toth(IsothermModel):
         saturation_loading, langmuir_k = super(Toth, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"M": saturation_loading, "K": langmuir_k, "t": 1}
+        return {"n_M": saturation_loading, "K": langmuir_k, "t": 1}

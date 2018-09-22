@@ -41,7 +41,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     adsorbent_properties : dict
         Properties for the adsorbate in the same form
         as 'adsorbate_properties'. A list of common models
-        can be found in .calculations.adsorbent_parameters.
+        can be found in .calculations.models_hk.
 
     Returns
     -------
@@ -54,13 +54,14 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     -----
 
     *Description*
+
     The H-K method [#]_ attempts to describe the adsorption within pores by calculation
     of the average potential energy for a pore. The method starts by assuming the
     relationship between the gas phase as being:
 
     .. math::
 
-        R_g T ln(\\frac{p}{p_0}) = U_0 + P_a
+        R_g T \\ln(\\frac{p}{p_0}) = U_0 + P_a
 
     Here :math:`U_0` is the potential function describing the surface to adsorbent
     interactions and :math:`P_a` is the potential function describing the adsorbate-
@@ -74,7 +75,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     .. math::
 
-        RTln(p/p_0) =   & N_A\\frac{n_a A_a + n_A A_A}{2 \\sigma^{4}(l-d)} \\\\
+        RT\\ln(p/p_0) =   & N_A\\frac{n_a A_a + n_A A_A}{2 \\sigma^{4}(l-d)} \\\\
                         & \\times \\int_{d/_2}^{1-d/_2}
                             \\Big[
                             - \\Big(\\frac{\\sigma}{r}\\Big)^{4}
@@ -132,7 +133,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     References
     ----------
     .. [#] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
-       Carbon-dioxide Adsorption Isoterms, 86
+       Carbon-dioxide Adsorption Isotherms, 86
 
     """
 

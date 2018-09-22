@@ -95,9 +95,9 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
             'Isotherm passed are in a different adsorbent basis.')
 
     # Get minimum and maximum loading for each isotherm
-    min_loading = max(
+    min_loading = 1.01 * max(
         [min(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
-    max_loading = min(
+    max_loading = 0.99 * min(
         [max(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
 
     # Get temperatures
@@ -110,10 +110,12 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
         loading = loading_points
 
     # Get pressure point for each isotherm at loading
-    pressures = numpy.array([[i.pressure_at(l, pressure_unit='bar',
-                                            pressure_mode='absolute',
-                                            loading_unit='mmol', branch=branch) for i in isotherms]
-                             for l in loading])
+    pressures = numpy.array(
+        [[numpy.asscalar(i.pressure_at(
+            l, pressure_unit='bar',
+            pressure_mode='absolute',
+            loading_unit='mmol', branch=branch)) for i in isotherms]
+            for l in loading])
 
     iso_heat, slopes, correlation = isosteric_heat_raw(pressures, temperatures)
 

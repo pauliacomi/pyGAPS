@@ -2,11 +2,13 @@
 Tests IAST graphs
 """
 
+import pytest
 from matplotlib.testing.decorators import cleanup
 
 import pygaps.graphing.iastgraphs as graphing
 
 
+@pytest.mark.graphing
 class TestIASTGraphs(object):
     """Tests all IAST graphs"""
 

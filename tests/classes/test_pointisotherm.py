@@ -8,10 +8,8 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 
-from ..conftest import basic
 
-
-@basic
+@pytest.mark.core
 class TestPointIsotherm(object):
     """
     Tests the pointisotherm class
@@ -20,30 +18,52 @@ class TestPointIsotherm(object):
 
     def test_isotherm_create(self):
         "Checks isotherm can be created from basic data"
-        isotherm_param = {
-            'sample_name': 'carbon',
-            'sample_batch': 'X1',
-            'adsorbate': 'nitrogen',
-            't_exp': 77,
-        }
 
-        isotherm_data = pandas.DataFrame({
-            'pressure': [1, 2, 3, 4, 5, 3, 2],
-            'loading': [1, 2, 3, 4, 5, 3, 2]
-        })
-
-        isotherm = pygaps.PointIsotherm(
-            isotherm_data,
+        pygaps.PointIsotherm(
+            pandas.DataFrame({
+                'pressure': [1, 2, 3, 4, 5, 3, 2],
+                'loading': [1, 2, 3, 4, 5, 3, 2]
+            }),
             loading_key='loading',
             pressure_key='pressure',
-            **isotherm_param
+            sample_name='carbon',
+            sample_batch='X1',
+            adsorbate='nitrogen',
+            t_exp=77,
+        )
+        return
+
+    def test_isotherm_id(self, basic_pointisotherm):
+        "Checks isotherm id works as intended"
+
+        iso_id = basic_pointisotherm.id
+        basic_pointisotherm.nothing = 'changed'
+        assert iso_id == basic_pointisotherm.id
+        basic_pointisotherm._data = basic_pointisotherm._data[:5]
+        assert iso_id != basic_pointisotherm.id
+
+        return
+
+    @pytest.mark.parametrize('missing_key',
+                             ['loading_key', 'pressure_key'])
+    def test_isotherm_miss_key(self, isotherm_parameters, isotherm_data, missing_key):
+        "Tests exception throw for missing data primary key (loading/pressure)"
+
+        keys = dict(
+            pressure_key="pressure",
+            loading_key="loading",
         )
 
-        iso_id = isotherm.id
-        isotherm.nothing = 'changed'
-        assert iso_id == isotherm.id
-        isotherm._data = isotherm._data[:5]
-        assert iso_id != isotherm.id
+        del keys[missing_key]
+
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.PointIsotherm(
+                isotherm_data,
+                loading_key=keys.get('loading_key'),
+                pressure_key=keys.get('pressure_key'),
+                **isotherm_parameters)
+
+        return
 
     @pytest.mark.parametrize('branch, expected', [
         ('guess', 4.5),
@@ -84,15 +104,15 @@ class TestPointIsotherm(object):
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
 
-        isotherm_data = pandas.DataFrame({
-            'pressure': [1, 2, 3, 4, 5, 3, 2],
-            'loading': [1, 2, 3, 4, 5, 3, 2]
-        })
-
         # regular creation
         isotherm = pygaps.PointIsotherm.from_isotherm(
             basic_isotherm,
-            isotherm_data,
+            pandas.DataFrame({
+                'pressure': [1, 2, 3, 4, 5, 3, 2],
+                'loading': [1, 2, 3, 4, 5, 3, 2]
+            }),
+            pressure_key='pressure',
+            loading_key='loading',
         )
 
         assert isotherm != basic_isotherm

@@ -11,11 +11,13 @@ import pygaps.utilities as utilities
 HERE = os.path.dirname(__file__)
 
 
+@pytest.mark.core
 def test_matplotlib_chemformula():
     assert utilities.string_utilities.convert_chemformula(
         "C4H10") == "$C_{4}H_{10}$"
 
 
+@pytest.mark.core
 def test_file_paths():
     path = os.path.join(HERE, 'tst')
 

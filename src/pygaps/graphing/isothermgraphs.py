@@ -2,6 +2,10 @@
 This module contains the functions for plotting and comparing isotherms.
 """
 
+import collections
+import warnings
+from itertools import cycle
+
 import matplotlib.pyplot as plt
 from cycler import cycler
 from matplotlib import cm
@@ -11,16 +15,16 @@ from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
 from ..utilities.string_utilities import convert_chemformula
 
-# ! list of plot types
-_PLOT_TYPES = ("isotherm", "property", "combined")
-
 # ! list of branch types
-_BRANCH_TYPES = ("ads", "des")
+_BRANCH_TYPES = ("ads", "des", "all", "all-nol")
 
 
 def plot_iso(isotherms,
-             plot_type='isotherm', secondary_key=None,
-             branch=_BRANCH_TYPES, logx=False, color=True,
+             x_data='pressure',
+             y1_data='loading',
+             y2_data=None,
+
+             branch="all", logx=False, color=True,
 
              adsorbent_basis="mass",
              adsorbent_unit="g",
@@ -34,8 +38,8 @@ def plot_iso(isotherms,
              y2_range=(None, None),
 
              fig_title=None,
-             legend_list=None,
-             legend_bottom=False,
+             lgd_keys=None,
+             lgd_pos='best',
 
              save_path=None,
              **other_parameters):
@@ -44,19 +48,18 @@ def plot_iso(isotherms,
 
     Parameters
     ----------
-    isotherms : list
-        An iterable of the isotherms to be plotted.
-    plot_type : {'isotherm', 'property', 'combined'}
-        The plot type, to display: isotherm, a property or a combination.
-        The 'isotherm' graph type displays only isotherm data and is the standard.
-        If other data is recorded in the isotherm object, such as enthalpy, it
-        can be displayed at the same time as the isotherm or in a property v
-        loading graph by selecting one of the other graph types.
-    secondary_key : 'str'
-        The key which has the column with the supplementary data to be plotted.
-        This parameter is only required in the 'property' and 'combined' graphs.
-    branch : list
-        List with branches to disply, options: 'ads', 'des'.
+    isotherms : PointIsotherms or list of Pointisotherms
+        An isotherm or iterable of isotherms to be plotted.
+
+    x_data : str
+        Key of data to plot on the x axis. Defaults to 'pressure'.
+    y1_data : tuple
+        Key of data to plot on the left y axis. Defaults to 'loading'.
+    y2_data : tuple
+        Key of data to plot on the right y axis. Defaults to None.
+    branch : str
+        Which branch to display, adsorption ('ads'), desorption ('des'),
+        both ('all') or both with a single legend entry ('all-nol').
     logx : bool
         Whether the graph x axis should be logarithmic.
     color : bool, optional
@@ -88,16 +91,17 @@ def plot_iso(isotherms,
         Range for data on the secondary y axis. eg: (0, 1). Is applied to each
         isotherm, in the unit/mode/basis requested.
 
-    legend_list : iterable
-        The components of the isotherm which are displayed on the legend. For example
-        pass ['sample_batch', 'adsorbate'] to have the legend labels display only these
-        two components. Defaults to the sample name and adsorbate.
     fig_title : str
-        Title of the graph. Defaults to type of graph.
-    legend_bottom : bool
-        Specify as True to have the legend at the bottom of the graph. Alternatively,
-        when plotting a lot of data, the legend is best displayed separately to the
-        side of the graph. In that case, set this to False.
+        Title of the graph. Defaults to none.
+    lgd_keys : iterable
+        The components of the isotherm which are displayed on the legend. For example
+        pass ['sample_name', 'sample_batch'] to have the legend labels display only these
+        two components. Works with any isotherm properties and with 'branch' and 'key',
+        the isotherm branch and the y-axis key respectively.
+        Defaults to 'sample_name' and 'adsorbate'.
+    lgd_pos : ['best', 'none', 'bottom', 'right', 'inner']
+        Specify to have the legend position to the bottom, the right of the graph
+        or inside the plot area itself. Defaults to 'best'.
 
     save_path : str, optional
         Whether to save the graph or not.
@@ -105,13 +109,18 @@ def plot_iso(isotherms,
 
     Other Parameters
     ----------------
+
+    fig_style : dict
+        A dictionary that will be passed into the matplotlib figure()
+        function.
+
     title_style : dict
         A dictionary that will be passed into the matplotlib set_title() function.
 
     label_style : dict
         A dictionary that will be passed into the matplotlib set_label() function.
 
-    line_style : dict
+    y1_line_style : dict
         A dictionary that will be passed into the matplotlib plot() function.
 
     tick_style : dict
@@ -129,147 +138,173 @@ def plot_iso(isotherms,
     fig : Matplotlib figure
         The figure object generated.
     axes1 : Matplotlib ax
-        Ax object for primary graph.
+        Ax object for left y1 axis.
     axes2 : Matplotlib ax
-        Ax object for secondary graph.
+        Ax object for right y2 axis (if applicable).
 
     """
 #######################################
 #
 # Initial checks
-    #
+    # Make iterable if not already
+    if not isinstance(isotherms, collections.Iterable):
+        isotherms = [isotherms]
+
     # Check for plot type validity
-    if plot_type is None:
+    if None in [x_data, y1_data]:
         raise ParameterError("Specify a plot type to graph"
-                             " e.g. plot_type=\'isotherm\'")
-    if plot_type not in _PLOT_TYPES:
-        raise ParameterError("Plot type {0} not an option. Viable plot"
-                             "types are {1}".format(plot_type, _PLOT_TYPES))
-    if plot_type == 'property' or plot_type == 'combined':
-        if secondary_key is None:
-            raise ParameterError("No secondary_key parameter specified")
-        if all(secondary_key not in isotherm.other_keys for isotherm in isotherms):
+                             " e.g. x_data=\'loading\', y1_data=\'pressure\'")
+
+    # Check if required keys are present in isotherms
+    def keys(iso):
+        ks = ['loading', 'pressure']
+        ks.extend(getattr(iso, 'other_keys', []))
+        return ks
+
+    if any(x_data not in keys(isotherm) for isotherm in isotherms):
+        raise GraphingError(
+            "None of the isotherms supplied have {} data".format(x_data))
+
+    if any(y1_data not in keys(isotherm) for isotherm in isotherms):
+        raise GraphingError(
+            "None of the isotherms supplied have {} data".format(y1_data))
+
+    if y2_data is not None:
+        if all(y2_data not in keys(isotherm) for isotherm in isotherms):
             raise GraphingError(
-                "None of the isotherms supplied have {} data".format(secondary_key))
+                "None of the isotherms supplied have {} data".format(y2_data))
+        elif any(y2_data not in keys(isotherm) for isotherm in isotherms):
+            warnings.warn('Some isotherms do not have {} data'.format(y2_data))
 
     # Store which branches will be displayed
     if branch is None:
         raise ParameterError("Specify a branch to display"
                              " e.g. branch=\'ads\'")
-    if not [i for i in branch if i in _BRANCH_TYPES]:
-        raise GraphingError("One of the supplied branch types is not valid."
+    if branch not in _BRANCH_TYPES:
+        raise GraphingError("The supplied branch type is not valid."
                             "Viable types are {}".format(_BRANCH_TYPES))
 
     ads = False
     des = False
-    if 'ads' in branch:
+    if branch == 'ads':
         ads = True
-    if 'des' in branch:
+    elif branch == 'des':
+        des = True
+    else:
+        ads = True
         des = True
 
     # Create empty axes object
-    axes2 = None
-
-    # Add limits for data x and y
-    range_pressure = None
-    range_property = None
-    range_loading = None
+    ax2 = None
 
 #######################################
 #
 # Settings and graph generation
+
+    # Create style dictionaries and get user defined ones
+    styles = {
+        'fig_style': {'figsize': (8, 8)},
+        'title_style': {
+            'horizontalalignment': 'center',
+            'fontsize': 25,
+            'fontdict': {'family': 'monospace'}
+        },
+        'label_style': {
+            'horizontalalignment': 'center',
+            'fontsize': 20,
+            'fontdict': {'family': 'monospace'},
+        },
+        'y1_line_style': {'linewidth': 2, 'markersize': 8},
+        'y2_line_style': {'linewidth': 0, 'markersize': 8},
+        'tick_style': {'labelsize': 17},
+        'legend_style': {'handlelength': 3, 'fontsize': 15},
+        'save_style': {},
+    }
+
+    # Overwrite with any user provided styles
+    for style in styles:
+        new_style = other_parameters.get(style)
+        if new_style:
+            styles[style].update(new_style)
+
     #
     # Generate the graph itself
-    fig, axes = plt.subplots(1, 1, figsize=(8, 8))
-    if plot_type == 'combined':
-        axes2 = axes.twinx()
+    fig = plt.figure(**styles['fig_style'])
+    ax1 = plt.subplot(111)
+    if y2_data:
+        ax2 = ax1.twinx()
 
     # Build the name of the axes
-    text_xaxis = r'Pressure'
-    text_yaxis = r'Loading'
-    if secondary_key == 'enthalpy':
-        text_y2axis = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
-    else:
-        text_y2axis = secondary_key
-    if pressure_mode == "absolute":
-        text_xaxis = text_xaxis + ' ($' + pressure_unit + '$)'
-    elif pressure_mode == "relative":
-        text_xaxis = "Relative " + text_xaxis
-    text_yaxis = text_yaxis + \
-        ' ($' + loading_unit + '/' + adsorbent_unit + '$)'
+    def get_name(key):
+        if key == 'pressure':
+            if pressure_mode == "absolute":
+                text = 'Pressure ($' + pressure_unit + '$)'
+            elif pressure_mode == "relative":
+                text = "Relative pressure"
+        elif key == 'loading':
+            text = 'Loading ($' + loading_unit + '/' + adsorbent_unit + '$)'
+        elif key == 'enthalpy':
+            text = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
+        else:
+            text = key
+        return text
 
-    # Set the colours of the graph
-    cy1 = cycler('marker', ['o', 's'])
-    cy2 = cycler('marker', ['v', '^'])
-    cy4 = cycler('marker', ['v', '^', '<', '>'])
+    text_xaxis = get_name(x_data)
+    text_yaxis = get_name(y1_data)
+    if y2_data:
+        text_y2axis = get_name(y2_data)
 
+    # Get a cycling style for the graph
     if color:
-        number_of_lines = 6
-        if isinstance(color, int):
+        number_of_lines = 7
+        if not isinstance(color, bool):
             number_of_lines = color
 
-        colors = [cm.jet(x) for x in linspace(0, 1, number_of_lines)]
+        if isinstance(color, int):
+            colors = [cm.jet(x) for x in linspace(0, 1, number_of_lines)]
+
         if isinstance(color, list):
             colors = color
 
         polychrome_cy = cycler('color', colors)
-        pc_iso = (cy1 * polychrome_cy)
-        pc_prop = (cy2 * polychrome_cy)
+        y1_marker_cy = cycler('marker', ['o', 's'])
+        y2_marker_cy = cycler('marker', ['v', '^'])
+
+        pc_primary = cycle(y1_marker_cy * polychrome_cy)
+        pc_secondary = cycle(y2_marker_cy * polychrome_cy)
     else:
+        y1_marker_cy = cycler('marker', ['o', 's'])
+        y2_marker_cy = cycler('marker', ['v', '^', '<', '>'])
         monochrome_cy = cycler('color', ['black', 'grey', 'silver'])
-        linestyle_cy = cycler('linestyle', ['-', '--', ':', '-.'])
-        pc_iso = (cy1 * linestyle_cy * monochrome_cy)
-        pc_prop = (cy4 * linestyle_cy * monochrome_cy)
 
-    # Set the colours and ranges for the axes
-    if plot_type == 'isotherm':
-        axes.set_prop_cycle(pc_iso)
-        range_pressure = x_range
-        range_loading = y1_range
-        range_property = (None, None)
-    elif plot_type == 'property':
-        axes.set_prop_cycle(pc_prop)
-        range_pressure = (None, None)
-        range_loading = x_range
-        range_property = y1_range
-    elif plot_type == 'combined':
-        axes.set_prop_cycle(pc_iso)
-        axes2.set_prop_cycle(pc_prop)
-        range_pressure = x_range
-        range_loading = y1_range
-        range_property = y2_range
-
-    # Styles in the graph
-    styles = dict(title_style=dict(horizontalalignment='center',
-                                   fontsize=25, fontdict={'family': 'monospace'}),
-                  label_style=dict(horizontalalignment='center',
-                                   fontsize=20, fontdict={'family': 'monospace'}),
-                  line_style=dict(linewidth=2, markersize=8),
-                  tick_style=dict(labelsize=17),
-                  legend_style=dict(handlelength=3, fontsize=15, loc='best'),
-                  )
-
-    styles.update(other_parameters)  # Update with any user provided styles
+        pc_primary = cycle(y1_marker_cy * monochrome_cy)
+        pc_secondary = cycle(y2_marker_cy * monochrome_cy)
 
     # Put grid on plot
-    axes.grid(True, zorder=5)
+    ax1.grid(True, zorder=5)
 
     # Graph title
     if fig_title is None:
-        fig_title = plot_type.capitalize() + ' Graph'
-    axes.set_title(fig_title, **styles['title_style'])
+        fig_title = ''
+    ax1.set_title(fig_title, **styles['title_style'])
 
     # Graph legend builder
-    def build_label(lbl_components, isotherm):
+    def build_label(isotherm, lbl_components, iso_branch, key):
         """
         Builds a label for the legend depending on requested parameters
         """
         if lbl_components is None:
             return isotherm.sample_name + ' ' + convert_chemformula(isotherm.adsorbate)
         else:
+            if branch == 'all-nol' and iso_branch == 'des':
+                return ''
             text = []
             for selected in lbl_components:
                 if selected == 'branch':
+                    text.append(iso_branch)
+                    continue
+                elif selected == 'key':
+                    text.append(key)
                     continue
                 val = getattr(isotherm, selected)
                 if val:
@@ -279,116 +314,75 @@ def plot_iso(isotherms,
                         text.append(str(val))
 
             return " ".join(text)
+
 ###########################################
 #
-# Individual graphing functions
+# Getting specific data from an isotherm
     #
 
-    def isotherm_graph(axes, data_x, data_y, line_label, styles_dict):
-        "Plot an isotherm graph, regular or logx"
-
-        # Labels and ticks
-        axes.set_xlabel(text_xaxis, **styles_dict['label_style'])
-        axes.set_ylabel(text_yaxis, **styles_dict['label_style'])
-        axes.tick_params(axis='both', which='major',
-                         **styles_dict['tick_style'])
-
-        # Plot line
-        line, = axes.plot(data_x, data_y, label=line_label,
-                          **styles_dict['line_style'])
-
-        return line
-
-    def property_graph(axes, data_x, data_y, line_label, styles_dict):
-        "Plot an property graph versus amount adsorbed"
-
-        # Labels and ticks
-        axes.set_xlabel(text_yaxis, **styles_dict['label_style'])
-        axes.set_ylabel(text_y2axis, **styles_dict['label_style'])
-        axes.tick_params(axis='both', which='major',
-                         **styles_dict['tick_style'])
-        axes.set_ymargin(1)
-
-        # Generate a linestyle from the incoming dictionary
-        specific_line_style = styles_dict['line_style']
-        specific_line_style.update(dict(linewidth=0))
-
-        # Plot line
-        line, = axes.plot(data_x, data_y, label=line_label,
-                          **specific_line_style)
-
-        return line
-
-    def graph_caller(axes, axes2, isotherm, plot_branch, label, pl_type, styles):
-        """
-        Convenience function to call other graphing functions
-        """
-
-        line = None
-
-        # Get the data from the isotherm
-        def pressure():
-            return isotherm.pressure(
-                branch=plot_branch,
+    def get_data(isotherm, data_name, data_range, branch):
+        if data_name == 'pressure':
+            data = isotherm.pressure(
+                branch=branch,
                 pressure_unit=pressure_unit,
                 pressure_mode=pressure_mode,
-                min_range=range_pressure[0],
-                max_range=range_pressure[1],
+                min_range=data_range[0],
+                max_range=data_range[1],
                 indexed=True,
             )
-
-        def loading():
-            return isotherm.loading(
-                branch=plot_branch,
+        elif data_name == 'loading':
+            data = isotherm.loading(
+                branch=branch,
                 loading_unit=loading_unit,
                 loading_basis=loading_basis,
                 adsorbent_unit=adsorbent_unit,
                 adsorbent_basis=adsorbent_basis,
-                min_range=range_loading[0],
-                max_range=range_loading[1],
+                min_range=data_range[0],
+                max_range=data_range[1],
                 indexed=True,
             )
-
-        def secondary_prop():
-            return isotherm.other_data(
-                secondary_key,
-                branch=plot_branch,
-                min_range=range_property[0],
-                max_range=range_property[1],
+        else:
+            data = isotherm.other_data(
+                data_name,
+                branch=branch,
+                min_range=data_range[0],
+                max_range=data_range[1],
                 indexed=True,
             )
+        return data
 
-        if pl_type == 'isotherm':
-            p_points, l_points = pressure().align(loading(), join='inner')
-            line = isotherm_graph(axes,
-                                  p_points,
-                                  l_points,
-                                  label, styles_dict=styles)
+###########################################
+#
+# Generic ax1/ax2 graphing function
+    #
 
-        elif pl_type == 'property':
-            l_points, o_points = loading().align(secondary_prop(), join='inner')
-            line = property_graph(axes,
-                                  l_points,
-                                  o_points,
-                                  label, styles_dict=styles)
+    def graph_caller(isotherm, iso_branch, y1_style, y2_style):
+        """
+        Convenience function to call other graphing functions
+        """
 
-        elif pl_type == 'combined':
-            p_points, l_points = pressure().align(loading(), join='inner')
-            line = isotherm_graph(axes,
-                                  p_points,
-                                  l_points,
-                                  label, styles_dict=styles)
+        # Labels and ticks
+        ax1.set_xlabel(text_xaxis, **styles['label_style'])
+        ax1.set_ylabel(text_yaxis, **styles['label_style'])
+        ax1.tick_params(axis='both', which='major', **styles['tick_style'])
 
-            if secondary_prop is not None and secondary_key in isotherm.other_keys:
-                p_points, o_points = pressure().align(secondary_prop(), join='inner')
-                property_graph(axes2,
-                               p_points,
-                               o_points,
-                               label, styles_dict=styles)
-            else:
-                pass
+        # Plot line 1
+        label = build_label(isotherm, lgd_keys, iso_branch, y1_data)
+        x_p, y_p = get_data(isotherm, x_data, x_range, iso_branch).align(
+            get_data(isotherm, y1_data, y1_range, iso_branch), join='inner')
+        ax1.plot(x_p, y_p, label=label, **y1_style)
 
-        return line
+        # Plot line 2 (if applicable)
+        if y2_data and y2_data in keys(isotherm):
+            x_p, y2_p = get_data(isotherm, x_data, x_range, iso_branch).align(
+                get_data(isotherm, y2_data, y2_range, iso_branch), join='inner')
+
+            label = build_label(isotherm, lgd_keys, iso_branch, y2_data)
+            print(label)
+            ax2.set_ylabel(text_y2axis, **styles['label_style'])
+            ax2.tick_params(axis='both', which='major', **styles['tick_style'])
+            ax2.plot(x_p, y2_p, label=label, **y2_style)
+
 
 #####################################
 #
@@ -398,51 +392,35 @@ def plot_iso(isotherms,
     for isotherm in isotherms:
 
         # First build the label of the isotherm for the legend
-        line_label = build_label(legend_list, isotherm)
 
-        # Colour of the line, now empty
-        line_color = None
+        # Line styles for the current isotherm
+        y1_line_style = next(pc_primary)
+        y2_line_style = next(pc_secondary)
+        y1_line_style.update(styles['y1_line_style'])
+        y2_line_style.update(styles['y2_line_style'])
 
         # If there's an adsorption branch, plot it
         if ads:
-            plot_branch = 'ads'
-            if isotherm.has_branch(branch=plot_branch):
-
-                # Label the branch
-                lbl = line_label
-                if legend_list is not None and 'branch' in legend_list:
-                    lbl += ' ads'
+            iso_branch = 'ads'
+            if isotherm.has_branch(branch=iso_branch):
 
                 # Call the plotting function
-                line = graph_caller(axes, axes2,
-                                    isotherm, plot_branch,
-                                    lbl, plot_type, styles)
+                graph_caller(isotherm, iso_branch,
+                             y1_line_style, y2_line_style)
 
-                line_color = line.get_color()
+        # Switch to desorption linestyle (dotted, open marker)
+        y1_line_style['markerfacecolor'] = 'none'
+        y1_line_style['linestyle'] = '--'
+        y2_line_style['markerfacecolor'] = 'none'
 
+        # If there's a desorption branch, plot it
         if des:
-            plot_branch = 'des'
-            if isotherm.has_branch(branch=plot_branch):
-
-                # Label the branch
-                lbl = line_label
-                if legend_list is not None and 'branch' in legend_list:
-                    lbl += ' des'
-
-                # Set marker fill to empty, and match the colour from desorption
-                styles['line_style']['mfc'] = 'none'
-                if line_color is not None:
-                    styles['line_style']['c'] = line_color
+            iso_branch = 'des'
+            if isotherm.has_branch(branch=iso_branch):
 
                 # Call the plotting function
-                line = graph_caller(axes, axes2,
-                                    isotherm, plot_branch,
-                                    lbl, plot_type, styles)
-
-                # Delete the colour changes to go back to original settings
-                del styles['line_style']['mfc']
-                if line_color is not None:
-                    del styles['line_style']['c']
+                graph_caller(isotherm, iso_branch,
+                             y1_line_style, y2_line_style)
 
 
 #####################################
@@ -451,41 +429,73 @@ def plot_iso(isotherms,
     #
     # Convert the axes into logarithmic if required
     if logx:
-        axes.set_xscale('log')
+        ax1.set_xscale('log')
     else:
-        axes.set_xscale('linear')
-        axes.set_xlim(xmin=0)
+        ax1.set_xscale('linear')
+        ax1.set_xlim(left=0)
 
-    axes.set_xlim(x_range)
-    axes.set_ylim(y1_range)
-    if axes2:
-        axes2.set_ylim(y2_range)
+    ax1.set_xlim(x_range)
+    ax1.set_ylim(y1_range)
+    if ax2:
+        ax2.set_ylim(y2_range)
 
     # Add the legend
-    lines, labels = axes.get_legend_handles_labels()
-    if plot_type == 'combined':
-        lines2, labels2 = axes2.get_legend_handles_labels()
+    lines, labels = ax1.get_legend_handles_labels()
+    if y2_data:
+        lines2, labels2 = ax2.get_legend_handles_labels()
         lines = lines + lines2
         labels = labels + labels2
 
-    if legend_bottom:
-        styles['legend_style']['bbox_to_anchor'] = (0.5, -0.1)
-        styles['legend_style']['ncol'] = 2
-        styles['legend_style']['loc'] = 'upper center'
-    elif len(lines) > 5:
-        styles['legend_style']['bbox_to_anchor'] = (1.15, 0.5)
-        styles['legend_style']['loc'] = 'center left'
+    lgd = None
 
-    lgd = axes.legend(lines, labels, **styles['legend_style'])
+    if lgd_pos == 'best':
+        if len(lines) > 5:
+            lgd_pos = 'right'
+        else:
+            lgd_pos = 'inner'
+
+    if lgd_pos == 'none':
+        pass
+    elif lgd_pos == 'inner':
+        lgd = ax1.legend(lines, labels, **styles['legend_style'])
+    elif lgd_pos == 'bottom':
+        legend_style = {}
+        legend_style['bbox_to_anchor'] = (0.5, 0)
+        legend_style['loc'] = 'upper center'
+        legend_style['bbox_transform'] = fig.transFigure
+        legend_style['ncol'] = 2
+        legend_style.update(styles['legend_style'])
+        lgd = fig.legend(lines, labels, **legend_style)
+    elif lgd_pos == 'right':
+        legend_style = {}
+        legend_style['bbox_to_anchor'] = (1, 0.5)
+        legend_style['loc'] = 'center left'
+        legend_style['bbox_transform'] = fig.transFigure
+        legend_style.update(styles['legend_style'])
+        lgd = fig.legend(lines, labels, **legend_style)
+    elif lgd_pos == 'left':
+        legend_style = {}
+        legend_style['bbox_to_anchor'] = (0, 0.5)
+        legend_style['loc'] = 'center right'
+        legend_style['bbox_transform'] = fig.transFigure
+        legend_style.update(styles['legend_style'])
+        lgd = fig.legend(lines, labels, **legend_style)
+    else:
+        lgd = ax1.legend(lines, labels, **styles['legend_style'])
+
+    bbox_extra_artists = []
+    if lgd:
+        bbox_extra_artists.append(lgd)
 
     # Fix size of graphs
-    plt.tight_layout()
+    fig.tight_layout()
 
     if save_path:
-        fig.savefig(save_path,
-                    bbox_extra_artists=(lgd,),
-                    bbox_inches='tight',
-                    **styles['save_style'],
-                    )
+        fig.savefig(
+            save_path,
+            bbox_extra_artists=bbox_extra_artists,
+            bbox_inches='tight',
+            **styles['save_style'],
+        )
 
-    return fig, axes, axes2
+    return fig, ax1, ax2

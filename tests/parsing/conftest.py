@@ -14,3 +14,5 @@ DATA_EXCEL_MIC = [os.path.join(DATA_EXCEL_PATH, 'mic', 'Sample_A.xls'),
 
 DATA_EXCEL_BEL = [os.path.join(DATA_EXCEL_PATH, 'bel', 'Sample_C.xls'),
                   os.path.join(DATA_EXCEL_PATH, 'bel', 'Sample_D.xls')]
+
+DATA_BEL = [os.path.join(DATA_PATH, 'bel', 'Sample_C.DAT')]

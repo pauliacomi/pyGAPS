@@ -10,12 +10,11 @@ from numpy import isclose
 
 import pygaps
 
-from ..conftest import characterisation
 from .conftest import DATA_CALO
 from .conftest import DATA_CALO_PATH
 
 
-@characterisation
+@pytest.mark.characterisation
 class TestInitialEnthalpy(object):
     """
     Tests all initial enthalpy methods

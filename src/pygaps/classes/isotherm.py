@@ -2,13 +2,10 @@
 This module contains the main class that describes an isotherm.
 """
 
-import hashlib
-
 import pandas
 
-import pygaps
-
 from ..utilities.exceptions import ParameterError
+from ..utilities.hashgen import isotherm_to_hash
 from ..utilities.unit_converter import _MATERIAL_MODE
 from ..utilities.unit_converter import _PRESSURE_MODE
 from ..utilities.unit_converter import _PRESSURE_UNITS
@@ -28,10 +25,6 @@ class Isotherm(object):
     Parameters
     ----------
 
-    loading_key : str
-        The title of the pressure data in the DataFrame provided.
-    pressure_key : str
-        The title of the loading data in the DataFrame provided.
     sample_name : str
         Name of the sample on which the isotherm is measured.
     sample_batch : str
@@ -99,13 +92,17 @@ class Isotherm(object):
         'loading_basis',
     ]
 
+    _reserved_params = [
+        '_instantiated',
+    ]
+
     _db_columns = ['id'] + _named_params
-    _id_params = _named_params + _unit_params + ['other_properties']
+    _id_params = _named_params + _unit_params
+
+##########################################################
+#   Instantiation and classmethods
 
     def __init__(self,
-                 loading_key=None,
-                 pressure_key=None,
-
                  adsorbent_basis="mass",
                  adsorbent_unit="g",
                  loading_basis="molar",
@@ -166,12 +163,6 @@ class Isotherm(object):
                 "Unit selected for adsorbent ({}) is not an option. See viable "
                 "values: {}".format(adsorbent_unit, list(_MATERIAL_MODE[loading_basis].keys())))
 
-        # Column titles
-        if None in [loading_key, pressure_key]:
-            raise ParameterError(
-                "Pass loading_key and pressure_key, the names of the loading and"
-                " pressure columns in the DataFrame, to the constructor.")
-
         #: Basis for the adsorbent.
         self.adsorbent_basis = str(adsorbent_basis)
         #: Unit for the adsorbent.
@@ -188,13 +179,6 @@ class Isotherm(object):
         else:
             #: Units for pressure.
             self.pressure_unit = str(pressure_unit)
-
-        # Save column names
-        #: Name of column in the dataframe that contains adsorbed amount.
-        self.loading_key = loading_key
-
-        #: Name of column in the dataframe that contains pressure.
-        self.pressure_key = pressure_key
 
         # Must-have properties of the isotherm
         #
@@ -270,7 +254,8 @@ class Isotherm(object):
         # Save the rest of the properties as an extra dict
         # now that the named properties were taken out of
         #: Other properties of the isotherm.
-        self.other_properties = isotherm_parameters
+        for attr in isotherm_parameters:
+            setattr(self, attr, isotherm_parameters[attr])
 
         # Finish instantiation process
         # (check if none in case its part of a Point/Model Isotherm instantiation)
@@ -299,11 +284,8 @@ class Isotherm(object):
     def _check_if_hash(self, name, extra_params=[]):
         """Checks if the hash needs to be generated"""
         if getattr(self, '_instantiated', False) and name in self._id_params + extra_params:
-            # Generate the unique id using md5
-            self.id = None        # set the id to none for repeatability of json
-            md_hasher = hashlib.md5(
-                pygaps.isotherm_to_json(self).encode('utf-8'))
-            self.id = md_hasher.hexdigest()
+            # Generate the unique hash
+            self.id = isotherm_to_hash(self)
 
     def __eq__(self, other_isotherm):
         """
@@ -353,16 +335,17 @@ class Isotherm(object):
 
         # Units/basis
         string += ("Units: \n")
-        string += ("Unit for loading: " + str(self.loading_unit) +
+        string += ("\tUnit for loading: " + str(self.loading_unit) +
                    "/" + str(self.adsorbent_unit) + '\n')
         if self.pressure_mode == 'relative':
-            string += ("Relative pressure \n")
+            string += ("\tRelative pressure \n")
         else:
-            string += ("Unit for pressure: " + str(self.pressure_unit) + '\n')
+            string += ("\tUnit for pressure: " + str(self.pressure_unit) + '\n')
 
         string += ("Other properties: \n")
-        for prop in self.other_properties:
-            string += (prop + ": " + str(self.other_properties[prop]) + '\n')
+        for prop in vars(self):
+            if prop not in self._named_params + self._unit_params + self._reserved_params:
+                string += ('\t' + prop + ": " + str(getattr(self, prop)) + '\n')
 
         return string
 
@@ -376,30 +359,23 @@ class Isotherm(object):
         dict
             Dictionary of all parameters.
         """
-        parameter_dict = {}
+        parameter_dict = vars(self).copy()
 
-        # Add named parameters
-        for param in self._named_params + self._unit_params + ['id']:
-            try:
-                val = getattr(self, param)
-                if val:
-                    parameter_dict.update({param: val})
-            except AttributeError:
-                pass
-
-        # Now add the rest
-        parameter_dict.update(self.other_properties)
+        # Remove reserved parameters
+        for param in self._reserved_params:
+            if param in parameter_dict:
+                parameter_dict.pop(param, None)
 
         return parameter_dict
 
     # Figure out the adsorption and desorption branches
-    def _splitdata(self, _data):
+    def _splitdata(self, _data, pressure_key):
         """
         Splits isotherm data into an adsorption and desorption part and
         adds a column to mark the transition between the two.
         """
         # Get a column where all increasing are False and all decreasing are True
-        increasing = _data.loc[:, self.pressure_key].diff().fillna(0) < 0
+        increasing = _data.loc[:, pressure_key].diff().fillna(0) < 0
         # Get the first inflexion point (assume where des starts)
         inflexion = increasing.idxmax()
 

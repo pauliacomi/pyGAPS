@@ -32,4 +32,4 @@ resulting plot.
 Examples
 --------
 
-Check it out in the ipython notebook in the :ref:`examples <examples/plotting.ipynb>` section.
+Check it out in the ipython notebook in the `examples <../examples/plotting.ipynb>`_ section.

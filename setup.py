@@ -22,7 +22,7 @@ def read(*names, **kwargs):
 
 setup(
     name='pygaps',
-    version='1.2.0',
+    version='1.3.0',
     license='MIT license',
     description='A framework for processing adsorption data for porous materials',
     long_description='%s\n%s' % (
@@ -48,6 +48,7 @@ setup(
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         # 'Programming Language :: Python :: Implementation :: CPython',
         # 'Programming Language :: Python :: Implementation :: PyPy3',
         'Topic :: Scientific/Engineering :: Physics',
@@ -74,8 +75,11 @@ setup(
         'nose',
     ],
     extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
+        'reST': [
+            'docutils>=0.11'
+            'doc9',
+            'pandoc',
+            'restructuredtext-lint',
+        ],
     },
 )

@@ -2,12 +2,12 @@
 Tests csv interaction
 """
 
+import pytest
+
 import pygaps
 
-from ..conftest import parsing
 
-
-@parsing
+@pytest.mark.parsing
 class TestCSV(object):
 
     def test_csv(self, basic_pointisotherm, tmpdir_factory):

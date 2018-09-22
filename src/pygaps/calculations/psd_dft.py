@@ -53,7 +53,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
     constraint that the contribution of each isotherm cannot be negative.
 
     """
-    # Paramter checks
+    # Parameter checks
     if len(pressure) != len(loading):
         raise Exception("The length of the pressure and loading arrays"
                         " do not match")
@@ -95,8 +95,10 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
 
     # run the optimisation algorithm
     guess = [0 for pore in points_arr.index]
+    bounds = [(0, None) for pore in points_arr.index]
     result = scipy.optimize.minimize(
-        sum_squares, guess, method='SLSQP', constraints=cons)
+        sum_squares, guess, method='SLSQP',
+        bounds=bounds, constraints=cons)
 
     if not result.success:
         raise CalculationError(

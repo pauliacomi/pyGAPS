@@ -7,18 +7,6 @@ import pytest
 
 import pygaps
 
-# Basic functionality
-basic = pytest.mark.basic
-
-# Characterisation functionality
-characterisation = pytest.mark.characterisation
-
-# Modelling functionality
-modelling = pytest.mark.modelling
-
-# Parsing functionality
-parsing = pytest.mark.parsing
-
 # Incremental tests
 
 
@@ -119,10 +107,7 @@ def basic_isotherm(isotherm_parameters):
     """
     Creates an basic isotherm from model data
     """
-    isotherm = pygaps.classes.isotherm.Isotherm(
-        loading_key=LOADING_KEY,
-        pressure_key=PRESSURE_KEY,
-        **isotherm_parameters)
+    isotherm = pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
 
     return isotherm
 
@@ -137,20 +122,25 @@ def basic_pointisotherm(isotherm_data, basic_isotherm):
     isotherm = pygaps.PointIsotherm.from_isotherm(
         basic_isotherm,
         isotherm_data,
+        loading_key=LOADING_KEY,
+        pressure_key=PRESSURE_KEY,
         other_keys=other_keys)
 
     return isotherm
 
 
 @pytest.fixture()
-def basic_modelisotherm(basic_pointisotherm):
+def basic_modelisotherm(isotherm_data, basic_isotherm):
     """
     Creates an isotherm from model data
     """
     model = "Henry"
 
-    isotherm = pygaps.ModelIsotherm.from_pointisotherm(
-        basic_pointisotherm,
+    isotherm = pygaps.ModelIsotherm.from_isotherm(
+        basic_isotherm,
+        isotherm_data,
+        loading_key=LOADING_KEY,
+        pressure_key=PRESSURE_KEY,
         model=model,
     )
 

@@ -13,14 +13,16 @@ class Langmuir(IsothermModel):
 
     .. math::
 
-        L(P) = M\\frac{KP}{1+KP}
+        n(p) = n_m\\frac{K p}{1 + K p}
 
     Notes
     -----
 
     The Langmuir theory [#]_, proposed at the start of the 20th century, states that
-    adsorption happens on active sites on a surface in a single layer. It is
-    derived based on several assumptions.
+    adsorption takes place on specific sites on a surface, until
+    all sites are occupied.
+    It was originally derived from a kinetic model of gas adsorption and
+    is based on several assumptions.
 
         * All sites are equivalent and have the same chance of being occupied
         * Each adsorbate molecule can occupy one adsorption site
@@ -29,36 +31,45 @@ class Langmuir(IsothermModel):
           of sites currently free and currently occupied, respectively
         * Adsorption is complete when all sites are filled.
 
-    Using the following assumptions we can define rates for both the adsorption and
-    desorption. The adsorption rate will be proportional to the number of sites available
-    on the surface, as well as the number of molecules in the gas, which is represented by
-    the pressure. The desorption rate, on the other hand, will be proportional to the
-    number of occupied sites and the energy of adsorption.
-    It is also useful to define :math:`\\theta = \\frac{n_a}{M}` as the surface coverage,
-    the number of sites occupied divided by the total sites. Mathematically:
+
+    Using these assumptions we can define rates for both adsorption and
+    desorption. The adsorption rate :math:`r_a`
+    will be proportional to the number of sites available on
+    the surface, as well as the number of molecules in the gas,
+    which is given by pressure.
+    The desorption rate :math:`r_d`, on the other hand, will
+    be proportional to the number of occupied sites and the energy
+    of adsorption. It is also useful to define
+    :math:`\\theta = n_{ads}/n_{ads}^m` as the fractional
+    surface coverage, the number of sites occupied divided by the total
+    sites. At equilibrium, the rate of adsorption and the rate of
+    desorption are equal, therefore the two equations can be combined.
+    The equation can then be arranged to obtain an expression for the
+    loading called the Langmuir model. Mathematically:
 
     .. math::
 
-        v_a = k_a p (1 - \\theta)
+        r_a = k_a p (1 - \\theta)
 
-        v_d = k_d \\theta \\exp{(-\\frac{E}{RT})}
+        r_d = k_d \\theta \\exp{\\Big(-\\frac{E_{ads}}{R_g T}\\Big)}
 
-    Here, :math:`M` is the moles adsorbed at the completion of the monolayer, and therefore
-    the maximum possible loading. At equilibrium, the rate of adsorption and the rate of
+    At equilibrium, the rate of adsorption and the rate of
     desorption are equal, therefore the two equations can be combined.
 
     .. math::
 
-        k_a p (1 - \\theta) = k_d \\theta \\exp{(-\\frac{E}{RT})}
+        k_a p (1 - \\theta) = k_d \\theta \\exp{\\Big(-\\frac{E_{ads}}{R_gT}\\Big)}
 
     Rearranging to get an expression for the loading, the Langmuir equation becomes:
 
     .. math::
 
-        L(P) = M\\frac{KP}{1+KP}
+        n(p) = n_m \\frac{K p}{1 + K p}
 
-    The Langmuir constant is the product of the individual desorption and adsorption constants
-    :math:`k_a` and :math:`k_d` and exponentially related to the energy of adsorption
+    Here, :math:`n_m` is the moles adsorbed at the completion of the
+    monolayer, and therefore the maximum possible loading.
+    The Langmuir constant is the product of the individual desorption and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
+    related to the energy of adsorption
     :math:`\\exp{(-\\frac{E}{RT})}`.
 
     References
@@ -76,7 +87,7 @@ class Langmuir(IsothermModel):
         Instantiation function
         """
 
-        self.params = {"M": numpy.nan, "K": numpy.nan}
+        self.params = {"n_m": numpy.nan, "K": numpy.nan}
 
     def loading(self, pressure):
         """
@@ -92,7 +103,7 @@ class Langmuir(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["M"] * self.params["K"] * pressure / \
+        return self.params["n_m"] * self.params["K"] * pressure / \
             (1.0 + self.params["K"] * pressure)
 
     def pressure(self, loading):
@@ -104,7 +115,7 @@ class Langmuir(IsothermModel):
 
         .. math::
 
-            \\P = \\frac{L}{K(M-L)}
+            p = \\frac{n}{K (n_m - n)}
 
         Parameters
         ----------
@@ -117,7 +128,7 @@ class Langmuir(IsothermModel):
             Pressure at specified loading.
         """
         return loading / \
-            (self.params["K"] * (self.params["M"] - loading))
+            (self.params["K"] * (self.params["n_m"] - loading))
 
     def spreading_pressure(self, pressure):
         """
@@ -126,13 +137,13 @@ class Langmuir(IsothermModel):
 
         .. math::
 
-            \\pi = \\int_{0}^{P_i} \\frac{n_i(P_i)}{P_i} dP_i
+            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Langmuir model is solved analytically.
 
         .. math::
 
-            \\pi = M \\log{1 + KP}
+            \\pi = n_m \\log{1 + K p}
 
         Parameters
         ----------
@@ -144,7 +155,7 @@ class Langmuir(IsothermModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["M"] * \
+        return self.params["n_m"] * \
             numpy.log(1.0 + self.params["K"] * pressure)
 
     def default_guess(self, data, loading_key, pressure_key):
@@ -168,4 +179,4 @@ class Langmuir(IsothermModel):
         saturation_loading, langmuir_k = super(Langmuir, self).default_guess(
             data, loading_key, pressure_key)
 
-        return {"M": saturation_loading, "K": langmuir_k}
+        return {"n_m": saturation_loading, "K": langmuir_k}

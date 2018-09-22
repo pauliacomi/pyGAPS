@@ -48,7 +48,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
     return
 
 
-def isotherm_from_csv(path, separator=','):
+def isotherm_from_csv(path, separator=',', branch='guess'):
     """
     A function that will get the experiment and sample data from a csv file
     file and return the isotherm object.
@@ -79,8 +79,9 @@ def isotherm_from_csv(path, separator=','):
 
     isotherm = PointIsotherm(
         data_df,
-        loading_key=data_df.columns[0],
-        pressure_key=data_df.columns[1],
+        branch=branch,
+        pressure_key=data_df.columns[0],
+        loading_key=data_df.columns[1],
         other_keys=list(data_df.columns[2:]),
         **sample_info)
 
