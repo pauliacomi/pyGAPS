@@ -76,7 +76,7 @@ A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinter
 Database example
 ----------------
 
-Check it out in the ipython notebook in the `examples <../examples/database.ipynb>` section
+Check it out in the ipython notebook in the `examples <../examples/database.ipynb>`_ section
 
 
 .. _sqlite-manual-creation:

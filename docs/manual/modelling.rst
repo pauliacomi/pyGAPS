@@ -156,7 +156,7 @@ isotherm.
 Modelling examples
 ------------------
 
-Check it out in the ipython notebook in the `examples <../examples/modelling.ipynb>` section
+Check it out in the ipython notebook in the `examples <../examples/modelling.ipynb>`_ section
 
 
 .. _modelling-custom:
