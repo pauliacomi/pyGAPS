@@ -295,7 +295,7 @@ def psd_plot(pore_widths, pore_dist, method=None,
     if labelcum:
         lns = l1 + l2
     labs = [l.get_label() for l in lns]
-    ax1.legend(lns, labs, loc='best')
+    ax1.legend(lns, labs, loc='lower right')
     ax1.set_ylim(bottom=0)
     ax2.set_ylim(bottom=0)
     ax1.grid(True)
