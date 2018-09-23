@@ -10,7 +10,7 @@ from ..utilities.exceptions import ParameterError
 
 
 def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
-                        maximum_adsorbed, adsorbate_properties,
+                        adsorbate_properties,
                         adsorbent_properties=None):
     """
     Calculates the pore size distribution using the Horvath-Kawazoe method
@@ -25,9 +25,6 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         Temperature of the experiment, in K.
     pore_geometry : str
         The geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'.
-    maximum_adsorbed : float
-        The amount of adsorbate filling the micropores. If the material
-        has only micropores, it is taken as the volume adsorbed at p/p0 = 0.9.
     adsorbate_properties : dict
         Properties for the adsorbate in the form of::
 
@@ -36,6 +33,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
                 'polarizability'=0,               # nm3
                 'magnetic_susceptibility'=0,      # nm3
                 'surface_density'=0,              # molecules/m2
+                'liquid_density'=0,               # g/cm3
+                'adsorbate_molar_mass'=0,         # g/mol
             )
 
     adsorbent_properties : dict
@@ -167,12 +166,13 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
             "A dictionary of adsorbate properties must be provided"
             " for the HK method. The properties required are:"
             "molecular_diameter, liquid_density, polarizability,"
-            "magnetic_susceptibility, surface_density")
-    missing = [x for x in adsorbate_properties if x not in ['molecular_diameter',
-                                                            'liquid_density',
-                                                            'polarizability',
-                                                            'magnetic_susceptibility',
-                                                            'surface_density']]
+            "magnetic_susceptibility, surface_density, adsorbate_molar_mass")
+    missing = [x for x in ['molecular_diameter',
+                           'liquid_density',
+                           'polarizability',
+                           'magnetic_susceptibility',
+                           'surface_density',
+                           'adsorbate_molar_mass'] if x not in adsorbate_properties]
     if len(missing) != 0:
         raise ParameterError(
             "Adsorbate properties dictionary is missing parameters: "
@@ -187,6 +187,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     m_adsorbent = adsorbent_properties.get('magnetic_susceptibility') * 1e-27   # to m3
     n_adsorbate = adsorbate_properties.get('surface_density')
     n_adsorbent = adsorbent_properties.get('surface_density')
+    liquid_density = adsorbate_properties.get('liquid_density')
+    adsorbate_molar_mass = adsorbate_properties.get('adsorbate_molar_mass')
 
     # calculation of constants and terms
     e_m = scipy.constants.electron_mass
@@ -227,9 +229,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     # finally calculate pore distribution
     pore_widths = numpy.array(p_w)
-    avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2
-    pore_dist = numpy.diff(loading / maximum_adsorbed) / \
-        numpy.diff(pore_widths)
-    # c_pore_dist = loading / maximum_adsorbed
+    avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2          # nm
+    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000    # cm3/g
+    pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
 
     return avg_pore_widths, pore_dist

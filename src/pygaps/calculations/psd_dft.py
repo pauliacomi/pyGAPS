@@ -89,16 +89,17 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
     bounds = [(0, None) for pore in pore_widths]
     result = scipy.optimize.minimize(
         sum_squares, guess, method='SLSQP',
-        bounds=bounds, constraints=cons)
+        bounds=bounds, constraints=cons, options={'ftol': 1e-04})
 
     if not result.success:
         raise CalculationError(
-            "Minimization of DFT failed with error {1}".format(result.message)
+            "Minimization of DFT failed with error {}".format(result.message)
         )
 
-    pore_dist = result.x
+    # convert from preponderence to distribution
+    pore_dist = result.x[1:] / numpy.diff(pore_widths)
 
-    return pore_widths, pore_dist
+    return pore_widths[1:], pore_dist
 
 
 def _load_kernel(path):
