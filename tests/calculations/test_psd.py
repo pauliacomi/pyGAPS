@@ -141,5 +141,3 @@ class TestPSD(object):
         # max_error = 0.1  # 10 percent
 
         assert result_dict is not None
-
-        return

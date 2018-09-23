@@ -65,27 +65,18 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
     kernel_points = []
     for psize in kernel:
         kernel_points.append(kernel.get(psize)(pressure))
+    kernel_points = numpy.array(kernel_points)
 
     pore_widths = numpy.array(list(kernel.keys())).astype(float)
 
-    points_arr = pandas.DataFrame(
-        kernel_points,
-        index=pore_widths,
-        columns=pressure)
-
     # define the minimization function
     def sum_squares(pore_dist):
-        return (points_arr.multiply(pore_dist, axis=0)
-                # -> multiply each loading with its contribution
-                .sum()
-                # -> add the contributions together at each pressure
-                .subtract(loading)
-                # -> difference between calculated and isotherm
-                .pow(2)
-                # -> square the difference
-                .sum()
-                # -> sum of squares together
-                )
+        return numpy.square(                                                  # -> square the difference
+            numpy.subtract(                                                   # -> difference between calculated and isotherm
+                numpy.multiply(                                               # -> multiply each loading with its contribution
+                    kernel_points, pore_dist[:, numpy.newaxis]).sum(axis=0),  # -> add the contributions together at each pressure
+                loading)
+        ).sum(axis=0)                                                         # -> sum of squares together
 
     # define the constraints (x>0)
     cons = [{
@@ -93,9 +84,9 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
         'fun': lambda x: x,
     }]
 
-    # run the optimisation algorithm
-    guess = [0 for pore in points_arr.index]
-    bounds = [(0, None) for pore in points_arr.index]
+    # # run the optimisation algorithm
+    guess = [0 for pore in pore_widths]
+    bounds = [(0, None) for pore in pore_widths]
     result = scipy.optimize.minimize(
         sum_squares, guess, method='SLSQP',
         bounds=bounds, constraints=cons)
@@ -137,7 +128,7 @@ def _load_kernel(path):
         raw_kernel = raw_kernel.append(pandas.DataFrame(
             [0 for col in raw_kernel.columns], index=raw_kernel.columns, columns=[0]).transpose())
 
-        kernel = dict()
+        kernel = {}
         for pore_size in raw_kernel:
             interpolator = scipy.interpolate.interp1d(
                 raw_kernel[pore_size].index,
