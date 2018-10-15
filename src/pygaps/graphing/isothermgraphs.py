@@ -378,7 +378,6 @@ def plot_iso(isotherms,
                 get_data(isotherm, y2_data, y2_range, iso_branch), join='inner')
 
             label = build_label(isotherm, lgd_keys, iso_branch, y2_data)
-            print(label)
             ax2.set_ylabel(text_y2axis, **styles['label_style'])
             ax2.tick_params(axis='both', which='major', **styles['tick_style'])
             ax2.plot(x_p, y2_p, label=label, **y2_style)
