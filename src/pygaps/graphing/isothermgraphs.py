@@ -122,6 +122,11 @@ def plot_iso(isotherms,
 
     y1_line_style : dict
         A dictionary that will be passed into the matplotlib plot() function.
+        Applicable for left axis.
+
+    y2_line_style : dict
+        A dictionary that will be passed into the matplotlib plot() function.
+        Applicable for right axis.
 
     tick_style : dict
         A dictionary that will be passed into the matplotlib tick_params() function.
@@ -293,11 +298,11 @@ def plot_iso(isotherms,
         """
         Builds a label for the legend depending on requested parameters
         """
-        if lbl_components is None:
-            return isotherm.sample_name + ' ' + convert_chemformula(isotherm.adsorbate)
+        if branch == 'all-nol' and iso_branch == 'des':
+            return ''
         else:
-            if branch == 'all-nol' and iso_branch == 'des':
-                return ''
+            if lbl_components is None:
+                return isotherm.sample_name + ' ' + convert_chemformula(isotherm.adsorbate)
             text = []
             for selected in lbl_components:
                 if selected == 'branch':
