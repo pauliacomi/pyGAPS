@@ -156,7 +156,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     adsorbate = Adsorbate.from_list(isotherm.adsorbate)
     try:
         enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
-    except (ParameterError, CalculationError) as e_info:
+    except (ParameterError, CalculationError):
         enth_liq = 0
         warnings.warn(
             "Could not calculate liquid enthalpy, perhaps in supercritical regime")

@@ -122,8 +122,6 @@ class TestModelIsotherm(object):
         pygaps.ModelIsotherm.from_pointisotherm(
             isotherm, guess_model=True, verbose=True)
 
-
-##########################
     def test_isotherm_ret_pressure(self, basic_modelisotherm, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
@@ -186,8 +184,6 @@ class TestModelIsotherm(object):
         assert isinstance(basic_modelisotherm.loading(
             5, indexed=True), pandas.Series)
 
-
-##########################
     def test_isotherm_ret_loading_at(self, basic_modelisotherm, use_sample, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
