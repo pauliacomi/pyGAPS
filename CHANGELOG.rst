@@ -3,8 +3,12 @@ Changelog
 =========
 
 
-1.3.1 ()
+1.4.0 (2018-11-10)
 ------------------
+
+Features:
+
+* Added the GAB isotherm model
 
 Bugfixes:
 

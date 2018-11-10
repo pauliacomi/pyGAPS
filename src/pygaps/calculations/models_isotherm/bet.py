@@ -180,7 +180,7 @@ class BET(IsothermModel):
 
         .. math::
 
-            \\pi = n_m \\ln{\\frac{1 - K_b p + C p}{1- K_b p}}
+            \\pi = n_m \\ln{\\frac{1 - N p + C p}{1- N p}}
 
         Parameters
         ----------

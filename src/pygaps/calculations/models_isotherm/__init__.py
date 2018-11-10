@@ -21,10 +21,11 @@ from .toth import Toth
 from .tslangmuir import TSLangmuir
 from .virial import Virial
 from .wvst import WVST
+from .gab import GAB
 
 # This list has all the available models
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-           Quadratic, BET, TemkinApprox, Virial,
+           Quadratic, BET, GAB, TemkinApprox, Virial,
            Toth, JensenSeaton, FHVST, WVST]
 
 # This list has all the models which will be used when attempting to
