@@ -89,7 +89,7 @@ def psd_bjh(loading, pressure, pore_geometry,
        I. Computations from Nitrogen Isotherms”, Elliott P. Barrett, Leslie G. Joyner and
        Paul P. Halenda, J. Amer. Chem. Soc., 73, 373 (1951)
 
-    .. [#] "Adsorption by Powders & Porous Solids", F. Roquerol, J Roquerol
+    .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
        and K. Sing, Academic Press, 1999
     """
     # Parameter checks
@@ -105,7 +105,7 @@ def psd_bjh(loading, pressure, pore_geometry,
         raise NotImplementedError
 
     # Calculate the adsorbed volume of liquid and diff
-    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density * 1000
+    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000
     d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
@@ -144,9 +144,9 @@ def psd_bjh(loading, pressure, pore_geometry,
         pore_volumes.append(pore_volume)
 
     pore_widths = 2 * avg_pore_radii
-    pore_dist = (pore_volumes / (2 * d_pore_radii)) / 1e6
+    pore_dist = (pore_volumes / (2 * d_pore_radii))
 
-    return pore_widths, pore_dist
+    return pore_widths[::-1], pore_dist[::-1]
 
 
 def psd_dollimore_heal(loading, pressure, pore_geometry,
@@ -247,7 +247,7 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
         raise NotImplementedError
 
     # Calculate the adsorbed volume of liquid and diff
-    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density * 1000
+    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000
     d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
@@ -290,6 +290,6 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
         pore_volumes.append(pore_volume)
 
     pore_widths = 2 * avg_pore_radii
-    pore_dist = (pore_volumes / (2 * d_pore_radii)) / 1e6
+    pore_dist = (pore_volumes / (2 * d_pore_radii))
 
-    return pore_widths, pore_dist
+    return pore_widths[::-1], pore_dist[::-1]

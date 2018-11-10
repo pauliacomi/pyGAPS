@@ -32,10 +32,10 @@ class TestIsothermGraphs(object):
 
     @cleanup
     def test_branch_plot(self, basic_pointisotherm):
-        pygaps.plot_iso(basic_pointisotherm, branch='ads')
-        pygaps.plot_iso(basic_pointisotherm, branch='des')
-        pygaps.plot_iso(basic_pointisotherm, branch='all')
-        pygaps.plot_iso(basic_pointisotherm, branch='all-nol')
+        pygaps.plot_iso(basic_pointisotherm, branch='ads', fig_title='ads')
+        pygaps.plot_iso(basic_pointisotherm, branch='des', fig_title='des')
+        pygaps.plot_iso(basic_pointisotherm, branch='all', fig_title='all')
+        pygaps.plot_iso(basic_pointisotherm, branch='all-nol', fig_title='all-nol')
 
     @cleanup
     def test_convert_plot(self, basic_pointisotherm, basic_adsorbate):

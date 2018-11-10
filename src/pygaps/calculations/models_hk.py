@@ -4,19 +4,19 @@ Contains dictionaries for use in the Horvath-Kawazoe method.
 
 from ..utilities.exceptions import ParameterError
 
-PROPERTIES_CARBON = dict(
-    molecular_diameter=0.34,            # nm
-    polarizability=1.02E-30,            # m3
-    magnetic_susceptibility=1.35E-34,   # m3
-    surface_density=3.845E19,           # molecules/m2
-)
+PROPERTIES_CARBON = {
+    'molecular_diameter': 0.34,            # nm
+    'polarizability': 1.02E-3,             # nm3
+    'magnetic_susceptibility': 1.35E-7,    # nm3
+    'surface_density': 3.845E19,           # molecules/m2
+}
 
-PROPERTIES_OXIDE_ION = dict(
-    molecular_diameter=0.276,            # nm
-    polarizability=2.5E-30,              # m3
-    magnetic_susceptibility=1.3E-34,     # m3
-    surface_density=1.315E19,            # molecules/m2
-)
+PROPERTIES_OXIDE_ION = {
+    'molecular_diameter': 0.276,            # nm
+    'polarizability': 2.5E-3,               # nm3
+    'magnetic_susceptibility': 1.3E-7,      # nm3
+    'surface_density': 1.315E19,            # molecules/m2
+}
 
 
 _ADSORBENT_MODELS = {'Carbon(HK)': PROPERTIES_CARBON,
@@ -57,8 +57,8 @@ def get_hk_model(model):
 
     # If the model is an dictionary, use it as is
     elif isinstance(model, dict):
-        for key in [('molecular_diameter', 'nm'), ('polarizability', 'm3'),
-                    ('magnetic_susceptibility', 'm3'), ('surface_density', 'molecules/m2')]:
+        for key in [('molecular_diameter', 'nm'), ('polarizability', 'nm3'),
+                    ('magnetic_susceptibility', 'nm3'), ('surface_density', 'molecules/m2')]:
             if key[0] not in model.keys():
                 raise ParameterError(
                     'The passed dictionary must contain the parameter {}'

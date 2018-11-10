@@ -11,6 +11,7 @@ from ...utilities.exceptions import ParameterError
 from .bet import BET
 from .dslangmuir import DSLangmuir
 from .fhvst import FHVST
+from .gab import GAB
 from .henry import Henry
 from .jensenseaton import JensenSeaton
 from .langmuir import Langmuir
@@ -24,7 +25,7 @@ from .wvst import WVST
 
 # This list has all the available models
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-           Quadratic, BET, TemkinApprox, Virial,
+           Quadratic, BET, GAB, TemkinApprox, Virial,
            Toth, JensenSeaton, FHVST, WVST]
 
 # This list has all the models which will be used when attempting to

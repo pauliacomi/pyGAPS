@@ -260,13 +260,14 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     adsorbate_properties = model_parameters.get('adsorbate_model')
     if adsorbate_properties is None:
         adsorbate = Adsorbate.from_list(isotherm.adsorbate)
-        adsorbate_properties = dict(
-            molecular_diameter=adsorbate.get_prop('molecular_diameter'),
-            polarizability=adsorbate.get_prop('polarizability') / 1e31,
-            magnetic_susceptibility=adsorbate.get_prop(
-                'magnetic_susceptibility'),
-            surface_density=adsorbate.get_prop('surface_density'),
-        )
+        adsorbate_properties = {
+            'molecular_diameter': adsorbate.get_prop('molecular_diameter'),
+            'polarizability': adsorbate.get_prop('polarizability'),
+            'magnetic_susceptibility': adsorbate.get_prop('magnetic_susceptibility'),
+            'surface_density': adsorbate.get_prop('surface_density'),
+            'liquid_density': adsorbate.liquid_density(isotherm.t_exp),
+            'adsorbate_molar_mass': adsorbate.molar_mass(),
+        }
 
     # Read data in
     loading = isotherm.loading(branch='ads',
@@ -274,9 +275,6 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
                                loading_unit='mmol')
     pressure = isotherm.pressure(branch='ads',
                                  pressure_mode='relative')
-    maximum_adsorbed = model_parameters.get('max_adsorbed')
-    if maximum_adsorbed is None:
-        maximum_adsorbed = isotherm.loading_at(0.9)
 
     # Adsorbent model definitions
     adsorbent_properties = get_hk_model(adsorbent_model)
@@ -285,7 +283,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     if psd_model == 'HK':
         pore_widths, pore_dist = psd_horvath_kawazoe(
             loading, pressure, isotherm.t_exp, pore_geometry,
-            maximum_adsorbed, adsorbate_properties, adsorbent_properties)
+            adsorbate_properties, adsorbent_properties)
 
     # Package the results
     result_dict = {
@@ -398,7 +396,11 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
                                  pressure_mode='relative')
 
     # Call the DFT function
-    pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)
+    pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)  # mmol/g
+
+    # Convert to volume units
+    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() / adsorbate.liquid_density(isotherm.t_exp) / 1000
 
     # Package the results
     result_dict = {

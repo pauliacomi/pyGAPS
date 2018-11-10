@@ -4,6 +4,7 @@
     "adsorbent_unit": "g",
     "comment": "A completed sample",
     "date": "6/17/2017 12:27:21 PM",
+    "user": "",
     "isotherm_data": [
         {
             "loading": "28.759507494882065",

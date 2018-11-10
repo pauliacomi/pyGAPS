@@ -17,13 +17,11 @@ class TestIsotherm(object):
         "Checks isotherm can be created from test data"
 
         pygaps.classes.isotherm.Isotherm(
-            is_real=False,
             sample_name='carbon',
             sample_batch='X1',
             adsorbate='nitrogen',
             t_exp=77,
         )
-        return
 
     def test_isotherm_id(self, basic_isotherm):
         "Checks isotherm id works as intended"
@@ -35,10 +33,8 @@ class TestIsotherm(object):
         basic_isotherm.t_act = 123
         assert iso_id != basic_isotherm.id
 
-        return
-
     @pytest.mark.parametrize('missing_param',
-                             ['sample_name', 'sample_batch', 't_exp', 'adsorbate'])
+                             pygaps.classes.isotherm.Isotherm._required_params)
     def test_isotherm_miss_param(self, isotherm_parameters, missing_param):
         "Tests exception throw for missing required attributes"
 
@@ -47,8 +43,6 @@ class TestIsotherm(object):
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
-
-        return
 
     @pytest.mark.parametrize('update', [
         ({'pressure_unit': 'Pa'}),
@@ -63,10 +57,7 @@ class TestIsotherm(object):
         "Tests exception throw for missing or wrong unit"
 
         isotherm_parameters.update(update)
-
         pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
-
-        return
 
     @pytest.mark.parametrize('prop, set_to', [
         ('pressure_unit', 'something'),
@@ -88,8 +79,6 @@ class TestIsotherm(object):
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
-
-        return
 
     def test_isotherm_get_parameters(self, isotherm_parameters, basic_isotherm):
         "Checks isotherm returns the same dict as was used to create it"

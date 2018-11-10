@@ -31,7 +31,6 @@ class TestPointIsotherm(object):
             adsorbate='nitrogen',
             t_exp=77,
         )
-        return
 
     def test_isotherm_id(self, basic_pointisotherm):
         "Checks isotherm id works as intended"
@@ -41,8 +40,6 @@ class TestPointIsotherm(object):
         assert iso_id == basic_pointisotherm.id
         basic_pointisotherm._data = basic_pointisotherm._data[:5]
         assert iso_id != basic_pointisotherm.id
-
-        return
 
     @pytest.mark.parametrize('missing_key',
                              ['loading_key', 'pressure_key'])
@@ -62,8 +59,6 @@ class TestPointIsotherm(object):
                 loading_key=keys.get('loading_key'),
                 pressure_key=keys.get('pressure_key'),
                 **isotherm_parameters)
-
-        return
 
     @pytest.mark.parametrize('branch, expected', [
         ('guess', 4.5),
@@ -148,8 +143,6 @@ class TestPointIsotherm(object):
         assert basic_pointisotherm.has_branch(branch='ads')
         assert basic_pointisotherm.has_branch(branch='des')
 
-        return
-
     def test_isotherm_ret_data(self, basic_pointisotherm):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
@@ -177,8 +170,6 @@ class TestPointIsotherm(object):
             basic_pointisotherm.loading_key: [4.5, 2.5],
             basic_pointisotherm.pressure_key: [4.5, 2.5],
         }, index=[6, 7]))
-
-        return
 
     def test_isotherm_ret_pressure(self, basic_pointisotherm, use_adsorbate):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
@@ -212,8 +203,6 @@ class TestPointIsotherm(object):
         assert basic_pointisotherm.pressure(indexed=True).equals(pandas.Series(
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5]
         ))
-
-        return
 
     def test_isotherm_ret_loading(self, basic_pointisotherm, use_sample, use_adsorbate):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
@@ -261,8 +250,6 @@ class TestPointIsotherm(object):
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5]
         ))
 
-        return
-
     def test_isotherm_ret_other_data(self, basic_pointisotherm):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
@@ -285,9 +272,7 @@ class TestPointIsotherm(object):
             [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0]
         ))
 
-        return
-
-##########################
+    ##########################
 
     @pytest.mark.parametrize('inp, expected, parameters', [
         (1, 1, dict()),
@@ -314,8 +299,6 @@ class TestPointIsotherm(object):
         assert numpy.isclose(basic_pointisotherm.loading_at(
             inp, **parameters), expected, 1e-5)
 
-        return
-
     @pytest.mark.parametrize('inp, expected, parameters', [
         (1, 1, dict()),
         (4, 4, dict(branch='des')),
@@ -340,8 +323,6 @@ class TestPointIsotherm(object):
         assert numpy.isclose(basic_pointisotherm.pressure_at(
             inp, **parameters), expected, 1e-5)
 
-        return
-
     @pytest.mark.parametrize('inp, expected, parameters', [
         (1, 1, dict()),
         (1, 1, dict(branch='ads')),
@@ -355,9 +336,7 @@ class TestPointIsotherm(object):
         assert numpy.isclose(basic_pointisotherm.spreading_pressure_at(
             inp, **parameters), expected, 1e-5)
 
-        return
-
-##########################
+    ##########################
 
     @pytest.mark.parametrize('unit, multiplier', [
                             ('bar', 1),

@@ -64,24 +64,23 @@ class Isotherm(object):
     ``sample_name``, ``sample_batch``, ``t_exp', ``adsorbate``.
     """
 
-    _named_params = [
-        # required
+    _required_params = [
         'sample_name',
         'sample_batch',
         't_exp',
-        'adsorbate',
-
-        # others
-        'user',
-        'machine',
-        'exp_type',
-        'date',
-        'is_real',
-        't_act',
-        'lab',
-        'project',
-        'comment',
+        'adsorbate'
     ]
+    _named_params = {
+        'user': str,
+        'machine': str,
+        'exp_type': str,
+        'date': str,
+        'is_real': bool,
+        't_act': float,
+        'lab': str,
+        'project': str,
+        'comment': str,
+    }
 
     _unit_params = [
         'pressure_unit',
@@ -96,8 +95,8 @@ class Isotherm(object):
         '_instantiated',
     ]
 
-    _db_columns = ['id'] + _named_params
-    _id_params = _named_params + _unit_params
+    _db_columns = ['id'] + _required_params + list(_named_params)
+    _id_params = _required_params + list(_named_params) + _unit_params
 
 ##########################################################
 #   Instantiation and classmethods
@@ -118,10 +117,10 @@ class Isotherm(object):
 
         # Checks
         if any(k not in isotherm_parameters
-               for k in ('sample_name', 'sample_batch', 't_exp', 'adsorbate')):
+               for k in self._required_params):
             raise ParameterError(
                 "Isotherm MUST have the following properties:"
-                "'sample_name', 'sample_batch', 't_exp', 'adsorbate'")
+                "{}".format(self._required_params))
 
         # Basis and mode
         if adsorbent_basis is None or pressure_mode is None or loading_basis is None:
@@ -185,6 +184,7 @@ class Isotherm(object):
 
         # ID
         self.id = isotherm_parameters.pop('id', None)
+
         #: Isotherm material name.
         self.sample_name = str(isotherm_parameters.pop('sample_name', None))
         #: Isotherm material batch.
@@ -194,62 +194,12 @@ class Isotherm(object):
         #: Isotherm adsorbate used.
         self.adsorbate = str(isotherm_parameters.pop('adsorbate', None))
 
-        # Good-to-have properties of the isotherm
-        #: Isotherm experiment date.
-        self.date = None
-        date = isotherm_parameters.pop('date', None)
-        if date:
-            self.date = str(date)
-
-        #: Isotherm sample activation temperature.
-        self.t_act = None
-        t_act = isotherm_parameters.pop('t_act', None)
-        if t_act:
-            self.t_act = float(t_act)
-
-        #: Isotherm lab.
-        self.lab = None
-        lab = isotherm_parameters.pop('lab', None)
-        if lab:
-            self.lab = str(lab)
-
-        #: Isotherm comments.
-        self.comment = None
-        comment = isotherm_parameters.pop('comment', None)
-        if comment:
-            self.comment = str(comment)
-
-        #
-        # Other properties
-        #: Isotherm user.
-        self.user = None
-        user = isotherm_parameters.pop('user', None)
-        if user:
-            self.user = str(user)
-
-        #: Isotherm project.
-        self.project = None
-        project = isotherm_parameters.pop('project', None)
-        if project:
-            self.project = str(project)
-
-        #: Isotherm machine used.
-        self.machine = None
-        machine = isotherm_parameters.pop('machine', None)
-        if machine:
-            self.machine = str(machine)
-
-        #: Isotherm physicality (real or simulation).
-        self.is_real = None
-        is_real = isotherm_parameters.pop('is_real', None)
-        if is_real:
-            self.is_real = bool(is_real)
-
-        #: Isotherm type (calorimetry/isotherm).
-        self.exp_type = None
-        exp_type = isotherm_parameters.pop('exp_type', None)
-        if exp_type:
-            self.exp_type = str(exp_type)
+        # Named properties of the isotherm
+        for named_prop in self._named_params:
+            prop_val = isotherm_parameters.pop(named_prop, None)
+            if prop_val:
+                prop_val = self._named_params[named_prop](prop_val)
+            setattr(self, named_prop, prop_val)
 
         # Save the rest of the properties as an extra dict
         # now that the named properties were taken out of
@@ -305,9 +255,9 @@ class Isotherm(object):
         '''
         string = ""
 
-        if self.is_real is True:
+        if getattr(self, 'is_real', True) is True:
             string += ("Experimental isotherm" + '\n')
-        elif self.is_real is False:
+        else:
             string += ("Simulated isotherm" + '\n')
 
         # Required
@@ -316,22 +266,11 @@ class Isotherm(object):
         string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
         string += ("Isotherm temperature: " + str(self.t_exp) + "K" + '\n')
 
-        if self.exp_type:
-            string += ("Isotherm type: " + str(self.exp_type) + '\n')
-        if self.date:
-            string += ("Isotherm date: " + str(self.date) + '\n')
-        if self.machine:
-            string += ("Machine: " + str(self.machine) + '\n')
-        if self.user:
-            string += ("User: " + str(self.user) + '\n')
-        if self.t_act:
-            string += ("Activation temperature: " +
-                       str(self.t_act) + "°C" + '\n')
-        if self.lab:
-            string += ("Source: " +
-                       str(self.lab) + '\n')
-        if self.comment:
-            string += ("Isotherm comments: " + str(self.comment) + '\n')
+        # Named
+        for param in self._named_params:
+            param_val = getattr(self, param, None)
+            if param_val:
+                string += (param + ': ' + str(param_val) + '\n')
 
         # Units/basis
         string += ("Units: \n")
@@ -344,7 +283,7 @@ class Isotherm(object):
 
         string += ("Other properties: \n")
         for prop in vars(self):
-            if prop not in self._named_params + self._unit_params + self._reserved_params:
+            if prop not in self._required_params + list(self._named_params) + self._unit_params + self._reserved_params:
                 string += ('\t' + prop + ": " + str(getattr(self, prop)) + '\n')
 
         return string

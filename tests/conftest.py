@@ -194,8 +194,8 @@ def adsorbate_data():
         'molar_mass': 28.01348,
         'cross_sectional_area': 0.162,
         'molecular_diameter': 0.3,
-        'polarizability': 1.76E-30,
-        'magnetic_susceptibility': 3.6E-35,
+        'polarizability': 1.76E-3,
+        'magnetic_susceptibility': 3.6E-8,
         'dipole_moment': 0.0,
         'quadrupole_moment': 1.52,
         'criticalp_temperature': 77.355,
@@ -203,6 +203,7 @@ def adsorbate_data():
         'criticalp_density': 11.2,
         'triplep_temperature': 63.1,
         # properties for 1atm/ 77k
+        'gas_density': 0.00461214,
         'liquid_density': 0.806,
         'surface_density': 6.71e18,
         'surface_tension': 8.8796,

@@ -30,7 +30,7 @@ class TestCalcGraphs(object):
 
     @cleanup
     def test_roq_graph(self):
-        """Test Roquerol graph"""
+        """Test Rouquerol graph"""
 
         pressure = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
         roq_points = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4]

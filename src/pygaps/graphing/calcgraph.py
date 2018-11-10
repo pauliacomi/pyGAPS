@@ -4,6 +4,7 @@ This module contains the functions for plotting calculation-specific graphs.
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy
 
 
 def roq_plot(pressure, roq_points, minimum, maximum,
@@ -224,7 +225,8 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
     return ax1
 
 
-def psd_plot(pore_widths, pore_dist, method=None, label=None,
+def psd_plot(pore_widths, pore_dist, method=None,
+             labeldiff='distribution', labelcum='cumulative',
              log=True, right=None, left=None):
     """
     Draws the pore size distribution plot.
@@ -253,15 +255,17 @@ def psd_plot(pore_widths, pore_dist, method=None, label=None,
         own styling if desired.
 
     """
-    if not label:
-        label = 'distribution'
-
     fig = plt.figure(figsize=(15, 5))
     ax1 = fig.add_subplot(111)
-    ax1.plot(pore_widths, pore_dist,
-             marker='', color='g', label=label)
+    ax2 = ax1.twinx()
+    l1 = ax1.plot(pore_widths, pore_dist,
+                  marker='', color='k', label=labeldiff)
+    if labelcum:
+        l2 = ax2.plot(pore_widths[1:], numpy.cumsum(pore_dist[1:] * numpy.diff(pore_widths)),
+                      marker='', color='r', linestyle="--", label=labelcum)
 
     # Func formatter
+
     def formatter(x, pos):
         return "{0:g}".format(x)
 
@@ -284,9 +288,16 @@ def psd_plot(pore_widths, pore_dist, method=None, label=None,
 
     ax1.set_title("PSD plot " + str(method))
     ax1.set_xlabel('Pore width (nm)')
-    ax1.set_ylabel('Distribution')
-    ax1.legend(loc='best')
+    ax1.set_ylabel('Differential Vol (dV/dw)')
+    ax2.set_ylabel('Cumulative Vol ($cm^3 g^{-1}$)')
+
+    lns = l1
+    if labelcum:
+        lns = l1 + l2
+    labs = [l.get_label() for l in lns]
+    ax1.legend(lns, labs, loc='lower right')
     ax1.set_ylim(bottom=0)
+    ax2.set_ylim(bottom=0)
     ax1.grid(True)
 
     return ax1

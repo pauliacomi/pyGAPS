@@ -62,14 +62,14 @@ class TestModelIsotherm(object):
             )
 
         # regular creation
-        isotherm = pygaps.ModelIsotherm(
+        pygaps.ModelIsotherm(
             isotherm_data,
             model='Henry',
             **isotherm_param
         )
 
         # regular creation, desorption
-        isotherm = pygaps.ModelIsotherm(
+        pygaps.ModelIsotherm(
             isotherm_data,
             model='Henry',
             branch='des',
@@ -77,20 +77,18 @@ class TestModelIsotherm(object):
         )
 
         # regular creation, guessed parameters
-        isotherm = pygaps.ModelIsotherm(
+        pygaps.ModelIsotherm(
             isotherm_data,
             model='Henry',
             param_guess={'K': 1.0},
             **isotherm_param
         )
 
-        return isotherm
-
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
 
         # regular creation
-        isotherm = pygaps.ModelIsotherm.from_isotherm(
+        pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
             pandas.DataFrame({
                 'pressure': [1, 2, 3, 4, 5, 3, 2],
@@ -101,18 +99,14 @@ class TestModelIsotherm(object):
             model='Henry',
         )
 
-        return isotherm
-
     def test_isotherm_create_from_pointisotherm(self, basic_pointisotherm):
         "Checks isotherm can be created from isotherm"
 
         # regular creation
-        isotherm = pygaps.ModelIsotherm.from_pointisotherm(
+        pygaps.ModelIsotherm.from_pointisotherm(
             basic_pointisotherm,
             model='Henry',
         )
-
-        return isotherm
 
     @pytest.mark.parametrize('file, ',
                              [(data['file']) for data in list(DATA.values())])
@@ -125,12 +119,9 @@ class TestModelIsotherm(object):
             isotherm = pygaps.PointIsotherm.from_json(
                 text_file.read())
 
-        model_iso = pygaps.ModelIsotherm.from_pointisotherm(
+        pygaps.ModelIsotherm.from_pointisotherm(
             isotherm, guess_model=True, verbose=True)
 
-        return model_iso
-
-##########################
     def test_isotherm_ret_pressure(self, basic_modelisotherm, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
@@ -158,8 +149,6 @@ class TestModelIsotherm(object):
         assert basic_modelisotherm.pressure(5, indexed=True).equals(pandas.Series(
             [1.0, 2.25, 3.5, 4.75, 6.0]
         ))
-
-        return
 
     def test_isotherm_ret_loading(self, basic_modelisotherm, use_sample, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
@@ -195,9 +184,6 @@ class TestModelIsotherm(object):
         assert isinstance(basic_modelisotherm.loading(
             5, indexed=True), pandas.Series)
 
-        return
-
-##########################
     def test_isotherm_ret_loading_at(self, basic_modelisotherm, use_sample, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
@@ -238,8 +224,6 @@ class TestModelIsotherm(object):
         loading_bads = basic_modelisotherm.loading_at(
             1, adsorbent_basis='volume', adsorbent_unit='cm3')
         assert loading_bads == pytest.approx(10, 1e-3)
-
-        return
 
     def test_isotherm_ret_pressure_at(self, basic_modelisotherm, use_sample, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
@@ -282,8 +266,6 @@ class TestModelIsotherm(object):
             10, adsorbent_basis='volume', adsorbent_unit='cm3')
         assert pressure_bads == pytest.approx(1.0, 1e-5)
 
-        return
-
     def test_isotherm_spreading_pressure_at(self, basic_modelisotherm, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
@@ -305,12 +287,8 @@ class TestModelIsotherm(object):
             0.5, pressure_mode='relative')
         assert spressure_mode == pytest.approx(3.89137, 1e-2)
 
-        return
-
     @cleanup
     def test_isotherm_print_parameters(self, basic_modelisotherm):
         "Checks isotherm can print its own info"
 
         basic_modelisotherm.print_info(show=False)
-
-        return

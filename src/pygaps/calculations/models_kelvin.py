@@ -77,7 +77,7 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     for condensation or evaporation.
 
     .. math::
-        \\ln\\Big(\\frac{p}{p_0}\Big) = -\\frac{2 \\cos\\theta M_m \\gamma}{r_K\\rho_l RT}
+        \\ln\\Big(\\frac{p}{p_0}\\Big) = -\\frac{2 \\cos\\theta M_m \\gamma}{r_K\\rho_l RT}
 
     *Limitations*
 

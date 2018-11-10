@@ -18,12 +18,6 @@
         "--verbose"
     ],
 
-    "python.autoComplete.preloadModules": [
-        "numpy",
-        "pandas",
-        "matplotlib"
-    ],
-
     "cSpell.words": [
         "csvinterface",
         "excelinterface",

@@ -4,7 +4,7 @@ This module contains general functions for folder stepping.
 
 import os.path
 
-from .exceptions import Error
+from .exceptions import pgError
 
 
 def util_get_file_paths(folder, extension=None):
@@ -25,7 +25,7 @@ def util_get_file_paths(folder, extension=None):
 
     '''
     if extension is None:
-        raise Error("Must provide a file extension to look for")
+        raise pgError("Must provide a file extension to look for")
 
     paths = []
 

@@ -515,7 +515,6 @@ To export an isotherm, pyGAPS provides several choices to the user:
     - Converting the isotherm in a JSON format, using the :meth:`~pygaps.parsing.jsoninterface.isotherm_to_json` function
     - Converting the isotherm to a CSV file, using the :meth:`~pygaps.parsing.csvinterface.isotherm_to_csv` function
     - Converting the isotherm to an Excel file, using the :meth:`~pygaps.parsing.excelinterface.isotherm_to_xl` function
-      (of course only valid if Excel is installed on the system)
     - Uploading the isotherm to a sqlite database, either using the internal database or
       a user-specified external one. For more info on interacting with the sqlite database
       see the respective :ref:`section<sqlite-manual>` of the manual.

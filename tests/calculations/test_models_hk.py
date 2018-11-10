@@ -27,8 +27,8 @@ class TestHKModels(object):
 
         model_dict = dict(
             molecular_diameter=0.276,            # nm
-            polarizability=2.5E-30,            # m3
-            magnetic_susceptibility=1.3E-34,   # m3
+            polarizability=2.5E-3,              # nm3
+            magnetic_susceptibility=1.3E-7,     # nm3
             surface_density=1.315E19,           # molecules/m2
         )
 
