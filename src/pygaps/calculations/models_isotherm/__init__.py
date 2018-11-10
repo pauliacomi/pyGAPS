@@ -11,6 +11,7 @@ from ...utilities.exceptions import ParameterError
 from .bet import BET
 from .dslangmuir import DSLangmuir
 from .fhvst import FHVST
+from .gab import GAB
 from .henry import Henry
 from .jensenseaton import JensenSeaton
 from .langmuir import Langmuir
@@ -21,7 +22,6 @@ from .toth import Toth
 from .tslangmuir import TSLangmuir
 from .virial import Virial
 from .wvst import WVST
-from .gab import GAB
 
 # This list has all the available models
 _MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
