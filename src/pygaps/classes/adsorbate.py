@@ -260,7 +260,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.molar_mass(calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -314,7 +314,7 @@ class Adsorbate(object):
                 try:
                     sat_p = self.saturation_pressure(temp, unit=unit,
                                                      calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
             if unit is not None:
@@ -366,7 +366,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.surface_tension(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -416,7 +416,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.liquid_density(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -466,7 +466,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.gas_density(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -522,7 +522,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.enthalpy_liquefaction(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:

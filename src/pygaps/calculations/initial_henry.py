@@ -129,7 +129,7 @@ def initial_henry_virial(isotherm, verbose=False):
                      lgd_keys=['sample_name'])
 
             plt.show()
-        except CalculationError as err:
+        except CalculationError:
             plt.close()
             print('Cannot plot comparison due to model instability')
 
