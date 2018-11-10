@@ -272,8 +272,7 @@ class TestPointIsotherm(object):
             [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0]
         ))
 
-
-##########################
+    ##########################
 
     @pytest.mark.parametrize('inp, expected, parameters', [
         (1, 1, dict()),
@@ -337,8 +336,7 @@ class TestPointIsotherm(object):
         assert numpy.isclose(basic_pointisotherm.spreading_pressure_at(
             inp, **parameters), expected, 1e-5)
 
-
-##########################
+    ##########################
 
     @pytest.mark.parametrize('unit, multiplier', [
                             ('bar', 1),

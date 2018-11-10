@@ -285,8 +285,8 @@ class PointIsotherm(Isotherm):
                              pressure_key=pressure_key,
                              **iso_params)
 
-##########################################################
-#   Overloaded and private functions
+    ##########################################################
+    #   Overloaded and private functions
 
     def __setattr__(self, name, value):
         """
@@ -302,9 +302,8 @@ class PointIsotherm(Isotherm):
         object.__setattr__(self, name, value)
         self._check_if_hash(name, ['_data'])
 
-
-##########################################################
-#   Conversion functions
+    ##########################################################
+    #   Conversion functions
 
     def convert_pressure(self, mode_to=None, unit_to=None, verbose=False):
         """
@@ -530,9 +529,8 @@ class PointIsotherm(Isotherm):
 
         return fig, ax1, ax2
 
-
-##########################################################
-#   Functions that return parts of the isotherm data
+    ##########################################################
+    #   Functions that return parts of the isotherm data
 
     def data(self, branch=None):
         """
@@ -769,9 +767,8 @@ class PointIsotherm(Isotherm):
         else:
             return True
 
-
-##########################################################
-#   Functions that interpolate values of the isotherm data
+    ##########################################################
+    #   Functions that interpolate values of the isotherm data
 
     def loading_at(self, pressure,
                    branch='ads',
