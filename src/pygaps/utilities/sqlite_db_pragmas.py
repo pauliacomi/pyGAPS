@@ -169,6 +169,18 @@ PRAGMA_ADSORBATES = """
                 );
 """
 
+PRAGMA_ADSORBATE_NAMES = """
+            DROP TABLE IF EXISTS "adsorbate_names";
+
+            CREATE TABLE `adsorbate_names` (
+            `id`                INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+            `ads_id`            INTEGER     NOT NULL,
+            `name`              TEXT        NOT NULL UNIQUE,
+
+            FOREIGN KEY(`ads_id`) REFERENCES `adsorbates`(`id`)
+            );
+"""
+
 PRAGMA_ADSORBATE_PROPERTIES = """
             DROP TABLE IF EXISTS "adsorbate_properties";
 
@@ -247,6 +259,7 @@ PRAGMAS = [
     PRAGMA_EXPERIMENT_DATA,
 
     PRAGMA_ADSORBATES,
+    PRAGMA_ADSORBATE_NAMES,
     PRAGMA_ADSORBATE_PROPERTIES_TYPE,
     PRAGMA_ADSORBATE_PROPERTIES,
 
