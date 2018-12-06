@@ -96,8 +96,7 @@ class Adsorbate(object):
         self.properties = properties
 
         # CoolProp interaction variables, only generate when called
-        self._backend = None
-        self._state = None
+        self._backend_name = None
 
         return
 
@@ -146,12 +145,13 @@ class Adsorbate(object):
 
         return string
 
-    def _get_state(self):
+    @property
+    def backend(self):
         """
         Returns the CoolProp state associated with the fluid.
         """
-        if not self._backend or self._backend != pygaps.COOLPROP_BACKEND:
-            self._backend = pygaps.COOLPROP_BACKEND
+        if not self._backend_name or self._backend_name != pygaps.COOLPROP_BACKEND:
+            self._backend_name = pygaps.COOLPROP_BACKEND
             self._state = CoolProp.AbstractState(
                 pygaps.COOLPROP_BACKEND, self.common_name())
 
@@ -253,7 +253,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                mol_m = self._get_state().molar_mass() * 1000
+                mol_m = self.backend.molar_mass() * 1000
 
             except Exception as e_info:
                 warnings.warn(str(e_info))
@@ -304,7 +304,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 sat_p = state.p()
 
@@ -357,7 +357,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 surf_t = state.surface_tension() * 1000
 
@@ -407,7 +407,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 liq_d = state.rhomass() / 1000
 
@@ -457,7 +457,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 1.0, temp)
                 gas_d = state.rhomass() / 1000
 
@@ -507,7 +507,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
 
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 h_liq = state.hmolar()
