@@ -114,7 +114,7 @@ def isotherm_from_json(json_isotherm, fmt=None,
                                  other_keys=other_keys,
                                  **raw_dict)
     elif model:
-        pass
+        raise NotImplementedError
     else:
         # generate the isotherm
         isotherm = Isotherm(**raw_dict)

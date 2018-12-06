@@ -5,6 +5,7 @@ This module contains the csv interface.
 import pandas
 
 from ..classes.pointisotherm import PointIsotherm
+from ..classes.modelisotherm import ModelIsotherm
 
 
 def isotherm_to_csv(isotherm, path, separator=','):
@@ -27,24 +28,26 @@ def isotherm_to_csv(isotherm, path, separator=','):
     with open(path, mode='w') as file:
 
         isotherm_data = isotherm.to_dict()
-        isotherm_data.pop('id', None)         # make sure id is not passed
 
         file.writelines([x + separator + str(y) + '\n'
                          for (x, y) in isotherm_data.items()])
 
-        file.write('data:[pressure, loading, other...]\n')
+        if isinstance(isotherm, PointIsotherm):
 
-        # get headings in an ordered way
-        headings = [
-            isotherm.pressure_key,
-            isotherm.loading_key,
-        ]
-        if isotherm.other_keys:
-            headings.extend(isotherm.other_keys)
-        data = isotherm.data()[headings]
+            # get headings in an ordered way
+            headings = [
+                isotherm.pressure_key,
+                isotherm.loading_key,
+            ]
+            if isotherm.other_keys:
+                headings.extend(isotherm.other_keys)
+            data = isotherm.data()[headings]
 
-        file.write(data.to_csv(None, sep=separator, index=False, header=True))
+            file.write('data:[pressure, loading, other...]\n')
+            file.write(data.to_csv(None, sep=separator, index=False, header=True))
 
+        elif isinstance(isotherm, ModelIsotherm):
+            raise NotImplementedError
     return
 
 

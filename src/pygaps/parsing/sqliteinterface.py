@@ -459,8 +459,10 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
             # Build upload dict
             upload_dict = {}
             iso_dict = isotherm.to_dict()
+            iso_id = isotherm.iso_id
             for param in Isotherm._db_columns:
                 upload_dict.update({param: iso_dict.pop(param, None)})
+            upload_dict['id'] = iso_id
 
             # Upload experiment info to database
             cursor.execute(sql_com, upload_dict)
@@ -474,19 +476,19 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
 
             # Insert standard data fields:
             cursor.execute(sql_insert,
-                           {'exp_id': isotherm.id, 'type': 'pressure',
+                           {'exp_id': iso_id, 'type': 'pressure',
                             'data': isotherm.pressure().tobytes()}
                            )
 
             cursor.execute(sql_insert,
-                           {'exp_id': isotherm.id, 'type': 'loading',
+                           {'exp_id': iso_id, 'type': 'loading',
                             'data': isotherm.loading().tobytes()}
                            )
 
             # Update or insert other fields:
             for key in isotherm.other_keys:
                 cursor.execute(sql_insert,
-                               {'exp_id': isotherm.id, 'type': key,
+                               {'exp_id': iso_id, 'type': key,
                                 'data': isotherm.other_data(key).tobytes()}
                                )
 
@@ -496,7 +498,7 @@ def db_upload_experiment(pth, isotherm, overwrite=None):
                                       to_insert=['exp_id', 'type', 'value'])
             for key in iso_dict:
                 cursor.execute(sql_insert,
-                               {'exp_id': isotherm.id,
+                               {'exp_id': iso_id,
                                 'type': key,
                                 'value': iso_dict[key]
                                 })
@@ -637,7 +639,7 @@ def db_delete_experiment(pth, isotherm):
                 build_select(table='experiments',
                              to_select=['id'],
                              where=['id']),
-                {'id':        isotherm.id}
+                {'id':        isotherm.iso_id}
             ).fetchone()
 
             if ids is None:
@@ -646,15 +648,15 @@ def db_delete_experiment(pth, isotherm):
 
             # Delete data from experiment_data table
             cursor.execute(build_delete(table='experiment_data',
-                                        where=['exp_id']), {'exp_id': isotherm.id})
+                                        where=['exp_id']), {'exp_id': isotherm.iso_id})
 
             # Delete data from experiment_data table
             cursor.execute(build_delete(table='experiment_properties',
-                                        where=['exp_id']), {'exp_id': isotherm.id})
+                                        where=['exp_id']), {'exp_id': isotherm.iso_id})
 
             # Delete experiment info in experiments table
             cursor.execute(build_delete(table='experiments',
-                                        where=['id']), {'id': isotherm.id})
+                                        where=['id']), {'id': isotherm.iso_id})
 
             # Print success
             print("Success:", isotherm)

@@ -210,7 +210,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     # get the required dictionaries
     fields = _FIELDS.copy()
     iso_dict = isotherm.to_dict()
-    iso_dict.pop('id', None)         # make sure id is not passed
+    iso_dict.pop('iso_id', None)         # make sure id is not passed
 
     if fmt == 'MADIREL':
         _update_recurs(fields, _FIELDS_MADIREL)
@@ -396,7 +396,7 @@ def isotherm_from_xl(path, fmt=None):
 
         # Put data in order
         sample_info.pop('isotherm data')    # remove useless field
-        sample_info.pop('id', None)         # make sure id is not passed
+        sample_info.pop('iso_id', None)         # make sure id is not passed
         pressure_mode = sample_info.pop('pressure_mode')
         pressure_unit = sample_info.pop('pressure_unit')
         loading_basis = sample_info.pop('loading_basis')

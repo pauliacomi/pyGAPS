@@ -26,12 +26,12 @@ class TestIsotherm(object):
     def test_isotherm_id(self, basic_isotherm):
         "Checks isotherm id works as intended"
 
-        iso_id = basic_isotherm.id
+        iso_id = basic_isotherm.iso_id
 
         basic_isotherm.new_param = 'changed'
-        assert iso_id == basic_isotherm.id
-        basic_isotherm.t_act = 123
-        assert iso_id != basic_isotherm.id
+        assert iso_id == basic_isotherm.iso_id
+        basic_isotherm.t_exp = 0
+        assert iso_id != basic_isotherm.iso_id
 
     @pytest.mark.parametrize('missing_param',
                              pygaps.classes.isotherm.Isotherm._required_params)
@@ -84,7 +84,6 @@ class TestIsotherm(object):
         "Checks isotherm returns the same dict as was used to create it"
 
         iso_dict = basic_isotherm.to_dict()
-        del iso_dict['id']
         assert isotherm_parameters == iso_dict
 
     def test_isotherm_print_parameters(self, basic_isotherm):

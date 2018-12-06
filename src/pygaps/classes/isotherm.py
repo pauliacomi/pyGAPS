@@ -91,12 +91,10 @@ class Isotherm(object):
         'loading_basis',
     ]
 
-    _reserved_params = [
-        '_instantiated',
-    ]
+    _reserved_params = []
 
     _db_columns = ['id'] + _required_params + list(_named_params)
-    _id_params = _required_params + list(_named_params) + _unit_params
+    _id_params = _required_params + _unit_params
 
 ##########################################################
 #   Instantiation and classmethods
@@ -182,24 +180,21 @@ class Isotherm(object):
         # Must-have properties of the isotherm
         #
 
-        # ID
-        self.id = isotherm_parameters.pop('id', None)
-
         #: Isotherm material name.
-        self.sample_name = str(isotherm_parameters.pop('sample_name', None))
+        self.sample_name = str(isotherm_parameters.pop('sample_name'))
         #: Isotherm material batch.
-        self.sample_batch = str(isotherm_parameters.pop('sample_batch', None))
+        self.sample_batch = str(isotherm_parameters.pop('sample_batch'))
         #: Isotherm experimental temperature.
-        self.t_exp = float(isotherm_parameters.pop('t_exp', None))
+        self.t_exp = float(isotherm_parameters.pop('t_exp'))
         #: Isotherm adsorbate used.
-        self.adsorbate = str(isotherm_parameters.pop('adsorbate', None))
+        self.adsorbate = str(isotherm_parameters.pop('adsorbate'))
 
         # Named properties of the isotherm
         for named_prop in self._named_params:
             prop_val = isotherm_parameters.pop(named_prop, None)
             if prop_val:
                 prop_val = self._named_params[named_prop](prop_val)
-            setattr(self, named_prop, prop_val)
+                setattr(self, named_prop, prop_val)
 
         # Save the rest of the properties as an extra dict
         # now that the named properties were taken out of
@@ -207,35 +202,12 @@ class Isotherm(object):
         for attr in isotherm_parameters:
             setattr(self, attr, isotherm_parameters[attr])
 
-        # Finish instantiation process
-        # (check if none in case its part of a Point/Model Isotherm instantiation)
-        if not hasattr(self, '_instantiated'):
-            self._instantiated = True
-            if self.id is None:
-                self._check_if_hash(True, [True])
-
     ##########################################################
     #   Overloaded and private functions
 
-    def __setattr__(self, name, value):
-        """
-        We overload the usual class setter to make sure that the id is always
-        representative of the data inside the isotherm.
-
-        The '_instantiated' attribute gets set to true after isotherm __init__
-        From then afterwards, each call to modify the isotherm properties
-        recalculates the md5 hash.
-        This is done to ensure uniqueness and also to allow isotherm objects to
-        be easily compared to each other.
-        """
-        object.__setattr__(self, name, value)
-        self._check_if_hash(name)
-
-    def _check_if_hash(self, name, extra_params=[]):
-        """Checks if the hash needs to be generated"""
-        if getattr(self, '_instantiated', False) and name in self._id_params + extra_params:
-            # Generate the unique hash
-            self.id = isotherm_to_hash(self)
+    @property
+    def iso_id(self):
+        return isotherm_to_hash(self)
 
     def __eq__(self, other_isotherm):
         """
@@ -244,7 +216,7 @@ class Isotherm(object):
         is to compare the two hashes of the isotherms.
         """
 
-        return self.id == other_isotherm.id
+        return self.iso_id == other_isotherm.iso_id
 
     ###########################################################
     #   Info functions

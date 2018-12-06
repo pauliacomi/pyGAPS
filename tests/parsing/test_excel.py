@@ -35,7 +35,7 @@ class TestExcel(object):
             if not iso_dict.get(key):
                 iso_dict[key] = ''
 
-        iso_data = basic_pointisotherm._data
+        iso_data = basic_pointisotherm.raw_data
 
         isotherm = pygaps.PointIsotherm(iso_data,
                                         loading_key=basic_pointisotherm.loading_key,

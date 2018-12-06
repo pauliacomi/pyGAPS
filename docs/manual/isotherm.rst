@@ -481,23 +481,13 @@ isotherm and should be unique to each object. The id string is actually an md5 h
 parameters and data. The id can then be used, both internally for database storage or for identification
 purposes.
 
-Internal logic is as follows:
-
-    - After isotherm instantiation, the isotherm object calls the json converter and obtains a string
-      of itself in json format
-    - The hashlib.md5 function is used to obtain a hash of the json string
-    - The hash is saved in the internal id parameter and the instantiation is complete
-
-Any internal change in the isotherm, such as changing the sample activation temperature, adding a new
-member in the data dictionary or converting/deleting the isotherm datapoints will lead to the id to
-be regenerated from the new data. This should be taken into account if writing a function that would
-modify a large number of isotherms or if repeatedly modifying each isotherm.
-
-It can be read directly from the isotherm using the following code but should never be directly modified.
+The id is generated automatically every time the isotherm.iso_id is called.
+The hashlib.md5 function is used to obtain a hash of the json string.
+It can be read using the following code but should never be directly modified.
 
 ::
 
-    point_isotherm.id
+    point_isotherm.iso_id
 
 .. note::
 

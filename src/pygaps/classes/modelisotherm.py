@@ -87,7 +87,6 @@ class ModelIsotherm(Isotherm):
     """
 
     _reserved_params = [
-        '_instantiated',
         'model',
     ]
 
@@ -117,12 +116,14 @@ class ModelIsotherm(Isotherm):
         class.
         """
         # Checks
+        if None in [loading_key, pressure_key]:
+            raise ParameterError(
+                "Pass loading_key and pressure_key, the names of the loading and"
+                " pressure columns in the DataFrame, to the constructor.")
+
         if model is None:
             raise ParameterError("Specify a model to fit to the pure-component"
                                  " isotherm data. e.g. model=\"Langmuir\"")
-
-        # Start construction process
-        self._instantiated = False
 
         # We change it to a simulated isotherm
         isotherm_parameters['is_real'] = False
@@ -137,12 +138,6 @@ class ModelIsotherm(Isotherm):
                           pressure_unit=pressure_unit,
 
                           **isotherm_parameters)
-
-        # Column titles
-        if None in [loading_key, pressure_key]:
-            raise ParameterError(
-                "Pass loading_key and pressure_key, the names of the loading and"
-                " pressure columns in the DataFrame, to the constructor.")
 
         if is_base_model(model):
             self.model = model
@@ -194,7 +189,7 @@ class ModelIsotherm(Isotherm):
                                              " in the %s model." % (param, model))
                     self.param_guess[param] = guess_val
 
-            #: Root mean square error in fit.
+            #: Root mean square error create and set.
             self.rmse = numpy.nan
 
             # fit model to isotherm data
@@ -203,13 +198,6 @@ class ModelIsotherm(Isotherm):
                                        self.param_guess,
                                        optimization_params,
                                        verbose)
-
-        # Finish instantiation process
-        self._instantiated = True
-
-        # Now that all data has been saved, generate the unique id if needed.
-        if self.id is None:
-            self._check_if_hash(True, [True])
 
     @classmethod
     def from_isotherm(cls, isotherm, isotherm_data,
@@ -254,8 +242,6 @@ class ModelIsotherm(Isotherm):
         """
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
-        # remove ID - a new one will be generated
-        iso_params.pop('id', None)
         # insert or update values
         iso_params['loading_key'] = loading_key
         iso_params['pressure_key'] = pressure_key
@@ -303,8 +289,6 @@ class ModelIsotherm(Isotherm):
         """
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
-        # remove ID - a new one will be generated
-        iso_params.pop('id', None)
 
         if guess_model:
             return ModelIsotherm.guess(isotherm.data(branch=branch),
@@ -393,23 +377,6 @@ class ModelIsotherm(Isotherm):
                 print("Best model fit is {0}".format(best_fit.model.name))
 
             return best_fit
-
-##########################################################
-#   Overloaded and private functions
-
-    def __setattr__(self, name, value):
-        """
-        We overload the usual class setter to make sure that the id is always
-        representative of the data inside the isotherm.
-
-        The '_instantiated' attribute gets set to true after isotherm __init__
-        From then afterwards, each call to modify the isotherm properties
-        recalculates the md5 hash.
-        This is done to ensure uniqueness and also to allow isotherm objects to
-        be easily compared to each other.
-        """
-        object.__setattr__(self, name, value)
-        self._check_if_hash(name, ['model'])
 
 ##########################################################
 #   Methods

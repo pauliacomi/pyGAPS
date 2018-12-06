@@ -2,6 +2,14 @@
 Changelog
 =========
 
+Breaking changes:
+
+* Isotherm unique ID is now generated on the fly (previously generated at
+  each isotherm modification). It also now takes into account only the
+  required parameters for each isotherm ( 'sample_name', 'sample_batch',
+  't_exp' and 'adsorbate') as well as the model name, if the
+  isotherm is a ModelIsotherm.
+
 
 1.4.0 (2018-11-10)
 ------------------

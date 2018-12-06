@@ -250,22 +250,20 @@ class TestDatabase(object):
 
         return
 
-    def test_experiment(self, db_file, isotherm_parameters, basic_pointisotherm):
+    def test_isotherm(self, db_file, isotherm_parameters, basic_pointisotherm):
         "Tests functions related to experiments table, then inserts a test experiment"
 
-        isotherm = basic_pointisotherm
-
         # Test experiment_type table
-        pygaps.db_upload_experiment_type(db_file, {'type': isotherm.exp_type,
+        pygaps.db_upload_experiment_type(db_file, {'type': basic_pointisotherm.exp_type,
                                                    'name': 'test type'})
 
         assert len(pygaps.db_get_experiment_types(db_file)) == 1
 
         with pytest.raises(pygaps.ParsingError):
-            pygaps.db_upload_experiment_type(db_file, {'type': isotherm.exp_type,
+            pygaps.db_upload_experiment_type(db_file, {'type': basic_pointisotherm.exp_type,
                                                        'name': 'test type'})
-        pygaps.db_delete_experiment_type(db_file, isotherm.exp_type)
-        pygaps.db_upload_experiment_type(db_file, {'type': isotherm.exp_type,
+        pygaps.db_delete_experiment_type(db_file, basic_pointisotherm.exp_type)
+        pygaps.db_upload_experiment_type(db_file, {'type': basic_pointisotherm.exp_type,
                                                    'name': 'test type'})
 
         # Property type testing
@@ -306,14 +304,14 @@ class TestDatabase(object):
 
         # Good upload
         pygaps.db_upload_experiment_data_type(db_file, {
-            'type': isotherm.loading_key,
+            'type': basic_pointisotherm.loading_key,
             'unit': "test unit"
         })
         pygaps.db_upload_experiment_data_type(db_file, {
-            'type': isotherm.pressure_key,
+            'type': basic_pointisotherm.pressure_key,
             'unit': "test unit"
         })
-        for key in isotherm.other_keys:
+        for key in basic_pointisotherm.other_keys:
             pygaps.db_upload_experiment_data_type(db_file, {
                 'type': key,
                 'unit': "test unit"
@@ -323,27 +321,27 @@ class TestDatabase(object):
         assert len(pygaps.db_get_experiments(db_file, {})) == 0
 
         # First upload
-        pygaps.db_upload_experiment(db_file, isotherm)
+        pygaps.db_upload_experiment(db_file, basic_pointisotherm)
 
         # Error test uniqueness
         with pytest.raises(pygaps.ParsingError):
-            pygaps.db_upload_experiment(db_file, isotherm)
+            pygaps.db_upload_experiment(db_file, basic_pointisotherm)
 
-        replace_isotherm = copy.deepcopy(isotherm)
+        replace_isotherm = copy.deepcopy(basic_pointisotherm)
         replace_isotherm.comment = 'New comment'
         pygaps.db_upload_experiment(
-            db_file, replace_isotherm, overwrite=isotherm)
+            db_file, replace_isotherm, overwrite=basic_pointisotherm)
         assert pygaps.db_get_experiments(
-            db_file, {'id': replace_isotherm.id})[0].comment == replace_isotherm.comment
+            db_file, {'id': replace_isotherm.iso_id})[0].comment == replace_isotherm.comment
 
         # Delete test
         pygaps.db_delete_experiment(db_file, replace_isotherm)
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
-            pygaps.db_delete_experiment(db_file, isotherm)
+            pygaps.db_delete_experiment(db_file, basic_pointisotherm)
 
         # Final upload
-        pygaps.db_upload_experiment(db_file, isotherm)
+        pygaps.db_upload_experiment(db_file, basic_pointisotherm)
 
         return
