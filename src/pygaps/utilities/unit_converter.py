@@ -104,7 +104,7 @@ def c_pressure(value,
             sign = -1
 
         value = value * \
-            pygaps.classes.adsorbate.Adsorbate.from_list(adsorbate_name).saturation_pressure(
+            pygaps.classes.adsorbate.Adsorbate.find(adsorbate_name).saturation_pressure(
                 temp, unit=unit) ** sign
 
     elif unit_to and mode_from == 'absolute':
@@ -173,31 +173,31 @@ def c_loading(value,
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = pygaps.classes.adsorbate.Adsorbate.from_list(
+                constant = pygaps.classes.adsorbate.Adsorbate.find(
                     adsorbate_name).gas_density(temp=temp)
                 sign = -1
             elif basis_to == 'molar':
-                constant = pygaps.classes.adsorbate.Adsorbate.from_list(
+                constant = pygaps.classes.adsorbate.Adsorbate.find(
                     adsorbate_name).molar_mass()
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = pygaps.classes.adsorbate.Adsorbate.from_list(
+                constant = pygaps.classes.adsorbate.Adsorbate.find(
                     adsorbate_name).gas_density(temp=temp)
                 sign = 1
             elif basis_to == 'molar':
-                adsorbate = pygaps.classes.adsorbate.Adsorbate.from_list(
+                adsorbate = pygaps.classes.adsorbate.Adsorbate.find(
                     adsorbate_name)
                 constant = adsorbate.gas_density(
                     temp=temp) / adsorbate.molar_mass()
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = pygaps.classes.adsorbate.Adsorbate.from_list(
+                constant = pygaps.classes.adsorbate.Adsorbate.find(
                     adsorbate_name).molar_mass()
                 sign = 1
             elif basis_to == 'volume':
-                adsorbate = pygaps.classes.adsorbate.Adsorbate.from_list(
+                adsorbate = pygaps.classes.adsorbate.Adsorbate.find(
                     adsorbate_name)
                 constant = adsorbate.gas_density(
                     temp=temp) / adsorbate.molar_mass()
@@ -273,31 +273,31 @@ def c_adsorbent(value,
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = pygaps.classes.sample.Sample.from_list(
+                constant = pygaps.classes.sample.Sample.find(
                     sample_name, sample_batch).get_prop('density')
                 sign = -1
             elif basis_to == 'molar':
-                constant = pygaps.classes.sample.Sample.from_list(
+                constant = pygaps.classes.sample.Sample.find(
                     sample_name, sample_batch).get_prop('molar_mass')
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = pygaps.classes.sample.Sample.from_list(
+                constant = pygaps.classes.sample.Sample.find(
                     sample_name, sample_batch).get_prop('density')
                 sign = 1
             elif basis_to == 'molar':
-                sample = pygaps.classes.sample.Sample.from_list(
+                sample = pygaps.classes.sample.Sample.find(
                     sample_name, sample_batch)
                 constant = sample.get_prop(
                     'density') / sample.get_prop('molar_mass')
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = pygaps.classes.sample.Sample.from_list(
+                constant = pygaps.classes.sample.Sample.find(
                     sample_name, sample_batch).get_prop('molar_mass')
                 sign = 1
             elif basis_to == 'volume':
-                sample = pygaps.classes.sample.Sample.from_list(
+                sample = pygaps.classes.sample.Sample.find(
                     sample_name, sample_batch)
                 constant = sample.get_prop(
                     'density') / sample.get_prop('molar_mass')

@@ -104,7 +104,7 @@ adsorbate class method with the name as the parameter:
 
 ::
 
-    my_adsorbate2 = pygaps.Adsorbate.from_list('CO2')
+    my_adsorbate2 = pygaps.Adsorbate.find('CO2')
 
 The user can also generate their own adsorbates, or modify the ones that are in memory.
 

@@ -124,7 +124,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
         reference_area = area_BET(reference_isotherm).get('area')
 
     # Get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 

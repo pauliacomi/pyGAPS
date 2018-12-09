@@ -164,8 +164,7 @@ PRAGMA_ADSORBATES = """
 
             CREATE TABLE "adsorbates" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `nick`          TEXT        NOT NULL UNIQUE,
-                `formula`       TEXT
+                `name`          TEXT        NOT NULL UNIQUE
                 );
 """
 

@@ -87,7 +87,7 @@ class Sample(object):
         return
 
     @classmethod
-    def from_list(cls, sample_name, sample_batch):
+    def find(cls, sample_name, sample_batch):
         """
         Gets the sample from the master list using its name
 

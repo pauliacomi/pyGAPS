@@ -2,7 +2,11 @@
 This module contains the main class that describes an isotherm.
 """
 
+import warnings
+
 import pandas
+
+import pygaps
 
 from ..utilities.exceptions import ParameterError
 from ..utilities.hashgen import isotherm_to_hash
@@ -188,6 +192,13 @@ class Isotherm(object):
         self.t_exp = float(isotherm_parameters.pop('t_exp'))
         #: Isotherm adsorbate used.
         self.adsorbate = str(isotherm_parameters.pop('adsorbate'))
+
+        if self.adsorbate.lower() not in pygaps.ADSORBATE_NAME_LIST:
+            warnings.warn(
+                ("Specified adsorbent is not in internal list"
+                 "(or name cannot be resolved to an existing one)."
+                 "CoolProp backend disabled for this adsorbent.")
+            )
 
         # Named properties of the isotherm
         for named_prop in self._named_params:

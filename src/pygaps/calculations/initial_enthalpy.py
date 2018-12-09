@@ -153,7 +153,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # active site.
 
     # We check enthalpy of liquefaction
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     try:
         enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
     except (ParameterError, CalculationError):

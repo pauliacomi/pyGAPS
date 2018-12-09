@@ -61,12 +61,12 @@ Sample management
 
 In pyGAPS, the samples can be stored in the internal sqlite database. At import-time, the list of all
 samples is automatically loaded into memory and stored in ``pygaps.SAMPLE_LIST``. The easiest way to retrieve
-a sample from the list is to use the :meth:`~pygaps.classes.sample.Sample.from_list` class method. It takes the
+a sample from the list is to use the :meth:`~pygaps.classes.sample.Sample.find` class method. It takes the
 sample name and sample batch as parameters.
 
 ::
 
-    my_sample2 = pygaps.Sample.from_list('carbon', 'X1')
+    my_sample2 = pygaps.Sample.find('carbon', 'X1')
 
 At first use the database will be empty. To populate the database with samples, the user should
 create the samples first and then upload them to the list for temporary storage, or to database for permanent storage.

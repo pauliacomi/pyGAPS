@@ -24,14 +24,14 @@ class TestSample(object):
     def test_sample_retrieved_list(self, sample_data, basic_sample):
         "Checks sample can be retrieved from master list"
         pygaps.data.SAMPLE_LIST.append(basic_sample)
-        uploaded_sample = pygaps.Sample.from_list(
+        uploaded_sample = pygaps.Sample.find(
             sample_data.get('name'),
             sample_data.get('batch'))
 
         assert sample_data == uploaded_sample.to_dict()
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.Sample.from_list('noname', 'nobatch')
+            pygaps.Sample.find('noname', 'nobatch')
 
     def test_sample_get_properties(self, sample_data, basic_sample):
         "Checks if properties of a sample can be located"

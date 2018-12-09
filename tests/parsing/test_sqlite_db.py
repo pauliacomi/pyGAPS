@@ -147,11 +147,10 @@ class TestDatabase(object):
 
         # Property type upload
         for prop in adsorbate_data:
-            if prop not in pygaps.Adsorbate._named_params:
-                pygaps.db_upload_adsorbate_property_type(db_file, {
-                    'type': prop,
-                    'unit': "test unit"
-                })
+            pygaps.db_upload_adsorbate_property_type(db_file, {
+                'type': prop,
+                'unit': "test unit"
+            })
 
         # Start testing samples table
 
@@ -166,10 +165,10 @@ class TestDatabase(object):
             pygaps.db_upload_adsorbate(db_file, basic_adsorbate)
 
         # Overwrite upload
-        basic_adsorbate.formula = "New Formula"
+        basic_adsorbate.properties['backend_name'] = "newname"
         pygaps.db_upload_adsorbate(db_file, basic_adsorbate, overwrite=True)
-        assert pygaps.db_get_adsorbates(
-            db_file)[0].formula == basic_adsorbate.formula
+        got_adsorbate = pygaps.db_get_adsorbates(db_file)[0]
+        assert got_adsorbate.properties['backend_name'] == basic_adsorbate.properties['backend_name']
 
         # Delete test
         pygaps.db_delete_adsorbate(db_file, basic_adsorbate)

@@ -124,7 +124,7 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     """
     # get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in

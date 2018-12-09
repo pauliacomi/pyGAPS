@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Features:
+* Increased number of adsorbates available in pyGAPS to 40.
+* Made adsorbates searchable by a list of aliases rather than a single name.
+* Exposed the CoolProp backend on adsorbate objects for convenience, it is
+  accessible through the adsorbate.backend property.
+
 Breaking changes:
 
 * Isotherm unique ID is now generated on the fly (previously generated at
@@ -9,6 +15,8 @@ Breaking changes:
   required parameters for each isotherm ( 'sample_name', 'sample_batch',
   't_exp' and 'adsorbate') as well as the model name, if the
   isotherm is a ModelIsotherm.
+* Renamed Adsorbate.from_list() method to Adsorbate.find()
+
 
 
 1.4.0 (2018-11-10)

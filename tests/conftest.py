@@ -187,10 +187,10 @@ def adsorbate_data():
     Creates an dict with all data for an model adsorbate
     """
     adsorbate_data = {
-        'nick': 'TA',
+        'name': 'TA',
         'formula': 'TA21',
 
-        'common_name': 'nitrogen',
+        'backend_name': 'nitrogen',
         'molar_mass': 28.01348,
         'cross_sectional_area': 0.162,
         'molecular_diameter': 0.3,
@@ -198,10 +198,10 @@ def adsorbate_data():
         'magnetic_susceptibility': 3.6E-8,
         'dipole_moment': 0.0,
         'quadrupole_moment': 1.52,
-        'criticalp_temperature': 77.355,
-        'criticalp_pressure': 34.0,
-        'criticalp_density': 11.2,
-        'triplep_temperature': 63.1,
+        't_critical': 77.355,
+        'p_critical': 34.0,
+        'rhomolar_critical': 11.2,
+        't_triple': 63.1,
         # properties for 1atm/ 77k
         'gas_density': 0.00461214,
         'liquid_density': 0.806,

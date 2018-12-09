@@ -3,6 +3,7 @@ This module contains the sql interface for data manipulation.
 """
 
 import array
+import functools
 import sqlite3
 
 import numpy
@@ -20,6 +21,13 @@ from ..utilities.sqlite_utilities import build_select_unnamed
 from ..utilities.sqlite_utilities import build_update
 
 # ---------------------- General functions
+
+
+def db_connect(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
 
 
 def _upload_one_all_columns(pth, table_id, columns, overwrite,
@@ -62,7 +70,7 @@ def _upload_one_all_columns(pth, table_id, columns, overwrite,
         db.close()
 
 
-def _get_all_no_id(pth, table_id, table_name, name_string):
+def _get_all_no_id(pth, table_id, table_name, name_string, verbose=True):
     """Gets all elements from a table as a dictionary, excluding id"""
     # Connect to database
     with sqlite3.connect(pth) as db:
@@ -88,7 +96,8 @@ def _get_all_no_id(pth, table_id, table_name, name_string):
         db.close()
 
     # Print success
-    print("Selected", len(types), name_string)
+    if verbose:
+        print("Selected", len(types), name_string)
     return types
 
 
@@ -236,7 +245,7 @@ def db_upload_sample(pth, sample, overwrite=False):
     return
 
 
-def db_get_samples(pth):
+def db_get_samples(pth, verbose=True):
     """
     Gets all samples and their properties.
 
@@ -281,8 +290,9 @@ def db_get_samples(pth):
     if db:
         db.close()
 
-    # Print success
-    print("Selected", len(samples), "samples")
+    if verbose:
+        # Print success
+        print("Selected", len(samples), "samples")
 
     return samples
 
@@ -828,31 +838,21 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
 
-            if overwrite:
-                sql_com = build_update(table="adsorbates",
-                                       to_set=['formula'],
-                                       where=['nick'])
-            else:
-                sql_com = build_insert(table="adsorbates",
-                                       to_insert=['nick', 'formula'])
+            if not overwrite:
 
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'nick':         adsorbate.name,
-                'formula':      adsorbate.formula,
-            }
-            )
+                sql_com = build_insert(table="adsorbates", to_insert=['name'])
 
-            # Upload or modify data in the table
-            if len(adsorbate.properties) > 0:
+                # Upload data in sample table
+                cursor.execute(sql_com, {'name': adsorbate.name})
+
+            # Upload or modify data in the associated tables
+            if adsorbate.properties:
                 # Get id of adsorbate
                 ads_id = cursor.execute(
                     build_select(table='adsorbates',
                                  to_select=['id'],
-                                 where=['nick']), {
-                        'nick':         adsorbate.name,
-                        'formula':      adsorbate.formula,
-                    }
+                                 where=['name']),
+                    {'name': adsorbate.name}
                 ).fetchone()[0]
 
                 # Sql of update routine
@@ -870,9 +870,8 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
                     cursor.execute(
                         build_select(table='adsorbate_properties',
                                      to_select=['type'],
-                                     where=['ads_id']), {
-                            'ads_id':        ads_id,
-                        }
+                                     where=['ads_id']),
+                        {'ads_id': ads_id}
                     )
                     updates = [elt[0] for elt in cursor.fetchall()]
 
@@ -886,6 +885,34 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
                         'ads_id':           ads_id,
                         'type':             prop,
                         'value':            adsorbate.properties[prop]
+                    })
+
+            if adsorbate.alias:
+
+                # Get id of adsorbate
+                ads_id = cursor.execute(
+                    build_select(table='adsorbates',
+                                 to_select=['id'],
+                                 where=['name']),
+                    {'name': adsorbate.name}
+                ).fetchone()[0]
+
+                if overwrite:
+                    # Delete existing names
+                    cursor.execute(
+                        build_delete(table='adsorbate_names',
+                                     where=['ads_id']),
+                        {'ads_id': ads_id}
+                    )
+
+                # Sql of insert routine
+                sql_insert = build_insert(table='adsorbate_names',
+                                          to_insert=['ads_id', 'name'])
+
+                for alias in adsorbate.alias:
+                    cursor.execute(sql_insert, {
+                        'ads_id':           ads_id,
+                        'name':             alias,
                     })
 
         # Print success
@@ -905,7 +932,7 @@ def db_upload_adsorbate(pth, adsorbate, overwrite=False):
     return
 
 
-def db_get_adsorbates(pth):
+def db_get_adsorbates(pth, verbose=True):
     """
     Gets all adsorbates and their properties.
 
@@ -930,8 +957,6 @@ def db_get_adsorbates(pth):
         # Create the adsorbates
         for row in cursor:
 
-            adsorbate_params = dict(zip(row.keys(), row))
-
             # Get the extra data from the adsorbate_properties table
             cur_inner = db.cursor()
 
@@ -939,21 +964,30 @@ def db_get_adsorbates(pth):
                 build_select(table='adsorbate_properties',
                              to_select=['type', 'value'],
                              where=['ads_id']),
-                {'ads_id': adsorbate_params.pop('id')}
+                {'ads_id': row['id']}
             )
 
-            adsorbate_params.update({
-                row[0]: row[1] for row in cur_inner})
+            adsorbate_params = {row[0]: row[1] for row in cur_inner}
+
+            cur_inner.execute(
+                build_select(table='adsorbate_names',
+                             to_select=['name'],
+                             where=['ads_id']),
+                {'ads_id': row['id']}
+            )
+            alias = [row[0] for row in cur_inner]
 
             # Build adsorbate objects
-            adsorbates.append(Adsorbate(**adsorbate_params))
+            adsorbates.append(
+                Adsorbate(row['name'], alias=alias, **adsorbate_params))
 
     # Close the db connection
     if db:
         db.close()
 
     # Print success
-    print("Selected", len(adsorbates), "adsorbates")
+    if verbose:
+        print("Selected", len(adsorbates), "adsorbates")
 
     return adsorbates
 
@@ -975,8 +1009,8 @@ def db_delete_adsorbate(pth, adsorbate):
             ids = cursor.execute(
                 build_select(table='adsorbates',
                              to_select=['id'],
-                             where=['nick']),
-                {'nick':        adsorbate.name}
+                             where=['name']),
+                {'name': adsorbate.name}
             ).fetchone()
 
             if ids is None:
@@ -985,17 +1019,22 @@ def db_delete_adsorbate(pth, adsorbate):
             ads_id = ids[0]
 
             # Delete data from adsorbate_properties table
-            # Build sql request
-            sql_com = build_delete(table='adsorbate_properties',
-                                   where=['ads_id'])
+            cursor.execute(
+                build_delete(table='adsorbate_properties',
+                             where=['ads_id']),
+                {'ads_id': ads_id})
 
-            cursor.execute(sql_com, {'ads_id': ads_id})
+            # Delete names from adsorbate_names table
+            cursor.execute(
+                build_delete(table='adsorbate_names',
+                             where=['ads_id']),
+                {'ads_id': ads_id})
 
             # Delete sample info in adsorbate table
-            sql_com = build_delete(table='adsorbates',
-                                   where=['id'])
-
-            cursor.execute(sql_com, {'id': ads_id})
+            cursor.execute(
+                build_delete(table='adsorbates',
+                             where=['id']),
+                {'id': ads_id})
 
             # Print success
             print("Success", adsorbate.name)
@@ -1053,7 +1092,17 @@ def db_delete_adsorbate_property_type(pth, property_type):
 
     _delete_one_by_id(pth, table_name, table_id, property_type, name_string)
 
-    return
+
+def db_get_adsorbate_names(pth):
+    """
+    Gets all adsorbate property types.
+    """
+
+    name_string = ''
+    table = 'adsorbate_names'
+    table_id = 'id'
+
+    return _get_all_no_id(pth, table_id, table, name_string, verbose=False)
 
 
 # ---------------------- Contacts

@@ -120,7 +120,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
                              " e.g. thickness_model=\"Halsey\"")
 
     # Get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
     liquid_density = adsorbate.liquid_density(isotherm.t_exp)
 
