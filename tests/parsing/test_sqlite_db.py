@@ -178,7 +178,7 @@ class TestDatabase(object):
         })
 
         # Get test
-        assert len(pygaps.db_get_isotherm_property_types(db_file)) == 1
+        assert any(a['type'] == 'prop' for a in pygaps.db_get_isotherm_property_types(db_file))
 
         # Unique test
         with pytest.raises(pygaps.ParsingError):
@@ -192,7 +192,7 @@ class TestDatabase(object):
 
         # Property type upload
         for prop in isotherm_parameters:
-            if prop not in pygaps.classes.isotherm.Isotherm._db_columns:
+            if prop not in pygaps.classes.isotherm.Isotherm._db_columns and prop not in pygaps.classes.isotherm.Isotherm._unit_params:
                 pygaps.db_upload_isotherm_property_type(db_file, {
                     'type': prop,
                     'unit': "test unit"

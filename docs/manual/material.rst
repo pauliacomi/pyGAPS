@@ -1,7 +1,7 @@
 .. _material-manual:
 
 The Material class
-================
+==================
 
 .. _material-manual-general:
 
@@ -28,7 +28,7 @@ reference.
 .. _material-manual-create:
 
 Creating a Material
------------------
+-------------------
 
 To create an instance of the Material class, the material parameters are passed directly. The parameters
 must contain a value for ``name`` and ``batch``, with the rest of the parameters being optional.
@@ -38,8 +38,8 @@ An example of how to create a material:
 ::
 
     my_material = pygaps.Material(
-        name='carbon',              # Required
-        batch='X1',                 # Required
+        'carbon',                   # Name
+        'X1',                       # Batch or ID
         owner='Test User',          # User specific
         type='powder',              # User specific
         density=1,                  # User specific
@@ -57,7 +57,7 @@ To view a summary of the material properties, the standard python print function
 .. _material-manual-manage:
 
 Material management
------------------
+-------------------
 
 In pyGAPS, the materials can be stored in the internal sqlite database. At import-time, the list of all
 materials is automatically loaded into memory and stored in ``pygaps.MATERIAL_LIST``. The easiest way to retrieve

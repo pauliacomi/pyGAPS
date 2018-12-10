@@ -490,7 +490,7 @@ class PointIsotherm(Isotherm):
     ##########################################################
     #   Functions that return parts of the isotherm data
 
-    def data(self, branch=None):
+    def data(self, raw=False, branch=None):
         """
         Returns all data.
 
@@ -506,7 +506,9 @@ class PointIsotherm(Isotherm):
             The pandas DataFrame containing all isotherm data.
 
         """
-        if branch is None:
+        if raw:
+            return self.raw_data
+        elif branch is None:
             return self.raw_data.drop('branch', axis=1)
         elif branch == 'ads':
             return self.raw_data.loc[~self.raw_data['branch']].drop('branch', axis=1)

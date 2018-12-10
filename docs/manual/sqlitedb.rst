@@ -59,7 +59,7 @@ A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinter
 
 .. note::
 
-    For now, ModelIsotherms cannot be stored in the database.
+    Currently, ModelIsotherms cannot be stored in the database.
 
 
 .. _sqlite-manual-examples:

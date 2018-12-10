@@ -1,27 +1,27 @@
+adsorbent_basis,mass
+adsorbent_unit,g
+loading_basis,molar
+loading_unit,mmol
+pressure_mode,absolute
+pressure_unit,bar
 material_name,HKUST-1(Cu)
 material_batch,Test
 t_iso,303.0
 adsorbate,CO2
+iso_type,Calorimetrie
 user,ADW
 machine,CV
-iso_type,Calorimetrie
 date,21/05/2010 00:00
 is_real,True
 t_act,150.0
 lab,MADIREL
-pressure_unit,bar
-pressure_mode,absolute
-adsorbent_unit,g
-adsorbent_basis,mass
-loading_unit,mmol
-loading_basis,molar
 data:[pressure, loading, other...]
 loading(mmol),pressure(bar),Enthalpy(kJ/mol)
 0.7623282370000001,0.15583871,28.78796861
 1.533349004,0.32593871,28.76093926
 2.497572655,0.55443871,28.74997675
 3.4701210330000003,0.80723871,28.84816971
-4.255506074,1.03393871,28.9629352
+4.2555060739999995,1.03393871,28.9629352
 4.935367805,1.25153871,28.84886891
 5.712573207999999,1.53033871,28.73635632
 6.397007764,1.80973871,28.576631

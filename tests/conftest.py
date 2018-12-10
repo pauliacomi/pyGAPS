@@ -83,6 +83,8 @@ def isotherm_parameters():
         'origin': 'test',
         'test_parameter': 'parameter',
 
+        # No warnings
+        'warn_off': True
     }
 
     return parameters

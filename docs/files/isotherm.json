@@ -1,6 +1,4 @@
 {
-    "id": "6db7312c2d4e8b0b2981dcdd316af96e",
-
     "material_name": "HKUST-1(Cu)",
     "material_batch": "KRICT",
     "adsorbate": "CO2",
@@ -22,7 +20,6 @@
     "user": "ADW",
     "project": "EU MACADEMIA",
     "comment": "a comment",
-    "other_properties": null,
 
     "isotherm_data": [
         {

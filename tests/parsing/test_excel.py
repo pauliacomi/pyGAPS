@@ -71,4 +71,5 @@ class TestExcel(object):
             json_path = path.replace('.xls', '.json')
 
             with open(json_path, 'r') as file:
-                assert isotherm == pygaps.isotherm_from_json(file.read())
+                new_iso = pygaps.isotherm_from_json(file.read())
+                assert isotherm == new_iso

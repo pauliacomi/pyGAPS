@@ -11,7 +11,7 @@ Adsorbate
 
 
 Material
-------
+--------
 
 .. automodule:: pygaps.classes.material
     :members:

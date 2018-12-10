@@ -324,7 +324,7 @@ def isotherm_from_xl(path, fmt=None):
         material_info['material_batch'] = 'bel'
 
         pressure_mode = 'relative'
-        pressure_unit = 'kPa'
+        pressure_unit = None
         loading_basis = 'molar'
         adsorbent_basis = 'mass'
 

@@ -317,17 +317,20 @@ def db_upload_material_property_type(path, type_dict, overwrite=False, verbose=T
     """
     Uploads a material property type.
 
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    type_dict : dict
-        A dictionary that contains property type of the form
+    The type_dict takes the form of::
+
         {
             'type' : 'the_type',
             'unit': 'the_unit',
             'description': 'the_description'
         }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains property type.
     overwrite : bool
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -354,8 +357,8 @@ def db_get_material_property_types(path, verbose=True, **kwargs):
 
     Returns
     -------
-    list
-        list of property types
+    dict
+        dict of property types
     """
 
     cursor = kwargs.pop('cursor', None)
@@ -474,12 +477,13 @@ def db_upload_isotherm(path, isotherm, overwrite=None, verbose=True, **kwargs):
 
     # Upload the remaining data from the isotherm
     for key in iso_dict:
-        cursor.execute(build_insert(table='isotherm_properties',
-                                    to_insert=['iso_id', 'type', 'value']),
-                       {'iso_id': iso_id,
-                        'type': key,
-                        'value': iso_dict[key]
-                        })
+        if key not in isotherm._unit_params:
+            cursor.execute(build_insert(table='isotherm_properties',
+                                        to_insert=['iso_id', 'type', 'value']),
+                           {'iso_id': iso_id,
+                            'type': key,
+                            'value': iso_dict[key]
+                            })
 
     if verbose:
         # Print success
@@ -638,16 +642,20 @@ def db_upload_isotherm_type(path, type_dict, overwrite=False, verbose=True, **kw
     """
     Uploads a isotherm type.
 
+    The type_dict takes the form of::
+
+        {
+            'type' : 'the_type',
+            'unit': 'the_unit',
+            'description': 'the_description'
+        }
+
     Parameters
     ----------
     path : str
         Path to the database. Use pygaps.DATABASE for internal access.
     type_dict : dict
-        A dictionary that contains isotherm type of the form
-        {
-            'type' : 'the_type',
-            'description': 'the_description'
-        }
+        A dictionary that contains isotherm type.
     overwrite : bool
         Whether to upload the isotherm type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -674,8 +682,8 @@ def db_get_isotherm_types(path, verbose=True, **kwargs):
 
     Returns
     -------
-    list
-        list of isotherm types
+    dict
+        dict of isotherm types
     """
 
     cursor = kwargs.pop('cursor', None)
@@ -708,17 +716,20 @@ def db_upload_isotherm_property_type(path, type_dict, overwrite=False, verbose=T
     """
     Uploads a property type.
 
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    type_dict : dict
-        A dictionary that contains property type of the form
+    The type_dict takes the form of::
+
         {
             'type' : 'the_type',
             'unit': 'the_unit',
             'description': 'the_description'
         }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains property type.
     overwrite : bool
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -745,8 +756,8 @@ def db_get_isotherm_property_types(path, verbose=True, **kwargs):
 
     Returns
     -------
-    list
-        list of property types
+    dict
+        dict of property types
     """
 
     cursor = kwargs.pop('cursor', None)
@@ -779,17 +790,20 @@ def db_upload_isotherm_data_type(path, type_dict, overwrite=False, verbose=True,
     """
     Uploads a data type.
 
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    type_dict : dict
-        A dictionary that contains data type of the form
+    The type_dict takes the form of::
+
         {
             'type' : 'the_type',
             'unit': 'the_unit',
             'description': 'the_description'
         }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains data type.
     overwrite : bool
         Whether to upload the data type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -816,8 +830,8 @@ def db_get_isotherm_data_types(path, verbose=True, **kwargs):
 
     Returns
     -------
-    list
-        list of data types
+    dict
+        dict of data types
     """
 
     cursor = kwargs.pop('cursor', None)
@@ -1074,17 +1088,20 @@ def db_upload_adsorbate_property_type(path, type_dict, overwrite=False, verbose=
     """
     Uploads an adsorbate property type.
 
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    type_dict : dict
-        A dictionary that contains property type of the form
+    The type_dict takes the form of::
+
         {
             'type' : 'the_type',
             'unit': 'the_unit',
             'description': 'the_description'
         }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains property type.
     overwrite : bool
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -1111,8 +1128,8 @@ def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
 
     Returns
     -------
-    list
-        list of property types
+    dict
+        dict of property types
     """
 
     cursor = kwargs.pop('cursor', None)
@@ -1154,8 +1171,8 @@ def db_get_adsorbate_names(path, verbose=True, **kwargs):
 
     Returns
     -------
-    list
-        list of aliases
+    dict
+        dict of aliases
     """
 
     cursor = kwargs.pop('cursor', None)

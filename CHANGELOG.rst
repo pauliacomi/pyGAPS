@@ -3,6 +3,7 @@ Changelog
 =========
 
 Features:
+
 * Increased number of adsorbates available in pyGAPS to 40.
 * Made adsorbates searchable by a list of aliases rather than a single name.
 * Exposed the CoolProp backend on adsorbate objects for convenience, it is
