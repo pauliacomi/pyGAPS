@@ -10,9 +10,9 @@ import numpy
 import pandas
 
 from ..classes.adsorbate import Adsorbate
+from ..classes.material import Material
 from ..classes.pointisotherm import Isotherm
 from ..classes.pointisotherm import PointIsotherm
-from ..classes.material import Material
 from ..utilities.exceptions import ParsingError
 from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert

@@ -23,9 +23,9 @@ from .calculations.psd import micropore_size_distribution
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw
 from .classes.adsorbate import Adsorbate
+from .classes.material import Material
 from .classes.modelisotherm import ModelIsotherm
 from .classes.pointisotherm import PointIsotherm
-from .classes.material import Material
 from .graphing.iastgraphs import plot_iast_vle
 from .graphing.isothermgraphs import plot_iso
 from .parsing import *

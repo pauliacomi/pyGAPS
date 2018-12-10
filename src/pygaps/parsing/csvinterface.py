@@ -4,8 +4,8 @@ This module contains the csv interface.
 
 import pandas
 
-from ..classes.pointisotherm import PointIsotherm
 from ..classes.modelisotherm import ModelIsotherm
+from ..classes.pointisotherm import PointIsotherm
 
 
 def isotherm_to_csv(isotherm, path, separator=','):
