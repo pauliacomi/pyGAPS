@@ -3,160 +3,130 @@ This module contains the sql pragmas to generate the sqlite database.
 """
 
 
-# Pragmas relating to samples
+# Pragmas relating to materials
 
-PRAGMA_SAMPLES = """
-            DROP TABLE IF EXISTS "samples";
+PRAGMA_MATERIALS = """
+            DROP TABLE IF EXISTS "materials";
 
-            CREATE TABLE "samples" (
+            CREATE TABLE "materials" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `name`          TEXT        NOT NULL,
                 `batch`         TEXT        NOT NULL,
 
-                `contact`       TEXT        NOT NULL,
-                `source`        TEXT        NOT NULL,
-                `type`          TEXT        NOT NULL,
-
-                `project`       TEXT,
-                `struct`        TEXT,
-                `form`          TEXT,
-                `comment`       TEXT,
-
                 UNIQUE(name,batch)
-                FOREIGN KEY(`contact`)      REFERENCES `contacts`(`nick`),
-                FOREIGN KEY(`source`)       REFERENCES `sources`(`nick`),
-                FOREIGN KEY(`type`)         REFERENCES `sample_type`(`type`)
                 );
 """
 
-PRAGMA_SAMPLE_TYPE = """
-            DROP TABLE IF EXISTS "sample_type";
+PRAGMA_MATERIAL_PROPERTIES = """
 
-            CREATE TABLE "sample_type" (
+            DROP TABLE IF EXISTS "material_properties";
+
+            CREATE TABLE "material_properties" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `type`          TEXT        NOT NULL UNIQUE,
-                `name`          TEXT
-                );
-"""
-
-PRAGMA_SAMPLE_PROPERTIES = """
-
-            DROP TABLE IF EXISTS "sample_properties";
-
-            CREATE TABLE "sample_properties" (
-                `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `sample_id`     INTEGER     NOT NULL,
+                `material_id`   INTEGER     NOT NULL,
                 `type`          TEXT        NOT NULL,
                 `value`         TEXT,
 
-                FOREIGN KEY(`sample_id`)    REFERENCES `samples`(`id`),
-                FOREIGN KEY(`type`)         REFERENCES 'sample_properties_type'('type')
+                FOREIGN KEY(`material_id`)    REFERENCES `materials`(`id`),
+                FOREIGN KEY(`type`)         REFERENCES 'material_properties_type'('type')
                 );
 """
 
-PRAGMA_SAMPLE_PROPERTY_TYPE = """
+PRAGMA_MATERIAL_PROPERTY_TYPE = """
 
-            DROP TABLE IF EXISTS "sample_properties_type";
+            DROP TABLE IF EXISTS "material_properties_type";
 
-            CREATE TABLE "sample_properties_type" (
+            CREATE TABLE "material_properties_type" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `type`          TEXT        NOT NULL UNIQUE,
-                `unit`          TEXT
-                );
+                `unit`          TEXT,
+                `description`   TEXT
+);
 """
 
 
-# Pragmas relating to experiments
+# Pragmas relating to isotherms
 
-PRAGMA_EXPERIMENTS = """
-            DROP TABLE IF EXISTS "experiments";
+PRAGMA_ISOTHERMS = """
+            DROP TABLE IF EXISTS "isotherms";
 
-            CREATE TABLE "experiments" (
+            CREATE TABLE "isotherms" (
                 `id`            TEXT        NOT NULL PRIMARY KEY UNIQUE,
-                `sample_name`   TEXT        NOT NULL,
-                `sample_batch`  TEXT        NOT NULL,
-                `t_exp`         REAL        NOT NULL,
+                `material_name`   TEXT      NOT NULL,
+                `material_batch`  TEXT      NOT NULL,
+                `t_iso`         REAL        NOT NULL,
                 `adsorbate`     TEXT        NOT NULL,
+                `iso_type`      TEXT        NOT NULL,
 
-                `exp_type`      TEXT        NOT NULL,
-                `machine`       TEXT        NOT NULL,
-                `user`          TEXT        NOT NULL,
-
-                `date`          TEXT,
-                `is_real`       INTEGER,
-                `t_act`         REAL,
-                `lab`           TEXT,
-                `project`       TEXT,
-                `comment`       TEXT,
-
-                FOREIGN KEY(`sample_name`,`sample_batch`)   REFERENCES `samples`(`name`,`batch`),
-                FOREIGN KEY(`exp_type`)         REFERENCES `experiment_type`(`type`),
-                FOREIGN KEY(`machine`)          REFERENCES `machines`(`nick`),
-                FOREIGN KEY(`user`)             REFERENCES `contacts`(`nick`),
-                FOREIGN KEY(`adsorbate`)        REFERENCES `adsorbates`(`nick`)
+                FOREIGN KEY(`material_name`,`material_batch`)   REFERENCES `materials`(`name`,`batch`),
+                FOREIGN KEY(`iso_type`)         REFERENCES `isotherm_type`(`type`),
+                FOREIGN KEY(`adsorbate`)        REFERENCES `adsorbates`(`name`)
                 );
 """
 
-PRAGMA_EXPERIMENT_TYPE = """
+PRAGMA_ISOTHERM_TYPE = """
 
-            DROP TABLE IF EXISTS "experiment_type";
+            DROP TABLE IF EXISTS "isotherm_type";
 
-            CREATE TABLE "experiment_type" (
+            CREATE TABLE "isotherm_type" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `type`          TEXT        NOT NULL UNIQUE,
-                `name`          TEXT
+                `description`   TEXT
                 );
 """
-PRAGMA_EXPERIMENT_PROPERTIES = """
+PRAGMA_ISOTHERM_PROPERTIES = """
 
-            DROP TABLE IF EXISTS "experiment_properties";
+            DROP TABLE IF EXISTS "isotherm_properties";
 
-            CREATE TABLE "experiment_properties" (
+            CREATE TABLE "isotherm_properties" (
                 `id`            INTEGER         NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `exp_id` INTEGER         NOT NULL,
+                `iso_id`        INTEGER         NOT NULL,
                 `type`          TEXT            NOT NULL,
                 `value`         TEXT            NOT NULL,
 
-                FOREIGN KEY(`exp_id`)    REFERENCES `experiments`(`id`),
-                FOREIGN KEY(`type`)             REFERENCES 'experiment_properties_type'('type')
+                FOREIGN KEY(`iso_id`)    REFERENCES `isotherms`(`id`),
+                FOREIGN KEY(`type`)      REFERENCES 'isotherm_properties_type'('type')
                 );
 """
 
-PRAGMA_EXPERIMENT_PROPERTY_TYPE = """
+PRAGMA_ISOTHERM_PROPERTY_TYPE = """
 
-            DROP TABLE IF EXISTS "experiment_properties_type";
+            DROP TABLE IF EXISTS "isotherm_properties_type";
 
-            CREATE TABLE "experiment_properties_type" (
+            CREATE TABLE "isotherm_properties_type" (
                 `id`            INTEGER         NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `type`          TEXT            NOT NULL UNIQUE,
-                `unit`          TEXT
+                `unit`          TEXT,
+                `description`   TEXT
                 );
 """
 
 
-PRAGMA_EXPERIMENT_DATA = """
-            DROP TABLE IF EXISTS "experiment_data";
+PRAGMA_ISOTHERM_DATA = """
+            DROP TABLE IF EXISTS "isotherm_data";
 
-            CREATE TABLE "experiment_data" (
+            CREATE TABLE "isotherm_data" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `exp_id`        INTEGER     NOT NULL,
+                `iso_id`        INTEGER     NOT NULL,
                 `type`          TEXT        NOT NULL,
                 `data`          BLOB        NOT NULL,
 
-                FOREIGN KEY(`exp_id`) REFERENCES `experiments`(`id`),
-                FOREIGN KEY(`type`) REFERENCES `experiment_data_type`(`type`)
+                FOREIGN KEY(`iso_id`) REFERENCES `isotherms`(`id`),
+                FOREIGN KEY(`type`) REFERENCES `isotherm_data_type`(`type`)
                 );
 """
 
-PRAGMA_EXPERIMENT_DATA_TYPE = """
-            DROP TABLE IF EXISTS "experiment_data_type";
+PRAGMA_ISOTHERM_DATA_TYPE = """
+            DROP TABLE IF EXISTS "isotherm_data_type";
 
-            CREATE TABLE "experiment_data_type" (
+            CREATE TABLE "isotherm_data_type" (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `type`          TEXT        NOT NULL UNIQUE,
-                `unit`          TEXT
+                `unit`          TEXT,
+                `description`   TEXT
                 );
 """
+
 
 # Pragmas relating to gasses
 PRAGMA_ADSORBATES = """
@@ -200,69 +170,28 @@ PRAGMA_ADSORBATE_PROPERTIES_TYPE = """
             CREATE TABLE `adsorbate_properties_type` (
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `type`          TEXT        NOT NULL UNIQUE,
-                `unit`          TEXT
+                `unit`          TEXT,
+                `description`   TEXT
                 );
 """
 
-# Pragmas relating to contacts
-PRAGMA_CONTACTS = """
-            DROP TABLE IF EXISTS "contacts";
-
-            CREATE TABLE "contacts" (
-                `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `nick`          TEXT        NOT NULL UNIQUE,
-                `name`          TEXT        NOT NULL,
-                `email`         TEXT,
-                `phone`         TEXT
-                );
-"""
-
-# Pragmas relating to machines
-
-PRAGMA_MACHINES = """
-            DROP TABLE IF EXISTS "machines";
-
-            CREATE TABLE "machines" (
-                `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `nick`          TEXT        NOT NULL UNIQUE,
-                `name`          TEXT,
-                `type`          TEXT
-                );
-"""
-
-# Pragmas relating to sources
-
-PRAGMA_SOURCES = """
-            DROP TABLE IF EXISTS "sources";
-
-            CREATE TABLE "sources" (
-                `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-                `nick`          TEXT        NOT NULL UNIQUE,
-                `name`          TEXT
-                );
-"""
 
 # List of pragmas
 
 PRAGMAS = [
-    PRAGMA_SAMPLES,
-    PRAGMA_SAMPLE_PROPERTIES,
-    PRAGMA_SAMPLE_TYPE,
-    PRAGMA_SAMPLE_PROPERTY_TYPE,
+    PRAGMA_MATERIALS,
+    PRAGMA_MATERIAL_PROPERTIES,
+    PRAGMA_MATERIAL_PROPERTY_TYPE,
 
-    PRAGMA_EXPERIMENT_TYPE,
-    PRAGMA_EXPERIMENTS,
-    PRAGMA_EXPERIMENT_PROPERTY_TYPE,
-    PRAGMA_EXPERIMENT_PROPERTIES,
-    PRAGMA_EXPERIMENT_DATA_TYPE,
-    PRAGMA_EXPERIMENT_DATA,
+    PRAGMA_ISOTHERM_TYPE,
+    PRAGMA_ISOTHERMS,
+    PRAGMA_ISOTHERM_PROPERTY_TYPE,
+    PRAGMA_ISOTHERM_PROPERTIES,
+    PRAGMA_ISOTHERM_DATA_TYPE,
+    PRAGMA_ISOTHERM_DATA,
 
     PRAGMA_ADSORBATES,
     PRAGMA_ADSORBATE_NAMES,
     PRAGMA_ADSORBATE_PROPERTIES_TYPE,
     PRAGMA_ADSORBATE_PROPERTIES,
-
-    PRAGMA_CONTACTS,
-    PRAGMA_MACHINES,
-    PRAGMA_SOURCES,
 ]
