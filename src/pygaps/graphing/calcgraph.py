@@ -357,7 +357,7 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
     log : int
         Whether to display a logarithmic graph
     title : str
-        Name of the sample to put in the title.
+        Name of the material to put in the title.
 
     Returns
     -------

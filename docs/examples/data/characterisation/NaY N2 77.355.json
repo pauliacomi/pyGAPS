@@ -1,6 +1,6 @@
 {
     "adsorbate": "N2",
-    "exp_type": "Isotherme",
+    "iso_type": "Isotherme",
     "id": "2a997747be74ae39546e5c1b4c3f0ab4",
     "is_real": true,
     "isotherm_data": [
@@ -415,9 +415,9 @@
     ],
     "lab": "MADIREL",
     "machine": "Triflex",
-    "sample_batch": "Test",
-    "sample_name": "NaY",
+    "material_batch": "Test",
+    "material_name": "NaY",
     "t_act": 200.0,
-    "t_exp": 77.355,
+    "t_iso": 77.355,
     "user": "PI"
 }

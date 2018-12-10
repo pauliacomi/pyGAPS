@@ -21,7 +21,7 @@ class TestIsostericHeat(object):
     Tests everything related to isosteric heat calculation
     """
 
-    def test_iso_heat_checks(self, use_sample):
+    def test_iso_heat_checks(self, use_material):
         """Tests initial checks"""
 
         isotherms = []
@@ -43,12 +43,12 @@ class TestIsostericHeat(object):
             pygaps.isosteric_heat([isotherms[0]])
 
         # Check same sample
-        isotherms[0].sample_name = 'Test'
+        isotherms[0].material_name = 'Test'
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.isosteric_heat(isotherms)
 
-        isotherms[0].sample_name = isotherms[1].sample_name
+        isotherms[0].material_name = isotherms[1].material_name
 
         # Check same basis
         isotherms[0].convert_adsorbent(basis_to='volume', unit_to='cm3')

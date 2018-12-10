@@ -1,10 +1,10 @@
-sample_name,HKUST-1(Cu)
-sample_batch,Test
-t_exp,303.0
+material_name,HKUST-1(Cu)
+material_batch,Test
+t_iso,303.0
 adsorbate,CO2
 user,ADW
 machine,CV
-exp_type,Calorimetrie
+iso_type,Calorimetrie
 date,21/05/2010 00:00
 is_real,True
 t_act,150.0

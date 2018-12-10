@@ -1,6 +1,6 @@
 {
     "adsorbate": "CH4",
-    "exp_type": "Isotherm",
+    "iso_type": "Isotherm",
     "id": "96c4f55ce92e8cf5d35dab44f1d575ef",
     "is_real": true,
     "isotherm_data": [
@@ -110,9 +110,9 @@
         }
     ],
     "lab": "MADIREL",
-    "sample_batch": "Test",
-    "sample_name": "MOF-5(Zn)",
+    "material_batch": "Test",
+    "material_name": "MOF-5(Zn)",
     "t_act": 150.0,
-    "t_exp": 298.0,
+    "t_iso": 298.0,
     "user": "PI"
 }

@@ -1,6 +1,6 @@
 {
     "adsorbate": "C2H6",
-    "exp_type": "Isotherm",
+    "iso_type": "Isotherm",
     "id": "6cac5dba7a91ac90edaa521fdfd7456d",
     "is_real": true,
     "isotherm_data": [
@@ -82,9 +82,9 @@
         }
     ],
     "lab": "MADIREL",
-    "sample_batch": "Test",
-    "sample_name": "MOF-5(Zn)",
+    "material_batch": "Test",
+    "material_name": "MOF-5(Zn)",
     "t_act": 150.0,
-    "t_exp": 298.0,
+    "t_iso": 298.0,
     "user": "PI"
 }

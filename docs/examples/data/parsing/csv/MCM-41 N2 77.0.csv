@@ -1,10 +1,10 @@
-sample_name,MCM-41
-sample_batch,Test
-t_exp,77.0
+material_name,MCM-41
+material_batch,Test
+t_iso,77.0
 adsorbate,N2
 user,PI
 machine,Triflex
-exp_type,Isotherme
+iso_type,Isotherme
 is_real,True
 t_act,150.0
 lab,MADIREL

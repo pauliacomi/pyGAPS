@@ -1,6 +1,6 @@
 {
     "adsorbate": "N2",
-    "exp_type": "physisorption",
+    "iso_type": "physisorption",
     "id": "0b323834ec551914c92c4d6ee9af986c",
     "is_real": true,
     "isotherm_data": [
@@ -139,9 +139,9 @@
     ],
     "lab": "local",
     "machine": "homemade1",
-    "sample_batch": "X1",
-    "sample_name": "Carbon",
+    "material_batch": "X1",
+    "material_name": "Carbon",
     "t_act": 150.0,
-    "t_exp": 303.0,
+    "t_iso": 303.0,
     "user": "Bob"
 }

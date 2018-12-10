@@ -95,10 +95,10 @@ def plot_iso(isotherms,
         Title of the graph. Defaults to none.
     lgd_keys : iterable
         The components of the isotherm which are displayed on the legend. For example
-        pass ['sample_name', 'sample_batch'] to have the legend labels display only these
+        pass ['material_name', 'material_batch'] to have the legend labels display only these
         two components. Works with any isotherm properties and with 'branch' and 'key',
         the isotherm branch and the y-axis key respectively.
-        Defaults to 'sample_name' and 'adsorbate'.
+        Defaults to 'material_name' and 'adsorbate'.
     lgd_pos : ['best', 'none', 'bottom', 'right', 'inner']
         Specify to have the legend position to the bottom, the right of the graph
         or inside the plot area itself. Defaults to 'best'.
@@ -302,7 +302,7 @@ def plot_iso(isotherms,
             return ''
         else:
             if lbl_components is None:
-                return isotherm.sample_name + ' ' + convert_chemformula(isotherm.adsorbate)
+                return isotherm.material_name + ' ' + convert_chemformula(isotherm.adsorbate)
             text = []
             for selected in lbl_components:
                 if selected == 'branch':

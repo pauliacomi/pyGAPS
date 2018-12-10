@@ -78,7 +78,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     The slope of the linear section can be used to calculate the area where the adsorption
     is taking place. If it is of a linear region at the start of the curve, it will represent
     the total surface area of the material. If at the end of the curve, it will instead
-    represent external surface area of the sample. The formula to calculate the area is:
+    represent external surface area of the material. The formula to calculate the area is:
 
     .. math::
 
@@ -122,7 +122,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     # Get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
-    liquid_density = adsorbate.liquid_density(isotherm.t_exp)
+    liquid_density = adsorbate.liquid_density(isotherm.t_iso)
 
     # Read data in
     loading = isotherm.loading(branch='ads',

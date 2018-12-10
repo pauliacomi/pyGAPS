@@ -122,8 +122,8 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     # Get required adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
-    liquid_density = adsorbate.liquid_density(isotherm.t_exp)
-    surface_tension = adsorbate.surface_tension(isotherm.t_exp)
+    liquid_density = adsorbate.liquid_density(isotherm.t_iso)
+    surface_tension = adsorbate.surface_tension(isotherm.t_iso)
 
     # Read data in, depending on branch requested
     # If on an adsorption branch, data will be reversed
@@ -154,7 +154,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         m_geometry = meniscus_geometry(branch, pore_geometry)
         k_model = partial(kelvin_radius_std,
                           meniscus_geometry=m_geometry,
-                          temperature=isotherm.t_exp,
+                          temperature=isotherm.t_iso,
                           liquid_density=liquid_density,
                           adsorbate_molar_mass=molar_mass,
                           adsorbate_surface_tension=surface_tension)
@@ -265,7 +265,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
             'polarizability': adsorbate.get_prop('polarizability'),
             'magnetic_susceptibility': adsorbate.get_prop('magnetic_susceptibility'),
             'surface_density': adsorbate.get_prop('surface_density'),
-            'liquid_density': adsorbate.liquid_density(isotherm.t_exp),
+            'liquid_density': adsorbate.liquid_density(isotherm.t_iso),
             'adsorbate_molar_mass': adsorbate.molar_mass(),
         }
 
@@ -282,7 +282,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     # Call specified pore size distribution function
     if psd_model == 'HK':
         pore_widths, pore_dist = psd_horvath_kawazoe(
-            loading, pressure, isotherm.t_exp, pore_geometry,
+            loading, pressure, isotherm.t_iso, pore_geometry,
             adsorbate_properties, adsorbent_properties)
 
     # Package the results
@@ -400,7 +400,7 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
 
     # Convert to volume units
     adsorbate = Adsorbate.find(isotherm.adsorbate)
-    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() / adsorbate.liquid_density(isotherm.t_exp) / 1000
+    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() / adsorbate.liquid_density(isotherm.t_iso) / 1000
 
     # Package the results
     result_dict = {

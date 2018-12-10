@@ -1,6 +1,6 @@
 {
     "adsorbate": "N2",
-    "exp_type": "Isotherme",
+    "iso_type": "Isotherme",
     "id": "b3d3e5efe512973312043c2c16729ac7",
     "is_real": true,
     "isotherm_data": [
@@ -531,9 +531,9 @@
     ],
     "lab": "MADIREL",
     "machine": "Triflex",
-    "sample_batch": "Test",
-    "sample_name": "Takeda 5A",
+    "material_batch": "Test",
+    "material_name": "Takeda 5A",
     "t_act": 200.0,
-    "t_exp": 77.355,
+    "t_iso": 77.355,
     "user": "PI"
 }

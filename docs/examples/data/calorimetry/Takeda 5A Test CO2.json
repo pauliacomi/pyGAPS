@@ -1,6 +1,6 @@
 {
     "adsorbate": "CO2",
-    "exp_type": "Calorimetrie",
+    "iso_type": "Calorimetrie",
     "id": "35a72c26772c272dfa36559a2c824f90",
     "is_real": true,
     "isotherm_data": [
@@ -172,9 +172,9 @@
     ],
     "lab": "MADIREL",
     "machine": "CV",
-    "sample_batch": "Test",
-    "sample_name": "Takeda 5A",
+    "material_batch": "Test",
+    "material_name": "Takeda 5A",
     "t_act": 150.0,
-    "t_exp": 303.0,
+    "t_iso": 303.0,
     "user": "ADW"
 }

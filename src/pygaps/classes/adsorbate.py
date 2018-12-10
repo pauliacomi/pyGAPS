@@ -23,7 +23,7 @@ class Adsorbate(object):
     vapour pressure, etc.
 
     The properties can be either calculated through a wrapper over
-    CoolProp or supplied in the initial sample creation.
+    CoolProp or supplied in the initial adsorbate creation.
     All parameters passed are saved in a self.parameters
     dictionary.
 
@@ -97,7 +97,7 @@ class Adsorbate(object):
         self.alias = alias
         if alias is None:
             self.alias = [name.lower()]
-        else:
+        elif name not in alias:
             self.alias.append(name.lower())
 
         #: Adsorbate properties

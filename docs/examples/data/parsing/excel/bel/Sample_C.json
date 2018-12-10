@@ -95,8 +95,8 @@
     "mass": 0.074,
     "pressure_mode": "relative",
     "pressure_unit": null,
-    "sample_batch": "bel",
-    "sample_name": "Sample_C",
-    "t_exp": 303.0,
+    "material_batch": "bel",
+    "material_name": "Sample_C",
+    "t_iso": 303.0,
     "user": "User"
 }

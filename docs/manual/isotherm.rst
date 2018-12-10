@@ -109,10 +109,10 @@ The isotherm parameters must include:
       column in the DataFrame contain which data of the isotherm. If other columns are to be
       stored in the isotherm object, put their names in a list and pass it as the ``other_keys``
       parameter
-    - The sample name (``sample_name``)
-    - The sample batch (``sample_batch``)
+    - The sample name (``material_name``)
+    - The sample batch (``material_batch``)
     - The adsorbate used (``adsorbate``)
-    - The temperature, in K at which the data was recorded (``t_exp``)
+    - The temperature, in K at which the data was recorded (``t_iso``)
 
 The isotherm units can also be specified here. If not specified, the framework will assume
 default values: absolute pressure in *bar* and the amount adsorbed in terms of
@@ -176,10 +176,10 @@ instantiation is below, with explanations.
         # Finally the isotherm description parameters
         # must be passed.
 
-        sample_name='carbon',           # Required
-        sample_batch='X1',              # Required
+        material_name='carbon',           # Required
+        material_batch='X1',              # Required
         adsorbate='nitrogen',           # Required
-        t_exp=77,                       # Required
+        t_iso=77,                       # Required
         t_act=150,                      # Recognised / named
         user='John',                    # Recognised / named
         DOI='10.000/mydoi',             # Unknown / user specific
@@ -248,10 +248,10 @@ The code to generate a ModelIsotherm is then:
         # Finally the isotherm description parameters
         # must be passed.
 
-        sample_name='carbon',           # Required
-        sample_batch='X1',              # Required
+        material_name='carbon',           # Required
+        material_batch='X1',              # Required
         adsorbate='nitrogen',           # Required
-        t_exp=77,                       # Required
+        t_iso=77,                       # Required
         t_act=150,                      # Recognised / named
         user='John',                    # Recognised / named
         DOI='10.000/mydoi',             # Unknown / user specific
@@ -462,13 +462,13 @@ For adsorbent basis, the same properties (density and molar mass) are required, 
 requested. Here, these properties are specific to each material and cannot be calculated. Therefore,
 they have to be specified by the user.
 
-Similar to the list of adsorbates described above, pyGAPS includes a list of samples, stored as Sample objects.
+Similar to the list of adsorbates described above, pyGAPS includes a list of samples, stored as Material objects.
 This is populated at import-time from the database. It is this list from where the required properties are
 retrieved.
 
-To specify the properties, the user must create a Sample instance, populate it with the density
+To specify the properties, the user must create a Material instance, populate it with the density
 value and the molar mass, and then upload it either to the internal list or the internal database.
-For more info on this see the :ref:`Sample class manual <sample-manual>`
+For more info on this see the :ref:`Material class manual <material-manual>`
 
 
 .. _isotherms-manual-unique:

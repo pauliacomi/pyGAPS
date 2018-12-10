@@ -1,10 +1,10 @@
 {
     "id": "6db7312c2d4e8b0b2981dcdd316af96e",
 
-    "sample_name": "HKUST-1(Cu)",
-    "sample_batch": "KRICT",
+    "material_name": "HKUST-1(Cu)",
+    "material_batch": "KRICT",
     "adsorbate": "CO2",
-    "t_exp": 303.0,
+    "t_iso": 303.0,
 
     "pressure_mode" : "absolute",
     "pressure_unit" : "bar",
@@ -13,7 +13,7 @@
     "loading_basis" : "molar",
     "loading_unit" : "mmol",
 
-    "exp_type": "Calorimetrie",
+    "iso_type": "Calorimetrie",
     "date": "2010-05-21 00:00:00",
     "is_real": true,
     "machine": "CV",

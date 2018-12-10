@@ -71,11 +71,11 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
 
     with open(path) as file:
         line = file.readline().rstrip()
-        sample_info = {}
+        material_info = {}
 
         while not line.startswith('data'):
             values = line.split(sep=separator)
-            sample_info.update({values[0]: values[1]})
+            material_info.update({values[0]: values[1]})
             line = file.readline().rstrip()
 
         data_df = pandas.read_csv(file, sep=separator)
@@ -86,6 +86,6 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
         pressure_key=data_df.columns[0],
         loading_key=data_df.columns[1],
         other_keys=list(data_df.columns[2:]),
-        **sample_info)
+        **material_info)
 
     return isotherm

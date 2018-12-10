@@ -155,7 +155,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # We check enthalpy of liquefaction
     adsorbate = Adsorbate.find(isotherm.adsorbate)
     try:
-        enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
+        enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_iso)
     except (ParameterError, CalculationError):
         enth_liq = 0
         warnings.warn(
@@ -349,7 +349,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         )
 
         title = ' '.join(
-            [isotherm.sample_name, isotherm.sample_batch, isotherm.adsorbate])
+            [isotherm.material_name, isotherm.material_batch, isotherm.adsorbate])
         initial_enthalpy_plot(
             loading, enthalpy, enthalpy_approx(loading), title=title, extras=extras)
 
@@ -396,7 +396,7 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
                                    loading_unit='mmol',
                                    loading_basis='molar')
         title = ' '.join(
-            [isotherm.sample_name, isotherm.sample_batch, isotherm.adsorbate])
+            [isotherm.material_name, isotherm.material_batch, isotherm.adsorbate])
         initial_enthalpy_plot(
             loading, enthalpy, [initial_enthalpy for i in loading], title=title)
 

@@ -81,7 +81,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     The slope of the linear section can be used to calculate the area where the adsorption
     is taking place. If it is of a linear region at the start of the curve, it will represent
     the total surface area of the material. If at the end of the curve, it will instead
-    represent external surface area of the sample.
+    represent external surface area of the material.
     The calculation uses the known area of the reference material. If unknown, the area
     will be calculated here using the BET method.
 
@@ -126,7 +126,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     # Get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
-    liquid_density = adsorbate.liquid_density(isotherm.t_exp)
+    liquid_density = adsorbate.liquid_density(isotherm.t_iso)
 
     # Read data in
     loading = isotherm.loading(branch='ads',

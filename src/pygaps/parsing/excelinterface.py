@@ -15,21 +15,21 @@ from .excel_bel_parser import read_bel_report
 from .excel_mic_parser import read_mic_report
 
 _FIELDS = {
-    'sample_name': {
-        'text': ['Sample name', "Nom de l'échantillon"],
-        'name': 'sample_name',
+    'material_name': {
+        'text': ['Material name', "Nom de l'échantillon"],
+        'name': 'material_name',
         'row': 0,
         'column': 0,
     },
-    'sample_batch': {
-        'text': ['Sample batch', "Lot de l'échantillon"],
-        'name': 'sample_batch',
+    'material_batch': {
+        'text': ['Material batch', "Lot de l'échantillon"],
+        'name': 'material_batch',
         'row': 1,
         'column': 0,
     },
-    't_exp': {
+    't_iso': {
         'text': ['Experiment temperature (K)', "Température de l'expérience (K))"],
-        'name': 't_exp',
+        'name': 't_iso',
         'row': 2,
         'column': 0,
     },
@@ -84,9 +84,9 @@ _FIELDS = {
 }
 
 _FIELDS_MADIREL = {
-    'exp_type': {
+    'iso_type': {
         'text': ['Experiment type', "Type manip"],
-        'name': 'exp_type',
+        'name': 'iso_type',
         'row': 0,
         'column': 0,
     },
@@ -102,8 +102,8 @@ _FIELDS_MADIREL = {
         'row': 2,
         'column': 0,
     },
-    'sample_name': {'row': 3, 'column': 0},
-    'sample_batch': {'row': 4, 'column': 0},
+    'material_name': {'row': 3, 'column': 0},
+    'material_batch': {'row': 4, 'column': 0},
     't_act': {
         'text': ['Activation temperature (°C)', "Température d'activation (°C)"],
         'name': 't_act',
@@ -116,7 +116,7 @@ _FIELDS_MADIREL = {
         'row': 6,
         'column': 0,
     },
-    't_exp': {'row': 7, 'column': 0},
+    't_iso': {'row': 7, 'column': 0},
     'adsorbate': {'row': 8, 'column': 0},
     'user': {
         'text': ['User', "Surnom du contact"],
@@ -125,7 +125,7 @@ _FIELDS_MADIREL = {
         'column': 0,
     },
     'lab': {
-        'text': ['Sample source name', "Nom du labo"],
+        'text': ['Material source name', "Nom du labo"],
         'name': 'lab',
         'row': 10,
         'column': 0,
@@ -215,11 +215,11 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     if fmt == 'MADIREL':
         _update_recurs(fields, _FIELDS_MADIREL)
 
-        if 'exp_type' in fields:
-            if isotherm.exp_type.lower() == "isotherm":
-                iso_dict['exp_type'] = 'Isotherme'
-            elif isotherm.exp_type.lower() == "calorimetry":
-                iso_dict['exp_type'] = 'Calorimetrie'
+        if 'iso_type' in fields:
+            if isotherm.iso_type.lower() == "isotherm":
+                iso_dict['iso_type'] = 'Isotherme'
+            elif isotherm.iso_type.lower() == "calorimetry":
+                iso_dict['iso_type'] = 'Calorimetrie'
                 _update_recurs(fields, _FIELDS_MADIREL_ENTH)
         if 'is_real' in fields:
             if isotherm.is_real is True:
@@ -280,7 +280,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
 
 def isotherm_from_xl(path, fmt=None):
     """
-    A function that will get the experiment and sample data from a excel parser
+    A function that will get the experiment and material data from a excel parser
     file and return the isotherm object.
 
     Parameters
@@ -300,15 +300,15 @@ def isotherm_from_xl(path, fmt=None):
         if fmt not in _FORMATS:
             raise ParsingError('Format not supported')
 
-    sample_info = {}
+    material_info = {}
     loading_key = 'loading'
     pressure_key = 'pressure'
     other_keys = []
     branch_data = 'guess'
 
     if fmt == 'mic':
-        sample_info = read_mic_report(path)
-        sample_info['sample_batch'] = 'mic'
+        material_info = read_mic_report(path)
+        material_info['material_batch'] = 'mic'
 
         pressure_mode = 'relative'
         pressure_unit = 'kPa'
@@ -316,12 +316,12 @@ def isotherm_from_xl(path, fmt=None):
         adsorbent_basis = 'mass'
 
         experiment_data_df = pandas.DataFrame({
-            pressure_key: sample_info.pop(pressure_key)['relative'],
-            loading_key: sample_info.pop(loading_key),
+            pressure_key: material_info.pop(pressure_key)['relative'],
+            loading_key: material_info.pop(loading_key),
         })
     elif fmt == 'bel':
-        sample_info = read_bel_report(path)
-        sample_info['sample_batch'] = 'bel'
+        material_info = read_bel_report(path)
+        material_info['material_batch'] = 'bel'
 
         pressure_mode = 'relative'
         pressure_unit = 'kPa'
@@ -329,11 +329,11 @@ def isotherm_from_xl(path, fmt=None):
         adsorbent_basis = 'mass'
 
         experiment_data_df = pandas.DataFrame({
-            pressure_key: sample_info.pop(pressure_key)['relative'],
-            loading_key: sample_info.pop(loading_key),
+            pressure_key: material_info.pop(pressure_key)['relative'],
+            loading_key: material_info.pop(loading_key),
         })
 
-        branch_data = sample_info.pop('measurement')
+        branch_data = material_info.pop('measurement')
 
     else:
         # Get excel workbook and sheet
@@ -346,14 +346,14 @@ def isotherm_from_xl(path, fmt=None):
         if fmt == 'MADIREL':
             _update_recurs(fields, _FIELDS_MADIREL)
 
-            if sht.cell(fields['exp_type']['row'],
-                        fields['exp_type']['column'] + 1).value == 'Calorimetrie':
+            if sht.cell(fields['iso_type']['row'],
+                        fields['iso_type']['column'] + 1).value == 'Calorimetrie':
                 _update_recurs(fields, _FIELDS_MADIREL_ENTH)
 
         # read the main isotherm parameters
         for field in fields:
-            sample_info[field] = sht.cell(fields[field]['row'],
-                                          fields[field]['column'] + 1).value
+            material_info[field] = sht.cell(fields[field]['row'],
+                                            fields[field]['column'] + 1).value
 
         # find data limits
         header_row = fields['isotherm data']['row'] + 1
@@ -391,26 +391,26 @@ def isotherm_from_xl(path, fmt=None):
                 prop = sht.cell(row_index, 0).value
                 if not prop:
                     break
-                sample_info[prop] = sht.cell(row_index, 1).value
+                material_info[prop] = sht.cell(row_index, 1).value
                 row_index += 1
 
         # Put data in order
-        sample_info.pop('isotherm data')    # remove useless field
-        sample_info.pop('iso_id', None)         # make sure id is not passed
-        pressure_mode = sample_info.pop('pressure_mode')
-        pressure_unit = sample_info.pop('pressure_unit')
-        loading_basis = sample_info.pop('loading_basis')
-        adsorbent_basis = sample_info.pop('adsorbent_basis')
+        material_info.pop('isotherm data')    # remove useless field
+        material_info.pop('iso_id', None)         # make sure id is not passed
+        pressure_mode = material_info.pop('pressure_mode')
+        pressure_unit = material_info.pop('pressure_unit')
+        loading_basis = material_info.pop('loading_basis')
+        adsorbent_basis = material_info.pop('adsorbent_basis')
 
         if fmt == 'MADIREL':
-            if sample_info['is_real'] == "Experience":
-                sample_info['is_real'] = True
-            elif sample_info['is_real'] == "Simulation":
-                sample_info['is_real'] = False
-            if sample_info['exp_type'] == 'Isotherme':
-                sample_info['exp_type'] = 'isotherm'
-            elif sample_info['exp_type'] == 'Calorimetrie':
-                sample_info['exp_type'] = 'calorimetry'
+            if material_info['is_real'] == "Experience":
+                material_info['is_real'] = True
+            elif material_info['is_real'] == "Simulation":
+                material_info['is_real'] = False
+            if material_info['iso_type'] == 'Isotherme':
+                material_info['iso_type'] = 'isotherm'
+            elif material_info['iso_type'] == 'Calorimetrie':
+                material_info['iso_type'] = 'calorimetry'
 
     isotherm = PointIsotherm(
         experiment_data_df,
@@ -424,6 +424,6 @@ def isotherm_from_xl(path, fmt=None):
         adsorbent_basis=adsorbent_basis,
         branch=branch_data,
 
-        **sample_info)
+        **material_info)
 
     return isotherm

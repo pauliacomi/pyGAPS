@@ -53,9 +53,9 @@ def isotherm_parameters():
 
     parameters = {
 
-        'sample_name': 'TEST',
-        'sample_batch': 'TB',
-        't_exp': 100.0,
+        'material_name': 'TEST',
+        'material_batch': 'TB',
+        't_iso': 100.0,
         'adsorbate': 'TA',
 
         'date': '26/06/92',
@@ -67,7 +67,7 @@ def isotherm_parameters():
         'project': 'TP',
         'machine': 'TM',
         'is_real': True,
-        'exp_type': 'calorimetry',
+        'iso_type': 'calorimetry',
 
         # Units/bases
         'adsorbent_basis': 'mass',
@@ -148,11 +148,11 @@ def basic_modelisotherm(isotherm_data, basic_isotherm):
 
 
 @pytest.fixture(scope='function')
-def sample_data():
+def material_data():
     """
-    Creates an dict with all data for an model sample
+    Creates an dict with all data for an model material
     """
-    sample_data = {
+    material_data = {
         'name': 'TEST',
         'batch': 'TB',
         'contact': 'TU',
@@ -168,17 +168,17 @@ def sample_data():
         'molar_mass': 10,  # g/mol
     }
 
-    return sample_data
+    return material_data
 
 
 @pytest.fixture(scope='function')
-def basic_sample(sample_data):
+def basic_material(material_data):
     """
-    Creates an sample from model data
+    Creates an material from model data
     """
-    sample = pygaps.Sample(**sample_data)
+    material = pygaps.Material(**material_data)
 
-    return sample
+    return material
 
 
 @pytest.fixture(scope='session')
@@ -217,7 +217,7 @@ def adsorbate_data():
 @pytest.fixture(scope='function')
 def basic_adsorbate(adsorbate_data):
     """
-    Creates an sample from model data
+    Creates an material from model data
     """
     adsorbate = pygaps.Adsorbate(**adsorbate_data)
 
@@ -239,14 +239,14 @@ def use_adsorbate(basic_adsorbate):
 
 
 @pytest.fixture()
-def use_sample(basic_sample):
+def use_material(basic_material):
     """
-    Uploads sample to list
+    Uploads material to list
     """
 
-    sample = next(
-        (x for x in pygaps.SAMPLE_LIST if basic_sample.name == x.name and basic_sample.batch == x.batch), None)
-    if not sample:
-        pygaps.SAMPLE_LIST.append(basic_sample)
+    material = next(
+        (x for x in pygaps.MATERIAL_LIST if basic_material.name == x.name and basic_material.batch == x.batch), None)
+    if not material:
+        pygaps.MATERIAL_LIST.append(basic_material)
 
     return

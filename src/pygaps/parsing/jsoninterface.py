@@ -164,9 +164,9 @@ def _to_json_nist(raw_dict):
     # pressure_mode = raw_dict.pop('pressure_mode')
     pressure_unit = raw_dict.pop('pressure_unit')
 
-    nist_dict['adsorbentMaterial'] = raw_dict.pop('sample_name')
-    nist_dict['hashkey'] = raw_dict.pop('sample_batch')
-    nist_dict['temperature'] = raw_dict.pop('t_exp')
+    nist_dict['adsorbentMaterial'] = raw_dict.pop('material_name')
+    nist_dict['hashkey'] = raw_dict.pop('material_batch')
+    nist_dict['temperature'] = raw_dict.pop('t_iso')
 
     internal_adsorbate = raw_dict.pop('adsorbate')
     nist_adsorbate = [k for k, v in NIST_ADSORBATES.items()
@@ -190,9 +190,9 @@ def _from_json_nist(raw_dict):
     nist_dict = dict()
 
     # Get regular isotherm parameters
-    nist_dict['sample_name'] = raw_dict.pop('adsorbentMaterial')
-    nist_dict['sample_batch'] = raw_dict.pop('hashkey')
-    nist_dict['t_exp'] = raw_dict.pop('temperature')
+    nist_dict['material_name'] = raw_dict.pop('adsorbentMaterial')
+    nist_dict['material_batch'] = raw_dict.pop('hashkey')
+    nist_dict['t_iso'] = raw_dict.pop('temperature')
 
     # Get adsorbate
     nist_adsorbate = raw_dict.pop('adsorbateGas')
