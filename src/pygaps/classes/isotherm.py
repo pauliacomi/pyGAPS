@@ -103,14 +103,14 @@ class Isotherm(object):
                  pressure_mode="absolute",
                  pressure_unit="bar",
 
-                 **isotherm_parameters):
+                 **properties):
         """
         Instantiation is done by passing a dictionary with the parameters,
         as well as the info about units, modes and data columns.
         """
 
         # Checks
-        if any(k not in isotherm_parameters
+        if any(k not in properties
                for k in self._required_params):
             raise ParameterError(
                 "Isotherm MUST have the following properties:"
@@ -177,13 +177,13 @@ class Isotherm(object):
         #
 
         #: Isotherm material name.
-        self.material_name = str(isotherm_parameters.pop('material_name'))
+        self.material_name = str(properties.pop('material_name'))
         #: Isotherm material batch.
-        self.material_batch = str(isotherm_parameters.pop('material_batch'))
+        self.material_batch = str(properties.pop('material_batch'))
         #: Isotherm experimental temperature.
-        self.t_iso = float(isotherm_parameters.pop('t_iso'))
+        self.t_iso = float(properties.pop('t_iso'))
         #: Isotherm adsorbate used.
-        self.adsorbate = str(isotherm_parameters.pop('adsorbate'))
+        self.adsorbate = str(properties.pop('adsorbate'))
 
         if self.adsorbate.lower() not in pygaps.ADSORBATE_NAME_LIST:
             warnings.warn(
@@ -194,16 +194,17 @@ class Isotherm(object):
 
         # Named properties of the isotherm
         for named_prop in self._named_params:
-            prop_val = isotherm_parameters.pop(named_prop, None)
+            prop_val = properties.pop(named_prop, None)
             if prop_val:
                 prop_val = self._named_params[named_prop](prop_val)
                 setattr(self, named_prop, prop_val)
 
-        # Save the rest of the properties as an extra dict
-        # now that the named properties were taken out of
+        # Save the rest of the properties as members
         #: Other properties of the isotherm.
-        for attr in isotherm_parameters:
-            setattr(self, attr, isotherm_parameters[attr])
+        for attr in properties:
+            if hasattr(self, attr):
+                raise ParameterError("Cannot override standard class member '{}'".format(attr))
+            setattr(self, attr, properties[attr])
 
     ##########################################################
     #   Overloaded and private functions
@@ -229,11 +230,6 @@ class Isotherm(object):
         Prints a short summary of all the isotherm parameters.
         '''
         string = ""
-
-        if getattr(self, 'is_real', True) is True:
-            string += ("Experimental isotherm" + '\n')
-        else:
-            string += ("Simulated isotherm" + '\n')
 
         # Required
         string += ("Material: " + str(self.material_name) + '\n')
