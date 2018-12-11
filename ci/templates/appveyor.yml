@@ -17,7 +17,7 @@ environment:
       PYTHON_ARCH: '32'
       CONDA_PY: '{{ config.python[-3:].replace('.', '') }}'
     - CONDA_ROOT: 'C:\Miniconda3_64'
-      {%- if config.python != 'python3.6' %}
+      {%- if config.python != 'python3.5' %}
 
       WINDOWS_SDK_VERSION: v7.{{ '1' if config.python[-3] == '3' else '0' }}
       {%- endif %}
