@@ -191,6 +191,8 @@ class Isotherm(object):
                  "(or name cannot be resolved to an existing one)."
                  "CoolProp backend disabled for this adsorbent.")
             )
+        else:
+            self.adsorbate = pygaps.Adsorbate.find(self.adsorbate).name
 
         # Named properties of the isotherm
         for named_prop in self._named_params:

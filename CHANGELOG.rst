@@ -9,6 +9,7 @@ Features:
 * Exposed the CoolProp backend on adsorbate objects for convenience, it is
   accessible through the adsorbate.backend property.
 * Streamlined the internal database functions to be more general.
+* Updated NIST json import to new format. Cannot import multicomponent isotherms.
 
 Breaking changes:
 
