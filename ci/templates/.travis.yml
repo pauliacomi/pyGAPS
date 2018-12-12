@@ -109,7 +109,7 @@ jobs:
           skip_cleanup: true
           draft: true
           on:
-            branch: feature/develop
+            branch: develop
 
 
 notifications:
