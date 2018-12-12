@@ -30,6 +30,7 @@ Breaking changes:
 Bugfixes:
 
 * Fixed issue in CSV import which read all values as strings (instead of floats/bools)
+* Fixed an issue with Excel import of bools, as they were previously read as 1/0
 
 
 1.4.0 (2018-11-10)

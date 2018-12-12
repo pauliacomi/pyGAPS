@@ -141,7 +141,9 @@ _FIELDS_MADIREL = {
     'loading_basis':    {'row': 2, 'column': 2},
     'loading_unit':     {'row': 3, 'column': 2},
     'adsorbent_basis':  {'row': 4, 'column': 2},
-    'adsorbent_unit':   {'row': 5, 'column': 2},
+    'adsorbent_unit':   {'row': 5, 'column': 2}
+}
+_FIELDS_MADIREL_ISO = {
     'henry_constant':   {'row': 13, 'column': 0, 'text': ["Constante d'Henry"]},
     'langmuir_n1':      {'row': 14, 'column': 0, 'text': ["Langmuir N1"]},
     'langmuir_b1':      {'row': 15, 'column': 0, 'text': ["Langmuir B1"]},
@@ -214,6 +216,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
 
     if fmt == 'MADIREL':
         _update_recurs(fields, _FIELDS_MADIREL)
+        _update_recurs(fields, _FIELDS_MADIREL_ISO)
 
         if 'iso_type' in fields:
             if isotherm.iso_type.lower() == "isotherm":
@@ -345,6 +348,7 @@ def isotherm_from_xl(path, fmt=None):
 
         if fmt == 'MADIREL':
             _update_recurs(fields, _FIELDS_MADIREL)
+            _update_recurs(fields, _FIELDS_MADIREL_ISO)
 
             if sht.cell(fields['iso_type']['row'],
                         fields['iso_type']['column'] + 1).value == 'Calorimetrie':
@@ -388,10 +392,14 @@ def isotherm_from_xl(path, fmt=None):
         if sht:
             row_index = 0
             while row_index < sht.nrows:
-                prop = sht.cell(row_index, 0).value
-                if not prop:
+                cell = sht.cell(row_index, 1)
+                if cell.ctype == xlrd.XL_CELL_EMPTY:
                     break
-                material_info[prop] = sht.cell(row_index, 1).value
+                elif cell.ctype == xlrd.XL_CELL_BOOLEAN:
+                    val = bool(cell.value)
+                else:
+                    val = cell.value
+                material_info[sht.cell(row_index, 0).value] = val
                 row_index += 1
 
         # Put data in order
@@ -411,6 +419,13 @@ def isotherm_from_xl(path, fmt=None):
                 material_info['iso_type'] = 'isotherm'
             elif material_info['iso_type'] == 'Calorimetrie':
                 material_info['iso_type'] = 'calorimetry'
+
+            new_info = {}
+            for k, v in material_info.items():
+                if k in _FIELDS_MADIREL_ISO or k in _FIELDS_MADIREL_ENTH and v == '':
+                    continue
+                new_info.update({k: v})
+            material_info = new_info
 
     isotherm = PointIsotherm(
         experiment_data_df,
