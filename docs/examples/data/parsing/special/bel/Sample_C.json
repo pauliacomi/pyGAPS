@@ -3,8 +3,7 @@
     "adsorbent_basis": "mass",
     "adsorbent_unit": "g",
     "comment": "Comment number 1",
-    "date": "18/06/11 19:42:27",
-    "exp_param": "Leak amount 1.177Pa/min",
+    "date": "2018-06-11 19:42:27",
     "isotherm_data": [
         {
             "deadvolume": "11.242",
