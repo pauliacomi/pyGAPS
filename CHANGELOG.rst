@@ -27,6 +27,9 @@ Breaking changes:
   isotherm is a ModelIsotherm.
 * Renamed Adsorbate.from_list() method to Adsorbate.find()
 
+Bugfixes:
+
+* Fixed issue in CSV import which read all values as strings (instead of floats/bools)
 
 
 1.4.0 (2018-11-10)
