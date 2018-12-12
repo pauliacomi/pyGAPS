@@ -29,7 +29,7 @@ class TestIsotherm(object):
         iso_id = basic_isotherm.iso_id
 
         basic_isotherm.new_param = 'changed'
-        assert iso_id == basic_isotherm.iso_id
+        assert iso_id != basic_isotherm.iso_id
         basic_isotherm.t_iso = 0
         assert iso_id != basic_isotherm.iso_id
 

@@ -249,7 +249,7 @@ class TestDatabase(object):
             pygaps.db_upload_isotherm(db_file, basic_pointisotherm)
 
         replace_isotherm = copy.deepcopy(basic_pointisotherm)
-        replace_isotherm.comment = 'New comment'
+        replace_isotherm.raw_data = replace_isotherm.raw_data[2:]
         pygaps.db_upload_isotherm(
             db_file, replace_isotherm, overwrite=basic_pointisotherm)
         assert pygaps.db_get_isotherms(

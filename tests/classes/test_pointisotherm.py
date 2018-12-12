@@ -36,8 +36,8 @@ class TestPointIsotherm(object):
         "Checks isotherm id works as intended"
 
         iso_id = basic_pointisotherm.iso_id
-        basic_pointisotherm.nothing = 'changed'
-        assert iso_id == basic_pointisotherm.iso_id
+        basic_pointisotherm.new_param = 'changed'
+        assert iso_id != basic_pointisotherm.iso_id
         # basic_pointisotherm.raw_data = basic_pointisotherm.raw_data[:5]
         # assert iso_id != basic_pointisotherm.iso_id
 

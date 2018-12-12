@@ -38,7 +38,8 @@ def with_connection(func):
 
         except sqlite3.IntegrityError as e:
             conn.rollback()
-            print("Error")
+            if kwargs.get('verbose', False):
+                print("Error")
             raise ParsingError from e
         else:
             conn.commit()
@@ -618,7 +619,7 @@ def db_delete_isotherm(path, isotherm, verbose=True, **kwargs):
 
     if ids is None:
         raise sqlite3.IntegrityError(
-            "Isotherm to delete does not exist in database")
+            "Isotherm to delete does not exist in database. Did you modify any parameters?")
 
     # Delete data from isotherm_data table
     cursor.execute(build_delete(table='isotherm_data',
