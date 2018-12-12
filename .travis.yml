@@ -60,10 +60,14 @@ jobs:
     # Checks and docks
     - stage: test
       python: '3.7'     # specify python 3.7
+      dist: xenial
+      sudo: required
       env:
         - TOXENV=check
     - stage: test
       python: '3.7'     # specify python 3.7
+      dist: xenial
+      sudo: required
       env:
         - TOXENV=docs
       addons:
