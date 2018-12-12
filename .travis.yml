@@ -93,6 +93,8 @@ jobs:
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.7'     # specify python 3.7
+      dist: xenial
+      sudo: required
       env: TOXENV=none  # overwrite environment var
       install: skip     # no need to install tox
       script: skip      # run no tests
