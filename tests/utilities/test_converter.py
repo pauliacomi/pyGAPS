@@ -53,13 +53,13 @@ class TestConversions(object):
                                  (1, 'volume', 'molar', 'cm3', 'mol'),
                              ])
     def test_convert_adsorbent(self, value, basis_from, basis_to,
-                               unit_from, unit_to, use_sample):
+                               unit_from, unit_to, use_material):
 
         result = pygaps.utilities.unit_converter.c_adsorbent(
             1,
             basis_from=basis_from, basis_to=basis_to,
             unit_from=unit_from, unit_to=unit_to,
-            sample_name='TEST', sample_batch='TB'
+            material_name='TEST', material_batch='TB'
         )
 
         assert numpy.isclose(result, value, 0.01, 0.01)

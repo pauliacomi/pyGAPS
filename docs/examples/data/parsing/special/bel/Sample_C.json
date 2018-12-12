@@ -2,10 +2,8 @@
     "adsorbate": "C3H8",
     "adsorbent_basis": "mass",
     "adsorbent_unit": "g",
-    "cell_volume": "9.057",
     "comment": "Comment number 1",
-    "date": "18/06/11 19:42:27",
-    "exp_param": "Leak amount 1.177Pa/min",
+    "date": "2018-06-11 19:42:27",
     "isotherm_data": [
         {
             "deadvolume": "11.242",
@@ -136,11 +134,11 @@
     ],
     "loading_basis": "molar",
     "loading_unit": "cm3(STP)",
-    "mass": "0.0740",
-    "pressure_mode": "absolute",
-    "pressure_unit": "kPa",
-    "sample_batch": "bel",
-    "sample_name": "Sample_C",
-    "t_exp": 303.0,
+    "mass": 0.0740,
+    "pressure_mode": "relative",
+    "pressure_unit": null,
+    "material_batch": "bel",
+    "material_name": "Sample_C",
+    "t_iso": 303.0,
     "user": "User"
 }

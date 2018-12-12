@@ -17,10 +17,10 @@ class TestIsotherm(object):
         "Checks isotherm can be created from test data"
 
         pygaps.classes.isotherm.Isotherm(
-            sample_name='carbon',
-            sample_batch='X1',
+            material_name='carbon',
+            material_batch='X1',
             adsorbate='nitrogen',
-            t_exp=77,
+            t_iso=77,
         )
 
     def test_isotherm_id(self, basic_isotherm):
@@ -29,8 +29,8 @@ class TestIsotherm(object):
         iso_id = basic_isotherm.iso_id
 
         basic_isotherm.new_param = 'changed'
-        assert iso_id == basic_isotherm.iso_id
-        basic_isotherm.t_exp = 0
+        assert iso_id != basic_isotherm.iso_id
+        basic_isotherm.t_iso = 0
         assert iso_id != basic_isotherm.iso_id
 
     @pytest.mark.parametrize('missing_param',

@@ -26,10 +26,10 @@ class TestModelIsotherm(object):
         isotherm_param = {
             'loading_key': 'loading',
             'pressure_key': 'pressure',
-            'sample_name': 'carbon',
-            'sample_batch': 'X1',
+            'material_name': 'carbon',
+            'material_batch': 'X1',
             'adsorbate': 'nitrogen',
-            't_exp': 77,
+            't_iso': 77,
         }
 
         isotherm_data = pandas.DataFrame({
@@ -150,7 +150,7 @@ class TestModelIsotherm(object):
             [1.0, 2.25, 3.5, 4.75, 6.0]
         ))
 
-    def test_isotherm_ret_loading(self, basic_modelisotherm, use_sample, use_adsorbate):
+    def test_isotherm_ret_loading(self, basic_modelisotherm, use_material, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
         # Wrong branch
@@ -184,7 +184,7 @@ class TestModelIsotherm(object):
         assert isinstance(basic_modelisotherm.loading(
             5, indexed=True), pandas.Series)
 
-    def test_isotherm_ret_loading_at(self, basic_modelisotherm, use_sample, use_adsorbate):
+    def test_isotherm_ret_loading_at(self, basic_modelisotherm, use_material, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
         # Wrong branch
@@ -225,7 +225,7 @@ class TestModelIsotherm(object):
             1, adsorbent_basis='volume', adsorbent_unit='cm3')
         assert loading_bads == pytest.approx(10, 1e-3)
 
-    def test_isotherm_ret_pressure_at(self, basic_modelisotherm, use_sample, use_adsorbate):
+    def test_isotherm_ret_pressure_at(self, basic_modelisotherm, use_material, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
         # Wrong branch

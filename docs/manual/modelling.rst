@@ -41,6 +41,7 @@ Currently the models implemented are:
     - Double Site Langmuir: :mod:`~pygaps.calculations.models_isotherm.dslangmuir`
     - Triple Site Langmuir: :mod:`~pygaps.calculations.models_isotherm.tslangmuir`
     - BET: :mod:`~pygaps.calculations.models_isotherm.bet`
+    - GAB: :mod:`~pygaps.calculations.models_isotherm.gab`
     - Quadratic: :mod:`~pygaps.calculations.models_isotherm.quadratic`
     - Temkin Approximation: :mod:`~pygaps.calculations.models_isotherm.temkinapprox`
     - Toth: :mod:`~pygaps.calculations.models_isotherm.toth`

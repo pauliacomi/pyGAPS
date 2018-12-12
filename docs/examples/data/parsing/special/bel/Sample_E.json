@@ -1,0 +1,146 @@
+{
+    "adsorbate": "C3H8",
+    "adsorbent_basis": "mass",
+    "adsorbent_unit": "g",
+    "cell_volume": "9.057",
+    "comment": "Comment number 1",
+    "date": "18/06/11 19:42:27",
+    "exp_param": "Leak amount 1.177Pa/min",
+    "isotherm_data": [
+        {
+            "deadvolume": "11.242",
+            "loading": "7.4821",
+            "pressure": "0.21973",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.242",
+            "loading": "15.194",
+            "pressure": "1.1963",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.242",
+            "loading": "21.401999999999997",
+            "pressure": "2.2014",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.243",
+            "loading": "27.15",
+            "pressure": "3.3895",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.243",
+            "loading": "31.805999999999997",
+            "pressure": "4.7119",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.243",
+            "loading": "36.369",
+            "pressure": "6.6203",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.243",
+            "loading": "40.23",
+            "pressure": "8.838",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.243",
+            "loading": "43.388999999999996",
+            "pressure": "11.263",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.243",
+            "loading": "46.39",
+            "pressure": "13.960999999999999",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.243",
+            "loading": "48.443999999999996",
+            "pressure": "16.113",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.244000000000002",
+            "loading": "51.312",
+            "pressure": "19.771",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.244000000000002",
+            "loading": "53.17",
+            "pressure": "22.429000000000002",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.244000000000002",
+            "loading": "55.357",
+            "pressure": "26.034000000000002",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.244000000000002",
+            "loading": "57.831",
+            "pressure": "30.843000000000004",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.245",
+            "loading": "62.823",
+            "pressure": "44.332",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.245999999999999",
+            "loading": "64.822",
+            "pressure": "51.111000000000004",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.245999999999999",
+            "loading": "66.918",
+            "pressure": "60.714",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.247",
+            "loading": "68.712",
+            "pressure": "71.021",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.248",
+            "loading": "70.084",
+            "pressure": "81.023",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.248",
+            "loading": "71.236",
+            "pressure": "91.016",
+            "saturation": "1079.0"
+        },
+        {
+            "deadvolume": "11.249",
+            "loading": "72.251",
+            "pressure": "100.97",
+            "saturation": "1079.0"
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "cm3(STP)",
+    "mass": "0.0740",
+    "pressure_mode": "absolute",
+    "pressure_unit": "kPa",
+    "material_batch": "bel",
+    "material_name": "Sample_C",
+    "t_iso": 303.0,
+    "user": "User"
+}

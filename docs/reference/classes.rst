@@ -10,10 +10,10 @@ Adsorbate
     :members:
 
 
-Sample
-------
+Material
+--------
 
-.. automodule:: pygaps.classes.sample
+.. automodule:: pygaps.classes.material
     :members:
 
 .. _isotherms-ref:

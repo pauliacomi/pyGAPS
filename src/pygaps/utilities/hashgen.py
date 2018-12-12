@@ -24,7 +24,8 @@ def isotherm_to_hash(isotherm):
     """
 
     # Isotherm properties
-    raw_dict = {a: getattr(isotherm, a) for a in isotherm._id_params}
+    # raw_dict = {a: getattr(isotherm, a) for a in isotherm._id_params}
+    raw_dict = isotherm.to_dict()
 
     # Isotherm data
     if isinstance(isotherm, pygaps.PointIsotherm):

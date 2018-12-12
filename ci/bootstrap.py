@@ -28,9 +28,10 @@ if __name__ == "__main__":
             subprocess.check_call([sys.executable, "-m", "virtualenv", env_path])
         print("Installing `jinja2` and `matrix` into bootstrap environment...")
         subprocess.check_call([join(bin_path, "pip"), "install", "jinja2", "matrix"])
-    activate = join(bin_path, "activate_this.py")
-    # noinspection PyCompatibility
-    exec(compile(open(activate, "rb").read(), activate, "exec"), dict(__file__=activate))
+    python_executable = join(bin_path, "python.exe")
+    if not os.path.samefile(python_executable, sys.executable):
+        print("Re-executing with: {0}".format(python_executable))
+        os.execv(python_executable, [python_executable, __file__])
 
     import jinja2
 
@@ -48,7 +49,6 @@ if __name__ == "__main__":
         python = conf["python_versions"]
         deps = conf["dependencies"]
         tox_environments[alias] = {
-            "python": "python" + python if "py" not in python else python,
             "deps": deps.split(),
         }
         if "coverage_flags" in conf:
@@ -62,4 +62,4 @@ if __name__ == "__main__":
         with open(join(base_path, name), "w") as fh:
             fh.write(jinja.get_template(name).render(tox_environments=tox_environments))
         print("Wrote {}".format(name))
-    print("DONE.")
+print("DONE.")

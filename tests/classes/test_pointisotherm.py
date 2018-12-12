@@ -26,18 +26,18 @@ class TestPointIsotherm(object):
             }),
             loading_key='loading',
             pressure_key='pressure',
-            sample_name='carbon',
-            sample_batch='X1',
+            material_name='carbon',
+            material_batch='X1',
             adsorbate='nitrogen',
-            t_exp=77,
+            t_iso=77,
         )
 
     def test_isotherm_id(self, basic_pointisotherm):
         "Checks isotherm id works as intended"
 
         iso_id = basic_pointisotherm.iso_id
-        basic_pointisotherm.nothing = 'changed'
-        assert iso_id == basic_pointisotherm.iso_id
+        basic_pointisotherm.new_param = 'changed'
+        assert iso_id != basic_pointisotherm.iso_id
         # basic_pointisotherm.raw_data = basic_pointisotherm.raw_data[:5]
         # assert iso_id != basic_pointisotherm.iso_id
 
@@ -93,7 +93,7 @@ class TestPointIsotherm(object):
 
         assert isotherm == basic_pointisotherm
 
-        isotherm.t_exp = 0
+        isotherm.t_iso = 0
         assert isotherm != basic_pointisotherm
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
@@ -204,7 +204,7 @@ class TestPointIsotherm(object):
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5]
         ))
 
-    def test_isotherm_ret_loading(self, basic_pointisotherm, use_sample, use_adsorbate):
+    def test_isotherm_ret_loading(self, basic_pointisotherm, use_material, use_adsorbate):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
         # Standard return
@@ -292,7 +292,7 @@ class TestPointIsotherm(object):
         (10, 20.0, dict(interp_fill=(0, 20))),
         (1, 1, dict(interpolation_type='slinear')),
     ])
-    def test_isotherm_ret_loading_at(self, basic_pointisotherm, use_sample, use_adsorbate,
+    def test_isotherm_ret_loading_at(self, basic_pointisotherm, use_material, use_adsorbate,
                                      inp, parameters, expected):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
@@ -316,7 +316,7 @@ class TestPointIsotherm(object):
         (10, 20.0, dict(interp_fill=(0, 20))),
         (1, 1, dict(interpolation_type='slinear')),
     ])
-    def test_isotherm_ret_pressure_at(self, basic_pointisotherm, use_sample, use_adsorbate,
+    def test_isotherm_ret_pressure_at(self, basic_pointisotherm, use_material, use_adsorbate,
                                       inp, parameters, expected):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
@@ -403,7 +403,7 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 'unit', 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_loading_basis(self, basic_pointisotherm, use_sample,
+    def test_isotherm_convert_loading_basis(self, basic_pointisotherm, use_material,
                                             isotherm_data, basis, unit, multiplier):
         """Checks that the loading basis conversion function work as expected"""
 
@@ -442,7 +442,7 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 'unit', 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_adsorbent_basis(self, basic_pointisotherm, use_sample,
+    def test_isotherm_convert_adsorbent_basis(self, basic_pointisotherm, use_material,
                                               isotherm_data, basis, unit, multiplier):
         """Checks that the loading basis conversion function work as expected"""
 

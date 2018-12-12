@@ -2,13 +2,35 @@
 Changelog
 =========
 
+Features:
+
+* Increased number of adsorbates available in pyGAPS to 40.
+* Made adsorbates searchable by a list of aliases rather than a single name.
+* Exposed the CoolProp backend on adsorbate objects for convenience, it is
+  accessible through the adsorbate.backend property.
+* Streamlined the internal database functions to be more general.
+* Updated NIST json import to new format. Cannot import multicomponent isotherms.
+
 Breaking changes:
 
+* The Sample class is now renamed as Material.
+* Isotherm creation parameters have changed from 'sample_name', 'sample_batch'
+  and 't_exp' to 'material_name', 'material_batch' and 't_iso'.
+* Backend database has been simplified. Many required fields are no longer
+  present and left to the discretion of the user.
+* Several database functions have been renamed.
+  All functions switched: 'sample' -> 'material' and 'experiment' -> 'isotherm'.
 * Isotherm unique ID is now generated on the fly (previously generated at
   each isotherm modification). It also now takes into account only the
   required parameters for each isotherm ( 'sample_name', 'sample_batch',
   't_exp' and 'adsorbate') as well as the model name, if the
   isotherm is a ModelIsotherm.
+* Renamed Adsorbate.from_list() method to Adsorbate.find()
+
+Bugfixes:
+
+* Fixed issue in CSV import which read all values as strings (instead of floats/bools)
+* Fixed an issue with Excel import of bools, as they were previously read as 1/0
 
 
 1.4.0 (2018-11-10)

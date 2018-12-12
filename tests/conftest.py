@@ -53,9 +53,9 @@ def isotherm_parameters():
 
     parameters = {
 
-        'sample_name': 'TEST',
-        'sample_batch': 'TB',
-        't_exp': 100.0,
+        'material_name': 'TEST',
+        'material_batch': 'TB',
+        't_iso': 100.0,
         'adsorbate': 'TA',
 
         'date': '26/06/92',
@@ -67,7 +67,7 @@ def isotherm_parameters():
         'project': 'TP',
         'machine': 'TM',
         'is_real': True,
-        'exp_type': 'calorimetry',
+        'iso_type': 'calorimetry',
 
         # Units/bases
         'adsorbent_basis': 'mass',
@@ -83,6 +83,8 @@ def isotherm_parameters():
         'origin': 'test',
         'test_parameter': 'parameter',
 
+        # No warnings
+        'warn_off': True
     }
 
     return parameters
@@ -107,52 +109,55 @@ def basic_isotherm(isotherm_parameters):
     """
     Creates an basic isotherm from model data
     """
-    isotherm = pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
+    isotherm = pygaps.classes.isotherm.Isotherm(no_warn=True, **isotherm_parameters)
 
     return isotherm
 
 
 @pytest.fixture(scope='function')
-def basic_pointisotherm(isotherm_data, basic_isotherm):
+def basic_pointisotherm(isotherm_data, isotherm_parameters):
     """
     Creates an isotherm from model data
     """
     other_keys = [OTHER_KEY]
 
-    isotherm = pygaps.PointIsotherm.from_isotherm(
-        basic_isotherm,
+    isotherm = pygaps.PointIsotherm(
         isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
-        other_keys=other_keys)
+        other_keys=other_keys,
+        no_warn=True,
+        **isotherm_parameters
+    )
 
     return isotherm
 
 
 @pytest.fixture()
-def basic_modelisotherm(isotherm_data, basic_isotherm):
+def basic_modelisotherm(isotherm_data, isotherm_parameters):
     """
     Creates an isotherm from model data
     """
     model = "Henry"
 
-    isotherm = pygaps.ModelIsotherm.from_isotherm(
-        basic_isotherm,
+    isotherm = pygaps.ModelIsotherm(
         isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         model=model,
+        no_warn=True,
+        **isotherm_parameters
     )
 
     return isotherm
 
 
 @pytest.fixture(scope='function')
-def sample_data():
+def material_data():
     """
-    Creates an dict with all data for an model sample
+    Creates an dict with all data for an model material
     """
-    sample_data = {
+    m_data = {
         'name': 'TEST',
         'batch': 'TB',
         'contact': 'TU',
@@ -168,17 +173,17 @@ def sample_data():
         'molar_mass': 10,  # g/mol
     }
 
-    return sample_data
+    return m_data
 
 
 @pytest.fixture(scope='function')
-def basic_sample(sample_data):
+def basic_material(material_data):
     """
-    Creates an sample from model data
+    Creates an material from model data
     """
-    sample = pygaps.Sample(**sample_data)
+    material = pygaps.Material(**material_data)
 
-    return sample
+    return material
 
 
 @pytest.fixture(scope='session')
@@ -187,10 +192,10 @@ def adsorbate_data():
     Creates an dict with all data for an model adsorbate
     """
     adsorbate_data = {
-        'nick': 'TA',
+        'name': 'TA',
         'formula': 'TA21',
 
-        'common_name': 'nitrogen',
+        'backend_name': 'nitrogen',
         'molar_mass': 28.01348,
         'cross_sectional_area': 0.162,
         'molecular_diameter': 0.3,
@@ -198,10 +203,10 @@ def adsorbate_data():
         'magnetic_susceptibility': 3.6E-8,
         'dipole_moment': 0.0,
         'quadrupole_moment': 1.52,
-        'criticalp_temperature': 77.355,
-        'criticalp_pressure': 34.0,
-        'criticalp_density': 11.2,
-        'triplep_temperature': 63.1,
+        't_critical': 77.355,
+        'p_critical': 34.0,
+        'rhomolar_critical': 11.2,
+        't_triple': 63.1,
         # properties for 1atm/ 77k
         'gas_density': 0.00461214,
         'liquid_density': 0.806,
@@ -217,7 +222,7 @@ def adsorbate_data():
 @pytest.fixture(scope='function')
 def basic_adsorbate(adsorbate_data):
     """
-    Creates an sample from model data
+    Creates an material from model data
     """
     adsorbate = pygaps.Adsorbate(**adsorbate_data)
 
@@ -239,14 +244,14 @@ def use_adsorbate(basic_adsorbate):
 
 
 @pytest.fixture()
-def use_sample(basic_sample):
+def use_material(basic_material):
     """
-    Uploads sample to list
+    Uploads material to list
     """
 
-    sample = next(
-        (x for x in pygaps.SAMPLE_LIST if basic_sample.name == x.name and basic_sample.batch == x.batch), None)
-    if not sample:
-        pygaps.SAMPLE_LIST.append(basic_sample)
+    material = next(
+        (x for x in pygaps.MATERIAL_LIST if basic_material.name == x.name and basic_material.batch == x.batch), None)
+    if not material:
+        pygaps.MATERIAL_LIST.append(basic_material)
 
     return

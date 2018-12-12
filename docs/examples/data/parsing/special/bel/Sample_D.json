@@ -443,8 +443,8 @@
     "mass": 0.0543,
     "pressure_mode": "relative",
     "pressure_unit": null,
-    "sample_batch": "bel",
-    "sample_name": "Sample_D",
-    "t_exp": 298.15,
+    "material_batch": "bel",
+    "material_name": "Sample_D",
+    "t_iso": 298.15,
     "user": "User"
 }

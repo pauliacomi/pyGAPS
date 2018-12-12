@@ -83,8 +83,8 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
         raise ParameterError('Pass at least two isotherms.')
 
     # Check same sample
-    if not all(x.sample_name == isotherms[0].sample_name
-               and x.sample_batch == isotherms[0].sample_batch
+    if not all(x.material_name == isotherms[0].material_name
+               and x.material_batch == isotherms[0].material_batch
                for x in isotherms):
         raise ParameterError(
             'Isotherms passed are not measured on the same material and batch.')
@@ -101,7 +101,7 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
         [max(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
 
     # Get temperatures
-    temperatures = list(x.t_exp for x in isotherms)
+    temperatures = list(x.t_iso for x in isotherms)
 
     # Loading
     if loading_points is None:

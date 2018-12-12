@@ -88,11 +88,11 @@ def initial_henry_slope(isotherm,
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
         print("Final adjusted root mean square difference:", adjrmsd)
-        model_isotherm.sample_name = 'Henry model'
+        model_isotherm.material_name = 'Henry model'
         plot_iso([isotherm, model_isotherm],
                  plot_type='isotherm',
                  branch='ads',
-                 lgd_keys=['sample_name'],
+                 lgd_keys=['material_name'],
                  **plot_parameters)
 
         plt.show()
@@ -122,11 +122,11 @@ def initial_henry_virial(isotherm, verbose=False):
         isotherm, model='Virial', verbose=verbose)
 
     if verbose:
-        model_isotherm.sample_name = 'model'
+        model_isotherm.material_name = 'model'
         try:
             plot_iso([isotherm, model_isotherm],
                      plot_type='isotherm', branch='ads', logx=False,
-                     lgd_keys=['sample_name'])
+                     lgd_keys=['material_name'])
 
             plt.show()
         except CalculationError:

@@ -4,8 +4,32 @@ This module contains the csv interface.
 
 import pandas
 
-from ..classes.pointisotherm import PointIsotherm
 from ..classes.modelisotherm import ModelIsotherm
+from ..classes.pointisotherm import PointIsotherm
+
+
+def _is_float(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def _is_bool(s):
+    if s == 'True' or s == 'False':
+        return True
+    else:
+        return False
+
+
+def _to_bool(s):
+    if s == 'True':
+        return True
+    elif s == 'False':
+        return False
+    else:
+        raise ValueError('String cannot be converted to bool')
 
 
 def isotherm_to_csv(isotherm, path, separator=','):
@@ -71,11 +95,18 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
 
     with open(path) as file:
         line = file.readline().rstrip()
-        sample_info = {}
+        material_info = {}
 
         while not line.startswith('data'):
             values = line.split(sep=separator)
-            sample_info.update({values[0]: values[1]})
+
+            if _is_bool(values[1]):
+                val = _to_bool(values[1])
+            elif _is_float(values[1]):
+                val = float(values[1])
+            else:
+                val = values[1]
+            material_info.update({values[0]: val})
             line = file.readline().rstrip()
 
         data_df = pandas.read_csv(file, sep=separator)
@@ -86,6 +117,6 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
         pressure_key=data_df.columns[0],
         loading_key=data_df.columns[1],
         other_keys=list(data_df.columns[2:]),
-        **sample_info)
+        **material_info)
 
     return isotherm

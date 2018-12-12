@@ -1,7 +1,6 @@
 {
     "adsorbate": "N2",
-    "exp_type": "Isotherme",
-    "id": "3b841b450170096a95eecbb1d1b44891",
+    "iso_type": "Isotherme",
     "is_real": true,
     "isotherm_data": [
         {
@@ -459,9 +458,9 @@
     ],
     "lab": "MADIREL",
     "machine": "Triflex",
-    "sample_batch": "Test",
-    "sample_name": "UiO-66(Zr)",
+    "material_batch": "Test",
+    "material_name": "UiO-66(Zr)",
     "t_act": 200.0,
-    "t_exp": 77.355,
+    "t_iso": 77.355,
     "user": "PI"
 }

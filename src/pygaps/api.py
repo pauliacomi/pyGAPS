@@ -1,4 +1,4 @@
-# pylint: disable=W0614,W0401,W0611,W0622
+# pylint: disable=W0614,W0611,W0622
 # flake8: noqa
 
 from .calculations.alphas import alpha_s
@@ -23,9 +23,9 @@ from .calculations.psd import micropore_size_distribution
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw
 from .classes.adsorbate import Adsorbate
+from .classes.material import Material
 from .classes.modelisotherm import ModelIsotherm
 from .classes.pointisotherm import PointIsotherm
-from .classes.sample import Sample
 from .graphing.iastgraphs import plot_iast_vle
 from .graphing.isothermgraphs import plot_iso
 from .parsing import *

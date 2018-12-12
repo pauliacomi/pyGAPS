@@ -20,7 +20,7 @@ class TestTPlot(object):
     Tests everything related to tplot calculation
     """
 
-    def test_tplot_checks(self, basic_pointisotherm, basic_sample):
+    def test_tplot_checks(self, basic_pointisotherm, basic_material):
         """Test checks"""
 
         # Will raise a "no suitable model exception"

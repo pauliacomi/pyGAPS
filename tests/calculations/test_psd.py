@@ -19,7 +19,7 @@ class TestPSD(object):
     Tests everything related to pore size distribution calculation
     """
 
-    def test_psd_meso_checks(self, basic_pointisotherm, basic_sample):
+    def test_psd_meso_checks(self, basic_pointisotherm, basic_material):
 
         # Will raise a "no model exception"
         with pytest.raises(pygaps.ParameterError):

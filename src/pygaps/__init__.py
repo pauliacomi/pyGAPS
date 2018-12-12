@@ -1,4 +1,4 @@
-# pylint: disable=W0614,W0401,W0611,W0622
+# pylint: disable=W0614,W0611,W0622
 # flake8: noqa
 
 __author__ = 'Paul A. Iacomi'
@@ -34,5 +34,6 @@ del hard_dependencies, dependency, missing_dependencies
 
 from .data import DATABASE
 from .data import ADSORBATE_LIST
-from .data import SAMPLE_LIST
+from .data import ADSORBATE_NAME_LIST
+from .data import MATERIAL_LIST
 from .api import *
