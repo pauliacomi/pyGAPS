@@ -109,41 +109,44 @@ def basic_isotherm(isotherm_parameters):
     """
     Creates an basic isotherm from model data
     """
-    isotherm = pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
+    isotherm = pygaps.classes.isotherm.Isotherm(no_warn=True, **isotherm_parameters)
 
     return isotherm
 
 
 @pytest.fixture(scope='function')
-def basic_pointisotherm(isotherm_data, basic_isotherm):
+def basic_pointisotherm(isotherm_data, isotherm_parameters):
     """
     Creates an isotherm from model data
     """
     other_keys = [OTHER_KEY]
 
-    isotherm = pygaps.PointIsotherm.from_isotherm(
-        basic_isotherm,
+    isotherm = pygaps.PointIsotherm(
         isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
-        other_keys=other_keys)
+        other_keys=other_keys,
+        no_warn=True,
+        **isotherm_parameters
+    )
 
     return isotherm
 
 
 @pytest.fixture()
-def basic_modelisotherm(isotherm_data, basic_isotherm):
+def basic_modelisotherm(isotherm_data, isotherm_parameters):
     """
     Creates an isotherm from model data
     """
     model = "Henry"
 
-    isotherm = pygaps.ModelIsotherm.from_isotherm(
-        basic_isotherm,
+    isotherm = pygaps.ModelIsotherm(
         isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         model=model,
+        no_warn=True,
+        **isotherm_parameters
     )
 
     return isotherm
@@ -154,7 +157,7 @@ def material_data():
     """
     Creates an dict with all data for an model material
     """
-    material_data = {
+    m_data = {
         'name': 'TEST',
         'batch': 'TB',
         'contact': 'TU',
@@ -170,7 +173,7 @@ def material_data():
         'molar_mass': 10,  # g/mol
     }
 
-    return material_data
+    return m_data
 
 
 @pytest.fixture(scope='function')

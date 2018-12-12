@@ -185,12 +185,13 @@ class Isotherm(object):
         #: Isotherm adsorbate used.
         self.adsorbate = str(properties.pop('adsorbate'))
 
-        if not properties.pop('no_warn', None) and self.adsorbate.lower() not in pygaps.ADSORBATE_NAME_LIST:
-            warnings.warn(
-                ("Specified adsorbent is not in internal list"
-                 "(or name cannot be resolved to an existing one)."
-                 "CoolProp backend disabled for this adsorbent.")
-            )
+        if self.adsorbate.lower() not in pygaps.ADSORBATE_NAME_LIST:
+            if not properties.pop('no_warn', False):
+                warnings.warn(
+                    ("Specified adsorbent is not in internal list"
+                     "(or name cannot be resolved to an existing one)."
+                     "CoolProp backend disabled for this adsorbent.")
+                )
         else:
             self.adsorbate = pygaps.Adsorbate.find(self.adsorbate).name
 
