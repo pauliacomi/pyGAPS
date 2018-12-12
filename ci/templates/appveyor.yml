@@ -44,13 +44,21 @@ install:
   - cmd: conda config --set always_yes yes --set changeps1 no
   - cmd: conda update -q conda
 
-  # this is now the downloaded conda
+  # get the conda info
   - cmd: conda info -a
-  - cmd: conda create -q -n testenv python=%PYTHON_VERSION% setuptools pip pytest>3.1 numpy pandas scipy matplotlib bokeh xlrd xlwt jinja2 nose
+
+  # install required packages
+  - cmd: conda create -q -n testenv python=%PYTHON_VERSION%
+            setuptools
+            pip
+            coverage
+            pytest>3.1
+            pytest-cov
+            numpy
+            pandas
+            scipy
+            matplotlib
   - activate testenv
-  - pip install -U "pytest>=3.1.0" --ignore-installed
-  - pip install coverage
-  - pip install pytest-cov
 
   # Now build the module
   - '%WITH_COMPILER% pip install -ve .'
