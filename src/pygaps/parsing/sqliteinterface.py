@@ -6,18 +6,17 @@ import array
 import functools
 import sqlite3
 
-import numpy
 import pandas
 
 from ..classes.adsorbate import Adsorbate
 from ..classes.material import Material
 from ..classes.pointisotherm import Isotherm
 from ..classes.pointisotherm import PointIsotherm
+from ..utilities.python_utilities import grouped
 from ..utilities.exceptions import ParsingError
 from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
-from ..utilities.sqlite_utilities import build_select_unnamed
 from ..utilities.sqlite_utilities import build_update
 
 
@@ -517,59 +516,40 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
 
     # Get isotherm info from database
     # TODO parameter search from properties as well
-    sql_exp = build_select(table='isotherms',
+    cursor.execute(
+        build_select(table='isotherms',
                            to_select=Isotherm._db_columns,
-                           where=criteria.keys())
+                           where=criteria.keys()), criteria)
 
-    cursor.execute(sql_exp, criteria)
-    rows = cursor.fetchall()
-
-    # Create the isotherm list
     isotherms = []
+    alldata = cursor.fetchall()
 
-    if rows:
+    for rows in grouped(alldata, 100):  # we are taking 100 isotherms at a time
 
         ids = tuple(row['id'] for row in rows)
 
         # Get isotherm properties from database
-        cursor.execute(
-            build_select_unnamed(table='isotherm_properties',
-                                 to_select=[
-                                     'iso_id', 'type', 'value'],
-                                 where=['iso_id' for iso_id in ids], join='OR'), ids)
+        cursor.execute('''
+                SELECT iso_id, type, value FROM "isotherm_properties"
+                WHERE iso_id IN (%s);
+                ''' % ','.join('?' * len(ids)), ids)
         isotherm_props = cursor.fetchall()
 
-        # Get the properties from the isotherm_properties table
-        cursor.execute(
-            build_select_unnamed(table='isotherm_data',
-                                 to_select=[
-                                     'iso_id', 'type', 'data'],
-                                 where=['iso_id' for iso_id in ids], join='OR'), ids)
+        # Get the properties from the data table
+        cursor.execute('''
+                SELECT iso_id, type, data FROM "isotherm_data"
+                WHERE iso_id IN (%s);
+                ''' % ','.join('?' * len(ids)), ids)
         isotherm_data = cursor.fetchall()
 
         for row in rows:
 
-            # Generate the array for the pandas dataframe
-            # TODO
-            columns = []
-            other_keys = []
-            data_arr = None
-            for data in isotherm_data:
-                if data[0] == row['id']:
-
-                    columns.append(data[1])
-                    raw = array.array('d', data[2])
-                    if data_arr is None:
-                        data_arr = numpy.expand_dims(
-                            numpy.array(raw), axis=1)
-                    else:
-                        data_arr = numpy.hstack(
-                            (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
-
-                    if data[1] not in ('pressure', 'loading'):
-                        other_keys.append(data[1])
-
-            exp_data = pandas.DataFrame(data_arr, columns=columns)
+            # Generate the isotherm data
+            data_dict = {data[1]: array.array('d', data[2])
+                         for data in isotherm_data if data[0] == row['id']}
+            other_keys = [key for key in data_dict.keys()
+                          if key not in ('pressure', 'loading')]
+            exp_data = pandas.DataFrame(data_dict)
 
             # Generate the isotherm parameters dictionary
             exp_params = dict(zip(row.keys(), row))
@@ -998,9 +978,9 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
     cursor.execute('''SELECT * FROM adsorbates''')
 
     rows = cursor.fetchall()
-    adsorbates = []
 
     # Create the adsorbates
+    adsorbates = []
     for row in rows:
 
         cursor.execute(
