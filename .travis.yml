@@ -112,7 +112,7 @@ jobs:
           skip_cleanup: true
           draft: true
           on:
-            branch: develop
+            branch: master
 
 
 notifications:
