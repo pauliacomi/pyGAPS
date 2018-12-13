@@ -302,7 +302,7 @@ def plot_iso(isotherms,
             return ''
         else:
             if lbl_components is None:
-                return isotherm.material_name + ' ' + convert_chemformula(isotherm.adsorbate)
+                return isotherm.material_name + ' ' + convert_chemformula(isotherm)
             text = []
             for selected in lbl_components:
                 if selected == 'branch':
@@ -314,7 +314,7 @@ def plot_iso(isotherms,
                 val = getattr(isotherm, selected)
                 if val:
                     if selected == 'adsorbate':
-                        text.append(convert_chemformula(val))
+                        text.append(convert_chemformula(isotherm))
                     else:
                         text.append(str(val))
 

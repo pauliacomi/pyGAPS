@@ -80,7 +80,7 @@ def iast_binary_vle(isotherms, pressure,
     # Generate the array of partial pressures
     if verbose:
         plot_iast_vle(x_data, y_data,
-                      isotherms[0].adsorbate, isotherms[1].adsorbate,
+                      isotherms[0], isotherms[1],
                       pressure, isotherms[0].pressure_unit)
 
     return dict(x=x_data, y=y_data)
@@ -153,7 +153,7 @@ def iast_binary_svp(isotherms, mole_fractions, pressures,
 
     if verbose:
         plot_iast_svp(pressures, selectivities,
-                      isotherms[0].adsorbate, isotherms[1].adsorbate,
+                      isotherms[0], isotherms[1],
                       mole_fractions[0], isotherms[0].pressure_unit)
 
     return dict(pressure=pressures, selectivity=selectivities)
