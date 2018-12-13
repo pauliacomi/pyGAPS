@@ -12,8 +12,8 @@ from ..classes.adsorbate import Adsorbate
 from ..classes.material import Material
 from ..classes.pointisotherm import Isotherm
 from ..classes.pointisotherm import PointIsotherm
-from ..utilities.python_utilities import grouped
 from ..utilities.exceptions import ParsingError
+from ..utilities.python_utilities import grouped
 from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
