@@ -25,7 +25,7 @@ PRAGMA_MATERIAL_PROPERTIES = """
                 `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `material_id`   INTEGER     NOT NULL,
                 `type`          TEXT        NOT NULL,
-                `value`         TEXT,
+                `value`         REAL,
 
                 FOREIGN KEY(`material_id`)    REFERENCES `materials`(`id`),
                 FOREIGN KEY(`type`)         REFERENCES 'material_properties_type'('type')
@@ -82,7 +82,7 @@ PRAGMA_ISOTHERM_PROPERTIES = """
                 `id`            INTEGER         NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
                 `iso_id`        INTEGER         NOT NULL,
                 `type`          TEXT            NOT NULL,
-                `value`         TEXT            NOT NULL,
+                `value`         REAL            NOT NULL,
 
                 FOREIGN KEY(`iso_id`)    REFERENCES `isotherms`(`id`),
                 FOREIGN KEY(`type`)      REFERENCES 'isotherm_properties_type'('type')
