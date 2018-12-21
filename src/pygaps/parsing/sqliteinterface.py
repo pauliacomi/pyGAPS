@@ -159,7 +159,7 @@ def db_upload_material(path, material, overwrite=False, verbose=True, **kwargs):
 
         if material_ids is None:
             raise sqlite3.IntegrityError(
-                "Material to delete does not exist in database")
+                "Material to overwrite does not exist in database")
         mat_id = material_ids[0]
 
         # Sql of update routine

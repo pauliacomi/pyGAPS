@@ -78,9 +78,8 @@ class Material(object):
         # Checks to see if material exists in master list
         material = next(
             (material for material in pygaps.MATERIAL_LIST
-                if material_name == material.name
-                and
-                material_batch == material.batch),
+             if material_name == material.name
+             and material_batch == material.batch),
             None)
 
         if material is None:
