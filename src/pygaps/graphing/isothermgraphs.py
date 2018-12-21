@@ -291,7 +291,7 @@ def plot_iso(isotherms,
     # Graph title
     if fig_title is None:
         fig_title = ''
-    ax1.set_title(fig_title, **styles['title_style'])
+    ax1.set_title(fig_title, **styles['title_style'], y=1.01)
 
     # Graph legend builder
     def build_label(isotherm, lbl_components, iso_branch, key):
