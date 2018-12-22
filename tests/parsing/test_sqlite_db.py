@@ -2,8 +2,6 @@
 This test module has tests relating to sqlite database utilities
 """
 
-import copy
-
 import pytest
 
 import pygaps
