@@ -4,6 +4,7 @@ Hashing isotherms
 
 import hashlib
 import json
+
 from pandas.util import hash_pandas_object
 
 import pygaps
