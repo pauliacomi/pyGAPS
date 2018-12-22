@@ -1,144 +1,102 @@
 {
-    "adsorbate": "C3H8",
+    "adsorbate": "propane",
     "adsorbent_basis": "mass",
     "adsorbent_unit": "g",
     "comment": "Comment number 1",
     "date": "2018-06-11 19:42:27",
     "isotherm_data": [
         {
-            "deadvolume": "11.242",
             "loading": "7.4821",
-            "pressure": "0.21973",
-            "saturation": "1079.0"
+            "pressure": "0.00020364"
         },
         {
-            "deadvolume": "11.242",
             "loading": "15.194",
-            "pressure": "1.1963",
-            "saturation": "1079.0"
+            "pressure": "0.0011087"
         },
         {
-            "deadvolume": "11.242",
-            "loading": "21.401999999999997",
-            "pressure": "2.2014",
-            "saturation": "1079.0"
+            "loading": "21.402",
+            "pressure": "0.0020402"
         },
         {
-            "deadvolume": "11.243",
             "loading": "27.15",
-            "pressure": "3.3895",
-            "saturation": "1079.0"
+            "pressure": "0.0031413"
         },
         {
-            "deadvolume": "11.243",
-            "loading": "31.805999999999997",
-            "pressure": "4.7119",
-            "saturation": "1079.0"
+            "loading": "31.806",
+            "pressure": "0.0043669"
         },
         {
-            "deadvolume": "11.243",
             "loading": "36.369",
-            "pressure": "6.6203",
-            "saturation": "1079.0"
+            "pressure": "0.0061356"
         },
         {
-            "deadvolume": "11.243",
             "loading": "40.23",
-            "pressure": "8.838",
-            "saturation": "1079.0"
+            "pressure": "0.0081909"
         },
         {
-            "deadvolume": "11.243",
-            "loading": "43.388999999999996",
-            "pressure": "11.263",
-            "saturation": "1079.0"
+            "loading": "43.389",
+            "pressure": "0.010438"
         },
         {
-            "deadvolume": "11.243",
             "loading": "46.39",
-            "pressure": "13.960999999999999",
-            "saturation": "1079.0"
+            "pressure": "0.012939"
         },
         {
-            "deadvolume": "11.243",
-            "loading": "48.443999999999996",
-            "pressure": "16.113",
-            "saturation": "1079.0"
+            "loading": "48.444",
+            "pressure": "0.014933"
         },
         {
-            "deadvolume": "11.244000000000002",
             "loading": "51.312",
-            "pressure": "19.771",
-            "saturation": "1079.0"
+            "pressure": "0.018323"
         },
         {
-            "deadvolume": "11.244000000000002",
             "loading": "53.17",
-            "pressure": "22.429000000000002",
-            "saturation": "1079.0"
+            "pressure": "0.020787"
         },
         {
-            "deadvolume": "11.244000000000002",
             "loading": "55.357",
-            "pressure": "26.034000000000002",
-            "saturation": "1079.0"
+            "pressure": "0.024128"
         },
         {
-            "deadvolume": "11.244000000000002",
             "loading": "57.831",
-            "pressure": "30.843000000000004",
-            "saturation": "1079.0"
+            "pressure": "0.028585"
         },
         {
-            "deadvolume": "11.245",
             "loading": "62.823",
-            "pressure": "44.332",
-            "saturation": "1079.0"
+            "pressure": "0.041086"
         },
         {
-            "deadvolume": "11.245999999999999",
             "loading": "64.822",
-            "pressure": "51.111000000000004",
-            "saturation": "1079.0"
+            "pressure": "0.047369"
         },
         {
-            "deadvolume": "11.245999999999999",
             "loading": "66.918",
-            "pressure": "60.714",
-            "saturation": "1079.0"
+            "pressure": "0.056269"
         },
         {
-            "deadvolume": "11.247",
             "loading": "68.712",
-            "pressure": "71.021",
-            "saturation": "1079.0"
+            "pressure": "0.065821"
         },
         {
-            "deadvolume": "11.248",
             "loading": "70.084",
-            "pressure": "81.023",
-            "saturation": "1079.0"
+            "pressure": "0.075091"
         },
         {
-            "deadvolume": "11.248",
             "loading": "71.236",
-            "pressure": "91.016",
-            "saturation": "1079.0"
+            "pressure": "0.084352"
         },
         {
-            "deadvolume": "11.249",
             "loading": "72.251",
-            "pressure": "100.97",
-            "saturation": "1079.0"
+            "pressure": "0.093577"
         }
     ],
     "loading_basis": "molar",
     "loading_unit": "cm3(STP)",
-    "mass": 0.0740,
-    "pressure_mode": "relative",
-    "pressure_unit": null,
+    "mass": 0.074,
     "material_batch": "bel",
     "material_name": "Sample_C",
+    "pressure_mode": "relative",
+    "pressure_unit": null,
     "t_iso": 303.0,
     "user": "User"
 }
