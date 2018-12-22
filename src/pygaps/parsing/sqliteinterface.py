@@ -390,7 +390,7 @@ def db_delete_material_property_type(path, material_prop_type, verbose=True, **k
 
 
 @with_connection
-def db_upload_isotherm(path, isotherm, overwrite=None, verbose=True, **kwargs):
+def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
     """
     Uploads isotherm to the database.
 
@@ -403,42 +403,13 @@ def db_upload_isotherm(path, isotherm, overwrite=None, verbose=True, **kwargs):
         Path to the database. Use pygaps.DATABASE for internal access.
     isotherm : Isotherm
         Isotherm class to upload to the database.
-    overwrite : bool
-        Whether to upload the isotherm or overwrite it.
-        WARNING: Overwrite is done on ALL fields.
     verbose : bool
         Print to console on success or error.
     """
 
     cursor = kwargs.pop('cursor', None)
 
-    # First, if the goal was to overwrite an isotherm, must delete old data
-    if overwrite:
-        # Check if isotherm exists
-        ids = cursor.execute(
-            build_select(table='isotherms',
-                         to_select=['id'],
-                         where=['id']),
-            {'id':        isotherm.iso_id}
-        ).fetchone()
-
-        if ids is None:
-            raise sqlite3.IntegrityError(
-                "Isotherm to delete does not exist in database")
-
-        # Delete data from isotherm_data table
-        cursor.execute(build_delete(table='isotherm_data',
-                                    where=['iso_id']), {'iso_id': isotherm.iso_id})
-
-        # Delete data from isotherm_data table
-        cursor.execute(build_delete(table='isotherm_properties',
-                                    where=['iso_id']), {'iso_id': isotherm.iso_id})
-
-        # Delete isotherm in isotherms table
-        cursor.execute(build_delete(table='isotherms',
-                                    where=['id']), {'id': isotherm.iso_id})
-
-    # Then, the isotherm is going to be inserted into the database
+    # The isotherm is going to be inserted into the database
     # Build upload dict
     upload_dict = {}
     iso_dict = isotherm.to_dict()
@@ -573,7 +544,7 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_isotherm(path, isotherm, verbose=True, **kwargs):
+def db_delete_isotherm(path, iso_id, verbose=True, **kwargs):
     """
     Delete isotherm in the database.
 
@@ -581,11 +552,14 @@ def db_delete_isotherm(path, isotherm, verbose=True, **kwargs):
     ----------
     path : str
         Path to the database. Use pygaps.DATABASE for internal access.
-    isotherm : Isotherm
-        The Isotherm object to delete from the database.
+    isotherm : Isotherm or Isotherm.iso_id
+        The Isotherm object to delete from the database or its ID.
     verbose : bool
         Print to console on success or error.
     """
+
+    if isinstance(iso_id, Isotherm):
+        iso_id = iso_id.iso_id
 
     cursor = kwargs.pop('cursor', None)
 
@@ -594,7 +568,7 @@ def db_delete_isotherm(path, isotherm, verbose=True, **kwargs):
         build_select(table='isotherms',
                      to_select=['id'],
                      where=['id']),
-        {'id':        isotherm.iso_id}
+        {'id':        iso_id}
     ).fetchone()
 
     if ids is None:
@@ -603,19 +577,19 @@ def db_delete_isotherm(path, isotherm, verbose=True, **kwargs):
 
     # Delete data from isotherm_data table
     cursor.execute(build_delete(table='isotherm_data',
-                                where=['iso_id']), {'iso_id': isotherm.iso_id})
+                                where=['iso_id']), {'iso_id': iso_id})
 
     # Delete data from isotherm_data table
     cursor.execute(build_delete(table='isotherm_properties',
-                                where=['iso_id']), {'iso_id': isotherm.iso_id})
+                                where=['iso_id']), {'iso_id': iso_id})
 
     # Delete isotherm in isotherms table
     cursor.execute(build_delete(table='isotherms',
-                                where=['id']), {'id': isotherm.iso_id})
+                                where=['id']), {'id': iso_id})
 
     if verbose:
         # Print success
-        print("Success:", isotherm)
+        print("Success:", iso_id)
 
 
 @with_connection

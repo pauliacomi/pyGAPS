@@ -248,15 +248,8 @@ class TestDatabase(object):
         with pytest.raises(pygaps.ParsingError):
             pygaps.db_upload_isotherm(db_file, basic_pointisotherm)
 
-        replace_isotherm = copy.deepcopy(basic_pointisotherm)
-        replace_isotherm.raw_data = replace_isotherm.raw_data[2:]
-        pygaps.db_upload_isotherm(
-            db_file, replace_isotherm, overwrite=basic_pointisotherm)
-        assert pygaps.db_get_isotherms(
-            db_file, {'id': replace_isotherm.iso_id})[0].comment == replace_isotherm.comment
-
         # Delete test
-        pygaps.db_delete_isotherm(db_file, replace_isotherm)
+        pygaps.db_delete_isotherm(db_file, basic_pointisotherm)
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
