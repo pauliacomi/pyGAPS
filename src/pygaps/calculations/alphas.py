@@ -112,10 +112,10 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     # Check to see if reference isotherm is given
     if reference_isotherm is None:
         raise ParameterError("No reference isotherm for alpha s calculation "
-                             "is provided. Please supply one ")
+                             "is provided.")
     if reference_isotherm.adsorbate != isotherm.adsorbate:
         raise ParameterError("The reference isotherm adsorbate is different than the "
-                             "calculated isotherm adsorbate. ")
+                             "calculated isotherm adsorbate.")
 
     if reducing_pressure < 0 or reducing_pressure > 1:
         raise ParameterError(
