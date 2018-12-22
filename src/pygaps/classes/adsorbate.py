@@ -108,6 +108,23 @@ class Adsorbate(object):
 
         return
 
+    def __repr__(self):
+        return self.name
+
+    def __str__(self):
+        """
+        Prints a short summary of all the adsorbate parameters.
+        """
+        string = ""
+
+        string += ("Adsorbate: " + self.name + '\n')
+        string += ("Aliases: " + ", ".join(self.alias) + '\n')
+
+        for prop in self.properties:
+            string += (prop + ':' + str(self.properties.get(prop)) + '\n')
+
+        return string
+
     @classmethod
     def find(cls, adsorbate_name):
         """
@@ -142,19 +159,6 @@ class Adsorbate(object):
                 "with required adsorbate class".format(adsorbate_name))
 
         return adsorbate
-
-    def __str__(self):
-        """
-        Prints a short summary of all the adsorbate parameters.
-        """
-        string = ""
-
-        string += ("Adsorbate: " + self.name + '\n')
-
-        for prop in self.properties:
-            string += (prop + ':' + str(self.properties.get(prop)) + '\n')
-
-        return string
 
     @property
     def backend(self):

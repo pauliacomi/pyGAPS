@@ -53,6 +53,26 @@ class Material(object):
 
         return
 
+    def __repr__(self):
+        return ' '.join([self.name, self.batch])
+
+    def __str__(self):
+        '''
+        Prints a short summary of all the material parameters.
+        '''
+        string = ""
+
+        if self.name:
+            string += ("Material:" + self.name + '\n')
+        if self.batch:
+            string += ("Batch:" + self.batch + '\n')
+
+        if self.properties:
+            for prop in self.properties:
+                string += (prop + ':' + str(self.properties.get(prop)) + '\n')
+
+        return string
+
     @classmethod
     def find(cls, material_name, material_batch):
         """
@@ -90,23 +110,6 @@ class Material(object):
                     material_name, material_batch))
 
         return material
-
-    def __str__(self):
-        '''
-        Prints a short summary of all the material parameters.
-        '''
-        string = ""
-
-        if self.name:
-            string += ("Material:" + self.name + '\n')
-        if self.batch:
-            string += ("Batch:" + self.batch + '\n')
-
-        if self.properties:
-            for prop in self.properties:
-                string += (prop + ':' + str(self.properties.get(prop)) + '\n')
-
-        return string
 
     def to_dict(self):
         """
