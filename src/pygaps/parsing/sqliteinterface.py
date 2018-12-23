@@ -486,7 +486,6 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
     cursor = kwargs.pop('cursor', None)
 
     # Get isotherm info from database
-    # TODO parameter search from properties as well
     cursor.execute(
         build_select(table='isotherms',
                            to_select=Isotherm._db_columns,
