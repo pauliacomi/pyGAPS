@@ -89,11 +89,14 @@ def initial_henry_slope(isotherm,
         print("Selected points:", rows_taken)
         print("Final adjusted root mean square difference:", adjrmsd)
         model_isotherm.material_name = 'Henry model'
-        plot_iso([isotherm, model_isotherm],
-                 plot_type='isotherm',
-                 branch='ads',
-                 lgd_keys=['material_name'],
-                 **plot_parameters)
+        params = {
+            'plot_type': 'isotherm',
+            'branch': 'ads',
+            'fig_title': (' '.join([isotherm.material_name, isotherm.material_batch])),
+            'lgd_keys': ['material_name', 'adsorbate', 't_iso']
+        }
+        params.update(plot_parameters)
+        plot_iso([isotherm, model_isotherm], **params)
 
         plt.show()
 
@@ -101,7 +104,7 @@ def initial_henry_slope(isotherm,
     return model_isotherm.model.params["K"]
 
 
-def initial_henry_virial(isotherm, verbose=False):
+def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
     """
     Calculates an initial Henry constant based on fitting the virial equation.
 
@@ -124,10 +127,15 @@ def initial_henry_virial(isotherm, verbose=False):
     if verbose:
         model_isotherm.material_name = 'model'
         try:
-            plot_iso([isotherm, model_isotherm],
-                     plot_type='isotherm', branch='ads', logx=False,
-                     lgd_keys=['material_name'])
-
+            params = {
+                'plot_type': 'isotherm',
+                'branch': 'ads',
+                'logx': False,
+                'fig_title': (' '.join([isotherm.material_name, isotherm.material_batch])),
+                'lgd_keys': ['material_name', 'adsorbate', 't_iso']
+            }
+            params.update(plot_parameters)
+            plot_iso([isotherm, model_isotherm], **params)
             plt.show()
         except CalculationError:
             plt.close()
