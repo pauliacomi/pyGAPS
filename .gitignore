@@ -100,7 +100,7 @@ ENV/
 
 # VS code
 .vscode/*
-!.vscode/settings.json
+# !.vscode/settings.json
 
 # pytest
 .pytest_cache
