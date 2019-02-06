@@ -454,12 +454,7 @@ class PointIsotherm(Isotherm):
 
         Returns
         -------
-        fig : Matplotlib figure
-            The figure object generated. Only returned if graph is not shown.
-        ax1 : Matplotlib ax
-            Ax object for primary graph. Only returned if graph is not shown.
-        ax2 : Matplotlib ax
-            Ax object for secondary graph. Only returned if graph is not shown.
+        axes : matplotlib.axes.Axes or numpy.ndarray of them
         """
 
         print(self)
@@ -479,13 +474,13 @@ class PointIsotherm(Isotherm):
         )
         plot_dict.update(plot_iso_args)
 
-        fig, ax1, ax2 = plot_iso(self, **plot_dict)
+        axes = plot_iso(self, **plot_dict)
 
         if show:
             plt.show()
             return
 
-        return fig, ax1, ax2
+        return axes
 
     ##########################################################
     #   Functions that return parts of the isotherm data

@@ -143,7 +143,7 @@ class ModelIsotherm(Isotherm):
             self.model = model
 
             self.rmse = 0
-            self.branch = 'ads'
+            self.branch = branch
             self.pressure_range = [0, 1]
             self.loading_range = [0, 1]
 
@@ -875,12 +875,7 @@ class ModelIsotherm(Isotherm):
 
         Returns
         -------
-        fig : Matplotlib figure
-            The figure object generated. Only returned if graph is not shown.
-        ax1 : Matplotlib ax
-            Ax object for primary graph. Only returned if graph is not shown.
-        ax2 : Matplotlib ax
-            Ax object for secondary graph. Only returned if graph is not shown.
+        axes : matplotlib.axes.Axes or numpy.ndarray of them
         """
 
         print(self)
@@ -901,10 +896,10 @@ class ModelIsotherm(Isotherm):
         )
         plot_dict.update(plot_iso_args)
 
-        fig, ax1, ax2 = plot_iso(self, **plot_dict)
+        axes = plot_iso(self, **plot_dict)
 
         if show:
             plt.show()
             return
 
-        return fig, ax1, ax2
+        return axes

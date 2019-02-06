@@ -20,6 +20,7 @@ _BRANCH_TYPES = ("ads", "des", "all", "all-nol")
 
 
 def plot_iso(isotherms,
+             ax=None,
              x_data='pressure',
              y1_data='loading',
              y2_data=None,
@@ -50,6 +51,9 @@ def plot_iso(isotherms,
     ----------
     isotherms : PointIsotherms or list of Pointisotherms
         An isotherm or iterable of isotherms to be plotted.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     x_data : str
         Key of data to plot on the x axis. Defaults to 'pressure'.
@@ -140,12 +144,7 @@ def plot_iso(isotherms,
 
     Returns
     -------
-    fig : Matplotlib figure
-        The figure object generated.
-    axes1 : Matplotlib ax
-        Ax object for left y1 axis.
-    axes2 : Matplotlib ax
-        Ax object for right y2 axis (if applicable).
+    axes : matplotlib.axes.Axes or numpy.ndarray of them
 
     """
 #######################################
@@ -234,8 +233,12 @@ def plot_iso(isotherms,
 
     #
     # Generate the graph itself
-    fig = plt.figure(**styles['fig_style'])
-    ax1 = plt.subplot(111)
+    if ax:
+        ax1 = ax
+        fig = ax1.get_figure()
+    else:
+        fig = plt.figure(**styles['fig_style'])
+        ax1 = plt.subplot(111)
     if y2_data:
         ax2 = ax1.twinx()
 
@@ -249,7 +252,7 @@ def plot_iso(isotherms,
         elif key == 'loading':
             text = 'Loading ($' + loading_unit + '/' + adsorbent_unit + '$)'
         elif key == 'enthalpy':
-            text = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
+            text = r'$\Delta_{ads}h$ $(-kJ\/mol^{-1})$'
         else:
             text = key
         return text
@@ -502,4 +505,4 @@ def plot_iso(isotherms,
             **styles['save_style'],
         )
 
-    return fig, ax1, ax2
+    return [ax1, ax2]
