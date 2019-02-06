@@ -257,7 +257,7 @@ class ModelIsotherm(Isotherm):
     def from_pointisotherm(cls,
                            isotherm,
                            model=None,
-                           guess_model=False,
+                           guess_model=None,
                            branch='ads',
                            param_guess=None,
                            optimization_params=dict(method='Nelder-Mead'),
@@ -272,11 +272,12 @@ class ModelIsotherm(Isotherm):
             An instance of the PointIsotherm parent class to model.
         model : str
             The model to be used to describe the isotherm.
-        guess_model : bool
-            Set to true if you want to attempt to guess which model best
-            fits the isotherm data. This will mean a calculation of all
-            models available, so it will take a longer time.
-        branch : {None, 'ads', 'des'}, optional
+        guess_model : 'all', list of model names
+            Attempt to guess which model best fits the isotherm data
+            from the model name list supplied. If set to 'all'
+            A calculation of all models available will be performed,
+            therefore it will take a longer time.
+        branch : [None, 'ads', 'des'], optional
             Branch of isotherm to model. Defaults to adsorption branch.
         param_guess : dict, optional
             Starting guess for model parameters in the data fitting routine.
@@ -294,6 +295,7 @@ class ModelIsotherm(Isotherm):
             return ModelIsotherm.guess(isotherm.data(branch=branch),
                                        loading_key=isotherm.loading_key,
                                        pressure_key=isotherm.pressure_key,
+                                       models=guess_model,
                                        optimization_params=optimization_params,
                                        branch=branch,
                                        verbose=verbose,
@@ -313,14 +315,15 @@ class ModelIsotherm(Isotherm):
     def guess(cls, data,
               loading_key=None,
               pressure_key=None,
+              models='all',
               optimization_params=dict(method='Nelder-Mead'),
               branch='ads',
               verbose=False,
 
               **isotherm_parameters):
         """
-        Attempts to model the data using all available models, then returns
-        the one with the best rms fit.
+        Attempts to model the data using supplied list of model names,
+        then returns the one with the best rms fit.
 
         May take a long time depending on the number of datapoints.
 
@@ -332,6 +335,11 @@ class ModelIsotherm(Isotherm):
             Column of the pandas DataFrame where the loading is stored.
         pressure_key : str
             Column of the pandas DataFrame where the pressure is stored.
+        models : 'all', list of model names
+            Attempt to guess which model best fits the isotherm data
+            from the model name list supplied. If set to 'all'
+            A calculation of all models available will be performed,
+            therefore it will take a longer time.
 
         optimization_params : dict
             Dictionary to be passed to the minimization function to use in fitting model to data.
@@ -347,12 +355,19 @@ class ModelIsotherm(Isotherm):
             Any other parameters of the isotherm which should be stored internally.
         """
         attempts = []
-        for model in _GUESS_MODELS:
+        if models == 'all':
+            guess_models = [md.name for md in _GUESS_MODELS]
+        else:
+            guess_models = list(m for m in [md.name for md in _GUESS_MODELS] if m in models)
+            if len(guess_models) != len(models):
+                raise ParameterError('Not all models provided correspond to internal models')
+
+        for model in guess_models:
             try:
                 isotherm = ModelIsotherm(data,
                                          loading_key=loading_key,
                                          pressure_key=pressure_key,
-                                         model=model.name,
+                                         model=model,
                                          param_guess=None,
                                          optimization_params=optimization_params,
                                          branch=branch,
@@ -364,7 +379,7 @@ class ModelIsotherm(Isotherm):
 
             except CalculationError:
                 if verbose:
-                    print("Modelling using {0} failed".format(model.name))
+                    print("Modelling using {0} failed".format(model))
 
         if not attempts:
             raise CalculationError(

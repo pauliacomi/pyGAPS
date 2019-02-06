@@ -170,7 +170,7 @@ class IsothermModel(object):
         rmse = numpy.sqrt(opt_res.fun / len(loading))
 
         if verbose:
-            print("Model {0} success, rmse is {1}".format(
+            print("Model {0} success, RMSE is {1:.3f}".format(
                 self.name, rmse))
 
         return rmse
