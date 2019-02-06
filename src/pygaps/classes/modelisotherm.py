@@ -358,7 +358,7 @@ class ModelIsotherm(Isotherm):
         if models == 'all':
             guess_models = [md.name for md in _GUESS_MODELS]
         else:
-            guess_models = (m for m in [md.name for md in _GUESS_MODELS] if m in models)
+            guess_models = list(m for m in [md.name for md in _GUESS_MODELS] if m in models)
             if len(guess_models) != len(models):
                 raise ParameterError('Not all models provided correspond to internal models')
 
@@ -379,7 +379,7 @@ class ModelIsotherm(Isotherm):
 
             except CalculationError:
                 if verbose:
-                    print("Modelling using {0} failed".format(model.name))
+                    print("Modelling using {0} failed".format(model))
 
         if not attempts:
             raise CalculationError(

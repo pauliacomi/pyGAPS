@@ -111,7 +111,7 @@ class TestModelIsotherm(object):
     @pytest.mark.parametrize('file, ',
                              [(data['file']) for data in list(DATA.values())])
     def test_isotherm_create_guess(self, file):
-        "Checks isotherm can be created from a pointisotherm"
+        "Checks isotherm can be guessed from a pointisotherm"
 
         filepath = os.path.join(DATA_N77_PATH, file)
 
@@ -120,7 +120,14 @@ class TestModelIsotherm(object):
                 text_file.read())
 
         pygaps.ModelIsotherm.from_pointisotherm(
-            isotherm, guess_model=True, verbose=True)
+            isotherm, guess_model='all', verbose=True)
+
+        pygaps.ModelIsotherm.from_pointisotherm(
+            isotherm, guess_model=['Henry', 'Langmuir'], verbose=True)
+
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.ModelIsotherm.from_pointisotherm(
+                isotherm, guess_model=['Henry', 'DummyModel'], verbose=True)
 
     def test_isotherm_ret_pressure(self, basic_modelisotherm, use_adsorbate):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
