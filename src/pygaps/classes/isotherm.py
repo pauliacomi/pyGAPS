@@ -294,10 +294,10 @@ class Isotherm(object):
         inflexion = increasing.idxmax()
 
         # If there is an inflexion point
-        if inflexion != 0:
+        if inflexion != _data.index[0]:
             # If the first point is where the isotherm starts decreasing
             # Then it is a complete desorption curve
-            if inflexion == 1:
+            if inflexion == _data.index[1]:
                 inflexion = 0
 
             # Set all instances after the inflexion point to True
