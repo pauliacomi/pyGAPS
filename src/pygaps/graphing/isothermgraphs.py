@@ -505,4 +505,7 @@ def plot_iso(isotherms,
             **styles['save_style'],
         )
 
-    return [ax1, ax2]
+    if ax2:
+        return [ax1, ax2]
+    else:
+        return ax1
