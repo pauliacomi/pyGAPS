@@ -11,7 +11,7 @@ Features:
 * Streamlined the internal database functions to be more general.
 * Updated NIST json import to new format. Cannot import multicomponent isotherms.
 * Functions which generate matplotlib graphs now can take an Ax as parameter
-  (similar to behaviour of pandas).
+  (similar to behaviour of pandas) to plot on existing figures.
 * Changed behaviour of ModelIsotherm.guess function to accept a list of
   models to attempt to guess for.
 
@@ -36,7 +36,8 @@ Bugfixes:
 * Fixed issue in CSV import which read all values as strings (instead of floats/bools)
 * Fixed an issue with Excel import of bools, as they were previously read as 1/0
 * Fixed a bug where the automatic branch detection was not working when the
-  DataFrame passed had a non-standard index
+  DataFrame passed had a non-standard index.
+* Fixed not being able to call _repr_ on an isotherm.
 
 
 1.4.0 (2018-11-10)
