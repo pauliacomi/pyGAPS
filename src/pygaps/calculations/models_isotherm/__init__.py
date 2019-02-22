@@ -64,7 +64,7 @@ def get_isotherm_model(model_name):
 
     if model_name not in [model.name for model in _MODELS]:
         raise ParameterError("Model {0} not an option. Viable models "
-                             "are {1}".format(model_name, [model.name for model in _MODELS]))
+                             "are {1}.".format(model_name, ', '.join([model.name for model in _MODELS])))
 
     for _model in _MODELS:
         if model_name == _model.name:

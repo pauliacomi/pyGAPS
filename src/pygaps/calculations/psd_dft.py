@@ -96,7 +96,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
             "Minimization of DFT failed with error {}".format(result.message)
         )
 
-    # convert from preponderence to distribution
+    # convert from preponderance to distribution
     pore_dist = result.x[1:] / numpy.diff(pore_widths)
 
     return pore_widths[1:], pore_dist

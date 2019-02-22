@@ -87,7 +87,7 @@ def c_pressure(value,
         if mode_to not in _PRESSURE_MODE:
             raise ParameterError(
                 "Mode selected for pressure ({}) is not an option. Viable"
-                " modes are {}".format(mode_to, _PRESSURE_MODE.keys()))
+                " modes are {}".format(mode_to, list(_PRESSURE_MODE)))
 
         if mode_to == "absolute":
             if not unit_to:
@@ -95,7 +95,7 @@ def c_pressure(value,
             if unit_to not in _PRESSURE_UNITS:
                 raise ParameterError(
                     "Unit to is not an option. Viable"
-                    " units are {}".format(_PRESSURE_UNITS.keys()))
+                    " units are {}".format(list(_PRESSURE_UNITS)))
 
             unit = unit_to
             sign = 1
@@ -156,7 +156,7 @@ def c_loading(value,
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for loading ({}) is not an option. Viable"
-                " modes are {}".format(basis_to, _MATERIAL_MODE.keys()))
+                " modes are {}".format(basis_to, list(_MATERIAL_MODE)))
 
         if not unit_to or not unit_from:
             raise ParameterError("Specify both from and to units")
@@ -164,12 +164,12 @@ def c_loading(value,
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
                 "Unit to is not an option. Viable"
-                " units are {}".format(_MATERIAL_MODE[basis_to].keys()))
+                " units are {}".format(list(_MATERIAL_MODE[basis_to])))
 
         if unit_from not in _MATERIAL_MODE[basis_from]:
             raise ParameterError(
                 "Unit from is not an option. Viable"
-                " units are {}".format(_MATERIAL_MODE[basis_from].keys()))
+                " units are {}".format(list(_MATERIAL_MODE[basis_from])))
 
         if basis_from == 'mass':
             if basis_to == 'volume':
@@ -256,7 +256,7 @@ def c_adsorbent(value,
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for adsorbent ({}) is not an option. Viable"
-                " modes are {}".format(basis_to, _MATERIAL_MODE.keys()))
+                " modes are {}".format(basis_to, list(_MATERIAL_MODE)))
 
         if not unit_to or not unit_from:
             raise ParameterError("Specify both from and to units")
@@ -264,12 +264,12 @@ def c_adsorbent(value,
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
                 "Unit to is not an option. Viable"
-                " units are {}".format(_MATERIAL_MODE[basis_to].keys()))
+                " units are {}".format(list(_MATERIAL_MODE[basis_to])))
 
         if unit_from not in _MATERIAL_MODE[basis_from]:
             raise ParameterError(
                 "Unit from is not an option. Viable"
-                " units are {}".format(_MATERIAL_MODE[basis_from].keys()))
+                " units are {}".format(list(_MATERIAL_MODE[basis_from])))
 
         if basis_from == 'mass':
             if basis_to == 'volume':

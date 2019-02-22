@@ -133,7 +133,7 @@ class IsothermModel(object):
             Prints out extra information about steps taken.
         """
         if verbose:
-            print("Attempting to model using {}".format(self.name))
+            print("Attempting to model using {0}".format(self.name))
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
@@ -158,8 +158,7 @@ class IsothermModel(object):
                 "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
                 "\n\t\t{1}"
                 "\n\tTry a different starting point in the nonlinear optimization"
-                "\n\tby passing a dictionary of parameter guesses, param_guess, to the"
-                "\n\tconstructor."
+                "\n\tby passing a dictionary of parameter guesses, param_guess, to the constructor."
                 "\n\tDefault starting guess for parameters:"
                 "\n\t{2}".format(self.name, opt_res.message, param_guess))
 

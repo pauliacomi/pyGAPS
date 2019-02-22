@@ -47,7 +47,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
         a list of dictionaries containing the calculated parameters for each
         straight section, with each dictionary of the form. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
-        volume of adsorbent)::
+        volume of adsorbent):
 
             - ``section(array)`` : the points of the plot chosen for the line
             - ``area(float)`` : calculated surface area, from the section parameters
@@ -64,7 +64,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
 
     The t-plot method [#]_ attempts to relate the adsorption on a material with an ideal
     curve which describes the thickness of the adsorbed layer on a surface. A plot is
-    constructed, with the isotherm  loading data is plotted versus thickness values obtained
+    constructed, where the isotherm loading data is plotted versus thickness values obtained
     through the model.
     It stands to reason that, in the case that the experimental adsorption curve follows
     the model, a straight line will be obtained with its intercept through the origin.
