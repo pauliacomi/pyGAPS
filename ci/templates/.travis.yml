@@ -1,5 +1,4 @@
 language: python
-sudo: false
 cache: pip
 
 env:
@@ -61,13 +60,11 @@ jobs:
     - stage: test
       python: '3.7'     # specify python 3.7
       dist: xenial
-      sudo: required
       env:
         - TOXENV=check
     - stage: test
       python: '3.7'     # specify python 3.7
       dist: xenial
-      sudo: required
       env:
         - TOXENV=docs
       addons:
@@ -81,7 +78,6 @@ jobs:
       python: '{{ env.split("-")[0] if env.startswith("pypy") else "{0[2]}.{0[3]}".format(env) }}'
     {% if env.startswith('py37') %}
       dist: xenial
-      sudo: required
       {% endif %}
       env:
         - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
@@ -91,7 +87,6 @@ jobs:
     - stage: deploy
       python: '3.7'     # specify python 3.7
       dist: xenial
-      sudo: required
       env: TOXENV=none  # overwrite environment var
       install: skip     # no need to install tox
       script: skip      # run no tests
