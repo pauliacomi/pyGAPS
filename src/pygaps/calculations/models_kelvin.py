@@ -4,7 +4,7 @@ the mesopore range.
 """
 
 import numpy
-import scipy
+import scipy.constants as const
 
 
 def meniscus_geometry(branch, pore_geometry):
@@ -100,7 +100,7 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
 
     coefficient = (2 * adsorbate_surface_tension *
                    adsorbate_molar_density) / (geometry_factor *
-                                               scipy.constants.gas_constant * temperature)
+                                               const.gas_constant * temperature)
 
     radius = - coefficient / numpy.log(pressure)
 

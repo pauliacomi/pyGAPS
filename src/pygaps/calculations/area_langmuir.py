@@ -3,8 +3,8 @@ This module calculates the Langmuir surface area based on an isotherm.
 """
 import warnings
 
-import scipy.constants as constants
-import scipy.stats
+import scipy.constants as const
+import scipy.stats as stats
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import langmuir_plot
@@ -235,7 +235,7 @@ def langmuir_transform(loading, pressure):
 
 def langmuir_optimisation(pressure, langmuir_points):
     """Finds the slope and intercept of the Langmuir region"""
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         pressure, langmuir_points)
     return slope, intercept, corr_coef
 
@@ -245,5 +245,5 @@ def langmuir_parameters(slope, intercept, cross_section):
     n_monolayer = 1 / slope
     langmuir_const = 1 / (intercept * n_monolayer)
     langmuir_area = n_monolayer * cross_section * \
-        (10**(-18)) * constants.Avogadro
+        (10**(-18)) * const.Avogadro
     return n_monolayer, langmuir_const, langmuir_area

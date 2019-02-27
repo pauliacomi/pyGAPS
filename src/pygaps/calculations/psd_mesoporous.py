@@ -4,7 +4,7 @@ the mesopore range (2-50 nm).
 """
 
 import numpy
-import scipy
+import scipy.constants as const
 
 from ..utilities.exceptions import ParameterError
 
@@ -277,13 +277,13 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
         R_factor = (avg_pore_radii[i] /
                     (avg_k_radius[i] + d_thickness[i] / 2))**2
         D_var = d_thickness[i] * sum_d_area
-        E_var = 2 * scipy.constants.pi * \
+        E_var = 2 * const.pi * \
             d_thickness[i] * avg_thickness[i] * sum_length
 
         pore_volume = (d_volume[i] - D_var + E_var) * R_factor
 
         d_area = 2 * pore_volume / avg_pore_radii[i]
-        length = d_area / (2 * scipy.constants.pi * avg_pore_radii[i])
+        length = d_area / (2 * const.pi * avg_pore_radii[i])
         sum_d_area += d_area
         sum_length += length
 

@@ -4,7 +4,8 @@ the micropore range (<2 nm).
 """
 
 import numpy
-import scipy
+import scipy.constants as const
+import scipy.optimize as opt
 
 from ..utilities.exceptions import ParameterError
 
@@ -191,8 +192,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     adsorbate_molar_mass = adsorbate_properties.get('adsorbate_molar_mass')
 
     # calculation of constants and terms
-    e_m = scipy.constants.electron_mass
-    c_l = scipy.constants.speed_of_light
+    e_m = const.electron_mass
+    c_l = const.speed_of_light
     effective_diameter = d_adsorbate + d_adsorbent
     sigma = (2 / 5)**(1 / 6) * effective_diameter / 2
     sigma_si = sigma * 1e-9
@@ -201,8 +202,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         (p_adsorbate / m_adsorbate + p_adsorbent / m_adsorbent)
     a_adsorbate = 3 * e_m * c_l**2 * p_adsorbate * m_adsorbate / 2
 
-    constant_coefficient = scipy.constants.Avogadro / \
-        (scipy.constants.gas_constant * temperature) * \
+    constant_coefficient = const.Avogadro / \
+        (const.gas_constant * temperature) * \
         (n_adsorbate * a_adsorbate + n_adsorbent * a_adsorbent) / \
         (sigma_si**4)
 
@@ -224,7 +225,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         # minimise to find pore length
         def h_k_minimization(l_pore):
             return numpy.abs(h_k_pressure(l_pore) - p_point)
-        res = scipy.optimize.minimize_scalar(h_k_minimization)
+        res = opt.minimize_scalar(h_k_minimization)
         p_w.append(res.x - d_adsorbent)
 
     # finally calculate pore distribution

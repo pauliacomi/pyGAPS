@@ -4,7 +4,7 @@ This module contains BET surface area calculations.
 
 import warnings
 
-import scipy.constants as constants
+import scipy.constants as const
 import scipy.stats
 
 from ..classes.adsorbate import Adsorbate
@@ -307,5 +307,5 @@ def bet_parameters(slope, intercept, cross_section):
     c_const = (slope / intercept) + 1
     n_monolayer = 1 / (intercept * c_const)
     p_monolayer = 1 / (scipy.sqrt(c_const) + 1)
-    bet_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
+    bet_area = n_monolayer * cross_section * (10**(-18)) * const.Avogadro
     return n_monolayer, p_monolayer, c_const, bet_area

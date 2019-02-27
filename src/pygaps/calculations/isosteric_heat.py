@@ -3,8 +3,8 @@ This module calculates the isosteric heat for isotherms at different temperature
 """
 
 import numpy
-import scipy.constants as constants
-import scipy.stats
+import scipy.constants as const
+import scipy.stats as stats
 
 from ..graphing.calcgraph import isosteric_heat_plot
 from ..utilities.exceptions import ParameterError
@@ -177,10 +177,10 @@ def isosteric_heat_raw(pressures, temperatures):
     # Calculate heat for each point
     for pressure in pressures:
 
-        slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+        slope, intercept, corr_coef, p, stderr = stats.linregress(
             inv_t, numpy.log(pressure))
 
-        iso_heat.append(-constants.gas_constant * slope / 1000)
+        iso_heat.append(-const.gas_constant * slope / 1000)
         slopes.append(slope)
         correlations.append(corr_coef)
 
