@@ -297,7 +297,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     return result_dict
 
 
-def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_parameters):
+def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2, **model_parameters):
     """
     Calculates the pore size distribution using a DFT kernel from a PointIsotherm.
 
@@ -307,6 +307,9 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
         The isotherm to calculate the pore size distribution.
     kernel_path : str
         The path to the kernel used.
+    bspline_order : int
+        The smoothing order of the b-splines fit to the data.
+        If set to 0, data will be returned as-is.
 
     Returns
     -------
@@ -396,11 +399,12 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
                                  pressure_mode='relative')
 
     # Call the DFT function
-    pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)  # mmol/g
+    pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order)  # mmol/g
 
     # Convert to volume units
     adsorbate = Adsorbate.find(isotherm.adsorbate)
-    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() / adsorbate.liquid_density(isotherm.t_iso) / 1000
+    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() \
+        / adsorbate.liquid_density(isotherm.t_iso) / 1000
 
     # Package the results
     result_dict = {

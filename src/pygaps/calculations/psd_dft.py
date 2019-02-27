@@ -54,7 +54,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
         f(x) = \\sum_{p=p_0}^{p=p_x} (n_{p,exp} - \\sum_{w=w_0}^{w=w_y} n_{p, kernel} X_w )^2
 
     The function is then minimised using the `scipy.optimise.minimise` module, with the
-    constraint that the contribution of each isotherm cannot be negative.
+    constraint that the contribution of each kernel isotherm cannot be negative.
 
     """
     # Parameter checks
@@ -65,18 +65,14 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     # get the interpolation kernel
     kernel = _load_kernel(kernel_path)
 
-    # generate the pandas array
-    kernel_points = []
-    for psize in kernel:
-        kernel_points.append(kernel.get(psize)(pressure))
-    kernel_points = numpy.asarray(kernel_points)
-
-    pore_widths = numpy.asarray(list(kernel.keys())).astype(float)
+    # generate the numpy arrays
+    kernel_points = numpy.asarray([kernel[size](pressure) for size in kernel])
+    pore_widths = numpy.asarray(list(kernel.keys()), dtype='float64')
 
     # define the minimization function
     def sum_squares(pore_dist):
         return numpy.square(                                                  # -> square the difference
-            numpy.subtract(                                                   # -> difference between calculated and isotherm
+            numpy.subtract(                                                   # -> between calculated and isotherm
                 numpy.multiply(                                               # -> multiply each loading with its contribution
                     kernel_points, pore_dist[:, numpy.newaxis]).sum(axis=0),  # -> add the contributions together at each pressure
                 loading)
@@ -89,7 +85,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     }]
 
     # # run the optimisation algorithm
-    guess = [0 for pore in pore_widths]
+    guess = numpy.array([0 for pore in pore_widths])[:, numpy.newaxis]
     bounds = [(0, None) for pore in pore_widths]
     result = scipy.optimize.minimize(
         sum_squares, guess, method='SLSQP',
@@ -101,7 +97,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
         )
 
     # convert from preponderance to distribution
-    pore_dist = result.x[1:] / numpy.diff(pore_widths)
+    pore_dist = result.x.flatten()[1:] / numpy.diff(pore_widths)
 
     return bspline(pore_widths[1:], pore_dist, degree=bspline_order)
 
@@ -109,6 +105,11 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
 def _load_kernel(path):
     """
     Loads a kernel from disk or from memory.
+
+    Essentially takes a kernel stored as a pressure-loading
+    table, then creates a cubic interpolator for each
+    isotherm, then storing them as a dictionary of
+    pore-size keys to interpolator values.
 
     Parameters
     ----------
@@ -126,23 +127,22 @@ def _load_kernel(path):
     if path in _KERNELS:
         return _KERNELS[path]
 
-    else:
-        raw_kernel = pandas.read_csv(path, index_col=0)
+    raw_kernel = pandas.read_csv(path, index_col=0)
 
-        # add a 0 in the dataframe for interpolation between lowest values
-        raw_kernel = raw_kernel.append(pandas.DataFrame(
-            [0 for col in raw_kernel.columns], index=raw_kernel.columns, columns=[0]).transpose())
+    # add a 0 in the dataframe for interpolation between lowest values
+    raw_kernel = raw_kernel.append(pandas.DataFrame(
+        [0 for col in raw_kernel.columns], index=raw_kernel.columns, columns=[0]).transpose())
 
-        kernel = {}
-        for pore_size in raw_kernel:
-            interpolator = scipy.interpolate.interp1d(
-                raw_kernel[pore_size].index,
-                raw_kernel[pore_size].values,
-                kind='cubic')
+    kernel = {}
+    for pore_size in raw_kernel:
+        interpolator = scipy.interpolate.interp1d(
+            raw_kernel[pore_size].index,
+            raw_kernel[pore_size].values,
+            kind='cubic')
 
-            kernel.update({pore_size: interpolator})
+        kernel.update({pore_size: interpolator})
 
-        # Save the kernel in memory
-        _KERNELS.update({path: kernel})
+    # Save the kernel in memory
+    _KERNELS.update({path: kernel})
 
     return kernel

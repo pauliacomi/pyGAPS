@@ -14,6 +14,7 @@ Features:
   (similar to behaviour of pandas) to plot on existing figures.
 * Changed behaviour of ModelIsotherm.guess function to accept a list of
   models to attempt to guess for.
+* Added b-spline smoothing to output of dft fitting.
 
 Breaking changes:
 

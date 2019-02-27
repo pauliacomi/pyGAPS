@@ -11,14 +11,16 @@ import scipy.interpolate as interp
 from .exceptions import ParameterError
 
 
-def bspline(xs, ys, n=100, degree=3, periodic=False):
+def bspline(xs, ys, n=100, degree=2, periodic=False):
     """
     Calculate n samples on a b-spline
 
     Parameters
     ----------
-    cv : array
-        Array of control vertices
+    xs : array
+        X points of the curve to fit
+    ys : array
+        Y points of the curve to fit
     n  : int
         Number of samples to return
     degree : int
@@ -34,10 +36,10 @@ def bspline(xs, ys, n=100, degree=3, periodic=False):
         raise ParameterError("Arrays passed are not equal")
 
     # Do nothing if order is 0
-    if n == 0:
+    if degree == 0:
         return xs, ys
 
-    cv = numpy.dstack((xs, ys))
+    cv = numpy.stack((xs, ys), axis=-1)
 
     # If periodic, extend the point array by count+degree+1
     if periodic:
@@ -64,4 +66,4 @@ def bspline(xs, ys, n=100, degree=3, periodic=False):
     res = numpy.array(interp.splev(u, (kv, cv.T, degree))).T
 
     return (numpy.array([x[0] for x in res]),
-    numpy.array([y[1] for y in res]))
+            numpy.array([y[1] for y in res]))
