@@ -11,6 +11,7 @@ import pandas
 import scipy
 
 from ..utilities.exceptions import CalculationError
+from ..utilities.bspline import bspline
 
 _KERNELS = {}
 
@@ -18,7 +19,7 @@ INTERNAL = os.path.join(os.path.dirname(__file__),
                         'kernels', 'dft - N2 - carbon.csv')
 
 
-def psd_dft_kernel_fit(pressure, loading, kernel_path):
+def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     """
     Fits a DFT kernel on experimental adsorption data.
 
@@ -30,6 +31,9 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
         Relative pressure.
     kernel_path : str
         The location of the kernel to use.
+    bspline_order : int
+        The smoothing order of the b-splines fit to the data.
+        If set to 0, data will be returned as-is.
 
     Returns
     -------
@@ -96,10 +100,10 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
             "Minimization of DFT failed with error {}".format(result.message)
         )
 
-    # convert from preponderence to distribution
+    # convert from preponderance to distribution
     pore_dist = result.x[1:] / numpy.diff(pore_widths)
 
-    return pore_widths[1:], pore_dist
+    return bspline(pore_widths[1:], pore_dist, degree=bspline_order)
 
 
 def _load_kernel(path):
