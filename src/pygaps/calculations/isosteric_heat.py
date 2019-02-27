@@ -164,8 +164,8 @@ def isosteric_heat_raw(pressures, temperatures):
             "There are a different number of pressure points than temperature points")
 
     # Convert to numpy arrays, just in case
-    pressures = numpy.array(pressures)
-    temperatures = numpy.array(temperatures)
+    pressures = numpy.asarray(pressures)
+    temperatures = numpy.asarray(temperatures)
 
     # Calculate inverse temperatures
     inv_t = 1 / temperatures
