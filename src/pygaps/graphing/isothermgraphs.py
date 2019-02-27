@@ -248,7 +248,7 @@ def plot_iso(isotherms,
             if pressure_mode == "absolute":
                 text = 'Pressure ($' + pressure_unit + '$)'
             elif pressure_mode == "relative":
-                text = "Relative pressure"
+                text = "$p/p^0$"
         elif key == 'loading':
             text = 'Loading ($' + loading_unit + '/' + adsorbent_unit + '$)'
         elif key == 'enthalpy':

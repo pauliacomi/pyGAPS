@@ -226,7 +226,7 @@ class Isotherm(object):
         return self.iso_id == other_isotherm.iso_id
 
     def __repr__(self):
-        return ', '.join([self.iso_id, self.adsorbate, self.t_iso,
+        return ', '.join([self.iso_id, self.adsorbate, str(self.t_iso),
                           self.material_name, self.material_batch])
 
     def __str__(self):

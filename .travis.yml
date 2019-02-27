@@ -1,5 +1,4 @@
 language: python
-sudo: false
 cache: pip
 
 env:
@@ -41,12 +40,6 @@ install:
     fi
     set +x
 
-before_script:
-    # some tests require a GUI, so use xvfb
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3             # give xvfb some time to start
-
 script:
   # start tox to do the testing
   - tox -v
@@ -61,13 +54,11 @@ jobs:
     - stage: test
       python: '3.7'     # specify python 3.7
       dist: xenial
-      sudo: required
       env:
         - TOXENV=check
     - stage: test
       python: '3.7'     # specify python 3.7
       dist: xenial
-      sudo: required
       env:
         - TOXENV=docs
       addons:
@@ -87,14 +78,12 @@ jobs:
     - stage: test
       python: '3.7'
       dist: xenial
-      sudo: required
       env:
         - TOXENV=py37-cover,report,codecov
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.7'     # specify python 3.7
       dist: xenial
-      sudo: required
       env: TOXENV=none  # overwrite environment var
       install: skip     # no need to install tox
       script: skip      # run no tests
