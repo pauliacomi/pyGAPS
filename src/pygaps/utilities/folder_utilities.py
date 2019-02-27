@@ -8,7 +8,7 @@ from .exceptions import pgError
 
 
 def util_get_file_paths(folder, extension=None):
-    '''
+    """
     Gets the paths of the files with the requested extension as a list.
 
     Parameters
@@ -23,7 +23,7 @@ def util_get_file_paths(folder, extension=None):
     list
         Paths of each file.
 
-    '''
+    """
     if extension is None:
         raise pgError("Must provide a file extension to look for")
 

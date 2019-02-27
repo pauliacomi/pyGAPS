@@ -65,9 +65,9 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path):
     kernel_points = []
     for psize in kernel:
         kernel_points.append(kernel.get(psize)(pressure))
-    kernel_points = numpy.array(kernel_points)
+    kernel_points = numpy.asarray(kernel_points)
 
-    pore_widths = numpy.array(list(kernel.keys())).astype(float)
+    pore_widths = numpy.asarray(list(kernel.keys())).astype(float)
 
     # define the minimization function
     def sum_squares(pore_dist):

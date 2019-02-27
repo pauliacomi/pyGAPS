@@ -230,9 +230,9 @@ class Isotherm(object):
                           self.material_name, self.material_batch])
 
     def __str__(self):
-        '''
+        """
         Prints a short summary of all the isotherm parameters.
-        '''
+        """
         string = ""
 
         # Required
