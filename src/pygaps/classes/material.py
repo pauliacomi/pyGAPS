@@ -8,7 +8,7 @@ from ..utilities.exceptions import ParameterError
 
 
 class Material(object):
-    '''
+    """
     This class acts as a unified descriptor for an adsorbent material.
     Its purpose is to store properties such as adsorbent name,
     and batch.
@@ -35,7 +35,7 @@ class Material(object):
     of the user. There are, however, some unique properties
     which can be set as seen above.
 
-    '''
+    """
 
     def __init__(self, name, batch, **properties):
         """
@@ -57,9 +57,9 @@ class Material(object):
         return ' '.join([self.name, self.batch])
 
     def __str__(self):
-        '''
+        """
         Prints a short summary of all the material parameters.
-        '''
+        """
         string = ""
 
         if self.name:

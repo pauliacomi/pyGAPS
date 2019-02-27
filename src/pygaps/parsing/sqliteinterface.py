@@ -78,7 +78,7 @@ def _upload_one_all_columns(cursor, table_name, table_id, columns, input_dict,
 def _get_all_no_id(cursor, table_name, table_id, print_string, verbose, **kwargs):
     """Gets all elements from a table as a dictionary, excluding id"""
 
-    cursor.execute('''SELECT * FROM ''' + table_name)
+    cursor.execute("""SELECT * FROM """ + table_name)
 
     values = []
     for row in cursor:
@@ -233,7 +233,7 @@ def db_get_materials(path, verbose=True, **kwargs):
     cursor = kwargs.pop('cursor', None)
 
     # Execute the query
-    cursor.execute('''SELECT * FROM materials''')
+    cursor.execute("""SELECT * FROM materials""")
     rows = cursor.fetchall()
 
     materials = []
@@ -499,17 +499,17 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
         ids = tuple(row['id'] for row in rows)
 
         # Get isotherm properties from database
-        cursor.execute('''
+        cursor.execute("""
                 SELECT iso_id, type, value FROM "isotherm_properties"
                 WHERE iso_id IN (%s);
-                ''' % ','.join('?' * len(ids)), ids)
+                """ % ','.join('?' * len(ids)), ids)
         isotherm_props = cursor.fetchall()
 
         # Get the properties from the data table
-        cursor.execute('''
+        cursor.execute("""
                 SELECT iso_id, type, data FROM "isotherm_data"
                 WHERE iso_id IN (%s);
-                ''' % ','.join('?' * len(ids)), ids)
+                """ % ','.join('?' * len(ids)), ids)
         isotherm_data = cursor.fetchall()
 
         for row in rows:
@@ -948,7 +948,7 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
     cursor = kwargs.pop('cursor', None)
 
     # Get required adsorbate from database
-    cursor.execute('''SELECT * FROM adsorbates''')
+    cursor.execute("""SELECT * FROM adsorbates""")
 
     rows = cursor.fetchall()
 

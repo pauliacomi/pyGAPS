@@ -186,7 +186,7 @@ def _update_recurs(dict1, dict2):
 
 
 def isotherm_to_xl(isotherm, path, fmt=None):
-    '''
+    """
 
     A function that turns the isotherm into an excel file with the data and properties.
 
@@ -199,7 +199,7 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     fmt : {None, 'MADIREL'}, optional
         If the format is set to MADIREL, then the excel file is a specific version
         used by the MADIREL lab for internal processing.
-    '''
+    """
 
     if fmt:
         if fmt not in _FORMATS:

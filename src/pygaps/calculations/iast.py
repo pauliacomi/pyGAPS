@@ -136,8 +136,8 @@ def iast_binary_svp(isotherms, mole_fractions, pressures,
         )
 
     # Convert to numpy arrays just in case
-    pressures = numpy.array(pressures)
-    mole_fractions = numpy.array(mole_fractions)
+    pressures = numpy.asarray(pressures)
+    mole_fractions = numpy.asarray(mole_fractions)
 
     # Generate the array of partial pressures
     component_loadings = numpy.zeros((len(pressures), 2))
@@ -201,7 +201,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
                 raise ParameterError(
                     "Model {} cannot be used with IAST.".format(isotherm.model.name))
 
-    partial_pressures = numpy.array(partial_pressures)
+    partial_pressures = numpy.asarray(partial_pressures)
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:
         raise ParameterError("Pass list of pure component isotherms...")
@@ -262,7 +262,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
         # Default guess: pure-component loadings at these partial pressures.
         loading_guess = [isotherms[i].loading_at(partial_pressures[i]) for i in
                          range(n_components)]
-        loading_guess = numpy.array(loading_guess)
+        loading_guess = numpy.asarray(loading_guess)
         adsorbed_mole_fraction_guess = loading_guess / numpy.sum(loading_guess)
     else:
         numpy.testing.assert_almost_equal(1.0,
@@ -270,7 +270,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
                                               adsorbed_mole_fraction_guess),
                                           decimal=4)
         # if list, convert to numpy array
-        adsorbed_mole_fraction_guess = numpy.array(
+        adsorbed_mole_fraction_guess = numpy.asarray(
             adsorbed_mole_fraction_guess)
 
     res = scipy.optimize.root(
@@ -289,7 +289,7 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
 
     # concatenate mole fraction of last component
     adsorbed_mole_fractions = numpy.concatenate((adsorbed_mole_fractions,
-                                                 numpy.array(
+                                                 numpy.asarray(
                                                      [1.0 - numpy.sum(adsorbed_mole_fractions)])
                                                  ))
 
@@ -383,7 +383,7 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
                     "Model {} cannot be used with IAST.".format(isotherm.model.name))
 
     n_components = len(isotherms)  # number of components in the mixture
-    adsorbed_mole_fractions = numpy.array(adsorbed_mole_fractions)
+    adsorbed_mole_fractions = numpy.asarray(adsorbed_mole_fractions)
     if n_components == 1:
         raise ParameterError("Pass list of pure component isotherms...")
 
@@ -452,7 +452,7 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
         numpy.testing.assert_almost_equal(1.0, numpy.sum(gas_mole_fraction_guess),
                                           decimal=4)
         # if list, convert to numpy array
-        gas_mole_fraction_guess = numpy.array(gas_mole_fraction_guess)
+        gas_mole_fraction_guess = numpy.asarray(gas_mole_fraction_guess)
 
     res = scipy.optimize.root(
         spreading_pressure_differences, gas_mole_fraction_guess[:-1],

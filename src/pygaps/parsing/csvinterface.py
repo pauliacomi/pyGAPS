@@ -33,7 +33,7 @@ def _to_bool(s):
 
 
 def isotherm_to_csv(isotherm, path, separator=','):
-    '''
+    """
 
     A function that turns the isotherm into a csv
     file with the data and properties.
@@ -47,7 +47,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
     separator : str, optional
         Separator used int the csv file. Defaults to '',''.
 
-    '''
+    """
 
     with open(path, mode='w') as file:
 
