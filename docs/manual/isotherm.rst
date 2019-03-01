@@ -196,9 +196,6 @@ parameter.
         adsorbate='nitrogen',           # Required
         t_iso=77,                       # Required
     )
-::
-
-
 
 
 Creating a ModelIsotherm
