@@ -5,7 +5,9 @@ Calculation of the pore size distribution based on an isotherm.
 from functools import partial
 
 from ..classes.adsorbate import Adsorbate
+from ..classes.pointisotherm import PointIsotherm
 from ..graphing.calcgraph import psd_plot
+from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import ParameterError
 from .models_hk import get_hk_model
 from .models_kelvin import kelvin_radius_std
@@ -399,7 +401,8 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2,
                                  pressure_mode='relative')
 
     # Call the DFT function
-    pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order)  # mmol/g
+    pore_widths, pore_dist, dft_loading = psd_dft_kernel_fit(
+        pressure, loading, kernel_path, bspline_order)  # mmol/g
 
     # Convert to volume units
     adsorbate = Adsorbate.find(isotherm.adsorbate)
@@ -413,6 +416,16 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2,
     }
 
     if verbose:
+        params = {
+            'plot_type': 'isotherm',
+            'branch': 'ads',
+            'logx': True,
+            'fig_title': 'DFT Fit',
+            'lgd_keys': ['material_name'],
+            'y1_line_style': dict(markersize=5, linewidth=0)
+        }
+        ax = plot_iso(isotherm, **params)
+        ax.plot(pressure, dft_loading, 'r-')
         psd_plot(pore_widths, pore_dist, method='DFT')
 
     return result_dict

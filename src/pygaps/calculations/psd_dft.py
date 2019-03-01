@@ -70,13 +70,15 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     pore_widths = numpy.asarray(list(kernel.keys()), dtype='float64')
 
     # define the minimization function
+    def kernel_loading(pore_dist):
+        return numpy.multiply(
+            kernel_points, pore_dist[:, numpy.newaxis]      # -> multiply each loading with its contribution
+        ).sum(axis=0)                                       # -> add the contributions together at each pressure
+
     def sum_squares(pore_dist):
         return numpy.square(                                                  # -> square the difference
             numpy.subtract(                                                   # -> between calculated and isotherm
-                numpy.multiply(                                               # -> multiply each loading with its contribution
-                    kernel_points, pore_dist[:, numpy.newaxis]).sum(axis=0),  # -> add the contributions together at each pressure
-                loading)
-        ).sum(axis=0)                                                         # -> sum of squares together
+                kernel_loading(pore_dist), loading)).sum(axis=0)              # -> then sum the squares together
 
     # define the constraints (x>0)
     cons = [{
@@ -85,7 +87,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     }]
 
     # # run the optimisation algorithm
-    guess = numpy.array([0 for pore in pore_widths])[:, numpy.newaxis]
+    guess = numpy.array([0 for pore in pore_widths])
     bounds = [(0, None) for pore in pore_widths]
     result = scipy.optimize.minimize(
         sum_squares, guess, method='SLSQP',
@@ -97,9 +99,11 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
         )
 
     # convert from preponderance to distribution
-    pore_dist = result.x.flatten()[1:] / numpy.diff(pore_widths)
+    final_loading = kernel_loading(result.x)
+    pore_dist = result.x[1:] / numpy.diff(pore_widths)
+    pore_widths, pore_dist = bspline(pore_widths[1:], pore_dist, degree=bspline_order)
 
-    return bspline(pore_widths[1:], pore_dist, degree=bspline_order)
+    return pore_widths, pore_dist, final_loading
 
 
 def _load_kernel(path):
