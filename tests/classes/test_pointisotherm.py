@@ -19,17 +19,29 @@ class TestPointIsotherm(object):
     def test_isotherm_create(self):
         "Checks isotherm can be created from basic data"
 
+        isotherm_param = {
+            'material_name': 'carbon',
+            'material_batch': 'X1',
+            'adsorbate': 'nitrogen',
+            't_iso': 77,
+        }
+        pressure = [1, 2, 3, 4, 5, 3, 2]
+        loading = [1, 2, 3, 4, 5, 3, 2]
+
         pygaps.PointIsotherm(
-            pandas.DataFrame({
-                'pressure': [1, 2, 3, 4, 5, 3, 2],
-                'loading': [1, 2, 3, 4, 5, 3, 2]
+            pressure=pressure,
+            loading=loading,
+            **isotherm_param
+        )
+
+        pygaps.PointIsotherm(
+            isotherm_data=pandas.DataFrame({
+                'pressure': pressure,
+                'loading': loading
             }),
-            loading_key='loading',
             pressure_key='pressure',
-            material_name='carbon',
-            material_batch='X1',
-            adsorbate='nitrogen',
-            t_iso=77,
+            loading_key='loading',
+            **isotherm_param
         )
 
     def test_isotherm_id(self, basic_pointisotherm):
@@ -55,7 +67,7 @@ class TestPointIsotherm(object):
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.PointIsotherm(
-                isotherm_data,
+                isotherm_data=isotherm_data,
                 loading_key=keys.get('loading_key'),
                 pressure_key=keys.get('pressure_key'),
                 **isotherm_parameters)
@@ -70,7 +82,7 @@ class TestPointIsotherm(object):
         "Tests if isotherm branches are well specified"
 
         isotherm = pygaps.PointIsotherm(
-            isotherm_data,
+            isotherm_data=isotherm_data,
             loading_key='loading',
             pressure_key='pressure',
             other_keys=['enthalpy'],
@@ -84,7 +96,7 @@ class TestPointIsotherm(object):
         "Checks isotherm id's are unique"
 
         isotherm = pygaps.PointIsotherm(
-            isotherm_data,
+            isotherm_data=isotherm_data,
             loading_key='loading',
             pressure_key='pressure',
             other_keys=['enthalpy'],
@@ -102,7 +114,7 @@ class TestPointIsotherm(object):
         # regular creation
         pygaps.PointIsotherm.from_isotherm(
             basic_isotherm,
-            pandas.DataFrame({
+            isotherm_data=pandas.DataFrame({
                 'pressure': [1, 2, 3, 4, 5, 3, 2],
                 'loading': [1, 2, 3, 4, 5, 3, 2]
             }),

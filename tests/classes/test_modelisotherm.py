@@ -32,45 +32,32 @@ class TestModelIsotherm(object):
             't_iso': 77,
         }
 
+        pressure = [1, 2, 3, 4, 5, 3, 2]
+        loading = [1, 2, 3, 4, 5, 3, 2]
+
         isotherm_data = pandas.DataFrame({
-            'pressure': [1, 2, 3, 4, 5, 3, 2],
-            'loading': [1, 2, 3, 4, 5, 3, 2]
+            'pressure': pressure,
+            'loading': loading
         })
-
-        # Missing model
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.ModelIsotherm(
-                isotherm_data,
-                **isotherm_param
-            )
-
-        # Wrong model
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.ModelIsotherm(
-                isotherm_data,
-                model='Wrong',
-                **isotherm_param
-            )
-
-        # Wrong parameters
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.ModelIsotherm(
-                isotherm_data,
-                model='Henry',
-                param_guess={'K9': 'woof'},
-                **isotherm_param
-            )
 
         # regular creation
         pygaps.ModelIsotherm(
-            isotherm_data,
+            pressure=pressure,
+            loading=loading,
+            model='Henry',
+            **isotherm_param
+        )
+
+        # regular creation, DataFrame
+        pygaps.ModelIsotherm(
+            isotherm_data=isotherm_data,
             model='Henry',
             **isotherm_param
         )
 
         # regular creation, desorption
         pygaps.ModelIsotherm(
-            isotherm_data,
+            isotherm_data=isotherm_data,
             model='Henry',
             branch='des',
             **isotherm_param
@@ -78,11 +65,43 @@ class TestModelIsotherm(object):
 
         # regular creation, guessed parameters
         pygaps.ModelIsotherm(
-            isotherm_data,
+            isotherm_data=isotherm_data,
             model='Henry',
             param_guess={'K': 1.0},
             **isotherm_param
         )
+
+        # Missing pressure/loading
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.ModelIsotherm(
+                pressure=pressure,
+                loading=None,
+                **isotherm_param
+            )
+
+        # Missing model
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.ModelIsotherm(
+                isotherm_data=isotherm_data,
+                **isotherm_param
+            )
+
+        # Wrong model
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.ModelIsotherm(
+                isotherm_data=isotherm_data,
+                model='Wrong',
+                **isotherm_param
+            )
+
+        # Wrong parameters
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.ModelIsotherm(
+                isotherm_data=isotherm_data,
+                model='Henry',
+                param_guess={'K9': 'woof'},
+                **isotherm_param
+            )
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
@@ -90,7 +109,7 @@ class TestModelIsotherm(object):
         # regular creation
         pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
-            pandas.DataFrame({
+            isotherm_data=pandas.DataFrame({
                 'pressure': [1, 2, 3, 4, 5, 3, 2],
                 'loading': [1, 2, 3, 4, 5, 3, 2]
             }),

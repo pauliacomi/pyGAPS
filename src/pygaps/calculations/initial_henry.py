@@ -70,7 +70,7 @@ def initial_henry_slope(isotherm,
 
     while rows_taken != 1:
         model_isotherm = ModelIsotherm.from_isotherm(isotherm,
-                                                     data.head(rows_taken),
+                                                     isotherm_data=data.head(rows_taken),
                                                      pressure_key=isotherm.pressure_key,
                                                      loading_key=isotherm.loading_key,
                                                      model="Henry")

@@ -530,7 +530,7 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
             exp_params.pop('id')
 
             # build isotherm object
-            isotherms.append(PointIsotherm(exp_data,
+            isotherms.append(PointIsotherm(isotherm_data=exp_data,
                                            pressure_key="pressure",
                                            loading_key="loading",
                                            ** exp_params))

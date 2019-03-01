@@ -122,7 +122,7 @@ def basic_pointisotherm(isotherm_data, isotherm_parameters):
     other_keys = [OTHER_KEY]
 
     isotherm = pygaps.PointIsotherm(
-        isotherm_data,
+        isotherm_data=isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         other_keys=other_keys,
@@ -141,7 +141,7 @@ def basic_modelisotherm(isotherm_data, isotherm_parameters):
     model = "Henry"
 
     isotherm = pygaps.ModelIsotherm(
-        isotherm_data,
+        isotherm_data=isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         model=model,

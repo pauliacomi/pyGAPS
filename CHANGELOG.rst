@@ -5,6 +5,8 @@ Changelog
 Features:
 
 * Increased number of adsorbates available in pyGAPS to 40.
+* Added a new way to create an isotherm, from an two arrays of pressure and loading
+  (the old DataFrame method is still valid but changed: check breaking changes)
 * Made adsorbates searchable by a list of aliases rather than a single name.
 * Exposed the CoolProp backend on adsorbate objects for convenience, it is
   accessible through the adsorbate.backend property.
@@ -25,6 +27,8 @@ Breaking changes:
   present and left to the discretion of the user.
 * Several database functions have been renamed.
   All functions switched: 'sample' -> 'material' and 'experiment' -> 'isotherm'.
+* When passing a DataFrame for isotherm creation, it now has to be specified as
+  `isotherm_data`.
 * Isotherm unique ID is now generated on the fly (previously generated at
   each isotherm modification). It also now takes into account only the
   required parameters for each isotherm ( 'sample_name', 'sample_batch',

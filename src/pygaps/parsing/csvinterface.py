@@ -112,7 +112,7 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
         data_df = pandas.read_csv(file, sep=separator)
 
     isotherm = PointIsotherm(
-        data_df,
+        isotherm_data=data_df,
         branch=branch,
         pressure_key=data_df.columns[0],
         loading_key=data_df.columns[1],

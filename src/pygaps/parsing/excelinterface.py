@@ -428,7 +428,7 @@ def isotherm_from_xl(path, fmt=None):
             material_info = new_info
 
     isotherm = PointIsotherm(
-        experiment_data_df,
+        isotherm_data=experiment_data_df,
         loading_key=loading_key,
         pressure_key=pressure_key,
         other_keys=other_keys,

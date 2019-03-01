@@ -127,7 +127,7 @@ def isotherm_from_bel(path):
                                               and a != 'br'])
 
         isotherm = PointIsotherm(
-            data_df,
+            isotherm_data=data_df,
             branch=data_df['br'].tolist(),
             **material_info)
 

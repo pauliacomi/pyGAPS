@@ -50,8 +50,9 @@ Creating a PointIsotherm
 
 There are several ways to create a PointIsotherm object:
 
-    - Raw construction, from a dictionary with parameters and a pandas.DataFrame. This is the
-      most extensible way to create a PointIsotherm, as parameters can be manually specified.
+    - Simple method, passing in a pressure and loading array.
+    - From a pandas.DataFrame. This is the most extensible way to create a
+      PointIsotherm, as parameters can be manually specified.
     - A json string or file. This can be done either using the
       :meth:`~pygaps.parsing.jsoninterface.isotherm_from_json`
       function, or with the :meth:`~pygaps.classes.pointisotherm.PointIsotherm.from_json`
@@ -63,21 +64,8 @@ There are several ways to create a PointIsotherm object:
 
 This section will explain how to create an isotherm from raw data.
 
-First, a pandas.DataFrame should be created to hold the data. The DataFrame should have at
-least two columns: the pressures
-at which each point was recorded, and the loadings for each point. Other data columns, such
-as calorimetry data, magnetic field strengths, or other simultaneous measurements are also
-supported.
-
-::
-
-    isotherm_data = pandas.DataFrame({
-        'pressure' : [1, 2, 3, 4, 5, 3, 2],             # required
-        'loading' : [1, 2, 3, 4, 5, 3, 2],              # required
-        'enthalpy' : [15, 15, 15, 15, 15, 15, 15],
-        'xrd_peak_1' : [0, 0, 1, 2, 2, 1, 0],
-    })
-
+For the fastest way to create an isotherm object, pressure and loading arrays
+can be passed to the constructor with the ``pressure`` and ``loading`` parameters.
 
 The code does its best to attempt to guess whether the data passed is part of
 an adsorption branch, desorption branch or has both. It does this by looking
@@ -105,10 +93,7 @@ used and so on.
 
 The isotherm parameters must include:
 
-    - The ``loading_key`` and ``pressure_key`` are required parameters specifying which
-      column in the DataFrame contain which data of the isotherm. If other columns are to be
-      stored in the isotherm object, put their names in a list and pass it as the ``other_keys``
-      parameter
+    - pressure and loading (either directly as arrays or in a pandas.DataFrame)
     - The sample name (``material_name``)
     - The sample batch (``material_batch``)
     - The adsorbate used (``adsorbate``)
@@ -144,18 +129,11 @@ instantiation is below, with explanations.
 
     point_isotherm = pygaps.PointIsotherm(
 
-        # First the pandas.DataFrame with the points
-        # and the keys to what the columns represent.
-
-        isotherm_data,
-
-        loading_key='loading',          # The loading column
-        pressure_key='pressure',        # The pressure column
-        other_keys=['enthalpy',
-                    'xrd_peak_1'],      # The columns containing the other data
+        pressure=[],                    # pressure here
+        loading=[],                     # loading here
 
         # Some of the unit parameters can be specified
-        # if desired.
+        # (if desired).
 
         pressure_mode='absolute',       # Working in absolute pressure
         pressure_unit='bar',            # with units of bar
@@ -177,6 +155,49 @@ instantiation is below, with explanations.
         DOI='10.000/mydoi',             # User specific
         something='something',          # User specific
     )
+
+Alternatively, a pandas.DataFrame can be passed in.
+This allows for more data than just pressure and loading to be
+stored in a single isotherm. The DataFrame should have at
+least two columns: the pressures at which each point was recorded,
+and the loadings for each point. Other data columns, such
+as calorimetry data, magnetic field strengths, or other simultaneous measurements are also
+supported.
+
+If a DataFrame is used, ``loading_key`` and ``pressure_key`` are required parameters specifying
+which column in the DataFrame contains what data of the isotherm. If other columns are to be
+stored in the isotherm object, their names should be passed in a list as the ``other_keys``
+parameter.
+
+::
+
+    data = pandas.DataFrame({
+        'pressure' : [1, 2, 3, 4, 5, 3, 2],             # required
+        'loading' : [1, 2, 3, 4, 5, 3, 2],              # required
+        'enthalpy' : [15, 15, 15, 15, 15, 15, 15],
+        'xrd_peak_1' : [0, 0, 1, 2, 2, 1, 0],
+    })
+
+    point_isotherm = pygaps.PointIsotherm(
+
+        # First the pandas.DataFrame with the points
+        # and the keys to what the columns represent.
+
+        isotherm_data=data,
+        loading_key='loading',          # The loading column
+        pressure_key='pressure',        # The pressure column
+        other_keys=['enthalpy',
+                    'xrd_peak_1'],      # The columns containing the other data
+
+        # Required isotherm parameters
+
+        material_name='carbon',         # Required
+        material_batch='X1',            # Required
+        adsorbate='nitrogen',           # Required
+        t_iso=77,                       # Required
+    )
+::
+
 
 
 
@@ -212,13 +233,8 @@ The code to generate a ModelIsotherm is then:
 
     point_isotherm = pygaps.PointIsotherm(
 
-        # First the pandas.DataFrame with the points
-        # and the keys to what the columns represent.
-
-        isotherm_data,
-
-        loading_key='loading',          # The loading column
-        pressure_key='pressure',        # The pressure column
+        pressure=[],                    # pressure here
+        loading=[],                     # loading here
 
         # Now the model details can be specified
 
@@ -475,8 +491,7 @@ Ensuring isotherm uniqueness
 
 Each PointIsotherm can generate an id. This id is supposed to be a fingerprint of the
 isotherm and should be unique to each object. The id string is an md5 hash of the isotherm
-parameters (but not data!). The id can then be used, both internally for database storage or
-for identification purposes.
+unique parameters (but not other data!). The id is then used internally for database storage.
 
 The id is generated automatically every time the isotherm.iso_id is called.
 The hashlib.md5 function is used to obtain a hash of the json string.

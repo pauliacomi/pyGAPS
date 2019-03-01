@@ -29,17 +29,23 @@ class PointIsotherm(Isotherm):
     or simulation.
 
     The minimum arguments required to instantiate the class, besides those required for
-    the parent Isotherm, are isotherm_data, as the pandas dataframe containing the
-    discrete points, as well as string keys for the columns of the dataframe which have
-    the loading and the pressure data.
+    the parent Isotherm, are data, specified either as pressure and loading arrays or
+    as isotherm_data (a pandas dataframe containing the discrete points), as well as
+    string keys for the columns of the dataframe which have the loading and the pressure data.
 
     Parameters
     ----------
+    pressure : list
+        Create an isotherm directly from an array. Values for pressure.
+        If the ``isotherm_data`` dataframe is specified, these values are ignored.
+    loading : list
+        Create an isotherm directly from an array. Values for loading.
+        If the ``isotherm_data`` dataframe is specified, these values are ignored.
     isotherm_data : DataFrame
         Pure-component adsorption isotherm data.
-    loading_key : str
-        The title of the pressure data in the DataFrame provided.
     pressure_key : str
+        The title of the pressure data in the DataFrame provided.
+    loading_key : str
         The title of the loading data in the DataFrame provided.
     other_keys : iterable
         Other pandas DataFrame columns which contain data to be stored.
@@ -100,10 +106,12 @@ class PointIsotherm(Isotherm):
 #   Instantiation and classmethods
 
     def __init__(self,
-                 isotherm_data,
-                 loading_key=None,
+                 pressure=None,
+                 loading=None,
+                 isotherm_data=None,
                  pressure_key=None,
-                 other_keys=[],
+                 loading_key=None,
+                 other_keys=None,
                  branch='guess',
 
                  adsorbent_basis="mass",
@@ -120,14 +128,61 @@ class PointIsotherm(Isotherm):
         required by parent class.
         """
         # Checks
-        if None in [loading_key, pressure_key]:
+        if isotherm_data is not None:
+            if None in [pressure_key, loading_key]:
+                raise ParameterError(
+                    "Pass loading_key and pressure_key, the names of the loading and"
+                    " pressure columns in the DataFrame, to the constructor.")
+
+            # Save column names
+            #: Name of column in the dataframe that contains adsorbed amount.
+            self.loading_key = loading_key
+
+            #: Name of column in the dataframe that contains pressure.
+            self.pressure_key = pressure_key
+
+            #: List of column in the dataframe that contains other points.
+            if other_keys:
+                self.other_keys = other_keys
+            else:
+                self.other_keys = []
+
+            #: Pandas DataFrame that stores the data.
+            columns = [self.pressure_key, self.loading_key]
+            columns.extend(self.other_keys)
+            if not all([a in isotherm_data.columns for a in columns]):
+                raise ParameterError(
+                    "Could not find some specified columns in the adsorption DataFrame")
+            self.raw_data = isotherm_data[columns].sort_index(axis=1)
+
+        elif pressure is not None or loading is not None:
+            if pressure is None or loading is None:
+                raise ParameterError(
+                    "If you've chosen to pass loading and pressure directly as"
+                    " arrays, make sure both are specified!")
+            if len(pressure) != len(loading):
+                raise ParameterError(
+                    "Pressure and loading arrays are not equal!")
+            if other_keys:
+                raise ParameterError(
+                    "Cannot specify other isotherm components in this mode."
+                    " Use the ``isotherm_data`` method")
+
+            # Standard column names
+            self.pressure_key = 'pressure'
+            self.loading_key = 'loading'
+            self.other_keys = []
+
+            # DataFrame creation
+            self.raw_data = pandas.DataFrame({self.pressure_key: pressure,
+                                              self.loading_key: loading})
+        else:
             raise ParameterError(
-                "Pass loading_key and pressure_key, the names of the loading and"
-                " pressure columns in the DataFrame, to the constructor.")
+                "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
+                " or directly ``pressure`` and ``loading`` as arrays.")
 
         # Run base class constructor
         Isotherm.__init__(self,
-
                           adsorbent_basis=adsorbent_basis,
                           adsorbent_unit=adsorbent_unit,
                           loading_basis=loading_basis,
@@ -137,28 +192,10 @@ class PointIsotherm(Isotherm):
 
                           **isotherm_parameters)
 
-        # Save column names
-        #: Name of column in the dataframe that contains adsorbed amount.
-        self.loading_key = loading_key
-
-        #: Name of column in the dataframe that contains pressure.
-        self.pressure_key = pressure_key
-
-        #: List of column in the dataframe that contains other points.
-        self.other_keys = other_keys
-
-        #: Pandas DataFrame that stores the data.
-        columns = [pressure_key, loading_key]
-        columns.extend(other_keys)
-        if not all([a in isotherm_data.columns for a in columns]):
-            raise ParameterError(
-                "Could not find some specified columns in the adsorption DataFrame")
-        self.raw_data = isotherm_data[columns].sort_index(axis=1)
-
         # Deal with the isotherm branches (ads/des)
         if branch == 'guess':
             # Split the data in adsorption/desorption
-            self.raw_data = self._splitdata(self.raw_data, pressure_key)
+            self.raw_data = self._splitdata(self.raw_data, self.pressure_key)
         elif branch == 'ads':
             self.raw_data.insert(len(self.raw_data.columns), 'branch', False)
         elif branch == 'des':
@@ -194,10 +231,13 @@ class PointIsotherm(Isotherm):
         return pygaps.isotherm_from_json(json_string, **isotherm_parameters)
 
     @classmethod
-    def from_isotherm(cls, isotherm, isotherm_data,
-                      loading_key=None,
+    def from_isotherm(cls, isotherm,
+                      pressure=None,
+                      loading=None,
+                      isotherm_data=None,
                       pressure_key=None,
-                      other_keys=[]):
+                      loading_key=None,
+                      other_keys=None):
         """
         Constructs a point isotherm using a parent isotherm as the template for
         all the parameters.
@@ -206,6 +246,12 @@ class PointIsotherm(Isotherm):
         ----------
         isotherm : Isotherm
             An instance of the Isotherm parent class.
+        pressure : list
+            Create an isotherm directly from an array. Values for pressure.
+            If the ``isotherm_data`` dataframe is specified, these values are ignored.
+        loading : list
+            Create an isotherm directly from an array. Values for loading.
+            If the ``isotherm_data`` dataframe is specified, these values are ignored.
         isotherm_data : DataFrame
             Pure-component adsorption isotherm data.
         loading_key : str
@@ -216,11 +262,14 @@ class PointIsotherm(Isotherm):
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
         # insert or update values
-        iso_params['loading_key'] = loading_key
+        iso_params['pressure'] = pressure
+        iso_params['loading'] = loading
+        iso_params['isotherm_data'] = isotherm_data
         iso_params['pressure_key'] = pressure_key
+        iso_params['loading_key'] = loading_key
         iso_params['other_keys'] = other_keys
 
-        return cls(isotherm_data, **iso_params)
+        return cls(**iso_params)
 
     @classmethod
     def from_modelisotherm(cls, modelisotherm, pressure_points=None):
@@ -253,7 +302,7 @@ class PointIsotherm(Isotherm):
             pressure = pressure_points
 
         return PointIsotherm(
-            pandas.DataFrame({
+            isotherm_data=pandas.DataFrame({
                 'pressure': pressure,
                 'loading': modelisotherm.loading_at(pressure)
             }),

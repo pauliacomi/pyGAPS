@@ -30,12 +30,18 @@ class ModelIsotherm(Isotherm):
 
     Parameters
     ----------
+    pressure : list
+        Create an isotherm directly from an array. Values for pressure.
+        If the ``isotherm_data`` dataframe is specified, these values are ignored.
+    loading : list
+        Create an isotherm directly from an array. Values for loading.
+        If the ``isotherm_data`` dataframe is specified, these values are ignored.
     isotherm_data : DataFrame
         Pure-component adsorption isotherm data.
-    loading_key : str
-        Column of the pandas DataFrame where the loading is stored.
     pressure_key : str
         Column of the pandas DataFrame where the pressure is stored.
+    loading_key : str
+        Column of the pandas DataFrame where the loading is stored.
     model : str
         The model to be used to describe the isotherm.
     param_guess : dict
@@ -93,9 +99,12 @@ class ModelIsotherm(Isotherm):
 ##########################################################
 #   Instantiation and classmethods
 
-    def __init__(self, isotherm_data,
-                 loading_key=None,
+    def __init__(self,
+                 pressure=None,
+                 loading=None,
+                 isotherm_data=None,
                  pressure_key=None,
+                 loading_key=None,
                  model=None,
                  param_guess=None,
                  optimization_params=dict(method='Nelder-Mead'),
@@ -116,10 +125,29 @@ class ModelIsotherm(Isotherm):
         class.
         """
         # Checks
-        if None in [loading_key, pressure_key]:
+        if isotherm_data is not None:
+            if None in [pressure_key, loading_key]:
+                raise ParameterError(
+                    "Pass loading_key and pressure_key, the names of the loading and"
+                    " pressure columns in the DataFrame, to the constructor.")
+
+        elif pressure is not None or loading is not None:
+            if pressure is None or loading is None:
+                raise ParameterError(
+                    "If you've chosen to pass loading and pressure directly as"
+                    " arrays, make sure both are specified!")
+            if len(pressure) != len(loading):
+                raise ParameterError(
+                    "Pressure and loading arrays are not equal!")
+
+            pressure_key = 'pressure'
+            loading_key = 'loading'
+            isotherm_data = pandas.DataFrame({pressure_key: pressure,
+                                              loading_key: loading})
+        else:
             raise ParameterError(
-                "Pass loading_key and pressure_key, the names of the loading and"
-                " pressure columns in the DataFrame, to the constructor.")
+                "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
+                " or directly ``pressure`` and ``loading`` as arrays.")
 
         if model is None:
             raise ParameterError("Specify a model to fit to the pure-component"
@@ -200,9 +228,12 @@ class ModelIsotherm(Isotherm):
                                        verbose)
 
     @classmethod
-    def from_isotherm(cls, isotherm, isotherm_data,
-                      loading_key=None,
+    def from_isotherm(cls, isotherm,
+                      pressure=None,
+                      loading=None,
+                      isotherm_data=None,
                       pressure_key=None,
+                      loading_key=None,
                       model=None,
                       param_guess=None,
                       optimization_params=dict(method='Nelder-Mead'),
@@ -218,12 +249,18 @@ class ModelIsotherm(Isotherm):
 
         isotherm : Isotherm
             An instance of the Isotherm parent class.
+        pressure : list
+            Create an isotherm directly from an array. Values for pressure.
+            If the ``isotherm_data`` dataframe is specified, these values are ignored.
+        loading : list
+            Create an isotherm directly from an array. Values for loading.
+            If the ``isotherm_data`` dataframe is specified, these values are ignored.
         isotherm_data : DataFrame
             Pure-component adsorption isotherm data.
-        loading_key : str
-            Column of the pandas DataFrame where the loading is stored.
         pressure_key : str
             Column of the pandas DataFrame where the pressure is stored.
+        loading_key : str
+            Column of the pandas DataFrame where the loading is stored.
         model : str
             The model to be used to describe the isotherm.
         param_guess : dict
@@ -243,15 +280,18 @@ class ModelIsotherm(Isotherm):
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
         # insert or update values
-        iso_params['loading_key'] = loading_key
+        iso_params['pressure'] = pressure
+        iso_params['loading'] = loading
+        iso_params['isotherm_data'] = isotherm_data
         iso_params['pressure_key'] = pressure_key
+        iso_params['loading_key'] = loading_key
         iso_params['model'] = model
         iso_params['param_guess'] = param_guess
         iso_params['optimization_params'] = optimization_params
         iso_params['branch'] = branch
         iso_params['verbose'] = verbose
 
-        return cls(isotherm_data, **iso_params)
+        return cls(**iso_params)
 
     @classmethod
     def from_pointisotherm(cls,
@@ -292,18 +332,18 @@ class ModelIsotherm(Isotherm):
         iso_params = isotherm.to_dict()
 
         if guess_model:
-            return ModelIsotherm.guess(isotherm.data(branch=branch),
-                                       loading_key=isotherm.loading_key,
+            return ModelIsotherm.guess(isotherm_data=isotherm.data(branch=branch),
                                        pressure_key=isotherm.pressure_key,
+                                       loading_key=isotherm.loading_key,
                                        models=guess_model,
                                        optimization_params=optimization_params,
                                        branch=branch,
                                        verbose=verbose,
                                        **iso_params)
 
-        return cls(isotherm.data(branch=branch),
-                   loading_key=isotherm.loading_key,
+        return cls(isotherm_data=isotherm.data(branch=branch),
                    pressure_key=isotherm.pressure_key,
+                   loading_key=isotherm.loading_key,
                    model=model,
                    param_guess=param_guess,
                    optimization_params=optimization_params,
@@ -312,9 +352,12 @@ class ModelIsotherm(Isotherm):
                    **iso_params)
 
     @classmethod
-    def guess(cls, data,
-              loading_key=None,
+    def guess(cls,
+              pressure=None,
+              loading=None,
+              isotherm_data=None,
               pressure_key=None,
+              loading_key=None,
               models='all',
               optimization_params=dict(method='Nelder-Mead'),
               branch='ads',
@@ -329,12 +372,18 @@ class ModelIsotherm(Isotherm):
 
         Parameters
         ----------
+        pressure : list
+            Create an isotherm directly from an array. Values for pressure.
+            If the ``isotherm_data`` dataframe is specified, these values are ignored.
+        loading : list
+            Create an isotherm directly from an array. Values for loading.
+            If the ``isotherm_data`` dataframe is specified, these values are ignored.
         isotherm_data : DataFrame
             Pure-component adsorption isotherm data.
-        loading_key : str
-            Column of the pandas DataFrame where the loading is stored.
         pressure_key : str
             Column of the pandas DataFrame where the pressure is stored.
+        loading_key : str
+            Column of the pandas DataFrame where the loading is stored.
         models : 'all', list of model names
             Attempt to guess which model best fits the isotherm data
             from the model name list supplied. If set to 'all'
@@ -364,9 +413,11 @@ class ModelIsotherm(Isotherm):
 
         for model in guess_models:
             try:
-                isotherm = ModelIsotherm(data,
-                                         loading_key=loading_key,
+                isotherm = ModelIsotherm(pressure=pressure,
+                                         loading=loading,
+                                         isotherm_data=isotherm_data,
                                          pressure_key=pressure_key,
+                                         loading_key=loading_key,
                                          model=model,
                                          param_guess=None,
                                          optimization_params=optimization_params,
