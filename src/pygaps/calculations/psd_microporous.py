@@ -166,8 +166,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         raise ParameterError(
             "A dictionary of adsorbate properties must be provided"
             " for the HK method. The properties required are:"
-            "molecular_diameter, liquid_density, polarizability,"
-            "magnetic_susceptibility, surface_density, adsorbate_molar_mass")
+            " molecular_diameter, liquid_density, polarizability,"
+            " magnetic_susceptibility, surface_density, adsorbate_molar_mass")
     missing = [x for x in ['molecular_diameter',
                            'liquid_density',
                            'polarizability',
