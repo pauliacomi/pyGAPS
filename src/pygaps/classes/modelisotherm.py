@@ -699,7 +699,7 @@ class ModelIsotherm(Isotherm):
             branch = self.branch
 
         # Convert to numpy array just in case
-        pressure = numpy.array(pressure, ndmin=1)
+        pressure = numpy.asarray(pressure, ndmin=1)
 
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:
@@ -799,7 +799,7 @@ class ModelIsotherm(Isotherm):
             branch = self.branch
 
         # Convert to numpy array just in case
-        loading = numpy.array(loading, ndmin=1)
+        loading = numpy.asarray(loading, ndmin=1)
 
         # Ensure loading is in correct units and basis for the internal model
         if adsorbent_basis or adsorbent_unit:
