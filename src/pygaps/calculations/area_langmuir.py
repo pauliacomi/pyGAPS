@@ -190,19 +190,19 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
     if limits is None:
         limits = [0.05, 0.9]
 
-    max_p = limits[1]
     maximum = len(pressure) - 1
-    for index, value in reversed(list(enumerate(pressure))):
-        if value < max_p:
-            maximum = index
-            break
+    if limits[1]:
+        for index, value in reversed(list(enumerate(pressure))):
+            if value < limits[1]:
+                maximum = index
+                break
 
-    min_p = limits[0]
     minimum = 0
-    for index, value in enumerate(pressure):
-        if value > min_p:
-            minimum = index
-            break
+    if limits[0]:
+        for index, value in enumerate(pressure):
+            if value > limits[0]:
+                minimum = index
+                break
 
     if maximum - minimum < 3:
         raise CalculationError("The isotherm does not have enough points in the chosen "
