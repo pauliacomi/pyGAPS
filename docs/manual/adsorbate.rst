@@ -41,7 +41,7 @@ An example of how to create an adsorbate:
     my_adsorbate = pygaps.Adsorbate(
         'butane'                          # Required
         formula = 'C4H10',                # Recognised
-        alias = [n-butane]                # Recognised
+        alias = [n-butane, Butane]        # Recognised
         backend_name = 'butane',          # Recognised, Required for CoolProp interaction
         saturation_pressure = 2.2,        # Recognised
         carbon_number = 4,                # User specific
@@ -109,7 +109,7 @@ Adsorbate management
 A selection of the most common adsorbates used in experiments is already stored in the internal database.
 At import-time, they are automatically loaded into memory and stored in ``pygaps.ADSORBATE_LIST``.
 This should be enough for most uses of the framework. To retrieve an adsorbate from the list, use the
-adsorbate class method ``find``:
+adsorbate class method ``find``, which works with any of the aliases of the substance:
 
 ::
 
