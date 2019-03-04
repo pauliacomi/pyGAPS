@@ -137,7 +137,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     # use the bet function
     (bet_area, c_const, n_monolayer, p_monolayer, slope,
      intercept, minimum, maximum, corr_coef) = area_BET_raw(
-        loading, pressure, cross_section, limits=limits)
+        pressure, loading, cross_section, limits=limits)
 
     result_dict = {
         'area': bet_area,
@@ -163,23 +163,23 @@ def area_BET(isotherm, limits=None, verbose=False):
 
         # Generate plot of the BET points chosen
         bet_plot(pressure,
-                 bet_transform(loading, pressure),
+                 bet_transform(pressure, loading),
                  minimum, maximum,
                  slope, intercept,
                  p_monolayer,
-                 bet_transform(n_monolayer, p_monolayer))
+                 bet_transform(p_monolayer, n_monolayer))
 
         # Generate plot of the Rouquerol points chosen
         roq_plot(pressure,
-                 roq_transform(loading, pressure),
+                 roq_transform(pressure, loading),
                  minimum, maximum,
                  p_monolayer,
-                 roq_transform(n_monolayer, p_monolayer))
+                 roq_transform(p_monolayer, n_monolayer))
 
     return result_dict
 
 
-def area_BET_raw(loading, pressure, cross_section, limits=None):
+def area_BET_raw(pressure, loading, cross_section, limits=None):
     """
     This is a 'bare-bones' function to calculate BET surface area which is
     designed as a low-level alternative to the main function.
@@ -187,10 +187,10 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
 
     Parameters
     ----------
-    loading : array
-        Loadings, in mol/basis.
     pressure : array
         Pressures, relative.
+    loading : array
+        Loadings, in mol/basis.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
     limits : [float, float], optional
@@ -223,7 +223,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
                              " do not match")
 
     # Generate the Rouquerol array
-    roq_t_array = roq_transform(loading, pressure)
+    roq_t_array = roq_transform(pressure, loading)
 
     # select the maximum and minimum of the points and the pressure associated
     if limits is None:
@@ -264,7 +264,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
 
     # calculate the BET transform, slope and intercept
     bet_t_array = bet_transform(
-        loading[minimum:maximum], pressure[minimum:maximum])
+        pressure[minimum:maximum], loading[minimum:maximum])
     slope, intercept, corr_coef = bet_optimisation(
         pressure[minimum:maximum], bet_t_array)
 
@@ -284,14 +284,14 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
             slope, intercept, minimum, maximum, corr_coef)
 
 
-def roq_transform(loading, pressure):
+def roq_transform(pressure, loading):
     """Rouquerol transform function"""
     return loading * (1 - pressure)
 
 
-def bet_transform(loading, pressure):
+def bet_transform(pressure, loading):
     """BET transform function"""
-    return pressure / roq_transform(loading, pressure)
+    return pressure / roq_transform(pressure, loading)
 
 
 def bet_optimisation(pressure, bet_points):
