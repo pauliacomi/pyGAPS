@@ -24,6 +24,9 @@ The framework currently provides the following functionality for material charac
         - DFT kernel fitting PSD function :meth:`~pygaps.calculations.psd.dft_size_distribution`
           with the module containing the individual model references: :mod:`~pygaps.calculations.psd_dft`
     - Isosteric heat of adsorption calculation :mod:`~pygaps.calculations.isosteric_heat`
+    - Dubinin-Radushevitch and Dubinin-Astakov plots
+      (:meth:`~pygaps.calculations.dr_da_plots.dr_plot`
+      :meth:`~pygaps.calculations.dr_da_plots.da_plot`)
     - Initial Henry constant calculation :mod:`~pygaps.calculations.initial_henry`
     - Initial enthalpy of adsorption calculation (from isotherms with enthalpy data)
       :mod:`~pygaps.calculations.initial_enthalpy`

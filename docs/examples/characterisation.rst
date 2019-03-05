@@ -1,19 +1,19 @@
 .. _example-characterisation:
 
-Characterisation examples
+Material characterisation
 -------------------------
 
-This section will have several examples of the isotherm characterisation work that can be done in pyGAPS.
+This section will have several examples of the
+material characterisation that can be performed using pyGAPS.
 
-A complete applicability guide and info on each function parameters can be found in the
-:ref:`manual <characterisation-manual>`.
+A complete applicability guide and info on each function parameters
+can be found in the :ref:`manual <characterisation-manual>`.
 
 .. toctree::
     :glob:
 
     inspection
-    area_bet
-    area_langmuir
+    area_calcs
     tplot
     alphas
     psd
