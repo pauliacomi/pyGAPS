@@ -826,7 +826,7 @@ class PointIsotherm(Isotherm):
         """
 
         # Convert to numpy array just in case
-        pressure = numpy.asarray(pressure, ndmin=1)
+        pressure = numpy.asarray(pressure)
 
         # Check if interpolator is good
         if branch != self.l_interpolator.interp_branch or \
@@ -942,7 +942,7 @@ class PointIsotherm(Isotherm):
         """
 
         # Convert to numpy array just in case
-        loading = numpy.asarray(loading, ndmin=1)
+        loading = numpy.asarray(loading)
 
         # Check if interpolator branch is good
         if branch != self.p_interpolator.interp_branch or \
