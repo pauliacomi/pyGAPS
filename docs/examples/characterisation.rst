@@ -17,6 +17,7 @@ can be found in the :ref:`manual <characterisation-manual>`.
     tplot
     alphas
     psd
+    dr_da_plots
     isostericheat
     henryc
     initialenthalpy

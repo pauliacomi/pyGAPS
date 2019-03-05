@@ -5,8 +5,10 @@ Changelog
 Features:
 
 * Increased number of adsorbates available in pyGAPS to 40.
+* New material characterisation functions: Dubinin-Radushkevich
+  (dr_plot) and Dubinin-Astakov (da_plot) plots.
 * Added a new way to create an isotherm, from an two arrays of pressure and loading
-  (the old DataFrame method is still valid but changed: check breaking changes)
+  (the old DataFrame method is still valid but changed: check breaking changes).
 * Made adsorbates searchable by a list of aliases rather than a single name.
 * Exposed the CoolProp backend on adsorbate objects for convenience, it is
   accessible through the adsorbate.backend property.

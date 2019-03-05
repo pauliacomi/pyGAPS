@@ -22,6 +22,8 @@ from .calculations.psd import mesopore_size_distribution
 from .calculations.psd import micropore_size_distribution
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw
+from .calculations.dr_da_plots import da_plot
+from .calculations.dr_da_plots import dr_plot
 from .classes.adsorbate import Adsorbate
 from .classes.material import Material
 from .classes.modelisotherm import ModelIsotherm

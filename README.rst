@@ -81,7 +81,7 @@ Features
 ========
 
     - Advanced adsorption data import and manipulation
-    - Routine analysis such as BET/Langmuir surface area, t-plot, alpha-s method
+    - Routine analysis such as BET/Langmuir surface area, t-plot, alpha-s, Dubinin plots etc.
     - Pore size distribution calculations for mesopores (BJH, Dollimore-Heal)
     - Pore size distribution calculations for micropores (Horvath-Kawazoe)
     - Pore size distribution calculations using DFT kernels
