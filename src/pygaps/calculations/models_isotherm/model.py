@@ -141,9 +141,7 @@ class IsothermModel(object):
         guess = numpy.array([param_guess[param] for param in param_names])
 
         def residual_sum_of_squares(params_):
-            """
-            Residual Sum of Squares between model and data in data
-            """
+            """Residual sum of squares between model and data"""
             # change params to those in x
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = params_[i]
@@ -169,7 +167,6 @@ class IsothermModel(object):
         rmse = numpy.sqrt(opt_res.fun / len(loading))
 
         if verbose:
-            print("Model {0} success, RMSE is {1:.3f}".format(
-                self.name, rmse))
+            print("Model {0} success, RMSE is {1:.3f}".format(self.name, rmse))
 
         return rmse
