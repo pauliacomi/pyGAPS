@@ -8,7 +8,7 @@ import pygaps
 
 
 @pytest.mark.parsing
-class TestCSV(object):
+class TestCSV():
 
     def test_csv(self, basic_pointisotherm, tmpdir_factory):
         """Tests creation of the regular csv file"""

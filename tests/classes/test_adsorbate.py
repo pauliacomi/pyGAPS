@@ -10,7 +10,7 @@ import pygaps
 
 
 @pytest.mark.core
-class TestAdsorbate(object):
+class TestAdsorbate():
     """
     Tests the adsorbate class
     """

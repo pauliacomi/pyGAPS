@@ -6,7 +6,7 @@ import pygaps
 
 
 @pytest.mark.core
-class TestConversions(object):
+class TestConversions():
 
     @pytest.mark.parametrize('value, basis_from, basis_to, unit_from, unit_to',
                              [

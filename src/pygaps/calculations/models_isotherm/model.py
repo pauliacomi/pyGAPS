@@ -8,7 +8,7 @@ import scipy
 from ...utilities.exceptions import CalculationError
 
 
-class IsothermModel(object):
+class IsothermModel():
     """
     Base class for all models
     """

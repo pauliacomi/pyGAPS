@@ -632,13 +632,13 @@ class PointIsotherm(Isotherm):
         loading_unit : str, optional
             Unit in which the loading should be returned. If ``None``
             it defaults to which loading unit the isotherm is currently in.
-        loading_basis : {None, 'mass', 'volume'}
+        loading_basis : {None, 'mass', 'volume', 'molar'}
             The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         adsorbent_unit : str, optional
             Unit in which the adsorbent should be returned. If ``None``
             it defaults to which loading unit the isotherm is currently in.
-        adsorbent_basis : {None, 'mass', 'volume'}
+        adsorbent_basis : {None, 'mass', 'volume', 'molar'}
             The basis on which to return the adsorbent, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         min_range : float, optional
@@ -651,7 +651,7 @@ class PointIsotherm(Isotherm):
 
         Returns
         -------
-        array or Series
+        Array or Series
             The loading slice corresponding to the parameters passed.
 
         """
@@ -804,13 +804,13 @@ class PointIsotherm(Isotherm):
         loading_unit : str, optional
             Unit in which the loading should be returned. If ``None``
             it defaults to which loading unit the isotherm is currently in.
-        loading_basis : {None, 'mass', 'volume'}
+        loading_basis : {None, 'mass', 'volume', 'molar'}
             The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         adsorbent_unit : str, optional
             Unit in which the adsorbent should be returned. If ``None``
             it defaults to which loading unit the isotherm is currently in.
-        adsorbent_basis : {None, 'mass', 'volume'}
+        adsorbent_basis : {None, 'mass', 'volume', 'molar'}
             The basis on which to return the adsorbent, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
 
@@ -820,7 +820,7 @@ class PointIsotherm(Isotherm):
             Predicted loading at pressure P.
 
         """
-        # Convert to numpy array just in case
+        # Convert to a numpy array just in case
         pressure = numpy.asarray(pressure)
 
         # Check if interpolator is good

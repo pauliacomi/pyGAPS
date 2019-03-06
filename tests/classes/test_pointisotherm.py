@@ -10,7 +10,7 @@ import pygaps
 
 
 @pytest.mark.core
-class TestPointIsotherm(object):
+class TestPointIsotherm():
     """
     Tests the pointisotherm class
     """

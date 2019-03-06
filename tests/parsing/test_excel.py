@@ -11,7 +11,7 @@ from .conftest import DATA_EXCEL_STD
 
 
 @pytest.mark.parsing
-class TestExcel(object):
+class TestExcel():
 
     def test_read_create_excel(self, basic_pointisotherm, tmpdir_factory):
         """Tests creation of the regular excel file"""

@@ -8,7 +8,7 @@ import pygaps
 
 
 @pytest.mark.core
-class TestMaterial(object):
+class TestMaterial():
     """
     Tests the material class
     """

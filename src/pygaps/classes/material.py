@@ -7,7 +7,7 @@ import pygaps
 from ..utilities.exceptions import ParameterError
 
 
-class Material(object):
+class Material():
     """
     This class acts as a unified descriptor for an adsorbent material.
     Its purpose is to store properties such as adsorbent name,

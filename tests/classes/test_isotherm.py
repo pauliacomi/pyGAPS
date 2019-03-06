@@ -8,7 +8,7 @@ import pygaps
 
 
 @pytest.mark.core
-class TestIsotherm(object):
+class TestIsotherm():
     """
     Tests the parent isotherm object
     """

@@ -9,7 +9,7 @@ import pygaps
 
 
 @pytest.mark.graphing
-class TestIsothermGraphs(object):
+class TestIsothermGraphs():
     """Tests regular isotherm graphs"""
 
     @cleanup

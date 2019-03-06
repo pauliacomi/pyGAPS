@@ -15,7 +15,7 @@ from .conftest import DATA_CALO_PATH
 
 
 @pytest.mark.characterisation
-class TestInitialEnthalpy(object):
+class TestInitialEnthalpy():
     """
     Tests all initial enthalpy methods
     """

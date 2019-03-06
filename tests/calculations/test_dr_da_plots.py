@@ -12,7 +12,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestDAPlot(object):
+class TestDAPlot():
     """
     Tests everything related to the DA and related plots
     """

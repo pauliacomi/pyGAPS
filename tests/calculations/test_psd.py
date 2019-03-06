@@ -14,7 +14,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestPSD(object):
+class TestPSD():
     """
     Tests everything related to pore size distribution calculation
     """

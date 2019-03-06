@@ -15,7 +15,7 @@ from ..utilities.unit_converter import _PRESSURE_MODE
 from ..utilities.unit_converter import _PRESSURE_UNITS
 
 
-class Isotherm(object):
+class Isotherm():
     """
     Class which contains the general data for an isotherm, real or model.
 

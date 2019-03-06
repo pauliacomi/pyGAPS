@@ -14,7 +14,7 @@ from ..utilities.unit_converter import _PRESSURE_UNITS
 from ..utilities.unit_converter import c_unit
 
 
-class Adsorbate(object):
+class Adsorbate():
     """
     This class acts as a unified descriptor for an adsorbate.
 

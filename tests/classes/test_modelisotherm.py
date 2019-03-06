@@ -16,7 +16,7 @@ from ..calculations.conftest import DATA_N77_PATH
 
 
 @pytest.mark.core
-class TestModelIsotherm(object):
+class TestModelIsotherm():
     """
     Tests the pointisotherm class
     """

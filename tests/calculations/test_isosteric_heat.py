@@ -16,7 +16,7 @@ from .conftest import DATA_ISOSTERIC_PATH
 
 
 @pytest.mark.characterisation
-class TestIsostericHeat(object):
+class TestIsostericHeat():
     """
     Tests everything related to isosteric heat calculation
     """

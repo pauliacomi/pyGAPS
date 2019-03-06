@@ -9,7 +9,7 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 @pytest.mark.characterisation
-class TestHKModels(object):
+class TestHKModels():
     """
     Tests the HK models
     """

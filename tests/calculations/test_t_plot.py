@@ -15,7 +15,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestTPlot(object):
+class TestTPlot():
     """
     Tests everything related to tplot calculation
     """
