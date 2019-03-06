@@ -48,7 +48,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-            - ``alpha curve`` (list)
+            - ``alpha curve`` (list) : Calculated alpha-s curve
             - ``results`` (list of dicts):
 
                 - ``section`` (array) : the points of the plot chosen for the line

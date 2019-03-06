@@ -241,7 +241,7 @@ class ModelIsotherm(Isotherm):
                       verbose=False,
                       ):
         """
-        Constructs a ModelIsotherm using a parent isotherm as the template for
+        Construct a ModelIsotherm using a parent isotherm as the template for
         all the parameters.
 
         Parameters
@@ -365,8 +365,8 @@ class ModelIsotherm(Isotherm):
 
               **isotherm_parameters):
         """
-        Attempts to model the data using supplied list of model names,
-        then returns the one with the best rms fit.
+        Attempt to model the data using supplied list of model names,
+        then return the one with the best rms fit.
 
         May take a long time depending on the number of datapoints.
 
@@ -444,12 +444,60 @@ class ModelIsotherm(Isotherm):
 
             return best_fit
 
+###########################################################
+#   Info function
+
+    def print_info(self, show=True, **plot_iso_args):
+        """
+        Print a short summary of the isotherm parameters and a graph.
+
+        Parameters
+        ----------
+        show : bool, optional
+            Specifies if the graph is shown automatically or not.
+
+        Other Parameters
+        ----------------
+        plot_iso_args : dict
+            options to be passed to pygaps.plot_iso()
+
+        Returns
+        -------
+        axes : matplotlib.axes.Axes or numpy.ndarray of them
+
+        """
+        print(self)
+
+        print("%s identified model parameters:" % self.model.name)
+        for param, val in self.model.params.items():
+            print("\t%s = %f" % (param, val))
+        print("RMSE = ", self.rmse)
+
+        plot_dict = dict(
+            plot_type='isotherm',
+            adsorbent_basis=self.adsorbent_basis,
+            adsorbent_unit=self.adsorbent_unit,
+            loading_basis=self.loading_basis,
+            loading_unit=self.loading_unit,
+            pressure_unit=self.pressure_unit,
+            pressure_mode=self.pressure_mode,
+        )
+        plot_dict.update(plot_iso_args)
+
+        axes = plot_iso(self, **plot_dict)
+
+        if show:
+            plt.show()
+            return None
+
+        return axes
+
 ##########################################################
 #   Methods
 
     def has_branch(self, branch):
         """
-        Returns if the isotherm has an specific branch.
+        Check if the isotherm has an specific branch.
 
         Parameters
         ----------
@@ -460,8 +508,8 @@ class ModelIsotherm(Isotherm):
         -------
         bool
             Whether the data exists or not.
-        """
 
+        """
         if self.branch == branch:
             return True
         else:
@@ -471,7 +519,7 @@ class ModelIsotherm(Isotherm):
                  pressure_unit=None, pressure_mode=None,
                  min_range=None, max_range=None, indexed=False):
         """
-        Returns a numpy.linspace generated array with
+        Return a numpy.linspace generated array with
         a fixed number of equidistant points within the
         pressure range the model was created.
 
@@ -496,11 +544,11 @@ class ModelIsotherm(Isotherm):
             If this is specified to true, then the function returns an indexed
             pandas.Series with the columns requested instead of an array.
 
-
         Returns
         -------
         numpy.array or pandas.Series
             Pressure points in the model pressure range.
+
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -553,7 +601,7 @@ class ModelIsotherm(Isotherm):
                 adsorbent_unit=None, adsorbent_basis=None,
                 min_range=None, max_range=None, indexed=False):
         """
-        Returns the loading calculated at equidistant pressure
+        Return the loading calculated at equidistant pressure
         points within the pressure range the model was created.
 
         Parameters
@@ -583,11 +631,11 @@ class ModelIsotherm(Isotherm):
             If this is specified to true, then the function returns an indexed
             pandas.Series with the columns requested instead of an array.
 
-
         Returns
         -------
         numpy.array or pandas.Series
             Loading calculated at points the model pressure range.
+
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -657,7 +705,10 @@ class ModelIsotherm(Isotherm):
                    adsorbent_unit=None, adsorbent_basis=None,
                    ):
         """
-        Given stored model parameters, compute loading at pressure P.
+        Compute loading at pressure P, given stored model parameters.
+
+        Depending on the model, may be calculated directly or through
+        a numerical minimisation.
 
         Parameters
         ----------
@@ -691,6 +742,7 @@ class ModelIsotherm(Isotherm):
         float or array
             Predicted loading at pressure P using fitted model
             parameters.
+
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -757,7 +809,10 @@ class ModelIsotherm(Isotherm):
                     adsorbent_unit=None, adsorbent_basis=None,
                     ):
         """
-        Given stored model parameters, compute pressure at loading L.
+        Compute pressure at loading L, given stored model parameters.
+
+        Depending on the model, may be calculated directly or through
+        a numerical minimisation.
 
         Parameters
         ----------
@@ -791,6 +846,7 @@ class ModelIsotherm(Isotherm):
         float or array
             Predicted pressure at loading L using fitted model
             parameters.
+
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -858,7 +914,7 @@ class ModelIsotherm(Isotherm):
                               branch=None,
                               pressure_unit=None,
                               pressure_mode=None):
-        """
+        r"""
         Calculate reduced spreading pressure at a bulk gas pressure P.
 
         The reduced spreading pressure is an integral involving the isotherm
@@ -866,10 +922,10 @@ class ModelIsotherm(Isotherm):
 
         .. math::
 
-            \\Pi(p) = \\int_0^p \\frac{L(\\hat{p})}{ \\hat{p}} d\\hat{p},
+            \Pi(p) = \int_0^p \frac{L(\hat{p})}{ \hat{p}} d\hat{p},
 
-        which is computed analytically, as a function of the model isotherm
-        parameters.
+        which is computed analytically or numerically, depending on the
+        model used.
 
         Parameters
         ----------
@@ -887,7 +943,8 @@ class ModelIsotherm(Isotherm):
         Returns
         -------
         float
-            Spreading pressure, :math:`\\Pi`.
+            Spreading pressure, :math:`\Pi`.
+
         """
         if branch and branch != self.branch:
             raise ParameterError(
@@ -920,52 +977,3 @@ class ModelIsotherm(Isotherm):
         spreading_p = self.model.spreading_pressure(pressure)
 
         return spreading_p
-
-###########################################################
-#   Info function
-
-    def print_info(self, show=True, **plot_iso_args):
-        """
-        Prints a short summary of all the isotherm parameters and a
-        graph of the isotherm.
-
-        Parameters
-        ----------
-        show : bool, optional
-            Specifies if the graph is shown automatically or not.
-
-        Other Parameters
-        ----------------
-        plot_iso_args : dict
-            options to be passed to pygaps.plot_iso()
-
-        Returns
-        -------
-        axes : matplotlib.axes.Axes or numpy.ndarray of them
-        """
-
-        print(self)
-
-        print("%s identified model parameters:" % self.model.name)
-        for param, val in self.model.params.items():
-            print("\t%s = %f" % (param, val))
-        print("RMSE = ", self.rmse)
-
-        plot_dict = dict(
-            plot_type='isotherm',
-            adsorbent_basis=self.adsorbent_basis,
-            adsorbent_unit=self.adsorbent_unit,
-            loading_basis=self.loading_basis,
-            loading_unit=self.loading_unit,
-            pressure_unit=self.pressure_unit,
-            pressure_mode=self.pressure_mode,
-        )
-        plot_dict.update(plot_iso_args)
-
-        axes = plot_iso(self, **plot_dict)
-
-        if show:
-            plt.show()
-            return
-
-        return axes

@@ -44,7 +44,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-            - ``alpha curve`` (list)
+            - ``thickness curve`` (list) : Calculated thickness curve
             - ``results`` (list of dicts):
 
                 - ``section`` (array) : the points of the plot chosen for the line
