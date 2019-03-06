@@ -79,4 +79,4 @@ class TestDAPlot(object):
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        res = pygaps.da_plot(isotherm, verbose=True)
+        pygaps.da_plot(isotherm, verbose=True)

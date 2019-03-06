@@ -5,7 +5,6 @@ Calculation of the pore size distribution based on an isotherm.
 from functools import partial
 
 from ..classes.adsorbate import Adsorbate
-from ..classes.pointisotherm import PointIsotherm
 from ..graphing.calcgraph import psd_plot
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import ParameterError
