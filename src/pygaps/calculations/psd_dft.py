@@ -10,8 +10,8 @@ import numpy
 import pandas
 import scipy
 
-from ..utilities.exceptions import CalculationError
 from ..utilities.bspline import bspline
+from ..utilities.exceptions import CalculationError
 
 _KERNELS = {}
 
