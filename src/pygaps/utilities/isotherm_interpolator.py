@@ -36,7 +36,7 @@ class isotherm_interpolator():
                  interp_kind='linear',
                  interp_fill=None,
                  ):
-        """Instantiation function."""
+        """Instantiate function."""
         #: The kind of variable the interpolator will process.
         self.output_var = interp_type
         #: The branch the internal interpolator is on.
