@@ -1,10 +1,7 @@
-"""
-This module contains the t-plot calculation.
-"""
+"""This module contains the t-plot calculation."""
 
 import warnings
 
-import numpy
 import scipy
 
 from ..classes.adsorbate import Adsorbate
@@ -15,10 +12,8 @@ from .models_thickness import get_thickness_model
 
 
 def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False):
-    """
-    Calculates the external surface area and adsorbed volume
-    using the t-plot method.
-
+    r"""
+    Calculate surface area and pore volume using a t-plot.
 
     Pass an isotherm object to the function to have the t-plot method applied to it.
     The ``thickness_model`` parameter is a string which names the thickness equation which
@@ -33,7 +28,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     ----------
     isotherm : PointIsotherm
         The isotherm of which to calculate the t-plot parameters.
-    thickness_model : obj(`str`) or obj(`Isotherm`) or obj(`callable`), optional
+    thickness_model : `str` or `Isotherm` or `callable`, optional
         Name of the thickness model to use. Defaults to the Harkins and Jura
         thickness curve.
     limits : [float, float], optional
@@ -43,20 +38,21 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
 
     Returns
     -------
-    list
-        a list of dictionaries containing the calculated parameters for each
-        straight section, with each dictionary of the form. The basis of these
+    dict
+        A dictionary containing the t-plot curve, as well as a list of dictionaries
+        with calculated parameters for each straight section. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-            - ``section(array)`` : the points of the plot chosen for the line
-            - ``area(float)`` : calculated surface area, from the section parameters
-            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
-              per section
-            - ``slope(float)`` : slope of the straight trendline fixed through the region
-            - ``intercept(float)`` : intercept of the straight trendline through the region
-            - ``corr_coef(float)`` : correlation coefficient of the linear region
+            - ``alpha curve`` (list)
+            - ``results`` (list of dicts):
 
+                - ``section`` (array) : the points of the plot chosen for the line
+                - ``area`` (float) : calculated surface area, from the section parameters
+                - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated per section
+                - ``slope`` (float) : slope of the straight trendline fixed through the region
+                - ``intercept`` (float) : intercept of the straight trendline through the region
+                - ``corr_coef`` (float) : correlation coefficient of the linear region
 
     Notes
     -----
@@ -82,9 +78,9 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
 
     .. math::
 
-        A = \\frac{s M_m}{\\rho_{l}}
+        A = \frac{s M_m}{\rho_{l}}
 
-    where :math:`\\rho_{l}` is the liquid density of the adsorbate at experimental
+    where :math:`\rho_{l}` is the liquid density of the adsorbate at experimental
     conditions
 
     If the region selected is after a vertical deviation, the intercept of the line
@@ -93,7 +89,7 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
 
     .. math::
 
-        V_{ads} = \\frac{i M_m}{\\rho_{l}}
+        V_{ads} = \frac{i M_m}{\rho_{l}}
 
 
     *Limitations*
@@ -113,7 +109,6 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
        B. C. Lippens and J. H. de Boer, J. Catalysis, 4, 319 (1965)
 
     """
-
     # Function parameter checks
     if thickness_model is None:
         raise ParameterError("Specify a model to generate the thickness curve"
@@ -167,8 +162,11 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     return result_dict
 
 
-def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_molar_mass, limits=None):
+def t_plot_raw(loading, pressure, thickness_model, liquid_density,
+               adsorbate_molar_mass, limits=None):
     """
+    Calculate surface area and pore volume using a t-plot.
+
     This is a 'bare-bones' function to calculate t-plot parameters which is
     designed as a low-level alternative to the main function.
     Designed for advanced use, its parameters have to be manually specified.
@@ -176,9 +174,9 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
     Parameters
     ----------
     loading : array
-        In mol/g.
+        Amount adsorbed at the surface, mol/adsorbent.
     pressure : array
-        Relative.
+        Relative pressure corresponding to the loading.
     thickness_model : callable
         Function which which returns the thickness of the adsorbed layer at a pressure p.
     liquid_density : float
@@ -190,28 +188,27 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
 
     Returns
     -------
-    results : dict
-        A dictionary of results with the following components
+    results : list
+        A list of dictionaries with the following components:
 
-            - ``section(array)`` : the points of the plot chosen for the line
-            - ``area(float)`` : calculated surface area, from the section parameters
-            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
+            - ``section`` (array) : the points of the plot chosen for the line
+            - ``area`` (float) : calculated surface area, from the section parameters
+            - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated
               per section
-            - ``slope(float)`` : slope of the straight trendline fixed through the region
-            - ``intercept(float)`` : intercept of the straight trendline through the region
-            - ``corr_coef(float)`` : correlation coefficient of the linear region
+            - ``slope`` (float) : slope of the straight trendline fixed through the region
+            - ``intercept`` (float) : intercept of the straight trendline through the region
+            - ``corr_coef`` (float) : correlation coefficient of the linear region
 
     thickness_curve : array
         The generated thickness curve at each point using the thickness model.
 
     """
-
     if len(pressure) != len(loading):
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
 
     # Generate the thickness curve for the pressure points
-    thickness_curve = numpy.array(list(map(thickness_model, pressure)))
+    thickness_curve = thickness_model(pressure)
 
     results = []
 
@@ -244,7 +241,7 @@ def t_plot_raw(loading, pressure, thickness_model, liquid_density, adsorbate_mol
 
 
 def t_plot_parameters(thickness_curve, section, loading, molar_mass, liquid_density):
-    """Calculates the parameters from a linear section of the t-plot"""
+    """Calculates the parameters from a linear section of the t-plot."""
 
     slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
         thickness_curve[section],
@@ -266,4 +263,5 @@ def t_plot_parameters(thickness_curve, section, loading, molar_mass, liquid_dens
         }
 
         return result_dict
-    return
+
+    return None

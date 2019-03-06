@@ -25,7 +25,7 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
                                verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using a 'classical' model, applicable to mesopores.
+    Calculate the pore size distribution using a 'classical' model, applicable to mesopores.
 
     To use, specify the psd model in the function argument, then pass the parameters
     for each model.
@@ -55,11 +55,11 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths(array)`` : the widths of the pores
-            - ``pore_distribution(array)`` : contribution of each pore width to the
+            - ``pore_widths`` (array) : the widths of the pores
+            - ``pore_distribution`` (array) : contribution of each pore width to the
               overall pore distribution
 
     Notes
@@ -187,7 +187,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
                                 verbose=False, **model_parameters):
     """
-    Calculates the microporous size distribution using a 'classical' model.
+    Calculate the microporous size distribution using a 'classical' model.
 
     Parameters
     ----------
@@ -204,19 +204,19 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
     Other Parameters
     ----------------
-    adsorbate_model : obj('dict')
+    adsorbate_model : dict
         The adsorbate model to use for PSD, If null, properties are taken
         from the adsorbate in the list.
-    adsorbent_model : obj('str') or obj('dict')
+    adsorbent_model : str or dict
         The adsorbent model to use for PSD, It defaults to Carbon(HK).
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths(array)`` : the widths of the pores
-            - ``pore_distribution(array)`` : contribution of each pore width to the
+            - ``pore_widths`` (array) : the widths of the pores
+            - ``pore_distribution`` (array) : contribution of each pore width to the
               overall pore distribution
 
     Notes
@@ -231,7 +231,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
         - the HK, or Horvath-Kawazoe method
 
-    A common gotcha of data processing is: "garbage in = garbage out". Only use methods
+    A common *gotcha* of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
 
     See Also
@@ -300,7 +300,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
 def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2, **model_parameters):
     """
-    Calculates the pore size distribution using a DFT kernel from a PointIsotherm.
+    Calculate the pore size distribution using a DFT kernel from a PointIsotherm.
 
     Parameters
     ----------
@@ -314,11 +314,11 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2,
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths(array)`` : the widths of the pores
-            - ``pore_distribution(array)`` : contribution of each pore width to the
+            - ``pore_widths`` (array) : the widths of the pores
+            - ``pore_distribution`` (array) : contribution of each pore width to the
               overall pore distribution
 
     Notes

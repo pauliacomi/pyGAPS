@@ -1,6 +1,4 @@
-"""
-This module calculates the isosteric heat for isotherms at different temperatures.
-"""
+"""Module calculating the isosteric heat for isotherms at different temperatures."""
 
 import numpy
 import scipy.constants as const
@@ -11,9 +9,9 @@ from ..utilities.exceptions import ParameterError
 
 
 def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
-    """
-    Calculation of the isosteric heat of adsorption using several isotherms
-    taken at different temperatures on the same material.
+    r"""
+    Calculate the isosteric heat of adsorption using several isotherms
+    recorded at different temperatures on the same material.
 
     Parameters
     ----------
@@ -34,8 +32,8 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
     result_dict : dict
         A dictionary with the isosteric heats per loading, with the form:
 
-            - ``isosteric_heat(array)`` : the isosteric heat of adsorption in kj/mmol
-            - ``loading(array)`` : the loading for each point of the isosteric heat, in mmol
+            - ``isosteric_heat`` (array) : the isosteric heat of adsorption in kj/mmol
+            - ``loading`` (array) : the loading for each point of the isosteric heat, in mmol
 
     Notes
     -----
@@ -47,9 +45,9 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
 
     .. math::
 
-        \\Big( \\frac{\\partial \\ln P}{\\partial T} \\Big)_{n_a} = -\\frac{\\Delta H_{ads}}{R T^2}
+        \Big( \frac{\partial \ln P}{\partial T} \Big)_{n_a} = -\frac{\Delta H_{ads}}{R T^2}
 
-    Where :math:`\\Delta H_{ads}` is the enthalpy of adsorption. In order to approximate the
+    Where :math:`\Delta H_{ads}` is the enthalpy of adsorption. In order to approximate the
     partial differential, two or more isotherms are measured at different temperatures. The
     assumption made is that the heat of adsorption does not vary in the temperature range
     chosen. Therefore, the isosteric heat of adsorption can be calculated by using the pressures
@@ -57,10 +55,10 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
 
     .. math::
 
-        \\Delta H_{ads} = - R \\frac{\\partial \\ln P}{\\partial 1 / T}
+        \Delta H_{ads} = - R \frac{\partial \ln P}{\partial 1 / T}
 
-    and plotting the values of :math:`\\ln P` against :math:`1 / T` we should obtain a straight
-    line with a slope of :math:`- \\Delta H_{ads} / R.`
+    and plotting the values of :math:`\ln P` against :math:`1 / T` we should obtain a straight
+    line with a slope of :math:`- \Delta H_{ads} / R.`
 
     *Limitations*
 
@@ -77,7 +75,6 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
     especially at high relative pressures and for heavy adsorbates.
 
     """
-
     # Check more than one isotherm
     if len(isotherms) < 2:
         raise ParameterError('Pass at least two isotherms.')
@@ -134,13 +131,16 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
 
 def isosteric_heat_raw(pressures, temperatures):
     """
+    Calculate the isosteric heat of adsorption using several isotherms
+    recorded at different temperatures on the same material.
+
     This is a 'bare-bones' function to calculate isosteric heat which is
     designed as a low-level alternative to the main function.
     Designed for advanced use, its parameters have to be manually specified.
 
     Parameters
     ----------
-    pressure : array or arrays
+    pressure : array of arrays
         An array of arrays of pressures for each isotherm, in bar.
         For example, if using two isotherms to calculate the isosteric heat:
         [[l1_iso1, l1_iso2], [l2_iso1, l2_iso2], [l3_iso1, l3_iso2], ...]
@@ -157,7 +157,6 @@ def isosteric_heat_raw(pressures, temperatures):
         The correlation of the straight line of each fit.
 
     """
-
     # Check same lengths
     if len(pressures[0]) != len(temperatures):
         raise ParameterError(

@@ -1,6 +1,4 @@
-"""
-This module calculates the initial henry constant based on an isotherm.
-"""
+"""Module calculating the initial henry constant."""
 
 import matplotlib.pyplot as plt
 import numpy

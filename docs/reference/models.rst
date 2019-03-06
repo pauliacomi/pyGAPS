@@ -86,7 +86,7 @@ Flory-Huggins VST
 
 .. _modelling-ref:
 
-Multi-component Adsorption modelling
+Multi-component adsorption modelling
 ====================================
 
 IAST

@@ -1,7 +1,4 @@
-"""
-This module performs the heart of the IAST calculations, given the
-pure-component adsorption isotherm model.
-"""
+"""Module calculating IAST, given the pure-component adsorption isotherm model."""
 
 import numpy
 import scipy.optimize

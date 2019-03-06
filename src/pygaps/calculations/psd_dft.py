@@ -20,8 +20,8 @@ INTERNAL = os.path.join(os.path.dirname(__file__),
 
 
 def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
-    """
-    Fits a DFT kernel on experimental adsorption data.
+    r"""
+    Fit a DFT kernel on experimental adsorption data.
 
     Parameters
     ----------
@@ -51,7 +51,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
 
     .. math::
 
-        f(x) = \\sum_{p=p_0}^{p=p_x} (n_{p,exp} - \\sum_{w=w_0}^{w=w_y} n_{p, kernel} X_w )^2
+        f(x) = \sum_{p=p_0}^{p=p_x} (n_{p,exp} - \sum_{w=w_0}^{w=w_y} n_{p, kernel} X_w )^2
 
     The function is then minimised using the `scipy.optimise.minimise` module, with the
     constraint that the contribution of each kernel isotherm cannot be negative.
@@ -108,7 +108,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
 
 def _load_kernel(path):
     """
-    Loads a kernel from disk or from memory.
+    Load a kernel from disk or from memory.
 
     Essentially takes a kernel stored as a pressure-loading
     table, then creates a cubic interpolator for each
@@ -122,8 +122,8 @@ def _load_kernel(path):
 
     Returns
     -------
-    array
-        The kernel.
+    dict
+        The kernel with its pore size components as keys.
     """
     if path == 'internal':
         path = INTERNAL

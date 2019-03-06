@@ -1,6 +1,4 @@
-"""
-This module contains the alpha-s calculation.
-"""
+"""This module contains the alpha-s calculation."""
 
 import warnings
 
@@ -15,9 +13,8 @@ from .area_bet import area_BET
 
 def alpha_s(isotherm, reference_isotherm, reference_area=None,
             reducing_pressure=0.4, limits=None, verbose=False):
-    """
-    Calculates the external surface area and adsorbed volume using the alpha s method.
-
+    r"""
+    Calculate surface area and pore volume using the alpha-s method.
 
     Pass an isotherm object to the function to have the alpha-s method applied to it.
     The ``reference_isotherm`` parameter is an Isotherm class which will form the
@@ -45,36 +42,38 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
 
     Returns
     -------
-    list
-        A list of dictionaries containing the calculated parameters for each
-        straight section, with each dictionary of the form. The basis of these
+    dict
+        A dictionary containing the t-plot curve, as well as a list of dictionaries
+        with calculated parameters for each straight section. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-            - ``section(array)`` : the points of the plot chosen for the line
-            - ``area(float)`` : calculated surface area, from the section parameters
-            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
-              per section
-            - ``slope(float)`` : slope of the straight trendline fixed through the region
-            - ``intercept(float)`` : intercept of the straight trendline through the region
-            - ``corr_coef(float)`` : correlation coefficient of the linear region
+            - ``alpha curve`` (list)
+            - ``results`` (list of dicts):
+
+                - ``section`` (array) : the points of the plot chosen for the line
+                - ``area`` (float) : calculated surface area, from the section parameters
+                - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated per section
+                - ``slope`` (float) : slope of the straight trendline fixed through the region
+                - ``intercept`` (float) : intercept of the straight trendline through the region
+                - ``corr_coef`` (float) : correlation coefficient of the linear region
 
     Notes
     -----
     *Description*
 
     In order to extend the t-plot analysis with other adsorbents and non-standard
-    thickness curves, the :math:`\\alpha_s` method was devised [#]_. Instead of
+    thickness curves, the :math:`\alpha_s` method was devised [#]_. Instead of
     a formula that describes the thickness of the adsorbed layer, a reference
     isotherm is used. This isotherm is measured on a non-porous version of the
     material with the same surface characteristics and with the same adsorbate.
-    The :math:`\\alpha_s` values are obtained from this isotherm by regularisation with
+    The :math:`\alpha_s` values are obtained from this isotherm by regularisation with
     an adsorption amount at a specific relative pressure, usually taken as 0.4 since
     nitrogen hysteresis loops theoretically close at this value
 
     .. math::
 
-        \\alpha_s = \\frac{n_a}{n_{0.4}}
+        \alpha_s = \frac{n_a}{n_{0.4}}
 
     The analysis then proceeds as in the t-plot method.
 
@@ -87,7 +86,7 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
 
     .. math::
 
-        A = \\frac{s A_{ref}}{(n_{ref})_{0.4}}
+        A = \frac{s A_{ref}}{(n_{ref})_{0.4}}
 
     If the region selected is after a vertical deviation, the intercept of the line
     will no longer pass through the origin. This intercept be used to calculate the
@@ -95,11 +94,11 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
 
     .. math::
 
-        V_{ads} = \\frac{i M_m}{\\rho_{l}}
+        V_{ads} = \frac{i M_m}{\rho_{l}}
 
     *Limitations*
 
-    The reference isotherm chosen for the :math:`\\alpha_s` method must be a description
+    The reference isotherm chosen for the :math:`\alpha_s` method must be a description
     of the adsorption on a completely non-porous sample of the same material. It is
     often impossible to obtain such non-porous versions, therefore care must be taken
     how the reference isotherm is defined.
@@ -107,8 +106,8 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     References
     ----------
     .. [#] D.Atkinson, A.I.McLeod, K.S.W.Sing, J.Chim.Phys., 81,791(1984)
-    """
 
+    """
     # Check to see if reference isotherm is given
     if reference_isotherm is None:
         raise ParameterError("No reference isotherm for alpha s calculation "
@@ -138,11 +137,10 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
         loading_unit='mol', branch='ads')
     alpha_s_point = reference_isotherm.loading_at(
         0.4, loading_unit='mol', pressure_mode='relative', branch='ads')
-    alpha_curve = reference_loading / alpha_s_point
 
     # Call alpha s function
-    results = alpha_s_raw(
-        loading, alpha_curve, alpha_s_point, reference_area,
+    results, alpha_curve = alpha_s_raw(
+        loading, reference_loading, alpha_s_point, reference_area,
         liquid_density, molar_mass, limits=limits)
 
     result_dict = {
@@ -173,8 +171,11 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
     return result_dict
 
 
-def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_density, adsorbate_molar_mass, limits=None):
+def alpha_s_raw(loading, reference_loading, alpha_s_point, reference_area,
+                liquid_density, adsorbate_molar_mass, limits=None):
     """
+    Calculate surface area and pore volume using the alpha-s method.
+
     This is a 'bare-bones' function to calculate alpha-s parameters which is
     designed as a low-level alternative to the main function.
     Designed for advanced use, its parameters have to be manually specified.
@@ -182,9 +183,9 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
     Parameters
     ----------
     loading : array
-        Amount adsorbed at the surface, in mol/g.
-    alpha_curve : callable
-        Function which which returns the alpha_s value at a pressure p.
+        Amount adsorbed at the surface, in mol/adsorbent.
+    reference_loading : array
+        Loading of the reference curve corresponding to the same pressures.
     alpha_s_point : float
         p/p0 value at which the loading is reduced.
     reference_area : float
@@ -198,27 +199,30 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
 
     Returns
     -------
-    results : dict
-        A dictionary of results with the following components:
+    results : list
+        A list of dictionaries with the following components:
 
-            - ``section(array)`` : the points of the plot chosen for the line
-            - ``area(float)`` : calculated surface area, from the section parameters
-            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
+            - ``section`` (array) : the points of the plot chosen for the line
+            - ``area`` (float) : calculated surface area, from the section parameters
+            - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated
               per section
-            - ``slope(float)`` : slope of the straight trendline fixed through the region
-            - ``intercept(float)`` : intercept of the straight trendline through the region
-            - ``corr_coef(float)`` : correlation coefficient of the linear region
+            - ``slope`` (float) : slope of the straight trendline fixed through the region
+            - ``intercept`` (float) : intercept of the straight trendline through the region
+            - ``corr_coef`` (float) : correlation coefficient of the linear region
 
-    thickness_curve : array
+    alpha_curve : array
         The generated thickness curve at each point using the thickness model.
-    """
 
-    if len(loading) != len(alpha_curve):
+    """
+    if len(loading) != len(reference_loading):
         raise ParameterError("The length of the parameter arrays"
                              " do not match")
 
     # The alpha-s method is a generalisation of the t-plot method
     # As such, we can just call the t-plot method with the required parameters
+
+    alpha_curve = reference_loading / alpha_s_point
+
     results = []
 
     if limits is not None:
@@ -247,13 +251,13 @@ def alpha_s_raw(loading, alpha_curve, alpha_s_point, reference_area, liquid_dens
             warnings.warn(
                 'Could not find linear regions, attempt a manual limit')
 
-    return results
+    return results, alpha_curve
 
 
 def alpha_s_plot_parameters(alpha_curve, section, loading,
                             alpha_s_point,
                             reference_area, molar_mass, liquid_density):
-    """Gets the parameters for the linear region of the alpha-s plot"""
+    """Gets the parameters for the linear region of the alpha-s plot."""
 
     slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
         alpha_curve[section],
@@ -275,3 +279,5 @@ def alpha_s_plot_parameters(alpha_curve, section, loading,
         }
 
         return result_dict
+
+    return None

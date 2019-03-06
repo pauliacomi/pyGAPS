@@ -12,8 +12,8 @@ from ..utilities.exceptions import ParameterError
 def psd_bjh(loading, pressure, pore_geometry,
             thickness_model, condensation_model,
             liquid_density, adsorbate_molar_mass):
-    """
-    Calculates the pore size distribution using the BJH method.
+    r"""
+    Calculate a pore size distribution using the BJH method.
 
     Parameters
     ----------
@@ -64,23 +64,23 @@ def psd_bjh(loading, pressure, pore_geometry,
 
     .. math::
 
-        V_p & = \\Big(\\frac{\\bar{r}_p}{\\bar{r}_k + \\Delta t_n}\\Big)^2
-                (\\Delta V_n - \\Delta t_n \\sum_{i=1}^{n-1} \\Delta A_p
-                + \\Delta t_n \\bar{t}_n \\sum_{i=1}^{n-1} \\frac{\\Delta A_p}{\\bar{r}_p})
+        V_p & = \Big(\frac{\bar{r}_p}{\bar{r}_k + \Delta t_n}\Big)^2
+                (\Delta V_n - \Delta t_n \sum_{i=1}^{n-1} \Delta A_p
+                + \Delta t_n \bar{t}_n \sum_{i=1}^{n-1} \frac{\Delta A_p}{\bar{r}_p})
 
-        A & = 2 \\Delta V_p / r_p
+        A & = 2 \Delta V_p / r_p
 
     Where :
-        - :math:`\\Delta A_p` is the area of the pores
-        - :math:`\\Delta V_p` is the adsorbed volume change between two points
-        - :math:`\\bar{r}_p` is the average pore radius calculated as a sum of the
+        - :math:`\Delta A_p` is the area of the pores
+        - :math:`\Delta V_p` is the adsorbed volume change between two points
+        - :math:`\bar{r}_p` is the average pore radius calculated as a sum of the
           kelvin radius and layer thickness of the pores at pressure p between two
           measurement points
-        - :math:`\\bar{r}_k` is the average kelvin radius between two measurement points
-        - :math:`\\bar{t}_n` is the average layer thickness between two measurement points
-        - :math:`\\Delta t_n` is the average change in layer thickness between two measurement points
+        - :math:`\bar{r}_k` is the average kelvin radius between two measurement points
+        - :math:`\bar{t}_n` is the average layer thickness between two measurement points
+        - :math:`\Delta t_n` is the average change in layer thickness between two measurement points
 
-    Then, by plotting :math:`\\Delta V / (2*\\Delta r_p)` versus the width of the pores calculated
+    Then, by plotting :math:`\Delta V / (2*\Delta r_p)` versus the width of the pores calculated
     for each point, the pore size distribution can be obtained.
 
     References
@@ -91,6 +91,7 @@ def psd_bjh(loading, pressure, pore_geometry,
 
     .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
        and K. Sing, Academic Press, 1999
+
     """
     # Parameter checks
     if len(pressure) != len(loading):
@@ -109,12 +110,12 @@ def psd_bjh(loading, pressure, pore_geometry,
     d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
-    thickness_curve = numpy.array(list(map(thickness_model, pressure)))
+    thickness_curve = thickness_model(pressure)
     avg_thickness = numpy.add(thickness_curve[:-1], thickness_curve[1:]) / 2
     d_thickness = -numpy.diff(thickness_curve)
 
     # Generate the Kelvin pore radii and average
-    kelvin_radius = numpy.array(list(map(condensation_model, pressure)))
+    kelvin_radius = condensation_model(pressure)
     avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
 
     # Critical pore radii as a combination of the adsorbed
@@ -152,8 +153,8 @@ def psd_bjh(loading, pressure, pore_geometry,
 def psd_dollimore_heal(loading, pressure, pore_geometry,
                        thickness_model, condensation_model,
                        liquid_density, adsorbate_molar_mass):
-    """
-    Calculates the pore size distribution using the Dollimore-Heal method.
+    r"""
+    Calculate a pore size distribution using the Dollimore-Heal method.
 
     Parameters
     ----------
@@ -208,31 +209,32 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
 
     .. math::
 
-        V_p & = \\Big(\\frac{\\bar{r}_p}{\\bar{r}_k + \\Delta t_n}\\Big)^2
-                (\\Delta V_n - \\Delta t_n \\sum_{i=1}^{n-1} \\Delta A_p
-                + 2 \\pi \\Delta t_n \\bar{t}_n \\sum_{i=1}^{n-1} L_p)
+        V_p & = \Big(\frac{\bar{r}_p}{\bar{r}_k + \Delta t_n}\Big)^2
+                (\Delta V_n - \Delta t_n \sum_{i=1}^{n-1} \Delta A_p
+                + 2 \pi \Delta t_n \bar{t}_n \sum_{i=1}^{n-1} L_p)
 
-        A & = 2 \\Delta V_p / r_p
+        A & = 2 \Delta V_p / r_p
 
-        L & = \\Delta A_p / 2 \\pi r_p
+        L & = \Delta A_p / 2 \pi r_p
 
     Where :
-        - :math:`\\Delta A_p` is the area of the pores
-        - :math:`\\Delta V_p` is the adsorbed volume change between two points
-        - :math:`\\bar{r}_p` is the average pore radius calculated as a sum of the
+        - :math:`\Delta A_p` is the area of the pores
+        - :math:`\Delta V_p` is the adsorbed volume change between two points
+        - :math:`\bar{r}_p` is the average pore radius calculated as a sum of the
           kelvin radius and layer thickness of the pores at pressure p between two
           measurement points
-        - :math:`\\bar{r}_k` is the average kelvin radius between two measurement points
-        - :math:`\\bar{t}_n` is the average layer thickness between two measurement points
-        - :math:`\\Delta t_n` is the average change in layer thickness between two measurement points
+        - :math:`\bar{r}_k` is the average kelvin radius between two measurement points
+        - :math:`\bar{t}_n` is the average layer thickness between two measurement points
+        - :math:`\Delta t_n` is the average change in layer thickness between two measurement points
 
-    Then, by plotting :math:`\\Delta V/(2*\\Delta r_p)` versus the width of the pores calculated
+    Then, by plotting :math:`\Delta V/(2*\Delta r_p)` versus the width of the pores calculated
     for each point, the pore size distribution can be obtained.
 
     References
     ----------
     .. [#] D. Dollimore and G. R. Heal, J. Applied Chem. 14, 109 (1964);
        J. Colloid Interface Sci. 33, 508 (1970)
+
     """
     # Checks
     if len(pressure) != len(loading):
@@ -251,12 +253,12 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
-    thickness_curve = numpy.array(list(map(thickness_model, pressure)))
+    thickness_curve = thickness_model(pressure)
     avg_thickness = numpy.add(thickness_curve[:-1], thickness_curve[1:]) / 2
     d_thickness = -numpy.diff(thickness_curve)
 
     # Generate the Kelvin pore radii and average
-    kelvin_radius = numpy.array(list(map(condensation_model, pressure)))
+    kelvin_radius = condensation_model(pressure)
     avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
 
     # Critical pore radii as a combination of the adsorbed
