@@ -1,6 +1,4 @@
-"""
-Tests csv interaction
-"""
+"""Tests csv interaction."""
 
 import pytest
 

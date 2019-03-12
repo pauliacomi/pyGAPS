@@ -1,5 +1,3 @@
-# %%
-
 """
 This module contains the excel interface for returning data in all formats
 used, such as the parser file.
