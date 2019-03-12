@@ -2,6 +2,20 @@
 Changelog
 =========
 
+1.6.0 ()
+------------------
+
+Features:
+
+* Added a function to get isotherms from the NIST ISODB,
+  ``pygaps.load_nist_isotherm`` which takes the ISODB filename
+  as an argument.
+
+Breaking changes:
+
+Bugfixes:
+
+
 1.5.0 (2019-03-12)
 ------------------
 
