@@ -1,4 +1,4 @@
-# pylint: disable=W0614,W0401,W0611,W0622
+# pylint: disable=W0614,W0611,W0622
 # flake8: noqa
 
 from .calculations.alphas import alpha_s
@@ -7,6 +7,8 @@ from .calculations.area_bet import area_BET
 from .calculations.area_bet import area_BET_raw
 from .calculations.area_langmuir import area_langmuir
 from .calculations.area_langmuir import area_langmuir_raw
+from .calculations.dr_da_plots import da_plot
+from .calculations.dr_da_plots import dr_plot
 from .calculations.iast import iast
 from .calculations.iast import iast_binary_svp
 from .calculations.iast import iast_binary_vle
@@ -23,9 +25,9 @@ from .calculations.psd import micropore_size_distribution
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw
 from .classes.adsorbate import Adsorbate
+from .classes.material import Material
 from .classes.modelisotherm import ModelIsotherm
 from .classes.pointisotherm import PointIsotherm
-from .classes.sample import Sample
 from .graphing.iastgraphs import plot_iast_vle
 from .graphing.isothermgraphs import plot_iso
 from .parsing import *

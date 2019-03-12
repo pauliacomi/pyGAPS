@@ -10,9 +10,9 @@ from ..classes.pointisotherm import PointIsotherm
 
 _DATA = {
     'adsorptive': 'adsorbate',
-    'meas. temp': 't_exp',
+    'meas. temp': 't_iso',
     'sample weight': 'mass',
-    'comment1': 'sample_name',
+    'comment1': 'material_name',
     'comment2': 'user',
     'comment3': 'comment',
     'comment4': 'exp_param',
@@ -48,7 +48,7 @@ def isotherm_from_bel(path):
 
     with open(path) as file:
         line = file.readline().rstrip()
-        sample_info = {}
+        material_info = {}
         adsdata = StringIO()
 
         while line != '':
@@ -69,25 +69,25 @@ def isotherm_from_bel(path):
                         new_headers.append(txt)
 
                         if txt == 'loading':
-                            sample_info['loading_basis'] = 'molar'
+                            material_info['loading_basis'] = 'molar'
                             for (u, c) in (('/mmol', 'mmol'),
                                            ('/mol', 'mol'),
                                            ('/ml(STP)', 'cm3(STP)'),
                                            ('/cm3(STP)', 'cm3(STP)')):
                                 if u in h:
-                                    sample_info['loading_unit'] = c
-                            sample_info['adsorbent_basis'] = 'mass'
+                                    material_info['loading_unit'] = c
+                            material_info['adsorbent_basis'] = 'mass'
                             for (u, c) in (('g-1', 'g'),
                                            ('kg-1', 'kg')):
                                 if u in h:
-                                    sample_info['adsorbent_unit'] = c
+                                    material_info['adsorbent_unit'] = c
 
                         if txt == 'pressure':
-                            sample_info['pressure_mode'] = 'absolute'
+                            material_info['pressure_mode'] = 'absolute'
                             for (u, c) in (('/kPa', 'kPa'),
                                            ('/Pa', 'Pa')):
                                 if u in h:
-                                    sample_info['pressure_unit'] = c
+                                    material_info['pressure_unit'] = c
 
                     adsdata.write('\t'.join(new_headers) + '\n')
 
@@ -108,27 +108,27 @@ def isotherm_from_bel(path):
                 values = [v.strip('"') for v in values]
                 for n in _DATA:
                     if values[0].lower().startswith(n):
-                        sample_info.update({_DATA[n]: values[1]})
+                        material_info.update({_DATA[n]: values[1]})
 
         adsdata.seek(0)                 # Reset string buffer to 0
         data_df = pandas.read_table(adsdata,
                                     sep='\t')
         data_df.dropna(inplace=True, how='all', axis='columns')
-        sample_info['date'] = (sample_info['date']
-                               + ' ' +
-                               sample_info.pop('time'))
-        sample_info['sample_batch'] = 'bel'
-        sample_info['loading_key'] = 'loading'
-        sample_info['pressure_key'] = 'pressure'
-        sample_info['other_keys'] = sorted([a for a in data_df.columns
-                                            if a != 'loading'
-                                            and a != 'pressure'
-                                            and a != 'measurement'
-                                            and a != 'br'])
+        material_info['date'] = (material_info['date']
+                                 + ' ' +
+                                 material_info.pop('time'))
+        material_info['material_batch'] = 'bel'
+        material_info['loading_key'] = 'loading'
+        material_info['pressure_key'] = 'pressure'
+        material_info['other_keys'] = sorted([a for a in data_df.columns
+                                              if a != 'loading'
+                                              and a != 'pressure'
+                                              and a != 'measurement'
+                                              and a != 'br'])
 
         isotherm = PointIsotherm(
-            data_df,
+            isotherm_data=data_df,
             branch=data_df['br'].tolist(),
-            **sample_info)
+            **material_info)
 
     return isotherm

@@ -6,6 +6,7 @@ from functools import partial
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
+from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import ParameterError
 from .models_hk import get_hk_model
 from .models_kelvin import kelvin_radius_std
@@ -24,7 +25,7 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
                                verbose=False, **model_parameters):
     """
-    Calculates the pore size distribution using a 'classical' model, applicable to mesopores.
+    Calculate the pore size distribution using a 'classical' model, applicable to mesopores.
 
     To use, specify the psd model in the function argument, then pass the parameters
     for each model.
@@ -54,11 +55,11 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths(array)`` : the widths of the pores
-            - ``pore_distribution(array)`` : contribution of each pore width to the
+            - ``pore_widths`` (array) : the widths of the pores
+            - ``pore_distribution`` (array) : contribution of each pore width to the
               overall pore distribution
 
     Notes
@@ -120,10 +121,10 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         thickness_model = 'Harkins/Jura'
 
     # Get required adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     molar_mass = adsorbate.molar_mass()
-    liquid_density = adsorbate.liquid_density(isotherm.t_exp)
-    surface_tension = adsorbate.surface_tension(isotherm.t_exp)
+    liquid_density = adsorbate.liquid_density(isotherm.t_iso)
+    surface_tension = adsorbate.surface_tension(isotherm.t_iso)
 
     # Read data in, depending on branch requested
     # If on an adsorption branch, data will be reversed
@@ -154,7 +155,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         m_geometry = meniscus_geometry(branch, pore_geometry)
         k_model = partial(kelvin_radius_std,
                           meniscus_geometry=m_geometry,
-                          temperature=isotherm.t_exp,
+                          temperature=isotherm.t_iso,
                           liquid_density=liquid_density,
                           adsorbate_molar_mass=molar_mass,
                           adsorbate_surface_tension=surface_tension)
@@ -186,7 +187,7 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
 def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
                                 verbose=False, **model_parameters):
     """
-    Calculates the microporous size distribution using a 'classical' model.
+    Calculate the microporous size distribution using a 'classical' model.
 
     Parameters
     ----------
@@ -203,19 +204,19 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
     Other Parameters
     ----------------
-    adsorbate_model : obj('dict')
+    adsorbate_model : dict
         The adsorbate model to use for PSD, If null, properties are taken
         from the adsorbate in the list.
-    adsorbent_model : obj('str') or obj('dict')
+    adsorbent_model : str or dict
         The adsorbent model to use for PSD, It defaults to Carbon(HK).
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths(array)`` : the widths of the pores
-            - ``pore_distribution(array)`` : contribution of each pore width to the
+            - ``pore_widths`` (array) : the widths of the pores
+            - ``pore_distribution`` (array) : contribution of each pore width to the
               overall pore distribution
 
     Notes
@@ -230,7 +231,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
         - the HK, or Horvath-Kawazoe method
 
-    A common gotcha of data processing is: "garbage in = garbage out". Only use methods
+    A common *gotcha* of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
 
     See Also
@@ -259,13 +260,13 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     # Get adsorbate properties
     adsorbate_properties = model_parameters.get('adsorbate_model')
     if adsorbate_properties is None:
-        adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+        adsorbate = Adsorbate.find(isotherm.adsorbate)
         adsorbate_properties = {
             'molecular_diameter': adsorbate.get_prop('molecular_diameter'),
             'polarizability': adsorbate.get_prop('polarizability'),
             'magnetic_susceptibility': adsorbate.get_prop('magnetic_susceptibility'),
             'surface_density': adsorbate.get_prop('surface_density'),
-            'liquid_density': adsorbate.liquid_density(isotherm.t_exp),
+            'liquid_density': adsorbate.liquid_density(isotherm.t_iso),
             'adsorbate_molar_mass': adsorbate.molar_mass(),
         }
 
@@ -282,7 +283,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     # Call specified pore size distribution function
     if psd_model == 'HK':
         pore_widths, pore_dist = psd_horvath_kawazoe(
-            loading, pressure, isotherm.t_exp, pore_geometry,
+            loading, pressure, isotherm.t_iso, pore_geometry,
             adsorbate_properties, adsorbent_properties)
 
     # Package the results
@@ -297,9 +298,9 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     return result_dict
 
 
-def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_parameters):
+def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2, **model_parameters):
     """
-    Calculates the pore size distribution using a DFT kernel from a PointIsotherm.
+    Calculate the pore size distribution using a DFT kernel from a PointIsotherm.
 
     Parameters
     ----------
@@ -307,14 +308,17 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
         The isotherm to calculate the pore size distribution.
     kernel_path : str
         The path to the kernel used.
+    bspline_order : int
+        The smoothing order of the b-splines fit to the data.
+        If set to 0, data will be returned as-is.
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths(array)`` : the widths of the pores
-            - ``pore_distribution(array)`` : contribution of each pore width to the
+            - ``pore_widths`` (array) : the widths of the pores
+            - ``pore_distribution`` (array) : contribution of each pore width to the
               overall pore distribution
 
     Notes
@@ -396,11 +400,13 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
                                  pressure_mode='relative')
 
     # Call the DFT function
-    pore_widths, pore_dist = psd_dft_kernel_fit(pressure, loading, kernel_path)  # mmol/g
+    pore_widths, pore_dist, dft_loading = psd_dft_kernel_fit(
+        pressure, loading, kernel_path, bspline_order)  # mmol/g
 
     # Convert to volume units
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
-    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() / adsorbate.liquid_density(isotherm.t_exp) / 1000
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
+    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() \
+        / adsorbate.liquid_density(isotherm.t_iso) / 1000
 
     # Package the results
     result_dict = {
@@ -409,6 +415,16 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, **model_paramete
     }
 
     if verbose:
+        params = {
+            'plot_type': 'isotherm',
+            'branch': 'ads',
+            'logx': True,
+            'fig_title': 'DFT Fit',
+            'lgd_keys': ['material_name'],
+            'y1_line_style': dict(markersize=5, linewidth=0)
+        }
+        ax = plot_iso(isotherm, **params)
+        ax.plot(pressure, dft_loading, 'r-')
         psd_plot(pore_widths, pore_dist, method='DFT')
 
     return result_dict

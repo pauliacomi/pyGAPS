@@ -9,7 +9,7 @@ import pygaps.graphing.iastgraphs as graphing
 
 
 @pytest.mark.graphing
-class TestIASTGraphs(object):
+class TestIASTGraphs():
     """Tests all IAST graphs"""
 
     @cleanup

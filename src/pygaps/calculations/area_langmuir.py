@@ -1,10 +1,9 @@
-"""
-This module calculates the Langmuir surface area based on an isotherm.
-"""
+"""This module contains Langmuir area calculations."""
+
 import warnings
 
-import scipy.constants as constants
-import scipy.stats
+import scipy.constants as const
+import scipy.stats as stats
 
 from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import langmuir_plot
@@ -13,9 +12,8 @@ from ..utilities.exceptions import ParameterError
 
 
 def area_langmuir(isotherm, limits=None, verbose=False):
-    """
-    Function which returns the Langmuir-determined surface area of
-    an isotherm which is passed.
+    r"""
+    Calculate the Langmuir-determined surface area of an isotherm.
 
     Parameters
     ----------
@@ -28,17 +26,17 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary of results with the following components. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-        - ``area(float)`` : calculated Langmuir surface area, in m2/unit of adsorbent
-        - ``langmuir_const(float)`` : the constant in the Langmuir fit
-        - ``n_monolayer(float)`` : the amount adsorbed at the monolayer
-        - ``langmuir_slope(float)`` : slope of the Langmuir plot
-        - ``langmuir_intercept(float)`` : intercept of the Langmuir plot
-        - ``corr_coef(float)`` : correlation coefficient of the linear region in the Langmuir plot
+        - ``area`` (float) : calculated Langmuir surface area, in m2/unit of adsorbent
+        - ``langmuir_const`` (float) : the constant in the Langmuir fit
+        - ``n_monolayer`` (float) : the amount adsorbed at the monolayer
+        - ``langmuir_slope`` (float) : slope of the Langmuir plot
+        - ``langmuir_intercept`` (float) : intercept of the Langmuir plot
+        - ``corr_coef`` (float) : correlation coefficient of the linear region in the Langmuir plot
 
     Notes
     -----
@@ -59,24 +57,24 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
     .. math::
 
-        n = n_m\\frac{KP}{1+KP}
+        n = n_m\frac{KP}{1+KP}
 
     The equation can be rearranged as:
 
     .. math::
 
-        \\frac{P}{n} = \\frac{1}{K n_m} + \\frac{P}{n_m}
+        \frac{P}{n} = \frac{1}{K n_m} + \frac{P}{n_m}
 
     Assuming the data can be fitted with a Langmuir model, by plotting
-    :math:`\\frac{P}{n}` against pressure, a line will be obtained. The slope and
+    :math:`\frac{P}{n}` against pressure, a line will be obtained. The slope and
     intercept of this line can then be used to calculate :math:`n_{m}`,
     the amount adsorbed at the monolayer, as well as K, the Langmuir constant.
 
     .. math::
 
-        n_m = \\frac{1}{s}
+        n_m = \frac{1}{s}
 
-        K = \\frac{1}{i * n_m}
+        K = \frac{1}{i * n_m}
 
     The surface area can then be calculated by using the moles adsorbed at the
     monolayer. If the specific area taken by one of the adsorbate molecules on the surface
@@ -84,7 +82,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
     .. math::
 
-        a(Langmuir) = n_m A_N \\sigma
+        a(Langmuir) = n_m A_N \sigma
 
     *Limitations*
 
@@ -98,9 +96,8 @@ def area_langmuir(isotherm, limits=None, verbose=False):
     .. [#] I. Langmuir, J. American Chemical Society 38, 2219(1916); 40, 1368(1918)
 
     """
-
     # get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in
@@ -147,6 +144,8 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
 def area_langmuir_raw(loading, pressure, cross_section, limits=None):
     """
+    Calculate Langmuir-determined surface area.
+
     This is a 'bare-bones' function to calculate Langmuir surface area which is
     designed as a low-level alternative to the main function.
     Designed for advanced use, its parameters have to be manually specified.
@@ -190,19 +189,19 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
     if limits is None:
         limits = [0.05, 0.9]
 
-    max_p = limits[1]
     maximum = len(pressure) - 1
-    for index, value in reversed(list(enumerate(pressure))):
-        if value < max_p:
-            maximum = index
-            break
+    if limits[1]:
+        for index, value in reversed(list(enumerate(pressure))):
+            if value < limits[1]:
+                maximum = index
+                break
 
-    min_p = limits[0]
     minimum = 0
-    for index, value in enumerate(pressure):
-        if value > min_p:
-            minimum = index
-            break
+    if limits[0]:
+        for index, value in enumerate(pressure):
+            if value > limits[0]:
+                minimum = index
+                break
 
     if maximum - minimum < 3:
         raise CalculationError("The isotherm does not have enough points in the chosen "
@@ -229,21 +228,21 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
 
 
 def langmuir_transform(loading, pressure):
-    """Langmuir transform function"""
+    """Langmuir transform function."""
     return pressure / loading
 
 
 def langmuir_optimisation(pressure, langmuir_points):
-    """Finds the slope and intercept of the Langmuir region"""
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    """Finds the slope and intercept of the Langmuir region."""
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         pressure, langmuir_points)
     return slope, intercept, corr_coef
 
 
 def langmuir_parameters(slope, intercept, cross_section):
-    """Calculates the Langmuir parameters from the slope and intercept"""
+    """Calculates the Langmuir parameters from the slope and intercept."""
     n_monolayer = 1 / slope
     langmuir_const = 1 / (intercept * n_monolayer)
     langmuir_area = n_monolayer * cross_section * \
-        (10**(-18)) * constants.Avogadro
+        (10**(-18)) * const.Avogadro
     return n_monolayer, langmuir_const, langmuir_area

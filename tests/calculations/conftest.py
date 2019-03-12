@@ -20,6 +20,10 @@ DATA = {
         't_area': 80.0,
         'Khslope': 57000,
         'Khvirial': 200000,
+        'dr_volume': None,
+        'dr_potential': None,
+        'da_volume': None,
+        'da_potential': None,
     },
     'NaY': {
         'file': 'NaY N2 77.355.json',
@@ -29,6 +33,10 @@ DATA = {
         't_area': 120.0,
         'Khslope': 1770000,
         'Khvirial': 1260000,
+        'dr_volume': None,
+        'dr_potential': None,
+        'da_volume': None,
+        'da_potential': None,
     },
     'SiO2': {
         'file': 'SiO2 N2 77.355.json',
@@ -38,6 +46,10 @@ DATA = {
         't_area': 280.0,
         'Khslope': 780,
         'Khvirial': 250,
+        'dr_volume': None,
+        'dr_potential': None,
+        'da_volume': None,
+        'da_potential': None,
     },
     'Takeda 5A': {
         'file': 'Takeda 5A N2 77.355.json',
@@ -47,6 +59,10 @@ DATA = {
         't_area': 130.0,
         'Khslope': 1610000,
         'Khvirial': 4300000,
+        'dr_volume': 0.484,
+        'dr_potential': 5.84,
+        'da_volume': 0.346,
+        'da_potential': 7.071,
     },
     'UiO-66(Zr)': {
         'file': 'UiO-66(Zr) N2 77.355.json',
@@ -56,6 +72,10 @@ DATA = {
         't_area': 20.0,
         'Khslope': 700000,
         'Khvirial': 1350000,
+        'dr_volume': None,
+        'dr_potential': None,
+        'da_volume': None,
+        'da_potential': None,
     },
 
 }

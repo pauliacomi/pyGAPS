@@ -13,7 +13,7 @@ _RSPACE_REGEX = re.compile(r'\s+')
 _FIELDS = {
     'sample:': {
         'text': ['comment1'],
-        'name': 'sample_name',
+        'name': 'material_name',
         'row': 0,
         'column': 2,
         'type': 'string'
@@ -27,7 +27,7 @@ _FIELDS = {
     },
     'temperature': {
         'text': ['adsorption temp'],
-        'name': 't_exp',
+        'name': 't_iso',
         'row': 0,
         'column': 2,
         'type': 'number'

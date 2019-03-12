@@ -10,7 +10,7 @@ from pygaps.calculations.models_kelvin import _KELVIN_MODELS
 
 
 @pytest.mark.characterisation
-class TestKelvinModels(object):
+class TestKelvinModels():
     """
     Tests the thickness models
     """

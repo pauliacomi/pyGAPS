@@ -17,7 +17,7 @@ When `reporting a bug <https://github.com/pauliacomi/pygaps/issues>`_ please inc
 Documentation improvements
 ==========================
 
-pygaps could always use more documentation, whether as part of the
+The package could always use more documentation, whether as part of the
 official pygaps docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 

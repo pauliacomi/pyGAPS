@@ -9,7 +9,7 @@ Overview
 --------
 
 The framework provides capabilities to interact with an sqlite database, in order to store objects such as
-isotherms, samples, adsorbates and so on.
+isotherms, materials, adsorbates and so on.
 
 The database was initially envisioned as a centralised data storage for the MADIREL Laboratory in
 Marseilles. To generalize the concept for a this framework, the
@@ -52,23 +52,14 @@ internal database is to be used, the parameter passed should be the ``pygaps.DAT
 There are a few types of database functions:
 
     - :class:`~pygaps.classes.adsorbate.Adsorbate` management functions
-    - :class:`~pygaps.classes.sample.Sample` management functions.
-    - :class:`~pygaps.classes.pointisotherm.PointIsotherm` management functions,
-      here called `experiment`
-    - Functions which manage the `sources` table. This table is supposed to have a list of
-      laboratories, papers or any similar source where the sample is from
-    - Functions which manage the `contacts` table. This table is used for both sample
-      connections (for example who is the sample responsible, the synthesiser, the paper
-      author, etc...) and for experiment connections (who performed the experiment, who
-      is the simulation author, etc...)
-    - Functions which manage the `machines` table. This table is supposed to store a
-      list of the machines where the experiments could be performed.
+    - :class:`~pygaps.classes.material.Material` management functions.
+    - :class:`~pygaps.classes.pointisotherm.PointIsotherm` management functions
 
 A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinterface` reference.
 
 .. note::
 
-    For now, ModelIsotherms cannot be stored in the database.
+    Currently, ModelIsotherms cannot be stored in the database.
 
 
 .. _sqlite-manual-examples:

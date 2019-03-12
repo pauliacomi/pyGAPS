@@ -15,7 +15,7 @@
         "--doctest-modules",
         "--doctest-glob=/*.rst",
         "--exitfirst",
-        "--verbose"
+        "--verbose",
     ],
 
     "cSpell.words": [
@@ -31,5 +31,7 @@
         "nelder",
         "pointisotherm",
         "scipy"
-    ]
+    ],
+    "coverage-gutters.xmlname": "coverage.xml",
+    "python.pythonPath": "C:\\tools\\miniconda3\\envs\\py37\\python.exe"
 }

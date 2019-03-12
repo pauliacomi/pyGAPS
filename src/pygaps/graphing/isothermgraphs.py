@@ -20,6 +20,7 @@ _BRANCH_TYPES = ("ads", "des", "all", "all-nol")
 
 
 def plot_iso(isotherms,
+             ax=None,
              x_data='pressure',
              y1_data='loading',
              y2_data=None,
@@ -50,6 +51,9 @@ def plot_iso(isotherms,
     ----------
     isotherms : PointIsotherms or list of Pointisotherms
         An isotherm or iterable of isotherms to be plotted.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     x_data : str
         Key of data to plot on the x axis. Defaults to 'pressure'.
@@ -95,10 +99,10 @@ def plot_iso(isotherms,
         Title of the graph. Defaults to none.
     lgd_keys : iterable
         The components of the isotherm which are displayed on the legend. For example
-        pass ['sample_name', 'sample_batch'] to have the legend labels display only these
+        pass ['material_name', 'material_batch'] to have the legend labels display only these
         two components. Works with any isotherm properties and with 'branch' and 'key',
         the isotherm branch and the y-axis key respectively.
-        Defaults to 'sample_name' and 'adsorbate'.
+        Defaults to 'material_name' and 'adsorbate'.
     lgd_pos : ['best', 'none', 'bottom', 'right', 'inner']
         Specify to have the legend position to the bottom, the right of the graph
         or inside the plot area itself. Defaults to 'best'.
@@ -140,12 +144,7 @@ def plot_iso(isotherms,
 
     Returns
     -------
-    fig : Matplotlib figure
-        The figure object generated.
-    axes1 : Matplotlib ax
-        Ax object for left y1 axis.
-    axes2 : Matplotlib ax
-        Ax object for right y2 axis (if applicable).
+    axes : matplotlib.axes.Axes or numpy.ndarray of them
 
     """
 #######################################
@@ -234,8 +233,12 @@ def plot_iso(isotherms,
 
     #
     # Generate the graph itself
-    fig = plt.figure(**styles['fig_style'])
-    ax1 = plt.subplot(111)
+    if ax:
+        ax1 = ax
+        fig = ax1.get_figure()
+    else:
+        fig = plt.figure(**styles['fig_style'])
+        ax1 = plt.subplot(111)
     if y2_data:
         ax2 = ax1.twinx()
 
@@ -245,11 +248,11 @@ def plot_iso(isotherms,
             if pressure_mode == "absolute":
                 text = 'Pressure ($' + pressure_unit + '$)'
             elif pressure_mode == "relative":
-                text = "Relative pressure"
+                text = "$p/p^0$"
         elif key == 'loading':
             text = 'Loading ($' + loading_unit + '/' + adsorbent_unit + '$)'
         elif key == 'enthalpy':
-            text = r'Enthalpy of adsorption $(-kJ\/mol^{-1})$'
+            text = r'$\Delta_{ads}h$ $(-kJ\/mol^{-1})$'
         else:
             text = key
         return text
@@ -291,7 +294,7 @@ def plot_iso(isotherms,
     # Graph title
     if fig_title is None:
         fig_title = ''
-    ax1.set_title(fig_title, **styles['title_style'])
+    ax1.set_title(fig_title, **styles['title_style'], y=1.01)
 
     # Graph legend builder
     def build_label(isotherm, lbl_components, iso_branch, key):
@@ -302,7 +305,7 @@ def plot_iso(isotherms,
             return ''
         else:
             if lbl_components is None:
-                return isotherm.sample_name + ' ' + convert_chemformula(isotherm.adsorbate)
+                return isotherm.material_name + ' ' + convert_chemformula(isotherm)
             text = []
             for selected in lbl_components:
                 if selected == 'branch':
@@ -314,7 +317,7 @@ def plot_iso(isotherms,
                 val = getattr(isotherm, selected)
                 if val:
                     if selected == 'adsorbate':
-                        text.append(convert_chemformula(val))
+                        text.append(convert_chemformula(isotherm))
                     else:
                         text.append(str(val))
 
@@ -502,4 +505,7 @@ def plot_iso(isotherms,
             **styles['save_style'],
         )
 
-    return fig, ax1, ax2
+    if ax2:
+        return [ax1, ax2]
+    else:
+        return ax1

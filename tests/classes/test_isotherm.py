@@ -8,7 +8,7 @@ import pygaps
 
 
 @pytest.mark.core
-class TestIsotherm(object):
+class TestIsotherm():
     """
     Tests the parent isotherm object
     """
@@ -17,21 +17,21 @@ class TestIsotherm(object):
         "Checks isotherm can be created from test data"
 
         pygaps.classes.isotherm.Isotherm(
-            sample_name='carbon',
-            sample_batch='X1',
+            material_name='carbon',
+            material_batch='X1',
             adsorbate='nitrogen',
-            t_exp=77,
+            t_iso=77,
         )
 
     def test_isotherm_id(self, basic_isotherm):
         "Checks isotherm id works as intended"
 
-        iso_id = basic_isotherm.id
+        iso_id = basic_isotherm.iso_id
 
         basic_isotherm.new_param = 'changed'
-        assert iso_id == basic_isotherm.id
-        basic_isotherm.t_act = 123
-        assert iso_id != basic_isotherm.id
+        assert iso_id != basic_isotherm.iso_id
+        basic_isotherm.t_iso = 0
+        assert iso_id != basic_isotherm.iso_id
 
     @pytest.mark.parametrize('missing_param',
                              pygaps.classes.isotherm.Isotherm._required_params)
@@ -84,7 +84,6 @@ class TestIsotherm(object):
         "Checks isotherm returns the same dict as was used to create it"
 
         iso_dict = basic_isotherm.to_dict()
-        del iso_dict['id']
         assert isotherm_parameters == iso_dict
 
     def test_isotherm_print_parameters(self, basic_isotherm):

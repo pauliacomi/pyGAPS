@@ -14,7 +14,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestInitialHenry(object):
+class TestInitialHenry():
     """
     Tests all initial henry methods
     """

@@ -10,7 +10,7 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 @pytest.mark.characterisation
-class TestThicknessModels(object):
+class TestThicknessModels():
     """
     Tests the thickness models
     """

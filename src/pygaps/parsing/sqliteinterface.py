@@ -3,1195 +3,1131 @@ This module contains the sql interface for data manipulation.
 """
 
 import array
+import functools
 import sqlite3
 
-import numpy
 import pandas
 
 from ..classes.adsorbate import Adsorbate
+from ..classes.material import Material
 from ..classes.pointisotherm import Isotherm
 from ..classes.pointisotherm import PointIsotherm
-from ..classes.sample import Sample
 from ..utilities.exceptions import ParsingError
+from ..utilities.python_utilities import grouped
 from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert
 from ..utilities.sqlite_utilities import build_select
-from ..utilities.sqlite_utilities import build_select_unnamed
 from ..utilities.sqlite_utilities import build_update
+
+
+def with_connection(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+
+        path = args[0]
+        conn = sqlite3.connect(path)
+        conn.row_factory = sqlite3.Row
+
+        try:
+            # Get a cursor object
+            cursor = conn.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            ret = func(*args, **kwargs, cursor=cursor)
+
+        except sqlite3.IntegrityError as e:
+            conn.rollback()
+            if kwargs.get('verbose', False):
+                print("Error")
+            raise ParsingError from e
+        else:
+            conn.commit()
+        finally:
+            conn.close()
+
+        return ret
+
+    return wrapper
 
 # ---------------------- General functions
 
 
-def _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, input_dict, name_string):
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            to_insert = [table_id] + columns
-
-            if overwrite:
-                sql_com = build_update(table=table_name,
-                                       to_set=columns,
-                                       where=[table_id])
-            else:
-                sql_com = build_insert(table=table_name,
-                                       to_insert=to_insert)
-
-            # Upload or modify data in machines table
-            insert_dict = {key: input_dict.get(key) for key in to_insert}
-            cursor.execute(sql_com, insert_dict)
-
-        # Print success
-        print(name_string, "uploaded", insert_dict.get(table_id))
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on:", "\n",
-              input_dict.get(table_id),
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-
-def _get_all_no_id(pth, table_id, table_name, name_string):
+def _upload_one_all_columns(cursor, table_name, table_id, columns, input_dict,
+                            overwrite, print_string, verbose, **kwargs):
     """Gets all elements from a table as a dictionary, excluding id"""
-    # Connect to database
-    with sqlite3.connect(pth) as db:
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+    to_insert = [table_id] + columns
 
-        # Execute the query
-        cursor.execute('''SELECT * FROM ''' + table_name)
+    if overwrite:
+        sql_com = build_update(table=table_name,
+                               to_set=columns,
+                               where=[table_id])
+    else:
+        sql_com = build_insert(table=table_name,
+                               to_insert=to_insert)
 
-        # Get the types
-        types = []
-        for row in cursor:
-            unit = dict(zip(row.keys(), row))
-            unit.pop(table_id)
-            types.append(unit)
+    # Upload or modify data in machines table
+    insert_dict = {key: input_dict.get(key) for key in to_insert}
+    cursor.execute(sql_com, insert_dict)
 
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(types), name_string)
-    return types
-
-
-def _delete_one_by_id(pth, table_name, table_id, element_id, name_string):
-    """Gets all elements from a table as a dictionary, excluding id"""
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            # Check if exists
-            ids = cursor.execute(
-                build_select(table=table_name,
-                             to_select=[table_id],
-                             where=[table_id]),
-                {table_id:        element_id}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Element to delete does not exist in database")
-
-            sql_com = build_delete(table=table_name,
-                                   where=[table_id])
-
-            cursor.execute(sql_com, {table_id: element_id})
-
-            # Print success
-            print("Success, deleted", name_string, element_id)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on:", "\n",
-              element_id,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-# ---------------------- Samples
-
-
-def db_upload_sample(pth, sample, overwrite=False):
-    """
-    Uploads samples to the database.
-    If overwrite is set to true, the sample is overwritten
-    Overwrite is done based on sample.name + sample.batch
-    WARNING: Overwrite is done on ALL fields.
-    """
-
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            if overwrite:
-                sql_com = build_update(table="samples",
-                                       to_set=Sample._named_params,
-                                       where=['name', 'batch'])
-            else:
-                to_insert = ['name', 'batch'] + Sample._named_params
-                sql_com = build_insert(table="samples",
-                                       to_insert=to_insert)
-
-            sample_dict = sample.to_dict()
-            upload_dict = {'name': sample.name, 'batch': sample.batch}
-            for prop in Sample._named_params:
-                if prop in sample_dict:
-                    upload_dict.update({prop: sample_dict[prop]})
-                else:
-                    upload_dict.update({prop: ""})
-
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, upload_dict)
-
-            # Upload or modify data in sample_properties table
-            if sample.properties and len(sample.properties) > 0:
-                # Get id of sample
-                sample_id = cursor.execute(
-                    build_select(table='samples',
-                                 to_select=['id'],
-                                 where=['name', 'batch']), {
-                        'name':        sample.name,
-                        'batch':       sample.batch,
-                    }
-                ).fetchone()[0]
-
-                # Sql of update routine
-                sql_update = build_update(table='sample_properties',
-                                          to_set=['type', 'value'],
-                                          where=['sample_id'])
-                # Sql of insert routine
-                sql_insert = build_insert(table='sample_properties',
-                                          to_insert=['sample_id', 'type', 'value'])
-
-                updates = []
-
-                if overwrite:
-                    # Find existing properties
-                    cursor.execute(
-                        build_select(table='sample_properties',
-                                     to_select=['type'],
-                                     where=['sample_id']), {
-                            'sample_id':        sample_id,
-                        }
-                    )
-                    updates = [elt[0] for elt in cursor.fetchall()]
-
-                for prop in sample.properties:
-                    if prop is not None:
-                        if prop in updates:
-                            sql_com_prop = sql_update
-                        else:
-                            sql_com_prop = sql_insert
-
-                        cursor.execute(sql_com_prop, {
-                            'sample_id':        sample_id,
-                            'type':             prop,
-                            'value':            sample.properties[prop]
-                        })
-
+    if verbose:
         # Print success
-        print("Sample uploaded", sample.name, sample.batch)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
-              sample.name,
-              sample.batch,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    return
+        print(print_string, "uploaded", insert_dict.get(table_id))
 
 
-def db_get_samples(pth):
+def _get_all_no_id(cursor, table_name, table_id, print_string, verbose, **kwargs):
+    """Gets all elements from a table as a dictionary, excluding id"""
+
+    cursor.execute("""SELECT * FROM """ + table_name)
+
+    values = []
+    for row in cursor:
+        val = dict(zip(row.keys(), row))
+        val.pop(table_id)
+        values.append(val)
+
+    return values
+
+
+def _delete_by_id(cursor, table_name, table_id, element_id, print_string, verbose, **kwargs):
+    """Deletes elements in a database by using their ID"""
+
+    # Check if exists
+    ids = cursor.execute(
+        build_select(table=table_name,
+                     to_select=[table_id],
+                     where=[table_id]),
+        {table_id:        element_id}
+    ).fetchone()
+
+    if ids is None:
+        raise sqlite3.IntegrityError(
+            "Element to delete does not exist in database")
+
+    sql_com = build_delete(table=table_name,
+                           where=[table_id])
+
+    cursor.execute(sql_com, {table_id: element_id})
+
+    if verbose:
+        # Print success
+        print("Success, deleted", print_string, element_id)
+
+
+# ---------------------- Materials
+
+
+@with_connection
+def db_upload_material(path, material, overwrite=False, verbose=True, **kwargs):
     """
-    Gets all samples and their properties.
+    Uploads materials to the database.
+    If overwrite is set to true, the material is overwritten.
+    Overwrite is done based on material.name + material.batch
 
-    The number of samples is usually small, so all can be loaded in memory at once.
-    """
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    material : Material
+        Material class to upload to the database.
+    overwrite : bool
+        Whether to upload the material or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
-
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
-
-        # Execute the query
-        cursor.execute('''SELECT * FROM samples''')
-
-        samples = []
-
-        # Create the samples
-        for row in cursor:
-
-            sample_params = dict(zip(row.keys(), row))
-
-            # Get the extra data from the sample_properties table
-            cur_inner = db.cursor()
-
-            cur_inner.execute(build_select(table='sample_properties',
-                                           to_select=['type', 'value'],
-                                           where=['sample_id']), {
-                'sample_id':        sample_params.pop('id')
-            })
-
-            sample_params.update({
-                row[0]: row[1] for row in cur_inner})
-
-            # Build sample objects
-            samples.append(Sample(**sample_params))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(samples), "samples")
-
-    return samples
-
-
-def db_delete_sample(pth, sample):
-    """
-    Delete sample from the database.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    cursor = kwargs.pop('cursor', None)
 
-            # Get id of sample
-            sample_ids = cursor.execute(
-                build_select(table='samples',
-                             to_select=['id'],
-                             where=['name', 'batch']), {
-                    'name':        sample.name,
-                    'batch':       sample.batch,
+    if not overwrite:
+        cursor.execute(build_insert(table="materials",
+                                    to_insert=['name', 'batch']),
+                       {'name': material.name, 'batch': material.batch})
+
+    # Upload or modify data in material_properties table
+    if material.properties:
+        # Get id of material
+        material_ids = cursor.execute(
+            build_select(table='materials',
+                         to_select=['id'],
+                         where=['name', 'batch']), {
+                'name':        material.name,
+                'batch':       material.batch,
+            }
+        ).fetchone()
+
+        if material_ids is None:
+            raise sqlite3.IntegrityError(
+                "Material to overwrite does not exist in database")
+        mat_id = material_ids[0]
+
+        # Sql of update routine
+        sql_update = build_update(table='material_properties',
+                                  to_set=['value'],
+                                  where=['material_id', 'type'])
+        # Sql of insert routine
+        sql_insert = build_insert(table='material_properties',
+                                  to_insert=['material_id', 'type', 'value'])
+        # Sql of delete routine
+        sql_delete = build_delete(table='material_properties',
+                                  where=['material_id'])
+
+        updates = []
+
+        if overwrite:
+            # Find existing properties
+            cursor.execute(
+                build_select(table='material_properties',
+                             to_select=['type'],
+                             where=['material_id']), {
+                    'material_id':        mat_id,
                 }
-            ).fetchone()
+            )
+            updates = [elt[0] for elt in cursor.fetchall()]
 
-            if sample_ids is None:
-                raise sqlite3.IntegrityError(
-                    "Sample to delete does not exist in database")
+        for prop in material.properties:
+            if prop is not None:
+                if prop in updates:
+                    updates.remove(prop)
+                    sql_com_prop = sql_update
+                else:
+                    sql_com_prop = sql_insert
 
-            # Delete data from sample_properties table
-            # Build sql request
-            sql_com = build_delete(table='sample_properties',
-                                   where=['sample_id'])
+                cursor.execute(sql_com_prop, {
+                    'material_id':      mat_id,
+                    'type':             prop,
+                    'value':            material.properties[prop]
+                })
 
-            cursor.execute(sql_com, {'sample_id': sample_ids[0]})
+        for prop in updates:
+            cursor.execute(sql_delete, {'material_id': mat_id})
 
-            # Delete sample info in samples table
-            sql_com = build_delete(table='samples',
-                                   where=['id'])
-
-            cursor.execute(sql_com, {'id': sample_ids[0]})
-
-            # Print success
-            print("Success", sample.name, sample.batch)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
-              sample.name,
-              sample.batch,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
+    if verbose:
+        # Print success
+        print("Material uploaded", material.name, material.batch)
 
     return
 
 
-def db_upload_sample_type(pth, type_dict, overwrite=False):
+@with_connection
+def db_get_materials(path, verbose=True, **kwargs):
     """
-    Uploads a sample type.
+    Gets all materials and their properties.
+
+    The number of materials is usually small, so all can be loaded in memory at once.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
+
+    Returns
+    -------
+    list
+        list of Materials
     """
 
-    table_name = 'sample_type'
-    name_string = 'Sample type'
-    table_id = 'type'
-    columns = ['name']
+    cursor = kwargs.pop('cursor', None)
 
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, type_dict, name_string)
+    # Execute the query
+    cursor.execute("""SELECT * FROM materials""")
+    rows = cursor.fetchall()
+
+    materials = []
+
+    # Create the materials
+    for row in rows:
+
+        material_params = dict(zip(row.keys(), row))
+
+        # Get the extra data from the material_properties table
+        cursor.execute(build_select(table='material_properties',
+                                    to_select=['type', 'value'],
+                                    where=['material_id']),
+                       {
+            'material_id':        material_params.pop('id')
+        })
+
+        material_params.update({
+            row[0]: row[1] for row in cursor})
+
+        # Build material objects
+        materials.append(Material(**material_params))
+
+    if verbose:
+        # Print success
+        print("Selected", len(materials), "materials")
+
+    return materials
+
+
+@with_connection
+def db_delete_material(path, material, verbose=True, **kwargs):
+    """
+    Delete material from the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    material : Material
+        Material class to upload to the database.
+    verbose : bool
+        Print to console on success or error.
+    """
+
+    cursor = kwargs.pop('cursor', None)
+
+    # Get id of material
+    material_ids = cursor.execute(
+        build_select(table='materials',
+                     to_select=['id'],
+                     where=['name', 'batch']),
+        {
+            'name':        material.name,
+            'batch':       material.batch,
+        }
+    ).fetchone()
+
+    if material_ids is None:
+        raise sqlite3.IntegrityError(
+            "Material to delete does not exist in database")
+    mat_id = material_ids[0]
+
+    # Delete data from material_properties table
+    cursor.execute(build_delete(table='material_properties',
+                                where=['material_id']), {'material_id': mat_id})
+
+    # Delete material info in materials table
+    cursor.execute(build_delete(table='materials',
+                                where=['id']), {'id': mat_id})
+
+    if verbose:
+        # Print success
+        print("Success", material.name, material.batch)
 
     return
 
 
-def db_get_sample_types(pth):
+@with_connection
+def db_upload_material_property_type(path, type_dict, overwrite=False, verbose=True, **kwargs):
     """
-    Gets all sample types.
-    """
+    Uploads a material property type.
 
-    table = 'sample_type'
-    name_string = 'sample types'
-    table_id = 'id'
+    The type_dict takes the form of::
 
-    return _get_all_no_id(pth, table_id, table, name_string)
+        {
+            'type' : 'the_type',
+            'unit': 'the_unit',
+            'description': 'the_description'
+        }
 
-
-def db_delete_sample_type(pth, sample_type):
-    """
-    Delete sample type in the database.
-    """
-
-    table_id = 'type'
-    table_name = 'sample_type'
-    name_string = 'sample types'
-
-    _delete_one_by_id(pth, table_name, table_id, sample_type, name_string)
-
-    return
-
-
-def db_upload_sample_property_type(pth, type_dict, overwrite=False):
-    """
-    Uploads a sample property type.
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains property type.
+    overwrite : bool
+        Whether to upload the property type or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    table_name = 'sample_properties_type'
-    name_string = 'Sample properties type'
-    table_id = 'type'
-    columns = ['unit']
-
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, type_dict, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    _upload_one_all_columns(cursor, 'material_properties_type', 'type', ['unit', 'description'],
+                            type_dict, overwrite, 'Material properties type', verbose)
 
 
-def db_get_sample_property_types(pth):
+@with_connection
+def db_get_material_property_types(path, verbose=True, **kwargs):
     """
-    Gets all sample property types.
-    """
+    Gets all material property types.
 
-    table = 'sample_properties_type'
-    name_string = 'sample property types'
-    table_id = 'id'
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
 
-    return _get_all_no_id(pth, table_id, table, name_string)
-
-
-def db_delete_sample_property_type(pth, sample_prop_type):
-    """
-    Delete sample property type in the database.
+    Returns
+    -------
+    dict
+        dict of property types
     """
 
-    table_id = 'type'
-    table_name = 'sample_properties_type'
-    name_string = 'sample property types'
+    cursor = kwargs.pop('cursor', None)
+    return _get_all_no_id(cursor, 'material_properties_type', 'id',
+                          'material property types', verbose)
 
-    _delete_one_by_id(pth, table_name, table_id, sample_prop_type, name_string)
 
-    return
+@with_connection
+def db_delete_material_property_type(path, material_prop_type, verbose=True, **kwargs):
+    """
+    Delete material property type in the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    material_prop_type : str
+        The type to delete.
+    verbose : bool
+        Print to console on success or error.
+    """
+
+    cursor = kwargs.pop('cursor', None)
+    _delete_by_id(cursor, 'material_properties_type', 'type', material_prop_type,
+                  'material property types', verbose)
 
 
 # ---------------------- Experiments
 
 
-def db_upload_experiment(pth, isotherm, overwrite=None):
+@with_connection
+def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
     """
-    Uploads experiment to the database.
+    Uploads isotherm to the database.
 
-    Overwrite is the isotherm id where the data will be overwritten.
+    If overwrite is set to true, the isotherm is overwritten.
+    Overwrite is done based on isotherm.iso_id
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    isotherm : Isotherm
+        Isotherm class to upload to the database.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    cursor = kwargs.pop('cursor', None)
 
-            # First, if the goal was to overwrite an isotherm, must delete old data
-            if overwrite:
-                db_delete_experiment(pth, overwrite)
+    # The isotherm is going to be inserted into the database
+    # Build upload dict
+    upload_dict = {}
+    iso_dict = isotherm.to_dict()
+    iso_id = isotherm.iso_id
+    for param in Isotherm._db_columns:
+        upload_dict.update({param: iso_dict.pop(param, None)})
+    upload_dict['id'] = iso_id
 
-            # Then, the sample is going to be inserted into the database
-            # Build SQL request
-            sql_com = build_insert(table='experiments',
-                                   to_insert=Isotherm._db_columns)
+    # Upload isotherm info to database
+    cursor.execute(build_insert(table='isotherms',
+                                to_insert=Isotherm._db_columns), upload_dict)
 
-            # Build upload dict
-            upload_dict = {}
-            iso_dict = isotherm.to_dict()
-            for param in Isotherm._db_columns:
-                upload_dict.update({param: iso_dict.pop(param, None)})
+    # Then, the isotherm data will be uploaded into the isotherm_data table
 
-            # Upload experiment info to database
-            cursor.execute(sql_com, upload_dict)
+    # Build sql request
+    sql_insert = build_insert(table='isotherm_data',
+                              to_insert=['iso_id', 'type', 'data'])
 
-            # Then, the isotherm data will be uploaded
-            # into the experiment_data table
+    # Insert standard data fields:
+    cursor.execute(sql_insert,
+                   {'iso_id': iso_id, 'type': 'pressure',
+                    'data': isotherm.pressure().tobytes()}
+                   )
 
-            # Build sql request
-            sql_insert = build_insert(table='experiment_data',
-                                      to_insert=['exp_id', 'type', 'data'])
+    cursor.execute(sql_insert,
+                   {'iso_id': iso_id, 'type': 'loading',
+                    'data': isotherm.loading().tobytes()}
+                   )
 
-            # Insert standard data fields:
-            cursor.execute(sql_insert,
-                           {'exp_id': isotherm.id, 'type': 'pressure',
-                            'data': isotherm.pressure().tobytes()}
-                           )
+    # Update or insert other fields:
+    for key in isotherm.other_keys:
+        cursor.execute(sql_insert,
+                       {'iso_id': iso_id, 'type': key,
+                        'data': isotherm.other_data(key).tobytes()}
+                       )
 
-            cursor.execute(sql_insert,
-                           {'exp_id': isotherm.id, 'type': 'loading',
-                            'data': isotherm.loading().tobytes()}
-                           )
+    # Upload the remaining data from the isotherm
+    for key in iso_dict:
+        if key not in isotherm._unit_params:
+            cursor.execute(build_insert(table='isotherm_properties',
+                                        to_insert=['iso_id', 'type', 'value']),
+                           {'iso_id': iso_id,
+                            'type': key,
+                            'value': iso_dict[key]
+                            })
 
-            # Update or insert other fields:
-            for key in isotherm.other_keys:
-                cursor.execute(sql_insert,
-                               {'exp_id': isotherm.id, 'type': key,
-                                'data': isotherm.other_data(key).tobytes()}
-                               )
-
-            # Upload the remaining data from the isotherm
-            # Build sql request
-            sql_insert = build_insert(table='experiment_properties',
-                                      to_insert=['exp_id', 'type', 'value'])
-            for key in iso_dict:
-                cursor.execute(sql_insert,
-                               {'exp_id': isotherm.id,
-                                'type': key,
-                                'value': iso_dict[key]
-                                })
-
+    if verbose:
         # Print success
         print("Success:", isotherm)
 
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on isotherm:", "\n",
-              isotherm.exp_type,
-              isotherm.sample_name,
-              isotherm.sample_batch,
-              isotherm.user,
-              isotherm.adsorbate,
-              isotherm.machine,
-              isotherm.t_act,
-              isotherm.t_exp,
-              "\n", e)
-        raise ParsingError from e
 
-    # Close the db connection
-    if db:
-        db.close()
-
-    return
-
-
-def db_get_experiments(pth, criteria):
+@with_connection
+def db_get_isotherms(path, criteria, verbose=True, **kwargs):
     """
-    Gets experiments with the selected criteria from the database.
+    Gets isotherms with the selected criteria from the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    criteria : dict
+        Dictionary of isotherm parameters on which to filter database.
+        For example {'name': 'a_name', 'date': 'a_date'}. Parameters
+        must exist for the filtering to take place.
+    verbose : bool
+        Print to console on success or error.
+
+    Returns
+    -------
+    list
+        list of Isotherms
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    cursor = kwargs.pop('cursor', None)
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
+    # Get isotherm info from database
+    cursor.execute(
+        build_select(table='isotherms',
+                           to_select=Isotherm._db_columns,
+                           where=criteria.keys()), criteria)
 
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+    isotherms = []
+    alldata = cursor.fetchall()
 
-        # Get experiment info from database
-        sql_exp = build_select(table='experiments',
-                               to_select=Isotherm._db_columns,
-                               where=criteria.keys())
+    for rows in grouped(alldata, 100):  # we are taking 100 isotherms at a time
 
-        cursor.execute(sql_exp, criteria)
-        experiments = cursor.fetchall()
+        ids = tuple(row['id'] for row in rows)
 
-        # Create the isotherm list
-        isotherms = []
+        # Get isotherm properties from database
+        cursor.execute("""
+                SELECT iso_id, type, value FROM "isotherm_properties"
+                WHERE iso_id IN (%s);
+                """ % ','.join('?' * len(ids)), ids)
+        isotherm_props = cursor.fetchall()
 
-        if len(experiments) > 0:
+        # Get the properties from the data table
+        cursor.execute("""
+                SELECT iso_id, type, data FROM "isotherm_data"
+                WHERE iso_id IN (%s);
+                """ % ','.join('?' * len(ids)), ids)
+        isotherm_data = cursor.fetchall()
 
-            ids = tuple(exp['id'] for exp in experiments)
+        for row in rows:
 
-            # Get experiment properties from database
-            sql_exp_props = build_select_unnamed(table='experiment_properties',
-                                                 to_select=[
-                                                     'exp_id', 'type', 'value'],
-                                                 where=['exp_id' for exp_id in ids], join='OR')
+            # Generate the isotherm data
+            data_dict = {data[1]: array.array('d', data[2])
+                         for data in isotherm_data if data[0] == row['id']}
+            other_keys = [key for key in data_dict.keys()
+                          if key not in ('pressure', 'loading')]
+            exp_data = pandas.DataFrame(data_dict)
 
-            cursor.execute(sql_exp_props, ids)
-            experiment_props = cursor.fetchall()
+            # Generate the isotherm parameters dictionary
+            exp_params = dict(zip(row.keys(), row))
+            exp_params.update(
+                {prop[1]: prop[2]
+                    for prop in isotherm_props if prop[0] == row['id']})
+            exp_params.update({'other_keys': other_keys})
+            exp_params.pop('id')
 
-            # Get the properties from the experiment_properties table
-            sql_exp_data = build_select_unnamed(table='experiment_data',
-                                                to_select=[
-                                                    'exp_id', 'type', 'data'],
-                                                where=['exp_id' for exp_id in ids], join='OR')
-            cursor.execute(sql_exp_data, ids)
-            experiment_data = cursor.fetchall()
+            # build isotherm object
+            isotherms.append(PointIsotherm(isotherm_data=exp_data,
+                                           pressure_key="pressure",
+                                           loading_key="loading",
+                                           ** exp_params))
 
-            for exp in experiments:
-
-                # Generate the array for the pandas dataframe
-                columns = []
-                other_keys = []
-                data_arr = None
-                for data in experiment_data:
-                    if data[0] == exp['id']:
-
-                        columns.append(data[1])
-                        raw = array.array('d', data[2])
-                        if data_arr is None:
-                            data_arr = numpy.expand_dims(
-                                numpy.array(raw), axis=1)
-                        else:
-                            data_arr = numpy.hstack(
-                                (data_arr, numpy.expand_dims(numpy.array(raw), axis=1)))
-
-                        if data[1] not in ('pressure', 'loading'):
-                            other_keys.append(data[1])
-
-                exp_data = pandas.DataFrame(data_arr, columns=columns)
-
-                # Generate the experiment parameters dictionary
-                exp_params = dict(zip(exp.keys(), exp))
-                exp_params.update(
-                    {prop[1]: prop[2]
-                        for prop in experiment_props if prop[0] == exp['id']})
-                exp_params.update({'other_keys': other_keys})
-                exp_params.pop('id')
-
-                # build isotherm object
-                isotherms.append(PointIsotherm(exp_data,
-                                               pressure_key="pressure",
-                                               loading_key="loading",
-                                               ** exp_params))
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    # Print success
-    print("Selected", len(isotherms), "isotherms")
+    if verbose:
+        # Print success
+        print("Selected", len(isotherms), "isotherms")
 
     return isotherms
 
 
-def db_delete_experiment(pth, isotherm):
+@with_connection
+def db_delete_isotherm(path, iso_id, verbose=True, **kwargs):
     """
-    Delete experiment in the database.
-    """
+    Delete isotherm in the database.
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            # Check if sample exists
-            ids = cursor.execute(
-                build_select(table='experiments',
-                             to_select=['id'],
-                             where=['id']),
-                {'id':        isotherm.id}
-            ).fetchone()
-
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Experiment to delete does not exist in database")
-
-            # Delete data from experiment_data table
-            cursor.execute(build_delete(table='experiment_data',
-                                        where=['exp_id']), {'exp_id': isotherm.id})
-
-            # Delete data from experiment_data table
-            cursor.execute(build_delete(table='experiment_properties',
-                                        where=['exp_id']), {'exp_id': isotherm.id})
-
-            # Delete experiment info in experiments table
-            cursor.execute(build_delete(table='experiments',
-                                        where=['id']), {'id': isotherm.id})
-
-            # Print success
-            print("Success:", isotherm)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on isotherm:", "\n",
-              isotherm.exp_type,
-              isotherm.sample_name,
-              isotherm.sample_batch,
-              isotherm.user,
-              isotherm.adsorbate,
-              isotherm.machine,
-              isotherm.t_act,
-              isotherm.t_exp,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    return
-
-
-def db_upload_experiment_type(pth, type_dict, overwrite=False):
-    """
-    Uploads a experiment type.
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    isotherm : Isotherm or Isotherm.iso_id
+        The Isotherm object to delete from the database or its ID.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    table_name = 'experiment_type'
-    name_string = 'Experiment type'
-    table_id = 'type'
-    columns = ['name']
+    if isinstance(iso_id, Isotherm):
+        iso_id = iso_id.iso_id
 
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, type_dict, name_string)
+    cursor = kwargs.pop('cursor', None)
 
-    return
+    # Check if isotherm exists
+    ids = cursor.execute(
+        build_select(table='isotherms',
+                     to_select=['id'],
+                     where=['id']),
+        {'id':        iso_id}
+    ).fetchone()
+
+    if ids is None:
+        raise sqlite3.IntegrityError(
+            "Isotherm to delete does not exist in database. Did you modify any parameters?")
+
+    # Delete data from isotherm_data table
+    cursor.execute(build_delete(table='isotherm_data',
+                                where=['iso_id']), {'iso_id': iso_id})
+
+    # Delete data from isotherm_data table
+    cursor.execute(build_delete(table='isotherm_properties',
+                                where=['iso_id']), {'iso_id': iso_id})
+
+    # Delete isotherm in isotherms table
+    cursor.execute(build_delete(table='isotherms',
+                                where=['id']), {'id': iso_id})
+
+    if verbose:
+        # Print success
+        print("Success:", iso_id)
 
 
-def db_get_experiment_types(pth):
+@with_connection
+def db_upload_isotherm_type(path, type_dict, overwrite=False, verbose=True, **kwargs):
     """
-    Gets all sample types.
+    Uploads a isotherm type.
+
+    The type_dict takes the form of::
+
+        {
+            'type' : 'the_type',
+            'unit': 'the_unit',
+            'description': 'the_description'
+        }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains isotherm type.
+    overwrite : bool
+        Whether to upload the isotherm type or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    table = 'experiment_type'
-    name_string = 'experiment types'
-    table_id = 'id'
-
-    return _get_all_no_id(pth, table_id, table, name_string)
+    cursor = kwargs.pop('cursor', None)
+    _upload_one_all_columns(cursor, 'isotherm_type', 'type', ['description'],
+                            type_dict, overwrite, 'Experiment type', verbose)
 
 
-def db_delete_experiment_type(pth, exp_type):
+@with_connection
+def db_get_isotherm_types(path, verbose=True, **kwargs):
     """
-    Delete experiment type in the database.
+    Gets all isotherm types.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
+
+    Returns
+    -------
+    dict
+        dict of isotherm types
     """
 
-    table_id = 'type'
-    table_name = 'experiment_type'
-    name_string = 'experiment types'
-
-    _delete_one_by_id(pth, table_name, table_id, exp_type, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    return _get_all_no_id(cursor, 'isotherm_type', 'id',
+                          'isotherm types', verbose)
 
 
-def db_upload_experiment_property_type(pth, type_dict, overwrite=False):
+@with_connection
+def db_delete_isotherm_type(path, iso_type, verbose=True, **kwargs):
+    """
+    Delete isotherm type in the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    data_type : str
+        The type to delete.
+    verbose : bool
+        Print to console on success or error.
+    """
+
+    cursor = kwargs.pop('cursor', None)
+    _delete_by_id(cursor, 'isotherm_type', 'type', iso_type,
+                  'isotherm types', verbose)
+
+
+@with_connection
+def db_upload_isotherm_property_type(path, type_dict, overwrite=False, verbose=True, **kwargs):
     """
     Uploads a property type.
+
+    The type_dict takes the form of::
+
+        {
+            'type' : 'the_type',
+            'unit': 'the_unit',
+            'description': 'the_description'
+        }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains property type.
+    overwrite : bool
+        Whether to upload the property type or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    table_name = 'experiment_properties_type'
-    name_string = 'Experiment property type'
-    table_id = 'type'
-    columns = ['unit']
-
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, type_dict, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    _upload_one_all_columns(cursor, 'isotherm_properties_type', 'type', ['unit', 'description'],
+                            type_dict, overwrite, 'Experiment property type', verbose)
 
 
-def db_get_experiment_property_types(pth):
+@with_connection
+def db_get_isotherm_property_types(path, verbose=True, **kwargs):
     """
-    Gets all experiment property types.
-    """
+    Gets all isotherm property types.
 
-    table = 'experiment_properties_type'
-    name_string = 'experiment property types'
-    table_id = 'id'
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
 
-    return _get_all_no_id(pth, table_id, table, name_string)
-
-
-def db_delete_experiment_property_type(pth, property_type):
-    """
-    Delete experiment property type in the propertybase.
+    Returns
+    -------
+    dict
+        dict of property types
     """
 
-    table_id = 'type'
-    table_name = 'experiment_properties_type'
-    name_string = 'experiment property types'
-
-    _delete_one_by_id(pth, table_name, table_id, property_type, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    return _get_all_no_id(cursor, 'isotherm_properties_type', 'id',
+                          'isotherm property types', verbose)
 
 
-def db_upload_experiment_data_type(pth, type_dict, overwrite=False):
+@with_connection
+def db_delete_isotherm_property_type(path, property_type, verbose=True, **kwargs):
+    """
+    Delete isotherm property type in the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    property_type : str
+        Property type to delete.
+    verbose : bool
+        Print to console on success or error.
+    """
+
+    cursor = kwargs.pop('cursor', None)
+    _delete_by_id(cursor, 'isotherm_properties_type', 'type', property_type,
+                  'isotherm property types', verbose)
+
+
+@with_connection
+def db_upload_isotherm_data_type(path, type_dict, overwrite=False, verbose=True, **kwargs):
     """
     Uploads a data type.
+
+    The type_dict takes the form of::
+
+        {
+            'type' : 'the_type',
+            'unit': 'the_unit',
+            'description': 'the_description'
+        }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains data type.
+    overwrite : bool
+        Whether to upload the data type or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    table_name = 'experiment_data_type'
-    name_string = 'Experiment data type'
-    table_id = 'type'
-    columns = ['unit']
-
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, type_dict, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    _upload_one_all_columns(cursor, 'isotherm_data_type', 'type', ['unit', 'description'],
+                            type_dict, overwrite, 'Experiment data type', verbose)
 
 
-def db_get_experiment_data_types(pth):
+@with_connection
+def db_get_isotherm_data_types(path, verbose=True, **kwargs):
     """
-    Gets all experiment data types.
-    """
+    Gets all isotherm data types.
 
-    table = 'experiment_data_type'
-    name_string = 'experiment data types'
-    table_id = 'id'
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
 
-    return _get_all_no_id(pth, table_id, table, name_string)
-
-
-def db_delete_experiment_data_type(pth, data_type):
-    """
-    Delete experiment data type in the database.
+    Returns
+    -------
+    dict
+        dict of data types
     """
 
-    table_id = 'type'
-    table_name = 'experiment_data_type'
-    name_string = 'experiment data types'
+    cursor = kwargs.pop('cursor', None)
+    return _get_all_no_id(cursor, 'isotherm_data_type', 'id',
+                          'isotherm data types', verbose)
 
-    _delete_one_by_id(pth, table_name, table_id, data_type, name_string)
 
-    return
+@with_connection
+def db_delete_isotherm_data_type(path, data_type, verbose=True, **kwargs):
+    """
+    Delete isotherm data type in the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    data_type : str
+        The type to delete.
+    verbose : bool
+        Print to console on success or error.
+    """
+
+    cursor = kwargs.pop('cursor', None)
+    _delete_by_id(cursor, 'isotherm_data_type', 'type', data_type,
+                  'isotherm data types', verbose)
 
 
 # ---------------------- Adsorbates
 
-
-def db_upload_adsorbate(pth, adsorbate, overwrite=False):
+@with_connection
+def db_upload_adsorbate(path, adsorbate, overwrite=False, verbose=True, **kwargs):
     """
     Uploads adsorbates to the database.
 
-    If overwrite is set to true, the adsorbate is overwritten
+    If overwrite is set to true, the isotherm is overwritten.
     Overwrite is done based on adsorbate.name
-    WARNING: Overwrite is done on ALL fields
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    adsorbate : Adsorbate
+        Adsorbate class to upload to the database.
+    overwrite : bool
+        Whether to upload the adsorbate or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    cursor = kwargs.pop('cursor', None)
 
-            if overwrite:
-                sql_com = build_update(table="adsorbates",
-                                       to_set=['formula'],
-                                       where=['nick'])
+    if not overwrite:
+        # Upload in material table
+        cursor.execute(build_insert(table="adsorbates", to_insert=['name']),
+                       {'name': adsorbate.name})
+
+    # Get id of adsorbate
+    ids = cursor.execute(
+        build_select(table='adsorbates',
+                     to_select=['id'],
+                     where=['name']),
+        {'name': adsorbate.name}
+    ).fetchone()
+
+    if ids is None:
+        raise sqlite3.IntegrityError(
+            "Adsorbate to overwrite does not exist in database")
+    ads_id = ids[0]
+
+    # Upload or modify data in the associated tables
+    if adsorbate.properties:
+
+        # Sql of update routine
+        sql_update = build_update(table='adsorbate_properties',
+                                  to_set=['value'],
+                                  where=['ads_id', 'type'])
+        # Sql of insert routine
+        sql_insert = build_insert(table='adsorbate_properties',
+                                  to_insert=['ads_id', 'type', 'value'])
+        # Sql of delete routine
+        sql_delete = build_delete(table='adsorbate_properties',
+                                  where=['ads_id'])
+
+        updates = []
+
+        if overwrite:
+            # Find existing properties
+            cursor.execute(
+                build_select(table='adsorbate_properties',
+                             to_select=['type'],
+                             where=['ads_id']),
+                {'ads_id': ads_id}
+            )
+            updates = [elt[0] for elt in cursor.fetchall()]
+
+        for prop in adsorbate.properties:
+            if prop in updates:
+                updates.remove(prop)
+                sql_com_prop = sql_update
             else:
-                sql_com = build_insert(table="adsorbates",
-                                       to_insert=['nick', 'formula'])
+                sql_com_prop = sql_insert
 
-            # Upload or modify data in sample table
-            cursor.execute(sql_com, {
-                'nick':         adsorbate.name,
-                'formula':      adsorbate.formula,
-            }
+            cursor.execute(sql_com_prop, {
+                'ads_id':           ads_id,
+                'type':             prop,
+                'value':            adsorbate.properties[prop]
+            })
+
+        # delete the rest
+        for prop in updates:
+            cursor.execute(sql_delete, {'ads_id': ads_id})
+
+    if adsorbate.alias:
+
+        if overwrite:
+            # Delete existing names
+            cursor.execute(
+                build_delete(table='adsorbate_names',
+                             where=['ads_id']),
+                {'ads_id': ads_id}
             )
 
-            # Upload or modify data in the table
-            if len(adsorbate.properties) > 0:
-                # Get id of adsorbate
-                ads_id = cursor.execute(
-                    build_select(table='adsorbates',
-                                 to_select=['id'],
-                                 where=['nick']), {
-                        'nick':         adsorbate.name,
-                        'formula':      adsorbate.formula,
-                    }
-                ).fetchone()[0]
+        # Sql of insert routine
+        sql_insert = build_insert(table='adsorbate_names',
+                                  to_insert=['ads_id', 'name'])
 
-                # Sql of update routine
-                sql_update = build_update(table='adsorbate_properties',
-                                          to_set=['type', 'value'],
-                                          where=['ads_id'])
-                # Sql of insert routine
-                sql_insert = build_insert(table='adsorbate_properties',
-                                          to_insert=['ads_id', 'type', 'value'])
+        for alias in adsorbate.alias:
+            cursor.execute(sql_insert, {
+                'ads_id':           ads_id,
+                'name':             alias,
+            })
 
-                updates = []
-
-                if overwrite:
-                    # Find existing properties
-                    cursor.execute(
-                        build_select(table='adsorbate_properties',
-                                     to_select=['type'],
-                                     where=['ads_id']), {
-                            'ads_id':        ads_id,
-                        }
-                    )
-                    updates = [elt[0] for elt in cursor.fetchall()]
-
-                for prop in adsorbate.properties:
-                    if prop in updates:
-                        sql_com_prop = sql_update
-                    else:
-                        sql_com_prop = sql_insert
-
-                    cursor.execute(sql_com_prop, {
-                        'ads_id':           ads_id,
-                        'type':             prop,
-                        'value':            adsorbate.properties[prop]
-                    })
-
+    if verbose:
         # Print success
         print("Adsorbate uploaded", adsorbate.name)
 
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on adsorbate:", "\n",
-              adsorbate.name,
-              "\n", e)
-        raise ParsingError from e
 
-    # Close the db connection
-    if db:
-        db.close()
-
-    return
-
-
-def db_get_adsorbates(pth):
+@with_connection
+def db_get_adsorbates(path, verbose=True, **kwargs):
     """
     Gets all adsorbates and their properties.
 
     The number of adsorbates is usually small, so all can be
     loaded in memory at once.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
+
+    Returns
+    -------
+    list
+        list of Adsorbates
     """
 
-    # Connect to database
-    with sqlite3.connect(pth) as db:
+    cursor = kwargs.pop('cursor', None)
 
-        # Set row factory
-        db.row_factory = sqlite3.Row
-        # Get a cursor object
-        cursor = db.cursor()
-        cursor.execute('PRAGMA foreign_keys = ON')
+    # Get required adsorbate from database
+    cursor.execute("""SELECT * FROM adsorbates""")
 
-        # Get required adsorbate from database
-        cursor.execute('''SELECT * FROM adsorbates''')
+    rows = cursor.fetchall()
 
-        adsorbates = []
+    # Create the adsorbates
+    adsorbates = []
+    for row in rows:
 
-        # Create the adsorbates
-        for row in cursor:
+        cursor.execute(
+            build_select(table='adsorbate_properties',
+                         to_select=['type', 'value'],
+                         where=['ads_id']),
+            {'ads_id': row['id']}
+        )
 
-            adsorbate_params = dict(zip(row.keys(), row))
+        adsorbate_params = {r[0]: r[1] for r in cursor}
 
-            # Get the extra data from the adsorbate_properties table
-            cur_inner = db.cursor()
+        cursor.execute(
+            build_select(table='adsorbate_names',
+                         to_select=['name'],
+                         where=['ads_id']),
+            {'ads_id': row['id']}
+        )
+        alias = [r[0] for r in cursor]
 
-            cur_inner.execute(
-                build_select(table='adsorbate_properties',
-                             to_select=['type', 'value'],
-                             where=['ads_id']),
-                {'ads_id': adsorbate_params.pop('id')}
-            )
-
-            adsorbate_params.update({
-                row[0]: row[1] for row in cur_inner})
-
-            # Build adsorbate objects
-            adsorbates.append(Adsorbate(**adsorbate_params))
-
-    # Close the db connection
-    if db:
-        db.close()
+        # Build adsorbate objects
+        adsorbates.append(
+            Adsorbate(row['name'], alias=alias, **adsorbate_params))
 
     # Print success
-    print("Selected", len(adsorbates), "adsorbates")
+    if verbose:
+        print("Selected", len(adsorbates), "adsorbates")
 
     return adsorbates
 
 
-def db_delete_adsorbate(pth, adsorbate):
+@with_connection
+def db_delete_adsorbate(path, adsorbate, verbose=True, **kwargs):
     """
     Delete adsorbate from the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    adsorbate : Adsorbate
+        The Adsorbate class to delete.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    # Connect to database
-    db = sqlite3.connect(pth)
-    try:
-        with db:
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
+    cursor = kwargs.pop('cursor', None)
 
-            # Get id of adsorbate
-            ids = cursor.execute(
-                build_select(table='adsorbates',
-                             to_select=['id'],
-                             where=['nick']),
-                {'nick':        adsorbate.name}
-            ).fetchone()
+    # Get id of adsorbate
+    ids = cursor.execute(
+        build_select(table='adsorbates',
+                     to_select=['id'],
+                     where=['name']),
+        {'name': adsorbate.name}
+    ).fetchone()
 
-            if ids is None:
-                raise sqlite3.IntegrityError(
-                    "Adsorbate to delete does not exist in database")
-            ads_id = ids[0]
+    if ids is None:
+        raise sqlite3.IntegrityError(
+            "Adsorbate to delete does not exist in database")
+    ads_id = ids[0]
 
-            # Delete data from adsorbate_properties table
-            # Build sql request
-            sql_com = build_delete(table='adsorbate_properties',
-                                   where=['ads_id'])
+    # Delete data from adsorbate_properties table
+    cursor.execute(
+        build_delete(table='adsorbate_properties',
+                     where=['ads_id']),
+        {'ads_id': ads_id})
 
-            cursor.execute(sql_com, {'ads_id': ads_id})
+    # Delete names from adsorbate_names table
+    cursor.execute(
+        build_delete(table='adsorbate_names',
+                     where=['ads_id']),
+        {'ads_id': ads_id})
 
-            # Delete sample info in adsorbate table
-            sql_com = build_delete(table='adsorbates',
-                                   where=['id'])
+    # Delete material in adsorbates table
+    cursor.execute(
+        build_delete(table='adsorbates',
+                     where=['id']),
+        {'id': ads_id})
 
-            cursor.execute(sql_com, {'id': ads_id})
-
-            # Print success
-            print("Success", adsorbate.name)
-
-    # Catch the exception
-    except sqlite3.IntegrityError as e:
-        print("Error on sample:", "\n",
-              adsorbate.name,
-              "\n", e)
-        raise ParsingError from e
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    return
+    if verbose:
+        # Print success
+        print("Success", adsorbate.name)
 
 
-def db_upload_adsorbate_property_type(pth, type_dict, overwrite=False):
+@with_connection
+def db_upload_adsorbate_property_type(path, type_dict, overwrite=False, verbose=True, **kwargs):
     """
     Uploads an adsorbate property type.
+
+    The type_dict takes the form of::
+
+        {
+            'type' : 'the_type',
+            'unit': 'the_unit',
+            'description': 'the_description'
+        }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains property type.
+    overwrite : bool
+        Whether to upload the property type or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    table_name = 'adsorbate_properties_type'
-    name_string = 'Property type'
-    table_id = 'type'
-    columns = ['unit']
-
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, type_dict, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    _upload_one_all_columns(cursor, 'adsorbate_properties_type', 'type', ['unit', 'description'],
+                            type_dict, overwrite, 'Property type', verbose)
 
 
-def db_get_adsorbate_property_types(pth):
+@with_connection
+def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
     """
     Gets all adsorbate property types.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
+
+    Returns
+    -------
+    dict
+        dict of property types
     """
 
-    table = 'adsorbate_properties_type'
-    name_string = 'adsorbate property types'
-    table_id = 'id'
-
-    return _get_all_no_id(pth, table_id, table, name_string)
+    cursor = kwargs.pop('cursor', None)
+    return _get_all_no_id(cursor, 'adsorbate_properties_type', 'id',
+                          'adsorbate property types', verbose)
 
 
-def db_delete_adsorbate_property_type(pth, property_type):
+@with_connection
+def db_delete_adsorbate_property_type(path, property_type, verbose=True, **kwargs):
     """
     Delete property type in the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    property_type : str
+        Name of the property type to delete.
+    verbose : bool
+        Print to console on success or error.
     """
 
-    table_id = 'type'
-    table_name = 'adsorbate_properties_type'
-    name_string = 'adsorbate property types'
-
-    _delete_one_by_id(pth, table_name, table_id, property_type, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    _delete_by_id(cursor, 'adsorbate_properties_type', 'type', property_type,
+                  'adsorbate property types', verbose)
 
 
-# ---------------------- Contacts
-
-
-def db_upload_contact(pth, contact_dict, overwrite=False):
+@with_connection
+def db_get_adsorbate_names(path, verbose=True, **kwargs):
     """
-    Uploads comtact to the database.
+    Gets all adsorbate aliases.
 
-    If overwrite is set to true, the contact is overwritten.
-    WARNING: Overwrite is done on ALL fields.
-    """
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
 
-    table_name = 'contacts'
-    name_string = 'Contact'
-    table_id = 'nick'
-    columns = ['name', 'email', 'phone']
-
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, contact_dict, name_string)
-
-    return
-
-
-def db_get_contacts(pth):
-    """
-    Gets all contacts.
+    Returns
+    -------
+    dict
+        dict of aliases
     """
 
-    table = 'contacts'
-    name_string = 'contacts'
-    table_id = 'id'
-
-    return _get_all_no_id(pth, table_id, table, name_string)
-
-
-def db_delete_contact(pth, contact_nick):
-    """
-    Delete contact in the database.
-    """
-
-    table_id = 'nick'
-    table_name = 'contacts'
-    name_string = 'contact'
-
-    _delete_one_by_id(pth, table_name, table_id, contact_nick, name_string)
-
-    return
-
-# ---------------------- Sources
-
-
-def db_upload_source(pth, source_dict, overwrite=False):
-    """
-    Uploads source to the database.
-
-    If overwrite is set to true, the source is overwritten.
-    WARNING: Overwrite is done on ALL fields.
-    """
-
-    table_name = 'sources'
-    name_string = 'Source'
-    table_id = 'nick'
-    columns = ['name']
-
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, source_dict, name_string)
-
-    return
-
-
-def db_get_sources(pth):
-    """
-    Gets all sources.
-    """
-
-    table = 'sources'
-    name_string = 'sources'
-    table_id = 'id'
-
-    return _get_all_no_id(pth, table_id, table, name_string)
-
-
-def db_delete_source(pth, source_nick):
-    """
-    Delete source in the database.
-    """
-
-    table_id = 'nick'
-    table_name = 'sources'
-    name_string = 'source'
-
-    _delete_one_by_id(pth, table_name, table_id, source_nick, name_string)
-
-    return
-
-
-# ---------------------- Machines
-
-
-def db_upload_machine(pth, machine_dict, overwrite=False):
-    """
-    Uploads machine to the database.
-
-    If overwrite is set to true, the machine is overwritten.
-    WARNING: Overwrite is done on ALL fields.
-    """
-
-    table_name = 'machines'
-    name_string = 'Machine'
-    table_id = 'nick'
-    columns = ['name', 'type']
-
-    _upload_one_all_columns(pth, table_id, columns, overwrite,
-                            table_name, machine_dict, name_string)
-
-    return
-
-
-def db_get_machines(pth):
-    """
-    Gets all machines.
-    """
-
-    table = 'machines'
-    name_string = 'machines'
-    table_id = 'id'
-
-    return _get_all_no_id(pth, table_id, table, name_string)
-
-
-def db_delete_machine(pth, machine_nick):
-    """
-    Delete machine in the database.
-    """
-
-    table_id = 'nick'
-    table_name = 'machines'
-    name_string = 'machine'
-
-    _delete_one_by_id(pth, table_name, table_id, machine_nick, name_string)
-
-    return
+    cursor = kwargs.pop('cursor', None)
+    return _get_all_no_id(cursor, 'adsorbate_names', 'id', '', verbose)

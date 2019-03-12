@@ -28,4 +28,4 @@ def test_file_paths():
     paths = utilities.folder_utilities.util_get_file_paths(
         path, extension='.tst')
 
-    assert paths == known_paths
+    assert all([path in known_paths for path in paths])

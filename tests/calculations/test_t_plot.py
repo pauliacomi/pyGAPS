@@ -15,12 +15,12 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestTPlot(object):
+class TestTPlot():
     """
     Tests everything related to tplot calculation
     """
 
-    def test_tplot_checks(self, basic_pointisotherm, basic_sample):
+    def test_tplot_checks(self, basic_pointisotherm, basic_material):
         """Test checks"""
 
         # Will raise a "no suitable model exception"

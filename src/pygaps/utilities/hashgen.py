@@ -5,6 +5,8 @@ Hashing isotherms
 import hashlib
 import json
 
+from pandas.util import hash_pandas_object
+
 import pygaps
 
 
@@ -24,18 +26,18 @@ def isotherm_to_hash(isotherm):
     """
 
     # Isotherm properties
-    raw_dict = {a: getattr(isotherm, a) for a in isotherm._id_params}
+    # raw_dict = {a: getattr(isotherm, a) for a in isotherm._id_params}
+    raw_dict = isotherm.to_dict()
 
     # Isotherm data
     if isinstance(isotherm, pygaps.PointIsotherm):
-        isotherm_data_dict = isotherm.data().to_dict(orient='index')
-        raw_dict["isotherm_data"] = [{p: str(t) for p, t in v.items()}
-                                     for k, v in isotherm_data_dict.items()]
+        raw_dict["isotherm_hash"] = str(hash_pandas_object(isotherm.data()).sum())
     elif isinstance(isotherm, pygaps.ModelIsotherm):
-        raw_dict["isotherm_model"] = {
-            'model': isotherm.model.name,
-            'parameters': isotherm.model.params,
-        }
+        raw_dict["isotherm_model"] = isotherm.model.name
+        # raw_dict["isotherm_model"] = {
+        #     'model': isotherm.model.name,
+        #     'parameters': isotherm.model.params,
+        # }
 
     md_hasher = hashlib.md5(json.dumps(raw_dict, sort_keys=True).encode('utf-8'))
 

@@ -10,7 +10,7 @@ import pygaps
 
 
 @pytest.mark.core
-class TestPointIsotherm(object):
+class TestPointIsotherm():
     """
     Tests the pointisotherm class
     """
@@ -19,27 +19,39 @@ class TestPointIsotherm(object):
     def test_isotherm_create(self):
         "Checks isotherm can be created from basic data"
 
+        isotherm_param = {
+            'material_name': 'carbon',
+            'material_batch': 'X1',
+            'adsorbate': 'nitrogen',
+            't_iso': 77,
+        }
+        pressure = [1, 2, 3, 4, 5, 3, 2]
+        loading = [1, 2, 3, 4, 5, 3, 2]
+
         pygaps.PointIsotherm(
-            pandas.DataFrame({
-                'pressure': [1, 2, 3, 4, 5, 3, 2],
-                'loading': [1, 2, 3, 4, 5, 3, 2]
+            pressure=pressure,
+            loading=loading,
+            **isotherm_param
+        )
+
+        pygaps.PointIsotherm(
+            isotherm_data=pandas.DataFrame({
+                'pressure': pressure,
+                'loading': loading
             }),
-            loading_key='loading',
             pressure_key='pressure',
-            sample_name='carbon',
-            sample_batch='X1',
-            adsorbate='nitrogen',
-            t_exp=77,
+            loading_key='loading',
+            **isotherm_param
         )
 
     def test_isotherm_id(self, basic_pointisotherm):
         "Checks isotherm id works as intended"
 
-        iso_id = basic_pointisotherm.id
-        basic_pointisotherm.nothing = 'changed'
-        assert iso_id == basic_pointisotherm.id
-        basic_pointisotherm._data = basic_pointisotherm._data[:5]
-        assert iso_id != basic_pointisotherm.id
+        iso_id = basic_pointisotherm.iso_id
+        basic_pointisotherm.new_param = 'changed'
+        assert iso_id != basic_pointisotherm.iso_id
+        # basic_pointisotherm.raw_data = basic_pointisotherm.raw_data[:5]
+        # assert iso_id != basic_pointisotherm.iso_id
 
     @pytest.mark.parametrize('missing_key',
                              ['loading_key', 'pressure_key'])
@@ -55,7 +67,7 @@ class TestPointIsotherm(object):
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.PointIsotherm(
-                isotherm_data,
+                isotherm_data=isotherm_data,
                 loading_key=keys.get('loading_key'),
                 pressure_key=keys.get('pressure_key'),
                 **isotherm_parameters)
@@ -65,11 +77,12 @@ class TestPointIsotherm(object):
         ('des', 1.0),
         ([False, False, True, True, True, True, True, True], 3.0),
     ])
-    def test_isotherm_create_branches(self, isotherm_parameters, isotherm_data, branch, expected):
+    def test_isotherm_create_branches(
+            self, isotherm_parameters, isotherm_data, branch, expected):
         "Tests if isotherm branches are well specified"
 
         isotherm = pygaps.PointIsotherm(
-            isotherm_data,
+            isotherm_data=isotherm_data,
             loading_key='loading',
             pressure_key='pressure',
             other_keys=['enthalpy'],
@@ -83,7 +96,7 @@ class TestPointIsotherm(object):
         "Checks isotherm id's are unique"
 
         isotherm = pygaps.PointIsotherm(
-            isotherm_data,
+            isotherm_data=isotherm_data,
             loading_key='loading',
             pressure_key='pressure',
             other_keys=['enthalpy'],
@@ -92,25 +105,22 @@ class TestPointIsotherm(object):
 
         assert isotherm == basic_pointisotherm
 
-        isotherm.t_act = 0
-
+        isotherm.t_iso = 0
         assert isotherm != basic_pointisotherm
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         "Checks isotherm can be created from isotherm"
 
         # regular creation
-        isotherm = pygaps.PointIsotherm.from_isotherm(
+        pygaps.PointIsotherm.from_isotherm(
             basic_isotherm,
-            pandas.DataFrame({
+            isotherm_data=pandas.DataFrame({
                 'pressure': [1, 2, 3, 4, 5, 3, 2],
                 'loading': [1, 2, 3, 4, 5, 3, 2]
             }),
             pressure_key='pressure',
             loading_key='loading',
         )
-
-        assert isotherm != basic_isotherm
 
     def test_isotherm_create_from_modelisotherm(self, basic_modelisotherm, basic_pointisotherm):
         "Checks isotherm can be created from isotherm"
@@ -120,12 +130,14 @@ class TestPointIsotherm(object):
             basic_modelisotherm,
             pressure_points=None
         )
+        assert isotherm.loading_at(3) == basic_modelisotherm.loading_at(3)
 
         # Specifying points
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
             basic_modelisotherm,
             pressure_points=[1, 2, 3, 4]
         )
+        assert isotherm.loading_at(3) == basic_modelisotherm.loading_at(3)
 
         # Specifying isotherm
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
@@ -133,7 +145,7 @@ class TestPointIsotherm(object):
             pressure_points=basic_pointisotherm
         )
 
-        assert isotherm != basic_modelisotherm
+        assert isotherm.loading_at(3) == basic_modelisotherm.loading_at(3)
 
 ##########################
     def test_isotherm_ret_has_branch(self, basic_pointisotherm):
@@ -204,7 +216,7 @@ class TestPointIsotherm(object):
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5]
         ))
 
-    def test_isotherm_ret_loading(self, basic_pointisotherm, use_sample, use_adsorbate):
+    def test_isotherm_ret_loading(self, basic_pointisotherm, use_material, use_adsorbate):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
         # Standard return
@@ -292,7 +304,7 @@ class TestPointIsotherm(object):
         (10, 20.0, dict(interp_fill=(0, 20))),
         (1, 1, dict(interpolation_type='slinear')),
     ])
-    def test_isotherm_ret_loading_at(self, basic_pointisotherm, use_sample, use_adsorbate,
+    def test_isotherm_ret_loading_at(self, basic_pointisotherm, use_material, use_adsorbate,
                                      inp, parameters, expected):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
@@ -316,7 +328,7 @@ class TestPointIsotherm(object):
         (10, 20.0, dict(interp_fill=(0, 20))),
         (1, 1, dict(interpolation_type='slinear')),
     ])
-    def test_isotherm_ret_pressure_at(self, basic_pointisotherm, use_sample, use_adsorbate,
+    def test_isotherm_ret_pressure_at(self, basic_pointisotherm, use_material, use_adsorbate,
                                       inp, parameters, expected):
         """Checks that all the functions in ModelIsotherm return their specified parameter"""
 
@@ -403,7 +415,7 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 'unit', 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_loading_basis(self, basic_pointisotherm, use_sample,
+    def test_isotherm_convert_loading_basis(self, basic_pointisotherm, use_material,
                                             isotherm_data, basis, unit, multiplier):
         """Checks that the loading basis conversion function work as expected"""
 
@@ -442,7 +454,7 @@ class TestPointIsotherm(object):
         pytest.param("bad_mode", 'unit', 1,
                                 marks=pytest.mark.xfail),
     ])
-    def test_isotherm_convert_adsorbent_basis(self, basic_pointisotherm, use_sample,
+    def test_isotherm_convert_adsorbent_basis(self, basic_pointisotherm, use_material,
                                               isotherm_data, basis, unit, multiplier):
         """Checks that the loading basis conversion function work as expected"""
 

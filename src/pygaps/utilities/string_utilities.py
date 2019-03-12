@@ -1,6 +1,11 @@
 """
 This module contains general functions for string transformations.
 """
+import pygaps
+
+
+def _to_latex(string):
+    return ('$' + string + '$')
 
 
 def convert_chemformula(string):
@@ -9,7 +14,7 @@ def convert_chemformula(string):
 
     Parameters
     ----------
-    string : str
+    string or Isotherm: str
         String to process.
 
     Returns
@@ -17,28 +22,31 @@ def convert_chemformula(string):
     str
         Processed string.
     """
+    result = result = getattr(string, 'adsorbate', False)
+    if not result:
+        inner = []
+        # Iterate through the string, adding non-numbers to the no_digits list
+        number_processing = False
+        for i in string:
+            if i.isdigit() and number_processing:
+                number_processing = True
+            elif i.isdigit() and not number_processing:
+                inner.append('_{')
+                number_processing = True
+            else:
+                if number_processing:
+                    inner.append('}')
+                    number_processing = False
+            inner.append(i)
 
-    inner = []
-    # Iterate through the string, adding non-numbers to the no_digits list
-    number_processing = False
-    for i in string:
-        if i.isdigit() and number_processing:
-            number_processing = True
-        elif i.isdigit() and not number_processing:
-            inner.append('_{')
-            number_processing = True
-        else:
-            if number_processing:
-                inner.append('}')
-                number_processing = False
-        inner.append(i)
+        if inner[-1].isdigit():
+            inner.append('}')
 
-    if inner[-1].isdigit():
-        inner.append('}')
-    # Now join all elements of the list with '',
-    # which puts all of the characters together.
-    result = "$"
-    result += ''.join(inner)
-    result += "$"
-
-    return result
+        # which put all characters together.
+        result = ''.join(inner)
+    else:
+        try:
+            result = pygaps.Adsorbate.find(result).formula
+        except pygaps.ParameterError:
+            pass
+    return _to_latex(result)

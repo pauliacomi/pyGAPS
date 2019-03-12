@@ -1,8 +1,13 @@
 {
-    "adsorbate": "N2",
-    "exp_type": "physisorption",
-    "id": "0b323834ec551914c92c4d6ee9af986c",
-    "is_real": true,
+    "material_name": "Carbon",
+    "material_batch": "X1",
+    "adsorbate": "nitrogen",
+    "t_iso": 303.0,
+    "iso_type": "physisorption",
+    "user": "Bob",
+    "machine": "homemade1",
+    "t_act": 150.0,
+    "lab": "local",
     "isotherm_data": [
         {
             "loading": "0.426869211537",
@@ -136,12 +141,5 @@
             "loading": "3.42648076702",
             "pressure": "1.84143809524"
         }
-    ],
-    "lab": "local",
-    "machine": "homemade1",
-    "sample_batch": "X1",
-    "sample_name": "Carbon",
-    "t_act": 150.0,
-    "t_exp": 303.0,
-    "user": "Bob"
+    ]
 }

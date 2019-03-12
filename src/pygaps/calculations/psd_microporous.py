@@ -4,7 +4,8 @@ the micropore range (<2 nm).
 """
 
 import numpy
-import scipy
+import scipy.constants as const
+import scipy.optimize as opt
 
 from ..utilities.exceptions import ParameterError
 
@@ -12,8 +13,8 @@ from ..utilities.exceptions import ParameterError
 def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
                         adsorbate_properties,
                         adsorbent_properties=None):
-    """
-    Calculates the pore size distribution using the Horvath-Kawazoe method
+    r"""
+    Calculate the pore size distribution using the Horvath-Kawazoe method.
 
     Parameters
     ----------
@@ -60,12 +61,12 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     .. math::
 
-        R_g T \\ln(\\frac{p}{p_0}) = U_0 + P_a
+        R_g T \ln(\frac{p}{p_0}) = U_0 + P_a
 
     Here :math:`U_0` is the potential function describing the surface to adsorbent
     interactions and :math:`P_a` is the potential function describing the adsorbate-
     adsorbate interactions. This equation is derived from the equation of the free energy
-    of adsorption at constant temperature where term :math:`T \\Delta S^{tr}(w/w_{\\infty})`
+    of adsorption at constant temperature where term :math:`T \Delta S^{tr}(w/w_{\infty})`
     is assumed to be negligible.
 
     If a Lennard-Jones-type potential function describes the interactions between the
@@ -74,14 +75,14 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
 
     .. math::
 
-        RT\\ln(p/p_0) =   & N_A\\frac{n_a A_a + n_A A_A}{2 \\sigma^{4}(l-d)} \\\\
-                        & \\times \\int_{d/_2}^{1-d/_2}
-                            \\Big[
-                            - \\Big(\\frac{\\sigma}{r}\\Big)^{4}
-                            + \\Big(\\frac{\\sigma}{r}\\Big)^{10}
-                            - \\Big(\\frac{\\sigma}{l-r}\\Big)^{4}
-                            + \\Big(\\frac{\\sigma}{l-r}\\Big)^{4}
-                            \\Big] \\mathrm{d}x
+        RT\ln(p/p_0) =   & N_A\frac{n_a A_a + n_A A_A}{2 \sigma^{4}(l-d)} \\
+                        & \times \int_{d/_2}^{1-d/_2}
+                            \Big[
+                            - \Big(\frac{\sigma}{r}\Big)^{4}
+                            + \Big(\frac{\sigma}{r}\Big)^{10}
+                            - \Big(\frac{\sigma}{l-r}\Big)^{4}
+                            + \Big(\frac{\sigma}{l-r}\Big)^{4}
+                            \Big] \mathrm{d}x
 
     Where:
 
@@ -95,19 +96,19 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     * :math:`A_a` -- the Lennard-Jones potential constant of the adsorbent molecule defined as
 
         .. math::
-            A_a = \\frac{6mc^2\\alpha_a\\alpha_A}{\\alpha_a/\\varkappa_a + \\alpha_A/\\varkappa_A}
+            A_a = \frac{6mc^2\alpha_a\alpha_A}{\alpha_a/\varkappa_a + \alpha_A/\varkappa_A}
 
     * :math:`A_A` -- the Lennard-Jones potential constant of the adsorbate molecule defined as
 
         .. math::
-            A_a = \\frac{3 m_e c_l ^2\\alpha_A\\varkappa_A}{2}
+            A_a = \frac{3 m_e c_l ^2\alpha_A\varkappa_A}{2}
 
     * :math:`m_e` -- mass of an electron
     * :math:`c_l` -- speed of light in vacuum
-    * :math:`\\alpha_a` -- polarizability of the adsorbate molecule
-    * :math:`\\alpha_A` -- polarizability of the adsorbent molecule
-    * :math:`\\varkappa_a` -- magnetic susceptibility of the adsorbate molecule
-    * :math:`\\varkappa_A` -- magnetic susceptibility of the adsorbent molecule
+    * :math:`\alpha_a` -- polarizability of the adsorbate molecule
+    * :math:`\alpha_A` -- polarizability of the adsorbent molecule
+    * :math:`\varkappa_a` -- magnetic susceptibility of the adsorbate molecule
+    * :math:`\varkappa_A` -- magnetic susceptibility of the adsorbent molecule
 
 
     *Limitations*
@@ -128,14 +129,12 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
           have other contributions, the Lennard-Jones potential function will not be
           an accurate description of pore environment.
 
-
     References
     ----------
     .. [#] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
        Carbon-dioxide Adsorption Isotherms, 86
 
     """
-
     # Parameter checks
     if pore_geometry == 'slit':
         pass
@@ -165,8 +164,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         raise ParameterError(
             "A dictionary of adsorbate properties must be provided"
             " for the HK method. The properties required are:"
-            "molecular_diameter, liquid_density, polarizability,"
-            "magnetic_susceptibility, surface_density, adsorbate_molar_mass")
+            " molecular_diameter, liquid_density, polarizability,"
+            " magnetic_susceptibility, surface_density, adsorbate_molar_mass")
     missing = [x for x in ['molecular_diameter',
                            'liquid_density',
                            'polarizability',
@@ -191,8 +190,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     adsorbate_molar_mass = adsorbate_properties.get('adsorbate_molar_mass')
 
     # calculation of constants and terms
-    e_m = scipy.constants.electron_mass
-    c_l = scipy.constants.speed_of_light
+    e_m = const.electron_mass
+    c_l = const.speed_of_light
     effective_diameter = d_adsorbate + d_adsorbent
     sigma = (2 / 5)**(1 / 6) * effective_diameter / 2
     sigma_si = sigma * 1e-9
@@ -201,8 +200,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         (p_adsorbate / m_adsorbate + p_adsorbent / m_adsorbent)
     a_adsorbate = 3 * e_m * c_l**2 * p_adsorbate * m_adsorbate / 2
 
-    constant_coefficient = scipy.constants.Avogadro / \
-        (scipy.constants.gas_constant * temperature) * \
+    constant_coefficient = const.Avogadro / \
+        (const.gas_constant * temperature) * \
         (n_adsorbate * a_adsorbate + n_adsorbent * a_adsorbent) / \
         (sigma_si**4)
 
@@ -224,7 +223,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         # minimise to find pore length
         def h_k_minimization(l_pore):
             return numpy.abs(h_k_pressure(l_pore) - p_point)
-        res = scipy.optimize.minimize_scalar(h_k_minimization)
+        res = opt.minimize_scalar(h_k_minimization)
         p_w.append(res.x - d_adsorbent)
 
     # finally calculate pore distribution

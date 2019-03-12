@@ -1,3 +1,6 @@
+## Test
+pytest --cov --cov-report xml:coverage.xml
+
 ## Increase version
 bumpversion major/minor/patch
 
