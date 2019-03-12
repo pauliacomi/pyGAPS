@@ -26,7 +26,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary of results with the following components. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
