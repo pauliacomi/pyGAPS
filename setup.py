@@ -26,7 +26,7 @@ setup(
     version='1.5.0',
     license='MIT license',
     description='A framework for processing adsorption data for porous materials',
-    long_description='%s\n%s' % (
+    long_description='%s' % (
         re.compile('^.. start-badges.*^.. end-badges',
                    re.M | re.S).sub('', read('README.rst'))
     ),
@@ -81,8 +81,8 @@ setup(
     ],
     extras_require={
         'reST': [
-            'docutils>=0.11'
-            'doc9',
+            'docutils >= 0.11'
+            'doc8',
             'pandoc',
             'restructuredtext-lint',
         ],
