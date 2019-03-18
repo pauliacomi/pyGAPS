@@ -1,8 +1,9 @@
 """
 Interaction with the NIST ISODB.
 """
-import requests
 import warnings
+
+import requests
 
 from .jsoninterface import isotherm_from_json
 
