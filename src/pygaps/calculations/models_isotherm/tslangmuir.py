@@ -10,12 +10,12 @@ from .model import IsothermModel
 
 
 class TSLangmuir(IsothermModel):
-    """
+    r"""
     Triple-site Langmuir (TSLangmuir) adsorption isotherm
 
     .. math::
 
-        n(p) = n_{m_1} \\frac{K_1 p}{1+K_1 p} +  n_{m_2} \\frac{K_2 p}{1+K_2 p} + n_{m_3} \\frac{K_3 p}{1+K_3 p}
+        n(p) = n_{m_1} \frac{K_1 p}{1+K_1 p} +  n_{m_2} \frac{K_2 p}{1+K_2 p} + n_{m_3} \frac{K_3 p}{1+K_3 p}
 
     Notes
     -----
@@ -30,7 +30,7 @@ class TSLangmuir(IsothermModel):
 
     .. math::
 
-        n(p) = \\sum_i n_{m_i}\\frac{K_i p}{1+K_i p}
+        n(p) = \sum_i n_{m_i}\frac{K_i p}{1+K_i p}
 
     In practice, up to three adsorption sites are considered.
     This model is the triple-site model (:math:`i=3`).
@@ -106,19 +106,19 @@ class TSLangmuir(IsothermModel):
         return opt_res.x
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Triple Site Langmuir model is solved analytically.
 
         .. math::
 
-            \\pi = n_{m_1} \\log{1 + K_1 p} +  n_{m_2} \\log{1 + K_2 p} + n_{m_3} \\log{1 + K_3 p}
+            \pi = n_{m_1} \log{1 + K_1 p} +  n_{m_2} \log{1 + K_2 p} + n_{m_3} \log{1 + K_3 p}
 
         Parameters
         ----------

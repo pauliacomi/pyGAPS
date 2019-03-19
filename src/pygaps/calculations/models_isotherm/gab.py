@@ -10,12 +10,12 @@ from .model import IsothermModel
 
 
 class GAB(IsothermModel):
-    """
+    r"""
     Guggenheim-Anderson-de Boer (GAB) adsorption isotherm
 
     .. math::
 
-        n(p) = n_m \\frac{C K p}{(1 - K p)(1 - K p + K C p)}
+        n(p) = n_m \frac{C K p}{(1 - K p)(1 - K p + K C p)}
 
     Notes
     -----
@@ -93,19 +93,19 @@ class GAB(IsothermModel):
         return opt_res.x
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the GAB model is solved analytically.
 
         .. math::
 
-            \\pi = n_m \\ln{\\frac{1 - K p + C K p}{1- K p}}
+            \pi = n_m \ln{\frac{1 - K p + C K p}{1- K p}}
 
         Parameters
         ----------
