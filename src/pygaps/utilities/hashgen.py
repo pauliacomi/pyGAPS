@@ -12,7 +12,7 @@ import pygaps
 
 def isotherm_to_hash(isotherm):
     """
-    Converts an isotherm object to a unique hash.
+    Convert an isotherm object to a unique hash.
 
     Parameters
     ----------
