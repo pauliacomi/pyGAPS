@@ -86,5 +86,5 @@ class TestIsotherm():
 
     def test_isotherm_print_parameters(self, basic_isotherm):
         """Check isotherm can print its own info."""
-
+        repr(basic_isotherm)
         print(basic_isotherm)

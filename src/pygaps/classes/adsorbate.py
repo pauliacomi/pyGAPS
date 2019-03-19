@@ -1,6 +1,4 @@
-"""
-This module contains the adsorbate class.
-"""
+"""This module contains the adsorbate class."""
 
 import warnings
 
@@ -16,7 +14,7 @@ from ..utilities.unit_converter import c_unit
 
 class Adsorbate():
     """
-    This class acts as a unified descriptor for an adsorbate.
+    An unified class descriptor for an adsorbate.
 
     Its purpose is to expose properties such as adsorbate name,
     and formula, as well as physical properties, such as molar mass
@@ -109,12 +107,31 @@ class Adsorbate():
         return
 
     def __repr__(self):
+        """Print adsorbate standard name."""
         return self.name
 
     def __str__(self):
-        """
-        Prints a short summary of all the adsorbate parameters.
-        """
+        """Print adsorbate standard name."""
+        return self.name
+
+    def __eq__(self, other):
+        """Overload equality operator to include aliases."""
+        if isinstance(other, Adsorbate):
+            other = other.name
+        else:
+            other = other.lower()
+        return self.name == other or other in self.alias
+
+    def __add__(self, other):
+        """Overload addition operator to use name."""
+        return self.name + other
+
+    def __radd__(self, other):
+        """Overload addition operator to use name."""
+        return other + self.name
+
+    def print_info(self):
+        """Print a short summary of all the adsorbate parameters."""
         string = ""
 
         string += ("Adsorbate: " + self.name + '\n')
@@ -127,8 +144,7 @@ class Adsorbate():
 
     @classmethod
     def find(cls, adsorbate_name):
-        """
-        Gets the adsorbate from the master list using its name.
+        """Get the specified adsorbate from the master list.
 
         Parameters
         ----------
@@ -147,8 +163,9 @@ class Adsorbate():
         """
         # See if adsorbate exists in master list
         adsorbate = None
+
         for ads in pygaps.ADSORBATE_LIST:
-            if adsorbate_name.lower() in ads.alias:
+            if ads == adsorbate_name:
                 adsorbate = ads
                 break
 

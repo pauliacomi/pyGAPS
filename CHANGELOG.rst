@@ -11,6 +11,9 @@ Features:
   ``pygaps.load_nist_isotherm`` which takes the ISODB filename
   as an argument.
 * Added hexane as an adsorbate in the database.
+* Isotherm adsorbate is now a pygaps.Adsorbate object and
+  can be accessed directly for all attributes
+  (only when available in the internal database, otherwise still a string).
 
 Breaking changes:
 
