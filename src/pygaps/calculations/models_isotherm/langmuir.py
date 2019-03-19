@@ -131,7 +131,7 @@ class Langmuir(IsothermModel):
             (self.params["K"] * (self.params["n_m"] - loading))
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
