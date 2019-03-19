@@ -10,10 +10,13 @@ Features:
 * Added a function to get isotherms from the NIST ISODB,
   ``pygaps.load_nist_isotherm`` which takes the ISODB filename
   as an argument.
+* Added hexane as an adsorbate in the database.
 
 Breaking changes:
 
 Bugfixes:
+* Some of the gas values in the isotherm were incorrect.
+  They have been now updated.
 
 
 1.5.0 (2019-03-12)
