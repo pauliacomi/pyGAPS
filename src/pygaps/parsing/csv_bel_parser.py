@@ -111,8 +111,7 @@ def isotherm_from_bel(path):
                         material_info.update({_DATA[n]: values[1]})
 
         adsdata.seek(0)                 # Reset string buffer to 0
-        data_df = pandas.read_table(adsdata,
-                                    sep='\t')
+        data_df = pandas.read_csv(adsdata, sep='\t')
         data_df.dropna(inplace=True, how='all', axis='columns')
         material_info['date'] = (material_info['date']
                                  + ' ' +
