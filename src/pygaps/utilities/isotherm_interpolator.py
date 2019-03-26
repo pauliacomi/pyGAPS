@@ -46,9 +46,8 @@ class isotherm_interpolator():
         #: Value of loading to assume beyond highest pressure in the data.
         self.interp_fill = interp_fill
 
-        #: The internal interpolator function. This is generated
-        #: the first time it is needed to make calculations faster.
-
+        # The actual interpolator. This is generated
+        # the first time it is needed to make calculations faster.
         if known_data is None:
             return
 
