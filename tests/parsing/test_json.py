@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to parser classes
-"""
+"""Tests JSON parsing."""
 import os
 
 import pytest
@@ -11,7 +9,7 @@ import pygaps
 @pytest.mark.parsing
 class TestJson():
     def test_isotherm_to_json(self, basic_isotherm):
-        """Tests the parsing of an isotherm to json"""
+        """Test the parsing of an isotherm to json."""
 
         test_isotherm_json = pygaps.isotherm_to_json(basic_isotherm)
         new_isotherm = pygaps.isotherm_from_json(test_isotherm_json)
@@ -19,7 +17,7 @@ class TestJson():
         assert basic_isotherm == new_isotherm
 
     def test_pointisotherm_to_json(self, basic_pointisotherm):
-        """Tests the parsing of an isotherm to json"""
+        """Test the parsing of an isotherm to json."""
 
         test_isotherm_json = pygaps.isotherm_to_json(basic_pointisotherm)
         new_isotherm = pygaps.isotherm_from_json(test_isotherm_json)
@@ -29,6 +27,7 @@ class TestJson():
         return
 
     def test_isotherm_from_json_nist(self):
+        """Test the parsing of an isotherm from json."""
 
         JSON_PATH_NIST = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),

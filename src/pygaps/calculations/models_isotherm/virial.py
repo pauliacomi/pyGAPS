@@ -11,13 +11,13 @@ from .model import IsothermModel
 
 
 class Virial(IsothermModel):
-    """
+    r"""
 
     A virial isotherm model with 3 factors.
 
     .. math::
 
-        p = n \\exp{(-\\ln{K_H} + An + Bn^2 + Cn^3)}
+        p = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}
 
     Notes
     -----
@@ -27,7 +27,7 @@ class Virial(IsothermModel):
 
     .. math::
 
-        p = n \\exp{(K_1n^0 + K_2n^1 + K_3n^2 + K_4n^3 + ... + K_i n^{i-1})}
+        p = n \exp{(K_1n^0 + K_2n^1 + K_3n^2 + K_4n^3 + ... + K_i n^{i-1})}
 
     It has been applied with success to describe the behaviour of standard as
     well as supercritical isotherms. The factors are usually empirical,
@@ -37,7 +37,7 @@ class Virial(IsothermModel):
 
     .. math::
 
-        K_1 = -\\ln{K_{H,0}}
+        K_1 = -\ln{K_{H,0}}
 
     In practice, besides the first constant, only 2-3 factors are used.
 
@@ -107,13 +107,13 @@ class Virial(IsothermModel):
                                    + self.params['B'] * loading**2 + self.params['C'] * loading**3)
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Virial model cannot be solved analytically
         and must be calculated numerically.

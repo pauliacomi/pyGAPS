@@ -78,18 +78,29 @@ which allows a PointIsotherm to be used. An example is:
 Alternatively, the ``guess_model`` parameter allows for the ModelIsotherm to attempt
 to fit some of the available models and then return the best fitting one. This mode should
 be used carefully, as there's no guarantee that the the best fitting model is the
-one with any physical significance. It it also worth noting that, since all available
-models are first calculated, this option will take significantly more resources than
+one with any physical significance. It it also worth noting that, since a lot of
+models may be evaluated, this option will take significantly more resources than
 simply specifying the model manually. As a consequence, some models which require
 a lot of overhead, or whose loading must be calculated numerically, such as the
-virial model, have been excluded from this option. An example:
+virial model, have been excluded from this option.
+
+Alternatively, the user can specify a list of models to the ``guess_model`` parameter.
+An example:
 
 ::
 
+    # Attempting all models
     model_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
         point_isotherm,
         branch='des'
-        guess_model=True,
+        guess_model='all',
+    )
+
+    # With a subset of models instead
+    model_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
+        point_isotherm,
+        branch='des'
+        guess_model=['Henry', 'Langmuir', 'BET'],
     )
 
 Once the a ModelIsotherm is generated, it can be used as a regular PointIsotherm, as

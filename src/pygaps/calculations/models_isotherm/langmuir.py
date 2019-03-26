@@ -8,12 +8,12 @@ from .model import IsothermModel
 
 
 class Langmuir(IsothermModel):
-    """
+    r"""
     Langmuir isotherm model
 
     .. math::
 
-        n(p) = n_m\\frac{K p}{1 + K p}
+        n(p) = n_m\frac{K p}{1 + K p}
 
     Notes
     -----
@@ -40,7 +40,7 @@ class Langmuir(IsothermModel):
     The desorption rate :math:`r_d`, on the other hand, will
     be proportional to the number of occupied sites and the energy
     of adsorption. It is also useful to define
-    :math:`\\theta = n_{ads}/n_{ads}^m` as the fractional
+    :math:`\theta = n_{ads}/n_{ads}^m` as the fractional
     surface coverage, the number of sites occupied divided by the total
     sites. At equilibrium, the rate of adsorption and the rate of
     desorption are equal, therefore the two equations can be combined.
@@ -49,28 +49,28 @@ class Langmuir(IsothermModel):
 
     .. math::
 
-        r_a = k_a p (1 - \\theta)
+        r_a = k_a p (1 - \theta)
 
-        r_d = k_d \\theta \\exp{\\Big(-\\frac{E_{ads}}{R_g T}\\Big)}
+        r_d = k_d \theta \exp{\Big(-\frac{E_{ads}}{R_g T}\Big)}
 
     At equilibrium, the rate of adsorption and the rate of
     desorption are equal, therefore the two equations can be combined.
 
     .. math::
 
-        k_a p (1 - \\theta) = k_d \\theta \\exp{\\Big(-\\frac{E_{ads}}{R_gT}\\Big)}
+        k_a p (1 - \theta) = k_d \theta \exp{\Big(-\frac{E_{ads}}{R_gT}\Big)}
 
     Rearranging to get an expression for the loading, the Langmuir equation becomes:
 
     .. math::
 
-        n(p) = n_m \\frac{K p}{1 + K p}
+        n(p) = n_m \frac{K p}{1 + K p}
 
     Here, :math:`n_m` is the moles adsorbed at the completion of the
     monolayer, and therefore the maximum possible loading.
     The Langmuir constant is the product of the individual desorption and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
     related to the energy of adsorption
-    :math:`\\exp{(-\\frac{E}{RT})}`.
+    :math:`\exp{(-\frac{E}{RT})}`.
 
     References
     ----------
@@ -107,7 +107,7 @@ class Langmuir(IsothermModel):
             (1.0 + self.params["K"] * pressure)
 
     def pressure(self, loading):
-        """
+        r"""
         Function that calculates pressure as a function
         of loading.
         For the Langmuir model, a direct relationship can be found
@@ -115,7 +115,7 @@ class Langmuir(IsothermModel):
 
         .. math::
 
-            p = \\frac{n}{K (n_m - n)}
+            p = \frac{n}{K (n_m - n)}
 
         Parameters
         ----------
@@ -131,19 +131,19 @@ class Langmuir(IsothermModel):
             (self.params["K"] * (self.params["n_m"] - loading))
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Langmuir model is solved analytically.
 
         .. math::
 
-            \\pi = n_m \\log{1 + K p}
+            \pi = n_m \log{1 + K p}
 
         Parameters
         ----------

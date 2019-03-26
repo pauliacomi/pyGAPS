@@ -32,17 +32,15 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary of results with the following components. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
         - ``area`` (float) : calculated BET surface area, in m2/unit of adsorbent
         - ``c_const`` (float) : the C constant in the BET equation, unitless
-        - ``n_monolayer`` (float) : the amount adsorbed at the statistical monolayer location,
-          in mmol
-        - ``p_monolayer`` (float) : the pressure at which the statistical monolayer is chosen,
-          relative
+        - ``n_monolayer`` (float) : the amount adsorbed at statistical monolayer, in mmol
+        - ``p_monolayer`` (float) : the pressure at which statistical monolayer is chosen, relative
         - ``bet_slope`` (float) : slope of the BET plot
         - ``bet_intercept`` (float) : intercept of the BET plot
         - ``corr_coef`` (float) : correlation coefficient of the linear region in the BET plot
@@ -103,12 +101,12 @@ def area_BET(isotherm, limits=None, verbose=False):
     assumptions are implicitly made in this approach:
 
         * Adsorption takes place on the pore surface. Microporous materials which have pores
-          in similar size as the molecule adsorbed cannot have a realistic surface area
+          in similar size as the molecule adsorbed cannot posses a realistic surface area
         * The cross-sectional area of the molecule on the surface cannot be guaranteed
-          For example, nitrogen has been known to adopt a different conformation on the
-          surface of some materials, due to inter-molecular forces, which effectively
+          For example, nitrogen has been known to adopt different orientations on the
+          surface of some materials due to inter-molecular forces, which effectively
           lowers its cross-sectional area.
-        * No account is made for adsorbate-adsorbent interaction in BET theory
+        * No account is made for heterogeneous adsorbate-adsorbent interaction in the BET theory
 
     References
     ----------

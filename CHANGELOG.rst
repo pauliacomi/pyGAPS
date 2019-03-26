@@ -2,6 +2,30 @@
 Changelog
 =========
 
+1.6.0 ()
+------------------
+
+Features:
+
+* Added a function to get isotherms from the NIST ISODB,
+  ``pygaps.load_nist_isotherm`` which takes the ISODB filename
+  as an argument.
+* Added hexane as an adsorbate in the database.
+* Isotherm adsorbate is now a pygaps.Adsorbate object and
+  can be accessed directly for all attributes
+  (only when available in the internal database, otherwise still a string).
+* Added github issue templates.
+
+Breaking changes:
+
+Bugfixes:
+* Some of the gas values in the isotherm were incorrect.
+  They have been now updated.
+
+
+1.5.0 (2019-03-12)
+------------------
+
 Features:
 
 * Increased number of adsorbates available in pyGAPS to 40.
@@ -12,7 +36,7 @@ Features:
 * Made adsorbates searchable by a list of aliases rather than a single name.
 * Exposed the CoolProp backend on adsorbate objects for convenience, it is
   accessible through the adsorbate.backend property.
-* Streamlined the internal database functions to be more general.
+* Streamlined the internal database functions.
 * Updated NIST json import to new format. Cannot import multicomponent isotherms.
 * Functions which generate matplotlib graphs now can take an Ax as parameter
   (similar to behaviour of pandas) to plot on existing figures.
@@ -30,7 +54,7 @@ Breaking changes:
 * Several database functions have been renamed.
   All functions switched: 'sample' -> 'material' and 'experiment' -> 'isotherm'.
 * When passing a DataFrame for isotherm creation, it now has to be specified as
-  `isotherm_data`.
+  the parameter 'isotherm_data'.
 * Isotherm unique ID is now generated on the fly (previously generated at
   each isotherm modification). It also now takes into account only the
   required parameters for each isotherm ( 'sample_name', 'sample_batch',

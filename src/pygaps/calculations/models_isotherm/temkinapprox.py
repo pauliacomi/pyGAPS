@@ -10,12 +10,12 @@ from .model import IsothermModel
 
 
 class TemkinApprox(IsothermModel):
-    """
+    r"""
     Asymptotic approximation to the Temkin Isotherm
 
     .. math::
 
-        n(p) = n_M \\frac{K p}{1 + K p} + n_M \\theta (\\frac{K p}{1 + K p})^2 (\\frac{K p}{1 + K p} -1)
+        n(p) = n_M \frac{K p}{1 + K p} + n_M \theta (\frac{K p}{1 + K p})^2 (\frac{K p}{1 + K p} -1)
 
     Notes
     -----
@@ -28,8 +28,8 @@ class TemkinApprox(IsothermModel):
     to obtain an explicit equation for the loading.
 
     Here, :math:`n_M` and K have the same physical meaning as in the Langmuir model.
-    The additional parameter :math:`\\theta` describes the strength of the adsorbate-adsorbate
-    interactions (:math:`\\theta < 0` for attractions).
+    The additional parameter :math:`\theta` describes the strength of the adsorbate-adsorbate
+    interactions (:math:`\theta < 0` for attractions).
 
     References
     ----------
@@ -99,19 +99,19 @@ class TemkinApprox(IsothermModel):
         return opt_res.x
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the TemkinApprox model is solved analytically.
 
         .. math::
 
-            \\pi = n_M (\\ln{1+ K p} \\frac{\\theta (2 K p +1)}{2(1 + K p)^2})
+            \pi = n_M (\ln{1+ K p} \frac{\theta (2 K p +1)}{2(1 + K p)^2})
 
         Parameters
         ----------

@@ -8,7 +8,7 @@ from .model import IsothermModel
 
 
 class Henry(IsothermModel):
-    """
+    r"""
     Henry's law.
     Assumes a linear dependence of adsorbed amount with pressure.
 
@@ -35,7 +35,7 @@ class Henry(IsothermModel):
     low concentrations of gas there is a
     thermodynamic requirement for the applicability of Henry's law.
     Therefore, most models reduce to the Henry equation
-    as :math:`\\lim_{p \\to 0} n(p)`.
+    as :math:`\lim_{p \to 0} n(p)`.
 
     Usually, Henry's law is unrealistic because the adsorption sites
     will saturate at higher pressures.
@@ -93,19 +93,19 @@ class Henry(IsothermModel):
         return loading / self.params["K"]
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Henry model is solved analytically.
 
         .. math::
 
-            \\pi = K_H p
+            \pi = K_H p
 
         Parameters
         ----------

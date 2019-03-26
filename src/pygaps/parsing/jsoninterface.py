@@ -1,5 +1,5 @@
 """
-Parsing to and from json file format for isotherms.
+Parsing to and from a json file format for isotherms.
 """
 
 import json

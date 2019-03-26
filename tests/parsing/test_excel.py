@@ -1,6 +1,4 @@
-"""
-Tests excel interaction
-"""
+"""Tests excel interaction."""
 import pytest
 
 import pygaps
@@ -14,7 +12,7 @@ from .conftest import DATA_EXCEL_STD
 class TestExcel():
 
     def test_read_create_excel(self, basic_pointisotherm, tmpdir_factory):
-        """Tests creation of the regular excel file"""
+        """Test creation of the regular excel file."""
 
         path = tmpdir_factory.mktemp('excel').join('regular.xls').strpath
 
@@ -24,7 +22,7 @@ class TestExcel():
         assert isotherm == basic_pointisotherm
 
     def test_read_create_excel_madirel(self, basic_pointisotherm, tmpdir_factory):
-        """Tests creation of the MADIREL file"""
+        """Test creation of the MADIREL file."""
 
         path = DATA_EXCEL_STD[0]
         path = tmpdir_factory.mktemp('excel').join('MADIREL.xlx').strpath
@@ -35,7 +33,7 @@ class TestExcel():
         assert from_iso == basic_pointisotherm
 
     def test_read_excel_mic(self):
-        """Tests reading of micromeritics report files"""
+        """Test reading of micromeritics report files."""
 
         for path in DATA_EXCEL_MIC:
             isotherm = pygaps.isotherm_from_xl(path=path, fmt='mic')
@@ -46,7 +44,7 @@ class TestExcel():
                 assert isotherm == pygaps.isotherm_from_json(file.read())
 
     def test_read_excel_bel(self):
-        """Tests reading of bel report files"""
+        """Test reading of bel report files."""
 
         for path in DATA_EXCEL_BEL:
             isotherm = pygaps.isotherm_from_xl(path=path, fmt='bel')
