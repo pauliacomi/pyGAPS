@@ -790,9 +790,10 @@ class PointIsotherm(Isotherm):
         interpolation_type : str
             The type of scipy.interp1d used: `linear`, `nearest`, `zero`,
             `slinear`, `quadratic`, `cubic`. It defaults to `linear`.
-        interp_fill : float
-            Maximum value until which the interpolation is done. If blank,
-            interpolation will not predict outside the bounds of data.
+        interp_fill : array-like or (array-like, array_like) or “extrapolate”, optional
+            Parameter to determine what to do outside data bounds.
+            Passed to the scipy.interpolate.interp1d function as ``fill_value``.
+            If blank, interpolation will not predict outside the bounds of data.
 
         pressure_unit : str
             Unit the pressure is specified in. If ``None``, it defaults to
@@ -906,9 +907,10 @@ class PointIsotherm(Isotherm):
         interpolation_type : str
             The type of scipy.interp1d used: `linear`, `nearest`, `zero`,
             `slinear`, `quadratic`, `cubic`. It defaults to `linear`.
-        interp_fill : float
-            Maximum value until which the interpolation is done. If blank,
-            interpolation will not predict outside the bounds of data.
+        interp_fill : array-like or (array-like, array_like) or “extrapolate”, optional
+            Parameter to determine what to do outside data bounds.
+            Passed to the scipy.interpolate.interp1d function as ``fill_value``.
+            If blank, interpolation will not predict outside the bounds of data.
 
         pressure_unit : str
             Unit the pressure is returned in. If ``None``, it defaults to
@@ -1049,9 +1051,10 @@ class PointIsotherm(Isotherm):
         pressure_mode : str
             The mode the pressure is returned in. If ``None``, it defaults to
             internal isotherm mode.
-        interp_fill : float
-            Maximum value until which the interpolation is done. If blank,
-            interpolation will not predict outside the bounds of data.
+        interp_fill : array-like or (array-like, array_like) or “extrapolate”, optional
+            Parameter to determine what to do outside data bounds.
+            Passed to the scipy.interpolate.interp1d function as ``fill_value``.
+            If blank, interpolation will not predict outside the bounds of data.
 
         Returns
         -------
@@ -1075,7 +1078,7 @@ class PointIsotherm(Isotherm):
                                 adsorbent_basis=adsorbent_basis)
 
         # throw exception if interpolating outside the range.
-        if (self.l_interpolator.interp_fill is None) & (pressure > pressures.max()):
+        if (self.l_interpolator.interp_fill is None) & (pressure > pressures.max() or pressure < pressures.min()):
             raise CalculationError(
                 """
             To compute the spreading pressure at this bulk
@@ -1089,8 +1092,8 @@ class PointIsotherm(Isotherm):
 
             Option 1: fit an analytical model to extrapolate the isotherm
             Option 2: pass a `interp_fill` to the spreading pressure function of the
-                PointIsotherm object. Then, PointIsotherm will
-                assume that the uptake beyond pressure {0} is equal to
+                PointIsotherm object. Then, that PointIsotherm will
+                assume that the uptake beyond pressure {0} is given by
                 `interp_fill`. This is reasonable if your isotherm data exhibits
                 a plateau at the highest pressures.
             Option 3: Go back to the lab or computer to collect isotherm data
@@ -1110,36 +1113,36 @@ class PointIsotherm(Isotherm):
             # if this pressure is between 0 and first pressure point...
             # \int_0^P henry_const P /P dP = henry_const * P ...
             return henry_const * pressure
-        else:
-            # P > first pressure point
-            area = loadings[0]  # area of first segment \int_0^P_1 n(P)/P dP
 
-            # get area between P_1 and P_k, where P_k < P < P_{k+1}
-            for i in range(n_points - 1):
-                # linear interpolation of isotherm data
-                slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] -
-                                                           pressures[i])
-                intercept = loadings[i] - slope * pressures[i]
-                # add area of this segment
-                area += slope * (pressures[i + 1] - pressures[i]) + intercept * \
-                    numpy.log(pressures[i + 1] / pressures[i])
+        # P > first pressure point
+        area = loadings[0]  # area of first segment \int_0^P_1 n(P)/P dP
 
-            # finally, area of last segment
-            slope = (
-                self.loading_at(pressure,
-                                branch=branch,
-                                pressure_unit=pressure_unit,
-                                pressure_mode=pressure_mode,
+        # get area between P_1 and P_k, where P_k < P < P_{k+1}
+        for i in range(n_points - 1):
+            # linear interpolation of isotherm data
+            slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] -
+                                                       pressures[i])
+            intercept = loadings[i] - slope * pressures[i]
+            # add area of this segment
+            area += slope * (pressures[i + 1] - pressures[i]) + intercept * \
+                numpy.log(pressures[i + 1] / pressures[i])
 
-                                loading_unit=loading_unit,
-                                loading_basis=loading_basis,
-                                adsorbent_unit=adsorbent_unit,
-                                adsorbent_basis=adsorbent_basis,
-                                interp_fill=interp_fill) - loadings[n_points - 1]) / (
-                pressure - pressures[n_points - 1])
-            intercept = loadings[n_points - 1] - \
-                slope * pressures[n_points - 1]
-            area += slope * (pressure - pressures[n_points - 1]) + intercept * \
-                numpy.log(pressure / pressures[n_points - 1])
+        # finally, area of last segment
+        slope = (
+            self.loading_at(pressure,
+                            branch=branch,
+                            pressure_unit=pressure_unit,
+                            pressure_mode=pressure_mode,
 
-            return area
+                            loading_unit=loading_unit,
+                            loading_basis=loading_basis,
+                            adsorbent_unit=adsorbent_unit,
+                            adsorbent_basis=adsorbent_basis,
+                            interp_fill=interp_fill) - loadings[n_points - 1]) / (
+            pressure - pressures[n_points - 1])
+        intercept = loadings[n_points - 1] - \
+            slope * pressures[n_points - 1]
+        area += slope * (pressure - pressures[n_points - 1]) + intercept * \
+            numpy.log(pressure / pressures[n_points - 1])
+
+        return area

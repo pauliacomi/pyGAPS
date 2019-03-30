@@ -697,8 +697,7 @@ class ModelIsotherm(Isotherm):
 ##########################################################
 #   Functions that calculate values of the isotherm data
 
-    def loading_at(self, pressure,
-                   branch=None,
+    def loading_at(self, pressure, branch=None,
 
                    pressure_unit=None, pressure_mode=None,
                    loading_unit=None, loading_basis=None,
@@ -747,8 +746,6 @@ class ModelIsotherm(Isotherm):
         if branch and branch != self.branch:
             raise ParameterError(
                 "ModelIsotherm is not based off this isotherm branch")
-        else:
-            branch = self.branch
 
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)
@@ -801,8 +798,7 @@ class ModelIsotherm(Isotherm):
 
         return loading
 
-    def pressure_at(self, loading,
-                    branch=None,
+    def pressure_at(self, loading, branch=None,
 
                     pressure_unit=None, pressure_mode=None,
                     loading_unit=None, loading_basis=None,
@@ -851,8 +847,6 @@ class ModelIsotherm(Isotherm):
         if branch and branch != self.branch:
             raise ParameterError(
                 "ModelIsotherm is not based off this isotherm branch")
-        else:
-            branch = self.branch
 
         # Convert to numpy array just in case
         loading = numpy.asarray(loading)
@@ -910,8 +904,8 @@ class ModelIsotherm(Isotherm):
 
         return pressure
 
-    def spreading_pressure_at(self, pressure,
-                              branch=None,
+    def spreading_pressure_at(self, pressure, branch=None,
+
                               pressure_unit=None,
                               pressure_mode=None):
         r"""
@@ -949,8 +943,6 @@ class ModelIsotherm(Isotherm):
         if branch and branch != self.branch:
             raise ParameterError(
                 "ModelIsotherm is not based off this isotherm branch")
-        else:
-            branch = self.branch
 
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)
