@@ -14,32 +14,36 @@ from setuptools import setup
 
 
 def read(*names, **kwargs):
-    return io.open(
-        join(dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8')
-    ).read()
+    with io.open(
+            join(dirname(__file__), *names),
+            encoding=kwargs.get('encoding', 'utf8')
+    ) as fh:
+        return fh.read()
 
 
 setup(
     name='pygaps',
-    version='1.3.0',
+    version='1.5.0',
     license='MIT license',
     description='A framework for processing adsorption data for porous materials',
-    long_description='%s\n%s' % (
+    long_description='%s' % (
         re.compile('^.. start-badges.*^.. end-badges',
-                   re.M | re.S).sub('', read('README.rst')),
-        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
+                   re.M | re.S).sub('', read('README.rst'))
     ),
     author='Paul Iacomi',
     author_email='iacomi.paul@gmail.com',
     url='https://github.com/pauliacomi/pygaps',
+    project_urls={
+        "Documentation": 'https://pygaps.readthedocs.io',
+        "Source Code": 'https://github.com/pauliacomi/pygaps',
+    },
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
-        # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
+        # complete classifier list: https://pypi.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
@@ -67,6 +71,7 @@ setup(
         'xlrd >= 1.1',
         'xlwt >= 1.3',
         'coolprop >= 6.0',
+        'requests',
     ],
     tests_require=[
         'pytest',
@@ -76,8 +81,8 @@ setup(
     ],
     extras_require={
         'reST': [
-            'docutils>=0.11'
-            'doc9',
+            'docutils >= 0.11'
+            'doc8',
             'pandoc',
             'restructuredtext-lint',
         ],

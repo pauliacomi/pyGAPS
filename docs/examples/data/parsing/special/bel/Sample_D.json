@@ -1,5 +1,5 @@
 {
-    "adsorbate": "H2O",
+    "adsorbate": "water",
     "adsorbent_basis": "mass",
     "adsorbent_unit": "g",
     "comment": "",
@@ -441,10 +441,10 @@
     "loading_basis": "molar",
     "loading_unit": "mol",
     "mass": 0.0543,
+    "material_batch": "bel",
+    "material_name": "Sample_D",
     "pressure_mode": "relative",
     "pressure_unit": null,
-    "sample_batch": "bel",
-    "sample_name": "Sample_D",
-    "t_exp": 298.15,
+    "t_iso": 298.15,
     "user": "User"
 }

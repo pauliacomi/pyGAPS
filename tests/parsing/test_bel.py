@@ -1,6 +1,4 @@
-"""
-Tests bel file read
-"""
+"""Tests bel file read."""
 
 import pytest
 
@@ -10,7 +8,7 @@ from .conftest import DATA_BEL
 
 
 @pytest.mark.parsing
-class TestBEL(object):
+class TestBEL():
 
     def test_read_bel(self):
         """Tests reading of a bel data file"""

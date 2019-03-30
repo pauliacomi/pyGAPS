@@ -1,6 +1,4 @@
-"""
-Contains dictionaries for use in the Horvath-Kawazoe method.
-"""
+"""Contains dictionaries for use in the Horvath-Kawazoe method."""
 
 from ..utilities.exceptions import ParameterError
 
@@ -31,14 +29,14 @@ _ADSORBENT_MODELS = {'Carbon(HK)': PROPERTIES_CARBON,
 
 def get_hk_model(model):
     """
-    Gets the adsorbent model for HK psd.
+    Get the adsorbent model for HK PSD.
 
     The ``model`` parameter is a string which names the parameters which should be returned.
     Alternatively, a user can implement their own adsorbent model, by passing a dict.
 
     Parameters
     ----------
-    model : obj(`str`) or obj(`dict`)
+    model : `str` or `dict`
         Name of the model to use or a dict with the parameters.
 
     Returns
@@ -48,7 +46,7 @@ def get_hk_model(model):
 
     Raises
     ------
-    ``ParameterError``
+    ParameterError
         When string is not in the dictionary of models.
     """
     # If the model is a string, get a model from the _ADSORBENT_MODELS

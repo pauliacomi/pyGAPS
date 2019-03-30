@@ -49,7 +49,7 @@ def load_iast_models(load_iast):
 
 
 @pytest.mark.modelling
-class TestIAST(object):
+class TestIAST():
     """Tests IAST calculations"""
 
     def test_iast_checks(self, load_iast):

@@ -2,14 +2,14 @@
 This module has functions for calculating the thickness of an adsorbed layer at a
 particular pressure.
 """
-import math
+import numpy
 
 from ..utilities.exceptions import ParameterError
 
 
 def thickness_halsey(pressure):
     """
-    Function for the Halsey thickness curve.
+    Halsey thickness curve.
     Applicability: nitrogen at 77K.
 
     Parameters
@@ -21,12 +21,12 @@ def thickness_halsey(pressure):
     float
         Thickness of layer in nm.
     """
-    return 0.354 * ((-5) / math.log(pressure))**0.333
+    return 0.354 * ((-5) / numpy.log(pressure))**0.333
 
 
 def thickness_harkins_jura(pressure):
     """
-    Function for the Harkins and Jura thickness curve.
+    Harkins and Jura thickness curve.
     Applicability: nitrogen at 77K.
 
     Parameters
@@ -38,7 +38,7 @@ def thickness_harkins_jura(pressure):
     float
         Thickness of layer in nm.
     """
-    return (0.1399 / (0.034 - math.log10(pressure)))**0.5
+    return (0.1399 / (0.034 - numpy.log10(pressure)))**0.5
 
 
 _THICKNESS_MODELS = {
@@ -49,16 +49,17 @@ _THICKNESS_MODELS = {
 
 def get_thickness_model(model):
     """
+    Return a function calculating an adsorbate thickness.
+
     The ``model`` parameter is a string which names the thickness equation which
     should be used. Alternatively, a user can implement their own thickness model, either
     as an experimental isotherm or a function which describes the adsorbed layer. In that
     case, instead of a string, pass the Isotherm object or the callable function as the
     ``model`` parameter.
 
-
     Parameters
     ----------
-    model : obj(`str`) or obj(`callable`)
+    model : str or callable
         Name of the thickness model to use.
 
     Returns
@@ -69,7 +70,7 @@ def get_thickness_model(model):
 
     Raises
     ------
-    ``ParameterError``
+    ParameterError
         When string is not in the dictionary of models.
     """
     # If the model is a string, get a model from the _THICKNESS_MODELS

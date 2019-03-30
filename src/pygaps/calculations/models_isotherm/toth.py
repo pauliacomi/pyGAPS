@@ -10,12 +10,12 @@ from .model import IsothermModel
 
 
 class Toth(IsothermModel):
-    """
+    r"""
     The Toth isotherm model
 
     .. math::
 
-        n(p) = n_M \\frac{K p}{(1 + (K p)^t)^(1/t)}
+        n(p) = n_M \frac{K p}{(1 + (K p)^t)^(1/t)}
 
     Notes
     -----
@@ -89,13 +89,13 @@ class Toth(IsothermModel):
         return opt_res.x
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Toth model cannot be solved analytically
         and must be calculated numerically.

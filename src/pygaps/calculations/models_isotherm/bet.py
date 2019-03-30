@@ -10,12 +10,12 @@ from .model import IsothermModel
 
 
 class BET(IsothermModel):
-    """
+    r"""
     Brunauer-Emmett-Teller (BET) adsorption isotherm
 
     .. math::
 
-        n(p) = n_m \\frac{C p}{(1 - N p)(1 - N p + C p)}
+        n(p) = n_m \frac{C p}{(1 - N p)(1 - N p + C p)}
 
     Notes
     -----
@@ -34,7 +34,7 @@ class BET(IsothermModel):
         * The adsorption energy of a molecule on the second and higher
           layers equals the condensation energy of the adsorbent :math:`E_L`.
 
-    A particular surface percentage :math:`\\theta_x` is occupied with x layers.
+    A particular surface percentage :math:`\theta_x` is occupied with x layers.
     For each layer at equilibrium, the adsorption and desorption rates must be equal. We can
     then apply the Langmuir theory for each layer.
     It is assumed
@@ -44,57 +44,57 @@ class BET(IsothermModel):
 
     .. math::
 
-        k_{a_1} p \\theta_0 &= k_{d_1} \\theta_1 \\exp{(-\\frac{E_1}{R_gT})}
+        k_{a_1} p \theta_0 &= k_{d_1} \theta_1 \exp{(-\frac{E_1}{R_gT})}
 
-        k_{a_2} p \\theta_1 &= k_{d_2} \\theta_2 \\exp{(-\\frac{E_L}{R_gT})}
+        k_{a_2} p \theta_1 &= k_{d_2} \theta_2 \exp{(-\frac{E_L}{R_gT})}
 
         ...
 
-        k_{a_i} p \\theta_{i-1} &= k_{d_i} \\theta_i \\exp{-\\frac{E_L}{R_gT}}
+        k_{a_i} p \theta_{i-1} &= k_{d_i} \theta_i \exp{-\frac{E_L}{R_gT}}
 
     Since we are assuming that all layers beside the first have the same properties,
-    we can define :math:`g= \\frac{k_{d_2}}{k_{a_2}} = \\frac{k_{d_3}}{k_{a_3}} = ...`.
-    The coverages :math:`\\theta` can now be expressed in terms of :math:`\\theta_0`.
+    we can define :math:`g= \frac{k_{d_2}}{k_{a_2}} = \frac{k_{d_3}}{k_{a_3}} = ...`.
+    The coverages :math:`\theta` can now be expressed in terms of :math:`\theta_0`.
 
     .. math::
 
-        \\theta_1 &= y \\theta_0 \\quad where \\quad y = \\frac{k_{a_1}}{k_{d_1}} p \\exp{(-\\frac{E_1}{R_gT})}
+        \theta_1 &= y \theta_0 \quad where \quad y = \frac{k_{a_1}}{k_{d_1}} p \exp{(-\frac{E_1}{R_gT})}
 
-        \\theta_2 &= x \\theta_1 \\quad where \\quad x = \\frac{p}{g} \\exp{(-\\frac{E_L}{R_gT})}
+        \theta_2 &= x \theta_1 \quad where \quad x = \frac{p}{g} \exp{(-\frac{E_L}{R_gT})}
 
-        \\theta_3 &= x \\theta_2 = x^2 \\theta_1
+        \theta_3 &= x \theta_2 = x^2 \theta_1
 
         ...
 
-        \\theta_i &= x^{i-1} \\theta_1 = y x^{i-1} \\theta_0
+        \theta_i &= x^{i-1} \theta_1 = y x^{i-1} \theta_0
 
     A constant C may be defined such that
 
     .. math::
 
-        C = \\frac{y}{x} = \\frac{k_{a_1}}{k_{d_1}} g \\exp{(\\frac{E_1 - E_L}{R_gT})}
+        C = \frac{y}{x} = \frac{k_{a_1}}{k_{d_1}} g \exp{(\frac{E_1 - E_L}{R_gT})}
 
-        \\theta_i = C x^i \\theta_0
+        \theta_i = C x^i \theta_0
 
     For all the layers, the equations can be summed:
 
     .. math::
 
-        \\frac{n}{n_m} = \\sum_{i=1}^{\\infty} i \\theta^i = C \\sum_{i=1}^{\\infty} i x^i \\theta_0
+        \frac{n}{n_m} = \sum_{i=1}^{\infty} i \theta^i = C \sum_{i=1}^{\infty} i x^i \theta_0
 
     Since
 
     .. math::
 
-        \\theta_0 = 1 - \\sum_{1}^{\\infty} \\theta_i
+        \theta_0 = 1 - \sum_{1}^{\infty} \theta_i
 
-        \\sum_{i=1}^{\\infty} i x^i = \\frac{x}{(1-x)^2}
+        \sum_{i=1}^{\infty} i x^i = \frac{x}{(1-x)^2}
 
     Then we obtain the BET equation
 
     .. math::
 
-        n(p) = \\frac{n}{n_m} = n_m\\frac{C p}{(1-N p)(1-N p+ C p)}
+        n(p) = \frac{n}{n_m} = n_m\frac{C p}{(1-N p)(1-N p+ C p)}
 
     The BET constant C is exponentially proportional to the
     difference between the surface adsorption energy and the
@@ -168,19 +168,19 @@ class BET(IsothermModel):
         return opt_res.x
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the BET model is solved analytically.
 
         .. math::
 
-            \\pi = n_m \\ln{\\frac{1 - K_b p + C p}{1- K_b p}}
+            \pi = n_m \ln{\frac{1 - N p + C p}{1- N p}}
 
         Parameters
         ----------

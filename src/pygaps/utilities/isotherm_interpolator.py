@@ -4,12 +4,12 @@ A class used for isotherm interpolation.
 from scipy.interpolate import interp1d
 
 
-class isotherm_interpolator(object):
+class isotherm_interpolator():
     """
     Class used to interpolate between isotherm points.
     Call directly to use.
 
-    It is mainly a wrapper around scipi.interpolate.interp1d.
+    It is mainly a wrapper around scipy.interpolate.interp1d.
 
     Parameters
     ----------
@@ -36,9 +36,7 @@ class isotherm_interpolator(object):
                  interp_kind='linear',
                  interp_fill=None,
                  ):
-        """
-        Instantiation function.
-        """
+        """Instantiate function."""
         #: The kind of variable the interpolator will process.
         self.output_var = interp_type
         #: The branch the internal interpolator is on.
@@ -48,9 +46,8 @@ class isotherm_interpolator(object):
         #: Value of loading to assume beyond highest pressure in the data.
         self.interp_fill = interp_fill
 
-        #: The internal interpolator function. This is generated
-        #: the first time it is needed to make calculations faster.
-
+        # The actual interpolator. This is generated
+        # the first time it is needed to make calculations faster.
         if known_data is None:
             return
 
@@ -66,5 +63,5 @@ class isotherm_interpolator(object):
         return
 
     def __call__(self, data):
-
+        """Override direct call."""
         return self.interp_fun(data)

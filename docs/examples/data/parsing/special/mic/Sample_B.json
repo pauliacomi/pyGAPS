@@ -26,9 +26,9 @@
     "mass": 0.288,
     "pressure_mode": "relative",
     "pressure_unit": null,
-    "sample_batch": "mic",
-    "sample_name": "Sample B",
-    "t_exp": 77.3,
+    "material_batch": "mic",
+    "material_name": "Sample B",
+    "t_iso": 77.3,
     "time": [
         93,
         99

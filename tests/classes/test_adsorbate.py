@@ -10,40 +10,43 @@ import pygaps
 
 
 @pytest.mark.core
-class TestAdsorbate(object):
-    """
-    Tests the adsorbate class
-    """
+class TestAdsorbate():
+    """Test the adsorbate class."""
 
     def test_adsorbate_create(self, adsorbate_data, basic_adsorbate):
-        "Checks adsorbate can be created from test data"
+        """Check adsorbate can be created from test data."""
 
         assert adsorbate_data == basic_adsorbate.to_dict()
 
-        with pytest.raises(pygaps.ParameterError):
-            pygaps.Adsorbate()
-
     def test_adsorbate_retrieved_list(self, adsorbate_data, basic_adsorbate):
-        "Checks adsorbate can be retrieved from master list"
+        """Check adsorbate can be retrieved from master list"""
         pygaps.data.ADSORBATE_LIST.append(basic_adsorbate)
-        uploaded_adsorbate = pygaps.Adsorbate.from_list(
-            adsorbate_data.get('nick'))
+        uploaded_adsorbate = pygaps.Adsorbate.find(
+            adsorbate_data.get('name'))
 
         assert adsorbate_data == uploaded_adsorbate.to_dict()
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.Adsorbate.from_list('noname')
+            pygaps.Adsorbate.find('noname')
+
+    def test_adsorbate_find_equals(self):
+        """Check standard adsorbates can be found."""
+        ads = pygaps.Adsorbate.find('N2')
+
+        assert ads == 'N2'
+        assert ads == 'nitrogen'
+        assert ads == 'Nitrogen'
 
     def test_adsorbate_get_properties(self, adsorbate_data, basic_adsorbate):
-        "Checks if properties of a adsorbate can be located"
+        """Check if properties of a adsorbate can be located."""
 
-        assert basic_adsorbate.get_prop('common_name') == adsorbate_data.get('common_name')
-        assert basic_adsorbate.common_name() == adsorbate_data.get('common_name')
+        assert basic_adsorbate.get_prop('backend_name') == adsorbate_data.get('backend_name')
+        assert basic_adsorbate.backend_name() == adsorbate_data.get('backend_name')
 
-        name = basic_adsorbate.properties.pop('common_name')
+        name = basic_adsorbate.properties.pop('backend_name')
         with pytest.raises(pygaps.ParameterError):
-            basic_adsorbate.common_name()
-        basic_adsorbate.properties['common_name'] = name
+            basic_adsorbate.backend_name()
+        basic_adsorbate.properties['backend_name'] = name
 
     @pytest.mark.parametrize('calculated', [True, False])
     def test_adsorbate_named_props(self, adsorbate_data, basic_adsorbate, calculated):
@@ -66,7 +69,7 @@ class TestAdsorbate(object):
                               (False, pygaps.ParameterError)])
     def test_adsorbate_miss_named_props(self, calculated, error):
         temp = 77.355
-        ads = pygaps.Adsorbate(nick='n', formula='C2')
+        ads = pygaps.Adsorbate(name='n', formula='C2')
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             with pytest.raises(error):
@@ -83,6 +86,6 @@ class TestAdsorbate(object):
                 ads.enthalpy_liquefaction(temp, calculate=calculated)
 
     def test_adsorbate_print(self, basic_adsorbate):
-        """Checks the printing is done"""
-
+        """Check printing is possible."""
         print(basic_adsorbate)
+        basic_adsorbate.print_info()

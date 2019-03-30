@@ -15,7 +15,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestAreaBET(object):
+class TestAreaBET():
     """
     Tests everything related to BET surface area calculation
     """

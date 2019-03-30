@@ -1,6 +1,4 @@
-"""
-This module calculates the initial enthalpy of adsorption based on an isotherm.
-"""
+"""Module calculating the initial enthalpy of adsorption."""
 
 import warnings
 
@@ -14,8 +12,8 @@ from ..utilities.exceptions import ParameterError
 
 
 def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess):
-    """
-    Calculates an initial enthalpy based on a compound
+    r"""
+    Calculate an initial enthalpy based on a compound
     method with separate contributions:
 
         * A constant contribution
@@ -27,7 +25,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
 
     .. math::
 
-        \\Delta H(n) = K_{const}+\\frac{K_{exp}}{1+\\exp(E*(n-n_{loc})))}+K_{pa}*n^{p_a}+K_{pr}*n^{p_r}
+        \Delta H(n) = K_{const}+\frac{K_{exp}}{1+\exp(E*(n-n_{loc})))}+K_{pa}*n^{p_a}+K_{pr}*n^{p_r}
 
     Enthalpy data should be in KJ/mmol and positive.
 
@@ -83,9 +81,9 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     Returns
     -------
     dict
-        Dict containing initial enthalpy and fitting parameters.
-    """
+        Dict containing ``initial_enthalpy`` and fitting parameters.
 
+    """
     # Read data in
     loading = isotherm.loading(branch=branch,
                                loading_unit='mmol',
@@ -153,10 +151,10 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     # active site.
 
     # We check enthalpy of liquefaction
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     try:
-        enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_exp)
-    except (ParameterError, CalculationError) as e_info:
+        enth_liq = adsorbate.enthalpy_liquefaction(isotherm.t_iso)
+    except (ParameterError, CalculationError):
         enth_liq = 0
         warnings.warn(
             "Could not calculate liquid enthalpy, perhaps in supercritical regime")
@@ -348,8 +346,8 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
             (x_axis, baseline + power_term_repulsive(x_axis), 'power rep'),
         )
 
-        title = ' '.join(
-            [isotherm.sample_name, isotherm.sample_batch, isotherm.adsorbate])
+        title = '{0} {1} {2}'.format(
+            isotherm.material_name, isotherm.material_batch, isotherm.adsorbate)
         initial_enthalpy_plot(
             loading, enthalpy, enthalpy_approx(loading), title=title, extras=extras)
 
@@ -360,8 +358,8 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
 
 def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
     """
-    Calculates the initial enthalpy of adsorption by assuming it is the same
-    as the first point in the curve.
+    Calculate the initial enthalpy of adsorption, assuming it is the
+    first point in the curve.
 
     Parameters
     ----------
@@ -377,9 +375,9 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
     Returns
     -------
     dict
-        Dict containing initial enthalpy and other parameters.
-    """
+        Dict containing ``initial_enthalpy`` and other parameters.
 
+    """
     # Read data in
     enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
 
@@ -395,8 +393,8 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
         loading = isotherm.loading(branch=branch,
                                    loading_unit='mmol',
                                    loading_basis='molar')
-        title = ' '.join(
-            [isotherm.sample_name, isotherm.sample_batch, isotherm.adsorbate])
+        title = '{0} {1} {2}'.format(
+            isotherm.material_name, isotherm.material_batch, isotherm.adsorbate)
         initial_enthalpy_plot(
             loading, enthalpy, [initial_enthalpy for i in loading], title=title)
 

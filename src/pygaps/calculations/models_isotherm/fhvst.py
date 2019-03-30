@@ -10,7 +10,7 @@ from .model import IsothermModel
 
 
 class FHVST(IsothermModel):
-    """
+    r"""
 
     Flory-Huggins Vacancy Solution Theory isotherm model.
 
@@ -39,18 +39,18 @@ class FHVST(IsothermModel):
 
     .. math::
 
-        \\pi = - \\frac{R_g T}{\\sigma_v} \\ln{y_v x_v}
+        \pi = - \frac{R_g T}{\sigma_v} \ln{y_v x_v}
 
     where :math:`y_v` is the activity coefficient and  :math:`x_v` is the mole fraction of
     the vacancy in the adsorbed phase.
     This can then be introduced into the Gibbs equation to give a general isotherm equation
     for the Vacancy Solution Theory where :math:`K_H` is the Henry’s constant and
-    :math:`f(\\theta)` is a function that describes the non-ideality of the system based
+    :math:`f(\theta)` is a function that describes the non-ideality of the system based
     on activity coefficients:
 
     .. math::
 
-        p = \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} f(\\theta)
+        p = \frac{n_{ads}}{K_H} \frac{\theta}{1-\theta} f(\theta)
 
     The general VST equation requires an expression for the activity coefficients.
     Cochran [#]_ developed a simpler, three
@@ -59,14 +59,14 @@ class FHVST(IsothermModel):
 
     .. math::
 
-        p &= \\bigg( \\frac{n_{ads}}{K_H} \\frac{\\theta}{1-\\theta} \\bigg)
-            \\exp{\\frac{\\alpha^2_{1v}\\theta}{1+\\alpha_{1v}\\theta}}
+        p &= \bigg( \frac{n_{ads}}{K_H} \frac{\theta}{1-\theta} \bigg)
+            \exp{\frac{\alpha^2_{1v}\theta}{1+\alpha_{1v}\theta}}
 
         with
 
-        \\alpha_{1v} &= \\frac{\\alpha_{1}}{\\alpha_{v}} - 1
+        \alpha_{1v} &= \frac{\alpha_{1}}{\alpha_{v}} - 1
 
-    where :math:`\\alpha_{1}` and :math:`\\alpha_{v}` are the molar areas of the adsorbate
+    where :math:`\alpha_{1}` and :math:`\alpha_{v}` are the molar areas of the adsorbate
     and the vacancy respectively.
 
     References
@@ -146,13 +146,13 @@ class FHVST(IsothermModel):
         return res
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the FH-VST model cannot be solved analytically
         and must be calculated numerically.

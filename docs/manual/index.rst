@@ -8,7 +8,7 @@ Manual
 
     isotherm
     adsorbate
-    sample
+    material
     dataparsing
     characterisation
     modelling

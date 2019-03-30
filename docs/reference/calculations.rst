@@ -76,3 +76,9 @@ Initial heat of adsorption
 
 .. automodule:: pygaps.calculations.initial_enthalpy
     :members:
+
+Dubinin-Radushkevich and Dubinin-Astakov plots
+..............................................
+
+.. automodule:: pygaps.calculations.dr_da_plots
+    :members:

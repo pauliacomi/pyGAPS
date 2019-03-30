@@ -8,35 +8,33 @@ import pygaps
 
 
 @pytest.mark.core
-class TestIsotherm(object):
-    """
-    Tests the parent isotherm object
-    """
+class TestIsotherm():
+    """Test the basic isotherm object."""
 
     def test_isotherm_create(self):
-        "Checks isotherm can be created from test data"
+        """Check isotherm can be created from test data."""
 
         pygaps.classes.isotherm.Isotherm(
-            sample_name='carbon',
-            sample_batch='X1',
+            material_name='carbon',
+            material_batch='X1',
             adsorbate='nitrogen',
-            t_exp=77,
+            t_iso=77,
         )
 
     def test_isotherm_id(self, basic_isotherm):
-        "Checks isotherm id works as intended"
+        """Check isotherm id works as intended."""
 
-        iso_id = basic_isotherm.id
+        iso_id = basic_isotherm.iso_id
 
         basic_isotherm.new_param = 'changed'
-        assert iso_id == basic_isotherm.id
-        basic_isotherm.t_act = 123
-        assert iso_id != basic_isotherm.id
+        assert iso_id != basic_isotherm.iso_id
+        basic_isotherm.t_iso = 0
+        assert iso_id != basic_isotherm.iso_id
 
     @pytest.mark.parametrize('missing_param',
                              pygaps.classes.isotherm.Isotherm._required_params)
     def test_isotherm_miss_param(self, isotherm_parameters, missing_param):
-        "Tests exception throw for missing required attributes"
+        """Test exception throw for missing required attributes."""
 
         data = isotherm_parameters
         del data[missing_param]
@@ -54,7 +52,7 @@ class TestIsotherm(object):
         ({'adsorbent_basis': 'volume', 'adsorbent_unit': 'cm3'}),
     ])
     def test_isotherm_mode_and_units(self, isotherm_parameters, update):
-        "Tests exception throw for missing or wrong unit"
+        """Test exception throw for missing or wrong unit."""
 
         isotherm_parameters.update(update)
         pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
@@ -73,7 +71,7 @@ class TestIsotherm(object):
         ('adsorbent_basis', 'something')
     ])
     def test_isotherm_mode_and_units_bad(self, isotherm_parameters, prop, set_to):
-        "Tests exception throw for missing or wrong unit"
+        """Test exception throw for missing or wrong unit."""
 
         isotherm_parameters[prop] = set_to
 
@@ -81,13 +79,12 @@ class TestIsotherm(object):
             pygaps.classes.isotherm.Isotherm(**isotherm_parameters)
 
     def test_isotherm_get_parameters(self, isotherm_parameters, basic_isotherm):
-        "Checks isotherm returns the same dict as was used to create it"
+        """Check isotherm returns the same dict as was used to create it."""
 
         iso_dict = basic_isotherm.to_dict()
-        del iso_dict['id']
         assert isotherm_parameters == iso_dict
 
     def test_isotherm_print_parameters(self, basic_isotherm):
-        "Checks isotherm can print its own info"
-
+        """Check isotherm can print its own info."""
+        repr(basic_isotherm)
         print(basic_isotherm)

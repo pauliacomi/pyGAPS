@@ -16,7 +16,7 @@ _NUMBER_REGEX = re.compile(r'^(-)?\d+(.|,)?\d+')
 _FIELDS = {
     'sample:': {
         'text': ['sample:', 'echantillon:'],
-        'name': 'sample_name',
+        'name': 'material_name',
         'row': 0,
         'column': 1,
         'type': 'string'
@@ -30,7 +30,7 @@ _FIELDS = {
     },
     'temperature': {
         'text': ['analysis bath'],
-        'name': 't_exp',
+        'name': 't_iso',
         'row': 0,
         'column': 1,
         'type': 'number'
@@ -143,7 +143,7 @@ def _handle_numbers(field, val):
     """
     if val:
         ret = float(_NUMBER_REGEX.search(val.replace(',', '')).group())
-        if field['name'] == 't_exp':
+        if field['name'] == 't_iso':
             if '°C' in val:
                 ret = ret + 273.15
         return ret
@@ -245,7 +245,6 @@ def _check(data, path):
     if 'loading' in data:
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
-            logging.info('No data collected for {} in file {}.'
-                         .format(empty, path))
+            logging.info('No data collected for %s in file %s.', empty, path)
     if 'errors' in data:
         logging.warning('\n'.join(data['errors']))

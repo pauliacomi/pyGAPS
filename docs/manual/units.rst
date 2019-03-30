@@ -64,8 +64,8 @@ more important in industry where adsorbent bed design sizing is required.
 pyGAPS allows the basis to be changed to either mass, volume or molar.
 
 Depending on the conversion basis, the density or molar mass of the
-sample is needed and should be provided by the user. To specify this in a
-sample, check out the :ref:`Sample <sample-manual-manage>` manual.
+material is needed and should be provided by the user. To specify this in a
+material, check out the :ref:`Material <material-manual-manage>` manual.
 
 Adsorbent conversions are handled by the :func:`~pygaps.utilities.unit_converter.c_adsorbent` function.
 

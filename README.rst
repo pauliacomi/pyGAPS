@@ -2,7 +2,7 @@
 Overview
 ========
 
-pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorption data analysis written in python 3.
+pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorption data analysis written in Python 3.
 
 .. start-badges
 
@@ -29,9 +29,9 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :target: https://www.repostatus.org/#wip
     :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.3.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.5.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v1.3.0...master
+    :target: https://github.com/pauliacomi/pygaps/compare/v1.5.0...master
 
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
@@ -59,19 +59,19 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
 
 .. |version| image:: https://img.shields.io/pypi/v/pygaps.svg
     :alt: PyPI Package latest release
-    :target: https://pypi.python.org/pypi/pygaps
+    :target: https://pypi.org/project/pygaps
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/pygaps.svg
     :alt: PyPI Wheel
-    :target: https://pypi.python.org/pypi/pygaps
+    :target: https://pypi.org/project/pygaps
 
 .. |supported-versions| image:: https://img.shields.io/pypi/pyversions/pygaps.svg
     :alt: Supported versions
-    :target: https://pypi.python.org/pypi/pygaps
+    :target: https://pypi.org/project/pygaps
 
 .. |supported-implementations| image:: https://img.shields.io/pypi/implementation/pygaps.svg
     :alt: Supported implementations
-    :target: https://pypi.python.org/pypi/pygaps
+    :target: https://pypi.org/project/pygaps
 
 
 .. end-badges
@@ -81,11 +81,11 @@ Features
 ========
 
     - Advanced adsorption data import and manipulation
-    - Routine analysis such as BET surface area, t-plot, alpha-s method
+    - Routine analysis such as BET/Langmuir surface area, t-plot, alpha-s, Dubinin plots etc.
     - Pore size distribution calculations for mesopores (BJH, Dollimore-Heal)
     - Pore size distribution calculations for micropores (Horvath-Kawazoe)
     - Pore size distribution calculations using DFT kernels
-    - Isotherm modelling (Henry, Langmuir, DS/TS Langmuir, etc..)
+    - Isotherm model fitting (Henry, Langmuir, DS/TS Langmuir, etc..)
     - IAST calculations for binary and multicomponent adsorption
     - Isosteric heat of adsorption calculations
     - Parsing to and from multiple formats such as Excel, CSV and JSON
@@ -109,7 +109,8 @@ Installation
 ============
 
 The easiest way to install pyGAPS is from the command line.
-Make sure that you have `numpy`, `scipy`, `pandas` and `matplotlib` already installed.
+Make sure that you have `numpy`, `scipy`, `pandas` and `matplotlib`, as well as
+CoolProp already installed.
 
 .. code-block:: bash
 
@@ -122,24 +123,26 @@ that already has a full instalation). Then use pip inside your environment.
 
 .. code-block:: bat
 
-    conda create -n py3 python=3 numpy scipy pandas matplotlib
+    conda create -n py3 python=3 numpy scipy pandas matplotlib CoolProp
     activate py3
     pip install pygaps
 
 Alternatively, to install the development branch, clone the repository from Github.
-Then install the package with setuptools, either in regular or developer mode.
+Then install the package with pip or setuptools, either in regular or developer mode.
 
 .. code-block:: bash
 
     git clone https://github.com/pauliacomi/pyGAPS
 
-    # then install
+    // then install
 
-    python setup.py install
+    pip install ./              # pip
+    python setup.py install     # setuptools
 
-    # or developer mode
+    // or developer mode
 
-    python setup.py develop
+    pip install -e ./           # pip
+    python setup.py develop     # setuptools
 
 Development
 ===========

@@ -33,14 +33,21 @@ BET
 .. automodule:: pygaps.calculations.models_isotherm.bet
     :members:
 
+
+GAB
+---
+
+.. automodule:: pygaps.calculations.models_isotherm.gab
+    :members:
+
 Quadratic
 ---------
 
 .. automodule:: pygaps.calculations.models_isotherm.quadratic
     :members:
 
-Approximation to the Tempkin Isotherm
--------------------------------------
+Tempkin
+-------
 
 .. automodule:: pygaps.calculations.models_isotherm.temkinapprox
     :members:
@@ -79,7 +86,7 @@ Flory-Huggins VST
 
 .. _modelling-ref:
 
-Multi-component Adsorption modelling
+Multi-component adsorption modelling
 ====================================
 
 IAST

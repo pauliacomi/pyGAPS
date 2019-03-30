@@ -1,7 +1,6 @@
 {
     "adsorbate": "C4H10",
-    "exp_type": "isotherm",
-    "id": "eac86be3d223105909a43730d361e424",
+    "iso_type": "isotherm",
     "is_real": true,
     "isotherm_data": [
         {
@@ -181,7 +180,7 @@
             "pressure": "2.3226"
         }
     ],
-    "sample_batch": "TB",
-    "sample_name": "TEST",
-    "t_exp": 348.15
+    "material_batch": "TB",
+    "material_name": "TEST",
+    "t_iso": 348.15
 }

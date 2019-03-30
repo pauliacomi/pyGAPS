@@ -10,12 +10,12 @@ from .model import IsothermModel
 
 
 class DSLangmuir(IsothermModel):
-    """
+    r"""
     Dual-site Langmuir (DSLangmuir) adsorption isotherm
 
     .. math::
 
-        n(p) = n_{m_1}\\frac{K_1 p}{1+K_1 p} +  n_{m_2}\\frac{K_2 p}{1+K_2 p}
+        n(p) = n_{m_1}\frac{K_1 p}{1+K_1 p} +  n_{m_2}\frac{K_2 p}{1+K_2 p}
 
     Notes
     -----
@@ -30,7 +30,7 @@ class DSLangmuir(IsothermModel):
 
     .. math::
 
-        n(p) = \\sum_i n_{m_i} \\frac{K_i p}{1+K_i p}
+        n(p) = \sum_i n_{m_i} \frac{K_i p}{1+K_i p}
 
     In practice, up to three adsorption sites are considered.
     This model is the dual-site model (:math:`i=2`)
@@ -103,19 +103,19 @@ class DSLangmuir(IsothermModel):
         return opt_res.x
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Double Site Langmuir model is solved analytically.
 
         .. math::
 
-            \\pi = n_{m_1} \\log{1 + K_1 p} +  n_{m_2} \\log{1 + K_2 p}
+            \pi = n_{m_1} \log{1 + K_1 p} +  n_{m_2} \log{1 + K_2 p}
 
         Parameters
         ----------

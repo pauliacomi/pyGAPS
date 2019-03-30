@@ -1,6 +1,4 @@
-"""
-This module contains the adsorbate class.
-"""
+"""This module contains the adsorbate class."""
 
 import warnings
 
@@ -14,31 +12,34 @@ from ..utilities.unit_converter import _PRESSURE_UNITS
 from ..utilities.unit_converter import c_unit
 
 
-class Adsorbate(object):
+class Adsorbate():
     """
-    This class acts as a unified descriptor for an adsorbate.
+    An unified class descriptor for an adsorbate.
 
     Its purpose is to expose properties such as adsorbate name,
     and formula, as well as physical properties, such as molar mass
     vapour pressure, etc.
 
     The properties can be either calculated through a wrapper over
-    CoolProp or supplied in the initial sample creation.
+    CoolProp or supplied in the initial adsorbate creation.
     All parameters passed are saved in a self.parameters
     dictionary.
 
     Parameters
     ----------
-    nick : str
+    name : str
         The name which should be used for this adsorbate.
-    formula : str
-        A chemical formula for the adsorbate.
 
     Other Parameters
     ----------------
 
-    common_name : str
-        Used for integration with CoolProp. For a list of names
+    formula : str
+        A chemical formula for the adsorbate in the form He/N2/CO etc.
+    alias : list
+        Other names that the adsorbate might be used as.
+        Example: name=propanol, alias=['1-propanol']
+    backend_name : str
+        Used for integration with CoolProp/REFPROP. For a list of names
         look at the CoolProp `list of fluids
         <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
     molar_mass : float
@@ -62,7 +63,8 @@ class Adsorbate(object):
     unique properties which are used by calculations in other modules
     listed in the other parameters section above.
 
-    These properties can be either calculated by CoolProp or taken from the parameters
+    These properties can be either calculated by CoolProp (if the adsorbate
+    exists in CoolProp/REFPROP) or taken from the parameters
     dictionary. They are best accessed using the associated function.
 
     Calculated::
@@ -72,39 +74,77 @@ class Adsorbate(object):
     Value from dictionary::
 
         my_adsorbate.surface_tension(77, calculate=False)
+
+    If available, the underlying CoolProp state object
+    (http://www.coolprop.org/coolprop/LowLevelAPI.html) can be
+    accessed directly through the backend variable. For example,
+    to get the CoolProp-calculated critical pressure::
+
+        adsorbate.backend.p_critical()
+
     """
 
-    _required_params = ['nick', 'formula']
-    _named_params = ['nick', 'formula']
-
-    def __init__(self, **properties):
+    def __init__(self, name, alias=None, **properties):
         """
         Instantiation is done by passing a dictionary with the parameters.
         """
-        # Required sample parameters checks
-        if any(k not in properties
-               for k in self._required_params):
-            raise ParameterError(
-                "Adsorbate class must have the following information "
-                "in the properties dictionary: {}".format(self._required_params))
 
         #: Adsorbate name
-        self.name = properties.pop('nick')
-        #: Adsorbate formula
-        self.formula = properties.pop('formula')
+        self.name = name
+        #: List of aliases
+        self.alias = alias
+        if alias is None:
+            self.alias = [name.lower()]
+        elif name not in alias:
+            self.alias.append(name.lower())
+
         #: Adsorbate properties
         self.properties = properties
 
         # CoolProp interaction variables, only generate when called
-        self._backend = None
-        self._state = None
+        self._backend_mode = None
 
         return
 
+    def __repr__(self):
+        """Print adsorbate standard name."""
+        return self.name
+
+    def __str__(self):
+        """Print adsorbate standard name."""
+        return self.name
+
+    def __eq__(self, other):
+        """Overload equality operator to include aliases."""
+        if isinstance(other, Adsorbate):
+            other = other.name
+        else:
+            other = other.lower()
+        return self.name == other or other in self.alias
+
+    def __add__(self, other):
+        """Overload addition operator to use name."""
+        return self.name + other
+
+    def __radd__(self, other):
+        """Overload addition operator to use name."""
+        return other + self.name
+
+    def print_info(self):
+        """Print a short summary of all the adsorbate parameters."""
+        string = ""
+
+        string += ("Adsorbate: " + self.name + '\n')
+        string += ("Aliases: " + ", ".join(self.alias) + '\n')
+
+        for prop in self.properties:
+            string += (prop + ':' + str(self.properties.get(prop)) + '\n')
+
+        return string
+
     @classmethod
-    def from_list(cls, adsorbate_name):
-        """
-        Gets the adsorbate from the master list using its name.
+    def find(cls, adsorbate_name):
+        """Get the specified adsorbate from the master list.
 
         Parameters
         ----------
@@ -122,8 +162,13 @@ class Adsorbate(object):
             If it does not exist in list.
         """
         # See if adsorbate exists in master list
-        adsorbate = next(
-            (x for x in pygaps.ADSORBATE_LIST if adsorbate_name == x.name), None)
+        adsorbate = None
+
+        for ads in pygaps.ADSORBATE_LIST:
+            if ads == adsorbate_name:
+                adsorbate = ads
+                break
+
         if adsorbate is None:
             raise ParameterError(
                 "Adsorbate {0} does not exist in list of adsorbates. "
@@ -132,30 +177,28 @@ class Adsorbate(object):
 
         return adsorbate
 
-    def __str__(self):
-        """
-        Prints a short summary of all the adsorbate parameters.
-        """
-        string = ""
-
-        string += ("Adsorbate: " + self.name + '\n')
-        string += ("Formula:" + self.formula + '\n')
-
-        for prop in self.properties:
-            string += (prop + ':' + str(self.properties.get(prop)) + '\n')
-
-        return string
-
-    def _get_state(self):
+    @property
+    def backend(self):
         """
         Returns the CoolProp state associated with the fluid.
         """
-        if not self._backend or self._backend != pygaps.COOLPROP_BACKEND:
-            self._backend = pygaps.COOLPROP_BACKEND
+        if not self._backend_mode or self._backend_mode != pygaps.COOLPROP_BACKEND:
+            self._backend_mode = pygaps.COOLPROP_BACKEND
             self._state = CoolProp.AbstractState(
-                pygaps.COOLPROP_BACKEND, self.common_name())
+                pygaps.COOLPROP_BACKEND, self.backend_name())
 
         return self._state
+
+    @property
+    def formula(self):
+        """
+        Returns the adsorbent formula if applicable.
+        """
+        formula = self.properties.get('formula')
+        if formula is None:
+            formula = self.name
+
+        return formula
 
     def to_dict(self):
         """
@@ -169,8 +212,7 @@ class Adsorbate(object):
         """
 
         parameters_dict = {
-            'nick': self.name,
-            'formula': self.formula,
+            'name': self.name,
         }
         parameters_dict.update(self.properties)
 
@@ -205,14 +247,14 @@ class Adsorbate(object):
 
         return req_prop
 
-    def common_name(self):
+    def backend_name(self):
         """
         Gets the common name of the adsorbate from the properties dict.
 
         Returns
         -------
         str
-            Value of common_name in the properties dict
+            Value of backend_name in the properties dict
 
         Raises
         ------
@@ -220,11 +262,11 @@ class Adsorbate(object):
             If the the property does not exist
             in the class dictionary.
         """
-        c_name = self.properties.get("common_name")
+        c_name = self.properties.get("backend_name")
         if c_name is None:
             raise ParameterError(
                 "Adsorbate {0} does not have a property named "
-                "common_name. This must be available for CoolProp "
+                "backend_name. This must be available for CoolProp "
                 "interaction".format(self.name))
         return c_name
 
@@ -253,14 +295,14 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                mol_m = self._get_state().molar_mass() * 1000
+                mol_m = self.backend.molar_mass() * 1000
 
             except Exception as e_info:
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.molar_mass(calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -304,7 +346,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 sat_p = state.p()
 
@@ -314,7 +356,7 @@ class Adsorbate(object):
                 try:
                     sat_p = self.saturation_pressure(temp, unit=unit,
                                                      calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
             if unit is not None:
@@ -357,7 +399,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 surf_t = state.surface_tension() * 1000
 
@@ -366,7 +408,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.surface_tension(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -407,7 +449,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 liq_d = state.rhomass() / 1000
 
@@ -416,7 +458,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.liquid_density(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -457,7 +499,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
                 state.update(CoolProp.QT_INPUTS, 1.0, temp)
                 gas_d = state.rhomass() / 1000
 
@@ -466,7 +508,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.gas_density(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:
@@ -507,7 +549,7 @@ class Adsorbate(object):
         """
         if calculate:
             try:
-                state = self._get_state()
+                state = self.backend
 
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
                 h_liq = state.hmolar()
@@ -522,7 +564,7 @@ class Adsorbate(object):
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.enthalpy_liquefaction(temp, calculate=False)
-                except ParameterError as e_info:
+                except ParameterError:
                     raise CalculationError
 
         else:

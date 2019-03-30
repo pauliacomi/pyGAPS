@@ -22,7 +22,9 @@ class Mock(MagicMock):
 
 
 MOCK_MODULES = ['matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker',
-                'numpy', 'pandas', 'scipy', 'scipy.constants', 'scipy.stats',
+                'numpy',
+                'pandas', 'pandas.util',
+                'scipy', 'scipy.constants', 'scipy.stats',
                 'scipy.optimize', 'scipy.interpolate']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
@@ -62,7 +64,7 @@ project = 'pygaps'
 year = '2018'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '1.3.0'
+version = release = '1.5.0'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.']

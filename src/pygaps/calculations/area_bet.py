@@ -1,10 +1,8 @@
-"""
-This module contains BET surface area calculations.
-"""
+"""This module contains BET area calculations."""
 
 import warnings
 
-import scipy.constants as constants
+import scipy.constants as const
 import scipy.stats
 
 from ..classes.adsorbate import Adsorbate
@@ -15,16 +13,13 @@ from ..utilities.exceptions import ParameterError
 
 
 def area_BET(isotherm, limits=None, verbose=False):
-    """
-    Function returns the BET surface area of an isotherm object which
-    is passed to it.
-
+    r"""
+    Calculate BET-determined surface area from an isotherm.
 
     Pass an isotherm object to the function to have the BET method applied to it. Since
     the function automatically takes the properties of the adsorbate from the master
     list, ensure that it contains all the adsorbates which were used in the isotherms,
     together with the properties required.
-
 
     Parameters
     ----------
@@ -37,26 +32,24 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     Returns
     -------
-    result_dict : dict
+    dict
         A dictionary of results with the following components. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-        - ``area(float)`` : calculated BET surface area, in m2/unit of adsorbent
-        - ``c_const(float)`` : the C constant in the BET equation, unitless
-        - ``n_monolayer(float)`` : the amount adsorbed at the statistical monolayer location,
-          in mmol
-        - ``p_monolayer(float)`` : the pressure at which the statistical monolayer is chosen,
-          relative
-        - ``bet_slope(float)`` : slope of the BET plot
-        - ``bet_intercept(float)`` : intercept of the BET plot
-        - ``corr_coef(float)`` : correlation coefficient of the linear region in the BET plot
+        - ``area`` (float) : calculated BET surface area, in m2/unit of adsorbent
+        - ``c_const`` (float) : the C constant in the BET equation, unitless
+        - ``n_monolayer`` (float) : the amount adsorbed at statistical monolayer, in mmol
+        - ``p_monolayer`` (float) : the pressure at which statistical monolayer is chosen, relative
+        - ``bet_slope`` (float) : slope of the BET plot
+        - ``bet_intercept`` (float) : intercept of the BET plot
+        - ``corr_coef`` (float) : correlation coefficient of the linear region in the BET plot
 
     Notes
     -----
     *Description*
 
-    The BET surface area [#]_ is one of the first standardised methods to calculate the
+    The BET method [#]_ is one of the first standardised methods to calculate the
     surface area of a porous material. It is generally applied on isotherms obtained
     through N2 adsorption at 77K, although other adsorbates (Ar, Kr) have been used.
 
@@ -67,18 +60,18 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     .. math::
 
-        \\frac{p/p_0}{n_{ads} (1-p/p_0)} = \\frac{1}{n_{m} C} + \\frac{C - 1}{n_{m} C}(p/p_0)
+        \frac{p/p_0}{n_{ads} (1-p/p_0)} = \frac{1}{n_{m} C} + \frac{C - 1}{n_{m} C}(p/p_0)
 
-    Therefore, if we plot the isotherm points as :math:`\\frac{p/p_0}{n_{ads}(1-p/p_0)}` versus
+    Therefore, if we plot the isotherm points as :math:`\frac{p/p_0}{n_{ads}(1-p/p_0)}` versus
     :math:`p/p_0`, a linear region can usually be found. The slope and intercept of this line
     can then be used to calculate :math:`n_{m}`, the amount adsorbed at the statistical
     monolayer, as well as C, the BET constant.
 
     .. math::
 
-        n_{m} = \\frac{1}{s+i}
+        n_{m} = \frac{1}{s+i}
 
-        C = \\frac{s}{i} + 1
+        C = \frac{s}{i} + 1
 
     The surface area can then be calculated by using the moles adsorbed at the statistical
     monolayer. If the specific area taken by one of the adsorbate molecules on the surface
@@ -86,7 +79,7 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     .. math::
 
-        a(BET) = n_m A_N \\sigma
+        a(BET) = n_m A_N \sigma
 
 
     *Limitations*
@@ -108,12 +101,12 @@ def area_BET(isotherm, limits=None, verbose=False):
     assumptions are implicitly made in this approach:
 
         * Adsorption takes place on the pore surface. Microporous materials which have pores
-          in similar size as the molecule adsorbed cannot have a realistic surface area
+          in similar size as the molecule adsorbed cannot posses a realistic surface area
         * The cross-sectional area of the molecule on the surface cannot be guaranteed
-          For example, nitrogen has been known to adopt a different conformation on the
-          surface of some materials, due to inter-molecular forces, which effectively
+          For example, nitrogen has been known to adopt different orientations on the
+          surface of some materials due to inter-molecular forces, which effectively
           lowers its cross-sectional area.
-        * No account is made for adsorbate-adsorbent interaction in BET theory
+        * No account is made for heterogeneous adsorbate-adsorbent interaction in the BET theory
 
     References
     ----------
@@ -124,7 +117,7 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     """
     # get adsorbate properties
-    adsorbate = Adsorbate.from_list(isotherm.adsorbate)
+    adsorbate = Adsorbate.find(isotherm.adsorbate)
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in
@@ -137,7 +130,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     # use the bet function
     (bet_area, c_const, n_monolayer, p_monolayer, slope,
      intercept, minimum, maximum, corr_coef) = area_BET_raw(
-        loading, pressure, cross_section, limits=limits)
+        pressure, loading, cross_section, limits=limits)
 
     result_dict = {
         'area': bet_area,
@@ -163,34 +156,36 @@ def area_BET(isotherm, limits=None, verbose=False):
 
         # Generate plot of the BET points chosen
         bet_plot(pressure,
-                 bet_transform(loading, pressure),
+                 bet_transform(pressure, loading),
                  minimum, maximum,
                  slope, intercept,
                  p_monolayer,
-                 bet_transform(n_monolayer, p_monolayer))
+                 bet_transform(p_monolayer, n_monolayer))
 
         # Generate plot of the Rouquerol points chosen
         roq_plot(pressure,
-                 roq_transform(loading, pressure),
+                 roq_transform(pressure, loading),
                  minimum, maximum,
                  p_monolayer,
-                 roq_transform(n_monolayer, p_monolayer))
+                 roq_transform(p_monolayer, n_monolayer))
 
     return result_dict
 
 
-def area_BET_raw(loading, pressure, cross_section, limits=None):
+def area_BET_raw(pressure, loading, cross_section, limits=None):
     """
+    Calculate BET-determined surface area.
+
     This is a 'bare-bones' function to calculate BET surface area which is
     designed as a low-level alternative to the main function.
     Designed for advanced use, its parameters have to be manually specified.
 
     Parameters
     ----------
-    loading : array
-        Loadings, in mol/basis.
     pressure : array
         Pressures, relative.
+    loading : array
+        Loadings, in mol/basis.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
     limits : [float, float], optional
@@ -223,7 +218,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
                              " do not match")
 
     # Generate the Rouquerol array
-    roq_t_array = roq_transform(loading, pressure)
+    roq_t_array = roq_transform(pressure, loading)
 
     # select the maximum and minimum of the points and the pressure associated
     if limits is None:
@@ -244,19 +239,19 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
                 minimum = index
                 break
     else:
-        max_p = limits[1]
         maximum = len(roq_t_array) - 1
-        for index, value in reversed(list(enumerate(pressure))):
-            if value < max_p:
-                maximum = index
-                break
+        if limits[1]:
+            for index, value in reversed(list(enumerate(pressure))):
+                if value < limits[1]:
+                    maximum = index
+                    break
 
-        min_p = limits[0]
         minimum = 0
-        for index, value in enumerate(pressure):
-            if value > min_p:
-                minimum = index
-                break
+        if limits[0]:
+            for index, value in enumerate(pressure):
+                if value > limits[0]:
+                    minimum = index
+                    break
 
     if maximum - minimum < 3:
         raise CalculationError("The isotherm does not have enough points in the BET "
@@ -264,7 +259,7 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
 
     # calculate the BET transform, slope and intercept
     bet_t_array = bet_transform(
-        loading[minimum:maximum], pressure[minimum:maximum])
+        pressure[minimum:maximum], loading[minimum:maximum])
     slope, intercept, corr_coef = bet_optimisation(
         pressure[minimum:maximum], bet_t_array)
 
@@ -284,28 +279,28 @@ def area_BET_raw(loading, pressure, cross_section, limits=None):
             slope, intercept, minimum, maximum, corr_coef)
 
 
-def roq_transform(loading, pressure):
-    """Rouquerol transform function"""
+def roq_transform(pressure, loading):
+    """Rouquerol transform function."""
     return loading * (1 - pressure)
 
 
-def bet_transform(loading, pressure):
-    """BET transform function"""
-    return pressure / roq_transform(loading, pressure)
+def bet_transform(pressure, loading):
+    """BET transform function."""
+    return pressure / roq_transform(pressure, loading)
 
 
 def bet_optimisation(pressure, bet_points):
-    """Finds the slope and intercept of the BET region"""
+    """Finds the slope and intercept of the BET region."""
     slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
         pressure, bet_points)
     return slope, intercept, corr_coef
 
 
 def bet_parameters(slope, intercept, cross_section):
-    """Calculates the BET parameters from the slope and intercept"""
+    """Calculates the BET parameters from the slope and intercept."""
 
     c_const = (slope / intercept) + 1
     n_monolayer = 1 / (intercept * c_const)
     p_monolayer = 1 / (scipy.sqrt(c_const) + 1)
-    bet_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
+    bet_area = n_monolayer * cross_section * (10**(-18)) * const.Avogadro
     return n_monolayer, p_monolayer, c_const, bet_area

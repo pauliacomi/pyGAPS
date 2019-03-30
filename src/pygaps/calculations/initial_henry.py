@@ -1,6 +1,4 @@
-"""
-This module calculates the initial henry constant based on an isotherm.
-"""
+"""Module calculating the initial henry constant."""
 
 import matplotlib.pyplot as plt
 import numpy
@@ -70,7 +68,7 @@ def initial_henry_slope(isotherm,
 
     while rows_taken != 1:
         model_isotherm = ModelIsotherm.from_isotherm(isotherm,
-                                                     data.head(rows_taken),
+                                                     isotherm_data=data.head(rows_taken),
                                                      pressure_key=isotherm.pressure_key,
                                                      loading_key=isotherm.loading_key,
                                                      model="Henry")
@@ -88,12 +86,15 @@ def initial_henry_slope(isotherm,
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
         print("Final adjusted root mean square difference:", adjrmsd)
-        model_isotherm.sample_name = 'Henry model'
-        plot_iso([isotherm, model_isotherm],
-                 plot_type='isotherm',
-                 branch='ads',
-                 lgd_keys=['sample_name'],
-                 **plot_parameters)
+        model_isotherm.material_name = 'Henry model'
+        params = {
+            'plot_type': 'isotherm',
+            'branch': 'ads',
+            'fig_title': (' '.join([isotherm.material_name, isotherm.material_batch])),
+            'lgd_keys': ['material_name', 'adsorbate', 't_iso']
+        }
+        params.update(plot_parameters)
+        plot_iso([isotherm, model_isotherm], **params)
 
         plt.show()
 
@@ -101,7 +102,7 @@ def initial_henry_slope(isotherm,
     return model_isotherm.model.params["K"]
 
 
-def initial_henry_virial(isotherm, verbose=False):
+def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
     """
     Calculates an initial Henry constant based on fitting the virial equation.
 
@@ -122,14 +123,19 @@ def initial_henry_virial(isotherm, verbose=False):
         isotherm, model='Virial', verbose=verbose)
 
     if verbose:
-        model_isotherm.sample_name = 'model'
+        model_isotherm.material_name = 'model'
         try:
-            plot_iso([isotherm, model_isotherm],
-                     plot_type='isotherm', branch='ads', logx=False,
-                     lgd_keys=['sample_name'])
-
+            params = {
+                'plot_type': 'isotherm',
+                'branch': 'ads',
+                'logx': False,
+                'fig_title': (' '.join([isotherm.material_name, isotherm.material_batch])),
+                'lgd_keys': ['material_name', 'adsorbate', 't_iso']
+            }
+            params.update(plot_parameters)
+            plot_iso([isotherm, model_isotherm], **params)
             plt.show()
-        except CalculationError as err:
+        except CalculationError:
             plt.close()
             print('Cannot plot comparison due to model instability')
 

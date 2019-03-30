@@ -27,7 +27,7 @@ MODELS = {
 
 
 @pytest.mark.modelling
-class TestIsothermModels(object):
+class TestIsothermModels():
     """
     Tests the isotherm models
     """

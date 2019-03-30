@@ -15,7 +15,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestAlphaSPlot(object):
+class TestAlphaSPlot():
     """
     Tests everything related to alpha-s calculation
     """

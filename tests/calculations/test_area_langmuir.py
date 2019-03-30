@@ -15,7 +15,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestAreaLangmuir(object):
+class TestAreaLangmuir():
     """
     Tests everything related to Langmuir surface area calculation
     """

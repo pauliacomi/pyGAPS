@@ -1,5 +1,4 @@
 language: python
-sudo: false
 cache: pip
 
 env:
@@ -19,12 +18,27 @@ install:
   - easy_install --version
   - pip --version
   - tox --version
-
-before_script:
-    # some tests require a GUI, so use xvfb
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3             # give xvfb some time to start
+  - |
+    set -ex
+    if [[ $TRAVIS_PYTHON_VERSION == 'pypy' ]]; then
+        (cd $HOME
+         wget https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux64.tar.bz2
+         tar xf pypy2-*.tar.bz2
+         pypy2-*/bin/pypy -m ensurepip
+         pypy2-*/bin/pypy -m pip install -U virtualenv)
+        export PATH=$(echo $HOME/pypy2-*/bin):$PATH
+        export TOXPYTHON=$(echo $HOME/pypy2-*/bin/pypy)
+    fi
+    if [[ $TRAVIS_PYTHON_VERSION == 'pypy3' ]]; then
+        (cd $HOME
+         wget https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux64.tar.bz2
+         tar xf pypy3-*.tar.bz2
+         pypy3-*/bin/pypy3 -m ensurepip
+         pypy3-*/bin/pypy3 -m pip install -U virtualenv)
+        export PATH=$(echo $HOME/pypy3-*/bin):$PATH
+        export TOXPYTHON=$(echo $HOME/pypy3-*/bin/pypy3)
+    fi
+    set +x
 
 script:
   # start tox to do the testing
@@ -38,11 +52,13 @@ jobs:
   include:
     # Checks and docks
     - stage: test
-      python: '3.6'     # specify python 3.6
+      python: '3.7'     # specify python 3.7
+      dist: xenial
       env:
         - TOXENV=check
     - stage: test
-      python: '3.6'     # specify python 3.6
+      python: '3.7'     # specify python 3.7
+      dist: xenial
       env:
         - TOXENV=docs
       addons:
@@ -53,10 +69,9 @@ jobs:
     # Create an test job on the test stage for each python version
 {%- for env, config in tox_environments|dictsort %}{{ '' }}
     - stage: test
-      python: '{{ '{0[0]}-5.4'.format(env.split('-')) if env.startswith('pypy') else env.split('-')[0] }}'
-      {% if env.startswith('3.7') %}
+      python: '{{ env.split("-")[0] if env.startswith("pypy") else "{0[2]}.{0[3]}".format(env) }}'
+    {% if env.startswith('py37') %}
       dist: xenial
-      sudo: required
       {% endif %}
       env:
         - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
@@ -64,18 +79,26 @@ jobs:
 
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
-      python: '3.6'     # specify python 3.6
+      python: '3.7'     # specify python 3.7
+      dist: xenial
       env: TOXENV=none  # overwrite environment var
       install: skip     # no need to install tox
       script: skip      # run no tests
-      deploy: &pypi     # instead deploy on pypi
-        provider: pypi
-        user: paul.iacomi
-        password:
+      deploy:           # instead deploy
+        - provider: pypi
+          user: paul.iacomi
+          password:
             secure: n0/j7ueOm8N0frKsRtEOqWvY1I02iu08dNS3ylK+8q+78PrQwB9xQUlH8QRQselMrkobas9e2l9x8eglYNmN1yYata0mT/UexIy+h1CmHTt6oMxE6TSEiCRuyQ73TwV5F36eOOGLwYYzRLMOYjVaHC5E3f0W1RzGcWstrgZWRtVhHNZ+3IxYW+sqb2+JVeKlhqQgmZY2+LRkwf7UXgoNeYHElKB0WnoPNiK2UpYYm8Et4IWFs7BBQfFBTiHmvmsk2DVwBPUWfju0CLoGFKrf/7Z4polSgo88WIBMtW2vPq3JU7uGr3Bqc/XNs+atc0AT9/eqb7x7DogeikSagJa1dx1h///C90as5FV4pSSHRILTCV5quTl9IFKltefxcNPbQuDtwano7wYIxbU4fbGjb8kGOCzTd2IWaz9oy9XtpC6xLuxBxlG4IphD3qQPtvGqi5udHlC3PX7GTgnQ6ySPuZ6EqhHmTFcpbaT8AXp5jfi2LqHllIo/+PcTv3Bm1/89qEfwcm6biE8O41ejOyjb3WKiB2etOMkw7O0tZE9Ub2LrPFohcCQVJgKFcewKrb5zCtmN61m+S3IFu3tOrean3De13ycD1oYSLbwMxU3Cc2bvRoQ+JcnRSIiNcu4ujaHL7uANQClHTByhUa61PNgWVOH3P6YWU572khCEUzF8cEA=
-        distributions: "sdist bdist_wheel"
-        on:
-          branch: master
+          distributions: sdist bdist_wheel
+          on:
+            branch: master
+        - provider: releases
+          api_key:
+            secure: njElANcKbB/8XpjQQvTSLlz0zooirTAyCjMTcunLRzekCLjHRVkMpBpgpAF/bOVWQHc9OOu09cxfrU6nIv0vY1RjyaVoEAkzOM57fijTmEmXMher9GV+O3y9ZO72tJyFMzwDN/FArs5HaGQM4IC3HLjWCSDTLOK3uyauXv5x4Yewqny4taiTjwgAXGdzXOhuR8SysoMeol/DRpqjtZWV6Aht+R0sDRDSB/BCUOqmNn3OXgd+LQmQjT2pvDUUklYn4nr6qtO96YFtuQCe33KWYL80VF9PDKPUkiRsakdY9VDK+P4TQAeOPorZxBuQyrgifiGPHEEUSuOo42A4Kn2dSvQZsWGXuN6cE4UkpCeQ0wT5oztg1XfgizrmUOBOhIzELo3vvtqQz84gDihwAaJokcEbpyKWzG6ysjvqpL/sKYJ9kj8GpCvbNqJwYjzhstlRYwGZtfK/l6k2/bvvxoSmBZ/CaLAP5VPvqjG8b/giLqnORxF6j0YRe7paj8SEpMwdKbRt8xoQuSVSTCR7oDRi3hsP993Aqp9XbSB5fMqksrXFzX4LQrdpTrMvZlpEeXdhAJZvcXjLGRb2sgDZzJjo+uz2/v7B78QzHTBazMcZbqrtlC1msmjxqF2hZ3yjotSTG0CDF2iprQpufQ0+IVem8yc6jPRR/24Ijb/0yrcKCt0=
+          skip_cleanup: true
+          draft: true
+          on:
+            branch: master
 
 
 notifications:

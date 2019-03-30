@@ -2,7 +2,11 @@
 This module contains the main class that describes an isotherm.
 """
 
+import warnings
+
 import pandas
+
+import pygaps
 
 from ..utilities.exceptions import ParameterError
 from ..utilities.hashgen import isotherm_to_hash
@@ -11,7 +15,7 @@ from ..utilities.unit_converter import _PRESSURE_MODE
 from ..utilities.unit_converter import _PRESSURE_UNITS
 
 
-class Isotherm(object):
+class Isotherm():
     """
     Class which contains the general data for an isotherm, real or model.
 
@@ -25,13 +29,13 @@ class Isotherm(object):
     Parameters
     ----------
 
-    sample_name : str
-        Name of the sample on which the isotherm is measured.
-    sample_batch : str
-        Batch (or identifier) of the sample on which the isotherm is measured.
+    material_name : str
+        Name of the material on which the isotherm is measured.
+    material_batch : str
+        Batch (or identifier) of the material on which the isotherm is measured.
     adsorbate : str
         The adsorbate used in the experiment.
-    t_exp : float
+    t_iso : float
         Experiment temperature.
 
     Other Parameters
@@ -61,25 +65,17 @@ class Isotherm(object):
     implementation additions.
 
     The minimum arguments required to instantiate the class are
-    ``sample_name``, ``sample_batch``, ``t_exp', ``adsorbate``.
+    ``material_name``, ``material_batch``, ``t_iso', ``adsorbate``.
     """
 
     _required_params = [
-        'sample_name',
-        'sample_batch',
-        't_exp',
+        'material_name',
+        'material_batch',
+        't_iso',
         'adsorbate'
     ]
     _named_params = {
-        'user': str,
-        'machine': str,
-        'exp_type': str,
-        'date': str,
-        'is_real': bool,
-        't_act': float,
-        'lab': str,
-        'project': str,
-        'comment': str,
+        'iso_type': str,
     }
 
     _unit_params = [
@@ -91,12 +87,10 @@ class Isotherm(object):
         'loading_basis',
     ]
 
-    _reserved_params = [
-        '_instantiated',
-    ]
+    _reserved_params = []
 
     _db_columns = ['id'] + _required_params + list(_named_params)
-    _id_params = _required_params + list(_named_params) + _unit_params
+    _id_params = _required_params + _unit_params
 
 ##########################################################
 #   Instantiation and classmethods
@@ -109,14 +103,14 @@ class Isotherm(object):
                  pressure_mode="absolute",
                  pressure_unit="bar",
 
-                 **isotherm_parameters):
+                 **properties):
         """
         Instantiation is done by passing a dictionary with the parameters,
         as well as the info about units, modes and data columns.
         """
 
         # Checks
-        if any(k not in isotherm_parameters
+        if any(k not in properties
                for k in self._required_params):
             raise ParameterError(
                 "Isotherm MUST have the following properties:"
@@ -182,60 +176,45 @@ class Isotherm(object):
         # Must-have properties of the isotherm
         #
 
-        # ID
-        self.id = isotherm_parameters.pop('id', None)
-
         #: Isotherm material name.
-        self.sample_name = str(isotherm_parameters.pop('sample_name', None))
+        self.material_name = str(properties.pop('material_name'))
         #: Isotherm material batch.
-        self.sample_batch = str(isotherm_parameters.pop('sample_batch', None))
+        self.material_batch = str(properties.pop('material_batch'))
         #: Isotherm experimental temperature.
-        self.t_exp = float(isotherm_parameters.pop('t_exp', None))
+        self.t_iso = float(properties.pop('t_iso'))
         #: Isotherm adsorbate used.
-        self.adsorbate = str(isotherm_parameters.pop('adsorbate', None))
+        self.adsorbate = str(properties.pop('adsorbate'))
+
+        if self.adsorbate.lower() not in pygaps.ADSORBATE_NAME_LIST:
+            if not properties.pop('no_warn', False):
+                warnings.warn(
+                    ("Specified adsorbent is not in internal list"
+                     "(or name cannot be resolved to an existing one)."
+                     "CoolProp backend disabled for this adsorbent.")
+                )
+        else:
+            self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
 
         # Named properties of the isotherm
         for named_prop in self._named_params:
-            prop_val = isotherm_parameters.pop(named_prop, None)
+            prop_val = properties.pop(named_prop, None)
             if prop_val:
                 prop_val = self._named_params[named_prop](prop_val)
-            setattr(self, named_prop, prop_val)
+                setattr(self, named_prop, prop_val)
 
-        # Save the rest of the properties as an extra dict
-        # now that the named properties were taken out of
+        # Save the rest of the properties as members
         #: Other properties of the isotherm.
-        for attr in isotherm_parameters:
-            setattr(self, attr, isotherm_parameters[attr])
-
-        # Finish instantiation process
-        # (check if none in case its part of a Point/Model Isotherm instantiation)
-        if not hasattr(self, '_instantiated'):
-            self._instantiated = True
-            if self.id is None:
-                self._check_if_hash(True, [True])
+        for attr in properties:
+            if hasattr(self, attr):
+                raise ParameterError("Cannot override standard class member '{}'".format(attr))
+            setattr(self, attr, properties[attr])
 
     ##########################################################
     #   Overloaded and private functions
 
-    def __setattr__(self, name, value):
-        """
-        We overload the usual class setter to make sure that the id is always
-        representative of the data inside the isotherm.
-
-        The '_instantiated' attribute gets set to true after isotherm __init__
-        From then afterwards, each call to modify the isotherm properties
-        recalculates the md5 hash.
-        This is done to ensure uniqueness and also to allow isotherm objects to
-        be easily compared to each other.
-        """
-        object.__setattr__(self, name, value)
-        self._check_if_hash(name)
-
-    def _check_if_hash(self, name, extra_params=[]):
-        """Checks if the hash needs to be generated"""
-        if getattr(self, '_instantiated', False) and name in self._id_params + extra_params:
-            # Generate the unique hash
-            self.id = isotherm_to_hash(self)
+    @property
+    def iso_id(self):
+        return isotherm_to_hash(self)
 
     def __eq__(self, other_isotherm):
         """
@@ -244,27 +223,22 @@ class Isotherm(object):
         is to compare the two hashes of the isotherms.
         """
 
-        return self.id == other_isotherm.id
+        return self.iso_id == other_isotherm.iso_id
 
-    ###########################################################
-    #   Info functions
+    def __repr__(self):
+        """Print key isotherm parameters."""
+        return "{0}: '{1} - {2}' with '{3}' at {4} K".format(
+            self.iso_id, self.material_name, self.material_batch, self.adsorbate, self.t_iso)
 
     def __str__(self):
-        '''
-        Prints a short summary of all the isotherm parameters.
-        '''
+        """Print a short summary of all the isotherm parameters."""
         string = ""
 
-        if getattr(self, 'is_real', True) is True:
-            string += ("Experimental isotherm" + '\n')
-        else:
-            string += ("Simulated isotherm" + '\n')
-
         # Required
-        string += ("Material: " + str(self.sample_name) + '\n')
-        string += ("Batch: " + str(self.sample_batch) + '\n')
+        string += ("Material: " + str(self.material_name) + '\n')
+        string += ("Batch: " + str(self.material_batch) + '\n')
         string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
-        string += ("Isotherm temperature: " + str(self.t_exp) + "K" + '\n')
+        string += ("Isotherm temperature: " + str(self.t_iso) + "K" + '\n')
 
         # Named
         for param in self._named_params:
@@ -300,6 +274,9 @@ class Isotherm(object):
         """
         parameter_dict = vars(self).copy()
 
+        # This line is here to ensure that adsorbate is copied as a string
+        parameter_dict['adsorbate'] = str(parameter_dict['adsorbate'])
+
         # Remove reserved parameters
         for param in self._reserved_params:
             if param in parameter_dict:
@@ -319,10 +296,10 @@ class Isotherm(object):
         inflexion = increasing.idxmax()
 
         # If there is an inflexion point
-        if inflexion != 0:
+        if inflexion != _data.index[0]:
             # If the first point is where the isotherm starts decreasing
             # Then it is a complete desorption curve
-            if inflexion == 1:
+            if inflexion == _data.index[1]:
                 inflexion = 0
 
             # Set all instances after the inflexion point to True

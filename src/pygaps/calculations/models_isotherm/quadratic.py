@@ -10,12 +10,12 @@ from .model import IsothermModel
 
 
 class Quadratic(IsothermModel):
-    """
+    r"""
     Quadratic isotherm model
 
     .. math::
 
-        n(p) = n_M \\frac{(K_a + 2 K_b p)p}{1 + K_{a p} + K_{b p}^2}
+        n(p) = n_M \frac{(K_a + 2 K_b p)p}{1 + K_{a p} + K_{b p}^2}
 
     Notes
     -----
@@ -100,19 +100,19 @@ class Quadratic(IsothermModel):
         return opt_res.x
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Quadratic model is solved analytically.
 
         .. math::
 
-            \\pi = n_M \\ln{1+K_a p + K_b p^2}
+            \pi = n_M \ln{1+K_a p + K_b p^2}
 
         Parameters
         ----------

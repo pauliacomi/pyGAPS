@@ -9,7 +9,7 @@ import pygaps.graphing.calcgraph as graphing
 
 
 @pytest.mark.graphing
-class TestCalcGraphs(object):
+class TestCalcGraphs():
     """Tests all calculation graphs"""
 
     @cleanup

@@ -2,14 +2,88 @@
 Changelog
 =========
 
-
-1.3.1 ()
+1.6.0 ()
 ------------------
+
+Features:
+
+* Added a function to get isotherms from the NIST ISODB,
+  ``pygaps.load_nist_isotherm`` which takes the ISODB filename
+  as an argument.
+* Added hexane as an adsorbate in the database.
+* Isotherm adsorbate is now a pygaps.Adsorbate object and
+  can be accessed directly for all attributes
+  (only when available in the internal database, otherwise still a string).
+* Added github issue templates.
+
+Breaking changes:
+
+Bugfixes:
+* Some of the gas values in the isotherm were incorrect.
+  They have been now updated.
+
+
+1.5.0 (2019-03-12)
+------------------
+
+Features:
+
+* Increased number of adsorbates available in pyGAPS to 40.
+* New material characterisation functions: Dubinin-Radushkevich
+  (dr_plot) and Dubinin-Astakov (da_plot) plots.
+* Added a new way to create an isotherm, from an two arrays of pressure and loading
+  (the old DataFrame method is still valid but changed: check breaking changes).
+* Made adsorbates searchable by a list of aliases rather than a single name.
+* Exposed the CoolProp backend on adsorbate objects for convenience, it is
+  accessible through the adsorbate.backend property.
+* Streamlined the internal database functions.
+* Updated NIST json import to new format. Cannot import multicomponent isotherms.
+* Functions which generate matplotlib graphs now can take an Ax as parameter
+  (similar to behaviour of pandas) to plot on existing figures.
+* Changed behaviour of ModelIsotherm.guess function to accept a list of
+  models to attempt to guess for.
+* Added b-spline smoothing to output of dft fitting.
+
+Breaking changes:
+
+* The Sample class is now renamed as Material.
+* Isotherm creation parameters have changed from 'sample_name', 'sample_batch'
+  and 't_exp' to 'material_name', 'material_batch' and 't_iso'.
+* Backend database has been simplified. Many required fields are no longer
+  present and left to the discretion of the user.
+* Several database functions have been renamed.
+  All functions switched: 'sample' -> 'material' and 'experiment' -> 'isotherm'.
+* When passing a DataFrame for isotherm creation, it now has to be specified as
+  the parameter 'isotherm_data'.
+* Isotherm unique ID is now generated on the fly (previously generated at
+  each isotherm modification). It also now takes into account only the
+  required parameters for each isotherm ( 'sample_name', 'sample_batch',
+  't_exp' and 'adsorbate') as well as the model name, if the
+  isotherm is a ModelIsotherm.
+* Renamed Adsorbate.from_list() method to Adsorbate.find()
+
+Bugfixes:
+
+* Fixed issue in CSV import which read all values as strings (instead of floats/bools)
+* Fixed an issue with Excel import of bools, as they were previously read as 1/0
+* Fixed a bug where the automatic branch detection was not working when the
+  DataFrame passed had a non-standard index.
+* Fixed not being able to call _repr_ on an isotherm.
+
+
+1.4.0 (2018-11-10)
+------------------
+
+Features:
+
+* Added the GAB isotherm model
 
 Bugfixes:
 
 * Improved pore size distribution calculations to display cumulative pore
   volume when called.
+* Fixed the "all-nol" selection parameter for legend display in isotherm
+  graphs.
 
 1.3.0 (2018-08-13)
 ------------------
