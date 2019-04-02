@@ -102,6 +102,7 @@ class Adsorbate():
         self.properties = properties
 
         # CoolProp interaction variables, only generate when called
+        self._state = None
         self._backend_mode = None
 
         return
