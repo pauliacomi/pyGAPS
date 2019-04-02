@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to pore size distribution calculations
-"""
+"""Test pore size distribution calculations."""
 
 import os
 
@@ -15,9 +13,7 @@ from .conftest import DATA_N77_PATH
 
 @pytest.mark.characterisation
 class TestPSD():
-    """
-    Tests everything related to pore size distribution calculation
-    """
+    """Test pore size distribution calculation."""
 
     def test_psd_meso_checks(self, basic_pointisotherm, basic_material):
 
@@ -125,7 +121,7 @@ class TestPSD():
         (data['file']) for data in list(DATA.values())
     ])
     def test_psd_dft(self, file):
-        """Test psd calculation with several model isotherms"""
+        """Test psd calculation with several model isotherms."""
 
         filepath = os.path.join(DATA_N77_PATH, file)
 

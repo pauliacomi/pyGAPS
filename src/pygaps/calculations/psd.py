@@ -1,6 +1,4 @@
-"""
-Calculation of the pore size distribution based on an isotherm.
-"""
+"""Pore size distribution calculation based on an isotherm."""
 
 from functools import partial
 
@@ -107,6 +105,8 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         raise ParameterError("Geometry {} not an option for pore size"
                              "distribution.".format(pore_geometry),
                              "Available geometries are {}".format(_PORE_GEOMETRIES))
+    if not isinstance(isotherm.adsorbate, Adsorbate):
+        raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
     branch = model_parameters.get('branch')
     if branch is None:
@@ -121,10 +121,9 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         thickness_model = 'Harkins/Jura'
 
     # Get required adsorbate properties
-    adsorbate = Adsorbate.find(isotherm.adsorbate)
-    molar_mass = adsorbate.molar_mass()
-    liquid_density = adsorbate.liquid_density(isotherm.t_iso)
-    surface_tension = adsorbate.surface_tension(isotherm.t_iso)
+    molar_mass = isotherm.adsorbate.molar_mass()
+    liquid_density = isotherm.adsorbate.liquid_density(isotherm.t_iso)
+    surface_tension = isotherm.adsorbate.surface_tension(isotherm.t_iso)
 
     # Read data in, depending on branch requested
     # If on an adsorption branch, data will be reversed
@@ -252,6 +251,8 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
             "Geometry {} not an option for pore size distribution.".format(
                 pore_geometry),
             "Available geometries are {}".format(_PORE_GEOMETRIES))
+    if not isinstance(isotherm.adsorbate, Adsorbate):
+        raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
     adsorbent_model = model_parameters.get('adsorbent_model')
     if adsorbent_model is None:
@@ -260,14 +261,13 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     # Get adsorbate properties
     adsorbate_properties = model_parameters.get('adsorbate_model')
     if adsorbate_properties is None:
-        adsorbate = Adsorbate.find(isotherm.adsorbate)
         adsorbate_properties = {
-            'molecular_diameter': adsorbate.get_prop('molecular_diameter'),
-            'polarizability': adsorbate.get_prop('polarizability'),
-            'magnetic_susceptibility': adsorbate.get_prop('magnetic_susceptibility'),
-            'surface_density': adsorbate.get_prop('surface_density'),
-            'liquid_density': adsorbate.liquid_density(isotherm.t_iso),
-            'adsorbate_molar_mass': adsorbate.molar_mass(),
+            'molecular_diameter': isotherm.adsorbate.get_prop('molecular_diameter'),
+            'polarizability': isotherm.adsorbate.get_prop('polarizability'),
+            'magnetic_susceptibility': isotherm.adsorbate.get_prop('magnetic_susceptibility'),
+            'surface_density': isotherm.adsorbate.get_prop('surface_density'),
+            'liquid_density': isotherm.adsorbate.liquid_density(isotherm.t_iso),
+            'adsorbate_molar_mass': isotherm.adsorbate.molar_mass(),
         }
 
     # Read data in
@@ -391,6 +391,8 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2,
         raise ParameterError(
             "A path to the kernel to be used must be specified."
             "Use 'internal' to use the internal kernel (USE JUDICIOUSLY).")
+    if not isinstance(isotherm.adsorbate, Adsorbate):
+        raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
     # Read data in
     loading = isotherm.loading(branch='ads',
@@ -404,9 +406,8 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2,
         pressure, loading, kernel_path, bspline_order)  # mmol/g
 
     # Convert to volume units
-    adsorbate = Adsorbate.find(isotherm.adsorbate)
-    pore_dist = pore_dist * max(loading) * adsorbate.molar_mass() \
-        / adsorbate.liquid_density(isotherm.t_iso) / 1000
+    pore_dist = pore_dist * max(loading) * isotherm.adsorbate.molar_mass() \
+        / isotherm.adsorbate.liquid_density(isotherm.t_iso) / 1000
 
     # Package the results
     result_dict = {
