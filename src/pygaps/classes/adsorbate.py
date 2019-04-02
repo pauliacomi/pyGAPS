@@ -32,7 +32,6 @@ class Adsorbate():
 
     Other Parameters
     ----------------
-
     formula : str
         A chemical formula for the adsorbate in the form He/N2/CO etc.
     alias : list
@@ -57,7 +56,6 @@ class Adsorbate():
 
     Notes
     -----
-
     The members of the properties dictionary are left at the discretion
     of the user, to keep the class extensible. There are, however, some
     unique properties which are used by calculations in other modules
@@ -85,10 +83,7 @@ class Adsorbate():
     """
 
     def __init__(self, name, alias=None, **properties):
-        """
-        Instantiation is done by passing a dictionary with the parameters.
-        """
-
+        """Instantiate by passing a dictionary with the parameters."""
         #: Adsorbate name
         self.name = name
         #: List of aliases
@@ -104,8 +99,6 @@ class Adsorbate():
         # CoolProp interaction variables, only generate when called
         self._state = None
         self._backend_mode = None
-
-        return
 
     def __repr__(self):
         """Print adsorbate standard name."""
