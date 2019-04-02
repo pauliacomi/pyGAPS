@@ -2,7 +2,7 @@
 This module contains the functions for plotting and comparing isotherms.
 """
 
-import collections
+import collections.abc as abc
 import warnings
 from itertools import cycle
 
@@ -151,7 +151,7 @@ def plot_iso(isotherms,
 #
 # Initial checks
     # Make iterable if not already
-    if not isinstance(isotherms, collections.Iterable):
+    if not isinstance(isotherms, abc.Iterable):
         isotherms = [isotherms]
 
     # Check for plot type validity
