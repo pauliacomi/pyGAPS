@@ -19,6 +19,9 @@ Features:
 Breaking changes:
 
 Bugfixes:
+
+* REFPROP backend now correctly accessible
+  (it was previously impossible to activate).
 * Some of the gas values in the isotherm were incorrect.
   They have been now updated.
 
