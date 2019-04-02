@@ -17,11 +17,14 @@ Features:
 * Added github issue templates.
 
 Breaking changes:
+* Deprecated the MADIREL excel format
 
 Bugfixes:
 
 * REFPROP backend now correctly accessible
   (it was previously impossible to activate).
+* Fixed issue in excel import which could lead to
+  incorrect import.
 * Some of the gas values in the isotherm were incorrect.
   They have been now updated.
 

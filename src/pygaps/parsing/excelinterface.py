@@ -315,6 +315,8 @@ def isotherm_from_xl(path, fmt=None):
         pressure_unit = 'kPa'
         loading_basis = 'molar'
         adsorbent_basis = 'mass'
+        loading_unit = material_info.pop('loading_unit')
+        adsorbent_unit = material_info.pop('adsorbent_unit')
 
         experiment_data_df = pandas.DataFrame({
             pressure_key: material_info.pop(pressure_key)['relative'],
@@ -328,18 +330,22 @@ def isotherm_from_xl(path, fmt=None):
         pressure_unit = None
         loading_basis = 'molar'
         adsorbent_basis = 'mass'
+        branch_data = material_info.pop('measurement')
+        loading_unit = material_info.pop('loading_unit')
+        adsorbent_unit = material_info.pop('adsorbent_unit')
 
         experiment_data_df = pandas.DataFrame({
             pressure_key: material_info.pop(pressure_key)['relative'],
             loading_key: material_info.pop(loading_key),
         })
 
-        branch_data = material_info.pop('measurement')
-
     else:
         # Get excel workbook and sheet
         wb = xlrd.open_workbook(path)
-        sht = wb.sheet_by_name('data')
+        if 'data' in wb.sheet_names():
+            sht = wb.sheet_by_name('data')
+        else:
+            sht = wb.sheet_by_index(0)
 
         # get the required dictionaries
         fields = _FIELDS.copy()
@@ -364,7 +370,7 @@ def isotherm_from_xl(path, fmt=None):
 
         while final_row < sht.nrows:
             point = sht.cell(final_row, 0).value
-            if not point:
+            if point == '':
                 break
             final_row += 1
 
@@ -374,7 +380,7 @@ def isotherm_from_xl(path, fmt=None):
         experiment_data = {}
         while header_col < sht.ncols:
             header = sht.cell(header_row, header_col).value
-            if not header:
+            if header == '':
                 break
             headers.append(header)
             experiment_data[header] = [sht.cell(i, header_col).value for i in range(start_row, final_row)]
@@ -386,8 +392,8 @@ def isotherm_from_xl(path, fmt=None):
         experiment_data_df = pandas.DataFrame(experiment_data)
 
         # read the secondary isotherm parameters
-        sht = wb.sheet_by_name('otherdata')
-        if sht:
+        if 'otherdata' in wb.sheet_names():
+            sht = wb.sheet_by_name('otherdata')
             row_index = 0
             while row_index < sht.nrows:
                 cell = sht.cell(row_index, 1)
@@ -401,12 +407,14 @@ def isotherm_from_xl(path, fmt=None):
                 row_index += 1
 
         # Put data in order
-        material_info.pop('isotherm data')    # remove useless field
-        material_info.pop('iso_id', None)         # make sure id is not passed
+        material_info.pop('isotherm data')                      # remove useless field
+        material_info.pop('iso_id', None)                       # make sure id is not passed
         pressure_mode = material_info.pop('pressure_mode')
         pressure_unit = material_info.pop('pressure_unit')
         loading_basis = material_info.pop('loading_basis')
+        loading_unit = material_info.pop('loading_unit')
         adsorbent_basis = material_info.pop('adsorbent_basis')
+        adsorbent_unit = material_info.pop('adsorbent_unit')
 
         if fmt == 'MADIREL':
             if material_info['is_real'] == "Experience":
@@ -425,6 +433,13 @@ def isotherm_from_xl(path, fmt=None):
                 new_info.update({k: v})
             material_info = new_info
 
+            pressure_mode = 'absolute'
+            pressure_unit = 'bar'
+            loading_basis = 'molar'
+            loading_unit = 'mmol'
+            adsorbent_basis = 'mass'
+            adsorbent_unit = 'g'
+
     isotherm = PointIsotherm(
         isotherm_data=experiment_data_df,
         loading_key=loading_key,
@@ -434,7 +449,9 @@ def isotherm_from_xl(path, fmt=None):
         pressure_unit=pressure_unit,
         pressure_mode=pressure_mode,
         loading_basis=loading_basis,
+        loading_unit=loading_unit,
         adsorbent_basis=adsorbent_basis,
+        adsorbent_unit=adsorbent_unit,
         branch=branch_data,
 
         **material_info)
