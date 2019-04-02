@@ -243,7 +243,7 @@ class Adsorbate():
 
     def backend_name(self):
         """
-        Gets the common name of the adsorbate from the properties dict.
+        Get the common name of the adsorbate from the properties dict.
 
         Returns
         -------
