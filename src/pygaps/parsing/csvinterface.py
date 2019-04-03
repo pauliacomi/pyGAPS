@@ -49,7 +49,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
     """
 
-    with open(path, mode='w') as file:
+    with open(path, mode='w', newline='\n') as file:
 
         isotherm_data = isotherm.to_dict()
 
@@ -68,7 +68,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
             data = isotherm.data()[headings]
 
             file.write('data:[pressure, loading, other...]\n')
-            file.write(data.to_csv(None, sep=separator, index=False, header=True))
+            data.to_csv(file, sep=separator, index=False, header=True)
 
         elif isinstance(isotherm, ModelIsotherm):
             raise NotImplementedError
