@@ -173,9 +173,7 @@ class Adsorbate():
 
     @property
     def backend(self):
-        """
-        Returns the CoolProp state associated with the fluid.
-        """
+        """Return the CoolProp state associated with the fluid."""
         if not self._backend_mode or self._backend_mode != pygaps.COOLPROP_BACKEND:
             self._backend_mode = pygaps.COOLPROP_BACKEND
             self._state = CoolProp.AbstractState(
@@ -185,9 +183,7 @@ class Adsorbate():
 
     @property
     def formula(self):
-        """
-        Returns the adsorbent formula if applicable.
-        """
+        """Return the adsorbent formula."""
         formula = self.properties.get('formula')
         if formula is None:
             formula = self.name
@@ -196,7 +192,8 @@ class Adsorbate():
 
     def to_dict(self):
         """
-        Returns a dictionary of the adsorbate class.
+        Return a dictionary of the adsorbate class.
+
         Is the same dictionary that was used to create it.
 
         Returns
@@ -204,7 +201,6 @@ class Adsorbate():
         dict
             dictionary of all parameters
         """
-
         parameters_dict = {
             'name': self.name,
         }
@@ -214,7 +210,7 @@ class Adsorbate():
 
     def get_prop(self, prop):
         """
-        Returns a property from the 'properties' dictionary.
+        Return a property from the 'properties' dictionary.
 
         Parameters
         ----------
@@ -232,7 +228,6 @@ class Adsorbate():
             If the the property does not exist
             in the class dictionary.
         """
-
         req_prop = self.properties.get(prop)
         if req_prop is None:
             raise ParameterError(
@@ -243,7 +238,7 @@ class Adsorbate():
 
     def backend_name(self):
         """
-        Get the common name of the adsorbate from the properties dict.
+        Get the CoolProp interaction name of the adsorbate.
 
         Returns
         -------
@@ -266,7 +261,7 @@ class Adsorbate():
 
     def molar_mass(self, calculate=True):
         """
-        Returns the molar mass of the adsorbate
+        Return the molar mass of the adsorbate.
 
         Parameters
         ----------
@@ -310,8 +305,7 @@ class Adsorbate():
 
     def saturation_pressure(self, temp, unit=None, calculate=True):
         """
-        Uses an equation of state to determine the
-        saturation pressure at a particular temperature.
+        Get the saturation pressure at a particular temperature.
 
         Parameters
         ----------
@@ -366,8 +360,7 @@ class Adsorbate():
 
     def surface_tension(self, temp, calculate=True):
         """
-        Uses an equation of state to determine the
-        surface tension at a particular temperature.
+        Get the surface tension at a particular temperature.
 
         Parameters
         ----------
@@ -416,8 +409,7 @@ class Adsorbate():
 
     def liquid_density(self, temp, calculate=True):
         """
-        Uses an equation of state to determine the
-        liquid density at a particular temperature.
+        Get the liquid density at a particular temperature.
 
         Parameters
         ----------
@@ -466,8 +458,7 @@ class Adsorbate():
 
     def gas_density(self, temp, calculate=True):
         """
-        Uses an equation of state to determine the
-        gas density at a particular temperature.
+        Get the gas density at a particular temperature.
 
         Parameters
         ----------
@@ -516,8 +507,7 @@ class Adsorbate():
 
     def enthalpy_liquefaction(self, temp, calculate=True):
         """
-        Uses an equation of state to determine the
-        enthalpy of liquefaction at a particular temperature.
+        Get the enthalpy of liquefaction at a particular temperature.
 
         Parameters
         ----------
