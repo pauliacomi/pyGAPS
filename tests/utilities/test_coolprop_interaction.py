@@ -1,8 +1,8 @@
 """Test CoolProp interaction."""
 
-import pygaps
-
 import CoolProp
+
+import pygaps
 
 
 def test_backend_change():
@@ -22,6 +22,7 @@ def test_backend_names_coolprop():
 def test_backend_names_refprop():
     version = CoolProp.CoolProp.get_global_param_string("REFPROP_version")
     if version:
+        print(version)
         for adsorbate in pygaps.ADSORBATE_LIST:
             pygaps.backend_use_refprop()
             try:
