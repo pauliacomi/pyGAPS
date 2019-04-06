@@ -1,14 +1,18 @@
-"""
-Contains functions which plot graphs related to IAST calculations
-"""
+"""Functions for plotting graphs related to IAST calculations."""
+
 import matplotlib.pyplot as plt
 
 from ..utilities.string_utilities import convert_chemformula
+from .mpl_styles import IAST_STYLES
 
 
-def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
+def plot_iast_vle(
+        x_data, y_data,
+        adsorbate1, adsorbate2,
+        pressure, p_unit,
+        ax=None):
     """
-    Plots a vapour-adsorbed equilibrium graph from IAST data.
+    Plot a vapour-adsorbed equilibrium graph from IAST data.
 
     Parameters
     ----------
@@ -24,16 +28,19 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
         Pressure at which the vle is plotted.
     p_unit : str
         Unit of the pressure, for axis labelling.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
-    fig : matplotlib Figure
-        The figure object.
     ax : matplotlib ax
         The ax object.
     """
-    # Generate the figure
-    fig, ax = plt.subplots(figsize=(8, 8))
+    # Generate the figure if needed
+    if ax is None:
+        fig = plt.figure(**IAST_STYLES['fig_style'])
+        ax = fig.add_subplot(111)
 
     text_x = 'Gas fraction ' + convert_chemformula(adsorbate1)
     text_y = 'Adsorbed fraction ' + convert_chemformula(adsorbate1)
@@ -42,11 +49,12 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
     label = str(pressure) + ' (' + p_unit + ')'
 
     # graph title
-    ax.set_title(title_graph, fontsize=22, ha='center', va='bottom')
+    ax.set_title(title_graph, **IAST_STYLES['title_style'])
 
     # labels for the axes
-    ax.set_xlabel(text_x, fontsize=15)
-    ax.set_ylabel(text_y, fontsize=15)
+    ax.set_xlabel(text_x, **IAST_STYLES['label_style'])
+    ax.set_ylabel(text_y, **IAST_STYLES['label_style'])
+    ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
 
     # Regular data
     ax.plot(y_data, x_data, label=label)
@@ -55,19 +63,23 @@ def plot_iast_vle(x_data, y_data, adsorbate1, adsorbate2, pressure, p_unit):
     line = [0, 1]
     ax.plot(line, line, color='black')
 
-    ax.legend(fontsize=15, loc='best')
+    ax.legend(loc='best', **IAST_STYLES['legend_style'])
 
     ax.grid(True, zorder=5)
     ax.set_xlim(left=0, right=1)
     ax.set_ylim(bottom=0, top=1)
     ax.set_xscale('linear')
 
-    return fig, ax
+    return ax
 
 
-def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
+def plot_iast_svp(
+        p_data, s_data,
+        adsorbate1, adsorbate2,
+        fraction, p_unit,
+        ax=None):
     """
-    Plots a selectivity-vs-pressure graph from IAST data.
+    Plot a selectivity-vs-pressure graph from IAST data.
 
     Parameters
     ----------
@@ -83,17 +95,20 @@ def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
         Molar fraction of the main component in the mixture.
     p_unit : str
         Unit of the pressure, for axis labelling.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
-    fig : matplotlib Figure
-        The figure object.
     ax : matplotlib ax
         The ax object.
     """
 
-    # Generate the figure
-    fig, ax = plt.subplots(figsize=(8, 8))
+    # Generate the figure if needed
+    if ax is None:
+        fig = plt.figure(**IAST_STYLES['fig_style'])
+        ax = fig.add_subplot(111)
 
     text_x = 'Pressure (' + p_unit + ')'
     text_y = 'Selectivity ' + convert_chemformula(adsorbate1)
@@ -103,19 +118,20 @@ def plot_iast_svp(p_data, s_data, adsorbate1, adsorbate2, fraction, p_unit):
         convert_chemformula(adsorbate1)
 
     # graph title
-    ax.set_title(title_graph, fontsize=22, ha='center', va='bottom')
+    ax.set_title(title_graph, **IAST_STYLES['title_style'])
 
     # labels for the axes
-    ax.set_xlabel(text_x, fontsize=15)
-    ax.set_ylabel(text_y, fontsize=15)
+    ax.set_xlabel(text_x, **IAST_STYLES['label_style'])
+    ax.set_ylabel(text_y, **IAST_STYLES['label_style'])
+    ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
 
     # Regular data
     ax.plot(p_data, s_data, label=label)
 
-    ax.legend(fontsize=15, loc='best')
+    ax.legend(loc='best', **IAST_STYLES['legend_style'])
 
     ax.grid(True, zorder=5)
     ax.set_ylim(bottom=0)
     ax.set_xscale('linear')
 
-    return fig, ax
+    return ax

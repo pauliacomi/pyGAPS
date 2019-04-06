@@ -1,8 +1,7 @@
-"""
-This module contains the functions for plotting and comparing isotherms.
-"""
+"""Functions for plotting and comparing isotherms."""
 
 import collections.abc as abc
+import copy
 import warnings
 from itertools import cycle
 
@@ -14,6 +13,7 @@ from numpy import linspace
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
 from ..utilities.string_utilities import convert_chemformula
+from .mpl_styles import ISO_STYLES
 
 # ! list of branch types
 _BRANCH_TYPES = ("ads", "des", "all", "all-nol")
@@ -206,24 +206,7 @@ def plot_iso(isotherms,
 # Settings and graph generation
 
     # Create style dictionaries and get user defined ones
-    styles = {
-        'fig_style': {'figsize': (8, 8)},
-        'title_style': {
-            'horizontalalignment': 'center',
-            'fontsize': 25,
-            'fontdict': {'family': 'monospace'}
-        },
-        'label_style': {
-            'horizontalalignment': 'center',
-            'fontsize': 20,
-            'fontdict': {'family': 'monospace'},
-        },
-        'y1_line_style': {'linewidth': 2, 'markersize': 8},
-        'y2_line_style': {'linewidth': 0, 'markersize': 8},
-        'tick_style': {'labelsize': 17},
-        'legend_style': {'handlelength': 3, 'fontsize': 15},
-        'save_style': {},
-    }
+    styles = copy.deepcopy(ISO_STYLES)
 
     # Overwrite with any user provided styles
     for style in styles:
@@ -294,13 +277,11 @@ def plot_iso(isotherms,
     # Graph title
     if fig_title is None:
         fig_title = ''
-    ax1.set_title(fig_title, **styles['title_style'], y=1.01)
+    ax1.set_title(fig_title, **styles['title_style'])
 
     # Graph legend builder
     def build_label(isotherm, lbl_components, iso_branch, key):
-        """
-        Builds a label for the legend depending on requested parameters
-        """
+        """Build a label for the legend depending on requested parameters."""
         if branch == 'all-nol' and iso_branch == 'des':
             return ''
         else:
@@ -323,9 +304,9 @@ def plot_iso(isotherms,
 
             return " ".join(text)
 
-###########################################
-#
-# Getting specific data from an isotherm
+    ###########################################
+    #
+    # Getting specific data from an isotherm
     #
 
     def get_data(isotherm, data_name, data_range, branch):
@@ -507,5 +488,4 @@ def plot_iso(isotherms,
 
     if ax2:
         return [ax1, ax2]
-    else:
-        return ax1
+    return ax1
