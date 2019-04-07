@@ -27,11 +27,11 @@ class TestCoolProp():
     def test_backend_names_refprop(self):
         """Test if RERFPROP can be called for database adsorbents."""
         version = CoolProp.CoolProp.get_global_param_string("REFPROP_version")
-        if version:
-            print(version)
+        if version == 'n/a':
+            pass
+        else:
             pygaps.backend_use_refprop()
             for adsorbate in pygaps.ADSORBATE_LIST:
-                print(adsorbate)
                 try:
                     adsorbate.backend.molar_mass()
                 except pygaps.utilities.exceptions.ParameterError:
