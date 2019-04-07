@@ -87,7 +87,7 @@ Features
     - Pore size distribution calculations using DFT kernels
     - Isotherm model fitting (Henry, Langmuir, DS/TS Langmuir, etc..)
     - IAST calculations for binary and multicomponent adsorption
-    - Isosteric heat of adsorption calculations
+    - Isosteric enthalpy of adsorption calculations
     - Parsing to and from multiple formats such as Excel, CSV and JSON
     - An sqlite database backend for storing and retrieving data
     - Simple methods for isotherm graphing and comparison

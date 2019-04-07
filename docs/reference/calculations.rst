@@ -59,10 +59,10 @@ Pore size distribution DFT
     :members:
 
 
-Isosteric heat of adsorption
+Isosteric enthalpy of adsorption
 ............................
 
-.. automodule:: pygaps.calculations.isosteric_heat
+.. automodule:: pygaps.calculations.isosteric_enthalpy
     :members:
 
 Initial Henry constant
@@ -71,7 +71,7 @@ Initial Henry constant
 .. automodule:: pygaps.calculations.initial_henry
     :members:
 
-Initial heat of adsorption
+Initial enthalpy of adsorption
 ..........................
 
 .. automodule:: pygaps.calculations.initial_enthalpy

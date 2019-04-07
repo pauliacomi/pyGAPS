@@ -337,16 +337,16 @@ def psd_plot(pore_widths, pore_dist, method=None,
     return ax
 
 
-def isosteric_heat_plot(loading, isosteric_heat, log=False, ax=None):
+def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
     """
-    Draws the isosteric heat plot.
+    Draws the isosteric enthalpy plot.
 
     Parameters
     ----------
     loading : array
-        Loadings for which the isosteric heat was calculated.
-    isosteric_heat : array
-        The isosteric heat corresponding to each loading.
+        Loadings for which the isosteric enthalpy was calculated.
+    isosteric_enthalpy : array
+        The isosteric enthalpy corresponding to each loading.
     log : int
         Whether to display a logarithmic graph.
     ax : matplotlib axes object, default None
@@ -364,15 +364,15 @@ def isosteric_heat_plot(loading, isosteric_heat, log=False, ax=None):
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.plot(loading, isosteric_heat,
-            marker='o', color='g', label='heat')
+    ax.plot(loading, isosteric_enthalpy,
+            marker='o', color='g', label='enthalpy')
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
-    ax.set_title("Isosteric heat plot")
+    ax.set_title("Isosteric enthalpy plot")
     ax.set_xlabel('Loading')
-    ax.set_ylabel('Isosteric heat')
+    ax.set_ylabel('Isosteric enthalpy')
     ax.legend(loc='best')
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)

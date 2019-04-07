@@ -22,7 +22,7 @@ class TemkinApprox(IsothermModel):
 
     The Temkin adsorption isotherm [#]_, like the Langmuir model, considers
     a surface with n_M identical adsorption sites, but takes into account adsorbate-
-    adsorbate interactions by assuming that the heat of adsorption is a linear
+    adsorbate interactions by assuming that the enthalpy of adsorption is a linear
     function of the coverage. The Temkin isotherm is derived [#]_ using a
     mean-field argument and used an asymptotic approximation
     to obtain an explicit equation for the loading.
