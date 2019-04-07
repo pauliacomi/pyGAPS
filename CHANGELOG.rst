@@ -17,9 +17,10 @@ Features:
 * Added github issue templates.
 
 Breaking changes:
+
 * Deprecated the MADIREL excel format
 * Renamed ``isosteric_heat`` functions as ``isosteric_enthalpy`` for
-  improved nomenclature.
+  more correct nomenclature.
 
 Bugfixes:
 
