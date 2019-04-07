@@ -6,9 +6,9 @@ import scipy.optimize as opt
 import scipy.stats as stats
 
 from ..classes.adsorbate import Adsorbate
+from ..graphing.calcgraph import dra_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..graphing.calcgraph import dra_plot
 
 
 def dr_plot(isotherm, limits=None, verbose=False):
