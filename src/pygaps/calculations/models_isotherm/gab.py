@@ -30,14 +30,15 @@ class GAB(IsothermBaseModel):
     .. [#] “Water Activity: Theory and Applications to Food”, Kapsalis. J. G., 1987
     """
 
-    #: Name of the model
+    # Model parameters
     name = 'GAB'
     calculates = 'loading'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n_m": numpy.nan, "K": numpy.nan,  "C": numpy.nan}
+    param_names = ["n_m", "K", "C"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "C": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

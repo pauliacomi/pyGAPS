@@ -35,9 +35,16 @@ class TemkinApprox(IsothermBaseModel):
     .. [#] Phys. Chem. Chem. Phys., 2014,16, 5499-5513
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'TemkinApprox'
     calculates = 'loading'
+    param_names = ["n_M", "K", "tht"]
+    param_bounds = {
+        "n_M": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "tht": [0, numpy.inf],
+    }
 
     def __init__(self):
         """Instantiation function."""

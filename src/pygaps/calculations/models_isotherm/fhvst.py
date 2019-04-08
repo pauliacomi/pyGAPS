@@ -72,15 +72,16 @@ class FHVST(IsothermBaseModel):
        adsorption using Flory-Huggins activity coefficient equations. AIChE J. 1985, 31, 268-77.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'FH-VST'
     calculates = 'pressure'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n": numpy.nan, "K": numpy.nan,
-                       "a1v": numpy.nan}
+    param_names = ["n", "K", "a1v"]
+    param_bounds = {
+        "n": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "a1v": [-numpy.inf, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

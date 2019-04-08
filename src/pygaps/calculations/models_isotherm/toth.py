@@ -27,14 +27,16 @@ class Toth(IsothermBaseModel):
     but also zeolites.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'Toth'
     calculates = 'loading'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n_M": numpy.nan, "K": numpy.nan, "t": numpy.nan}
+    param_names = ["n_M", "K", "t"]
+    param_bounds = {
+        "n_M": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "t": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

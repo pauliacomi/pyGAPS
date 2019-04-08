@@ -39,14 +39,16 @@ class Virial(IsothermBaseModel):
 
     """
 
-    #: Name of the model
+    # Model parameters
     name = 'Virial'
     calculates = 'pressure'
-
-    def __init__(self):
-        """Instantiation function."""
-        self.params = {"K": numpy.nan, "A": numpy.nan,
-                       "B": numpy.nan, "C": numpy.nan}
+    param_names = ["K", "A", "B", "C"]
+    param_bounds = {
+        "K": [0, numpy.inf],
+        "A": [0, numpy.inf],
+        "B": [0, numpy.inf],
+        "C": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

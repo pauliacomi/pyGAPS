@@ -66,15 +66,17 @@ class WVST(IsothermBaseModel):
 
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'W-VST'
     calculates = 'pressure'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n": numpy.nan, "K": numpy.nan,
-                       "L1v": numpy.nan, "Lv1": numpy.nan}
+    param_names = ["n", "K", "L1v", "Lv1"]
+    param_bounds = {
+        "n": [0, numpy.inf],
+        "A": [0, numpy.inf],
+        "L1v": [-numpy.inf, numpy.inf],
+        "Lv1": [-numpy.inf, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

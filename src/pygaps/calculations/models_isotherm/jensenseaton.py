@@ -45,14 +45,16 @@ class JensenSeaton(IsothermBaseModel):
 
     """
 
+    # Model parameters
     name = 'Jensen-Seaton'
     calculates = 'loading'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"K": numpy.nan, 'a': numpy.nan,
-                       'b': numpy.nan, 'c': numpy.nan}
+    param_names = ["K", "a", "b", "c"]
+    param_bounds = {
+        "K": [0., numpy.inf],
+        "a": [0., numpy.inf],
+        "b": [0., numpy.inf],
+        "c": [0., numpy.inf],
+    }
 
     def loading(self, pressure):
         """
@@ -68,10 +70,10 @@ class JensenSeaton(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["K"] * pressure * \
+        return self.params["K"] * pressure / \
             (1 + (self.params["K"] * pressure /
                   (self.params["a"] * (1 + self.params["b"] * pressure))
-                  )**self.params['c'])**(- 1 / self.params['c'])
+                  )**self.params['c'])**(1 / self.params['c'])
 
     def pressure(self, loading):
         """

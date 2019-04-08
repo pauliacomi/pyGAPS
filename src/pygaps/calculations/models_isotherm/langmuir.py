@@ -65,7 +65,8 @@ class Langmuir(IsothermBaseModel):
 
     Here, :math:`n_m` is the moles adsorbed at the completion of the
     monolayer, and therefore the maximum possible loading.
-    The Langmuir constant is the product of the individual desorption and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
+    The Langmuir constant is the product of the individual desorption
+    and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
     related to the energy of adsorption
     :math:`\exp{(-\frac{E}{RT})}`.
 
@@ -75,14 +76,14 @@ class Langmuir(IsothermBaseModel):
 
     """
 
-    #: Name of the model
+    # Model parameters
     name = 'Langmuir'
     calculates = 'loading'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n_m": numpy.nan, "K": numpy.nan}
+    param_names = ["K", "n_m"]
+    param_bounds = {
+        "K": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

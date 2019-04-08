@@ -3,7 +3,7 @@
 import abc
 
 import numpy
-import scipy
+import scipy.optimize as opt
 
 from ...utilities.exceptions import CalculationError
 
@@ -15,12 +15,12 @@ class IsothermBaseModel():
 
     name = None
     calculates = None  # loading/pressure
-    params = {}
+    param_names = []
+    param_bounds = None
 
-    @abc.abstractmethod
     def __init__(self):
-        """Instantiation function."""
-        return
+        """Instantiate parameters."""
+        self.params = {param: numpy.nan for param in self.param_names}
 
     def __str__(self):
         """Print model name."""
@@ -132,19 +132,20 @@ class IsothermBaseModel():
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
-        # guess
         guess = numpy.array([param_guess[param] for param in param_names])
+        bounds = [[self.param_bounds[param][0] for param in param_names],
+                  [self.param_bounds[param][1] for param in param_names]]
 
-        def rss(params_):
-            """Residual sum of squares between model and data."""
-            # change params to those in x
+        def fun(x, p, l):
             for i, _ in enumerate(param_names):
-                self.params[param_names[i]] = params_[i]
-
-            return numpy.sum((loading - self.loading(pressure)) ** 2)
+                self.params[param_names[i]] = x[i]
+            return self.loading(p) - l
 
         # minimize RSS
-        opt_res = scipy.optimize.minimize(rss, guess, **optimization_params)
+        opt_res = opt.least_squares(
+            fun, guess,
+            args=(pressure, loading),
+            bounds=bounds)
         if not opt_res.success:
             raise CalculationError(
                 "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
@@ -158,7 +159,7 @@ class IsothermBaseModel():
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        rmse = numpy.sqrt(opt_res.fun / len(loading))
+        rmse = numpy.sqrt(numpy.sum(numpy.abs(opt_res.fun)) / len(loading))
 
         if verbose:
             print("Model {0} success, RMSE is {1:.3f}".format(self.name, rmse))

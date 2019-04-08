@@ -18,11 +18,12 @@ class DSLangmuir(IsothermBaseModel):
     Notes
     -----
     An extension to the Langmuir model is to consider the experimental isotherm to be
-    the sum of several Langmuir-type isotherms with different monolayer capacities and affinities [#]_.
-    The assumption is that the adsorbent presents several distinct types of homogeneous adsorption
-    sites, and that separate Langmuir equations should be applied to each. This is particularly
-    applicable in cases where the structure of the adsorbent suggests that different types of
-    sites are present, such as in crystalline materials of variable chemistry like zeolites and MOFs.
+    the sum of several Langmuir-type isotherms with different monolayer capacities and
+    affinities [#]_. The assumption is that the adsorbent presents several distinct
+    types of homogeneous adsorption sites, and that separate Langmuir equations
+    should be applied to each. This is particularly applicable in cases where the
+    structure of the adsorbent suggests that different types of sites are present,
+    such as in crystalline materials of variable chemistry like zeolites and MOFs.
     The resulting isotherm equation is:
 
     .. math::
@@ -38,15 +39,17 @@ class DSLangmuir(IsothermBaseModel):
        J. Am. Chem. Soc. 1918, 40, 1361-1402.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'DSLangmuir'
     calculates = 'loading'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n_m1": numpy.nan, "K1": numpy.nan,
-                       "n_m2": numpy.nan, "K2": numpy.nan}
+    param_names = ["n_m1", "K1", "n_m2", "K2"]
+    param_bounds = {
+        "n_m1": [0., numpy.inf],
+        "n_m2": [0., numpy.inf],
+        "K1": [0., numpy.inf],
+        "K2": [0., numpy.inf],
+    }
 
     def loading(self, pressure):
         """

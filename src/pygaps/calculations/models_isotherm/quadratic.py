@@ -37,14 +37,16 @@ class Quadratic(IsothermBaseModel):
        Publications, 1986.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'Quadratic'
     calculates = 'loading'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n_M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan}
+    param_names = ["n_M", "Ka", "Kb"]
+    param_bounds = {
+        "n_M": [0, numpy.inf],
+        "Ka": [-numpy.inf, numpy.inf],
+        "Kb": [-numpy.inf, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

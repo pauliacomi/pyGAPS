@@ -106,13 +106,19 @@ class BET(IsothermBaseModel):
 
     """
 
-    #: Name of the model
+    # Model parameters
     name = 'BET'
     calculates = 'loading'
+    param_names = ["n_m", "C", "N"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "C": [0, numpy.inf],
+        "N": [0, numpy.inf],
+    }
 
     def __init__(self):
         """Instantiation function."""
-        self.params = {"n_m": numpy.nan, "C": numpy.nan, "N": numpy.nan}
+        self.params = {param: numpy.nan for param in self.param_names}
 
     def loading(self, pressure):
         """

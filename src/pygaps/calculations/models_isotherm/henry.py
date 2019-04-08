@@ -38,14 +38,14 @@ class Henry(IsothermBaseModel):
     Only use if your data is linear.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'Henry'
     calculates = 'loading'
-
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"K": numpy.nan}
+    param_names = ["K"]
+    param_bounds = {
+        "K": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """

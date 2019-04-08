@@ -1,7 +1,6 @@
 """Test all the isotherm model functions."""
 
 import numpy
-import pandas
 import pytest
 
 import pygaps.calculations.models_isotherm as models
