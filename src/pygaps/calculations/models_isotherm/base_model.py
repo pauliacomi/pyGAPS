@@ -135,7 +135,7 @@ class IsothermBaseModel():
         # guess
         guess = numpy.array([param_guess[param] for param in param_names])
 
-        def residual_sum_of_squares(params_):
+        def rss(params_):
             """Residual sum of squares between model and data."""
             # change params to those in x
             for i, _ in enumerate(param_names):
@@ -144,8 +144,7 @@ class IsothermBaseModel():
             return numpy.sum((loading - self.loading(pressure)) ** 2)
 
         # minimize RSS
-        opt_res = scipy.optimize.minimize(
-            residual_sum_of_squares, guess, **optimization_params)
+        opt_res = scipy.optimize.minimize(rss, guess, **optimization_params)
         if not opt_res.success:
             raise CalculationError(
                 "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
