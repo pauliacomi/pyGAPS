@@ -147,8 +147,9 @@ class Virial(IsothermBaseModel):
 
     def fit(self, pressure, loading, param_guess, optimization_method=None, verbose=False):
         """
-        Fit model to data using nonlinear optimization with least squares loss
-        function. Assigns parameters to self
+        Fit model to data using nonlinear optimization with least squares loss function.
+
+        Resulting parameters are assigned to self.
 
         Parameters
         ----------

@@ -85,7 +85,6 @@ class ModelIsotherm(Isotherm):
 
     Notes
     -----
-
     Models supported are found in the :mod:calculations.models_isotherm.
     Here, :math:`L` is the adsorbate uptake and
     :math:`P` is pressure (fugacity technically).
