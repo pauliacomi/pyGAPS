@@ -16,7 +16,7 @@ def initial_henry_slope(isotherm,
                         verbose=False,
                         **plot_parameters):
     """
-    Calculates a henry constant based on the initial slope.
+    Calculate a henry constant based on the initial slope.
 
     Parameters
     ----------
@@ -104,7 +104,7 @@ def initial_henry_slope(isotherm,
 
 def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
     """
-    Calculates an initial Henry constant based on fitting the virial equation.
+    Calculate an initial Henry constant based on fitting the virial equation.
 
     Parameters
     ----------
@@ -117,8 +117,8 @@ def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
     -------
     float
         Initial Henry's constant.
-    """
 
+    """
     model_isotherm = ModelIsotherm.from_pointisotherm(
         isotherm, model='Virial', verbose=verbose)
 
