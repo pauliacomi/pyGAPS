@@ -77,18 +77,16 @@ class IsothermBaseModel():
         """
         return
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
@@ -99,19 +97,16 @@ class IsothermBaseModel():
 
         """
         # guess saturation loading to 10% more than highest loading
-        saturation_loading = 1.1 * data[loading_key].max()
+        saturation_loading = 1.1 * max(loading)
 
         # guess Langmuir K using the guess for saturation loading and lowest
         # pressure point (but not zero)
-        df_nonzero = data[data[loading_key] != 0.0]
-        idx_min = df_nonzero[loading_key].idxmin()
-        langmuir_k = df_nonzero[loading_key].loc[idx_min] / \
-            df_nonzero[pressure_key].loc[idx_min] / (
-            saturation_loading - df_nonzero[pressure_key].loc[idx_min])
+        idx_min = numpy.nonzero(loading)[0][0]
+        langmuir_k = loading[idx_min] / pressure[idx_min] / (saturation_loading - pressure[idx_min])
 
         return saturation_loading, langmuir_k
 
-    def fit(self, loading, pressure, param_guess, optimization_params=dict(method="Nelder-Mead"), verbose=False):
+    def fit(self, pressure, loading, param_guess, optimization_params=dict(method="Nelder-Mead"), verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -119,10 +114,10 @@ class IsothermBaseModel():
 
         Parameters
         ----------
-        loading : ndarray
-            The loading for each point.
         pressure : ndarray
             The pressures of each point.
+        loading : ndarray
+            The loading for each point.
         func : ndarray
             The pressures of each point.
         param_guess : ndarray
@@ -149,8 +144,8 @@ class IsothermBaseModel():
             return numpy.sum((loading - self.loading(pressure)) ** 2)
 
         # minimize RSS
-        opt_res = scipy.optimize.minimize(residual_sum_of_squares, guess,
-                                          **optimization_params)
+        opt_res = scipy.optimize.minimize(
+            residual_sum_of_squares, guess, **optimization_params)
         if not opt_res.success:
             raise CalculationError(
                 "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"

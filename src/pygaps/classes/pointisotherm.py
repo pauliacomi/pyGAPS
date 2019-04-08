@@ -294,7 +294,6 @@ class PointIsotherm(Isotherm):
                   of the pressure points in the passed isotherm. This is useful for
                   comparing a model overlap with the real isotherm.
         """
-
         if pressure_points is None:
             pressure = modelisotherm.pressure()
         elif isinstance(pressure_points, PointIsotherm):

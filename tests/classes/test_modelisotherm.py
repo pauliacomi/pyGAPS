@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to the adsorbate class
-"""
+"""Tests relating to the ModelIsotherm class."""
 
 import os
 
@@ -17,12 +15,10 @@ from ..calculations.conftest import DATA_N77_PATH
 
 @pytest.mark.core
 class TestModelIsotherm():
-    """
-    Tests the pointisotherm class
-    """
+    """Test the ModelIsotherm class."""
 
     def test_isotherm_create(self):
-        "Checks isotherm can be created from basic data"
+        """Check isotherm can be created from basic data."""
         isotherm_param = {
             'loading_key': 'loading',
             'pressure_key': 'pressure',
@@ -104,9 +100,7 @@ class TestModelIsotherm():
             )
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
-        "Checks isotherm can be created from isotherm"
-
-        # regular creation
+        """Check isotherm can be created from Isotherm."""
         pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
             isotherm_data=pandas.DataFrame({
@@ -119,9 +113,7 @@ class TestModelIsotherm():
         )
 
     def test_isotherm_create_from_pointisotherm(self, basic_pointisotherm):
-        "Checks isotherm can be created from isotherm"
-
-        # regular creation
+        """Check isotherm can be created from PointIsotherm."""
         pygaps.ModelIsotherm.from_pointisotherm(
             basic_pointisotherm,
             model='Henry',
@@ -130,7 +122,7 @@ class TestModelIsotherm():
     @pytest.mark.parametrize('file, ',
                              [(data['file']) for data in list(DATA.values())])
     def test_isotherm_create_guess(self, file):
-        "Checks isotherm can be guessed from a pointisotherm"
+        """Check isotherm can be guessed from PointIsotherm."""
 
         filepath = os.path.join(DATA_N77_PATH, file)
 
@@ -149,7 +141,7 @@ class TestModelIsotherm():
                 isotherm, guess_model=['Henry', 'DummyModel'], verbose=True)
 
     def test_isotherm_ret_pressure(self, basic_modelisotherm, use_adsorbate):
-        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+        """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
         with pytest.raises(pygaps.ParameterError):
@@ -177,7 +169,7 @@ class TestModelIsotherm():
         ))
 
     def test_isotherm_ret_loading(self, basic_modelisotherm, use_material, use_adsorbate):
-        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+        """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
         with pytest.raises(pygaps.ParameterError):
@@ -211,7 +203,7 @@ class TestModelIsotherm():
             5, indexed=True), pandas.Series)
 
     def test_isotherm_ret_loading_at(self, basic_modelisotherm, use_material, use_adsorbate):
-        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+        """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
         with pytest.raises(pygaps.ParameterError):
@@ -252,7 +244,7 @@ class TestModelIsotherm():
         assert loading_bads == pytest.approx(10, 1e-3)
 
     def test_isotherm_ret_pressure_at(self, basic_modelisotherm, use_material, use_adsorbate):
-        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+        """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
         with pytest.raises(pygaps.ParameterError):
@@ -293,7 +285,7 @@ class TestModelIsotherm():
         assert pressure_bads == pytest.approx(1.0, 1e-5)
 
     def test_isotherm_spreading_pressure_at(self, basic_modelisotherm, use_adsorbate):
-        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+        """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
         with pytest.raises(pygaps.ParameterError):
@@ -315,6 +307,6 @@ class TestModelIsotherm():
 
     @cleanup
     def test_isotherm_print_parameters(self, basic_modelisotherm):
-        "Checks isotherm can print its own info"
+        """Checks isotherm can print its own info."""
 
         basic_modelisotherm.print_info(show=False)

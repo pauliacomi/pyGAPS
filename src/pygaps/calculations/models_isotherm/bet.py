@@ -194,26 +194,23 @@ class BET(IsothermBaseModel):
              self.params["C"] * pressure) /
             (1.0 - self.params["N"] * pressure))
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(BET, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         # BET = Langmuir when N = 0.0. This is our default assumption.
         return {"n_m": saturation_loading, "C": langmuir_k,

@@ -123,18 +123,16 @@ class Virial(IsothermBaseModel):
         """
         raise NotImplementedError
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
@@ -142,23 +140,22 @@ class Virial(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         return None
         """
-        saturation_loading, langmuir_k = super(Virial, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         return {"K": saturation_loading * langmuir_k,
                 "A": 0, "B": 0, "C": 0}
 
-    def fit(self, loading, pressure, param_guess, optimization_method=None, verbose=False):
+    def fit(self, pressure, loading, param_guess, optimization_method=None, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss
         function. Assigns parameters to self
 
         Parameters
         ----------
-        loading : ndarray
-            The loading for each point.
         pressure : ndarray
             The pressures of each point.
+        loading : ndarray
+            The loading for each point.
         optimization_method : str
             Method in SciPy minimization function to use in fitting model to data.
         verbose : bool, optional

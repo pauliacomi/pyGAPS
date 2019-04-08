@@ -131,6 +131,25 @@ class ModelIsotherm(Isotherm):
                     "Pass loading_key and pressure_key, the names of the loading and"
                     " pressure columns in the DataFrame, to the constructor.")
 
+            # If branch column is already set
+            if 'branch' in isotherm_data.columns:
+                data = isotherm_data
+            else:
+                data = self._splitdata(isotherm_data, pressure_key)
+
+            if branch == 'ads':
+                data = data.loc[~data['branch']]
+            elif branch == 'des':
+                data = data.loc[data['branch']]
+
+            if data.empty:
+                raise ParameterError(
+                    "The isotherm branch does not contain enough points")
+
+            # Get just the pressure and loading columns
+            pressure = isotherm_data[pressure_key].values
+            loading = isotherm_data[loading_key].values
+
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
                 raise ParameterError(
@@ -140,10 +159,10 @@ class ModelIsotherm(Isotherm):
                 raise ParameterError(
                     "Pressure and loading arrays are not equal!")
 
-            pressure_key = 'pressure'
-            loading_key = 'loading'
-            isotherm_data = pandas.DataFrame({pressure_key: pressure,
-                                              loading_key: loading})
+            # Ensure we are dealing with numpy arrays
+            pressure = numpy.asarray(pressure)
+            loading = numpy.asarray(loading)
+
         else:
             raise ParameterError(
                 "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
@@ -177,37 +196,21 @@ class ModelIsotherm(Isotherm):
 
         else:
 
-            # Get required branch
-            data = self._splitdata(isotherm_data, pressure_key)
-
-            if branch == 'ads':
-                data = data.loc[~data['branch']]
-            elif branch == 'des':
-                data = data.loc[data['branch']]
-
-            if data.empty:
-                raise ParameterError(
-                    "The isotherm branch does not contain enough points")
-
             #: Branch the isotherm model is based on.
             self.branch = branch
 
             #: The pressure range on which the model was built.
-            self.pressure_range = [min(data[pressure_key]),
-                                   max(data[pressure_key])]
+            self.pressure_range = [min(pressure), max(pressure)]
 
             #: The loading range on which the model was built.
-            self.loading_range = [min(data[loading_key]),
-                                  max(data[loading_key])]
+            self.loading_range = [min(loading), max(loading)]
 
             #: Name of analytical model to fit to pure-component isotherm data
             #: adsorption isotherm.
             self.model = get_isotherm_model(model)
 
             #: Dictionary of parameters as a starting point for data fitting.
-            self.param_guess = self.model.default_guess(isotherm_data,
-                                                        loading_key,
-                                                        pressure_key)
+            self.param_guess = self.model.default_guess(pressure, loading)
 
             # Override defaults if user provides param_guess dictionary
             if param_guess is not None:
@@ -221,8 +224,7 @@ class ModelIsotherm(Isotherm):
             self.rmse = numpy.nan
 
             # fit model to isotherm data
-            self.rmse = self.model.fit(data[loading_key].values,
-                                       data[pressure_key].values,
+            self.rmse = self.model.fit(pressure, loading,
                                        self.param_guess,
                                        optimization_params,
                                        verbose)

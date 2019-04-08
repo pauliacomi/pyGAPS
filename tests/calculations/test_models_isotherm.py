@@ -52,8 +52,7 @@ class TestIsothermModels():
         """Parametrised test for each model."""
 
         model = models.get_isotherm_model(name)
-        dframe = pandas.DataFrame(data={'n': [0, 1], 'p': [0, 1]})
-        model.params = model.default_guess(dframe, 'n', 'p')
+        model.params = model.default_guess([0, 1], [0, 1])
 
         assert numpy.isclose(model.loading(1), loading, 0.001)
 
@@ -63,8 +62,7 @@ class TestIsothermModels():
         """Parametrised test for each model."""
 
         model = models.get_isotherm_model(name)
-        dframe = pandas.DataFrame(data={'n': [0, 1], 'p': [0, 1]})
-        model.params = model.default_guess(dframe, 'n', 'p')
+        model.params = model.default_guess([0, 1], [0, 1])
 
         assert numpy.isclose(model.pressure(loading), 1, 0.001)
 
@@ -74,7 +72,6 @@ class TestIsothermModels():
         """Parametrised test for each model."""
 
         model = models.get_isotherm_model(name)
-        dframe = pandas.DataFrame(data={'n': [0, 1], 'p': [0, 1]})
-        model.params = model.default_guess(dframe, 'n', 'p')
+        model.params = model.default_guess([0, 1], [0, 1])
 
         assert numpy.isclose(model.spreading_pressure(1), s_pressure, 0.001)
