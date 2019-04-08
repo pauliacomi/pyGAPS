@@ -1,17 +1,15 @@
-"""
-Quadratic isotherm model
-"""
+"""Quadratic isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Quadratic(IsothermModel):
+class Quadratic(IsothermBaseModel):
     r"""
-    Quadratic isotherm model
+    Quadratic isotherm model.
 
     .. math::
 
@@ -19,7 +17,6 @@ class Quadratic(IsothermModel):
 
     Notes
     -----
-
     The quadratic adsorption isotherm exhibits an inflection point; the loading
     is convex at low pressures but changes concavity as it saturates, yielding
     an S-shape. The S-shape can be explained by adsorbate-adsorbate attractive
@@ -45,15 +42,13 @@ class Quadratic(IsothermModel):
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n_M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -72,8 +67,8 @@ class Quadratic(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Quadratic model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -101,6 +96,8 @@ class Quadratic(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -129,7 +126,7 @@ class Quadratic(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

@@ -1,15 +1,13 @@
-"""
-Triple Site Langmuir isotherm model
-"""
+"""Triple Site Langmuir isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class TSLangmuir(IsothermModel):
+class TSLangmuir(IsothermBaseModel):
     r"""
     Triple-site Langmuir (TSLangmuir) adsorption isotherm
 
@@ -19,7 +17,6 @@ class TSLangmuir(IsothermModel):
 
     Notes
     -----
-
     An extension to the Langmuir model is to consider the experimental isotherm to be
     the sum of several Langmuir-type isotherms with different monolayer capacities and affinities [#]_.
     The assumption is that the adsorbent presents several distinct types of homogeneous adsorption
@@ -41,22 +38,19 @@ class TSLangmuir(IsothermModel):
        J. Am. Chem. Soc. 1918, 40, 1361-1402.
 
     """
-    #: Name of the model
+
     name = 'TSLangmuir'
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
-
+        """Instantiation function."""
         self.params = {"n_m1": numpy.nan, "K1": numpy.nan,
                        "n_m2": numpy.nan, "K2": numpy.nan,
                        "n_m3": numpy.nan, "K3": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -78,8 +72,8 @@ class TSLangmuir(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the TS Langmuir model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -107,6 +101,8 @@ class TSLangmuir(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -139,7 +135,7 @@ class TSLangmuir(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

@@ -1,17 +1,15 @@
-"""
-Jensen-Seaton isotherm model
-"""
+"""Jensen-Seaton isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class JensenSeaton(IsothermModel):
+class JensenSeaton(IsothermBaseModel):
     r"""
-    Jensen-Seaton isotherm model
+    Jensen-Seaton isotherm model.
 
     .. math::
 
@@ -19,7 +17,6 @@ class JensenSeaton(IsothermModel):
 
     Notes
     -----
-
     When modelling adsorption in micropores, a requirement was highlighted by
     Jensen and Seaton in 1996 [#]_, that at sufficiently high pressures the adsorption
     isotherm should not reach a horizontal plateau corresponding to saturation but
@@ -47,21 +44,19 @@ class JensenSeaton(IsothermModel):
        American Chemical Society (ACS). All Rights Reserved.), 2866-2867.
 
     """
-    #: Name of the model
+
     name = 'Jensen-Seaton'
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"K": numpy.nan, 'a': numpy.nan,
                        'b': numpy.nan, 'c': numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -80,8 +75,8 @@ class JensenSeaton(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Jensen-Seaton model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -109,6 +104,8 @@ class JensenSeaton(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -133,7 +130,7 @@ class JensenSeaton(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

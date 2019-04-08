@@ -1,17 +1,15 @@
-"""
-GAB isotherm model
-"""
+"""GAB isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class GAB(IsothermModel):
+class GAB(IsothermBaseModel):
     r"""
-    Guggenheim-Anderson-de Boer (GAB) adsorption isotherm
+    Guggenheim-Anderson-de Boer (GAB) adsorption isotherm.
 
     .. math::
 
@@ -19,7 +17,6 @@ class GAB(IsothermModel):
 
     Notes
     -----
-
     An extension of the BET model which introduces a constant
     K, accounting for a different enthalpy of adsorption of
     the adsorbed phase when compared to liquefaction enthalpy of
@@ -38,15 +35,13 @@ class GAB(IsothermModel):
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n_m": numpy.nan, "K": numpy.nan,  "C": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -65,8 +60,8 @@ class GAB(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+        
         For the GAB model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -94,6 +89,8 @@ class GAB(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -124,7 +121,7 @@ class GAB(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

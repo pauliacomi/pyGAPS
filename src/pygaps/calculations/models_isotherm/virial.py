@@ -1,18 +1,15 @@
-"""
-Virial isotherm model
-"""
+"""Virial isotherm model."""
 
 import matplotlib.pyplot as plt
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Virial(IsothermModel):
+class Virial(IsothermBaseModel):
     r"""
-
     A virial isotherm model with 3 factors.
 
     .. math::
@@ -21,7 +18,6 @@ class Virial(IsothermModel):
 
     Notes
     -----
-
     A virial isotherm model attempts to fit the measured data to a factorized
     exponent relationship between loading and pressure.
 
@@ -48,16 +44,13 @@ class Virial(IsothermModel):
     calculates = 'pressure'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
-
+        """Instantiation function."""
         self.params = {"K": numpy.nan, "A": numpy.nan,
                        "B": numpy.nan, "C": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading.
+        Calculate loading at specified pressure.
 
         Careful!
         For the Virial model, the loading has to
@@ -73,7 +66,6 @@ class Virial(IsothermModel):
         float
             Loading at specified pressure.
         """
-
         def fun(x):
             return (self.pressure(x) - pressure)**2
 
@@ -88,8 +80,7 @@ class Virial(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
 
         The Virial model calculates the pressure directly.
 
@@ -108,6 +99,8 @@ class Virial(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -132,7 +125,7 @@ class Virial(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

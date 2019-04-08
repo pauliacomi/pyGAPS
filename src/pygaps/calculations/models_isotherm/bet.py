@@ -1,17 +1,15 @@
-"""
-BET isotherm model
-"""
+"""BET isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class BET(IsothermModel):
+class BET(IsothermBaseModel):
     r"""
-    Brunauer-Emmett-Teller (BET) adsorption isotherm
+    Brunauer-Emmett-Teller (BET) adsorption isotherm.
 
     .. math::
 
@@ -19,7 +17,6 @@ class BET(IsothermModel):
 
     Notes
     -----
-
     Like the Langmuir model, the BET model [#]_
     assumes that adsorption is kinetically driven and takes place on
     adsorption sites at the material surface. However, each adsorbed
@@ -108,20 +105,18 @@ class BET(IsothermModel):
        P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
 
     """
+
     #: Name of the model
     name = 'BET'
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
-
+        """Instantiation function."""
         self.params = {"n_m": numpy.nan, "C": numpy.nan, "N": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -140,8 +135,8 @@ class BET(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the BET model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -169,6 +164,8 @@ class BET(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -199,7 +196,7 @@ class BET(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

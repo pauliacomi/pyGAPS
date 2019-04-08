@@ -1,22 +1,18 @@
-"""
-Wilson-VST isotherm model
-"""
+"""Wilson-VST isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class WVST(IsothermModel):
+class WVST(IsothermBaseModel):
     r"""
-
     Wilson Vacancy Solution Theory isotherm model.
 
     Notes
     -----
-
     As a part of the Vacancy Solution Theory (VST) family of models, it is based on concept
     of a “vacancy” species, denoted v, and assumes that the system consists of a
     mixture of these vacancies and the adsorbate [#]_.
@@ -75,16 +71,14 @@ class WVST(IsothermModel):
     calculates = 'pressure'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n": numpy.nan, "K": numpy.nan,
                        "L1v": numpy.nan, "Lv1": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading.
+        Calculate loading at specified pressure.
 
         Careful!
         For the W-VST model, the loading has to
@@ -115,8 +109,7 @@ class WVST(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
 
         The W-VST model calculates the pressure directly.
 
@@ -147,6 +140,8 @@ class WVST(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -171,7 +166,7 @@ class WVST(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

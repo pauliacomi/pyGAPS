@@ -1,16 +1,13 @@
-"""
-Henry isotherm model
-"""
+"""Henry isotherm model."""
 
 import numpy
 
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Henry(IsothermModel):
+class Henry(IsothermBaseModel):
     r"""
-    Henry's law.
-    Assumes a linear dependence of adsorbed amount with pressure.
+    Henry's law. Assumes a linear dependence of adsorbed amount with pressure.
 
     .. math::
 
@@ -18,7 +15,6 @@ class Henry(IsothermModel):
 
     Notes
     -----
-
     The simplest method of describing adsorption on a
     surface is Henry’s law. It assumes only interactions
     with the adsorbate surface and is described by a
@@ -47,15 +43,13 @@ class Henry(IsothermModel):
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"K": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -71,8 +65,8 @@ class Henry(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Henry model, a direct relationship can be found
         by rearranging the function.
 
@@ -94,6 +88,8 @@ class Henry(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -121,7 +117,7 @@ class Henry(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

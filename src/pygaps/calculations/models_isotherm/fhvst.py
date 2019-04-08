@@ -1,23 +1,18 @@
-"""
-Flory-Huggins-VST isotherm model
-"""
+"""Flory-Huggins-VST isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class FHVST(IsothermModel):
+class FHVST(IsothermBaseModel):
     r"""
-
     Flory-Huggins Vacancy Solution Theory isotherm model.
-
 
     Notes
     -----
-
     As a part of the Vacancy Solution Theory (VST) family of models, it is based on concept
     of a “vacancy” species, denoted v, and assumes that the system consists of a
     mixture of these vacancies and the adsorbate [#]_.
@@ -82,16 +77,14 @@ class FHVST(IsothermModel):
     calculates = 'pressure'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n": numpy.nan, "K": numpy.nan,
                        "a1v": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading.
+        Calculate loading at specified pressure.
 
         Careful!
         For the FH-VST model, the loading has to
@@ -122,8 +115,7 @@ class FHVST(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
 
         The FH-VST model calculates the pressure directly.
 
@@ -147,6 +139,8 @@ class FHVST(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -171,7 +165,7 @@ class FHVST(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
@@ -181,7 +175,6 @@ class FHVST(IsothermModel):
             Column with the loading.
         pressure_key : str
             Column with the pressure.
-
 
         Returns
         -------

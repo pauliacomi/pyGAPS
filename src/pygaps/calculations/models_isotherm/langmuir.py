@@ -1,15 +1,13 @@
-"""
-Langmuir isotherm model
-"""
+"""Langmuir isotherm model."""
 
 import numpy
 
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Langmuir(IsothermModel):
+class Langmuir(IsothermBaseModel):
     r"""
-    Langmuir isotherm model
+    Langmuir isotherm model.
 
     .. math::
 
@@ -17,7 +15,6 @@ class Langmuir(IsothermModel):
 
     Notes
     -----
-
     The Langmuir theory [#]_, proposed at the start of the 20th century, states that
     adsorption takes place on specific sites on a surface, until
     all sites are occupied.
@@ -83,15 +80,13 @@ class Langmuir(IsothermModel):
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n_m": numpy.nan, "K": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -108,8 +103,8 @@ class Langmuir(IsothermModel):
 
     def pressure(self, loading):
         r"""
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Langmuir model, a direct relationship can be found
         by rearranging the function.
 
@@ -132,6 +127,8 @@ class Langmuir(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -160,7 +157,7 @@ class Langmuir(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

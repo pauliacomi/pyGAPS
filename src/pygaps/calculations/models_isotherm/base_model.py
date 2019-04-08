@@ -1,6 +1,6 @@
-"""
-Base class for all models
-"""
+"""Base class for all isotherm models."""
+
+import abc
 
 import numpy
 import scipy
@@ -8,31 +8,28 @@ import scipy
 from ...utilities.exceptions import CalculationError
 
 
-class IsothermModel():
-    """
-    Base class for all models
-    """
+class IsothermBaseModel():
+    """Base class for all isotherm models."""
 
-    #: Name of the model
+    __metaclass__ = abc.ABCMeta
+
     name = None
     calculates = None  # loading/pressure
+    params = {}
 
+    @abc.abstractmethod
     def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = dict()
+        """Instantiation function."""
+        return
 
     def __str__(self):
-        """
-        Prints model name
-        """
+        """Print model name."""
         return self.name
 
+    @abc.abstractmethod
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -44,11 +41,12 @@ class IsothermModel():
         float
             Loading at specified pressure.
         """
-        return None
+        return
 
+    @abc.abstractmethod
     def pressure(self, loading):
         """
-        Function that calculates pressure
+        Calculate pressure at specified loading.
 
         Parameters
         ----------
@@ -60,11 +58,12 @@ class IsothermModel():
         float
             Pressure at specified loading.
         """
-        return None
+        return
 
+    @abc.abstractmethod
     def spreading_pressure(self, pressure):
         """
-        Function that calculates spreading pressure
+        Calculate spreading pressure at specified gas pressure.
 
         Parameters
         ----------
@@ -76,11 +75,11 @@ class IsothermModel():
         float
             Spreading pressure at specified pressure.
         """
-        return None
+        return
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
@@ -97,8 +96,8 @@ class IsothermModel():
             Loading at the saturation plateau.
         langmuir_k : float
             Langmuir calculated constant.
-        """
 
+        """
         # guess saturation loading to 10% more than highest loading
         saturation_loading = 1.1 * data[loading_key].max()
 
@@ -114,8 +113,9 @@ class IsothermModel():
 
     def fit(self, loading, pressure, param_guess, optimization_params=dict(method="Nelder-Mead"), verbose=False):
         """
-        Fit model to data using nonlinear optimization with least squares loss
-        function. Assigns parameters to self
+        Fit model to data using nonlinear optimization with least squares loss function.
+
+        Resulting parameters are assigned to self.
 
         Parameters
         ----------
@@ -141,7 +141,7 @@ class IsothermModel():
         guess = numpy.array([param_guess[param] for param in param_names])
 
         def residual_sum_of_squares(params_):
-            """Residual sum of squares between model and data"""
+            """Residual sum of squares between model and data."""
             # change params to those in x
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = params_[i]

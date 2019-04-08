@@ -1,17 +1,15 @@
-"""
-Double Site Langmuir isotherm model
-"""
+"""Double Site Langmuir isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class DSLangmuir(IsothermModel):
+class DSLangmuir(IsothermBaseModel):
     r"""
-    Dual-site Langmuir (DSLangmuir) adsorption isotherm
+    Dual-site Langmuir adsorption isotherm.
 
     .. math::
 
@@ -19,7 +17,6 @@ class DSLangmuir(IsothermModel):
 
     Notes
     -----
-
     An extension to the Langmuir model is to consider the experimental isotherm to be
     the sum of several Langmuir-type isotherms with different monolayer capacities and affinities [#]_.
     The assumption is that the adsorbent presents several distinct types of homogeneous adsorption
@@ -46,16 +43,14 @@ class DSLangmuir(IsothermModel):
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n_m1": numpy.nan, "K1": numpy.nan,
                        "n_m2": numpy.nan, "K2": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -75,8 +70,8 @@ class DSLangmuir(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Double Site Langmuir model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -104,6 +99,8 @@ class DSLangmuir(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -134,7 +131,7 @@ class DSLangmuir(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

@@ -1,17 +1,15 @@
-"""
-Temkin Approximation isotherm model
-"""
+"""Temkin Approximation isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class TemkinApprox(IsothermModel):
+class TemkinApprox(IsothermBaseModel):
     r"""
-    Asymptotic approximation to the Temkin Isotherm
+    Asymptotic approximation to the Temkin isotherm.
 
     .. math::
 
@@ -19,7 +17,6 @@ class TemkinApprox(IsothermModel):
 
     Notes
     -----
-
     The Temkin adsorption isotherm [#]_, like the Langmuir model, considers
     a surface with n_M identical adsorption sites, but takes into account adsorbate-
     adsorbate interactions by assuming that the enthalpy of adsorption is a linear
@@ -43,15 +40,13 @@ class TemkinApprox(IsothermModel):
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n_M": numpy.nan, "K": numpy.nan, "tht": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -71,8 +66,8 @@ class TemkinApprox(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the TemkinApprox model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -100,6 +95,8 @@ class TemkinApprox(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -130,7 +127,7 @@ class TemkinApprox(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------

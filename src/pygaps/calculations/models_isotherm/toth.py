@@ -1,17 +1,15 @@
-"""
-Toth isotherm model
-"""
+"""Toth isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Toth(IsothermModel):
+class Toth(IsothermBaseModel):
     r"""
-    The Toth isotherm model
+    Toth isotherm model.
 
     .. math::
 
@@ -19,7 +17,6 @@ class Toth(IsothermModel):
 
     Notes
     -----
-
     The Toth model is an empirical modification to the Langmuir equation.
     The parameter :math:`t` is a measure of the system heterogeneity.
 
@@ -35,15 +32,13 @@ class Toth(IsothermModel):
     calculates = 'loading'
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n_M": numpy.nan, "K": numpy.nan, "t": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -61,8 +56,8 @@ class Toth(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Toth model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -90,6 +85,8 @@ class Toth(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -114,7 +111,7 @@ class Toth(IsothermModel):
 
     def default_guess(self, data, loading_key, pressure_key):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
