@@ -14,6 +14,7 @@ Features:
 * Isotherm adsorbate is now a pygaps.Adsorbate object and
   can be accessed directly for all attributes
   (only when available in the internal database, otherwise still a string).
+* Isotherm modelling backend is now more robust.
 * Added github issue templates.
 
 Breaking changes:

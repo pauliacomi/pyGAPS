@@ -102,7 +102,7 @@ def initial_henry_slope(isotherm,
     return model_isotherm.model.params["K"]
 
 
-def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
+def initial_henry_virial(isotherm, verbose=False, optimization_params=None, **plot_parameters):
     """
     Calculate an initial Henry constant based on fitting the virial equation.
 
@@ -112,6 +112,10 @@ def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
         Isotherm to use for the calculation.
     verbose : bool, optional
         Whether to print out extra information.
+    optimization_params : dict
+        Custom parameters to pass to SciPy.optimize.least_squares.
+    plot_parameters : dict
+        Custom parameters to pass to pygaps.plot_iso.
 
     Returns
     -------
@@ -120,7 +124,11 @@ def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
 
     """
     model_isotherm = ModelIsotherm.from_pointisotherm(
-        isotherm, model='Virial', verbose=verbose)
+        isotherm,
+        model='Virial',
+        optimization_params=optimization_params,
+        verbose=verbose
+    )
 
     if verbose:
         model_isotherm.material_name = 'model'

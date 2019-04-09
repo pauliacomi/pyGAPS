@@ -83,10 +83,10 @@ class IsothermBaseModel():
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : array
             Pressure data.
+        loading : array
+            Loading data.
 
         Returns
         -------
@@ -96,17 +96,23 @@ class IsothermBaseModel():
             Langmuir calculated constant.
 
         """
+        # ensure arrays
+        loading = numpy.asarray(loading)
+        pressure = numpy.asarray(pressure)
+
+        # remove invalid values in function
+        zero_values = ~numpy.logical_and(pressure > 0, loading > 0)
+        if any(zero_values):
+            pressure = pressure[~zero_values]
+            loading = loading[~zero_values]
+
         # guess saturation loading to 10% more than highest loading
         saturation_loading = 1.1 * max(loading)
-
-        # guess Langmuir K using the guess for saturation loading and lowest
-        # pressure point (but not zero)
-        idx_min = numpy.nonzero(loading)[0][0]
-        langmuir_k = loading[idx_min] / pressure[idx_min] / (saturation_loading - pressure[idx_min])
+        langmuir_k = loading[0] / pressure[0] / (saturation_loading - pressure[0])
 
         return saturation_loading, langmuir_k
 
-    def fit(self, pressure, loading, param_guess, optimization_params=dict(method="Nelder-Mead"), verbose=False):
+    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -118,12 +124,10 @@ class IsothermBaseModel():
             The pressures of each point.
         loading : ndarray
             The loading for each point.
-        func : ndarray
-            The pressures of each point.
         param_guess : ndarray
             The initial guess for the fitting function.
         optimization_params : dict
-            Dictionary to be passed to the minimization function to use in fitting model to data.
+            Custom parameters to pass to SciPy.optimize.least_squares.
         verbose : bool, optional
             Prints out extra information about steps taken.
         """
@@ -136,16 +140,23 @@ class IsothermBaseModel():
         bounds = [[self.param_bounds[param][0] for param in param_names],
                   [self.param_bounds[param][1] for param in param_names]]
 
-        def fun(x, p, l):
+        def fit_func(x, p, l):
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = x[i]
             return self.loading(p) - l
 
+        kwargs = dict(
+            bounds=bounds,                      # supply the bounds of the parameters
+        )
+        if optimization_params:
+            kwargs.update(optimization_params)
+
         # minimize RSS
         opt_res = opt.least_squares(
-            fun, guess,
-            args=(pressure, loading),
-            bounds=bounds)
+            fit_func, guess,                    # provide the fit function and initial guess
+            args=(pressure, loading),           # supply the extra arguments to the fit function
+            **kwargs
+        )
         if not opt_res.success:
             raise CalculationError(
                 "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
