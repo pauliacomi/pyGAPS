@@ -92,6 +92,19 @@ Features
     - An sqlite database backend for storing and retrieving data
     - Simple methods for isotherm graphing and comparison
 
+Citing
+======
+
+A peer-reviewed paper regarding pyGAPS is currently in the process of being
+published. In the meantime, consider citing the *preprint* if you use the
+program in your work.
+
+Paul Iacomi, Philip L. Llewellyn, 2019.
+pyGAPS: A Python-Based Framework for Adsorption Isotherm
+Processing and Material Characterisation.
+https://doi.org/10.26434/chemrxiv.7970402.v1
+
+
 Documentation
 =============
 
