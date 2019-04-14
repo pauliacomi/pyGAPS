@@ -34,9 +34,7 @@ def _to_bool(s):
 
 def isotherm_to_csv(isotherm, path, separator=','):
     """
-
-    A function that turns the isotherm into a csv
-    file with the data and properties.
+    Convert isotherm into a CSV file.
 
     Parameters
     ----------
@@ -48,7 +46,6 @@ def isotherm_to_csv(isotherm, path, separator=','):
         Separator used int the csv file. Defaults to '',''.
 
     """
-
     with open(path, mode='w', newline='\n') as file:
 
         isotherm_data = isotherm.to_dict()
@@ -72,13 +69,11 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
         elif isinstance(isotherm, ModelIsotherm):
             raise NotImplementedError
-    return
 
 
 def isotherm_from_csv(path, separator=',', branch='guess'):
     """
-    A function that will get the experiment and sample data from a csv file
-    file and return the isotherm object.
+    Load an isotherm from a CSV file.
 
     Parameters
     ----------
@@ -91,8 +86,8 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
     -------
     PointIsotherm
         The isotherm contained in the csv file.
-    """
 
+    """
     with open(path) as file:
         line = file.readline().rstrip()
         material_info = {}
