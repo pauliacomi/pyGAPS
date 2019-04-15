@@ -108,6 +108,10 @@ class Adsorbate():
         """Print adsorbate standard name."""
         return self.name
 
+    def __hash__(self):
+        """Override hashing as a name hash."""
+        return hash(self.name)
+
     def __eq__(self, other):
         """Overload equality operator to include aliases."""
         if isinstance(other, Adsorbate):
