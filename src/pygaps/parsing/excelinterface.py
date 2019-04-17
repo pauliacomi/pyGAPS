@@ -11,25 +11,25 @@ from .excel_mic_parser import read_mic_report
 
 _FIELDS = {
     'material_name': {
-        'text': ['Material name', "Nom de l'échantillon"],
+        'text': ['Material name'],
         'name': 'material_name',
         'row': 0,
         'column': 0,
     },
     'material_batch': {
-        'text': ['Material batch', "Lot de l'échantillon"],
+        'text': ['Material batch'],
         'name': 'material_batch',
         'row': 1,
         'column': 0,
     },
     't_iso': {
-        'text': ['Experiment temperature (K)', "Température de l'expérience (K))"],
+        'text': ['Experiment temperature (K)'],
         'name': 't_iso',
         'row': 2,
         'column': 0,
     },
     'adsorbate': {
-        'text': ['Adsorbate used', "Formule chimique du gaz"],
+        'text': ['Adsorbate used'],
         'name': 'adsorbate',
         'row': 3,
         'column': 0,
