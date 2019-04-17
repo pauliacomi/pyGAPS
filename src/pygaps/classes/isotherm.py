@@ -1,6 +1,4 @@
-"""
-This module contains the main class that describes an isotherm.
-"""
+"""Contains the Isotherm base class."""
 
 import warnings
 
@@ -218,11 +216,12 @@ class Isotherm():
 
     def __eq__(self, other_isotherm):
         """
-        We overload the equality operator of the isotherm. Since id's should be unique and
-        representative of the data inside the isotherm, all we need to ensure equality
+        Overload the equality operator of the isotherm.
+
+        Since id's should be unique and representative of the
+        data inside the isotherm, all we need to ensure equality
         is to compare the two hashes of the isotherms.
         """
-
         return self.iso_id == other_isotherm.iso_id
 
     def __repr__(self):
