@@ -111,8 +111,7 @@ class Isotherm():
         if any(k not in properties
                for k in self._required_params):
             raise ParameterError(
-                "Isotherm MUST have the following properties:"
-                "{}".format(self._required_params))
+                f"Isotherm MUST have the following properties:{self._required_params}")
 
         # Basis and mode
         if adsorbent_basis is None or pressure_mode is None or loading_basis is None:
@@ -121,8 +120,8 @@ class Isotherm():
 
         if adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for adsorbent ({}) is not an option. See viable "
-                "values: {}".format(adsorbent_basis, list(_MATERIAL_MODE.keys())))
+                f"Basis selected for adsorbent ({adsorbent_basis}) is not an option."
+                f"See viable values: {list(_MATERIAL_MODE.keys())}")
 
         if loading_basis not in _MATERIAL_MODE:
             raise ParameterError(

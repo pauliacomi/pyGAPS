@@ -90,13 +90,12 @@ def get_isotherm_model(model_name):
     ParameterError
         When the model does not exist
     """
-    if model_name not in [model.name for model in _MODELS]:
-        raise ParameterError("Model {0} not an option. Viable models "
-                             "are {1}.".format(model_name, ', '.join([model.name for model in _MODELS])))
-
     for _model in _MODELS:
         if model_name == _model.name:
             return _model()
+
+    raise ParameterError(f"Model {model_name} not an option. Viable models "
+                         f"are {[model.name for model in _MODELS]}.")
 
 
 def is_iast_model(model_name):

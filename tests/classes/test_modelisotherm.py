@@ -99,6 +99,15 @@ class TestModelIsotherm():
                 **isotherm_param
             )
 
+    def test_isotherm_create_from_model(self, basic_isotherm):
+        """Check isotherm can be created from a model."""
+        model = pygaps.calculations.models_isotherm.get_isotherm_model('Henry')
+        pygaps.ModelIsotherm(
+            model=model,
+            material_name='Test', material_batch='Henry',
+            t_iso=303, adsorbate='nitrogen'
+        )
+
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
         """Check isotherm can be created from Isotherm."""
         pygaps.ModelIsotherm.from_isotherm(

@@ -124,6 +124,11 @@ class ModelIsotherm(Isotherm):
         class.
         """
         # Checks
+
+        if model is None:
+            raise ParameterError("Specify a model to fit to the pure-component"
+                                 " isotherm data. e.g. model=\"Langmuir\"")
+
         if isotherm_data is not None:
             if None in [pressure_key, loading_key]:
                 raise ParameterError(
@@ -149,6 +154,8 @@ class ModelIsotherm(Isotherm):
             pressure = isotherm_data[pressure_key].values
             loading = isotherm_data[loading_key].values
 
+            process = True
+
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
                 raise ParameterError(
@@ -162,24 +169,24 @@ class ModelIsotherm(Isotherm):
             pressure = numpy.asarray(pressure)
             loading = numpy.asarray(loading)
 
-        else:
-            raise ParameterError(
-                "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
-                " or directly ``pressure`` and ``loading`` as arrays.")
+            process = True
 
-        if model is None:
-            raise ParameterError("Specify a model to fit to the pure-component"
-                                 " isotherm data. e.g. model=\"Langmuir\"")
-
-        if is_base_model(model):
+        elif is_base_model(model):
             self.model = model
-
             self.rmse = 0
             self.branch = branch
             self.pressure_range = [0, 1]
             self.loading_range = [0, 1]
 
+            process = False
+
         else:
+            raise ParameterError(
+                "Pass isotherm data to fit in a pandas.DataFrame as ``isotherm_data``"
+                " or directly ``pressure`` and ``loading`` as arrays."
+                "Alternatively, pass an isotherm model instance.")
+
+        if process:
 
             #: Branch the isotherm model is based on.
             self.branch = branch
