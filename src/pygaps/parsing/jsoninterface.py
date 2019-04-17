@@ -1,6 +1,4 @@
-"""
-Parsing to and from a json file format for isotherms.
-"""
+"""Parse to and from a JSON file format for isotherms."""
 
 import json
 
