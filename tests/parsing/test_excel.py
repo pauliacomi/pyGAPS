@@ -1,4 +1,5 @@
-"""Tests excel interaction."""
+"""Tests excel parsing."""
+
 import pytest
 
 import pygaps
@@ -20,17 +21,6 @@ class TestExcel():
 
         isotherm = pygaps.isotherm_from_xl(path)
         assert isotherm == basic_pointisotherm
-
-    def test_read_create_excel_madirel(self, basic_pointisotherm, tmpdir_factory):
-        """Test creation of the MADIREL file."""
-
-        path = DATA_EXCEL_STD[0]
-        path = tmpdir_factory.mktemp('excel').join('MADIREL.xlx').strpath
-        pygaps.isotherm_to_xl(basic_pointisotherm,
-                              path=path, fmt='MADIREL')
-
-        from_iso = pygaps.isotherm_from_xl(path, fmt='MADIREL')
-        assert from_iso == basic_pointisotherm
 
     def test_read_excel_mic(self):
         """Test reading of micromeritics report files."""

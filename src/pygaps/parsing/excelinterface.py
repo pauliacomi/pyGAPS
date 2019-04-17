@@ -1,7 +1,4 @@
-"""
-This module contains the excel interface for returning data in all formats
-used, such as the parser file.
-"""
+"""Parse to and from an Excel file format for isotherms."""
 
 import pandas
 import xlrd
@@ -81,97 +78,8 @@ _FIELDS = {
     },
 }
 
-_FIELDS_MADIREL = {
-    'iso_type': {
-        'text': ['Experiment type', "Type manip"],
-        'name': 'iso_type',
-        'row': 0,
-        'column': 0,
-    },
-    'is_real': {
-        'text': ['Simulation or experiment', "Experience ou Simulation"],
-        'name': 'is_real',
-        'row': 1,
-        'column': 0,
-    },
-    'date': {
-        'text': ['Date', "Date de l'expérience"],
-        'name': 'date',
-        'row': 2,
-        'column': 0,
-    },
-    'material_name': {'row': 3, 'column': 0},
-    'material_batch': {'row': 4, 'column': 0},
-    't_act': {
-        'text': ['Activation temperature (°C)', "Température d'activation (°C)"],
-        'name': 't_act',
-        'row': 5,
-        'column': 0,
-    },
-    'machine': {
-        'text': ['Apparatus', "Surnom de l'appareil"],
-        'name': 'machine',
-        'row': 6,
-        'column': 0,
-    },
-    't_iso': {'row': 7, 'column': 0},
-    'adsorbate': {'row': 8, 'column': 0},
-    'user': {
-        'text': ['User', "Surnom du contact"],
-        'name': 'user',
-        'row': 9,
-        'column': 0,
-    },
-    'lab': {
-        'text': ['Material source name', "Nom du labo"],
-        'name': 'lab',
-        'row': 10,
-        'column': 0,
-    },
-    'project': {
-        'text': ['Project name', "Nom du projet"],
-        'name': 'project',
-        'row': 11,
-        'column': 0,
-    },
-    'pressure_mode':    {'row': 0, 'column': 2},
-    'pressure_unit':    {'row': 1, 'column': 2},
-    'loading_basis':    {'row': 2, 'column': 2},
-    'loading_unit':     {'row': 3, 'column': 2},
-    'adsorbent_basis':  {'row': 4, 'column': 2},
-    'adsorbent_unit':   {'row': 5, 'column': 2}
-}
-_FIELDS_MADIREL_ISO = {
-    'henry_constant':   {'row': 13, 'column': 0, 'text': ["Constante d'Henry"]},
-    'langmuir_n1':      {'row': 14, 'column': 0, 'text': ["Langmuir N1"]},
-    'langmuir_b1':      {'row': 15, 'column': 0, 'text': ["Langmuir B1"]},
-    'langmuir_n2':      {'row': 16, 'column': 0, 'text': ["Langmuir N2"]},
-    'langmuir_b2':      {'row': 17, 'column': 0, 'text': ["Langmuir B2"]},
-    'langmuir_n3':      {'row': 18, 'column': 0, 'text': ["Langmuir N3"]},
-    'langmuir_b3':      {'row': 19, 'column': 0, 'text': ["Langmuir B3"]},
-    'langmuir_r2':      {'row': 20, 'column': 0, 'text': ["Langmuir R2"]},
-    'c1':               {'row': 21, 'column': 0, 'text': ["C1"]},
-    'c2':               {'row': 22, 'column': 0, 'text': ["C2"]},
-    'c3':               {'row': 23, 'column': 0, 'text': ["C3"]},
-    'c4':               {'row': 24, 'column': 0, 'text': ["C4"]},
-    'c5':               {'row': 25, 'column': 0, 'text': ["C5"]},
-    'c6':               {'row': 26, 'column': 0, 'text': ["C6"]},
-    'c_m':              {'row': 27, 'column': 0, 'text': ["C_m"]},
-    'isotherm data':    {'row': 28, 'column': 0},
-}
-_FIELDS_MADIREL_ENTH = {
-    'enth_0':           {'row': 29, 'column': 0, 'text': ["Enthalpie à zéro"]},
-    'enth_a':           {'row': 30, 'column': 0, 'text': ["Polynome Enthalpie A"]},
-    'enth_b':           {'row': 31, 'column': 0, 'text': ["Polynome Enthalpie B"]},
-    'enth_c':           {'row': 32, 'column': 0, 'text': ["Polynome Enthalpie C"]},
-    'enth_d':           {'row': 33, 'column': 0, 'text': ["Polynome Enthalpie D"]},
-    'enth_e':           {'row': 34, 'column': 0, 'text': ["Polynome Enthalpie E"]},
-    'enth_f':           {'row': 35, 'column': 0, 'text': ["Polynome Enthalpie F"]},
-    'enth_r2':          {'row': 36, 'column': 0, 'text': ["Polynome Enthalpie R2"]},
-    'isotherm data':    {'row': 37, 'column': 0},
-}
 
-_FORMATS = ['bel', 'mic', 'MADIREL']
+_FORMATS = ['bel', 'mic']
 
 
 def _update_recurs(dict1, dict2):
@@ -183,7 +91,7 @@ def _update_recurs(dict1, dict2):
             dict1[f] = dict2[f]
 
 
-def isotherm_to_xl(isotherm, path, fmt=None):
+def isotherm_to_xl(isotherm, path):
     """
 
     A function that turns the isotherm into an excel file with the data and properties.
@@ -194,15 +102,8 @@ def isotherm_to_xl(isotherm, path, fmt=None):
         Isotherm to be written to excel.
     path : str
         Path to the file to be written.
-    fmt : {None, 'MADIREL'}, optional
-        If the format is set to MADIREL, then the excel file is a specific version
-        used by the MADIREL lab for internal processing.
+
     """
-
-    if fmt:
-        if fmt not in _FORMATS:
-            raise ParsingError('Format not supported')
-
     # create a new workbook and select first sheet
     wb = xlwt.Workbook()
     sht = wb.add_sheet('data')
@@ -211,22 +112,6 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     fields = _FIELDS.copy()
     iso_dict = isotherm.to_dict()
     iso_dict.pop('iso_id', None)         # make sure id is not passed
-
-    if fmt == 'MADIREL':
-        _update_recurs(fields, _FIELDS_MADIREL)
-        _update_recurs(fields, _FIELDS_MADIREL_ISO)
-
-        if 'iso_type' in fields:
-            if isotherm.iso_type.lower() == "isotherm":
-                iso_dict['iso_type'] = 'Isotherme'
-            elif isotherm.iso_type.lower() == "calorimetry":
-                iso_dict['iso_type'] = 'Calorimetrie'
-                _update_recurs(fields, _FIELDS_MADIREL_ENTH)
-        if 'is_real' in fields:
-            if isotherm.is_real is True:
-                iso_dict['is_real'] = 'Experience'
-            elif isotherm.is_real is False:
-                iso_dict['is_real'] = 'Simulation'
 
     # Add the required named properties
     prop_style = xlwt.easyxf(
@@ -247,11 +132,6 @@ def isotherm_to_xl(isotherm, path, fmt=None):
     # Generate the headings
     headings = [isotherm.loading_key, isotherm.pressure_key]
     headings.extend(isotherm.other_keys)
-
-    # if fmt == 'MADIREL':
-    #     headings = ['Pressure(bar)', 'Qte adsorbed(mmol/g)']
-    #     if any(x.lower().startswith('enthalpy') for x in isotherm.other_keys):
-    #         headings.append('Enthalpy(kJ/mol)')
 
     # Write all data
     col_width = 256 * 25              # 25 characters wide (-ish)
@@ -288,15 +168,15 @@ def isotherm_from_xl(path, fmt=None):
     ----------
     path : str
         Path to the file to be read.
-    fmt : {None, 'mic', 'bel', 'MADIREL'}, optional
+    fmt : {None, 'mic', 'bel'}, optional
         The format of the import for the isotherm.
 
     Returns
     -------
     PointIsotherm
         The isotherm contained in the excel file.
-    """
 
+    """
     if fmt:
         if fmt not in _FORMATS:
             raise ParsingError('Format not supported')
@@ -349,14 +229,6 @@ def isotherm_from_xl(path, fmt=None):
 
         # get the required dictionaries
         fields = _FIELDS.copy()
-
-        if fmt == 'MADIREL':
-            _update_recurs(fields, _FIELDS_MADIREL)
-            _update_recurs(fields, _FIELDS_MADIREL_ISO)
-
-            if sht.cell(fields['iso_type']['row'],
-                        fields['iso_type']['column'] + 1).value == 'Calorimetrie':
-                _update_recurs(fields, _FIELDS_MADIREL_ENTH)
 
         # read the main isotherm parameters
         for field in fields:
@@ -415,30 +287,6 @@ def isotherm_from_xl(path, fmt=None):
         loading_unit = material_info.pop('loading_unit')
         adsorbent_basis = material_info.pop('adsorbent_basis')
         adsorbent_unit = material_info.pop('adsorbent_unit')
-
-        if fmt == 'MADIREL':
-            if material_info['is_real'] == "Experience":
-                material_info['is_real'] = True
-            elif material_info['is_real'] == "Simulation":
-                material_info['is_real'] = False
-            if material_info['iso_type'] == 'Isotherme':
-                material_info['iso_type'] = 'isotherm'
-            elif material_info['iso_type'] == 'Calorimetrie':
-                material_info['iso_type'] = 'calorimetry'
-
-            new_info = {}
-            for k, v in material_info.items():
-                if k in _FIELDS_MADIREL_ISO or k in _FIELDS_MADIREL_ENTH and v == '':
-                    continue
-                new_info.update({k: v})
-            material_info = new_info
-
-            pressure_mode = 'absolute'
-            pressure_unit = 'bar'
-            loading_basis = 'molar'
-            loading_unit = 'mmol'
-            adsorbent_basis = 'mass'
-            adsorbent_unit = 'g'
 
     isotherm = PointIsotherm(
         isotherm_data=experiment_data_df,
