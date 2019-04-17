@@ -4,6 +4,7 @@ import json
 
 import pandas
 
+from ..calculations.models_isotherm import get_isotherm_model
 from ..classes.isotherm import Isotherm
 from ..classes.modelisotherm import ModelIsotherm
 from ..classes.pointisotherm import PointIsotherm
@@ -110,7 +111,17 @@ def isotherm_from_json(json_isotherm, fmt=None,
                                  other_keys=other_keys,
                                  **raw_dict)
     elif model:
-        raise NotImplementedError
+
+        new_mod = get_isotherm_model(model['model'])
+
+        for param in new_mod.params:
+            try:
+                new_mod.params[param] = model['parameters'][param]
+            except KeyError as err:
+                raise KeyError(f"The JSON is missing parameter {param}") from err
+
+        isotherm = ModelIsotherm(model=new_mod, **raw_dict)
+
     else:
         # generate the isotherm
         isotherm = Isotherm(**raw_dict)

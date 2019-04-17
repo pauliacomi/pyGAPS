@@ -93,6 +93,7 @@ class ModelIsotherm(Isotherm):
 
     _reserved_params = [
         'model',
+        'param_guess'
     ]
 
 ##########################################################
@@ -173,10 +174,11 @@ class ModelIsotherm(Isotherm):
 
         elif is_base_model(model):
             self.model = model
-            self.rmse = 0
+            self.rmse = isotherm_parameters.pop('rmse', 0)
             self.branch = branch
-            self.pressure_range = [0, 1]
-            self.loading_range = [0, 1]
+
+            self.pressure_range = isotherm_parameters.pop('pressure_range', [0, 1])
+            self.loading_range = isotherm_parameters.pop('loading_range', [0, 1])
 
             process = False
 

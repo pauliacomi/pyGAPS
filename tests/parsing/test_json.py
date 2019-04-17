@@ -17,14 +17,21 @@ class TestJson():
         assert basic_isotherm == new_isotherm
 
     def test_pointisotherm_to_json(self, basic_pointisotherm):
-        """Test the parsing of an isotherm to json."""
+        """Test the parsing of a PointIsotherm to json."""
 
         test_isotherm_json = pygaps.isotherm_to_json(basic_pointisotherm)
         new_isotherm = pygaps.isotherm_from_json(test_isotherm_json)
 
         assert basic_pointisotherm == new_isotherm
 
-        return
+    def test_modelisotherm_to_json(self, basic_modelisotherm):
+        """Test the parsing of an ModelIsotherm to json."""
+
+        test_isotherm_json = pygaps.isotherm_to_json(basic_modelisotherm)
+        print(test_isotherm_json)
+        new_isotherm = pygaps.isotherm_from_json(test_isotherm_json)
+
+        assert basic_modelisotherm == new_isotherm
 
     def test_isotherm_from_json_nist(self):
         """Test the parsing of an isotherm from json."""
@@ -35,5 +42,3 @@ class TestJson():
 
         with open(JSON_PATH_NIST) as file:
             pygaps.isotherm_from_json(file.read(), fmt='NIST')
-
-        return
