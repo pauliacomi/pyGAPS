@@ -1,12 +1,12 @@
-"""
-A class used for isotherm interpolation.
-"""
+"""A class used for isotherm interpolation."""
+
 from scipy.interpolate import interp1d
 
 
 class isotherm_interpolator():
     """
     Class used to interpolate between isotherm points.
+
     Call directly to use.
 
     It is mainly a wrapper around scipy.interpolate.interp1d.
