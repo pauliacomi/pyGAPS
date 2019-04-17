@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to the adsorbate class
-"""
+"""Tests relating to the adsorbate class."""
 
 import warnings
 
@@ -13,13 +11,25 @@ import pygaps
 class TestAdsorbate():
     """Test the adsorbate class."""
 
+    def test_adsorbate_basic(self):
+        """Basic creation tests."""
+        ads = pygaps.Adsorbate('Test')
+        assert ads == 'Test'
+        assert ads == 'test'
+        ads = pygaps.Adsorbate('Test', alias=['test2'])
+        assert ads == 'test2'
+        assert repr(ads) == 'Test'
+        assert str(ads) == 'Test'
+        assert hash(ads) == hash('Test')
+        assert ads + '2' == 'Test2'
+        assert 'i' + ads == 'iTest'
+
     def test_adsorbate_create(self, adsorbate_data, basic_adsorbate):
         """Check adsorbate can be created from test data."""
-
         assert adsorbate_data == basic_adsorbate.to_dict()
 
     def test_adsorbate_retrieved_list(self, adsorbate_data, basic_adsorbate):
-        """Check adsorbate can be retrieved from master list"""
+        """Check adsorbate can be retrieved from master list."""
         pygaps.data.ADSORBATE_LIST.append(basic_adsorbate)
         uploaded_adsorbate = pygaps.Adsorbate.find(
             adsorbate_data.get('name'))
@@ -32,7 +42,6 @@ class TestAdsorbate():
     def test_adsorbate_find_equals(self):
         """Check standard adsorbates can be found."""
         ads = pygaps.Adsorbate.find('N2')
-
         assert ads == 'N2'
         assert ads == 'nitrogen'
         assert ads == 'Nitrogen'
