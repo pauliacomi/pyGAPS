@@ -1,4 +1,4 @@
-"""This module contains the adsorbate class."""
+"""Contains the adsorbate class."""
 
 import warnings
 
@@ -88,10 +88,15 @@ class Adsorbate():
         self.name = name
         #: List of aliases
         self.alias = alias
+
+        # Generate the list of aliases
+        _name = name.lower()
         if alias is None:
-            self.alias = [name.lower()]
-        elif name not in alias:
-            self.alias.append(name.lower())
+            self.alias = [_name]
+        else:
+            alias = [a.lower() for a in alias]
+            if _name not in alias:
+                self.alias.append(_name)
 
         #: Adsorbate properties
         self.properties = properties
@@ -110,7 +115,7 @@ class Adsorbate():
 
     def __hash__(self):
         """Override hashing as a name hash."""
-        return hash(self.name)
+        return hash(self.__repr__())
 
     def __eq__(self, other):
         """Overload equality operator to include aliases."""
