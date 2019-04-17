@@ -268,14 +268,17 @@ def isotherm_from_xl(path, fmt=None):
             sht = wb.sheet_by_name('otherdata')
             row_index = 0
             while row_index < sht.nrows:
-                cell = sht.cell(row_index, 1)
-                if cell.ctype == xlrd.XL_CELL_EMPTY:
+                namec = sht.cell(row_index, 0)
+                valc = sht.cell(row_index, 1)
+                if namec.ctype == xlrd.XL_CELL_EMPTY:
                     break
-                elif cell.ctype == xlrd.XL_CELL_BOOLEAN:
-                    val = bool(cell.value)
+                if valc.ctype == xlrd.XL_CELL_BOOLEAN:
+                    val = bool(valc.value)
+                elif valc.ctype == xlrd.XL_CELL_EMPTY:
+                    val = None
                 else:
-                    val = cell.value
-                material_info[sht.cell(row_index, 0).value] = val
+                    val = valc.value
+                material_info[namec.value] = val
                 row_index += 1
 
         # Put data in order
