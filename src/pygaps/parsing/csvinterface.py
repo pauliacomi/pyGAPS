@@ -1,14 +1,16 @@
-"""
-This module contains the csv interface.
-"""
+"""The csv parsing interface."""
+
+import ast
 
 import pandas
 
+from ..calculations.models_isotherm import get_isotherm_model
 from ..classes.modelisotherm import ModelIsotherm
 from ..classes.pointisotherm import PointIsotherm
 
 
 def _is_float(s):
+    """Check if a value is a float."""
     try:
         float(s)
         return True
@@ -17,6 +19,7 @@ def _is_float(s):
 
 
 def _is_bool(s):
+    """Check a value is a CSV bool."""
     if s == 'True' or s == 'False':
         return True
     else:
@@ -24,12 +27,34 @@ def _is_bool(s):
 
 
 def _to_bool(s):
+    """Convert a value into a CSV bool."""
     if s == 'True':
         return True
     elif s == 'False':
         return False
     else:
         raise ValueError('String cannot be converted to bool')
+
+
+def _is_list(s):
+    """Check a value is a CSV list."""
+    if s[0] == '[' and s[-1] == ']':
+        return True
+    else:
+        return False
+
+
+def _from_list(s):
+    """Convert a value into a CSV list."""
+    # note that the function will fail if the list has other spaces
+    return ast.literal_eval(s.replace(' ', ","))
+
+
+def _to_string(s):
+    """Convert a value into a CSV-safe string."""
+    if isinstance(s, list):
+        return '[' + ' '.join([str(x) for x in s]) + "]"
+    return str(s)
 
 
 def isotherm_to_csv(isotherm, path, separator=','):
@@ -50,7 +75,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
         isotherm_data = isotherm.to_dict()
 
-        file.writelines([x + separator + str(y) + '\n'
+        file.writelines([x + separator + _to_string(y) + '\n'
                          for (x, y) in isotherm_data.items()])
 
         if isinstance(isotherm, PointIsotherm):
@@ -68,7 +93,11 @@ def isotherm_to_csv(isotherm, path, separator=','):
             data.to_csv(file, sep=separator, index=False, header=True)
 
         elif isinstance(isotherm, ModelIsotherm):
-            raise NotImplementedError
+
+            file.write('model:[name and parameters]\n')
+            file.write(('name' + separator + isotherm.model.name + '\n'))
+            file.writelines([param + separator + str(isotherm.model.params[param]) + '\n'
+                             for param in isotherm.model.params])
 
 
 def isotherm_from_csv(path, separator=',', branch='guess'):
@@ -92,26 +121,50 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
         line = file.readline().rstrip()
         material_info = {}
 
-        while not line.startswith('data'):
+        while not (line.startswith('data') or line.startswith('model')):
             values = line.split(sep=separator)
 
             if _is_bool(values[1]):
                 val = _to_bool(values[1])
             elif _is_float(values[1]):
                 val = float(values[1])
+            elif _is_list(values[1]):
+                val = _from_list(values[1])
             else:
                 val = values[1]
             material_info.update({values[0]: val})
             line = file.readline().rstrip()
 
-        data_df = pandas.read_csv(file, sep=separator)
+        if line.startswith('data'):
+            data_df = pandas.read_csv(file, sep=separator)
 
-    isotherm = PointIsotherm(
-        isotherm_data=data_df,
-        branch=branch,
-        pressure_key=data_df.columns[0],
-        loading_key=data_df.columns[1],
-        other_keys=list(data_df.columns[2:]),
-        **material_info)
+            isotherm = PointIsotherm(
+                isotherm_data=data_df,
+                branch=branch,
+                pressure_key=data_df.columns[0],
+                loading_key=data_df.columns[1],
+                other_keys=list(data_df.columns[2:]),
+                **material_info)
+
+        if line.startswith('model'):
+
+            model = {}
+            line = file.readline().rstrip()
+            model['name'] = line.split(sep=separator)[1]
+            model['parameters'] = {}
+            line = file.readline().rstrip()
+            while line != "":
+                values = line.split(sep=separator)
+                model['parameters'][values[0]] = float(values[1])
+                line = file.readline().rstrip()
+
+            new_mod = get_isotherm_model(model['name'])
+            for param in new_mod.params:
+                try:
+                    new_mod.params[param] = model['parameters'][param]
+                except KeyError as err:
+                    raise KeyError("The CSV is missing parameter {}".format(param)) from err
+
+            isotherm = ModelIsotherm(model=new_mod, **material_info)
 
     return isotherm
