@@ -26,7 +26,6 @@ class Isotherm():
 
     Parameters
     ----------
-
     material_name : str
         Name of the material on which the isotherm is measured.
     material_batch : str
@@ -57,7 +56,6 @@ class Isotherm():
 
     Notes
     -----
-
     The class is also used to prevent duplication of code within the child
     classes, by calling the common inherited function before any other specific
     implementation additions.
@@ -103,10 +101,10 @@ class Isotherm():
 
                  **properties):
         """
-        Instantiation is done by passing a dictionary with the parameters,
+        Instantiate is done by passing a dictionary with the parameters,
         as well as the info about units, modes and data columns.
-        """
 
+        """
         # Checks
         if any(k not in properties
                for k in self._required_params):

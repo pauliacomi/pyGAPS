@@ -241,10 +241,11 @@ class Virial(IsothermBaseModel):
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        rmse = numpy.sqrt(numpy.sum(numpy.abs(opt_res.fun)) / len(loading))
+        self.rmse = numpy.sqrt(numpy.sum(numpy.abs(opt_res.fun)) / len(loading))
+
         if verbose:
             print("Model {0} success, rmse is {1}".format(
-                self.name, rmse))
+                self.name, self.rmse))
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
             plt.plot(loading, ln_p_over_n, '.')
             plt.plot(n_load, numpy.log(numpy.divide(self.pressure(n_load), n_load)), '-')
@@ -254,5 +255,3 @@ class Virial(IsothermBaseModel):
             plt.xlabel("Loading")
             plt.ylabel("ln(p/n)")
             plt.show()
-
-        return rmse

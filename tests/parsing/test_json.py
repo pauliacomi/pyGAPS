@@ -28,10 +28,9 @@ class TestJson():
         """Test the parsing of an ModelIsotherm to json."""
 
         test_isotherm_json = pygaps.isotherm_to_json(basic_modelisotherm)
-        print(test_isotherm_json)
         new_isotherm = pygaps.isotherm_from_json(test_isotherm_json)
 
-        assert basic_modelisotherm == new_isotherm
+        assert basic_modelisotherm.to_dict() == new_isotherm.to_dict()
 
     def test_isotherm_from_json_nist(self):
         """Test the parsing of an isotherm from json."""

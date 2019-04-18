@@ -1,7 +1,4 @@
-"""
-This module contains objects to model pure-component adsorption
-isotherms from experimental or simulated data.
-"""
+"""Class representing a model of and isotherm."""
 
 
 import matplotlib.pyplot as plt
@@ -174,11 +171,7 @@ class ModelIsotherm(Isotherm):
 
         elif is_base_model(model):
             self.model = model
-            self.rmse = isotherm_parameters.pop('rmse', 0)
             self.branch = branch
-
-            self.pressure_range = isotherm_parameters.pop('pressure_range', [0, 1])
-            self.loading_range = isotherm_parameters.pop('loading_range', [0, 1])
 
             process = False
 
@@ -193,15 +186,15 @@ class ModelIsotherm(Isotherm):
             #: Branch the isotherm model is based on.
             self.branch = branch
 
-            #: The pressure range on which the model was built.
-            self.pressure_range = [min(pressure), max(pressure)]
-
-            #: The loading range on which the model was built.
-            self.loading_range = [min(loading), max(loading)]
-
             #: Name of analytical model to fit to pure-component isotherm data
             #: adsorption isotherm.
             self.model = get_isotherm_model(model)
+
+            #: The pressure range on which the model was built.
+            self.model.pressure_range = [min(pressure), max(pressure)]
+
+            #: The loading range on which the model was built.
+            self.model.loading_range = [min(loading), max(loading)]
 
             #: Dictionary of parameters as a starting point for data fitting.
             self.param_guess = self.model.default_guess(pressure, loading)
@@ -214,14 +207,11 @@ class ModelIsotherm(Isotherm):
                                              " in the %s model." % (param, model))
                     self.param_guess[param] = guess_val
 
-            #: Root mean square error create and set.
-            self.rmse = numpy.nan
-
             # fit model to isotherm data
-            self.rmse = self.model.fit(pressure, loading,
-                                       self.param_guess,
-                                       optimization_params,
-                                       verbose)
+            self.model.fit(pressure, loading,
+                           self.param_guess,
+                           optimization_params,
+                           verbose)
 
         # State it's a simulated isotherm
         isotherm_parameters['is_real'] = False
@@ -446,7 +436,7 @@ class ModelIsotherm(Isotherm):
             raise CalculationError(
                 "No model could be reliably fit on the isotherm")
 
-        errors = [x.rmse for x in attempts]
+        errors = [x.model.rmse for x in attempts]
         best_fit = attempts[errors.index(min(errors))]
 
         if verbose:
@@ -477,11 +467,7 @@ class ModelIsotherm(Isotherm):
 
         """
         print(self)
-
-        print("%s identified model parameters:" % self.model.name)
-        for param, val in self.model.params.items():
-            print("\t%s = %f" % (param, val))
-        print("RMSE = ", self.rmse)
+        print(self.model)
 
         plot_dict = dict(
             plot_type='isotherm',
@@ -565,8 +551,8 @@ class ModelIsotherm(Isotherm):
 
         # Generate pressure points
         if self.model.calculates == 'loading':
-            ret = numpy.linspace(self.pressure_range[0],
-                                 self.pressure_range[1],
+            ret = numpy.linspace(self.model.pressure_range[0],
+                                 self.model.pressure_range[1],
                                  points)
 
             # Convert if needed
@@ -650,8 +636,8 @@ class ModelIsotherm(Isotherm):
                 "ModelIsotherm is not based off this isotherm branch")
 
         if self.model.calculates == 'pressure':
-            ret = numpy.linspace(self.loading_range[0],
-                                 self.loading_range[1],
+            ret = numpy.linspace(self.model.loading_range[0],
+                                 self.model.loading_range[1],
                                  points)
 
             if adsorbent_basis or adsorbent_unit:

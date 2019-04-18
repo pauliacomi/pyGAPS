@@ -96,6 +96,9 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
             file.write('model:[name and parameters]\n')
             file.write(('name' + separator + isotherm.model.name + '\n'))
+            file.write(('rmse' + separator + _to_string(isotherm.model.rmse) + '\n'))
+            file.write(('pressure range' + separator + _to_string(isotherm.model.pressure_range) + '\n'))
+            file.write(('loading range' + separator + _to_string(isotherm.model.loading_range) + '\n'))
             file.writelines([param + separator + str(isotherm.model.params[param]) + '\n'
                              for param in isotherm.model.params])
 
@@ -151,14 +154,23 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
             model = {}
             line = file.readline().rstrip()
             model['name'] = line.split(sep=separator)[1]
-            model['parameters'] = {}
             line = file.readline().rstrip()
+            model['rmse'] = line.split(sep=separator)[1]
+            line = file.readline().rstrip()
+            model['pressure_range'] = _from_list(line.split(sep=separator)[1])
+            line = file.readline().rstrip()
+            model['loading_range'] = _from_list(line.split(sep=separator)[1])
+            line = file.readline().rstrip()
+            model['parameters'] = {}
             while line != "":
                 values = line.split(sep=separator)
                 model['parameters'][values[0]] = float(values[1])
                 line = file.readline().rstrip()
 
             new_mod = get_isotherm_model(model['name'])
+            new_mod.rmse = model['rmse']
+            new_mod.pressure_range = model['pressure_range']
+            new_mod.loading_range = model['loading_range']
             for param in new_mod.params:
                 try:
                     new_mod.params[param] = model['parameters'][param]

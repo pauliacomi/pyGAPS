@@ -17,14 +17,45 @@ class IsothermBaseModel():
     calculates = None  # loading/pressure
     param_names = []
     param_bounds = None
+    rmse = None
+    pressure_range = None
+    loading_range = None
 
     def __init__(self):
         """Instantiate parameters."""
         self.params = {param: numpy.nan for param in self.param_names}
 
-    def __str__(self):
+    def __repr__(self):
         """Print model name."""
-        return self.name
+        return "pyGAPS Model, type {}".format(self.name)
+
+    def __str__(self):
+        """Print model name and parameters."""
+        ret_string = (
+            "Model is {0}.\n".format(self.name) +
+            "RMSE = {:.4f}\n".format(self.rmse) +
+            "Model parameters:\n"
+        )
+        for param, val in self.params.items():
+            ret_string += "\t%s = %f\n" % (param, val)
+        ret_string += (
+            "Model applicable range:\n" +
+            "\tPressure range: {:.2f} - {:.2f}\n".format(
+                self.pressure_range[0], self.pressure_range[1]) +
+            "\tLoading range: {:.2f} - {:.2f}\n".format(
+                self.loading_range[0], self.loading_range[1])
+        )
+
+        return ret_string
+
+    def to_dict(self):
+        return {
+            'model': self.name,
+            'rmse': self.rmse,
+            'parameters': self.params,
+            'pressure_range': self.pressure_range,
+            'loading_range': self.loading_range,
+        }
 
     @abc.abstractmethod
     def loading(self, pressure):
@@ -170,9 +201,7 @@ class IsothermBaseModel():
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        rmse = numpy.sqrt(numpy.sum(numpy.abs(opt_res.fun)) / len(loading))
+        self.rmse = numpy.sqrt(numpy.sum(numpy.abs(opt_res.fun)) / len(loading))
 
         if verbose:
-            print("Model {0} success, RMSE is {1:.3f}".format(self.name, rmse))
-
-        return rmse
+            print("Model {0} success, RMSE is {1:.3f}".format(self.name, self.rmse))
