@@ -23,7 +23,7 @@ def isotherm_to_json(isotherm, fmt=None):
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : Isotherm
         Isotherm to be written to json.
     fmt : {None, 'NIST'}, optional
         If the format is set to NIST, then the json format a specific version
@@ -75,7 +75,7 @@ def isotherm_from_json(json_isotherm, fmt=None,
 
     Returns
     -------
-    PointIsotherm
+    Isotherm
         The isotherm contained in the json
 
     """

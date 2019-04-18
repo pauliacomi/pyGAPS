@@ -15,6 +15,7 @@ Features:
   can be accessed directly for all attributes
   (only when available in the internal database, otherwise still a string).
 * Isotherm modelling backend is now more robust.
+* ModelIsotherms can now be saved and imported from JSON, CSV and Excel.
 * Added github issue templates.
 
 Breaking changes:

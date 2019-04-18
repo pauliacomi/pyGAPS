@@ -63,7 +63,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : Isotherm
         Isotherm to be written to csv.
     path : str
         Path to the file to be written.
@@ -116,7 +116,7 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
 
     Returns
     -------
-    PointIsotherm
+    Isotherm
         The isotherm contained in the csv file.
 
     """
@@ -124,7 +124,7 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
         line = file.readline().rstrip()
         material_info = {}
 
-        while not (line.startswith('data') or line.startswith('model')):
+        while not (line.startswith('data') or line.startswith('model') or line == ""):
             values = line.split(sep=separator)
 
             if _is_bool(values[1]):
