@@ -8,6 +8,7 @@ If adding a custom model, it should be also added below.
 """
 
 from ...utilities.exceptions import ParameterError
+from .base_model import IsothermBaseModel
 from .bet import BET
 from .dslangmuir import DSLangmuir
 from .fhvst import FHVST
@@ -15,7 +16,6 @@ from .gab import GAB
 from .henry import Henry
 from .jensenseaton import JensenSeaton
 from .langmuir import Langmuir
-from .base_model import IsothermBaseModel
 from .quadratic import Quadratic
 from .temkinapprox import TemkinApprox
 from .toth import Toth
@@ -94,8 +94,8 @@ def get_isotherm_model(model_name):
         if model_name == _model.name:
             return _model()
 
-    raise ParameterError(f"Model {model_name} not an option. Viable models "
-                         f"are {[model.name for model in _MODELS]}.")
+    raise ParameterError("Model {0} not an option. Viable models "
+                         "are {1}.".format(model_name, [model.name for model in _MODELS]))
 
 
 def is_iast_model(model_name):
