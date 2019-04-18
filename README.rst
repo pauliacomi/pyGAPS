@@ -53,7 +53,7 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :alt: Requirements Status
     :target: https://requires.io/github/pauliacomi/pyGAPS/requirements/?branch=master
 
-.. |codecov| image:: https://codecov.io/github/pauliacomi/pygaps/coverage.svg?branch=master
+.. |codecov| image:: https://codecov.io/gh/pauliacomi/pygaps/branch/master/graphs/badge.svg?branch=master
     :alt: Coverage Status
     :target: https://codecov.io/github/pauliacomi/pygaps
 
