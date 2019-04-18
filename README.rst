@@ -25,9 +25,9 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
       - | |version| |wheel|
         | |supported-versions| |supported-implementations|
 
-.. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
-    :target: https://www.repostatus.org/#wip
-    :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
+.. |status| image:: https://www.repostatus.org/badges/latest/active.svg
+    :target: https://www.repostatus.org/#active
+    :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
 .. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.5.0.svg
     :alt: Commits since latest release
