@@ -498,12 +498,8 @@ class PointIsotherm(Isotherm):
         """
         print(self)
 
-        secondary_data = None
-        if self.other_keys:
-            secondary_data = self.other_keys[0]
-
         plot_dict = dict(
-            secondary_data=secondary_data,
+            y2_data=self.other_keys[0] if self.other_keys else None,
             adsorbent_basis=self.adsorbent_basis,
             adsorbent_unit=self.adsorbent_unit,
             loading_basis=self.loading_basis,
