@@ -186,6 +186,7 @@ class Virial(IsothermBaseModel):
         ln_p_over_n = numpy.log(numpy.divide(pressure, loading))
 
         # add point
+        add_point = False
         added_point = False
         if optimization_params:
             add_point = optimization_params.pop('add_point', None)
