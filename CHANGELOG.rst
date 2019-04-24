@@ -17,6 +17,10 @@ Features:
 * Isotherm modelling backend is now more robust.
 * ModelIsotherms can now be saved and imported from JSON, CSV and Excel.
 * Added github issue templates.
+* Removed some plotting styles.
+* Added a ``marker`` option to the ``plot_iso`` function
+  which acts similar to the ``color`` parameter and allows
+  simple selection of the marker style.
 
 Breaking changes:
 
@@ -32,6 +36,8 @@ Bugfixes:
   incorrect import.
 * Some of the gas values in the isotherm were incorrect.
   They have been now updated.
+* Fixed secondary data not being automatically plotted
+  when ``print_info`` called
 
 
 1.5.0 (2019-03-12)
@@ -42,13 +48,15 @@ Features:
 * Increased number of adsorbates available in pyGAPS to 40.
 * New material characterisation functions: Dubinin-Radushkevich
   (dr_plot) and Dubinin-Astakov (da_plot) plots.
-* Added a new way to create an isotherm, from an two arrays of pressure and loading
-  (the old DataFrame method is still valid but changed: check breaking changes).
+* Added a new way to create an isotherm, from an two arrays of pressure
+  and loading (the old DataFrame method is still valid but changed:
+  check breaking changes).
 * Made adsorbates searchable by a list of aliases rather than a single name.
 * Exposed the CoolProp backend on adsorbate objects for convenience, it is
   accessible through the adsorbate.backend property.
 * Streamlined the internal database functions.
-* Updated NIST json import to new format. Cannot import multicomponent isotherms.
+* Updated NIST json import to new format.
+  Cannot import multicomponent isotherms.
 * Functions which generate matplotlib graphs now can take an Ax as parameter
   (similar to behaviour of pandas) to plot on existing figures.
 * Changed behaviour of ModelIsotherm.guess function to accept a list of
