@@ -46,7 +46,7 @@ def plot_iso(isotherms,
              save_path=None,
              **other_parameters):
     """
-    Plots the isotherm(s) provided on a single graph.
+    Plot the isotherm(s) provided on a single graph.
 
     Parameters
     ----------
@@ -125,7 +125,6 @@ def plot_iso(isotherms,
 
     Other Parameters
     ----------------
-
     fig_style : dict
         A dictionary that will be passed into the matplotlib figure()
         function.
