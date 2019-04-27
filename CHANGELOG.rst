@@ -24,7 +24,7 @@ Features:
 
 Breaking changes:
 
-* Deprecated the MADIREL excel format
+* Deprecated and removed the MADIREL excel format
 * Renamed ``isosteric_heat`` functions as ``isosteric_enthalpy`` for
   more correct nomenclature.
 
