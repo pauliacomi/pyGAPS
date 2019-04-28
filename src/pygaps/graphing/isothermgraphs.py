@@ -11,7 +11,8 @@ import numpy
 from cycler import cycler
 from matplotlib import cm
 
-from ..utilities.exceptions import GraphingError, ParameterError
+from ..utilities.exceptions import GraphingError
+from ..utilities.exceptions import ParameterError
 from ..utilities.string_utilities import convert_chemformula
 from .mpl_styles import ISO_STYLES
 
