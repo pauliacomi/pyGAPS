@@ -242,7 +242,7 @@ class Virial(IsothermBaseModel):
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        self.rmse = numpy.sqrt(numpy.sum(numpy.abs(opt_res.fun)) / len(loading))
+        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
             print("Model {0} success, rmse is {1}".format(

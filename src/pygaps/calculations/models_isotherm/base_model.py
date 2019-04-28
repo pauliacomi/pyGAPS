@@ -32,7 +32,7 @@ class IsothermBaseModel():
     def __str__(self):
         """Print model name and parameters."""
         ret_string = (
-            "Model is {0}.\n".format(self.name) +
+            "{0} isotherm model.\n".format(self.name) +
             "RMSE = {:.4f}\n".format(self.rmse) +
             "Model parameters:\n"
         )
@@ -201,7 +201,7 @@ class IsothermBaseModel():
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        self.rmse = numpy.sqrt(numpy.sum(numpy.abs(opt_res.fun)) / len(loading))
+        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
             print("Model {0} success, RMSE is {1:.3f}".format(self.name, self.rmse))
