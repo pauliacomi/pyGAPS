@@ -1,7 +1,4 @@
-"""
-This module contains objects to model pure-component adsorption
-isotherms from experimental or simulated data.
-"""
+"""Class representing a model of and isotherm."""
 
 
 import matplotlib.pyplot as plt
@@ -64,7 +61,7 @@ class ModelIsotherm(Isotherm):
     optimization_params : dict
         Dictionary to be passed to the minimization function to use in fitting model to data.
         See `here
-        <https://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
+        <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html>`__.
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
@@ -85,7 +82,6 @@ class ModelIsotherm(Isotherm):
 
     Notes
     -----
-
     Models supported are found in the :mod:calculations.models_isotherm.
     Here, :math:`L` is the adsorbate uptake and
     :math:`P` is pressure (fugacity technically).
@@ -94,6 +90,7 @@ class ModelIsotherm(Isotherm):
 
     _reserved_params = [
         'model',
+        'param_guess'
     ]
 
 ##########################################################
@@ -107,7 +104,7 @@ class ModelIsotherm(Isotherm):
                  loading_key=None,
                  model=None,
                  param_guess=None,
-                 optimization_params=dict(method='Nelder-Mead'),
+                 optimization_params=None,
                  branch='ads',
                  verbose=False,
 
@@ -125,11 +122,37 @@ class ModelIsotherm(Isotherm):
         class.
         """
         # Checks
+
+        if model is None:
+            raise ParameterError("Specify a model to fit to the pure-component"
+                                 " isotherm data. e.g. model=\"Langmuir\"")
+
         if isotherm_data is not None:
             if None in [pressure_key, loading_key]:
                 raise ParameterError(
                     "Pass loading_key and pressure_key, the names of the loading and"
                     " pressure columns in the DataFrame, to the constructor.")
+
+            # If branch column is already set
+            if 'branch' in isotherm_data.columns:
+                data = isotherm_data
+            else:
+                data = self._splitdata(isotherm_data, pressure_key)
+
+            if branch == 'ads':
+                data = data.loc[~data['branch']]
+            elif branch == 'des':
+                data = data.loc[data['branch']]
+
+            if data.empty:
+                raise ParameterError(
+                    "The isotherm branch does not contain enough points")
+
+            # Get just the pressure and loading columns
+            pressure = isotherm_data[pressure_key].values
+            loading = isotherm_data[loading_key].values
+
+            process = True
 
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
@@ -140,20 +163,57 @@ class ModelIsotherm(Isotherm):
                 raise ParameterError(
                     "Pressure and loading arrays are not equal!")
 
-            pressure_key = 'pressure'
-            loading_key = 'loading'
-            isotherm_data = pandas.DataFrame({pressure_key: pressure,
-                                              loading_key: loading})
+            # Ensure we are dealing with numpy arrays
+            pressure = numpy.asarray(pressure)
+            loading = numpy.asarray(loading)
+
+            process = True
+
+        elif is_base_model(model):
+            self.model = model
+            self.branch = branch
+
+            process = False
+
         else:
             raise ParameterError(
-                "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
-                " or directly ``pressure`` and ``loading`` as arrays.")
+                "Pass isotherm data to fit in a pandas.DataFrame as ``isotherm_data``"
+                " or directly ``pressure`` and ``loading`` as arrays."
+                "Alternatively, pass an isotherm model instance.")
 
-        if model is None:
-            raise ParameterError("Specify a model to fit to the pure-component"
-                                 " isotherm data. e.g. model=\"Langmuir\"")
+        if process:
 
-        # We change it to a simulated isotherm
+            #: Branch the isotherm model is based on.
+            self.branch = branch
+
+            #: Name of analytical model to fit to pure-component isotherm data
+            #: adsorption isotherm.
+            self.model = get_isotherm_model(model)
+
+            #: The pressure range on which the model was built.
+            self.model.pressure_range = [min(pressure), max(pressure)]
+
+            #: The loading range on which the model was built.
+            self.model.loading_range = [min(loading), max(loading)]
+
+            #: Dictionary of parameters as a starting point for data fitting.
+            self.param_guess = self.model.default_guess(pressure, loading)
+
+            # Override defaults if user provides param_guess dictionary
+            if param_guess is not None:
+                for param, guess_val in param_guess.items():
+                    if param not in self.param_guess.keys():
+                        raise ParameterError("%s is not a valid parameter"
+                                             " in the %s model." % (param, model))
+                    self.param_guess[param] = guess_val
+
+            # fit model to isotherm data
+            self.model.fit(pressure, loading,
+                           self.param_guess,
+                           optimization_params,
+                           verbose)
+
+        # State it's a simulated isotherm
         isotherm_parameters['is_real'] = False
 
         # Run base class constructor
@@ -167,66 +227,6 @@ class ModelIsotherm(Isotherm):
 
                           **isotherm_parameters)
 
-        if is_base_model(model):
-            self.model = model
-
-            self.rmse = 0
-            self.branch = branch
-            self.pressure_range = [0, 1]
-            self.loading_range = [0, 1]
-
-        else:
-
-            # Get required branch
-            data = self._splitdata(isotherm_data, pressure_key)
-
-            if branch == 'ads':
-                data = data.loc[~data['branch']]
-            elif branch == 'des':
-                data = data.loc[data['branch']]
-
-            if data.empty:
-                raise ParameterError(
-                    "The isotherm branch does not contain enough points")
-
-            #: Branch the isotherm model is based on.
-            self.branch = branch
-
-            #: The pressure range on which the model was built.
-            self.pressure_range = [min(data[pressure_key]),
-                                   max(data[pressure_key])]
-
-            #: The loading range on which the model was built.
-            self.loading_range = [min(data[loading_key]),
-                                  max(data[loading_key])]
-
-            #: Name of analytical model to fit to pure-component isotherm data
-            #: adsorption isotherm.
-            self.model = get_isotherm_model(model)
-
-            #: Dictionary of parameters as a starting point for data fitting.
-            self.param_guess = self.model.default_guess(isotherm_data,
-                                                        loading_key,
-                                                        pressure_key)
-
-            # Override defaults if user provides param_guess dictionary
-            if param_guess is not None:
-                for param, guess_val in param_guess.items():
-                    if param not in self.param_guess.keys():
-                        raise ParameterError("%s is not a valid parameter"
-                                             " in the %s model." % (param, model))
-                    self.param_guess[param] = guess_val
-
-            #: Root mean square error create and set.
-            self.rmse = numpy.nan
-
-            # fit model to isotherm data
-            self.rmse = self.model.fit(data[loading_key].values,
-                                       data[pressure_key].values,
-                                       self.param_guess,
-                                       optimization_params,
-                                       verbose)
-
     @classmethod
     def from_isotherm(cls, isotherm,
                       pressure=None,
@@ -236,7 +236,7 @@ class ModelIsotherm(Isotherm):
                       loading_key=None,
                       model=None,
                       param_guess=None,
-                      optimization_params=dict(method='Nelder-Mead'),
+                      optimization_params=None,
                       branch='ads',
                       verbose=False,
                       ):
@@ -300,7 +300,7 @@ class ModelIsotherm(Isotherm):
                            guess_model=None,
                            branch='ads',
                            param_guess=None,
-                           optimization_params=dict(method='Nelder-Mead'),
+                           optimization_params=None,
                            verbose=False):
         """
         Constructs a ModelIsotherm using a the data from a PointIsotherm
@@ -359,7 +359,7 @@ class ModelIsotherm(Isotherm):
               pressure_key=None,
               loading_key=None,
               models='all',
-              optimization_params=dict(method='Nelder-Mead'),
+              optimization_params=None,
               branch='ads',
               verbose=False,
 
@@ -435,14 +435,14 @@ class ModelIsotherm(Isotherm):
         if not attempts:
             raise CalculationError(
                 "No model could be reliably fit on the isotherm")
-        else:
-            errors = [x.rmse for x in attempts]
-            best_fit = attempts[errors.index(min(errors))]
 
-            if verbose:
-                print("Best model fit is {0}".format(best_fit.model.name))
+        errors = [x.model.rmse for x in attempts]
+        best_fit = attempts[errors.index(min(errors))]
 
-            return best_fit
+        if verbose:
+            print("Best model fit is {0}".format(best_fit.model.name))
+
+        return best_fit
 
 ###########################################################
 #   Info function
@@ -467,11 +467,7 @@ class ModelIsotherm(Isotherm):
 
         """
         print(self)
-
-        print("%s identified model parameters:" % self.model.name)
-        for param, val in self.model.params.items():
-            print("\t%s = %f" % (param, val))
-        print("RMSE = ", self.rmse)
+        print(self.model)
 
         plot_dict = dict(
             plot_type='isotherm',
@@ -512,8 +508,7 @@ class ModelIsotherm(Isotherm):
         """
         if self.branch == branch:
             return True
-        else:
-            return False
+        return False
 
     def pressure(self, points=20, branch=None,
                  pressure_unit=None, pressure_mode=None,
@@ -556,8 +551,8 @@ class ModelIsotherm(Isotherm):
 
         # Generate pressure points
         if self.model.calculates == 'loading':
-            ret = numpy.linspace(self.pressure_range[0],
-                                 self.pressure_range[1],
+            ret = numpy.linspace(self.model.pressure_range[0],
+                                 self.model.pressure_range[1],
                                  points)
 
             # Convert if needed
@@ -589,12 +584,11 @@ class ModelIsotherm(Isotherm):
             if max_range is None:
                 max_range = max(ret)
 
-            ret = list(filter(lambda x: x >= min_range and x <= max_range, ret))
+            ret = list(filter(lambda x: min_range <= x <= max_range, ret))
 
         if indexed:
             return pandas.Series(ret)
-        else:
-            return ret
+        return ret
 
     def loading(self, points=20, branch=None,
                 loading_unit=None, loading_basis=None,
@@ -642,8 +636,8 @@ class ModelIsotherm(Isotherm):
                 "ModelIsotherm is not based off this isotherm branch")
 
         if self.model.calculates == 'pressure':
-            ret = numpy.linspace(self.loading_range[0],
-                                 self.loading_range[1],
+            ret = numpy.linspace(self.model.loading_range[0],
+                                 self.model.loading_range[1],
                                  points)
 
             if adsorbent_basis or adsorbent_unit:
@@ -687,7 +681,7 @@ class ModelIsotherm(Isotherm):
             if max_range is None:
                 max_range = max(ret)
 
-            ret = list(filter(lambda x: x >= min_range and x <= max_range, ret))
+            ret = list(filter(lambda x: min_range <= x <= max_range, ret))
 
         if indexed:
             return pandas.Series(ret)

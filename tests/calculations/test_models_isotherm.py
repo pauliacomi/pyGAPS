@@ -1,12 +1,9 @@
-"""
-This test module tests all the isotherm model functions
-"""
+"""Test all the isotherm model functions."""
 
 import numpy
-import pandas
 import pytest
 
-import pygaps.calculations.models_isotherm as mi
+import pygaps.calculations.models_isotherm as models
 from pygaps.utilities.exceptions import ParameterError
 
 MODELS = {
@@ -28,57 +25,52 @@ MODELS = {
 
 @pytest.mark.modelling
 class TestIsothermModels():
-    """
-    Tests the isotherm models
-    """
+    """Test the isotherm models."""
 
     def test_base_class(self):
-        "Tests base class for model"
-        model = mi.model.IsothermModel()
+        """Tests base class for model."""
+        model = models.base_model.IsothermBaseModel()
         model.loading(1)
         model.pressure(1)
         model.spreading_pressure(1)
 
     def test_get_model(self):
-        "Model getter function"
+        """Model getter function."""
 
         model_name = 'Henry'
 
-        model = mi.get_isotherm_model(model_name)
+        model = models.get_isotherm_model(model_name)
         assert model.name == model_name
 
         with pytest.raises(ParameterError):
-            mi.get_isotherm_model('bad_model')
+            models.get_isotherm_model('bad_model')
 
     @pytest.mark.parametrize("name, loading",
                              [(key, MODELS[key][0]) for key in MODELS])
     def test_models_loading(self, name, loading):
-        "Parametrised test for each model"
+        """Parametrised test for each model."""
 
-        model = mi.get_isotherm_model(name)
-        dframe = pandas.DataFrame(data={'n': [0, 1], 'p': [0, 1]})
-        model.params = model.default_guess(dframe, 'n', 'p')
+        model = models.get_isotherm_model(name)
+        model.params = model.default_guess([0, 1], [0, 1])
 
         assert numpy.isclose(model.loading(1), loading, 0.001)
 
     @pytest.mark.parametrize("name, loading",
                              [(key, MODELS[key][0]) for key in MODELS])
     def test_models_pressure(self, name, loading, capsys):
-        "Parametrised test for each model"
+        """Parametrised test for each model."""
 
-        model = mi.get_isotherm_model(name)
-        dframe = pandas.DataFrame(data={'n': [0, 1], 'p': [0, 1]})
-        model.params = model.default_guess(dframe, 'n', 'p')
+        model = models.get_isotherm_model(name)
+        model.params = model.default_guess([0, 1], [0, 1])
 
         assert numpy.isclose(model.pressure(loading), 1, 0.001)
 
     @pytest.mark.parametrize("name, s_pressure",
                              [pytest.param(key, MODELS[key][1], marks=MODELS[key][2]) for key in MODELS])
     def test_models_s_pressure(self, name, s_pressure):
-        "Parametrised test for each model"
+        """Parametrised test for each model."""
 
-        model = mi.get_isotherm_model(name)
-        dframe = pandas.DataFrame(data={'n': [0, 1], 'p': [0, 1]})
-        model.params = model.default_guess(dframe, 'n', 'p')
+        model = models.get_isotherm_model(name)
+        model.params = model.default_guess([0, 1], [0, 1])
 
         assert numpy.isclose(model.spreading_pressure(1), s_pressure, 0.001)

@@ -13,7 +13,7 @@ be predicted from pure component isotherms.
 
 The main IAST code was written by Cory Simon [#]_, and was then incorporated in pyGAPS. A very good
 explanation of the method, complete with use cases and recommendations can still be found on the pyIAST
-`documentation <http://pyiast.readthedocs.io/en/latest/>`__
+`documentation <https://pyiast.readthedocs.io/en/latest/>`__
 
 With the inclusion of the source code, several changes have been introduced, to improve the usability
 of the method and to conform it to the rest of the code. A tutorial of IAST within pyGAPS follows.

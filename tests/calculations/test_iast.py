@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to IAST calculations
-"""
+"""Tests relating to IAST calculations."""
 import os
 
 import numpy
@@ -15,9 +13,7 @@ from .conftest import DATA_IAST_PATH
 
 @pytest.fixture()
 def load_iast():
-    """
-    Loads the files from disk
-    """
+    """Load the files from disk."""
     filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['CH4'].get('file'))
 
     with open(filepath, 'r') as text_file:
@@ -35,9 +31,7 @@ def load_iast():
 
 @pytest.fixture()
 def load_iast_models(load_iast):
-    """
-    Creates models from the disk files
-    """
+    """Create models from the disk files."""
 
     ch4, c2h6 = load_iast
 
@@ -50,7 +44,7 @@ def load_iast_models(load_iast):
 
 @pytest.mark.modelling
 class TestIAST():
-    """Tests IAST calculations"""
+    """Test IAST calculations."""
 
     def test_iast_checks(self, load_iast):
 
@@ -118,7 +112,7 @@ class TestIAST():
             ideal_pressures[0], partial_pressures[0], atol=0.1)
 
     def test_iast_svp(self, load_iast):
-        """Tests the selectivity-pressure graph"""
+        """Test the selectivity-pressure graph with point."""
 
         ch4, c2h6 = load_iast
 
@@ -132,7 +126,7 @@ class TestIAST():
         assert numpy.isclose(avg, expected_avg, atol=0.01)
 
     def test_iast_svp_model(self, load_iast_models):
-        """Tests the selectivity-pressure graph"""
+        """Test the selectivity-pressure graph with models."""
 
         ch4, c2h6 = load_iast_models
 

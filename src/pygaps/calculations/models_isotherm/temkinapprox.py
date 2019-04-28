@@ -1,17 +1,15 @@
-"""
-Temkin Approximation isotherm model
-"""
+"""Temkin Approximation isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class TemkinApprox(IsothermModel):
+class TemkinApprox(IsothermBaseModel):
     r"""
-    Asymptotic approximation to the Temkin Isotherm
+    Asymptotic approximation to the Temkin isotherm.
 
     .. math::
 
@@ -19,10 +17,9 @@ class TemkinApprox(IsothermModel):
 
     Notes
     -----
-
     The Temkin adsorption isotherm [#]_, like the Langmuir model, considers
     a surface with n_M identical adsorption sites, but takes into account adsorbate-
-    adsorbate interactions by assuming that the heat of adsorption is a linear
+    adsorbate interactions by assuming that the enthalpy of adsorption is a linear
     function of the coverage. The Temkin isotherm is derived [#]_ using a
     mean-field argument and used an asymptotic approximation
     to obtain an explicit equation for the loading.
@@ -38,20 +35,25 @@ class TemkinApprox(IsothermModel):
     .. [#] Phys. Chem. Chem. Phys., 2014,16, 5499-5513
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'TemkinApprox'
     calculates = 'loading'
+    param_names = ["n_M", "K", "tht"]
+    param_bounds = {
+        "n_M": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "tht": [0, numpy.inf],
+    }
 
     def __init__(self):
-        """
-        Instantiation function
-        """
+        """Instantiation function."""
 
         self.params = {"n_M": numpy.nan, "K": numpy.nan, "tht": numpy.nan}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -71,8 +73,8 @@ class TemkinApprox(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the TemkinApprox model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -100,6 +102,8 @@ class TemkinApprox(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -128,25 +132,22 @@ class TemkinApprox(IsothermModel):
                                      self.params["tht"] * (2.0 * self.params["K"] * pressure + 1.0) /
                                      (2.0 * one_plus_kp ** 2))
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(TemkinApprox, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         return {"n_M": saturation_loading, "K": langmuir_k, "tht": 0.0}

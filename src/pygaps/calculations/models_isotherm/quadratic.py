@@ -1,17 +1,15 @@
-"""
-Quadratic isotherm model
-"""
+"""Quadratic isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Quadratic(IsothermModel):
+class Quadratic(IsothermBaseModel):
     r"""
-    Quadratic isotherm model
+    Quadratic isotherm model.
 
     .. math::
 
@@ -19,7 +17,6 @@ class Quadratic(IsothermModel):
 
     Notes
     -----
-
     The quadratic adsorption isotherm exhibits an inflection point; the loading
     is convex at low pressures but changes concavity as it saturates, yielding
     an S-shape. The S-shape can be explained by adsorbate-adsorbate attractive
@@ -40,20 +37,20 @@ class Quadratic(IsothermModel):
        Publications, 1986.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'Quadratic'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_M": numpy.nan, "Ka": numpy.nan, "Kb": numpy.nan}
+    param_names = ["n_M", "Ka", "Kb"]
+    param_bounds = {
+        "n_M": [0, numpy.inf],
+        "Ka": [-numpy.inf, numpy.inf],
+        "Kb": [-numpy.inf, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -72,8 +69,8 @@ class Quadratic(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Quadratic model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -101,6 +98,8 @@ class Quadratic(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -127,26 +126,23 @@ class Quadratic(IsothermModel):
         return self.params["n_M"] * numpy.log(1.0 + self.params["Ka"] * pressure +
                                               self.params["Kb"] * pressure ** 2)
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(Quadratic, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         return {"n_M": saturation_loading / 2.0, "Ka": langmuir_k,
                 "Kb": langmuir_k ** 2.0}

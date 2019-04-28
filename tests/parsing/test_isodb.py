@@ -9,7 +9,4 @@ import pygaps
 class TestISODB():
     def test_get_isotherm(self):
         """Test the parsing of an isotherm to json."""
-
-        iso = pygaps.isotherm_from_isodb('10.1002adfm.201200084.Isotherm3')
-
-        assert iso
+        pygaps.isotherm_from_isodb('10.1002adfm.201200084.Isotherm3')

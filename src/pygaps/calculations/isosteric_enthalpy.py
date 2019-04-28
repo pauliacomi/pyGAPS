@@ -1,25 +1,25 @@
-"""Module calculating the isosteric heat for isotherms at different temperatures."""
+"""Module calculating the isosteric enthalpy for isotherms at different temperatures."""
 
 import numpy
 import scipy.constants as const
 import scipy.stats as stats
 
-from ..graphing.calcgraph import isosteric_heat_plot
+from ..graphing.calcgraph import isosteric_enthalpy_plot
 from ..utilities.exceptions import ParameterError
 
 
-def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
+def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=False):
     r"""
-    Calculate the isosteric heat of adsorption using several isotherms
+    Calculate the isosteric enthalpy of adsorption using several isotherms
     recorded at different temperatures on the same material.
 
     Parameters
     ----------
     isotherms : iterable of Isotherms
-        The isotherms to use in calculation of the isosteric heat. They should all
+        The isotherms to use in calculation of the isosteric enthalpy. They should all
         be measured on the same material.
     loading_points : array, optional
-        The loading points at which the isosteric heat should be calculated. Take care,
+        The loading points at which the isosteric enthalpy should be calculated. Take care,
         as the points must be within the range of loading of all passed isotherms, or
         else the calculation cannot complete.
     branch : str
@@ -30,17 +30,17 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
     Returns
     -------
     result_dict : dict
-        A dictionary with the isosteric heats per loading, with the form:
+        A dictionary with the isosteric enthalpies per loading, with the form:
 
-            - ``isosteric_heat`` (array) : the isosteric heat of adsorption in kj/mmol
-            - ``loading`` (array) : the loading for each point of the isosteric heat, in mmol
+            - ``isosteric_enthalpy`` (array) : the isosteric enthalpy of adsorption in kj/mmol
+            - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol
 
     Notes
     -----
 
     *Description*
 
-    The isosteric heats are calculated from experimental data using the Clausius-Clapeyron
+    The isosteric enthalpies are calculated from experimental data using the Clausius-Clapeyron
     equation as the starting point:
 
     .. math::
@@ -49,8 +49,8 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
 
     Where :math:`\Delta H_{ads}` is the enthalpy of adsorption. In order to approximate the
     partial differential, two or more isotherms are measured at different temperatures. The
-    assumption made is that the heat of adsorption does not vary in the temperature range
-    chosen. Therefore, the isosteric heat of adsorption can be calculated by using the pressures
+    assumption made is that the enthalpy of adsorption does not vary in the temperature range
+    chosen. Therefore, the isosteric enthalpy of adsorption can be calculated by using the pressures
     at which the loading is identical using the following equation for each point:
 
     .. math::
@@ -62,16 +62,16 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
 
     *Limitations*
 
-    The isosteric heat is sensitive to the differences in pressure between the two isotherms. If
+    The isosteric enthalpy is sensitive to the differences in pressure between the two isotherms. If
     the isotherms measured are too close together, the error margin will increase.
 
     The method also assumes that enthalpy of adsorption does not vary with temperature. If the
-    variation is large for the system in question, the isosteric heat calculation will give
+    variation is large for the system in question, the isosteric enthalpy calculation will give
     unrealistic values.
 
     Even with carefully measured experimental data, there are two assumptions used in deriving
     the Clausius-Clapeyron equation: an ideal bulk gas phase and a negligible adsorbed phase
-    molar volume. These have a significant effect on the calculated isosteric heats of adsorption,
+    molar volume. These have a significant effect on the calculated isosteric enthalpies of adsorption,
     especially at high relative pressures and for heavy adsorbates.
 
     """
@@ -114,27 +114,27 @@ def isosteric_heat(isotherms, loading_points=None, branch='ads', verbose=False):
             loading_unit='mmol', branch=branch)) for i in isotherms]
             for l in loading])
 
-    iso_heat, slopes, correlation = isosteric_heat_raw(pressures, temperatures)
+    iso_enthalpy, slopes, correlation = isosteric_enthalpy_raw(pressures, temperatures)
 
     result_dict = {
         'loading': loading,
-        'isosteric_heat': iso_heat,
+        'isosteric_enthalpy': iso_enthalpy,
         'slopes': slopes,
         'correlation': correlation,
     }
 
     if verbose:
-        isosteric_heat_plot(loading, iso_heat)
+        isosteric_enthalpy_plot(loading, iso_enthalpy)
 
     return result_dict
 
 
-def isosteric_heat_raw(pressures, temperatures):
+def isosteric_enthalpy_raw(pressures, temperatures):
     """
-    Calculate the isosteric heat of adsorption using several isotherms
+    Calculate the isosteric enthalpy of adsorption using several isotherms
     recorded at different temperatures on the same material.
 
-    This is a 'bare-bones' function to calculate isosteric heat which is
+    This is a 'bare-bones' function to calculate isosteric enthalpy which is
     designed as a low-level alternative to the main function.
     Designed for advanced use, its parameters have to be manually specified.
 
@@ -142,15 +142,15 @@ def isosteric_heat_raw(pressures, temperatures):
     ----------
     pressure : array of arrays
         An array of arrays of pressures for each isotherm, in bar.
-        For example, if using two isotherms to calculate the isosteric heat:
+        For example, if using two isotherms to calculate the isosteric enthalpy:
         [[l1_iso1, l1_iso2], [l2_iso1, l2_iso2], [l3_iso1, l3_iso2], ...]
     temperatures : array
         Temperatures at which the isotherms are taken, kelvin.
 
     Returns
     -------
-    iso_heat : array
-        Calculated isosteric heat.
+    isosteric_enthalpy : array
+        Calculated isosteric enthalpy.
     slopes : array
         Slopes fitted for each point.
     correlations : array
@@ -169,18 +169,18 @@ def isosteric_heat_raw(pressures, temperatures):
     # Calculate inverse temperatures
     inv_t = 1 / temperatures
 
-    iso_heat = []
+    isosteric_enthalpy = []
     slopes = []
     correlations = []
 
-    # Calculate heat for each point
+    # Calculate enthalpy for each point
     for pressure in pressures:
 
         slope, intercept, corr_coef, p, stderr = stats.linregress(
             inv_t, numpy.log(pressure))
 
-        iso_heat.append(-const.gas_constant * slope / 1000)
+        isosteric_enthalpy.append(-const.gas_constant * slope / 1000)
         slopes.append(slope)
         correlations.append(corr_coef)
 
-    return iso_heat, slopes, correlations
+    return isosteric_enthalpy, slopes, correlations

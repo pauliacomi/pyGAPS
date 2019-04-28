@@ -16,7 +16,7 @@ def initial_henry_slope(isotherm,
                         verbose=False,
                         **plot_parameters):
     """
-    Calculates a henry constant based on the initial slope.
+    Calculate a henry constant based on the initial slope.
 
     Parameters
     ----------
@@ -72,7 +72,7 @@ def initial_henry_slope(isotherm,
                                                      pressure_key=isotherm.pressure_key,
                                                      loading_key=isotherm.loading_key,
                                                      model="Henry")
-        adjrmsd = model_isotherm.rmse / numpy.ptp(data[isotherm.loading_key])
+        adjrmsd = model_isotherm.model.rmse / numpy.ptp(data[isotherm.loading_key])
 
         if adjrmsd > max_adjrms and rows_taken != 2:
             rows_taken = rows_taken - 1
@@ -102,9 +102,9 @@ def initial_henry_slope(isotherm,
     return model_isotherm.model.params["K"]
 
 
-def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
+def initial_henry_virial(isotherm, verbose=False, optimization_params=None, **plot_parameters):
     """
-    Calculates an initial Henry constant based on fitting the virial equation.
+    Calculate an initial Henry constant based on fitting the virial equation.
 
     Parameters
     ----------
@@ -112,15 +112,23 @@ def initial_henry_virial(isotherm, verbose=False, **plot_parameters):
         Isotherm to use for the calculation.
     verbose : bool, optional
         Whether to print out extra information.
+    optimization_params : dict
+        Custom parameters to pass to SciPy.optimize.least_squares.
+    plot_parameters : dict
+        Custom parameters to pass to pygaps.plot_iso.
 
     Returns
     -------
     float
         Initial Henry's constant.
-    """
 
+    """
     model_isotherm = ModelIsotherm.from_pointisotherm(
-        isotherm, model='Virial', verbose=verbose)
+        isotherm,
+        model='Virial',
+        optimization_params=optimization_params,
+        verbose=verbose
+    )
 
     if verbose:
         model_isotherm.material_name = 'model'

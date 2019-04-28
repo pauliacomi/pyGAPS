@@ -1,12 +1,12 @@
 """Dubinin-Radushkevich equation and related plots."""
 
-import matplotlib.pyplot as plt
 import numpy
 import scipy.constants as const
 import scipy.optimize as opt
 import scipy.stats as stats
 
 from ..classes.adsorbate import Adsorbate
+from ..graphing.calcgraph import dra_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
@@ -207,12 +207,7 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
 
     if verbose:
 
-        linear = slope * log_n_p0p(exp) + intercept
-        plt.plot(log_n_p0p(exp), logv, "o")
-        plt.plot(log_n_p0p(exp), linear, linestyle='--', color='black', label='trendline')
-        plt.xlabel('log $p^0/p$')
-        plt.ylabel('log $V/V_0$')
-        plt.legend()
+        dra_plot(logv, log_n_p0p, slope, intercept, exp)
 
         if find_exp:
             print("Exponent is: {:.2f}".format(exp))

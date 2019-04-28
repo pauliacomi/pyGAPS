@@ -1,11 +1,10 @@
-"""
-Parsing to and from a json file format for isotherms.
-"""
+"""Parse to and from a JSON file format for isotherms."""
 
 import json
 
 import pandas
 
+from ..calculations.models_isotherm import get_isotherm_model
 from ..classes.isotherm import Isotherm
 from ..classes.modelisotherm import ModelIsotherm
 from ..classes.pointisotherm import PointIsotherm
@@ -18,12 +17,13 @@ from ..utilities.unit_converter import _VOLUME_UNITS
 
 def isotherm_to_json(isotherm, fmt=None):
     """
-    Converts an isotherm object to a json structure.
+    Convert an isotherm object to a json structure.
+
     Structure is inspired by the NIST format.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : Isotherm
         Isotherm to be written to json.
     fmt : {None, 'NIST'}, optional
         If the format is set to NIST, then the json format a specific version
@@ -44,10 +44,7 @@ def isotherm_to_json(isotherm, fmt=None):
         raw_dict["isotherm_data"] = [{p: str(t) for p, t in v.items()}
                                      for k, v in isotherm_data_dict.items()]
     elif isinstance(isotherm, ModelIsotherm):
-        raw_dict["isotherm_model"] = {
-            'model': isotherm.model.name,
-            'parameters': isotherm.model.params,
-        }
+        raw_dict["isotherm_model"] = isotherm.model.to_dict()
 
     json_isotherm = json.dumps(raw_dict, sort_keys=True)
 
@@ -58,7 +55,8 @@ def isotherm_from_json(json_isotherm, fmt=None,
                        loading_key='loading', pressure_key='pressure',
                        **isotherm_parameters):
     """
-    Converts a json isotherm format to a internal format.
+    Convert a json isotherm format to a pygaps Isotherm.
+
     Structure is inspired by the NIST format.
 
     Parameters
@@ -77,10 +75,10 @@ def isotherm_from_json(json_isotherm, fmt=None,
 
     Returns
     -------
-    PointIsotherm
+    Isotherm
         The isotherm contained in the json
-    """
 
+    """
     # Parse isotherm in dictionary
     raw_dict = json.loads(json_isotherm)
 
@@ -112,7 +110,29 @@ def isotherm_from_json(json_isotherm, fmt=None,
                                  other_keys=other_keys,
                                  **raw_dict)
     elif model:
-        raise NotImplementedError
+
+        new_mod = get_isotherm_model(model['model'])
+
+        rmse = model.pop('rmse', None)
+        if rmse:
+            new_mod.rmse = rmse
+
+        prange = model.pop('pressure_range', None)
+        if prange:
+            new_mod.pressure_range = prange
+
+        lrange = model.pop('loading_range', None)
+        if lrange:
+            new_mod.loading_range = lrange
+
+        for param in new_mod.params:
+            try:
+                new_mod.params[param] = model['parameters'][param]
+            except KeyError as err:
+                raise KeyError("The JSON is missing parameter '{0}'".format(param)) from err
+
+        isotherm = ModelIsotherm(model=new_mod, **raw_dict)
+
     else:
         # generate the isotherm
         isotherm = Isotherm(**raw_dict)
@@ -121,9 +141,7 @@ def isotherm_from_json(json_isotherm, fmt=None,
 
 
 def _from_json_nist(raw_dict):
-    """
-    Converts a NIST dictionary format to a internal format.
-    """
+    """Convert a NIST dictionary format to a internal format."""
 
     nist_dict = dict()
 

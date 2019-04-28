@@ -1,17 +1,15 @@
-"""
-Jensen-Seaton isotherm model
-"""
+"""Jensen-Seaton isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class JensenSeaton(IsothermModel):
+class JensenSeaton(IsothermBaseModel):
     r"""
-    Jensen-Seaton isotherm model
+    Jensen-Seaton isotherm model.
 
     .. math::
 
@@ -19,7 +17,6 @@ class JensenSeaton(IsothermModel):
 
     Notes
     -----
-
     When modelling adsorption in micropores, a requirement was highlighted by
     Jensen and Seaton in 1996 [#]_, that at sufficiently high pressures the adsorption
     isotherm should not reach a horizontal plateau corresponding to saturation but
@@ -47,21 +44,21 @@ class JensenSeaton(IsothermModel):
        American Chemical Society (ACS). All Rights Reserved.), 2866-2867.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'Jensen-Seaton'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"K": numpy.nan, 'a': numpy.nan,
-                       'b': numpy.nan, 'c': numpy.nan}
+    param_names = ["K", "a", "b", "c"]
+    param_bounds = {
+        "K": [0., numpy.inf],
+        "a": [0., numpy.inf],
+        "b": [0., numpy.inf],
+        "c": [0., numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -73,15 +70,15 @@ class JensenSeaton(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["K"] * pressure * \
+        return self.params["K"] * pressure / \
             (1 + (self.params["K"] * pressure /
                   (self.params["a"] * (1 + self.params["b"] * pressure))
-                  )**self.params['c'])**(- 1 / self.params['c'])
+                  )**self.params['c'])**(1 / self.params['c'])
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Jensen-Seaton model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -109,6 +106,8 @@ class JensenSeaton(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -131,26 +130,23 @@ class JensenSeaton(IsothermModel):
         """
         return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(JensenSeaton, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         return {"K": saturation_loading * langmuir_k,
                 "a": 1,

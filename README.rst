@@ -25,9 +25,9 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
       - | |version| |wheel|
         | |supported-versions| |supported-implementations|
 
-.. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
-    :target: https://www.repostatus.org/#wip
-    :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
+.. |status| image:: https://www.repostatus.org/badges/latest/active.svg
+    :target: https://www.repostatus.org/#active
+    :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
 .. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.5.0.svg
     :alt: Commits since latest release
@@ -53,7 +53,7 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :alt: Requirements Status
     :target: https://requires.io/github/pauliacomi/pyGAPS/requirements/?branch=master
 
-.. |codecov| image:: https://codecov.io/github/pauliacomi/pygaps/coverage.svg?branch=master
+.. |codecov| image:: https://img.shields.io/codecov/c/github/pauliacomi/pygaps.svg
     :alt: Coverage Status
     :target: https://codecov.io/github/pauliacomi/pygaps
 
@@ -87,10 +87,23 @@ Features
     - Pore size distribution calculations using DFT kernels
     - Isotherm model fitting (Henry, Langmuir, DS/TS Langmuir, etc..)
     - IAST calculations for binary and multicomponent adsorption
-    - Isosteric heat of adsorption calculations
+    - Isosteric enthalpy of adsorption calculations
     - Parsing to and from multiple formats such as Excel, CSV and JSON
     - An sqlite database backend for storing and retrieving data
     - Simple methods for isotherm graphing and comparison
+
+Citing
+======
+
+A peer-reviewed paper regarding pyGAPS is currently in the process of being
+published. In the meantime, consider citing the *preprint* if you use the
+program in your work.
+
+Paul Iacomi, Philip L. Llewellyn, 2019.
+pyGAPS: A Python-Based Framework for Adsorption Isotherm
+Processing and Material Characterisation.
+https://doi.org/10.26434/chemrxiv.7970402.v1
+
 
 Documentation
 =============

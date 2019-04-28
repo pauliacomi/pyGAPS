@@ -1,17 +1,15 @@
-"""
-Toth isotherm model
-"""
+"""Toth isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Toth(IsothermModel):
+class Toth(IsothermBaseModel):
     r"""
-    The Toth isotherm model
+    Toth isotherm model.
 
     .. math::
 
@@ -19,7 +17,6 @@ class Toth(IsothermModel):
 
     Notes
     -----
-
     The Toth model is an empirical modification to the Langmuir equation.
     The parameter :math:`t` is a measure of the system heterogeneity.
 
@@ -30,20 +27,20 @@ class Toth(IsothermModel):
     but also zeolites.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'Toth'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_M": numpy.nan, "K": numpy.nan, "t": numpy.nan}
+    param_names = ["n_M", "K", "t"]
+    param_bounds = {
+        "n_M": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "t": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -61,8 +58,8 @@ class Toth(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Toth model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -90,6 +87,8 @@ class Toth(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -112,25 +111,22 @@ class Toth(IsothermModel):
         """
         return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(Toth, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         return {"n_M": saturation_loading, "K": langmuir_k, "t": 1}

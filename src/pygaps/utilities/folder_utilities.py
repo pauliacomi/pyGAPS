@@ -1,6 +1,4 @@
-"""
-This module contains general functions for folder stepping.
-"""
+"""General functions for stepping through folders."""
 
 import os.path
 
@@ -9,7 +7,7 @@ from .exceptions import pgError
 
 def util_get_file_paths(folder, extension=None):
     """
-    Gets the paths of the files with the requested extension as a list.
+    Get the paths of the files with the requested extension as a list.
 
     Parameters
     ----------

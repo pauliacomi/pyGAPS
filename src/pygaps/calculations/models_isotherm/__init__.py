@@ -2,12 +2,13 @@
 # flake8: noqa
 
 """
-This file has all the isotherm models which are available
+Lists all isotherm models which are available.
 
 If adding a custom model, it should be also added below.
 """
 
 from ...utilities.exceptions import ParameterError
+from .base_model import IsothermBaseModel
 from .bet import BET
 from .dslangmuir import DSLangmuir
 from .fhvst import FHVST
@@ -15,7 +16,6 @@ from .gab import GAB
 from .henry import Henry
 from .jensenseaton import JensenSeaton
 from .langmuir import Langmuir
-from .model import IsothermModel
 from .quadratic import Quadratic
 from .temkinapprox import TemkinApprox
 from .toth import Toth
@@ -24,27 +24,56 @@ from .virial import Virial
 from .wvst import WVST
 
 # This list has all the available models
-_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-           Quadratic, BET, GAB, TemkinApprox, Virial,
-           Toth, JensenSeaton, FHVST, WVST]
+_MODELS = [
+    Henry,
+    Langmuir,
+    DSLangmuir,
+    TSLangmuir,
+    Quadratic,
+    BET,
+    GAB,
+    TemkinApprox,
+    Virial,
+    Toth,
+    JensenSeaton,
+    FHVST,
+    WVST
+]
 
 # This list has all the models which will be used when attempting to
 # guess an isotherm model. They are the ones where the fitting
 # is fast enough to be acceptable
-_GUESS_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-                 Quadratic, BET, TemkinApprox, Toth, JensenSeaton]
+_GUESS_MODELS = [
+    Henry,
+    Langmuir,
+    DSLangmuir,
+    TSLangmuir,
+    Quadratic,
+    BET,
+    TemkinApprox,
+    Toth,
+    JensenSeaton
+]
 
 # This list has all the models which work with IAST.
 # This is required as some models (such as Freundlich)
 # are not thermodynamically consistent.
-_IAST_MODELS = [Henry, Langmuir, DSLangmuir, TSLangmuir,
-                Quadratic, BET, TemkinApprox, Toth, JensenSeaton]
+_IAST_MODELS = [
+    Henry,
+    Langmuir,
+    DSLangmuir,
+    TSLangmuir,
+    Quadratic,
+    BET,
+    TemkinApprox,
+    Toth,
+    JensenSeaton
+]
 
 
 def get_isotherm_model(model_name):
     """
-    Checks whether specified model name exists
-    and returns an instance of that model class.
+    Check whether specified model name exists and return an instance of that model class.
 
     Parameters
     ----------
@@ -61,20 +90,17 @@ def get_isotherm_model(model_name):
     ParameterError
         When the model does not exist
     """
-
-    if model_name not in [model.name for model in _MODELS]:
-        raise ParameterError("Model {0} not an option. Viable models "
-                             "are {1}.".format(model_name, ', '.join([model.name for model in _MODELS])))
-
     for _model in _MODELS:
         if model_name == _model.name:
             return _model()
 
+    raise ParameterError("Model {0} not an option. Viable models "
+                         "are {1}.".format(model_name, [model.name for model in _MODELS]))
+
 
 def is_iast_model(model_name):
     """
-    Checks whether specified model can be used
-    with IAST.
+    Check whether specified model can be used with IAST.
 
     Parameters
     ----------
@@ -87,18 +113,17 @@ def is_iast_model(model_name):
         Whether it is applicable or not.
 
     """
-
     return model_name in [model.name for model in _IAST_MODELS]
 
 
 def is_base_model(model):
     """
-    Checks whether it is a model.
+    Check whether the input is derived from the base model.
 
     Parameters
     ----------
     model : Model
-        A derived IsothermModel class
+        A derived IsothermBaseModel class
 
     Returns
     -------
@@ -106,5 +131,4 @@ def is_base_model(model):
         True or false.
 
     """
-
-    return isinstance(model, IsothermModel)
+    return isinstance(model, IsothermBaseModel)

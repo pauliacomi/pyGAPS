@@ -1,17 +1,15 @@
-"""
-BET isotherm model
-"""
+"""BET isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class BET(IsothermModel):
+class BET(IsothermBaseModel):
     r"""
-    Brunauer-Emmett-Teller (BET) adsorption isotherm
+    Brunauer-Emmett-Teller (BET) adsorption isotherm.
 
     .. math::
 
@@ -19,7 +17,6 @@ class BET(IsothermModel):
 
     Notes
     -----
-
     Like the Langmuir model, the BET model [#]_
     assumes that adsorption is kinetically driven and takes place on
     adsorption sites at the material surface. However, each adsorbed
@@ -108,20 +105,24 @@ class BET(IsothermModel):
        P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'BET'
     calculates = 'loading'
+    param_names = ["n_m", "C", "N"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "C": [0, numpy.inf],
+        "N": [0, numpy.inf],
+    }
 
     def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_m": numpy.nan, "C": numpy.nan, "N": numpy.nan}
+        """Instantiation function."""
+        self.params = {param: numpy.nan for param in self.param_names}
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -140,8 +141,8 @@ class BET(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the BET model, the pressure will
         be computed numerically as no analytical inversion is possible.
 
@@ -169,6 +170,8 @@ class BET(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -197,26 +200,23 @@ class BET(IsothermModel):
              self.params["C"] * pressure) /
             (1.0 - self.params["N"] * pressure))
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
         loading_key : str
-            Column with the loading.
+            Loading data.
         pressure_key : str
-            Column with the pressure.
+            Pressure data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(BET, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         # BET = Langmuir when N = 0.0. This is our default assumption.
         return {"n_m": saturation_loading, "C": langmuir_k,

@@ -1,10 +1,8 @@
-"""
-Custom errors thrown by the program.
-"""
+"""Custom errors thrown by the program."""
 
 
 class pgError(Exception):
-    """Error raised by this program."""
+    """Base error raised by pyGAPS."""
 
 
 class ParameterError(pgError):
