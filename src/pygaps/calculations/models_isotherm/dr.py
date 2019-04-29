@@ -4,7 +4,7 @@ import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
 class DR(IsothermModel):

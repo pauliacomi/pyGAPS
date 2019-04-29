@@ -4,10 +4,10 @@ import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class DR(IsothermModel):
+class DR(IsothermBaseModel):
     r"""
     Dubinin-Astakov (DA) adsorption isotherm.
 
@@ -25,20 +25,20 @@ class DR(IsothermModel):
        in Progress in Surface and Membrane Science, vol. 9, Elsevier, 1975, pp. 1–70.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'DA'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_t": numpy.nan, "m": numpy.nan, "eps": numpy.nan}
+    param_names = ["n_m", "e", "exp"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "e": [-numpy.inf, numpy.inf],
+        "exp": [0, 3],
+    }
 
     def loading(self, pressure):
         """
-        Calculate loading.
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -50,16 +50,17 @@ class DR(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_t"] * numpy.exp(
-            scipy.constants.r
+        return self.params["n_m"] * numpy.exp(
+            (scipy.constants.r) **
         )
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
-        For the BET model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        Calculate pressure at specified loading.
+
+        Careful!
+        For the DA model, the loading has to
+        be computed numerically.
 
         Parameters
         ----------
