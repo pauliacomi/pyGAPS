@@ -34,7 +34,7 @@ Bugfixes:
   (it was previously impossible to activate).
 * Fixed issue in excel import which could lead to
   incorrect import.
-* Some of the gas values in the isotherm were incorrect.
+* Some of the adsorbate values in the database were incorrect.
   They have been now updated.
 * Fixed secondary data not being automatically plotted
   when ``print_info`` called
