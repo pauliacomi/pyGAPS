@@ -190,6 +190,9 @@ class ModelIsotherm(Isotherm):
             #: adsorption isotherm.
             self.model = get_isotherm_model(model)
 
+            # Pass odd parameters
+            self.model.__init_parameters__(isotherm_parameters)
+
             #: The pressure range on which the model was built.
             self.model.pressure_range = [min(pressure), max(pressure)]
 

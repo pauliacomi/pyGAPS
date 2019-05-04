@@ -28,7 +28,6 @@ class Langmuir(IsothermBaseModel):
           of sites currently free and currently occupied, respectively
         * Adsorption is complete when all sites are filled.
 
-
     Using these assumptions we can define rates for both adsorption and
     desorption. The adsorption rate :math:`r_a`
     will be proportional to the number of sites available on

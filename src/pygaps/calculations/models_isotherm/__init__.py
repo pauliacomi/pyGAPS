@@ -7,9 +7,12 @@ Lists all isotherm models which are available.
 If adding a custom model, it should be also added below.
 """
 
-from ...utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
+
 from .base_model import IsothermBaseModel
 from .bet import BET
+from .da import DA
+from .dr import DR
 from .dslangmuir import DSLangmuir
 from .fhvst import FHVST
 from .gab import GAB
@@ -29,9 +32,11 @@ _MODELS = [
     Langmuir,
     DSLangmuir,
     TSLangmuir,
-    Quadratic,
     BET,
     GAB,
+    DA,
+    DR,
+    Quadratic,
     TemkinApprox,
     Virial,
     Toth,
@@ -47,7 +52,7 @@ _GUESS_MODELS = [
     Henry,
     Langmuir,
     DSLangmuir,
-    TSLangmuir,
+    DR,
     Quadratic,
     BET,
     TemkinApprox,

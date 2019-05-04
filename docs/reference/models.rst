@@ -33,11 +33,22 @@ BET
 .. automodule:: pygaps.calculations.models_isotherm.bet
     :members:
 
-
 GAB
 ---
 
 .. automodule:: pygaps.calculations.models_isotherm.gab
+    :members:
+
+Dubinin-Radushkevitch (DR)
+--------------------------
+
+.. automodule:: pygaps.calculations.models_isotherm.dr
+    :members:
+
+Dubinin-Astakov (DA)
+--------------------
+
+.. automodule:: pygaps.calculations.models_isotherm.da
     :members:
 
 Quadratic
@@ -63,7 +74,6 @@ Jensen-Seaton
 
 .. automodule:: pygaps.calculations.models_isotherm.jensenseaton
     :members:
-
 
 Virial
 ------
