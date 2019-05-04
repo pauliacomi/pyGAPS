@@ -49,10 +49,11 @@ def dr_plot(isotherm, limits=None, verbose=False):
 
     .. math::
 
-        V_{ads} = V_{t} \exp\Big[\Big(\frac{A}{\varepsilon}\Big)^{2}\Big]
+        V_{ads} = V_{t} \exp\Big[\Big(\frac{\Delta G}{\varepsilon}\Big)^{2}\Big]
 
-    Here :math:`A` is the change in Gibbs free energy :math:`A = - RT \ln(p_0/p)`
-    and :math:`\varepsilon` is a characteristic energy of adsorption.
+    Here :math:`\Delta G` is the change in Gibbs free energy
+    :math:`\Delta G = - RT \ln(p_0/p)` and :math:`\varepsilon`
+    is a characteristic energy of adsorption.
 
     If an experimental isotherm is consistent with the DR model,
     the equation can be used to obtain the total pore volume
@@ -128,10 +129,11 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
 
     .. math::
 
-        V_{ads} = V_{t} \exp\Big[\Big(\frac{A}{\varepsilon}\Big)^{n}\Big]
+        V_{ads} = V_{t} \exp\Big[\Big(\frac{\Delta G}{\varepsilon}\Big)^{n}\Big]
 
-    Here :math:`A` is the change in Gibbs free energy :math:`A = - RT \ln(p_0/p)`
-    and :math:`\varepsilon` is a characteristic energy of adsorption.
+    Here :math:`\Delta G` is the change in Gibbs free energy
+    :math:`\Delta G = - RT \ln(p_0/p)` and :math:`\varepsilon`
+    is a characteristic energy of adsorption.
     The exponent :math:`n` is a fitting coefficient, often taken between
     1 (described as surface adsorption) and 3 (micropore adsorption).
     The exponent can also be related to surface heterogeneity.

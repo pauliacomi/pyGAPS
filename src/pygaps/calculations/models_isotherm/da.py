@@ -3,21 +3,43 @@
 import numpy
 import scipy
 
-from ...utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
 
-class DR(IsothermBaseModel):
+class DA(IsothermBaseModel):
     r"""
     Dubinin-Astakov (DA) adsorption isotherm.
 
     .. math::
 
-        n(p) = n_t \exp\Big[\Big(-\frac{RT\ln(p_0/p)}{\varepsilon}\Big)^{m}\Big]
+        n(p) = n_t \exp\Big[-\Big(\frac{-RT\ln(p/p_0)}{\varepsilon}\Big)^{m}\Big]
+
+    The pressure passed should be in a relative basis.
 
     Notes
     -----
+    The Dubinin-Astakov isotherm model extends the
+    Dubinin-Radushkevich model, itself based on the potential theory
+    of Polanyi, which asserts that molecules
+    near a surface are subjected to a potential field.
+    The adsorbate at the surface is in a liquid state and
+    its local pressure is conversely equal to the vapour pressure
+    at the adsorption temperature. The Polanyi theory attempts to
+    relate the surface coverage with the Gibbs free energy of adsorption,
+    :math:`\Delta G^{ads} = - R T \ln p/p_0` and the total coverage
+    :math:`\theta`.
 
+    There are three parameters which define the model:
+
+        * The total amount adsorbed (`n_t`), analogous to the monolayer
+          capacity in the Langmuir model.
+        * A potential energy term `e`.
+        * A power term, `m`, which can vary between 1 and 3.
+          The DA model becomes the DR models when m=2.
+
+    It describes adsorption in a single uniform type of pores. To note
+    that the model does not reduce to Henry's law at low pressure
+    and is therefore not strictly physical.
 
     References
     ----------
@@ -25,16 +47,20 @@ class DR(IsothermBaseModel):
        in Progress in Surface and Membrane Science, vol. 9, Elsevier, 1975, pp. 1–70.
 
     """
-
     # Model parameters
     name = 'DA'
     calculates = 'loading'
-    param_names = ["n_m", "e", "exp"]
+    param_names = ["n_m", "e", "m"]
     param_bounds = {
         "n_m": [0, numpy.inf],
-        "e": [-numpy.inf, numpy.inf],
-        "exp": [0, 3],
+        "e": [0, numpy.inf],
+        "m": [1, 3],
     }
+    minus_rt = - 1000  # base value
+
+    def __init_parameters__(self, parameters):
+        """Initialize model parameters from isotherm data."""
+        self.minus_rt = -scipy.constants.gas_constant * parameters['t_iso']
 
     def loading(self, pressure):
         """
@@ -50,17 +76,19 @@ class DR(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * numpy.exp(
-            (scipy.constants.r) **
-        )
+        return self.params["n_m"] * \
+            numpy.exp(-(self.minus_rt * numpy.log(pressure) / self.params["e"]) ** self.params["m"]
+                      )
 
     def pressure(self, loading):
-        """
+        r"""
         Calculate pressure at specified loading.
 
-        Careful!
-        For the DA model, the loading has to
-        be computed numerically.
+        For the DA model, a direct relationship can be found analytically.
+
+        .. math::
+
+            p/p_0 = \exp\Big( -\frac{\varepsilon}{RT}\sqrt[m]{-\ln n/n_m} \Big)
 
         Parameters
         ----------
@@ -71,21 +99,16 @@ class DR(IsothermBaseModel):
         -------
         float
             Pressure at specified loading.
+
         """
-        def fun(x):
-            return self.loading(x) - loading
-
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
-
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
-
-        return opt_res.x
+        return numpy.exp(
+            self.params['e']/self.minus_rt *
+            (-numpy.log(loading/self.params['n_m'])**(1/self.params['e'])))
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -93,11 +116,8 @@ class DR(IsothermBaseModel):
 
             \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
-        The integral for the BET model is solved analytically.
-
-        .. math::
-
-            \pi = n_m \ln{\frac{1 - N p + C p}{1- N p}}
+        The integral for the DA model cannot be solved analytically
+        and must be calculated numerically.
 
         Parameters
         ----------
@@ -109,14 +129,11 @@ class DR(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m"] * numpy.log(
-            (1.0 - self.params["N"] * pressure +
-             self.params["C"] * pressure) /
-            (1.0 - self.params["N"] * pressure))
+        return NotImplementedError
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
@@ -132,9 +149,9 @@ class DR(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(BET, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        # BET = Langmuir when N = 0.0. This is our default assumption.
-        return {"n_m": saturation_loading, "C": langmuir_k,
-                "N": langmuir_k * 0.01}
+        return {
+            "n_m": saturation_loading,
+            "e": -self.minus_rt,
+            "m": 1}

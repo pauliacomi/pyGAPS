@@ -3,21 +3,40 @@
 import numpy
 import scipy
 
-from ...utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
 
-class DR(IsothermModel):
+class DR(IsothermBaseModel):
     r"""
     Dubinin-Radushkevitch (DR) adsorption isotherm.
 
     .. math::
 
-        n(p) = n_t \exp\Big[\Big(-\frac{RT\ln(p_0/p)}{\varepsilon}\Big)^{2}\Big]
+        n(p) = n_t \exp\Big[-\Big(\frac{-RT\ln(p/p_0)}{\varepsilon}\Big)^{2}\Big]
+
+    The pressure passed should be in a relative basis.
 
     Notes
     -----
+    The Dubinin-Radushkevich isotherm model extends the potential theory
+    of Polanyi, which asserts that molecules
+    near a surface are subjected to a potential field.
+    The adsorbate at the surface is in a liquid state and
+    its local pressure is conversely equal to the vapour pressure
+    at the adsorption temperature. The Polanyi theory attempts to
+    relate the surface coverage with the Gibbs free energy of adsorption,
+    :math:`\Delta G^{ads} = - R T \ln p/p_0` and the total coverage
+    :math:`\theta`.
 
+    There are two parameters which define the model:
+
+        * The total amount adsorbed (`n_t`), analogous to the monolayer
+          capacity in the Langmuir model.
+        * A potential energy term `e`.
+
+    It describes adsorption in a single uniform type of pores. To note
+    that the model does not reduce to Henry's law at low pressure
+    and is therefore not strictly physical.
 
     References
     ----------
@@ -26,20 +45,23 @@ class DR(IsothermModel):
        Journal of Colloid and Interface Science, vol. 21, no. 4, pp. 378–393, Apr. 1966.
 
     """
-    #: Name of the model
+    # Model parameters
     name = 'DR'
     calculates = 'loading'
+    param_names = ["n_m", "e"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "e": [0, numpy.inf],
+    }
+    minus_rt = -1000  # base value
 
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_m": numpy.nan, "C": numpy.nan, "N": numpy.nan}
+    def __init_parameters__(self, parameters):
+        """Initialize model parameters from isotherm data."""
+        self.minus_rt = -scipy.constants.gas_constant * parameters['t_iso']
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -51,17 +73,18 @@ class DR(IsothermModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * self.params["C"] * pressure / (
-            (1.0 - self.params["N"] * pressure) *
-            (1.0 - self.params["N"] * pressure +
-             self.params["C"] * pressure))
+        return self.params["n_m"] * \
+            numpy.exp(-(self.minus_rt * numpy.log(pressure) / self.params["e"]) ** 2)
 
     def pressure(self, loading):
-        """
-        Function that calculates pressure as a function
-        of loading.
-        For the BET model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        r"""
+        Calculate pressure at specified loading.
+
+        For the DR model, a direct relationship can be found analytically.
+
+        .. math::
+
+            p/p_0 = \exp\Big( -\frac{\varepsilon}{RT}\sqrt{-\ln n/n_m} \Big)
 
         Parameters
         ----------
@@ -72,21 +95,16 @@ class DR(IsothermModel):
         -------
         float
             Pressure at specified loading.
+
         """
-        def fun(x):
-            return self.loading(x) - loading
-
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
-
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
-
-        return opt_res.x
+        return numpy.exp(
+            self.params['e']/self.minus_rt *
+            numpy.sqrt(-numpy.log(loading/self.params['n_m'])))
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -94,11 +112,8 @@ class DR(IsothermModel):
 
             \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
-        The integral for the BET model is solved analytically.
-
-        .. math::
-
-            \pi = n_m \ln{\frac{1 - N p + C p}{1- N p}}
+        The integral for the DR model cannot be solved analytically
+        and must be calculated numerically.
 
         Parameters
         ----------
@@ -110,14 +125,11 @@ class DR(IsothermModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m"] * numpy.log(
-            (1.0 - self.params["N"] * pressure +
-             self.params["C"] * pressure) /
-            (1.0 - self.params["N"] * pressure))
+        return NotImplementedError
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
@@ -133,9 +145,8 @@ class DR(IsothermModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(BET, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        # BET = Langmuir when N = 0.0. This is our default assumption.
-        return {"n_m": saturation_loading, "C": langmuir_k,
-                "N": langmuir_k * 0.01}
+        return {
+            "n_m": saturation_loading,
+            "e": -self.minus_rt}

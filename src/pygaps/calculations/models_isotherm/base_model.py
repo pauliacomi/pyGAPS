@@ -25,6 +25,10 @@ class IsothermBaseModel():
         """Instantiate parameters."""
         self.params = {param: numpy.nan for param in self.param_names}
 
+    def __init_parameters__(self, parameters):
+        """Initialize model parameters from isotherm data."""
+        pass
+
     def __repr__(self):
         """Print model name."""
         return "pyGAPS Model, type {}".format(self.name)
