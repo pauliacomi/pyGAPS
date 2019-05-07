@@ -15,6 +15,7 @@ from .da import DA
 from .dr import DR
 from .dslangmuir import DSLangmuir
 from .fhvst import FHVST
+from .freundlich import Freundlich
 from .gab import GAB
 from .henry import Henry
 from .jensenseaton import JensenSeaton
@@ -34,6 +35,7 @@ _MODELS = [
     TSLangmuir,
     BET,
     GAB,
+    Freundlich,
     DA,
     DR,
     Quadratic,
@@ -52,6 +54,7 @@ _GUESS_MODELS = [
     Henry,
     Langmuir,
     DSLangmuir,
+    Freundlich,
     DR,
     Quadratic,
     BET,
@@ -62,7 +65,7 @@ _GUESS_MODELS = [
 
 # This list has all the models which work with IAST.
 # This is required as some models (such as Freundlich)
-# are not thermodynamically consistent.
+# are not physically consistent.
 _IAST_MODELS = [
     Henry,
     Langmuir,

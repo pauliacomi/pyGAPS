@@ -18,7 +18,7 @@ class DR(IsothermBaseModel):
 
     Notes
     -----
-    The Dubinin-Radushkevich isotherm model extends the potential theory
+    The Dubinin-Radushkevich isotherm model [#]_ extends the potential theory
     of Polanyi, which asserts that molecules
     near a surface are subjected to a potential field.
     The adsorbate at the surface is in a liquid state and
@@ -125,7 +125,7 @@ class DR(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return NotImplementedError
+        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def default_guess(self, pressure, loading):
         """
@@ -133,12 +133,10 @@ class DR(IsothermBaseModel):
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------

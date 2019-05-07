@@ -50,7 +50,7 @@ class FHVST(IsothermBaseModel):
     The general VST equation requires an expression for the activity coefficients.
     Cochran [#]_ developed a simpler, three
     parameter equation based on the Flory – Huggins equation for the activity coefficient.
-    The equation for then becomes:
+    The equation then becomes:
 
     .. math::
 
@@ -76,9 +76,9 @@ class FHVST(IsothermBaseModel):
     # Model parameters
     name = 'FH-VST'
     calculates = 'pressure'
-    param_names = ["n", "K", "a1v"]
+    param_names = ["n_m", "K", "a1v"]
     param_bounds = {
-        "n": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
         "K": [0, numpy.inf],
         "a1v": [-numpy.inf, numpy.inf],
     }
@@ -130,9 +130,9 @@ class FHVST(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        cov = loading / self.params["n"]
+        cov = loading / self.params["n_m"]
 
-        res = (self.params["n"] / self.params["K"]) * (cov / (1 - cov)) * \
+        res = (self.params["n_m"] / self.params["K"]) * (cov / (1 - cov)) * \
             numpy.exp(self.params["a1v"]**2 * cov /
                       (1 + self.params["a1v"] * cov))
 
@@ -170,10 +170,10 @@ class FHVST(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
@@ -182,5 +182,5 @@ class FHVST(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n": saturation_loading, "K": langmuir_k,
+        return {"n_m": saturation_loading, "K": langmuir_k,
                 "a1v": 0}

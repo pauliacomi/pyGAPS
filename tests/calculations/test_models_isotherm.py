@@ -1,28 +1,33 @@
 """Test all the isotherm model functions."""
 
+import os
+import ast
+
 import numpy
 import pytest
 
 import pygaps.calculations.models_isotherm as models
 from pygaps.utilities.exceptions import ParameterError
 
-MODELS = {
-    'Henry': [11, 11, pytest.mark.okay],
-    'Langmuir': [1, 2.6376848, pytest.mark.okay],
-    'DSLangmuir': [0.911428571, 1.955441434, pytest.mark.okay],
-    'TSLangmuir':  [0.821333333, 1.545618429, pytest.mark.okay],
-    'BET': [1.121304791, 2.743535635, pytest.mark.okay],
-    'GAB': [1, 2.743535635, pytest.mark.okay],
-    'DR': [0.5, 0.41149, pytest.mark.okay],
-    'DA': [0.5, 0.41149, pytest.mark.okay],
-    'Quadratic': [1.040540541, 2.590241611, pytest.mark.okay],
-    'TemkinApprox': [1, 2.6376848, pytest.mark.okay],
-    'Jensen-Seaton': [1.692307, 3.071936612, pytest.mark.okay],
-    'Toth': [1, 2.6376848, pytest.mark.okay],
+MODEL_DATA_PATH = os.path.join(os.path.dirname(__file__), 'isotherm_model_data')
 
-    'Virial': [11, 1, pytest.mark.xfail],
-    'W-VST': [0.9910, 1, pytest.mark.xfail],
-    'FH-VST': [0.9910, 1, pytest.mark.xfail],
+MODELS_TESTED = {
+    'Henry': pytest.mark.okay,
+    'Langmuir': pytest.mark.okay,
+    'DSLangmuir': pytest.mark.okay,
+    'TSLangmuir': pytest.mark.okay,
+    'BET': pytest.mark.okay,
+    'GAB': pytest.mark.okay,
+    'Freundlich': pytest.mark.okay,
+    'DR': pytest.mark.okay,
+    'DA': pytest.mark.okay,
+    'Quadratic': pytest.mark.okay,
+    'TemkinApprox': pytest.mark.okay,
+    'Jensen-Seaton': pytest.mark.okay,
+    'Toth': pytest.mark.okay,
+    'Virial': pytest.mark.xfail,
+    'W-VST': pytest.mark.xfail,
+    'FH-VST': pytest.mark.xfail,
 }
 
 
@@ -31,49 +36,59 @@ class TestIsothermModels():
     """Test the isotherm models."""
 
     def test_base_class(self):
-        """Tests base class for model."""
+        """Test base class for model."""
         model = models.base_model.IsothermBaseModel()
         model.loading(1)
         model.pressure(1)
         model.spreading_pressure(1)
 
     def test_get_model(self):
-        """Model getter function."""
-
-        model_name = 'Henry'
-
-        model = models.get_isotherm_model(model_name)
-        assert model.name == model_name
+        """Test model getter function."""
+        for model_name in MODELS_TESTED:
+            model = models.get_isotherm_model(model_name)
+            assert model.name == model_name
 
         with pytest.raises(ParameterError):
             models.get_isotherm_model('bad_model')
 
-    @pytest.mark.parametrize("name, loading",
-                             [(key, MODELS[key][0]) for key in MODELS])
-    def test_models_loading(self, name, loading):
-        """Parametrised test for each model."""
+    @pytest.mark.parametrize("name", MODELS_TESTED.keys())
+    def test_models_loading(self, name, capsys):
+        """Test each model loading function."""
 
-        model = models.get_isotherm_model(name)
-        model.params = model.default_guess([0, 1], [0, 1])
+        with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
 
-        assert numpy.isclose(model.loading(1), loading, 0.001)
+            model = models.get_isotherm_model(name)
+            model.params = ast.literal_eval(f.readline())
 
-    @pytest.mark.parametrize("name, loading",
-                             [(key, MODELS[key][0]) for key in MODELS])
-    def test_models_pressure(self, name, loading, capsys):
-        """Parametrised test for each model."""
+            for line in f:
+                line_comp = list(map(float, line.split(',')))
+                pressure, loading = line_comp[0], line_comp[1]
+                assert numpy.isclose(model.loading(pressure), loading, 0.001)
 
-        model = models.get_isotherm_model(name)
-        model.params = model.default_guess([0, 1], [0, 1])
+    @pytest.mark.parametrize("name", [key for key in MODELS_TESTED])
+    def test_models_pressure(self, name, capsys):
+        """Test each model pressure function."""
 
-        assert numpy.isclose(model.pressure(loading), 1, 0.001)
+        with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
 
-    @pytest.mark.parametrize("name, s_pressure",
-                             [pytest.param(key, MODELS[key][1], marks=MODELS[key][2]) for key in MODELS])
-    def test_models_s_pressure(self, name, s_pressure):
-        """Parametrised test for each model."""
+            model = models.get_isotherm_model(name)
+            model.params = ast.literal_eval(f.readline())
 
-        model = models.get_isotherm_model(name)
-        model.params = model.default_guess([0, 1], [0, 1])
+            for line in f:
+                line_comp = list(map(float, line.split(',')))
+                pressure, loading = line_comp[0], line_comp[1]
+                assert numpy.isclose(model.pressure(loading), pressure, 0.001)
 
-        assert numpy.isclose(model.spreading_pressure(1), s_pressure, 0.001)
+    @pytest.mark.parametrize("name", [pytest.param(key, marks=MODELS_TESTED[key]) for key in MODELS_TESTED])
+    def test_models_s_pressure(self, name):
+        """Test each model spreading pressure function."""
+
+        with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
+
+            model = models.get_isotherm_model(name)
+            model.params = ast.literal_eval(f.readline())
+
+            for line in f:
+                line_comp = list(map(float, line.split(',')))
+                pressure, s_pressure = line_comp[0], line_comp[2]
+                assert numpy.isclose(model.spreading_pressure(pressure), s_pressure, 0.001)

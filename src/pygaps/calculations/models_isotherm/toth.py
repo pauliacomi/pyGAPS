@@ -13,7 +13,7 @@ class Toth(IsothermBaseModel):
 
     .. math::
 
-        n(p) = n_M \frac{K p}{(1 + (K p)^t)^(1/t)}
+        n(p) = n_m \frac{K p}{\sqrt[t]{1 + (K p)^t}}
 
     Notes
     -----
@@ -21,19 +21,18 @@ class Toth(IsothermBaseModel):
     The parameter :math:`t` is a measure of the system heterogeneity.
 
     Thanks to this additional parameter, the Toth equation can accurately describe a
-    large number of adsorbent/adsorbate systems and is recommended as the first
-    choice of isotherm equation for fitting isotherms of many adsorbents such as
-    hydrocarbons, carbon oxides, hydrogen sulphide and alcohols on activated carbons
-    but also zeolites.
+    large number of adsorbent/adsorbate systems and is such as
+    hydrocarbons, carbon oxides, hydrogen sulphide and alcohols on
+    activated carbons and zeolites.
 
     """
 
     # Model parameters
     name = 'Toth'
     calculates = 'loading'
-    param_names = ["n_M", "K", "t"]
+    param_names = ["n_m", "K", "t"]
     param_bounds = {
-        "n_M": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
         "K": [0, numpy.inf],
         "t": [0, numpy.inf],
     }
@@ -52,16 +51,20 @@ class Toth(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_M"] * self.params["K"] * pressure / \
+        return self.params["n_m"] * self.params["K"] * pressure / \
             (1.0 + (self.params["K"] * pressure)**self.params["t"]) \
             ** (1 / self.params["t"])
 
     def pressure(self, loading):
-        """
+        r"""
         Calculate pressure at specified loading.
 
-        For the Toth model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        For the Toth model, a direct relationship can be found
+        analytically:
+
+        .. math::
+
+            p = \frac{n/(n_m K)}{\sqrt[t]{1-(n/n_m)^t)}}
 
         Parameters
         ----------
@@ -73,17 +76,8 @@ class Toth(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
-
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
-
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
-
-        return opt_res.x
+        return (loading / (self.params["n_m"]*self.params["K"])) / \
+            (1 - (loading/self.params["n_m"])**self.params["t"])**(1/self.params["t"])
 
     def spreading_pressure(self, pressure):
         r"""
@@ -117,10 +111,10 @@ class Toth(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
@@ -129,4 +123,4 @@ class Toth(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n_M": saturation_loading, "K": langmuir_k, "t": 1}
+        return {"n_m": saturation_loading, "K": langmuir_k, "t": 1}

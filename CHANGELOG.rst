@@ -21,9 +21,11 @@ Features:
 * Added a ``marker`` option to the ``plot_iso`` function
   which acts similar to the ``color`` parameter and allows
   simple selection of the marker style.
-* Added two new isotherm models: Dubinin-Radushkevich and
+* Added three new isotherm models: Freundlich, Dubinin-Radushkevich and
   Dubinin-Astakov. They can be used for fitting by specifying
-  `DR` and `DA` as the model, respectivelly.
+  `Freundlich`, `DR` or `DA` as the model, respectivelly.
+* Faster performance of some models due to analytical calculations,
+  as well as more thorough testing
 
 Breaking changes:
 

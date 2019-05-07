@@ -23,7 +23,7 @@ class GAB(IsothermBaseModel):
     the bulk phase.
 
     It is often used to fit adsorption and desorption isotherms of
-    water in the food industry.[#]_
+    water in the food industry. [#]_
 
     References
     ----------
@@ -33,11 +33,11 @@ class GAB(IsothermBaseModel):
     # Model parameters
     name = 'GAB'
     calculates = 'loading'
-    param_names = ["n_m", "K", "C"]
+    param_names = ["n_m", "C", "K"]
     param_bounds = {
         "n_m": [0, numpy.inf],
-        "K": [0, numpy.inf],
         "C": [0, numpy.inf],
+        "K": [0, numpy.inf],
     }
 
     def loading(self, pressure):
@@ -63,8 +63,8 @@ class GAB(IsothermBaseModel):
         """
         Calculate pressure at specified loading.
 
-        For the GAB model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        For the BET model, an analytical inversion is possible.
+        See function code for implementation.
 
         Parameters
         ----------
@@ -76,17 +76,20 @@ class GAB(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        a = self.params['n_m']
+        b = self.params['K']
+        c = self.params['C']
 
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+        x = loading * (1-c) * b**2
+        y = (loading * (c-2) - a*c) * b
 
-        return opt_res.x
+        res = (-y - numpy.sqrt(y**2 - 4*x*loading)) / (2*x)
+
+        if numpy.isnan(res).any():
+            res = numpy.nan_to_num(res, copy=False)
+
+        return res
 
     def spreading_pressure(self, pressure):
         r"""
@@ -126,10 +129,10 @@ class GAB(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------

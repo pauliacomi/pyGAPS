@@ -116,10 +116,6 @@ class BET(IsothermBaseModel):
         "N": [0, numpy.inf],
     }
 
-    def __init__(self):
-        """Instantiation function."""
-        self.params = {param: numpy.nan for param in self.param_names}
-
     def loading(self, pressure):
         """
         Calculate loading at specified pressure.
@@ -143,8 +139,8 @@ class BET(IsothermBaseModel):
         """
         Calculate pressure at specified loading.
 
-        For the BET model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        For the BET model, an analytical inversion is possible.
+        See function code for implementation.
 
         Parameters
         ----------
@@ -156,17 +152,19 @@ class BET(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
+        a = self.params['n_m']
+        b = self.params['N']
+        c = self.params['C']
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        x = loading * b * (b-c)
+        y = loading * c - 2 * loading * b - a * c
 
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+        res = (-y - numpy.sqrt(y**2 - 4*x*loading)) / (2*x)
 
-        return opt_res.x
+        if numpy.isnan(res).any():
+            res = numpy.nan_to_num(res, copy=False)
+
+        return res
 
     def spreading_pressure(self, pressure):
         r"""
@@ -196,8 +194,7 @@ class BET(IsothermBaseModel):
             Spreading pressure at specified pressure.
         """
         return self.params["n_m"] * numpy.log(
-            (1.0 - self.params["N"] * pressure +
-             self.params["C"] * pressure) /
+            (1.0 - self.params["N"] * pressure + self.params["C"] * pressure) /
             (1.0 - self.params["N"] * pressure))
 
     def default_guess(self, pressure, loading):
@@ -206,10 +203,10 @@ class BET(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------

@@ -13,7 +13,7 @@ class Quadratic(IsothermBaseModel):
 
     .. math::
 
-        n(p) = n_M \frac{(K_a + 2 K_b p)p}{1 + K_{a p} + K_{b p}^2}
+        n(p) = n_m \frac{p (K_a + 2 K_b p)}{1 + K_a p + K_b p^2}
 
     Notes
     -----
@@ -41,9 +41,9 @@ class Quadratic(IsothermBaseModel):
     # Model parameters
     name = 'Quadratic'
     calculates = 'loading'
-    param_names = ["n_M", "Ka", "Kb"]
+    param_names = ["n_m", "Ka", "Kb"]
     param_bounds = {
-        "n_M": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
         "Ka": [-numpy.inf, numpy.inf],
         "Kb": [-numpy.inf, numpy.inf],
     }
@@ -62,7 +62,7 @@ class Quadratic(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_M"] * (self.params["Ka"] +
+        return self.params["n_m"] * (self.params["Ka"] +
                                      2.0 * self.params["Kb"] * pressure) * pressure / (
             1.0 + self.params["Ka"] * pressure +
             self.params["Kb"] * pressure ** 2)
@@ -71,8 +71,8 @@ class Quadratic(IsothermBaseModel):
         """
         Calculate pressure at specified loading.
 
-        For the Quadratic model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        For the Quadratic model, an analytical inversion is possible.
+        See function code for implementation.
 
         Parameters
         ----------
@@ -84,17 +84,19 @@ class Quadratic(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
+        a = self.params['n_m']
+        b = self.params['Ka']
+        c = self.params['Kb']
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        x = (loading - 2*a) * c
+        y = (loading - a) * b
 
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+        res = (-y - numpy.sqrt(y**2 - 4*x*loading)) / (2*x)
 
-        return opt_res.x
+        if numpy.isnan(res).any():
+            res = numpy.nan_to_num(res, copy=False)
+
+        return res
 
     def spreading_pressure(self, pressure):
         r"""
@@ -111,7 +113,7 @@ class Quadratic(IsothermBaseModel):
 
         .. math::
 
-            \pi = n_M \ln{1+K_a p + K_b p^2}
+            \pi = n_m \ln{1+K_a p + K_b p^2}
 
         Parameters
         ----------
@@ -123,7 +125,7 @@ class Quadratic(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_M"] * numpy.log(1.0 + self.params["Ka"] * pressure +
+        return self.params["n_m"] * numpy.log(1.0 + self.params["Ka"] * pressure +
                                               self.params["Kb"] * pressure ** 2)
 
     def default_guess(self, pressure, loading):
@@ -132,10 +134,10 @@ class Quadratic(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
@@ -144,5 +146,5 @@ class Quadratic(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n_M": saturation_loading / 2.0, "Ka": langmuir_k,
+        return {"n_m": saturation_loading / 2.0, "Ka": langmuir_k,
                 "Kb": langmuir_k ** 2.0}

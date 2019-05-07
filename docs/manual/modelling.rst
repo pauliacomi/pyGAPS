@@ -38,18 +38,27 @@ Currently the models implemented are:
 
     - :mod:`~pygaps.calculations.models_isotherm.henry` - Henry
     - :mod:`~pygaps.calculations.models_isotherm.langmuir` - Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.dslangmuir` - Double Site Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.tslangmuir` - Triple Site Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.bet` - Brunnauer-Emmet-Teller (BET)
-    - :mod:`~pygaps.calculations.models_isotherm.gab` - GAB
-    - :mod:`~pygaps.calculations.models_isotherm.dr` - Dubinin-Radushkevitch (DR)
+    - :mod:`~pygaps.calculations.models_isotherm.dslangmuir` -
+      Double Site Langmuir
+    - :mod:`~pygaps.calculations.models_isotherm.tslangmuir` -
+      Triple Site Langmuir
+    - :mod:`~pygaps.calculations.models_isotherm.bet` -
+      Brunnauer-Emmet-Teller (BET)
+    - :mod:`~pygaps.calculations.models_isotherm.gab` -
+      Guggenheim-Anderson-de Boer (GAB)
+    - :mod:`~pygaps.calculations.models_isotherm.freundlich` - Freundlich
+    - :mod:`~pygaps.calculations.models_isotherm.dr` -
+      Dubinin-Radushkevitch (DR)
     - :mod:`~pygaps.calculations.models_isotherm.da` - Dubinin-Astakov (DA)
     - :mod:`~pygaps.calculations.models_isotherm.quadratic` - Quadratic
-    - :mod:`~pygaps.calculations.models_isotherm.temkinapprox` - Temkin Approximation
+    - :mod:`~pygaps.calculations.models_isotherm.temkinapprox` -
+      Temkin Approximation
     - :mod:`~pygaps.calculations.models_isotherm.toth` - Toth
     - :mod:`~pygaps.calculations.models_isotherm.jensenseaton` - Jensen-Seaton
-    - :mod:`~pygaps.calculations.models_isotherm.wvst` - Wilson VST
-    - :mod:`~pygaps.calculations.models_isotherm.fhvst` - Flory-Huggins VST
+    - :mod:`~pygaps.calculations.models_isotherm.wvst` -
+      Wilson Vacancy Solution Theory (W-VST)
+    - :mod:`~pygaps.calculations.models_isotherm.fhvst` -
+      Flory-Huggins Vacancy Solution Theory (FH-VST)
 
 For an explanation of each model, visit its respective reference page.
 Custom models can also be added to the list if you are willing to write them.

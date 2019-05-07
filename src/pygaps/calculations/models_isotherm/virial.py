@@ -133,16 +133,15 @@ class Virial(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
-        return None
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 

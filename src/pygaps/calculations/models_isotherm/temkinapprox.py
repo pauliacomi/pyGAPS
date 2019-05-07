@@ -13,18 +13,18 @@ class TemkinApprox(IsothermBaseModel):
 
     .. math::
 
-        n(p) = n_M \frac{K p}{1 + K p} + n_M \theta (\frac{K p}{1 + K p})^2 (\frac{K p}{1 + K p} -1)
+        n(p) = n_m \frac{K p}{1 + K p} + n_m \theta (\frac{K p}{1 + K p})^2 (\frac{K p}{1 + K p} -1)
 
     Notes
     -----
     The Temkin adsorption isotherm [#]_, like the Langmuir model, considers
-    a surface with n_M identical adsorption sites, but takes into account adsorbate-
+    a surface with n_m identical adsorption sites, but takes into account adsorbate-
     adsorbate interactions by assuming that the enthalpy of adsorption is a linear
     function of the coverage. The Temkin isotherm is derived [#]_ using a
     mean-field argument and used an asymptotic approximation
     to obtain an explicit equation for the loading.
 
-    Here, :math:`n_M` and K have the same physical meaning as in the Langmuir model.
+    Here, :math:`n_m` and K have the same physical meaning as in the Langmuir model.
     The additional parameter :math:`\theta` describes the strength of the adsorbate-adsorbate
     interactions (:math:`\theta < 0` for attractions).
 
@@ -39,9 +39,9 @@ class TemkinApprox(IsothermBaseModel):
     # Model parameters
     name = 'TemkinApprox'
     calculates = 'loading'
-    param_names = ["n_M", "K", "tht"]
+    param_names = ["n_m", "K", "tht"]
     param_bounds = {
-        "n_M": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
         "K": [0, numpy.inf],
         "tht": [0, numpy.inf],
     }
@@ -49,7 +49,7 @@ class TemkinApprox(IsothermBaseModel):
     def __init__(self):
         """Instantiation function."""
 
-        self.params = {"n_M": numpy.nan, "K": numpy.nan, "tht": numpy.nan}
+        self.params = {"n_m": numpy.nan, "K": numpy.nan, "tht": numpy.nan}
 
     def loading(self, pressure):
         """
@@ -65,11 +65,9 @@ class TemkinApprox(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        langmuir_fractional_loading = self.params["K"] * pressure / \
-            (1.0 + self.params["K"] * pressure)
-        return self.params["n_M"] * (langmuir_fractional_loading +
-                                     self.params["tht"] * langmuir_fractional_loading ** 2 *
-                                     (langmuir_fractional_loading - 1))
+        lang_load = self.params["K"] * pressure / (1.0 + self.params["K"] * pressure)
+        return self.params["n_m"] * (lang_load + self.params["tht"] * lang_load ** 2 *
+                                     (lang_load - 1))
 
     def pressure(self, loading):
         """
@@ -115,7 +113,7 @@ class TemkinApprox(IsothermBaseModel):
 
         .. math::
 
-            \pi = n_M (\ln{1+ K p} \frac{\theta (2 K p +1)}{2(1 + K p)^2})
+            \pi = n_m \Big( \ln{(1 + K p)} + \frac{\theta (2 K p + 1)}{2(1 + K p)^2}\Big)
 
         Parameters
         ----------
@@ -128,7 +126,7 @@ class TemkinApprox(IsothermBaseModel):
             Spreading pressure at specified pressure.
         """
         one_plus_kp = 1.0 + self.params["K"] * pressure
-        return self.params["n_M"] * (numpy.log(one_plus_kp) +
+        return self.params["n_m"] * (numpy.log(one_plus_kp) +
                                      self.params["tht"] * (2.0 * self.params["K"] * pressure + 1.0) /
                                      (2.0 * one_plus_kp ** 2))
 
@@ -138,10 +136,10 @@ class TemkinApprox(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
@@ -150,4 +148,4 @@ class TemkinApprox(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n_M": saturation_loading, "K": langmuir_k, "tht": 0.0}
+        return {"n_m": saturation_loading, "K": langmuir_k, "tht": 0.0}

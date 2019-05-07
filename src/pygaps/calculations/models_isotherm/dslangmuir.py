@@ -65,7 +65,6 @@ class DSLangmuir(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        # K_i p
         k1p = self.params["K1"] * pressure
         k2p = self.params["K2"] * pressure
         return self.params["n_m1"] * k1p / (1.0 + k1p) + \
@@ -75,8 +74,8 @@ class DSLangmuir(IsothermBaseModel):
         """
         Calculate pressure at specified loading.
 
-        For the Double Site Langmuir model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        For the Double Site Langmuir model, an analytical inversion is possible.
+        See function code for implementation.
 
         Parameters
         ----------
@@ -88,17 +87,20 @@ class DSLangmuir(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
+        a = self.params['n_m1']
+        b = self.params['K1']
+        c = self.params['n_m2']
+        d = self.params['K2']
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        x = (a + c - loading) * b * d
+        y = (a*b + c*d - loading*(b+d))
 
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+        res = (-y + numpy.sqrt(y**2 - 4*x*(-loading))) / (2*x)
 
-        return opt_res.x
+        if numpy.isnan(res).any():
+            res = numpy.nan_to_num(res, copy=False)
+
+        return res
 
     def spreading_pressure(self, pressure):
         r"""
@@ -138,10 +140,10 @@ class DSLangmuir(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------

@@ -18,7 +18,7 @@ class DA(IsothermBaseModel):
 
     Notes
     -----
-    The Dubinin-Astakov isotherm model extends the
+    The Dubinin-Astakov isotherm model [#]_ extends the
     Dubinin-Radushkevich model, itself based on the potential theory
     of Polanyi, which asserts that molecules
     near a surface are subjected to a potential field.
@@ -103,7 +103,7 @@ class DA(IsothermBaseModel):
         """
         return numpy.exp(
             self.params['e']/self.minus_rt *
-            (-numpy.log(loading/self.params['n_m'])**(1/self.params['e'])))
+            numpy.power(-numpy.log(loading/self.params['n_m']), 1/self.params['m']))
 
     def spreading_pressure(self, pressure):
         r"""
@@ -129,7 +129,7 @@ class DA(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return NotImplementedError
+        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def default_guess(self, pressure, loading):
         """
@@ -137,12 +137,10 @@ class DA(IsothermBaseModel):
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------

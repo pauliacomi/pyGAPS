@@ -64,16 +64,15 @@ class WVST(IsothermBaseModel):
     .. [#] Suwanayuen, S.; Danner, R. P., Gas-Adsorption Isotherm Equation Based On
        Vacancy Solution Theory. AIChE Journal 1980, 26, (1), 68-76.
 
-
     """
 
     # Model parameters
     name = 'W-VST'
     calculates = 'pressure'
-    param_names = ["n", "K", "L1v", "Lv1"]
+    param_names = ["n_m", "K", "L1v", "Lv1"]
     param_bounds = {
-        "n": [0, numpy.inf],
-        "A": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
+        "K": [0, numpy.inf],
         "L1v": [-numpy.inf, numpy.inf],
         "Lv1": [-numpy.inf, numpy.inf],
     }
@@ -95,8 +94,8 @@ class WVST(IsothermBaseModel):
         -------
         float
             Loading at specified pressure.
-        """
 
+        """
         def fun(x):
             return self.pressure(x) - pressure
 
@@ -124,18 +123,19 @@ class WVST(IsothermBaseModel):
         -------
         float
             Pressure at specified loading.
+
         """
-        cov = loading / self.params["n"]
+        cov = loading / self.params["n_m"]
 
         coef = self.params["L1v"] * (1 - (1 - self.params["Lv1"]) * cov) / \
             (self.params["L1v"] + (1 - self.params["L1v"]) * cov)
 
         expcoef = -((self.params["Lv1"] * (1 - self.params["Lv1"]) * cov) /
                     (1 - (1 - self.params["Lv1"]) * cov)) \
-                  - (((1 - self.params["L1v"]) * cov) /
+                  - ((1 - self.params["L1v"]) * cov /
                      (self.params["L1v"] + (1 - self.params["L1v"]) * cov))
 
-        res = (self.params["n"] / self.params["K"] * cov / (1 - cov)) * \
+        res = (self.params["n_m"] / self.params["K"] * cov / (1 - cov)) * \
             coef * numpy.exp(expcoef)
 
         return res
@@ -172,10 +172,10 @@ class WVST(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
@@ -184,5 +184,5 @@ class WVST(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n": saturation_loading, "K": langmuir_k,
+        return {"n_m": saturation_loading, "K": langmuir_k,
                 "L1v": 1, "Lv1": 1}

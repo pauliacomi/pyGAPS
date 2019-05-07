@@ -13,29 +13,31 @@ class JensenSeaton(IsothermBaseModel):
 
     .. math::
 
-        n(p) = K_H p (1 + \frac{K_H p}{(a (1+(b p)))^c})^{(-1/c)}
+        n(p) = K p \Big(1 + \frac{K p}{(a (1 + b p))^c}\Big)^{(-1/c)}
 
     Notes
     -----
     When modelling adsorption in micropores, a requirement was highlighted by
-    Jensen and Seaton in 1996 [#]_, that at sufficiently high pressures the adsorption
-    isotherm should not reach a horizontal plateau corresponding to saturation but
-    that this asymptote should continue to rise due to the compression of the adsorbate
-    in the pores. They came up with a semi-empirical equation to describe this phenomenon
-    based on a function that interpolates between two asymptotes: the Henry’s law asymptote
-    at low pressure and an asymptote reflecting the compressibility of the adsorbate at
-    high pressure.
+    Jensen and Seaton in 1996 [#]_, that at sufficiently high pressures the
+    adsorption isotherm should not reach a horizontal plateau corresponding
+    to saturation but that this asymptote should continue to rise due to
+    the compression of the adsorbate in the pores. They came up with a
+    semi-empirical equation to describe this phenomenon based on a function
+    that interpolates between two asymptotes: the Henry’s law asymptote
+    at low pressure and an asymptote reflecting the compressibility of the
+    adsorbate at high pressure.
 
-    Here :math:`K_H` is the Henry constant, :math:`b` is the compressibility of the
+    Here :math:`K` is the Henry constant, :math:`b` is the compressibility of the
     adsorbed phase and :math:`c` an empirical constant.
 
-    The equation can be used to model both absolute and excess adsorption as the pore
-    volume can be incorporated into the definition of :math:`b`, although this can lead
-    to negative adsorption slopes for the compressibility asymptote.
-    This equation has been found to provide a better fit for experimental data
-    from microporous solids than the Langmuir or Toth equation, in particular for
-    adsorbent/adsorbate systems with high Henry’s constants where the amount adsorbed
-    increases rapidly at relatively low pressures and then slows down dramatically.
+    The equation can be used to model both absolute and excess adsorption as
+    the pore volume can be incorporated into the definition of :math:`b`,
+    although this can lead to negative adsorption slopes for the
+    compressibility asymptote. This equation has been found to provide a
+    better fit for experimental data from microporous solids than the Langmuir
+    or Toth equation, in particular for adsorbent/adsorbate systems with
+    high Henry’s constants where the amount adsorbed increases rapidly at
+    relatively low pressures and then slows down dramatically.
 
     References
     ----------
@@ -136,10 +138,10 @@ class JensenSeaton(IsothermBaseModel):
 
         Parameters
         ----------
-        loading_key : str
-            Loading data.
-        pressure_key : str
+        pressure : ndarray
             Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
