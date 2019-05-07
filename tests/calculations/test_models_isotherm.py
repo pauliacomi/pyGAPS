@@ -1,7 +1,7 @@
 """Test all the isotherm model functions."""
 
-import os
 import ast
+import os
 
 import numpy
 import pytest
