@@ -1,9 +1,7 @@
 """BET isotherm model."""
 
 import numpy
-import scipy
 
-from ...utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
 
