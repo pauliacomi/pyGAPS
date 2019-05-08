@@ -26,6 +26,9 @@ New features:
   `Freundlich`, `DR` or `DA` as the model, respectivelly.
 * Faster performance of some models due to analytical calculations,
   as well as more thorough testing
+* Added an isotherm ``plot`` function to plot an individual isotherm.
+* Added functions to import and export JSON files directly from a
+  file: ``isotherm_from_jsonf`` and ``isotherm_to_jsonf``.
 
 Breaking changes:
 

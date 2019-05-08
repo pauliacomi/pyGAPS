@@ -5,16 +5,24 @@ Installation
 Command line
 ============
 
-The installation process should take care of the dependencies for you. If using pip all
-you need to do is at the command line::
+The installation process should take care of the dependencies for you.
+If using pip all you need to do is::
 
     pip install pygaps
 
-If on windows, we recommend using the `Anaconda/Conda <https://www.anaconda.com/>`__ environment,
-as it preinstalls most required dependencies as well as making managing environments a breeze.
+We recommend using the `Anaconda/Conda <https://www.anaconda.com/>`__ environment,
+as it preinstalls most required dependencies as well as making
+managing environments a breeze.
 
-Alternatively, to install the development branch, clone the repository from Github.
-Then install the package, either in regular or developer mode
+.. code-block:: bat
+
+    conda create -n py3 python=3 numpy scipy pandas matplotlib CoolProp
+    conda activate py3
+    pip install pygaps
+
+Alternatively, to install the development branch,
+clone the repository from Github. Then install the package,
+either in regular or developer mode
 
 ::
 

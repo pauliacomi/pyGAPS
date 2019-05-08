@@ -123,21 +123,21 @@ Installation
 
 The easiest way to install pyGAPS is from the command line.
 Make sure that you have `numpy`, `scipy`, `pandas` and `matplotlib`, as well as
-CoolProp already installed.
+`CoolProp` already installed.
 
 .. code-block:: bash
 
     pip install pygaps
 
-On Windows, `Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
-environments for you.
-First create a new environment and use conda to install the dependencies (or start with one
-that already has a full instalation). Then use pip inside your environment.
+`Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
+environments for you. First create a new environment and use conda to
+install the dependencies (or start with one that already has a full instalation).
+Then use pip inside your environment.
 
 .. code-block:: bat
 
     conda create -n py3 python=3 numpy scipy pandas matplotlib CoolProp
-    activate py3
+    conda activate py3
     pip install pygaps
 
 Alternatively, to install the development branch, clone the repository from Github.
@@ -192,17 +192,18 @@ For testing only with the environment you are currently on, run instead
 
     pytest
 
-Alternatively, you can depend on travisCI for the testing, which will be slower overall
-but should have all the environments required.
+Alternatively, you can depend on
+`TravisCI <https://travis-ci.org/pauliacomi/pyGAPS>`__ for testing,
+which will be slower overall but should have all the environments required.
 
 Questions?
 ==========
 
-I'm more than happy to answer any questions. Shoot me an email at paul.iacomi@univ-amu or find
-me on some social media.
+I'm more than happy to answer any questions. Shoot an email to
+mail( at )pauliacomi.com or find me on some social media.
 
-For any bugs found, please open an `issue <https://github.com/pauliacomi/pyGAPS/issues/>`__ or, If
-you feel like you can do the fix yourself, submit a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__.
-It'll make my life easier
-
+For any bugs found, please open an
+`issue <https://github.com/pauliacomi/pyGAPS/issues/>`__ or, even better,
+submit a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__.
+It'll make my life easier.
 This also applies to any features which you think might benefit the project.

@@ -71,11 +71,9 @@ The code does its best to attempt to guess whether the data passed is part of
 an adsorption branch, desorption branch or has both. It does this by looking
 at whether pressure is increasing or decreasing between two consecutive points.
 It then marks the particular branch internally.
-
 If the data isn't well conditioned, this functionality will likely not produce
 good results. In this case, the user can specify whether the data passed in is
 an adsorption or desorption branch by using the ``branch`` argument.
-
 What's more, the user can specify where the branches are located by passing
 an iterable as the ``branch`` parameter. See more in the reference.
 
@@ -274,16 +272,21 @@ the manual.
 Accessing isotherm data
 -----------------------
 
-Once an isotherm is created, it is useful to see is a visual representation of the isotherm.
-The isotherm classes contain a ``print_info`` function which will display the isotherm parameters,
-as well as a graph of the data.
+Once an isotherm is created, it is useful to check if it contains the
+correct parameters or have a plot of the isotherm.
+The isotherm classes can be inspected using the following functions:
 
-    - PointIsotherm :meth:`~pygaps.classes.pointisotherm.PointIsotherm.print_info`
-    - ModelIsotherm :meth:`~pygaps.classes.modelisotherm.ModelIsotherm.print_info`
+    - The Python ``print(iso)`` will display all isotherm properties.
+    - The ``iso.plot()`` function will display an isotherm plot.
+      (:meth:`~pygaps.classes.pointisotherm.PointIsotherm.plot`)
+    - The ``iso.print_info()`` function combines the two above
+      (:meth:`~pygaps.classes.pointisotherm.PointIsotherm.print_info`)
 
-To access the isotherm data, one of several functions can be used. There are individual methods for each data type:
-``pressure``, ``loading`` and ``other_data``. The first two are applicable to both PointIsotherms and ModelIsotherms.
-While PointIsotherm methods return the actual discrete data, ModelIsotherms use their internal model to generate
+To access the isotherm data, one of several functions can be used. There
+are individual methods for each data type: ``pressure``, ``loading`` and
+``other_data``. The first two are applicable to both PointIsotherms and
+ModelIsotherms. While PointIsotherm methods return the actual discrete data,
+ModelIsotherms use their internal model to generate
 data with the characteristics required.
 
     - For loading: PointIsotherm :meth:`~pygaps.classes.pointisotherm.PointIsotherm.loading`
