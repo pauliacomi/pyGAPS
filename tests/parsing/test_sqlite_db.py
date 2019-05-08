@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to sqlite database utilities
-"""
+"""Tests sqlite database utilities."""
 
 import pytest
 

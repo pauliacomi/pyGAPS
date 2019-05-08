@@ -27,17 +27,34 @@ Triple Site Langmuir
 .. automodule:: pygaps.calculations.models_isotherm.tslangmuir
     :members:
 
-BET
----
+Brunnauer-Emmet-Teller (BET)
+----------------------------
 
 .. automodule:: pygaps.calculations.models_isotherm.bet
     :members:
 
-
-GAB
----
+Guggenheim-Anderson-de Boer (GAB)
+---------------------------------
 
 .. automodule:: pygaps.calculations.models_isotherm.gab
+    :members:
+
+Freundlich
+----------
+
+.. automodule:: pygaps.calculations.models_isotherm.freundlich
+    :members:
+
+Dubinin-Radushkevitch (DR)
+--------------------------
+
+.. automodule:: pygaps.calculations.models_isotherm.dr
+    :members:
+
+Dubinin-Astakov (DA)
+--------------------
+
+.. automodule:: pygaps.calculations.models_isotherm.da
     :members:
 
 Quadratic
@@ -64,21 +81,20 @@ Jensen-Seaton
 .. automodule:: pygaps.calculations.models_isotherm.jensenseaton
     :members:
 
-
 Virial
 ------
 
 .. automodule:: pygaps.calculations.models_isotherm.virial
     :members:
 
-Wilson VST
-----------
+Wilson Vacancy Solution Theory (W-VST)
+--------------------------------------
 
 .. automodule:: pygaps.calculations.models_isotherm.wvst
     :members:
 
-Flory-Huggins VST
------------------
+Flory-Huggins Vacancy Solution Theory (FH-VST)
+----------------------------------------------
 
 .. automodule:: pygaps.calculations.models_isotherm.fhvst
     :members:

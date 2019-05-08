@@ -1,23 +1,20 @@
-"""
-Langmuir isotherm model
-"""
+"""Langmuir isotherm model."""
 
 import numpy
 
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Langmuir(IsothermModel):
-    """
-    Langmuir isotherm model
+class Langmuir(IsothermBaseModel):
+    r"""
+    Langmuir isotherm model.
 
     .. math::
 
-        n(p) = n_m\\frac{K p}{1 + K p}
+        n(p) = n_m\frac{K p}{1 + K p}
 
     Notes
     -----
-
     The Langmuir theory [#]_, proposed at the start of the 20th century, states that
     adsorption takes place on specific sites on a surface, until
     all sites are occupied.
@@ -31,7 +28,6 @@ class Langmuir(IsothermModel):
           of sites currently free and currently occupied, respectively
         * Adsorption is complete when all sites are filled.
 
-
     Using these assumptions we can define rates for both adsorption and
     desorption. The adsorption rate :math:`r_a`
     will be proportional to the number of sites available on
@@ -40,7 +36,7 @@ class Langmuir(IsothermModel):
     The desorption rate :math:`r_d`, on the other hand, will
     be proportional to the number of occupied sites and the energy
     of adsorption. It is also useful to define
-    :math:`\\theta = n_{ads}/n_{ads}^m` as the fractional
+    :math:`\theta = n_{ads}/n_{ads}^m` as the fractional
     surface coverage, the number of sites occupied divided by the total
     sites. At equilibrium, the rate of adsorption and the rate of
     desorption are equal, therefore the two equations can be combined.
@@ -49,28 +45,29 @@ class Langmuir(IsothermModel):
 
     .. math::
 
-        r_a = k_a p (1 - \\theta)
+        r_a = k_a p (1 - \theta)
 
-        r_d = k_d \\theta \\exp{\\Big(-\\frac{E_{ads}}{R_g T}\\Big)}
+        r_d = k_d \theta \exp{\Big(-\frac{E_{ads}}{R_g T}\Big)}
 
     At equilibrium, the rate of adsorption and the rate of
     desorption are equal, therefore the two equations can be combined.
 
     .. math::
 
-        k_a p (1 - \\theta) = k_d \\theta \\exp{\\Big(-\\frac{E_{ads}}{R_gT}\\Big)}
+        k_a p (1 - \theta) = k_d \theta \exp{\Big(-\frac{E_{ads}}{R_gT}\Big)}
 
     Rearranging to get an expression for the loading, the Langmuir equation becomes:
 
     .. math::
 
-        n(p) = n_m \\frac{K p}{1 + K p}
+        n(p) = n_m \frac{K p}{1 + K p}
 
     Here, :math:`n_m` is the moles adsorbed at the completion of the
     monolayer, and therefore the maximum possible loading.
-    The Langmuir constant is the product of the individual desorption and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
+    The Langmuir constant is the product of the individual desorption
+    and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
     related to the energy of adsorption
-    :math:`\\exp{(-\\frac{E}{RT})}`.
+    :math:`\exp{(-\frac{E}{RT})}`.
 
     References
     ----------
@@ -78,20 +75,18 @@ class Langmuir(IsothermModel):
 
     """
 
-    #: Name of the model
+    # Model parameters
     name = 'Langmuir'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_m": numpy.nan, "K": numpy.nan}
+    param_names = ["K", "n_m"]
+    param_bounds = {
+        "K": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -107,15 +102,15 @@ class Langmuir(IsothermModel):
             (1.0 + self.params["K"] * pressure)
 
     def pressure(self, loading):
-        """
-        Function that calculates pressure as a function
-        of loading.
+        r"""
+        Calculate pressure at specified loading.
+
         For the Langmuir model, a direct relationship can be found
         by rearranging the function.
 
         .. math::
 
-            p = \\frac{n}{K (n_m - n)}
+            p = \frac{n}{K (n_m - n)}
 
         Parameters
         ----------
@@ -131,19 +126,21 @@ class Langmuir(IsothermModel):
             (self.params["K"] * (self.params["n_m"] - loading))
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Langmuir model is solved analytically.
 
         .. math::
 
-            \\pi = n_m \\log{1 + K p}
+            \pi = n_m \log{1 + K p}
 
         Parameters
         ----------
@@ -158,25 +155,22 @@ class Langmuir(IsothermModel):
         return self.params["n_m"] * \
             numpy.log(1.0 + self.params["K"] * pressure)
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(Langmuir, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         return {"n_m": saturation_loading, "K": langmuir_k}

@@ -47,11 +47,9 @@ OTHER_KEY = "enthalpy"
 
 @pytest.fixture(scope='function')
 def isotherm_parameters():
-    """
-    Creates a dictionary with all parameters for an model isotherm
-    """
+    """Create a dictionary with all parameters for an isotherm."""
 
-    parameters = {
+    return {
 
         'material_name': 'TEST',
         'material_batch': 'TB',
@@ -87,8 +85,6 @@ def isotherm_parameters():
         'warn_off': True
     }
 
-    return parameters
-
 
 @pytest.fixture(scope='function')
 def isotherm_data():
@@ -106,19 +102,13 @@ def isotherm_data():
 
 @pytest.fixture(scope='function')
 def basic_isotherm(isotherm_parameters):
-    """
-    Creates an basic isotherm from model data
-    """
-    isotherm = pygaps.classes.isotherm.Isotherm(no_warn=True, **isotherm_parameters)
-
-    return isotherm
+    """Create a basic isotherm from basic data."""
+    return pygaps.classes.isotherm.Isotherm(no_warn=True, **isotherm_parameters)
 
 
 @pytest.fixture(scope='function')
 def basic_pointisotherm(isotherm_data, isotherm_parameters):
-    """
-    Creates an isotherm from model data
-    """
+    """Create a point isotherm from basic data."""
     other_keys = [OTHER_KEY]
 
     isotherm = pygaps.PointIsotherm(
@@ -135,9 +125,7 @@ def basic_pointisotherm(isotherm_data, isotherm_parameters):
 
 @pytest.fixture()
 def basic_modelisotherm(isotherm_data, isotherm_parameters):
-    """
-    Creates an isotherm from model data
-    """
+    """Creates a model isotherm from basic data."""
     model = "Henry"
 
     isotherm = pygaps.ModelIsotherm(

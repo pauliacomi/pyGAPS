@@ -1,6 +1,4 @@
-"""
-This module contains the functions that generate the sqlite database.
-"""
+"""Generate the default sqlite database."""
 
 
 import sqlite3
@@ -13,7 +11,7 @@ from .sqlite_db_pragmas import PRAGMAS
 
 def db_create(pth):
     """
-    Creates the entire database.
+    Create the entire database.
 
     Parameters
     ----------
@@ -36,7 +34,7 @@ def db_create(pth):
 
 def db_execute_general(pth, statement):
     """
-    A general function that executes SQL statements.
+    Execute general SQL statements.
 
     Parameters
     ----------
@@ -46,7 +44,6 @@ def db_execute_general(pth, statement):
         SQL statement to execute.
 
     """
-
     # Attempt to connect
     try:
         with sqlite3.connect(pth) as db:

@@ -16,15 +16,13 @@ from .conftest import DATA_CALO_PATH
 
 @pytest.mark.characterisation
 class TestInitialEnthalpy():
-    """
-    Tests all initial enthalpy methods
-    """
+    """Test all initial enthalpy methods."""
 
     @cleanup
     @pytest.mark.parametrize('file, expected',
                              [(data['file'], data['ienth']) for data in list(DATA_CALO.values())])
     def test_ienthalpy_comb(self, file, expected):
-        "The combined polynomial method"
+        """The combined polynomial method"""
 
         filepath = os.path.join(DATA_CALO_PATH, file)
 
@@ -42,7 +40,7 @@ class TestInitialEnthalpy():
     @pytest.mark.parametrize('file, expected',
                              [(data['file'], data['ienth']) for data in list(DATA_CALO.values())])
     def test_ienthalpy_point(self, file, expected):
-        "The point method"
+        """The point method."""
 
         filepath = os.path.join(DATA_CALO_PATH, file)
 

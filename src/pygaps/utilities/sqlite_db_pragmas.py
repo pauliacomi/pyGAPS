@@ -1,6 +1,4 @@
-"""
-This module contains the sql pragmas to generate the sqlite database.
-"""
+"""All sql pragmas to generate the sqlite database."""
 
 
 # Pragmas relating to materials

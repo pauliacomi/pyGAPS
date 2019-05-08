@@ -11,8 +11,8 @@ from .models_isotherm import is_iast_model
 
 
 def iast_binary_vle(isotherms, pressure,
-                    verbose=False, warningoff=False,
-                    adsorbed_mole_fraction_guess=None):
+                    warningoff=False, adsorbed_mole_fraction_guess=None,
+                    verbose=False, ax=None):
     """
     Perform IAST calculations to predict the vapour-liquid equilibrium curve
     at a fixed pressure, over the entire range of partial pressures.
@@ -28,8 +28,6 @@ def iast_binary_vle(isotherms, pressure,
     pressure : float
         Pressure at which the vapour-liquid equilibrium is to be
         calculated.
-    verbose : bool, optional
-        Print off a extra information, as well as a graph.
     warningoff: bool, optional
         When False, warnings will print when the IAST
         calculation result required extrapolation of the pure-component
@@ -37,6 +35,11 @@ def iast_binary_vle(isotherms, pressure,
     adsorbed_mole_fraction_guess : array or list, optional
         Starting guesses for adsorbed phase mole fractions that
         `iast` solves for.
+    verbose : bool, optional
+        Print off a extra information, as well as a graph.
+    ax : matplotlib axes object, optional
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -78,14 +81,15 @@ def iast_binary_vle(isotherms, pressure,
     if verbose:
         plot_iast_vle(x_data, y_data,
                       isotherms[0], isotherms[1],
-                      pressure, isotherms[0].pressure_unit)
+                      pressure, isotherms[0].pressure_unit,
+                      ax=ax)
 
     return dict(x=x_data, y=y_data)
 
 
 def iast_binary_svp(isotherms, mole_fractions, pressures,
-                    verbose=False, warningoff=False,
-                    adsorbed_mole_fraction_guess=None):
+                    warningoff=False, adsorbed_mole_fraction_guess=None,
+                    verbose=False, ax=None):
     """
     Perform IAST calculations to predict the selectivity of one of the components
     as a function of pressure.
@@ -103,8 +107,6 @@ def iast_binary_svp(isotherms, mole_fractions, pressures,
         e.g. [0.1, 0.9]
     pressures : list
         Pressure values at which the selectivity should be calculated.
-    verbose : bool, optional
-        Print off a extra information, as well as a graph.
     warningoff: bool, optional
         When False, warnings will print when the IAST
         calculation result required extrapolation of the pure-component
@@ -112,6 +114,11 @@ def iast_binary_svp(isotherms, mole_fractions, pressures,
     adsorbed_mole_fraction_guess : array or list, optional
         Starting guesses for adsorbed phase mole fractions that
         `iast` solves for.
+    verbose : bool, optional
+        Print off a extra information, as well as a graph.
+    ax : matplotlib axes object, optional
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -151,7 +158,8 @@ def iast_binary_svp(isotherms, mole_fractions, pressures,
     if verbose:
         plot_iast_svp(pressures, selectivities,
                       isotherms[0], isotherms[1],
-                      mole_fractions[0], isotherms[0].pressure_unit)
+                      mole_fractions[0], isotherms[0].pressure_unit,
+                      ax=ax)
 
     return dict(pressure=pressures, selectivity=selectivities)
 

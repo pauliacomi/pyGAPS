@@ -1,6 +1,4 @@
-"""
-This module contains the main class that describes an isotherm.
-"""
+"""Contains the Isotherm base class."""
 
 import warnings
 
@@ -28,7 +26,6 @@ class Isotherm():
 
     Parameters
     ----------
-
     material_name : str
         Name of the material on which the isotherm is measured.
     material_batch : str
@@ -59,7 +56,6 @@ class Isotherm():
 
     Notes
     -----
-
     The class is also used to prevent duplication of code within the child
     classes, by calling the common inherited function before any other specific
     implementation additions.
@@ -105,16 +101,15 @@ class Isotherm():
 
                  **properties):
         """
-        Instantiation is done by passing a dictionary with the parameters,
+        Instantiate is done by passing a dictionary with the parameters,
         as well as the info about units, modes and data columns.
-        """
 
+        """
         # Checks
         if any(k not in properties
                for k in self._required_params):
             raise ParameterError(
-                "Isotherm MUST have the following properties:"
-                "{}".format(self._required_params))
+                "Isotherm MUST have the following properties:{0}".format(self._required_params))
 
         # Basis and mode
         if adsorbent_basis is None or pressure_mode is None or loading_basis is None:
@@ -123,8 +118,8 @@ class Isotherm():
 
         if adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for adsorbent ({}) is not an option. See viable "
-                "values: {}".format(adsorbent_basis, list(_MATERIAL_MODE.keys())))
+                "Basis selected for adsorbent ({0}) is not an option."
+                "See viable values: {1}".format(adsorbent_basis, list(_MATERIAL_MODE.keys())))
 
         if loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
@@ -193,7 +188,7 @@ class Isotherm():
                      "CoolProp backend disabled for this adsorbent.")
                 )
         else:
-            self.adsorbate = pygaps.Adsorbate.find(self.adsorbate).name
+            self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
 
         # Named properties of the isotherm
         for named_prop in self._named_params:
@@ -218,21 +213,21 @@ class Isotherm():
 
     def __eq__(self, other_isotherm):
         """
-        We overload the equality operator of the isotherm. Since id's should be unique and
-        representative of the data inside the isotherm, all we need to ensure equality
+        Overload the equality operator of the isotherm.
+
+        Since id's should be unique and representative of the
+        data inside the isotherm, all we need to ensure equality
         is to compare the two hashes of the isotherms.
         """
-
         return self.iso_id == other_isotherm.iso_id
 
     def __repr__(self):
-        return ', '.join([self.iso_id, self.adsorbate, str(self.t_iso),
-                          self.material_name, self.material_batch])
+        """Print key isotherm parameters."""
+        return "{0}: '{1} - {2}' with '{3}' at {4} K".format(
+            self.iso_id, self.material_name, self.material_batch, self.adsorbate, self.t_iso)
 
     def __str__(self):
-        """
-        Prints a short summary of all the isotherm parameters.
-        """
+        """Print a short summary of all the isotherm parameters."""
         string = ""
 
         # Required
@@ -274,6 +269,9 @@ class Isotherm():
             Dictionary of all parameters.
         """
         parameter_dict = vars(self).copy()
+
+        # This line is here to ensure that adsorbate is copied as a string
+        parameter_dict['adsorbate'] = str(parameter_dict['adsorbate'])
 
         # Remove reserved parameters
         for param in self._reserved_params:

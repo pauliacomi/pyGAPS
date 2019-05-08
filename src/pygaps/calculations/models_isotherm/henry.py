@@ -1,16 +1,13 @@
-"""
-Henry isotherm model
-"""
+"""Henry isotherm model."""
 
 import numpy
 
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Henry(IsothermModel):
-    """
-    Henry's law.
-    Assumes a linear dependence of adsorbed amount with pressure.
+class Henry(IsothermBaseModel):
+    r"""
+    Henry's law. Assumes a linear dependence of adsorbed amount with pressure.
 
     .. math::
 
@@ -18,7 +15,6 @@ class Henry(IsothermModel):
 
     Notes
     -----
-
     The simplest method of describing adsorption on a
     surface is Henry’s law. It assumes only interactions
     with the adsorbate surface and is described by a
@@ -35,27 +31,25 @@ class Henry(IsothermModel):
     low concentrations of gas there is a
     thermodynamic requirement for the applicability of Henry's law.
     Therefore, most models reduce to the Henry equation
-    as :math:`\\lim_{p \\to 0} n(p)`.
+    as :math:`\lim_{p \to 0} n(p)`.
 
     Usually, Henry's law is unrealistic because the adsorption sites
     will saturate at higher pressures.
     Only use if your data is linear.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'Henry'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"K": numpy.nan}
+    param_names = ["K"]
+    param_bounds = {
+        "K": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -71,8 +65,8 @@ class Henry(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Henry model, a direct relationship can be found
         by rearranging the function.
 
@@ -93,19 +87,21 @@ class Henry(IsothermModel):
         return loading / self.params["K"]
 
     def spreading_pressure(self, pressure):
-        """
+        r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
         .. math::
 
-            \\pi = \\int_{0}^{p_i} \\frac{n_i(p_i)}{p_i} dp_i
+            \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the Henry model is solved analytically.
 
         .. math::
 
-            \\pi = K_H p
+            \pi = K_H p
 
         Parameters
         ----------
@@ -119,26 +115,22 @@ class Henry(IsothermModel):
         """
         return self.params["K"] * pressure
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
-
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(Henry, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
         return {"K": saturation_loading * langmuir_k}

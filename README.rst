@@ -25,13 +25,13 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
       - | |version| |wheel|
         | |supported-versions| |supported-implementations|
 
-.. |status| image:: https://www.repostatus.org/badges/latest/wip.svg
-    :target: https://www.repostatus.org/#wip
-    :alt: Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.
+.. |status| image:: https://www.repostatus.org/badges/latest/active.svg
+    :target: https://www.repostatus.org/#active
+    :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.5.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.6.0.svg
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v1.5.0...master
+    :target: https://github.com/pauliacomi/pygaps/compare/v1.6.0...master
 
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
@@ -53,7 +53,7 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :alt: Requirements Status
     :target: https://requires.io/github/pauliacomi/pyGAPS/requirements/?branch=master
 
-.. |codecov| image:: https://codecov.io/github/pauliacomi/pygaps/coverage.svg?branch=master
+.. |codecov| image:: https://img.shields.io/codecov/c/github/pauliacomi/pygaps.svg
     :alt: Coverage Status
     :target: https://codecov.io/github/pauliacomi/pygaps
 
@@ -87,10 +87,23 @@ Features
     - Pore size distribution calculations using DFT kernels
     - Isotherm model fitting (Henry, Langmuir, DS/TS Langmuir, etc..)
     - IAST calculations for binary and multicomponent adsorption
-    - Isosteric heat of adsorption calculations
+    - Isosteric enthalpy of adsorption calculations
     - Parsing to and from multiple formats such as Excel, CSV and JSON
     - An sqlite database backend for storing and retrieving data
     - Simple methods for isotherm graphing and comparison
+
+Citing
+======
+
+A peer-reviewed paper regarding pyGAPS is currently in the process of being
+published. In the meantime, consider citing the *preprint* if you use the
+program in your work.
+
+Paul Iacomi, Philip L. Llewellyn, 2019.
+pyGAPS: A Python-Based Framework for Adsorption Isotherm
+Processing and Material Characterisation.
+https://doi.org/10.26434/chemrxiv.7970402.v1
+
 
 Documentation
 =============
@@ -110,21 +123,21 @@ Installation
 
 The easiest way to install pyGAPS is from the command line.
 Make sure that you have `numpy`, `scipy`, `pandas` and `matplotlib`, as well as
-CoolProp already installed.
+`CoolProp` already installed.
 
 .. code-block:: bash
 
     pip install pygaps
 
-On Windows, `Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
-environments for you.
-First create a new environment and use conda to install the dependencies (or start with one
-that already has a full instalation). Then use pip inside your environment.
+`Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
+environments for you. First create a new environment and use conda to
+install the dependencies (or start with one that already has a full instalation).
+Then use pip inside your environment.
 
 .. code-block:: bat
 
     conda create -n py3 python=3 numpy scipy pandas matplotlib CoolProp
-    activate py3
+    conda activate py3
     pip install pygaps
 
 Alternatively, to install the development branch, clone the repository from Github.
@@ -179,17 +192,18 @@ For testing only with the environment you are currently on, run instead
 
     pytest
 
-Alternatively, you can depend on travisCI for the testing, which will be slower overall
-but should have all the environments required.
+Alternatively, you can depend on
+`TravisCI <https://travis-ci.org/pauliacomi/pyGAPS>`__ for testing,
+which will be slower overall but should have all the environments required.
 
 Questions?
 ==========
 
-I'm more than happy to answer any questions. Shoot me an email at paul.iacomi@univ-amu or find
-me on some social media.
+I'm more than happy to answer any questions. Shoot an email to
+mail( at )pauliacomi.com or find me on some social media.
 
-For any bugs found, please open an `issue <https://github.com/pauliacomi/pyGAPS/issues/>`__ or, If
-you feel like you can do the fix yourself, submit a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__.
-It'll make my life easier
-
+For any bugs found, please open an
+`issue <https://github.com/pauliacomi/pyGAPS/issues/>`__ or, even better,
+submit a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__.
+It'll make my life easier.
 This also applies to any features which you think might benefit the project.

@@ -2,21 +2,70 @@
 Changelog
 =========
 
+1.6.0 (2019-05-08)
+------------------
+
+New features:
+
+* Added a function to get isotherms from the NIST ISODB,
+  ``pygaps.load_nist_isotherm`` which takes the ISODB filename
+  as an argument.
+* Added hexane as an adsorbate in the database.
+* Isotherm adsorbate is now a pygaps.Adsorbate object and
+  can be accessed directly for all attributes
+  (only when available in the internal database, otherwise still a string).
+* ModelIsotherms can now be saved and imported from JSON, CSV and Excel.
+* Added a ``marker`` option to the ``plot_iso`` function
+  which acts similar to the ``color`` parameter and allows
+  simple selection of the marker style.
+* Added three new isotherm models: Freundlich, Dubinin-Radushkevich and
+  Dubinin-Astakov. They can be used for fitting by specifying
+  `Freundlich`, `DR` or `DA` as the model, respectivelly.
+* Faster performance of some models due to analytical calculations,
+  as well as more thorough testing
+* Isotherm modelling backend is now more robust.
+* Added an isotherm ``plot`` function to plot an individual isotherm.
+* Added functions to import and export JSON files directly from a
+  file: ``isotherm_from_jsonf`` and ``isotherm_to_jsonf``.
+* Added github issue templates.
+* Removed some plotting styles.
+
+Breaking changes:
+
+* Deprecated and removed the MADIREL excel format.
+* Renamed ``isosteric_heat`` functions as ``isosteric_enthalpy`` for
+  more correct nomenclature.
+* Some model parameters have been renamed for consistency.
+
+Bugfixes:
+
+* REFPROP backend now correctly accessible
+  (it was previously impossible to activate).
+* Fixed issue in excel import which could lead to
+  incorrect import.
+* Some of the adsorbate values in the database were incorrect.
+  They have been now updated.
+* Fixed secondary data not being automatically plotted
+  when ``print_info`` called.
+
+
 1.5.0 (2019-03-12)
 ------------------
 
-Features:
+New features:
 
 * Increased number of adsorbates available in pyGAPS to 40.
 * New material characterisation functions: Dubinin-Radushkevich
   (dr_plot) and Dubinin-Astakov (da_plot) plots.
-* Added a new way to create an isotherm, from an two arrays of pressure and loading
-  (the old DataFrame method is still valid but changed: check breaking changes).
+* Added a new way to create an isotherm, from an two arrays of pressure
+  and loading (the old DataFrame method is still valid but changed:
+  check breaking changes).
 * Made adsorbates searchable by a list of aliases rather than a single name.
 * Exposed the CoolProp backend on adsorbate objects for convenience, it is
   accessible through the adsorbate.backend property.
 * Streamlined the internal database functions.
-* Updated NIST json import to new format. Cannot import multicomponent isotherms.
+* Updated NIST json import to new format.
+  Cannot import multicomponent isotherms.
 * Functions which generate matplotlib graphs now can take an Ax as parameter
   (similar to behaviour of pandas) to plot on existing figures.
 * Changed behaviour of ModelIsotherm.guess function to accept a list of
@@ -53,7 +102,7 @@ Bugfixes:
 1.4.0 (2018-11-10)
 ------------------
 
-Features:
+New features:
 
 * Added the GAB isotherm model
 
@@ -67,7 +116,7 @@ Bugfixes:
 1.3.0 (2018-08-13)
 ------------------
 
-Features:
+New features:
 
 * Added an excel import which can take Micromeritics or
   Belsorp report (.xls) files. Micromeritics code was
@@ -107,16 +156,18 @@ Bugfixes:
 1.2.0 (2018-02-19)
 ------------------
 
-Features:
+New features:
 
 * The plotting legend now works with any isotherm attribute specified
 * Changed model parent class to print out model name when displayed
-* Added Toth and Jensen-Seaton models to the IAST calculation (spreading pressure is computed
+* Added Toth and Jensen-Seaton models to the IAST calculation
+  (spreading pressure is computed
   numerically using scipy.integrate.quad, :issue:`7`)
 
 Bugfixes:
 
-* Fixed an issue where the returned IAST selectivity v pressure data would not include all pressures
+* Fixed an issue where the returned IAST selectivity v pressure
+  data would not include all pressures
 * Changed sqlite retrieval order to improve performance (:issue:`2`)
 * Fixed an error where IAST vle data was plotted opposite to the graph axes
 * Fixed a mistake in the Jensen-Seaton equation
@@ -125,14 +176,17 @@ Bugfixes:
 1.1.1 (2018-02-11)
 ------------------
 
-Features:
+New features:
 
-* Allowed for branch selection for isosteric heat and fixed an error where this was an issue (:issue:`3`)
+* Allowed for branch selection for isosteric heat and fixed
+  an error where this was an issue (:issue:`3`)
 
 Bugfixes:
 
-* Fixed an issue when plotting isotherms with and without secondary data simultaneously
-* Fixed error with magnitude of polarizability of adsorbate from database in microporous PSD
+* Fixed an issue when plotting isotherms with and without
+  secondary data simultaneously
+* Fixed error with magnitude of polarizability of adsorbate
+  from database in microporous PSD
 
 
 1.1.0 (2018-01-24)
@@ -146,7 +200,8 @@ Bugfixes:
 ------------------
 
 * Fixed wrong value of polarizability for nitrogen in database
-* Added a check for initial enthalpy when the isotherm is measured in supercritical mode
+* Added a check for initial enthalpy when the isotherm is measured
+  in supercritical mode
 
 1.0.0 (2018-01-01)
 ------------------

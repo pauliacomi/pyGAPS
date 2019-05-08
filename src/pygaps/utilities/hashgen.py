@@ -1,6 +1,4 @@
-"""
-Hashing isotherms
-"""
+"""Isotherm hashing function."""
 
 import hashlib
 import json
@@ -12,7 +10,7 @@ import pygaps
 
 def isotherm_to_hash(isotherm):
     """
-    Converts an isotherm object to a unique hash.
+    Convert an isotherm object to a unique hash.
 
     Parameters
     ----------
@@ -24,7 +22,6 @@ def isotherm_to_hash(isotherm):
     str
         A string with the Isotherm hash.
     """
-
     # Isotherm properties
     # raw_dict = {a: getattr(isotherm, a) for a in isotherm._id_params}
     raw_dict = isotherm.to_dict()

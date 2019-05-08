@@ -1,6 +1,4 @@
-"""
-Tests bel file read
-"""
+"""Tests bel file read."""
 
 import pytest
 

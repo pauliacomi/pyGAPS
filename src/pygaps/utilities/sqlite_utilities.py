@@ -1,11 +1,9 @@
-"""
-This module contains general functions for SQL query building.
-"""
+"""General functions for SQL query building."""
 
 
 def build_update(table, to_set, where, prefix=None):
     """
-    Builds an update request
+    Build an update request.
 
     Parameters
     ----------
@@ -22,8 +20,8 @@ def build_update(table, to_set, where, prefix=None):
     -------
     str
         Built query.
-    """
 
+    """
     sql_q = 'UPDATE \"' + table + '\"'
     sql_q += " SET "
     sql_q += ', '.join('{0} = :{0}'.format(w) for w in to_set)
@@ -38,7 +36,7 @@ def build_update(table, to_set, where, prefix=None):
 
 def build_insert(table, to_insert):
     """
-    Builds an insert request.
+    Build an insert request.
 
     Parameters
     ----------
@@ -51,8 +49,8 @@ def build_insert(table, to_insert):
     -------
     str
         Built query.
-    """
 
+    """
     sql_q = 'INSERT INTO \"' + table + '\" ('
     sql_q += ', '.join('{0}'.format(w) for w in to_insert)
     sql_q += ') VALUES ('
@@ -64,7 +62,7 @@ def build_insert(table, to_insert):
 
 def build_select(table, to_select, where):
     """
-    Builds an select request.
+    Build an select request.
 
     Parameters
     ----------
@@ -79,8 +77,8 @@ def build_select(table, to_select, where):
     -------
     str
         Built query.
-    """
 
+    """
     sql_q = "SELECT "
     sql_q += ', '.join('{0}'.format(w) for w in to_select)
     sql_q += ' FROM \"' + table + '\"'
@@ -93,7 +91,7 @@ def build_select(table, to_select, where):
 
 def build_select_unnamed(table, to_select, where, join='AND'):
     """
-    Builds an select request with multiple parameters.
+    Build an select request with multiple parameters.
 
     Parameters
     ----------
@@ -110,8 +108,8 @@ def build_select_unnamed(table, to_select, where, join='AND'):
     -------
     str
         Built query.
-    """
 
+    """
     sql_q = "SELECT "
     sql_q += ', '.join('{0}'.format(w) for w in to_select)
     sql_q += ' FROM \"' + table + '\"'
@@ -124,7 +122,7 @@ def build_select_unnamed(table, to_select, where, join='AND'):
 
 def build_delete(table, where):
     """
-    Builds a delete request.
+    Build a delete request.
 
     Parameters
     ----------
@@ -137,8 +135,8 @@ def build_delete(table, where):
     -------
     str
         Built query.
-    """
 
+    """
     sql_q = "DELETE "
     sql_q += 'FROM \"' + table + '\"'
     sql_q += ' WHERE '

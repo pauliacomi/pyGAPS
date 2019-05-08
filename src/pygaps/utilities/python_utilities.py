@@ -1,6 +1,4 @@
-"""
-Utilities for different python functionality
-"""
+"""Utilities for different python functionality."""
 
 
 def _one_pass(iters):

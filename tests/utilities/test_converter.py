@@ -1,4 +1,4 @@
-# %%
+"""Tests unit converter."""
 import numpy
 import pytest
 

@@ -1,22 +1,10 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "restructuredtext.confPath": "{workspaceRoot}/docs",
+    "restructuredtext.confPath": "{workspaceRoot}\\docs",
     "restructuredtext.builtDocumentationPath": "${workspaceRoot}/dist/docs",
     "restructuredtext.workspaceRoot": "c:\\Users\\pauli\\Git\\pyGAPS",
 
-    "python.unitTest.pyTestEnabled": true,
-    "python.unitTest.pyTestArgs": [
-        "-rxEfsw",
-        "--ignore=docs/conf.py",
-        "--ignore=setup.py",
-        "--ignore=ci",
-        "--ignore=examples",
-        "--ignore=.eggs",
-        "--doctest-modules",
-        "--doctest-glob=/*.rst",
-        "--exitfirst",
-        "--verbose",
-    ],
+    "python.testing.pyTestEnabled": true,
 
     "cSpell.words": [
         "csvinterface",
@@ -33,5 +21,5 @@
         "scipy"
     ],
     "coverage-gutters.xmlname": "coverage.xml",
-    "python.pythonPath": "C:\\tools\\miniconda3\\envs\\py37\\python.exe"
+    "python.pythonPath": "C:\\tools\\miniconda3\\envs\\py37\\python.exe",
 }
