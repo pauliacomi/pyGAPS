@@ -15,9 +15,27 @@ from ..utilities.unit_converter import _PRESSURE_UNITS
 from ..utilities.unit_converter import _VOLUME_UNITS
 
 
+def isotherm_to_jsonf(isotherm, path):
+    """
+    Write an isotherm object to a json file.
+
+    Convenience function wrapping ``isotherm_to_json``.
+
+    Parameters
+    ----------
+    isotherm : Isotherm
+        Isotherm to be written to json.
+    path : str
+        Path to the file to be written.
+
+    """
+    with open(path, mode='w') as file:
+        file.write(isotherm_to_json(isotherm))
+
+
 def isotherm_to_json(isotherm, fmt=None):
     """
-    Convert an isotherm object to a json structure.
+    Convert an isotherm object to a json string.
 
     Structure is inspired by the NIST format.
 
@@ -51,18 +69,18 @@ def isotherm_to_json(isotherm, fmt=None):
     return json_isotherm
 
 
-def isotherm_from_json(json_isotherm, fmt=None,
-                       loading_key='loading', pressure_key='pressure',
-                       **isotherm_parameters):
+def isotherm_from_jsonf(path, fmt=None,
+                        loading_key='loading', pressure_key='pressure',
+                        **isotherm_parameters):
     """
-    Convert a json isotherm format to a pygaps Isotherm.
+    Load an isotherm from a JSON file.
 
-    Structure is inspired by the NIST format.
+    Convenience function wrapping ``isotherm_from_json``.
 
     Parameters
     ----------
-    json_isotherm : str
-        The isotherm in the json format, as string.
+    path : str
+        Path to the file to be read.
     loading_key : str
         The title of the pressure data in the json provided.
     pressure_key
@@ -76,7 +94,44 @@ def isotherm_from_json(json_isotherm, fmt=None,
     Returns
     -------
     Isotherm
-        The isotherm contained in the json
+        The isotherm contained in the json file.
+    """
+    with open(path) as file:
+        return isotherm_from_json(
+            file.read(), fmt=fmt,
+            loading_key=loading_key, pressure_key=pressure_key,
+            **isotherm_parameters)
+
+
+def isotherm_from_json(json_isotherm, fmt=None,
+                       loading_key='loading', pressure_key='pressure',
+                       **isotherm_parameters):
+    """
+    Convert a json isotherm format to a pygaps Isotherm.
+
+    Structure is inspired by the NIST format.
+
+    Parameters
+    ----------
+    json_isotherm : str
+        The isotherm in a json format, as a string.
+    loading_key : str
+        The title of the pressure data in the json provided.
+    pressure_key
+        The title of the loading data in the json provided.
+    fmt : {None, 'NIST'}, optional
+        If the format is set to NIST, then the json format a specific version
+        used by the NIST database of adsorbents.
+
+    Other Parameters
+    ----------------
+    isotherm_parameters :
+        Any other options to be overridden in the isotherm creation.
+
+    Returns
+    -------
+    Isotherm
+        The isotherm contained in the json string.
 
     """
     # Parse isotherm in dictionary
@@ -141,7 +196,7 @@ def isotherm_from_json(json_isotherm, fmt=None,
 
 
 def _from_json_nist(raw_dict):
-    """Convert a NIST dictionary format to a internal format."""
+    """Convert a NIST dictionary format to an internal format."""
 
     nist_dict = dict()
 
@@ -209,9 +264,7 @@ def _from_json_nist(raw_dict):
 
 
 def _from_data_nist(raw_data):
-    """
-    Converts a NIST data format to a internal format.
-    """
+    """Convert a NIST data format to an internal format."""
 
     for point in raw_data:
         point.pop('species_data')

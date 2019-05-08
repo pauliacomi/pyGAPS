@@ -32,6 +32,15 @@ class TestJson():
 
         assert basic_modelisotherm.to_dict() == new_isotherm.to_dict()
 
+    def test_isotherm_from_json_file(self, basic_pointisotherm, tmpdir_factory):
+        """Test the parsing of an isotherm to a json file."""
+
+        path = tmpdir_factory.mktemp('json').join('isotherm.json').strpath
+        pygaps.isotherm_to_jsonf(basic_pointisotherm, path)
+        isotherm = pygaps.isotherm_from_jsonf(path)
+
+        assert isotherm == basic_pointisotherm
+
     def test_isotherm_from_json_nist(self):
         """Test the parsing of an isotherm from json."""
 
