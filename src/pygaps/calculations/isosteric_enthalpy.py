@@ -108,10 +108,10 @@ def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=Fal
 
     # Get pressure point for each isotherm at loading
     pressures = numpy.array(
-        [[numpy.asscalar(i.pressure_at(
+        [[i.pressure_at(
             l, pressure_unit='bar',
             pressure_mode='absolute',
-            loading_unit='mmol', branch=branch)) for i in isotherms]
+            loading_unit='mmol', branch=branch).item() for i in isotherms]
             for l in loading])
 
     iso_enthalpy, slopes, correlation = isosteric_enthalpy_raw(pressures, temperatures)

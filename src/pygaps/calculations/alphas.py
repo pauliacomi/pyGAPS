@@ -267,7 +267,7 @@ def alpha_s_plot_parameters(alpha_curve, section, loading,
 
     if slope * (max(alpha_curve) / max(loading)) < 3:
         adsorbed_volume = intercept * molar_mass / liquid_density
-        area = scipy.asscalar(reference_area / alpha_s_point * slope)
+        area = (reference_area / alpha_s_point * slope).item()
 
         result_dict = {
             'section': section,
