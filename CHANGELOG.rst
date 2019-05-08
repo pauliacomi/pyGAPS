@@ -2,7 +2,7 @@
 Changelog
 =========
 
-1.6.0 ()
+1.6.0 (2019-05-08)
 ------------------
 
 New features:
@@ -14,10 +14,7 @@ New features:
 * Isotherm adsorbate is now a pygaps.Adsorbate object and
   can be accessed directly for all attributes
   (only when available in the internal database, otherwise still a string).
-* Isotherm modelling backend is now more robust.
 * ModelIsotherms can now be saved and imported from JSON, CSV and Excel.
-* Added github issue templates.
-* Removed some plotting styles.
 * Added a ``marker`` option to the ``plot_iso`` function
   which acts similar to the ``color`` parameter and allows
   simple selection of the marker style.
@@ -26,9 +23,12 @@ New features:
   `Freundlich`, `DR` or `DA` as the model, respectivelly.
 * Faster performance of some models due to analytical calculations,
   as well as more thorough testing
+* Isotherm modelling backend is now more robust.
 * Added an isotherm ``plot`` function to plot an individual isotherm.
 * Added functions to import and export JSON files directly from a
   file: ``isotherm_from_jsonf`` and ``isotherm_to_jsonf``.
+* Added github issue templates.
+* Removed some plotting styles.
 
 Breaking changes:
 
