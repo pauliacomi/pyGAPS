@@ -11,14 +11,12 @@
     "loading_basis" : "molar",
     "loading_unit" : "mmol",
 
-    "iso_type": "Calorimetrie",
+    "iso_type": "calorimetry",
     "date": "2010-05-21 00:00:00",
-    "is_real": true,
-    "machine": "CV",
-    "lab": "MADIREL",
+    "machine": "device1",
     "t_act": 150.0,
-    "user": "ADW",
-    "project": "EU MACADEMIA",
+    "user": "PI",
+    "project": "ACRONYM",
     "comment": "a comment",
 
     "isotherm_data": [
