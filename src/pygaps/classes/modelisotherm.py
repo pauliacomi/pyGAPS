@@ -471,7 +471,27 @@ class ModelIsotherm(Isotherm):
         """
         print(self)
         print(self.model)
+        return self.plot(show, **plot_iso_args)
 
+    def plot(self, show=True, **plot_iso_args):
+        """
+        Plot the isotherm using pygaps.plot_iso().
+
+        Parameters
+        ----------
+        show : bool, optional
+            Specifies if the graph is shown automatically or not.
+
+        Other Parameters
+        ----------------
+        plot_iso_args : dict
+            options to be passed to pygaps.plot_iso()
+
+        Returns
+        -------
+        axes : matplotlib.axes.Axes or numpy.ndarray of them
+
+        """
         plot_dict = dict(
             plot_type='isotherm',
             adsorbent_basis=self.adsorbent_basis,
