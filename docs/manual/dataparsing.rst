@@ -18,7 +18,7 @@ export isotherms.
     - Several manufacturer-specific formats.
     - From an sqlite database: pyGAPS contains functionality to store and
       retrieve constructed isotherms in a sqlite database.
-    - From the NIST ISODB `database <http://adsorption.nist.gov/>`__.
+    - From the NIST ISODB `database <https://adsorption.nist.gov/>`__.
 
 .. _parsing-manual-sqlite:
 

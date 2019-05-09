@@ -41,7 +41,7 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :target: https://opensource.org/licenses/MIT
     :alt: Project License
 
-.. |travis| image:: https://travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
+.. |travis| image:: https://api.travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/pauliacomi/pyGAPS
 
