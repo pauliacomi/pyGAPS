@@ -80,11 +80,22 @@ setup(
         'nose',
     ],
     extras_require={
-        'reST': [
+        'dev': [
+            'isort',
+            'pylint',
+            'flake8',
+            'autopep8',
+            'pydocstyle',
+            'bump2version',
+        ],
+        'docs': [
             'docutils >= 0.11'
             'doc8',
             'pandoc',
             'restructuredtext-lint',
+            'sphinx',
+            'nbsphinx',
+            'sphinx_rtd_theme',
         ],
     },
 )
