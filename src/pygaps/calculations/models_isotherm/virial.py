@@ -145,8 +145,16 @@ class Virial(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"K": saturation_loading * langmuir_k,
-                "A": 0, "B": 0, "C": 0}
+        guess = {"K": saturation_loading * langmuir_k,
+                 "A": 0, "B": 0, "C": 0}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess
 
     def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
         """
