@@ -99,6 +99,7 @@ ENV/
 .mypy_cache/
 
 # VS code
+.vscode
 .vscode/
 
 # pytest
