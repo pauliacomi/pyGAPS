@@ -99,8 +99,8 @@ ENV/
 .mypy_cache/
 
 # VS code
-.vscode/*
-# !.vscode/settings.json
+.vscode
+.vscode/
 
 # pytest
 .pytest_cache

@@ -2,6 +2,19 @@
 Changelog
 =========
 
+1.6.1 (2019-05-09)
+------------------
+
+New features:
+
+* Simplified the slope method for Henry's constant
+  calculation
+
+Bugfixes:
+
+* Ensured that model initial fitting guess cannot be
+  outside the bounds of the variables.
+
 1.6.0 (2019-05-08)
 ------------------
 

@@ -213,6 +213,12 @@ class BET(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        # BET = Langmuir when N = 0.0. This is our default assumption.
-        return {"n_m": saturation_loading, "C": langmuir_k,
-                "N": langmuir_k * 0.01}
+        guess = {"n_m": saturation_loading, "C": langmuir_k, "N": langmuir_k * 0.01}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess

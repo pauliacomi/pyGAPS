@@ -150,5 +150,13 @@ class DSLangmuir(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n_m1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
-                "n_m2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}
+        guess = {"n_m1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
+                 "n_m2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess

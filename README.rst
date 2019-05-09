@@ -29,9 +29,9 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :target: https://www.repostatus.org/#active
     :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.6.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.6.1.svg
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v1.6.0...master
+    :target: https://github.com/pauliacomi/pygaps/compare/v1.6.1...master
 
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
@@ -41,7 +41,7 @@ pyGAPS (Python General Adsorption Processing Suite) is a framework for adsorptio
     :target: https://opensource.org/licenses/MIT
     :alt: Project License
 
-.. |travis| image:: https://travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
+.. |travis| image:: https://api.travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/pauliacomi/pyGAPS
 

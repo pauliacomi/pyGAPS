@@ -140,6 +140,12 @@ class Freundlich(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {
-            "K": langmuir_k,
-            "m": 1}
+        guess = {"K": saturation_loading * langmuir_k, "m": 1}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess

@@ -148,4 +148,12 @@ class TemkinApprox(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n_m": saturation_loading, "K": langmuir_k, "tht": 0.0}
+        guess = {"n_m": saturation_loading, "K": langmuir_k, "tht": 0.0}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess
