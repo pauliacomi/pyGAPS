@@ -1,5 +1,7 @@
 language: python
 cache: pip
+git:                    # no need to clone everything
+  depth: 5
 
 env:
   global:
