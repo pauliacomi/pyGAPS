@@ -2,6 +2,16 @@
 Changelog
 =========
 
+1.. ()
+------------------
+
+New features:
+
+* Added a new parameters named logy1 and logy2 to
+  set the plotting vertical axes to be logarithmic.
+* To remove the legend now set the lgd_pos to None
+
+
 1.6.1 (2019-05-09)
 ------------------
 

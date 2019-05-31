@@ -27,6 +27,7 @@ def plot_iso(isotherms,
              y2_data=None,
 
              branch="all", logx=False,
+             logy1=False, logy2=False,
              color=True, marker=None,
 
              adsorbent_basis="mass",
@@ -68,6 +69,10 @@ def plot_iso(isotherms,
         both ('all') or both with a single legend entry ('all-nol').
     logx : bool
         Whether the graph x axis should be logarithmic.
+    logy1 : bool
+        Whether the graph y1 axis should be logarithmic.
+    logy2 : bool
+        Whether the graph y2 axis should be logarithmic.
 
     color : bool, int, list, optional
         If a boolean, the option controls if the graph is coloured or
@@ -116,7 +121,7 @@ def plot_iso(isotherms,
         two components. Works with any isotherm properties and with 'branch' and 'key',
         the isotherm branch and the y-axis key respectively.
         Defaults to 'material_name' and 'adsorbate'.
-    lgd_pos : ['best', 'none', 'bottom', 'right', 'inner']
+    lgd_pos : [None, 'best', 'bottom', 'right', 'inner']
         Specify to have the legend position to the bottom, the right of the graph
         or inside the plot area itself. Defaults to 'best'.
 
@@ -459,8 +464,14 @@ def plot_iso(isotherms,
     if logx:
         ax1.set_xscale('log')
     else:
-        ax1.set_xscale('linear')
         ax1.set_xlim(left=0)
+    if logy1:
+        ax1.set_yscale('log')
+    else:
+        ax1.set_ylim(bottom=0)
+    if ax2:
+        if logy2:
+            ax2.set_yscale('log')
 
     ax1.set_xlim(x_range)
     ax1.set_ylim(y1_range)
@@ -482,7 +493,7 @@ def plot_iso(isotherms,
         else:
             lgd_pos = 'inner'
 
-    if lgd_pos == 'none':
+    if lgd_pos is None:
         pass
     elif lgd_pos == 'inner':
         lgd = ax1.legend(lines, labels, **styles['legend_style'])
