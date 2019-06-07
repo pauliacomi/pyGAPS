@@ -11,6 +11,11 @@ New features:
   set the plotting vertical axes to be logarithmic.
 * To remove the legend now set the lgd_pos to None
 
+* Pore size distribution improvements:
+
+    * Changed HK dictionary name OxideIon(SF) -> 'AlSiOxideIon'
+    * Added a new HK dictionary 'AlPhOxideIon'
+
 
 1.6.1 (2019-05-09)
 ------------------
