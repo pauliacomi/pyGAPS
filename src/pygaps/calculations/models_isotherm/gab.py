@@ -1,17 +1,13 @@
-"""
-GAB isotherm model
-"""
+"""GAB isotherm model."""
 
 import numpy
-import scipy
 
-from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class GAB(IsothermModel):
+class GAB(IsothermBaseModel):
     r"""
-    Guggenheim-Anderson-de Boer (GAB) adsorption isotherm
+    Guggenheim-Anderson-de Boer (GAB) adsorption isotherm.
 
     .. math::
 
@@ -19,34 +15,32 @@ class GAB(IsothermModel):
 
     Notes
     -----
-
     An extension of the BET model which introduces a constant
     K, accounting for a different enthalpy of adsorption of
     the adsorbed phase when compared to liquefaction enthalpy of
     the bulk phase.
 
     It is often used to fit adsorption and desorption isotherms of
-    water in the food industry.[#]_
+    water in the food industry. [#]_
 
     References
     ----------
     .. [#] “Water Activity: Theory and Applications to Food”, Kapsalis. J. G., 1987
     """
 
-    #: Name of the model
+    # Model parameters
     name = 'GAB'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_m": numpy.nan, "K": numpy.nan,  "C": numpy.nan}
+    param_names = ["n_m", "C", "K"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "C": [0, numpy.inf],
+        "K": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -65,10 +59,10 @@ class GAB(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
-        For the GAB model, the pressure will
-        be computed numerically as no analytical inversion is possible.
+        Calculate pressure at specified loading.
+
+        For the BET model, an analytical inversion is possible.
+        See function code for implementation.
 
         Parameters
         ----------
@@ -80,20 +74,25 @@ class GAB(IsothermModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        a = self.params['n_m']
+        b = self.params['K']
+        c = self.params['C']
 
-        if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+        x = loading * (1-c) * b**2
+        y = (loading * (c-2) - a*c) * b
 
-        return opt_res.x
+        res = (-y - numpy.sqrt(y**2 - 4*x*loading)) / (2*x)
+
+        if numpy.isnan(res).any():
+            res = numpy.nan_to_num(res, copy=False)
+
+        return res
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -122,25 +121,30 @@ class GAB(IsothermModel):
              self.params["K"] * self.params["C"] * pressure) /
             (1.0 - self.params["K"] * pressure))
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(GAB, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n_m": saturation_loading, "C": langmuir_k, "K": 1.00}
+        guess = {"n_m": saturation_loading, "C": langmuir_k, "K": 1.00}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess

@@ -1,5 +1,7 @@
 language: python
 cache: pip
+git:                    # no need to clone everything
+  depth: 5
 
 env:
   global:
@@ -96,7 +98,7 @@ jobs:
           api_key:
             secure: njElANcKbB/8XpjQQvTSLlz0zooirTAyCjMTcunLRzekCLjHRVkMpBpgpAF/bOVWQHc9OOu09cxfrU6nIv0vY1RjyaVoEAkzOM57fijTmEmXMher9GV+O3y9ZO72tJyFMzwDN/FArs5HaGQM4IC3HLjWCSDTLOK3uyauXv5x4Yewqny4taiTjwgAXGdzXOhuR8SysoMeol/DRpqjtZWV6Aht+R0sDRDSB/BCUOqmNn3OXgd+LQmQjT2pvDUUklYn4nr6qtO96YFtuQCe33KWYL80VF9PDKPUkiRsakdY9VDK+P4TQAeOPorZxBuQyrgifiGPHEEUSuOo42A4Kn2dSvQZsWGXuN6cE4UkpCeQ0wT5oztg1XfgizrmUOBOhIzELo3vvtqQz84gDihwAaJokcEbpyKWzG6ysjvqpL/sKYJ9kj8GpCvbNqJwYjzhstlRYwGZtfK/l6k2/bvvxoSmBZ/CaLAP5VPvqjG8b/giLqnORxF6j0YRe7paj8SEpMwdKbRt8xoQuSVSTCR7oDRi3hsP993Aqp9XbSB5fMqksrXFzX4LQrdpTrMvZlpEeXdhAJZvcXjLGRb2sgDZzJjo+uz2/v7B78QzHTBazMcZbqrtlC1msmjxqF2hZ3yjotSTG0CDF2iprQpufQ0+IVem8yc6jPRR/24Ijb/0yrcKCt0=
           skip_cleanup: true
-          draft: true
+          draft: false
           on:
             branch: master
 

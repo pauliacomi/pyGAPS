@@ -18,7 +18,7 @@ can be found in the :ref:`manual <characterisation-manual>`.
     alphas
     psd
     dr_da_plots
-    isostericheat
+    isostericenthalpy
     henryc
     initialenthalpy
 

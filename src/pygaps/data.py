@@ -1,7 +1,9 @@
 """
-The memory storage from where objects such as adsorbates or materials
-are taken. These are populated at import-time.
+Loading some data at import-time.
 
+Here is where objects such as adsorbates or materials
+are imported to be available for pyGAPS.
+These are populated at import-time.
 Also defines the internal database location.
 """
 import os

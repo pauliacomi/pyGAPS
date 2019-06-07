@@ -294,7 +294,6 @@ class PointIsotherm(Isotherm):
                   of the pressure points in the passed isotherm. This is useful for
                   comparing a model overlap with the real isotherm.
         """
-
         if pressure_points is None:
             pressure = modelisotherm.pressure()
         elif isinstance(pressure_points, PointIsotherm):
@@ -498,13 +497,29 @@ class PointIsotherm(Isotherm):
 
         """
         print(self)
+        return self.plot(show, **plot_iso_args)
 
-        secondary_data = None
-        if self.other_keys:
-            secondary_data = self.other_keys[0]
+    def plot(self, show=True, **plot_iso_args):
+        """
+        Plot the isotherm using pygaps.plot_iso().
 
+        Parameters
+        ----------
+        show : bool, optional
+            Specifies if the graph is shown automatically or not.
+
+        Other Parameters
+        ----------------
+        plot_iso_args : dict
+            options to be passed to pygaps.plot_iso()
+
+        Returns
+        -------
+        axes : matplotlib.axes.Axes or numpy.ndarray of them
+
+        """
         plot_dict = dict(
-            secondary_data=secondary_data,
+            y2_data=self.other_keys[0] if self.other_keys else None,
             adsorbent_basis=self.adsorbent_basis,
             adsorbent_unit=self.adsorbent_unit,
             loading_basis=self.loading_basis,

@@ -17,8 +17,8 @@ from .calculations.initial_enthalpy import initial_enthalpy_comp
 from .calculations.initial_enthalpy import initial_enthalpy_point
 from .calculations.initial_henry import initial_henry_slope
 from .calculations.initial_henry import initial_henry_virial
-from .calculations.isosteric_heat import isosteric_heat
-from .calculations.isosteric_heat import isosteric_heat_raw
+from .calculations.isosteric_enthalpy import isosteric_enthalpy
+from .calculations.isosteric_enthalpy import isosteric_enthalpy_raw
 from .calculations.psd import dft_size_distribution
 from .calculations.psd import mesopore_size_distribution
 from .calculations.psd import micropore_size_distribution
@@ -38,7 +38,9 @@ from .parsing.excelinterface import isotherm_from_xl
 from .parsing.excelinterface import isotherm_to_xl
 from .parsing.isodb_interface import isotherm_from_isodb
 from .parsing.jsoninterface import isotherm_from_json
+from .parsing.jsoninterface import isotherm_from_jsonf
 from .parsing.jsoninterface import isotherm_to_json
+from .parsing.jsoninterface import isotherm_to_jsonf
 from .utilities.coolprop_utilities import COOLPROP_BACKEND
 from .utilities.coolprop_utilities import backend_use_coolprop
 from .utilities.coolprop_utilities import backend_use_refprop

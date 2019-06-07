@@ -1,6 +1,4 @@
-"""
-This module contains the material class.
-"""
+"""Contains the material class."""
 
 import pygaps
 
@@ -9,10 +7,10 @@ from ..utilities.exceptions import ParameterError
 
 class Material():
     """
-    This class acts as a unified descriptor for an adsorbent material.
+    An unified descriptor for an adsorbent material.
+
     Its purpose is to store properties such as adsorbent name,
     and batch.
-
 
     Parameters
     ----------
@@ -30,7 +28,6 @@ class Material():
 
     Notes
     -----
-
     The members of the properties are left at the discretion
     of the user. There are, however, some unique properties
     which can be set as seen above.
@@ -38,10 +35,7 @@ class Material():
     """
 
     def __init__(self, name, batch, **properties):
-        """
-        Instantiation is done by passing all the parameters.
-        """
-
+        """Instantiate by passing all the parameters."""
         #: Material name
         self.name = name
 
@@ -54,18 +48,14 @@ class Material():
         return
 
     def __repr__(self):
+        """Print material name and batch."""
         return ' '.join([self.name, self.batch])
 
     def __str__(self):
-        """
-        Prints a short summary of all the material parameters.
-        """
+        """Print a short summary of all the material parameters."""
         string = ""
-
-        if self.name:
-            string += ("Material:" + self.name + '\n')
-        if self.batch:
-            string += ("Batch:" + self.batch + '\n')
+        string += ("Material:" + self.name + '\n')
+        string += ("Batch:" + self.batch + '\n')
 
         if self.properties:
             for prop in self.properties:
@@ -73,10 +63,20 @@ class Material():
 
         return string
 
+    def __hash__(self):
+        """Override hashing as a hash of name and batch."""
+        return hash(self.__repr__())
+
+    def __eq__(self, other):
+        """Overload equality operator to use name and batch."""
+        if isinstance(other, Material):
+            return self.name == other.name and self.batch == other.batch
+        return self.__repr__() == other
+
     @classmethod
     def find(cls, material_name, material_batch):
         """
-        Gets the material from the master list using its name
+        Get the material from the master list using its name.
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class Material():
         Raises
         ------
         ``ParameterError``
-            if it does not exist or cannot be calculated.
+            If it does not exist or cannot be calculated.
         """
         # Checks to see if material exists in master list
         material = next(
@@ -113,15 +113,16 @@ class Material():
 
     def to_dict(self):
         """
-        Returns a dictionary of the material class
+        Return a dictionary of the material class.
+
         Is the same dictionary that was used to create it.
 
         Returns
         -------
         dict
             Dictionary of all parameters.
-        """
 
+        """
         parameters_dict = {
             'name': self.name,
             'batch': self.batch
@@ -133,8 +134,7 @@ class Material():
 
     def get_prop(self, prop):
         """
-        Returns a property from the 'properties' dictionary.
-        Or a named property if requested.
+        Return a property from the internal dictionary.
 
         Parameters
         ----------
@@ -149,9 +149,9 @@ class Material():
         Raises
         ------
         ``ParameterError``
-            if it does not exist.
-        """
+            If it does not exist.
 
+        """
         req_prop = self.properties.get(prop)
         if req_prop is None:
             try:

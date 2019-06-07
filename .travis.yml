@@ -1,5 +1,7 @@
 language: python
 cache: pip
+git:                    # no need to clone everything
+  depth: 5
 
 env:
   global:
@@ -94,14 +96,14 @@ jobs:
             secure: n0/j7ueOm8N0frKsRtEOqWvY1I02iu08dNS3ylK+8q+78PrQwB9xQUlH8QRQselMrkobas9e2l9x8eglYNmN1yYata0mT/UexIy+h1CmHTt6oMxE6TSEiCRuyQ73TwV5F36eOOGLwYYzRLMOYjVaHC5E3f0W1RzGcWstrgZWRtVhHNZ+3IxYW+sqb2+JVeKlhqQgmZY2+LRkwf7UXgoNeYHElKB0WnoPNiK2UpYYm8Et4IWFs7BBQfFBTiHmvmsk2DVwBPUWfju0CLoGFKrf/7Z4polSgo88WIBMtW2vPq3JU7uGr3Bqc/XNs+atc0AT9/eqb7x7DogeikSagJa1dx1h///C90as5FV4pSSHRILTCV5quTl9IFKltefxcNPbQuDtwano7wYIxbU4fbGjb8kGOCzTd2IWaz9oy9XtpC6xLuxBxlG4IphD3qQPtvGqi5udHlC3PX7GTgnQ6ySPuZ6EqhHmTFcpbaT8AXp5jfi2LqHllIo/+PcTv3Bm1/89qEfwcm6biE8O41ejOyjb3WKiB2etOMkw7O0tZE9Ub2LrPFohcCQVJgKFcewKrb5zCtmN61m+S3IFu3tOrean3De13ycD1oYSLbwMxU3Cc2bvRoQ+JcnRSIiNcu4ujaHL7uANQClHTByhUa61PNgWVOH3P6YWU572khCEUzF8cEA=
           distributions: sdist bdist_wheel
           on:
-            branch: master
+            tags: true
         - provider: releases
           api_key:
             secure: njElANcKbB/8XpjQQvTSLlz0zooirTAyCjMTcunLRzekCLjHRVkMpBpgpAF/bOVWQHc9OOu09cxfrU6nIv0vY1RjyaVoEAkzOM57fijTmEmXMher9GV+O3y9ZO72tJyFMzwDN/FArs5HaGQM4IC3HLjWCSDTLOK3uyauXv5x4Yewqny4taiTjwgAXGdzXOhuR8SysoMeol/DRpqjtZWV6Aht+R0sDRDSB/BCUOqmNn3OXgd+LQmQjT2pvDUUklYn4nr6qtO96YFtuQCe33KWYL80VF9PDKPUkiRsakdY9VDK+P4TQAeOPorZxBuQyrgifiGPHEEUSuOo42A4Kn2dSvQZsWGXuN6cE4UkpCeQ0wT5oztg1XfgizrmUOBOhIzELo3vvtqQz84gDihwAaJokcEbpyKWzG6ysjvqpL/sKYJ9kj8GpCvbNqJwYjzhstlRYwGZtfK/l6k2/bvvxoSmBZ/CaLAP5VPvqjG8b/giLqnORxF6j0YRe7paj8SEpMwdKbRt8xoQuSVSTCR7oDRi3hsP993Aqp9XbSB5fMqksrXFzX4LQrdpTrMvZlpEeXdhAJZvcXjLGRb2sgDZzJjo+uz2/v7B78QzHTBazMcZbqrtlC1msmjxqF2hZ3yjotSTG0CDF2iprQpufQ0+IVem8yc6jPRR/24Ijb/0yrcKCt0=
           skip_cleanup: true
-          draft: true
+          draft: false
           on:
-            branch: master
+            tags: true
 
 
 notifications:

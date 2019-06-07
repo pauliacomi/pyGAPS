@@ -1,19 +1,20 @@
-"""
-This module contains the functions for plotting and comparing isotherms.
-"""
+"""Functions for plotting and comparing isotherms."""
 
-import collections
+import collections.abc as abc
+import copy
+import math
 import warnings
 from itertools import cycle
 
 import matplotlib.pyplot as plt
+import numpy
 from cycler import cycler
 from matplotlib import cm
-from numpy import linspace
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
 from ..utilities.string_utilities import convert_chemformula
+from .mpl_styles import ISO_STYLES
 
 # ! list of branch types
 _BRANCH_TYPES = ("ads", "des", "all", "all-nol")
@@ -25,7 +26,9 @@ def plot_iso(isotherms,
              y1_data='loading',
              y2_data=None,
 
-             branch="all", logx=False, color=True,
+             branch="all", logx=False,
+             logy1=False, logy2=False,
+             color=True, marker=None,
 
              adsorbent_basis="mass",
              adsorbent_unit="g",
@@ -45,7 +48,7 @@ def plot_iso(isotherms,
              save_path=None,
              **other_parameters):
     """
-    Plots the isotherm(s) provided on a single graph.
+    Plot the isotherm(s) provided on a single graph.
 
     Parameters
     ----------
@@ -66,9 +69,24 @@ def plot_iso(isotherms,
         both ('all') or both with a single legend entry ('all-nol').
     logx : bool
         Whether the graph x axis should be logarithmic.
-    color : bool, optional
-        Whether the graph should be coloured or grayscale. Grayscale graphs
-        are usually preferred for publications or print media.
+    logy1 : bool
+        Whether the graph y1 axis should be logarithmic.
+    logy2 : bool
+        Whether the graph y2 axis should be logarithmic.
+
+    color : bool, int, list, optional
+        If a boolean, the option controls if the graph is coloured or
+        grayscale. Grayscale graphs are usually preferred for publications
+        or print media. If an int, it will be the number of colours the
+        colourspace is divided into. If a list of matplotlib colour names
+        or values, it will be passed directly to the plot function.
+    marker : bool, int, list, optional
+        Whether the graph should contain different markers.
+        Implied ``True`` if color=False. Set both to "True" to
+        get both effects at the same time.
+        If an int, it will be the number of markers used.
+        If a list of matplotlib markers,
+        it will be passed directly to the plot function.
 
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
@@ -103,7 +121,7 @@ def plot_iso(isotherms,
         two components. Works with any isotherm properties and with 'branch' and 'key',
         the isotherm branch and the y-axis key respectively.
         Defaults to 'material_name' and 'adsorbate'.
-    lgd_pos : ['best', 'none', 'bottom', 'right', 'inner']
+    lgd_pos : [None, 'best', 'bottom', 'right', 'inner']
         Specify to have the legend position to the bottom, the right of the graph
         or inside the plot area itself. Defaults to 'best'.
 
@@ -113,7 +131,6 @@ def plot_iso(isotherms,
 
     Other Parameters
     ----------------
-
     fig_style : dict
         A dictionary that will be passed into the matplotlib figure()
         function.
@@ -151,7 +168,7 @@ def plot_iso(isotherms,
 #
 # Initial checks
     # Make iterable if not already
-    if not isinstance(isotherms, collections.Iterable):
+    if not isinstance(isotherms, abc.Iterable):
         isotherms = [isotherms]
 
     # Check for plot type validity
@@ -206,24 +223,7 @@ def plot_iso(isotherms,
 # Settings and graph generation
 
     # Create style dictionaries and get user defined ones
-    styles = {
-        'fig_style': {'figsize': (8, 8)},
-        'title_style': {
-            'horizontalalignment': 'center',
-            'fontsize': 25,
-            'fontdict': {'family': 'monospace'}
-        },
-        'label_style': {
-            'horizontalalignment': 'center',
-            'fontsize': 20,
-            'fontdict': {'family': 'monospace'},
-        },
-        'y1_line_style': {'linewidth': 2, 'markersize': 8},
-        'y2_line_style': {'linewidth': 0, 'markersize': 8},
-        'tick_style': {'labelsize': 17},
-        'legend_style': {'handlelength': 3, 'fontsize': 15},
-        'save_style': {},
-    }
+    styles = copy.deepcopy(ISO_STYLES)
 
     # Overwrite with any user provided styles
     for style in styles:
@@ -264,29 +264,59 @@ def plot_iso(isotherms,
 
     # Get a cycling style for the graph
     if color:
-        number_of_lines = 7
-        if not isinstance(color, bool):
-            number_of_lines = color
-
-        if isinstance(color, int):
-            colors = [cm.jet(x) for x in linspace(0, 1, number_of_lines)]
-
-        if isinstance(color, list):
+        if isinstance(color, bool):
+            colors = [cm.jet(x) for x in numpy.linspace(0, 1, 7)]
+        elif isinstance(color, int):
+            colors = [cm.jet(x) for x in numpy.linspace(0, 1, color)]
+        elif isinstance(color, list):
             colors = color
+        else:
+            raise ParameterError("Unknown ``color`` parameter type.")
 
-        polychrome_cy = cycler('color', colors)
-        y1_marker_cy = cycler('marker', ['o', 's'])
-        y2_marker_cy = cycler('marker', ['v', '^'])
+        color_cy = cycler('color', colors)
 
-        pc_primary = cycle(y1_marker_cy * polychrome_cy)
-        pc_secondary = cycle(y2_marker_cy * polychrome_cy)
     else:
-        y1_marker_cy = cycler('marker', ['o', 's'])
-        y2_marker_cy = cycler('marker', ['v', '^', '<', '>'])
-        monochrome_cy = cycler('color', ['black', 'grey', 'silver'])
+        color_cy = cycler('color', ['black', 'grey', 'silver'])
 
-        pc_primary = cycle(y1_marker_cy * monochrome_cy)
-        pc_secondary = cycle(y2_marker_cy * monochrome_cy)
+    all_markers = ['o', 's', 'D', 'P', '*', '<', '>', 'X', 'v', '^']
+    if marker is None:
+        marker = True
+
+    cycle_compose = True
+    if isinstance(marker, bool):
+        if marker:
+            cycle_compose = False
+            markers = all_markers
+        else:
+            markers = []
+    elif isinstance(marker, int):
+        marker = len(all_markers) if marker > len(all_markers) else marker
+        markers = all_markers[:marker]
+    elif isinstance(marker, list):
+        markers = marker
+    else:
+        raise ParameterError("Unknown ``marker`` parameter type.")
+
+    y1_marker_cy = cycler('marker', markers)
+    y2_marker_cy = cycler('marker', markers[::-1])
+
+    def extend_cycle(cy_1, cy_2):
+        l_1 = len(cy_1)
+        l_2 = len(cy_2)
+        if l_1 == 0:
+            return cycle(cy_2)
+        if l_2 == 0:
+            return cycle(cy_1)
+        if l_1 > l_2:
+            return cycle(cy_1 + (cy_2 * math.ceil(l_1 / l_2))[:l_1])
+        return cycle(cy_2 + (cy_1 * math.ceil(l_2 / l_1))[:l_2])
+
+    if cycle_compose:
+        pc_primary = extend_cycle(y1_marker_cy, color_cy)
+        pc_secondary = extend_cycle(y2_marker_cy, color_cy)
+    else:
+        pc_primary = cycle(y1_marker_cy * color_cy)
+        pc_secondary = cycle(y2_marker_cy * color_cy)
 
     # Put grid on plot
     ax1.grid(True, zorder=5)
@@ -294,13 +324,11 @@ def plot_iso(isotherms,
     # Graph title
     if fig_title is None:
         fig_title = ''
-    ax1.set_title(fig_title, **styles['title_style'], y=1.01)
+    ax1.set_title(fig_title, **styles['title_style'])
 
     # Graph legend builder
     def build_label(isotherm, lbl_components, iso_branch, key):
-        """
-        Builds a label for the legend depending on requested parameters
-        """
+        """Build a label for the legend depending on requested parameters."""
         if branch == 'all-nol' and iso_branch == 'des':
             return ''
         else:
@@ -323,9 +351,9 @@ def plot_iso(isotherms,
 
             return " ".join(text)
 
-###########################################
-#
-# Getting specific data from an isotherm
+    ###########################################
+    #
+    # Getting specific data from an isotherm
     #
 
     def get_data(isotherm, data_name, data_range, branch):
@@ -365,9 +393,7 @@ def plot_iso(isotherms,
     #
 
     def graph_caller(isotherm, iso_branch, y1_style, y2_style):
-        """
-        Convenience function to call other graphing functions
-        """
+        """Convenience function to call other graphing functions."""
 
         # Labels and ticks
         ax1.set_xlabel(text_xaxis, **styles['label_style'])
@@ -438,8 +464,14 @@ def plot_iso(isotherms,
     if logx:
         ax1.set_xscale('log')
     else:
-        ax1.set_xscale('linear')
         ax1.set_xlim(left=0)
+    if logy1:
+        ax1.set_yscale('log')
+    else:
+        ax1.set_ylim(bottom=0)
+    if ax2:
+        if logy2:
+            ax2.set_yscale('log')
 
     ax1.set_xlim(x_range)
     ax1.set_ylim(y1_range)
@@ -461,7 +493,7 @@ def plot_iso(isotherms,
         else:
             lgd_pos = 'inner'
 
-    if lgd_pos == 'none':
+    if lgd_pos is None:
         pass
     elif lgd_pos == 'inner':
         lgd = ax1.legend(lines, labels, **styles['legend_style'])
@@ -507,5 +539,4 @@ def plot_iso(isotherms,
 
     if ax2:
         return [ax1, ax2]
-    else:
-        return ax1
+    return ax1

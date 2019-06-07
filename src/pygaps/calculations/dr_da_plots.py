@@ -1,12 +1,12 @@
 """Dubinin-Radushkevich equation and related plots."""
 
-import matplotlib.pyplot as plt
 import numpy
 import scipy.constants as const
 import scipy.optimize as opt
 import scipy.stats as stats
 
 from ..classes.adsorbate import Adsorbate
+from ..graphing.calcgraph import dra_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
@@ -49,10 +49,11 @@ def dr_plot(isotherm, limits=None, verbose=False):
 
     .. math::
 
-        V_{ads} = V_{t} \exp\Big[\Big(\frac{A}{\varepsilon}\Big)^{2}\Big]
+        V_{ads} = V_{t} \exp\Big[\Big(\frac{\Delta G}{\varepsilon}\Big)^{2}\Big]
 
-    Here :math:`A` is the change in Gibbs free energy :math:`A = - RT \ln(p_0/p)`
-    and :math:`\varepsilon` is a characteristic energy of adsorption.
+    Here :math:`\Delta G` is the change in Gibbs free energy
+    :math:`\Delta G = - RT \ln(p_0/p)` and :math:`\varepsilon`
+    is a characteristic energy of adsorption.
 
     If an experimental isotherm is consistent with the DR model,
     the equation can be used to obtain the total pore volume
@@ -128,10 +129,11 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
 
     .. math::
 
-        V_{ads} = V_{t} \exp\Big[\Big(\frac{A}{\varepsilon}\Big)^{n}\Big]
+        V_{ads} = V_{t} \exp\Big[\Big(\frac{\Delta G}{\varepsilon}\Big)^{n}\Big]
 
-    Here :math:`A` is the change in Gibbs free energy :math:`A = - RT \ln(p_0/p)`
-    and :math:`\varepsilon` is a characteristic energy of adsorption.
+    Here :math:`\Delta G` is the change in Gibbs free energy
+    :math:`\Delta G = - RT \ln(p_0/p)` and :math:`\varepsilon`
+    is a characteristic energy of adsorption.
     The exponent :math:`n` is a fitting coefficient, often taken between
     1 (described as surface adsorption) and 3 (micropore adsorption).
     The exponent can also be related to surface heterogeneity.
@@ -207,12 +209,7 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
 
     if verbose:
 
-        linear = slope * log_n_p0p(exp) + intercept
-        plt.plot(log_n_p0p(exp), logv, "o")
-        plt.plot(log_n_p0p(exp), linear, linestyle='--', color='black', label='trendline')
-        plt.xlabel('log $p^0/p$')
-        plt.ylabel('log $V/V_0$')
-        plt.legend()
+        dra_plot(logv, log_n_p0p, slope, intercept, exp)
 
         if find_exp:
             print("Exponent is: {:.2f}".format(exp))

@@ -1,16 +1,15 @@
-"""
-This module contains general functions for string transformations.
-"""
+"""General functions for string transformations."""
 import pygaps
 
 
 def _to_latex(string):
+    """Latex-decorate a string."""
     return ('$' + string + '$')
 
 
 def convert_chemformula(string):
     """
-    Converts a chemical formula string to a matplotlib parsable format (latex).
+    Convert a chemical formula string to a matplotlib parsable format (latex).
 
     Parameters
     ----------

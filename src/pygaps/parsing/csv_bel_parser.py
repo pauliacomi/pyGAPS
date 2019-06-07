@@ -1,6 +1,4 @@
-"""
-This module contains the bel interface.
-"""
+"""Interface with BEL-generated DAT files."""
 
 from io import StringIO
 
@@ -32,8 +30,7 @@ _DATA = {
 
 def isotherm_from_bel(path):
     """
-    A function that will get the experiment and sample data
-    from a BEL Japan .dat file and return the isotherm object.
+    Get the isotherm and sample data from a BEL Japan .dat file.
 
     Parameters
     ----------
@@ -44,8 +41,8 @@ def isotherm_from_bel(path):
     -------
     PointIsotherm
         The isotherm contained in the dat file.
-    """
 
+    """
     with open(path) as file:
         line = file.readline().rstrip()
         material_info = {}

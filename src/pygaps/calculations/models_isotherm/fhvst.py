@@ -1,23 +1,18 @@
-"""
-Flory-Huggins-VST isotherm model
-"""
+"""Flory-Huggins-VST isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class FHVST(IsothermModel):
+class FHVST(IsothermBaseModel):
     r"""
-
     Flory-Huggins Vacancy Solution Theory isotherm model.
-
 
     Notes
     -----
-
     As a part of the Vacancy Solution Theory (VST) family of models, it is based on concept
     of a “vacancy” species, denoted v, and assumes that the system consists of a
     mixture of these vacancies and the adsorbate [#]_.
@@ -55,7 +50,7 @@ class FHVST(IsothermModel):
     The general VST equation requires an expression for the activity coefficients.
     Cochran [#]_ developed a simpler, three
     parameter equation based on the Flory – Huggins equation for the activity coefficient.
-    The equation for then becomes:
+    The equation then becomes:
 
     .. math::
 
@@ -77,21 +72,20 @@ class FHVST(IsothermModel):
        adsorption using Flory-Huggins activity coefficient equations. AIChE J. 1985, 31, 268-77.
 
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'FH-VST'
     calculates = 'pressure'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n": numpy.nan, "K": numpy.nan,
-                       "a1v": numpy.nan}
+    param_names = ["n_m", "K", "a1v"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "a1v": [-numpy.inf, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading.
+        Calculate loading at specified pressure.
 
         Careful!
         For the FH-VST model, the loading has to
@@ -122,8 +116,7 @@ class FHVST(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
 
         The FH-VST model calculates the pressure directly.
 
@@ -137,9 +130,9 @@ class FHVST(IsothermModel):
         float
             Pressure at specified loading.
         """
-        cov = loading / self.params["n"]
+        cov = loading / self.params["n_m"]
 
-        res = (self.params["n"] / self.params["K"]) * (cov / (1 - cov)) * \
+        res = (self.params["n_m"] / self.params["K"]) * (cov / (1 - cov)) * \
             numpy.exp(self.params["a1v"]**2 * cov /
                       (1 + self.params["a1v"] * cov))
 
@@ -147,6 +140,8 @@ class FHVST(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -169,27 +164,30 @@ class FHVST(IsothermModel):
         """
         return NotImplementedError
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
-
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(FHVST, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n": saturation_loading, "K": langmuir_k,
-                "a1v": 0}
+        guess = {"n_m": saturation_loading, "K": langmuir_k, "a1v": 0}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess

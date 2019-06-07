@@ -1,6 +1,4 @@
-"""
-Interaction with the NIST ISODB.
-"""
+"""Interaction with the NIST ISODB."""
 import warnings
 
 import requests
@@ -11,8 +9,20 @@ _ISODB_API = "https://adsorption.nist.gov/isodb/api"
 
 
 def isotherm_from_isodb(filename):
-    """Load an isotherm from NIST ISODB."""
+    """
+    Load an isotherm from the NIST ISODB.
 
+    Parameters
+    ----------
+    filename : str
+        ISODB filename to retrieve using the API.
+
+    Returns
+    -------
+    Isotherm
+        The isotherm from ISODB.
+
+    """
     url = r"{0}/isotherm/{1}.json".format(_ISODB_API, filename)
 
     try:

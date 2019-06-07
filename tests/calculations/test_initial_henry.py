@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to initial henry constant
-"""
+"""Tests relating to initial henry constant."""
 
 import os
 
@@ -15,14 +13,12 @@ from .conftest import DATA_N77_PATH
 
 @pytest.mark.characterisation
 class TestInitialHenry():
-    """
-    Tests all initial henry methods
-    """
+    """Test all initial henry methods."""
 
     @pytest.mark.parametrize('file, expected',
                              [(data['file'], data['Khslope']) for data in list(DATA.values())])
     def test_ihenry_slope(self, file, expected):
-        "The initial slope method"
+        """Test initial slope method."""
 
         filepath = os.path.join(DATA_N77_PATH, file)
 
@@ -40,7 +36,7 @@ class TestInitialHenry():
     @pytest.mark.parametrize('file, expected',
                              [(data['file'], data['Khvirial']) for data in list(DATA.values())])
     def test_ihenry_virial(self, file, expected):
-        "The virial method"
+        """Test virial method."""
 
         filepath = os.path.join(DATA_N77_PATH, file)
 

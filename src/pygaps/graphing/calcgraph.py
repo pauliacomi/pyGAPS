@@ -1,16 +1,18 @@
-"""
-This module contains the functions for plotting calculation-specific graphs.
-"""
+"""Functions for plotting calculation-specific graphs."""
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy
 
+from .mpl_styles import LABEL_STYLE
+from .mpl_styles import TICK_STYLE
+from .mpl_styles import TITLE_STYLE
+
 
 def roq_plot(pressure, roq_points, minimum, maximum,
-             p_monolayer, roq_monolayer):
+             p_monolayer, roq_monolayer, ax=None):
     """
-    Draws the Rouquerol plot.
+    Draw a Rouquerol plot.
 
     Parameters
     ----------
@@ -26,6 +28,9 @@ def roq_plot(pressure, roq_points, minimum, maximum,
         Pressure at which statistical monolayer is achieved.
     rol_monolayer : float
         Rouquerol transform of the point at which statistical monolayer is achieved.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -33,26 +38,28 @@ def roq_plot(pressure, roq_points, minimum, maximum,
         Matplotlib axes of the graph generated. The user can then apply their
         own styling if desired.
     """
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(pressure, roq_points,
-             marker='', color='g', label='all points')
-    ax1.plot(pressure[minimum:maximum], roq_points[minimum:maximum],
-             marker='o', linestyle='', color='r', label='chosen points')
-    ax1.plot(p_monolayer, roq_monolayer,
-             marker='x', linestyle='', color='black', label='monolayer point')
-    ax1.set_title("Rouquerol plot")
-    ax1.set_xlabel('p/p°')
-    ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
-    ax1.legend(loc='best')
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.subplots()
 
-    return ax1
+    ax.plot(pressure, roq_points,
+            marker='', color='g', label='all points')
+    ax.plot(pressure[minimum:maximum], roq_points[minimum:maximum],
+            marker='o', linestyle='', color='r', label='chosen points')
+    ax.plot(p_monolayer, roq_monolayer,
+            marker='x', linestyle='', color='black', label='monolayer point')
+    ax.set_title("Rouquerol plot")
+    ax.set_xlabel('p/p°')
+    ax.set_ylabel('(p/p°)/(n(1-(P/P°))')
+    ax.legend(loc='best')
+
+    return ax
 
 
 def bet_plot(pressure, bet_points, minimum, maximum,
-             slope, intercept, p_monolayer, bet_monolayer):
+             slope, intercept, p_monolayer, bet_monolayer, ax=None):
     """
-    Draws the BET plot.
+    Draw a BET plot.
 
     Parameters
     ----------
@@ -72,6 +79,9 @@ def bet_plot(pressure, bet_points, minimum, maximum,
         Pressure at which statistical monolayer is achieved.
     rol_monolayer : float
         BET transform of the point at which statistical monolayer is achieved.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -79,34 +89,36 @@ def bet_plot(pressure, bet_points, minimum, maximum,
         Matplotlib axes of the graph generated. The user can then apply their
         own styling if desired.
     """
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(pressure, bet_points,
-             marker='', color='g')
-    ax1.plot(pressure[minimum:maximum], bet_points[minimum:maximum],
-             marker='o', linestyle='', color='r', label='chosen points')
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.subplots()
+
+    ax.plot(pressure, bet_points,
+            marker='', color='g')
+    ax.plot(pressure[minimum:maximum], bet_points[minimum:maximum],
+            marker='o', linestyle='', color='r', label='chosen points')
     x_lim = [0, pressure[maximum]]
     y_lim = [slope * x_lim[0] + intercept,
              slope * x_lim[1] + intercept]
-    ax1.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
-    ax1.plot(p_monolayer, bet_monolayer,
-             marker='x', linestyle='', color='black', label='monolayer point')
+    ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
+    ax.plot(p_monolayer, bet_monolayer,
+            marker='x', linestyle='', color='black', label='monolayer point')
 
-    ax1.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
-    ax1.set_xlim(
+    ax.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
+    ax.set_xlim(
         left=0, right=pressure[maximum] * 1.2)
-    ax1.set_title("BET plot")
-    ax1.set_xlabel('p/p°')
-    ax1.set_ylabel('(p/p°)/(n(1-(P/P°))')
-    ax1.legend(loc='best')
+    ax.set_title("BET plot")
+    ax.set_xlabel('p/p°')
+    ax.set_ylabel('(p/p°)/(n(1-(P/P°))')
+    ax.legend(loc='best')
 
-    return ax1
+    return ax
 
 
 def langmuir_plot(pressure, langmuir_points, minimum, maximum,
-                  slope, intercept):
+                  slope, intercept, ax=None):
     """
-    Draws the Langmuir plot.
+    Draw a Langmuir plot.
 
     Parameters
     ----------
@@ -122,6 +134,9 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
         Slope of the chosen linear region.
     intercept : float
         Intercept of the chosen linear region.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -129,32 +144,33 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
         Matplotlib axes of the graph generated. The user can then apply their
         own styling if desired.
     """
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(pressure, langmuir_points,
-             marker='', color='g')
-    ax1.plot(pressure[minimum:maximum], langmuir_points[minimum:maximum],
-             marker='o', linestyle='', color='r', label='chosen points')
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.subplots()
+
+    ax.plot(pressure, langmuir_points,
+            marker='', color='g')
+    ax.plot(pressure[minimum:maximum], langmuir_points[minimum:maximum],
+            marker='o', linestyle='', color='r', label='chosen points')
     x_lim = [0, pressure[maximum]]
     y_lim = [slope * x_lim[0] + intercept,
              slope * x_lim[1] + intercept]
-    ax1.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
+    ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
 
-    ax1.set_ylim(bottom=0, top=langmuir_points[maximum] * 1.2)
-    ax1.set_xlim(
+    ax.set_ylim(bottom=0, top=langmuir_points[maximum] * 1.2)
+    ax.set_xlim(
         left=0, right=pressure[maximum] * 1.2)
-    ax1.set_title("Langmuir plot")
-    ax1.set_xlabel('p/p°')
-    ax1.set_ylabel('(p/p°)/n')
-    ax1.legend(loc='best')
+    ax.set_title("Langmuir plot")
+    ax.set_xlabel('p/p°')
+    ax.set_ylabel('(p/p°)/n')
+    ax.legend(loc='best')
 
-    return ax1
+    return ax
 
 
-def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=None):
+def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=None, ax=None):
     """
-    Draws the t-plot.
-    Also used for alpha-s plot.
+    Draw a t-plot (also used for the alpha-s plot).
 
     Parameters
     ----------
@@ -179,6 +195,9 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
         Whether the function is used for alpha_s display.
     alpha_reducing_p : bool
         The reducing pressure used for alpha_s.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -186,9 +205,10 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
         Matplotlib axes of the graph generated. The user can then apply their
         own styling if desired.
     """
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.subplots()
 
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
     if alpha_s:
         label1 = '$\\alpha_s$ method'
         label2 = '$\\alpha_s (V/V_{' + str(alpha_reducing_p) + '})$'
@@ -197,13 +217,13 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
         label1 = 't transform'
         label2 = 'Layer thickness (nm)'
         label3 = 't-plot method'
-    ax1.plot(thickness_curve, loading,
-             marker='', color='g', label=label1)
+    ax.plot(thickness_curve, loading,
+            marker='', color='g', label=label1)
 
     for index, result in enumerate(results):
         # plot chosen points
-        ax1.plot(thickness_curve[result.get('section')], loading[result.get('section')],
-                 marker='.', linestyle='')
+        ax.plot(thickness_curve[result.get('section')], loading[result.get('section')],
+                marker='.', linestyle='')
 
         # plot line
         min_lim = 0
@@ -212,24 +232,24 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
         y_lim = [result.get('slope') * min_lim + result.get('intercept'),
                  result.get('slope') * max_lim + result.get('intercept')]
 
-        ax1.plot(x_lim, y_lim, linestyle='--',
-                 color='black', label='linear' + str(index + 1))
+        ax.plot(x_lim, y_lim, linestyle='--',
+                color='black', label='linear' + str(index + 1))
 
-    ax1.set_title(label3)
-    ax1.set_xlim(left=0)
-    ax1.set_ylim(bottom=0)
-    ax1.set_xlabel(label2)
-    ax1.set_ylabel('Loading')
-    ax1.legend(loc='best')
+    ax.set_title(label3)
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.set_xlabel(label2)
+    ax.set_ylabel('Loading')
+    ax.legend(loc='best')
 
-    return ax1
+    return ax
 
 
 def psd_plot(pore_widths, pore_dist, method=None,
              labeldiff='distribution', labelcum='cumulative',
-             log=True, right=None, left=None):
+             line_style=None, log=True, right=None, left=None, ax=None):
     """
-    Draws the pore size distribution plot.
+    Draw a pore size distribution plot.
 
     Parameters
     ----------
@@ -239,14 +259,22 @@ def psd_plot(pore_widths, pore_dist, method=None,
         Contribution of each pore radius which will make up the y axis.
     method : str
         The method used. Will be a string part of the title.
-    label : str
+    labeldiff : str
         The label for the plotted data, which will appear in the legend.
+    labelcum : str, optional
+        The label for the cumulative data, which will appear in the legend.
+        Set to None to remove cumulative distribution
+    line_style : dict, optional
+        The style dictionary to send to the plot() function.
     log : int
         Whether to display a logarithmic graph.
     right : int
         Higher bound of the selected pore widths.
     right : int
         Lower bound of the selected pore widths.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -255,12 +283,18 @@ def psd_plot(pore_widths, pore_dist, method=None,
         own styling if desired.
 
     """
-    fig = plt.figure(figsize=(15, 5))
-    ax1 = fig.add_subplot(111)
-    ax2 = ax1.twinx()
-    l1 = ax1.plot(pore_widths, pore_dist,
-                  marker='', color='k', label=labeldiff)
+    # Generate the figure if needed
+    if ax is None:
+        fig = plt.figure(figsize=(15, 5))
+        ax = fig.add_subplot(111)
+
+    lst = {'marker': '', 'color': 'k'}
+    if line_style is not None:
+        lst.update(line_style)
+
+    l1 = ax.plot(pore_widths, pore_dist, label=labeldiff, **lst)
     if labelcum:
+        ax2 = ax.twinx()
         l2 = ax2.plot(pore_widths[1:], numpy.cumsum(pore_dist[1:] * numpy.diff(pore_widths)),
                       marker='', color='r', linestyle="--", label=labelcum)
 
@@ -270,51 +304,57 @@ def psd_plot(pore_widths, pore_dist, method=None,
         return "{0:g}".format(x)
 
     if log:
-
-        ax1.set_xscale('log')
-        ax1.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
-        ax1.xaxis.set_major_formatter(ticker.FuncFormatter(formatter))
-        ax1.xaxis.set_major_locator(ticker.LogLocator(
+        ax.set_xscale('log')
+        ax.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
+        ax.xaxis.set_major_formatter(ticker.FuncFormatter(formatter))
+        ax.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
-        ax1.tick_params(axis='x', which='minor', width=0.75,
-                        length=2.5, labelsize=10)
-        ax1.tick_params(axis='x', which='major',
-                        width=2, length=10, labelsize=10)
-        ax1.set_xlim(left=left, right=right)
+        ax.tick_params(axis='x', which='minor', width=0.75,
+                       length=2.5, **TICK_STYLE)
+        ax.tick_params(axis='x', which='major',
+                       width=2, length=10, **TICK_STYLE)
+        ax.set_xlim(left=left, right=right)
     else:
         if not left:
             left = 0
-        ax1.set_xlim(left=left, right=right)
+        ax.set_xlim(left=left, right=right)
+        ax.tick_params(axis='both', which='major', **TICK_STYLE)
 
-    ax1.set_title("PSD plot " + str(method))
-    ax1.set_xlabel('Pore width (nm)')
-    ax1.set_ylabel('Differential Vol (dV/dw)')
-    ax2.set_ylabel('Cumulative Vol ($cm^3 g^{-1}$)')
+    ax.set_title("PSD plot " + str(method), **TITLE_STYLE)
+    ax.set_xlabel('Pore width (nm)', **LABEL_STYLE)
+    ax.set_ylabel('Distribution (dV/dw)', **LABEL_STYLE)
+    if labelcum:
+        ax2.set_ylabel('Cumulative Vol ($cm^3 g^{-1}$)', **LABEL_STYLE)
 
     lns = l1
     if labelcum:
         lns = l1 + l2
     labs = [l.get_label() for l in lns]
-    ax1.legend(lns, labs, loc='lower right')
-    ax1.set_ylim(bottom=0)
-    ax2.set_ylim(bottom=0)
-    ax1.grid(True)
+    ax.legend(lns, labs, loc='lower right')
+    ax.set_ylim(bottom=0)
+    if labelcum:
+        ax2.set_ylim(bottom=0)
+    ax.grid(True)
 
-    return ax1
+    return ax
 
 
-def isosteric_heat_plot(loading, isosteric_heat, log=False):
+def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
     """
-    Draws the isosteric heat plot.
+    Draws the isosteric enthalpy plot.
 
     Parameters
     ----------
     loading : array
-        Loadings for which the isosteric heat was calculated.
-    isosteric_heat : array
-        The isosteric heat corresponding to each loading.
+        Loadings for which the isosteric enthalpy was calculated.
+    isosteric_enthalpy : array
+        The isosteric enthalpy corresponding to each loading.
     log : int
         Whether to display a logarithmic graph.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
+
     Returns
     -------
     matplotlib.axes
@@ -322,27 +362,29 @@ def isosteric_heat_plot(loading, isosteric_heat, log=False):
         own styling if desired.
 
     """
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(loading, isosteric_heat,
-             marker='o', color='g', label='heat')
-    if(log):
-        ax1.set_xscale('log')
-        ax1.xaxis.set_major_locator(ticker.LogLocator(
-            base=10.0, numticks=15, numdecs=20))
-    ax1.set_title("Isosteric heat plot")
-    ax1.set_xlabel('Loading')
-    ax1.set_ylabel('Isosteric heat')
-    ax1.legend(loc='best')
-    ax1.set_xlim(left=0)
-    ax1.set_ylim(bottom=0)
-    ax1.grid(True)
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.subplots()
 
-    return ax1
+    ax.plot(loading, isosteric_enthalpy,
+            marker='o', color='g', label='enthalpy')
+    if log:
+        ax.set_xscale('log')
+        ax.xaxis.set_major_locator(ticker.LogLocator(
+            base=10.0, numticks=15, numdecs=20))
+    ax.set_title("Isosteric enthalpy plot")
+    ax.set_xlabel('Loading')
+    ax.set_ylabel('Isosteric enthalpy')
+    ax.legend(loc='best')
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.grid(True)
+
+    return ax
 
 
 def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
-                          title=None, extras=None):
+                          title=None, extras=None, ax=None):
     """
     Draws the initial enthalpy calculation plot.
 
@@ -358,6 +400,9 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
         Whether to display a logarithmic graph
     title : str
         Name of the material to put in the title.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
 
     Returns
     -------
@@ -366,27 +411,70 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
         own styling if desired.
 
     """
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111)
-    ax1.plot(loading, enthalpy,
-             marker='o', color='black', label='original', linestyle='')
-    ax1.plot(loading, fitted_enthalpy,
-             color='r', label='fitted', linestyle='-')
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.subplots()
+
+    ax.plot(loading, enthalpy,
+            marker='o', color='black', label='original', linestyle='')
+    ax.plot(loading, fitted_enthalpy,
+            color='r', label='fitted', linestyle='-')
 
     if extras is not None:
         for param in extras:
-            ax1.plot(param[0], param[1], label=param[2], linestyle='--')
+            ax.plot(param[0], param[1], label=param[2], linestyle='--')
     if log:
-        ax1.set_xscale('log')
-        ax1.xaxis.set_major_locator(ticker.LogLocator(
+        ax.set_xscale('log')
+        ax.xaxis.set_major_locator(ticker.LogLocator(
             base=10.0, numticks=15, numdecs=20))
 
-    ax1.set_title(title + " initial enthalpy fit")
-    ax1.set_xlabel('Loading')
-    ax1.set_ylabel('Enthalpy')
-    ax1.legend(loc='best')
-    ax1.set_ylim(bottom=0, top=(max(enthalpy) * 1.2))
-    ax1.set_xlim(left=0)
-    ax1.grid(True)
+    ax.set_title(title + " initial enthalpy fit")
+    ax.set_xlabel('Loading')
+    ax.set_ylabel('Enthalpy')
+    ax.legend(loc='best')
+    ax.set_ylim(bottom=0, top=(max(enthalpy) * 1.2))
+    ax.set_xlim(left=0)
+    ax.grid(True)
 
-    return ax1
+    return ax
+
+
+def dra_plot(logv, log_n_p0p, slope, intercept, exp, ax=None):
+    """
+    Draw a Dubinin plot.
+
+    Parameters
+    ----------
+    logv : array
+        Logarithm of volume adsorbed.
+    log_n_p0p : array
+        Logarithm of pressure term.
+    slope : float
+        Slope of the fitted line.
+    intercept : float
+        Intercept of the fitted line.
+    exp : float
+        Whether to display a logarithmic graph.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
+
+    Returns
+    -------
+    matplotlib.axes
+        Matplotlib axes of the graph generated. The user can then apply their
+        own styling if desired.
+
+    """
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.subplots()
+
+    linear = slope * log_n_p0p(exp) + intercept
+    ax.plot(log_n_p0p(exp), logv, "o")
+    ax.plot(log_n_p0p(exp), linear, linestyle='--', color='black', label='trendline')
+    ax.set_xlabel('log $p^0/p$')
+    ax.set_ylabel('log $V/V_0$')
+    ax.legend()
+
+    return ax

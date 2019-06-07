@@ -1,6 +1,4 @@
-"""
-This test module has tests relating to isosteric heat calculations
-"""
+"""Tests relating to isosteric enthalpy calculations."""
 
 import os
 
@@ -16,14 +14,13 @@ from .conftest import DATA_ISOSTERIC_PATH
 
 
 @pytest.mark.characterisation
-class TestIsostericHeat():
+class TestIsostericEnthalpy():
     """
-    Tests everything related to isosteric heat calculation
+    Tests everything related to isosteric enthalpy calculation
     """
 
-    def test_iso_heat_checks(self, use_material):
-        """Tests initial checks"""
-
+    def test_iso_enthalpy_checks(self, use_material):
+        """Test initial checks."""
         isotherms = []
 
         # load test data
@@ -40,13 +37,13 @@ class TestIsostericHeat():
 
         # Check multiple isotherms
         with pytest.raises(pygaps.ParameterError):
-            pygaps.isosteric_heat([isotherms[0]])
+            pygaps.isosteric_enthalpy([isotherms[0]])
 
         # Check same sample
         isotherms[0].material_name = 'Test'
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.isosteric_heat(isotherms)
+            pygaps.isosteric_enthalpy(isotherms)
 
         isotherms[0].material_name = isotherms[1].material_name
 
@@ -54,13 +51,12 @@ class TestIsostericHeat():
         isotherms[0].convert_adsorbent(basis_to='volume', unit_to='cm3')
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.isosteric_heat(isotherms)
+            pygaps.isosteric_enthalpy(isotherms)
 
         return
 
-    def test_iso_heat(self):
-        """Tests calculation"""
-
+    def test_iso_enthalpy(self):
+        """Test calculation."""
         isotherms = []
 
         # load test data
@@ -75,15 +71,15 @@ class TestIsostericHeat():
 
             isotherms.append(isotherm)
 
-        result_dict = pygaps.isosteric_heat(isotherms, verbose=False)
+        result_dict = pygaps.isosteric_enthalpy(isotherms, verbose=False)
 
-        assert isclose(average(result_dict['isosteric_heat']), 29, 3)
+        assert isclose(average(result_dict['isosteric_enthalpy']), 29, 3)
 
         return
 
     @cleanup
-    def test_iso_heat_output(self):
-        """Test verbosity"""
+    def test_iso_enthalpy_output(self):
+        """Test verbosity."""
 
         isotherms = []
 
@@ -99,6 +95,4 @@ class TestIsostericHeat():
 
             isotherms.append(isotherm)
 
-        pygaps.isosteric_heat(isotherms, verbose=True)
-
-        return
+        pygaps.isosteric_enthalpy(isotherms, verbose=True)

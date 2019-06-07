@@ -16,8 +16,9 @@ export isotherms.
     - Parsing an excel file of a standard format.
     - Parsing a csv file of a standard format.
     - Several manufacturer-specific formats.
-    - From an sqlite database: pyGAPS contains functionality to store and retrieve constructed
-      isotherms in a sqlite database.
+    - From an sqlite database: pyGAPS contains functionality to store and
+      retrieve constructed isotherms in a sqlite database.
+    - From the NIST ISODB `database <https://adsorption.nist.gov/>`__.
 
 .. _parsing-manual-sqlite:
 
@@ -161,4 +162,27 @@ machines output proprietary files which can nevertheless be imported.
 Currently pyGAPS includes functionality to import:
 
     - Microtrac BEL .dat files using :meth:`~pygaps.parsing.csv_bel_parser.isotherm_from_bel`
+    - Microtrac BEL .xls files using :meth:`~pygaps.parsing.excelinterface.isotherm_from_xl`
+      and ``fmt="bel"``
+    - Micromeritics .xls files using :meth:`~pygaps.parsing.excelinterface.isotherm_from_xl`
+      and ``fmt="mic"``
 
+
+.. _parsing-manual-isodb:
+
+Isotherms from the NIST ISODB
+-----------------------------
+
+The NIST ISODB is a database of adsorption isotherms.
+pyGAPS can pull a specific isotherm from the NIST ISODB
+by using the :meth:`~pygaps.parsing.isodb_interface.isotherm_from_isodb` function.
+The ISODB isotherm filename should be specified as a paramater.
+
+::
+
+    isotherm = pygaps.isotherm_from_isodb('10.1002adfm.201200084.Isotherm3')
+
+.. caution::
+
+    This functionality relies on public APIs from NIST.
+    No guarantee can be made regarding future availability.

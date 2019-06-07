@@ -1,15 +1,13 @@
-"""
-Langmuir isotherm model
-"""
+"""Langmuir isotherm model."""
 
 import numpy
 
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class Langmuir(IsothermModel):
+class Langmuir(IsothermBaseModel):
     r"""
-    Langmuir isotherm model
+    Langmuir isotherm model.
 
     .. math::
 
@@ -17,7 +15,6 @@ class Langmuir(IsothermModel):
 
     Notes
     -----
-
     The Langmuir theory [#]_, proposed at the start of the 20th century, states that
     adsorption takes place on specific sites on a surface, until
     all sites are occupied.
@@ -30,7 +27,6 @@ class Langmuir(IsothermModel):
         * The rates of adsorption and desorption are proportional to the number
           of sites currently free and currently occupied, respectively
         * Adsorption is complete when all sites are filled.
-
 
     Using these assumptions we can define rates for both adsorption and
     desorption. The adsorption rate :math:`r_a`
@@ -68,7 +64,8 @@ class Langmuir(IsothermModel):
 
     Here, :math:`n_m` is the moles adsorbed at the completion of the
     monolayer, and therefore the maximum possible loading.
-    The Langmuir constant is the product of the individual desorption and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
+    The Langmuir constant is the product of the individual desorption
+    and adsorption constants :math:`k_a` and :math:`k_d` and exponentially
     related to the energy of adsorption
     :math:`\exp{(-\frac{E}{RT})}`.
 
@@ -78,20 +75,18 @@ class Langmuir(IsothermModel):
 
     """
 
-    #: Name of the model
+    # Model parameters
     name = 'Langmuir'
     calculates = 'loading'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n_m": numpy.nan, "K": numpy.nan}
+    param_names = ["K", "n_m"]
+    param_bounds = {
+        "K": [0, numpy.inf],
+        "n_m": [0, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading
+        Calculate loading at specified pressure.
 
         Parameters
         ----------
@@ -108,8 +103,8 @@ class Langmuir(IsothermModel):
 
     def pressure(self, loading):
         r"""
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
+
         For the Langmuir model, a direct relationship can be found
         by rearranging the function.
 
@@ -132,6 +127,8 @@ class Langmuir(IsothermModel):
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -158,25 +155,30 @@ class Langmuir(IsothermModel):
         return self.params["n_m"] * \
             numpy.log(1.0 + self.params["K"] * pressure)
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(Langmuir, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n_m": saturation_loading, "K": langmuir_k}
+        guess = {"n_m": saturation_loading, "K": langmuir_k}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess

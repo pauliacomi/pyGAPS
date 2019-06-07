@@ -1,22 +1,18 @@
-"""
-Wilson-VST isotherm model
-"""
+"""Wilson-VST isotherm model."""
 
 import numpy
 import scipy
 
 from ...utilities.exceptions import CalculationError
-from .model import IsothermModel
+from .base_model import IsothermBaseModel
 
 
-class WVST(IsothermModel):
+class WVST(IsothermBaseModel):
     r"""
-
     Wilson Vacancy Solution Theory isotherm model.
 
     Notes
     -----
-
     As a part of the Vacancy Solution Theory (VST) family of models, it is based on concept
     of a “vacancy” species, denoted v, and assumes that the system consists of a
     mixture of these vacancies and the adsorbate [#]_.
@@ -68,23 +64,22 @@ class WVST(IsothermModel):
     .. [#] Suwanayuen, S.; Danner, R. P., Gas-Adsorption Isotherm Equation Based On
        Vacancy Solution Theory. AIChE Journal 1980, 26, (1), 68-76.
 
-
     """
-    #: Name of the model
+
+    # Model parameters
     name = 'W-VST'
     calculates = 'pressure'
-
-    def __init__(self):
-        """
-        Instantiation function
-        """
-
-        self.params = {"n": numpy.nan, "K": numpy.nan,
-                       "L1v": numpy.nan, "Lv1": numpy.nan}
+    param_names = ["n_m", "K", "L1v", "Lv1"]
+    param_bounds = {
+        "n_m": [0, numpy.inf],
+        "K": [0, numpy.inf],
+        "L1v": [-numpy.inf, numpy.inf],
+        "Lv1": [-numpy.inf, numpy.inf],
+    }
 
     def loading(self, pressure):
         """
-        Function that calculates loading.
+        Calculate loading at specified pressure.
 
         Careful!
         For the W-VST model, the loading has to
@@ -99,8 +94,8 @@ class WVST(IsothermModel):
         -------
         float
             Loading at specified pressure.
-        """
 
+        """
         def fun(x):
             return self.pressure(x) - pressure
 
@@ -115,8 +110,7 @@ class WVST(IsothermModel):
 
     def pressure(self, loading):
         """
-        Function that calculates pressure as a function
-        of loading.
+        Calculate pressure at specified loading.
 
         The W-VST model calculates the pressure directly.
 
@@ -129,24 +123,27 @@ class WVST(IsothermModel):
         -------
         float
             Pressure at specified loading.
+
         """
-        cov = loading / self.params["n"]
+        cov = loading / self.params["n_m"]
 
         coef = self.params["L1v"] * (1 - (1 - self.params["Lv1"]) * cov) / \
             (self.params["L1v"] + (1 - self.params["L1v"]) * cov)
 
         expcoef = -((self.params["Lv1"] * (1 - self.params["Lv1"]) * cov) /
                     (1 - (1 - self.params["Lv1"]) * cov)) \
-                  - (((1 - self.params["L1v"]) * cov) /
+                  - ((1 - self.params["L1v"]) * cov /
                      (self.params["L1v"] + (1 - self.params["L1v"]) * cov))
 
-        res = (self.params["n"] / self.params["K"] * cov / (1 - cov)) * \
+        res = (self.params["n_m"] / self.params["K"] * cov / (1 - cov)) * \
             coef * numpy.exp(expcoef)
 
         return res
 
     def spreading_pressure(self, pressure):
         r"""
+        Calculate spreading pressure at specified gas pressure.
+
         Function that calculates spreading pressure by solving the
         following integral at each point i.
 
@@ -169,27 +166,31 @@ class WVST(IsothermModel):
         """
         return NotImplementedError
 
-    def default_guess(self, data, loading_key, pressure_key):
+    def default_guess(self, pressure, loading):
         """
-        Returns initial guess for fitting
+        Return initial guess for fitting.
 
         Parameters
         ----------
-        data : pandas.DataFrame
-            Data of the isotherm.
-        loading_key : str
-            Column with the loading.
-        pressure_key : str
-            Column with the pressure.
-
+        pressure : ndarray
+            Pressure data.
+        loading : ndarray
+            Loading data.
 
         Returns
         -------
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super(WVST, self).default_guess(
-            data, loading_key, pressure_key)
+        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
 
-        return {"n": saturation_loading, "K": langmuir_k,
-                "L1v": 1, "Lv1": 1}
+        guess = {"n_m": saturation_loading, "K": langmuir_k,
+                 "L1v": 1, "Lv1": 1}
+
+        for param in guess:
+            if guess[param] < self.param_bounds[param][0]:
+                guess[param] = self.param_bounds[param][0]
+            if guess[param] > self.param_bounds[param][1]:
+                guess[param] = self.param_bounds[param][1]
+
+        return guess
