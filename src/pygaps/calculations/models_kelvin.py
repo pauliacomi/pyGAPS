@@ -6,6 +6,8 @@ the mesopore range.
 import numpy
 import scipy.constants as const
 
+from ..utilities.exceptions import ParameterError
+
 
 def meniscus_geometry(branch, pore_geometry):
     """
@@ -31,13 +33,19 @@ def meniscus_geometry(branch, pore_geometry):
             m_geometry = 'sphere'
         elif pore_geometry == 'slit':
             m_geometry = 'cylinder'
-    if branch == 'des':
+        else:
+            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
+    elif branch == 'des':
         if pore_geometry == 'cylinder':
             m_geometry = 'sphere'
         elif pore_geometry == 'sphere':
             m_geometry = 'sphere'
         elif pore_geometry == 'slit':
             m_geometry = 'slit'
+        else:
+            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
+    else:
+        raise ParameterError("Adsorption branch must be either 'ads' or 'des'.")
 
     return m_geometry
 

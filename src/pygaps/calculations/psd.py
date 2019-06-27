@@ -25,21 +25,19 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     """
     Calculate the pore size distribution using a 'classical' model, applicable to mesopores.
 
-    To use, specify the psd model in the function argument, then pass the parameters
-    for each model.
+    To use, specify the psd model and assumed pore geometry. Each model
+    has other parameters which can be specified.
 
     Parameters
     ----------
     isotherm : Isotherm
-        Isotherm which the pore size distribution will be calculated.
+        Isotherm for which the pore size distribution will be calculated.
     psd_model : str
         The pore size distribution model to use.
     pore_geometry : str
         The geometry of the adsorbent pores.
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
-    model_parameters : dict
-        A dictionary to override specific settings for each model.
 
     Other Parameters
     ----------------
@@ -87,13 +85,17 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
         - The filling/emptying of each pore does not depend on its location.
         - The adsorption on the pore walls is not different from surface adsorption.
 
+    References
+    ----------
+    .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
+       and K. Sing, Academic Press, 1999
+
     See Also
     --------
     pygaps.calculations.psd_mesoporous.psd_bjh : the BJH or Barrett, Joyner and Halenda method
     pygaps.calculations.psd_mesoporous.psd_dollimore_heal : the DH or Dollimore-Heal method
 
     """
-
     # Function parameter checks
     if psd_model is None:
         raise ParameterError("Specify a model to generate the pore size"
@@ -191,15 +193,13 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     Parameters
     ----------
     isotherm : Isotherm
-        Isotherm which the pore size distribution will be calculated.
+        Isotherm for which the pore size distribution will be calculated.
     psd_model : str
         The pore size distribution model to use.
     pore_geometry : str
         The geometry of the adsorbent pores.
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
-    model_parameters : dict
-        A dictionary to override specific settings for each model.
 
     Other Parameters
     ----------------
@@ -220,7 +220,6 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
     Notes
     -----
-
     Calculates the pore size distribution using a 'classical' model which attempts to
     describe the adsorption in a pore of specific width w at a relative pressure p/p0
     as a single function :math:`p/p0 = f(w)`. This function uses properties of the
@@ -230,7 +229,7 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
 
         - the HK, or Horvath-Kawazoe method
 
-    A common *gotcha* of data processing is: "garbage in = garbage out". Only use methods
+    A common mantra of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
 
     See Also
@@ -238,7 +237,6 @@ def micropore_size_distribution(isotherm, psd_model, pore_geometry='slit',
     pygaps.calculations.psd_microporous.psd_horvath_kawazoe : the HK, of Horvath-Kawazoe method
 
     """
-
     # Function parameter checks
     if psd_model is None:
         raise ParameterError("Specify a model to generate the pore size"
@@ -305,7 +303,7 @@ def dft_size_distribution(isotherm, kernel_path, verbose=False, bspline_order=2,
     Parameters
     ----------
     isotherm : PointIsotherm
-        The isotherm to calculate the pore size distribution.
+        The isotherm for which the pore size distribution will be calculated.
     kernel_path : str
         The path to the kernel used.
     bspline_order : int

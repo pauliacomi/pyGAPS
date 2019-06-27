@@ -1,6 +1,7 @@
 """
-Module contains 'classical' methods of calculating a pore size distribution for pores in
-the mesopore range (2-50 nm).
+Module contains 'classical' methods of calculating a pore size
+distribution for pores in the mesopore range (2-50 nm).
+These methods are based on the Kelvin equation.
 """
 
 import numpy
@@ -85,8 +86,8 @@ def psd_bjh(loading, pressure, pore_geometry,
 
     References
     ----------
-    .. [#] “The Determination of Pore Volume and Area Distributions in Porous Substances.
-       I. Computations from Nitrogen Isotherms”, Elliott P. Barrett, Leslie G. Joyner and
+    .. [#] "The Determination of Pore Volume and Area Distributions in Porous Substances.
+       I. Computations from Nitrogen Isotherms", Elliott P. Barrett, Leslie G. Joyner and
        Paul P. Halenda, J. Amer. Chem. Soc., 73, 373 (1951)
 
     .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
@@ -204,8 +205,8 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     The original model used the desorption curve as a basis for calculating pore size distribution.
     Between two points of the curve, the volume desorbed can be described as the volume contribution
     from pore evaporation and the volume from layer thickness decrease as per the equation
-    above. The computation is done cumulatively, starting from the filled pores and calculating for each
-    point the volume adsorbed in a pore from the following equation:
+    above. The computation is done cumulatively, starting from the filled pores and calculating for
+    each point the volume adsorbed in a pore from the following equation:
 
     .. math::
 
