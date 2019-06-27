@@ -2,14 +2,18 @@
 Changelog
 =========
 
-1.. ()
+1.7.0 ()
 ------------------
 
 New features:
 
+* After attempting a model guess for the creation of a ModelIsotherm,
+  all tested models are now plotted alongside the isotherm to
+  be modelled.
 * Added a new parameters named logy1 and logy2 to
   set the plotting vertical axes to be logarithmic.
 * To remove the legend now set the lgd_pos to None
+
 
 
 1.6.1 (2019-05-09)

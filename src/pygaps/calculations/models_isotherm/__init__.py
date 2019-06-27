@@ -55,7 +55,6 @@ _GUESS_MODELS = [
     Langmuir,
     DSLangmuir,
     Freundlich,
-    DR,
     Quadratic,
     BET,
     TemkinApprox,
