@@ -32,7 +32,7 @@ def meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'sphere':
             m_geometry = 'sphere'
         elif pore_geometry == 'slit':
-            m_geometry = 'cylinder'
+            m_geometry = 'slit'
         else:
             raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     elif branch == 'des':
@@ -41,7 +41,7 @@ def meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'sphere':
             m_geometry = 'sphere'
         elif pore_geometry == 'slit':
-            m_geometry = 'slit'
+            m_geometry = 'cylinder'
         else:
             raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     else:
