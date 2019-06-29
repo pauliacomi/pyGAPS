@@ -100,11 +100,14 @@ def psd_bjh(loading, pressure, pore_geometry,
                              " do not match")
 
     if pore_geometry == 'slit':
-        raise NotImplementedError
+        vol_area_ratio = 1  # ALSO NEED THICKNESS!
+        width_factor = 1
     elif pore_geometry == 'cylinder':
-        pass
+        vol_area_ratio = 2
+        width_factor = 2
     elif pore_geometry == 'sphere':
-        raise NotImplementedError
+        vol_area_ratio = 3
+        width_factor = 2
 
     # Calculate the adsorbed volume of liquid and diff
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000
@@ -121,9 +124,9 @@ def psd_bjh(loading, pressure, pore_geometry,
 
     # Critical pore radii as a combination of the adsorbed
     # layer thickness and kelvin pore radius, with average and diff
-    pore_radii = numpy.add(thickness_curve, kelvin_radius)
-    avg_pore_radii = numpy.add(avg_thickness, avg_k_radius)
-    d_pore_radii = -numpy.diff(pore_radii)
+    pore_widths = numpy.add(width_factor * thickness_curve, 2 * kelvin_radius)
+    avg_pore_widths = numpy.add(avg_thickness, 2 * avg_k_radius)
+    d_pore_widths = -numpy.diff(pore_widths)
 
     # Now we can iteratively calculate the pore size distribution
     d_area = 0
@@ -139,7 +142,7 @@ def psd_bjh(loading, pressure, pore_geometry,
 
         pore_volume = (d_volume[i] - D_var + E_var) * R_factor
 
-        d_area = 2 * pore_volume / avg_pore_radii[i]
+        d_area = vol_area_ratio * pore_volume / avg_pore_radii[i]
         sum_d_area += d_area
         sum_d_area_div_r += d_area / avg_pore_radii[i]
 
