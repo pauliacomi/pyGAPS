@@ -465,8 +465,7 @@ class ModelIsotherm(Isotherm):
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
-        print(self)
-        print(self.model)
+        return super().__str__() + self.model.__str__()
 
     def print_info(self, show=True, **plot_iso_args):
         """
@@ -488,7 +487,6 @@ class ModelIsotherm(Isotherm):
 
         """
         print(self)
-        print(self.model)
         return self.plot(show, **plot_iso_args)
 
     def plot(self, show=True, **plot_iso_args):
