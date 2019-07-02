@@ -13,6 +13,8 @@ New features:
 
 * Pore size distribution improvements:
 
+    * Changed names of PSD funtions to `psd_microporous`,
+      `psd_mesoporous` and `psd_dft`.
     * Changed HK dictionary name OxideIon(SF) -> 'AlSiOxideIon'
     * Added a new HK dictionary 'AlPhOxideIon'
 

@@ -7,8 +7,8 @@ based on the Kelvin equation and pore condensation/evaporation.
 import numpy
 
 from ..classes.adsorbate import Adsorbate
-from ..utilities.exceptions import ParameterError
 from ..graphing.calcgraph import psd_plot
+from ..utilities.exceptions import ParameterError
 from .models_kelvin import get_kelvin_model
 from .models_kelvin import meniscus_geometry
 from .models_thickness import get_thickness_model
@@ -17,13 +17,13 @@ _MESO_PSD_MODELS = ['BJH', 'DH']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
-def mesopore_size_distribution(isotherm,
-                               psd_model='pygaps-DH',
-                               pore_geometry='cylinder',
-                               branch='des',
-                               thickness_model='Harkins/Jura',
-                               kelvin_model='Kelvin',
-                               verbose=False, **model_parameters):
+def psd_mesoporous(isotherm,
+                   psd_model='pygaps-DH',
+                   pore_geometry='cylinder',
+                   branch='des',
+                   thickness_model='Harkins/Jura',
+                   kelvin_model='Kelvin',
+                   verbose=False, **model_parameters):
     r"""
     Calculate the mesopore size distribution.
 

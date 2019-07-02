@@ -39,11 +39,8 @@ Mesoporous pore size distribution
 .. automodule:: pygaps.calculations.psd_mesoporous
     :members:
 
-
 Microporous pore size distribution
 ..................................
-
-.. autofunction:: pygaps.calculations.psd.micropore_size_distribution
 
 .. automodule:: pygaps.calculations.psd_microporous
     :members:
@@ -51,11 +48,8 @@ Microporous pore size distribution
 Pore size distribution DFT
 ..........................
 
-.. autofunction:: pygaps.calculations.psd.dft_size_distribution
-
 .. automodule:: pygaps.calculations.psd_dft
     :members:
-
 
 Isosteric enthalpy of adsorption
 ................................

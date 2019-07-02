@@ -42,7 +42,7 @@ def meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'sphere':
             m_geometry = 'spherical'
         elif pore_geometry == 'slit':
-            m_geometry = 'cylindrical'
+            m_geometry = 'hemicylindrical'
         else:
             raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     else:
@@ -98,8 +98,7 @@ def kelvin_radius(pressure, meniscus_geometry, temperature,
     entire adsorbate.
 
     """
-
-    # for a cylindrical meniscus
+    # Define geometry factor depending on meniscus
     if meniscus_geometry == 'cylindrical':
         geometry_factor = 2.0
     elif meniscus_geometry == 'spherical':

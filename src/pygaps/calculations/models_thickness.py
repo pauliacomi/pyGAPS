@@ -1,6 +1,5 @@
 """
-This module has functions for calculating the thickness of an adsorbed layer at a
-particular pressure.
+Functions calculating the thickness of an adsorbed layer as a function of pressure.
 """
 import numpy
 
@@ -9,13 +8,13 @@ from ..utilities.exceptions import ParameterError
 
 def thickness_halsey(pressure):
     """
-    Halsey thickness curve.
-    Applicability: nitrogen at 77K.
+    Halsey thickness curve. Applicable for nitrogen at 77K.
 
     Parameters
     ----------
     pressure : float
         Relative pressure.
+
     Returns
     -------
     float
@@ -26,13 +25,13 @@ def thickness_halsey(pressure):
 
 def thickness_harkins_jura(pressure):
     """
-    Harkins and Jura thickness curve.
-    Applicability: nitrogen at 77K.
+    Harkins and Jura thickness curve. Applicable for nitrogen at 77K.
 
     Parameters
     ----------
     pressure : float
         Relative pressure.
+
     Returns
     -------
     float
@@ -78,11 +77,9 @@ def get_thickness_model(model):
         if model not in _THICKNESS_MODELS:
             raise ParameterError("Model {} not a thickness function.".format(model),
                                  "Available models are {}".format(_THICKNESS_MODELS.keys()))
-        else:
-            t_model = _THICKNESS_MODELS[model]
+
+        return _THICKNESS_MODELS[model]
 
     # If the model is an callable, return it instead
     else:
-        t_model = model
-
-    return t_model
+        return model
