@@ -7,7 +7,7 @@ from ..graphing.calcgraph import psd_plot
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import ParameterError
 from .models_hk import get_hk_model
-from .models_kelvin import kelvin_radius_std
+from .models_kelvin import get_kelvin_model
 from .models_kelvin import meniscus_geometry
 from .models_thickness import get_thickness_model
 from .psd_dft import psd_dft_kernel_fit
@@ -122,6 +122,11 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     if thickness_model is None:
         thickness_model = 'Harkins/Jura'
 
+    # Default kelvin model
+    kelvin_model = model_parameters.get('kelvin_model')
+    if kelvin_model is None:
+        kelvin_model = 'Kelvin'
+
     # Get required adsorbate properties
     molar_mass = isotherm.adsorbate.molar_mass()
     liquid_density = isotherm.adsorbate.liquid_density(isotherm.t_iso)
@@ -151,17 +156,14 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     t_model = get_thickness_model(thickness_model)
 
     # Kelvin model definitions
-    kelvin_model = model_parameters.get('kelvin_model')
-    if kelvin_model:
-        k_model = kelvin_model
-    else:
-        m_geometry = meniscus_geometry(branch, pore_geometry)
-        k_model = partial(kelvin_radius_std,
-                          meniscus_geometry=m_geometry,
-                          temperature=isotherm.t_iso,
-                          liquid_density=liquid_density,
-                          adsorbate_molar_mass=molar_mass,
-                          adsorbate_surface_tension=surface_tension)
+    k_model_args = {
+        "meniscus_geometry": meniscus_geometry(branch, pore_geometry),
+        "temperature": isotherm.t_iso,
+        "liquid_density": liquid_density,
+        "adsorbate_molar_mass": molar_mass,
+        "adsorbate_surface_tension": surface_tension
+    }
+    k_model = get_kelvin_model(kelvin_model, **k_model_args)
 
     # Call specified pore size distribution function
     if psd_model == 'BJH':

@@ -2,6 +2,7 @@
 Module contains functions to calculate the critical evaporation/condensation pore radius
 the mesopore range.
 """
+from functools import partial
 
 import numpy
 import scipy.constants as const
@@ -50,8 +51,8 @@ def meniscus_geometry(branch, pore_geometry):
     return m_geometry
 
 
-def kelvin_radius_std(pressure, meniscus_geometry, temperature,
-                      liquid_density, adsorbate_molar_mass, adsorbate_surface_tension):
+def kelvin_radius(pressure, meniscus_geometry, temperature,
+                  liquid_density, adsorbate_molar_mass, adsorbate_surface_tension):
     r"""
     Calculate the kelvin radius of the pore, using the standard
     form of the kelvin equation.
@@ -119,6 +120,57 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
     return radius
 
 
+def kelvin_radius_kjs(pressure, meniscus_geometry, temperature,
+                      liquid_density, adsorbate_molar_mass, adsorbate_surface_tension):
+
+    return kelvin_radius(pressure, meniscus_geometry, temperature,
+                         liquid_density, adsorbate_molar_mass, adsorbate_surface_tension) + 3
+
+
 _KELVIN_MODELS = {
-    'Kelvin': kelvin_radius_std,
+    'Kelvin': kelvin_radius,
+    'Kelvin-KJS': kelvin_radius_kjs,
 }
+
+
+def get_kelvin_model(model, **model_args):
+    """
+    Return a function calculating an kelvin-based critical radius.
+
+    The ``model`` parameter is a string which names the Kelvin model to
+    be used. Alternatively, a user can implement their own model,
+    as a function which returns the critical radius the adsorbed layer. In that
+    case, instead of a string, pass a callable function as the
+    ``model`` parameter.
+
+    Parameters
+    ----------
+    model : str or callable
+        Name of the kelvin model to use or function that returns
+        a critical radius.
+
+    model_args: dict
+        any arguments needed for the model
+
+    Returns
+    -------
+    callable
+        A callable that takes pressure in and returns a critical kelvin radius
+        at that point.
+
+    Raises
+    ------
+    ParameterError
+        When string is not in the dictionary of models.
+    """
+    # If the model is a string, get a model from the _THICKNESS_MODELS
+    if isinstance(model, str):
+        if model not in _KELVIN_MODELS:
+            raise ParameterError("Model {} not a kelvin model.".format(model),
+                                 "Available models are {}".format(_KELVIN_MODELS.keys()))
+
+        return partial(_KELVIN_MODELS[model], **model_args)
+
+    # If the model is an callable, return it instead
+    else:
+        return model

@@ -5,7 +5,6 @@ These methods are based on the Kelvin equation.
 """
 
 import numpy
-import scipy.constants as const
 
 from ..utilities.exceptions import ParameterError
 
@@ -301,12 +300,11 @@ def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
 
-    if pore_geometry == 'slit':
-        raise NotImplementedError
-    if pore_geometry == 'cylinder':
-        pass
-    if pore_geometry == 'sphere':
-        raise NotImplementedError
+    if pore_geometry == 'slit' or pore_geometry == 'sphere':
+        raise ParameterError(
+            "The DH method is provided for compatibility and only applicable"
+            " to cylindrical pores. Use the pyGAPS method for other options."
+        )
 
     # Calculate the first differential of volume adsorbed
     d_volume = -numpy.diff(volume_adsorbed)
@@ -339,6 +337,76 @@ def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
         E_var = d_thickness[i] * avg_thickness[i] * sum_length_factor
 
         pore_volume = (d_volume[i] - D_var + E_var) * R_factor
+
+        d_area = 2 * pore_volume / avg_pore_radii[i]
+        length = d_area / avg_pore_radii[i]
+        sum_area_factor += d_area
+        sum_length_factor += length
+
+        pore_volumes.append(pore_volume)
+
+    pore_widths = 2 * avg_pore_radii
+    pore_dist = (pore_volumes / (2 * d_pore_radii))
+
+    return pore_widths[::-1], pore_dist[::-1]
+
+
+def psd_pygaps(volume_adsorbed, relative_pressure, pore_geometry,
+               thickness_model, condensation_model):
+    # Checks
+    if len(volume_adsorbed) != len(relative_pressure):
+        raise ParameterError("The length of the pressure and loading arrays"
+                             " do not match")
+
+    if pore_geometry == 'slit':
+        vol_area_ratio = 0.5  # ALSO NEED THICKNESS!
+        width_factor = 1
+
+    elif pore_geometry == 'cylinder':
+        vol_area_ratio = 1
+        width_factor = 2
+
+        def thickness_factor(dt, avg_t, sum_v, sum_l):
+            return - dt * sum_v + dt * avg_t * sum_l
+
+    elif pore_geometry == 'sphere':
+        vol_area_ratio = 3/2
+        width_factor = 2
+
+        def thickness_factor(dt, avg_t, sum_v, sum_l):
+            return - dt * sum_v + dt * avg_t * sum_l - dt * avg_t**2
+
+    # Calculate the first differential of volume adsorbed
+    d_volume = -numpy.diff(volume_adsorbed)
+
+    # Generate the thickness curve, average and diff
+    thickness_curve = thickness_model(relative_pressure)
+    avg_thickness = numpy.add(thickness_curve[:-1], thickness_curve[1:]) / 2
+    d_thickness = -numpy.diff(thickness_curve)
+
+    # Generate the Kelvin pore radii and average
+    kelvin_radius = condensation_model(relative_pressure)
+    avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
+
+    # Critical pore radii as a combination of the adsorbed
+    # layer thickness and kelvin pore radius, with average and diff
+    pore_radii = numpy.add(thickness_curve, kelvin_radius)
+    avg_pore_radii = numpy.add(avg_thickness, avg_k_radius)
+    d_pore_radii = -numpy.diff(pore_radii)
+
+    # Now we can iteratively calculate the pore size distribution
+    sum_area_factor = 0
+    sum_length_factor = 0
+    pore_volumes = []
+
+    for i in range(len(avg_pore_radii)):
+
+        ratio_factor = (avg_pore_radii[i] /
+                        (avg_k_radius[i] + d_thickness[i] / 2))**2
+        thickness_factor = d_thickness[i] * sum_area_factor
+        E_var = d_thickness[i] * avg_thickness[i] * sum_length_factor
+
+        pore_volume = (d_volume[i] +) * R_factor
 
         d_area = 2 * pore_volume / avg_pore_radii[i]
         length = d_area / avg_pore_radii[i]
