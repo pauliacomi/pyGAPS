@@ -20,7 +20,7 @@ from .calculations.initial_henry import initial_henry_virial
 from .calculations.isosteric_enthalpy import isosteric_enthalpy
 from .calculations.isosteric_enthalpy import isosteric_enthalpy_raw
 from .calculations.psd import dft_size_distribution
-from .calculations.psd import mesopore_size_distribution
+from .calculations.psd_mesoporous import mesopore_size_distribution
 from .calculations.psd import micropore_size_distribution
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw

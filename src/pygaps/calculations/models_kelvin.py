@@ -29,20 +29,20 @@ def meniscus_geometry(branch, pore_geometry):
     """
     if branch == 'ads':
         if pore_geometry == 'cylinder':
-            m_geometry = 'cylinder'
+            m_geometry = 'cylindrical'
         elif pore_geometry == 'sphere':
-            m_geometry = 'sphere'
+            m_geometry = 'spherical'
         elif pore_geometry == 'slit':
-            m_geometry = 'none'
+            m_geometry = 'hemicylindrical'
         else:
             raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     elif branch == 'des':
         if pore_geometry == 'cylinder':
-            m_geometry = 'sphere'
+            m_geometry = 'spherical'
         elif pore_geometry == 'sphere':
-            m_geometry = 'sphere'
+            m_geometry = 'spherical'
         elif pore_geometry == 'slit':
-            m_geometry = 'cylinder'
+            m_geometry = 'cylindrical'
         else:
             raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     else:
@@ -100,14 +100,12 @@ def kelvin_radius(pressure, meniscus_geometry, temperature,
     """
 
     # for a cylindrical meniscus
-    if meniscus_geometry == 'cylinder':
+    if meniscus_geometry == 'cylindrical':
         geometry_factor = 2.0
-    elif meniscus_geometry == 'sphere':
+    elif meniscus_geometry == 'spherical':
         geometry_factor = 1.0
-    # for no meniscus (eg. adsorption on infinite slit pores)
-    # there is no kelvin radius, only "flat" surface adsorption
-    elif meniscus_geometry == 'none':
-        return 0
+    elif meniscus_geometry == 'hemicylindrical':
+        geometry_factor = 0.5
 
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 

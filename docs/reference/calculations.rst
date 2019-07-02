@@ -33,17 +33,15 @@ Alpha-s plot
     :members: alpha_s, alpha_s_raw
 
 
-Pore size distribution mesopores
-................................
-
-.. autofunction:: pygaps.calculations.psd.mesopore_size_distribution
+Mesoporous pore size distribution
+.................................
 
 .. automodule:: pygaps.calculations.psd_mesoporous
     :members:
 
 
-Pore size distribution micropores
-.................................
+Microporous pore size distribution
+..................................
 
 .. autofunction:: pygaps.calculations.psd.micropore_size_distribution
 

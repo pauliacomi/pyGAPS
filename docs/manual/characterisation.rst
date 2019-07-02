@@ -17,7 +17,7 @@ The framework currently provides the following functionality for material charac
     - The t-plot method :mod:`~pygaps.calculations.tplot`
     - The :math:`\alpha_s` method :mod:`~pygaps.calculations.alphas`
     - Pore size distribution (PSD) calculations
-        - Mesoporous PSD calculations function :meth:`~pygaps.calculations.psd.mesopore_size_distribution`
+        - Mesoporous PSD calculations function :meth:`~pygaps.calculations.psd_mesoporous.mesopore_size_distribution`
           with the module containing the individual model references: :mod:`pygaps.calculations.psd_mesoporous`
         - Microporous PSD calculations function :meth:`~pygaps.calculations.psd.micropore_size_distribution`
           with the module containing the individual model references: :mod:`~pygaps.calculations.psd_microporous`
