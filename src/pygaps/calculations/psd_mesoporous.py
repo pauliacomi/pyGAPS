@@ -10,9 +10,9 @@ import scipy.constants as const
 from ..utilities.exceptions import ParameterError
 
 
-def psd_bjh(loading, pressure, pore_geometry,
-            thickness_model, condensation_model,
-            liquid_density, adsorbate_molar_mass):
+def psd_bjh_old(loading, pressure, pore_geometry,
+                thickness_model, condensation_model,
+                liquid_density, adsorbate_molar_mass):
     r"""
     Calculate a pore size distribution using the BJH method.
 
@@ -130,33 +130,89 @@ def psd_bjh(loading, pressure, pore_geometry,
 
     # Now we can iteratively calculate the pore size distribution
     d_area = 0
-    sum_d_area = 0
-    sum_d_area_div_r = 0
+    sum_area_factor = 0
+    sum_area_factor_div_r = 0
     pore_volumes = []
 
-    for i, _ in enumerate(avg_pore_radii):
+    for i in range(len(avg_pore_widths)):
 
-        R_factor = (avg_pore_radii[i] / (avg_k_radius[i] + d_thickness[i]))**2
-        D_var = d_thickness[i] * sum_d_area
-        E_var = d_thickness[i] * avg_thickness[i] * sum_d_area_div_r
+        R_factor = (avg_pore_widths[i] / 2 / (avg_k_radius[i] + d_thickness[i]))**2
+        D_var = d_thickness[i] * sum_area_factor
+        E_var = d_thickness[i] * avg_thickness[i] * sum_area_factor_div_r
 
         pore_volume = (d_volume[i] - D_var + E_var) * R_factor
 
-        d_area = vol_area_ratio * pore_volume / avg_pore_radii[i]
-        sum_d_area += d_area
-        sum_d_area_div_r += d_area / avg_pore_radii[i]
+        d_area = vol_area_ratio * pore_volume / avg_pore_widths[i] / 2
+        sum_area_factor += d_area
+        sum_area_factor_div_r += d_area / avg_pore_widths[i] / 2
 
         pore_volumes.append(pore_volume)
 
-    pore_widths = 2 * avg_pore_radii
-    pore_dist = (pore_volumes / (2 * d_pore_radii))
+    pore_dist = pore_volumes / d_pore_widths
 
     return pore_widths[::-1], pore_dist[::-1]
 
 
-def psd_dollimore_heal(loading, pressure, pore_geometry,
-                       thickness_model, condensation_model,
-                       liquid_density, adsorbate_molar_mass):
+def psd_bjh(volume_adsorbed, relative_pressure, pore_geometry,
+            thickness_model, condensation_model):
+
+    # checks
+    if len(volume_adsorbed) != len(relative_pressure):
+        raise ParameterError("The length of the pressure and loading arrays"
+                             " do not match")
+
+    if pore_geometry == 'slit':
+        vol_area_ratio = 0.5  # ALSO NEED THICKNESS!
+        width_factor = 1
+    elif pore_geometry == 'cylinder':
+        vol_area_ratio = 1
+        width_factor = 2
+    elif pore_geometry == 'sphere':
+        vol_area_ratio = 3/2
+        width_factor = 2
+
+    # Calculate the adsorbed volume of liquid and diff
+    d_volume = -numpy.diff(volume_adsorbed)
+
+    # Generate the thickness curve, average and diff
+    thickness = thickness_model(relative_pressure)
+    avg_thickness = numpy.add(thickness[:-1], thickness[1:]) / 2
+    d_thickness = -numpy.diff(thickness)
+
+    # Generate the Kelvin pore radii and average
+    kelvin_radius = condensation_model(relative_pressure)
+    avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
+
+    # Critical pore radii as a combination of the adsorbed
+    # layer thickness and kelvin pore radius, with average and diff
+    pore_widths = numpy.add(2 * thickness, width_factor * kelvin_radius)
+    avg_pore_widths = numpy.add(2 * avg_thickness, width_factor * avg_k_radius)
+    d_pore_widths = -numpy.diff(pore_widths)
+
+    # Now we can iteratively calculate the pore size distribution
+    sum_area_factor = 0
+    pore_volumes = []
+
+    for i in range(len(avg_pore_widths)):
+
+        ratio_factor = (avg_pore_widths[i] / (2 * (avg_k_radius[i] + d_thickness[i])))**2
+        thickness_factor = d_thickness[i] * sum_area_factor
+
+        pore_volume = (d_volume[i] - thickness_factor) * ratio_factor
+
+        pore_area_correction = (avg_pore_widths[i] - 2 * avg_thickness[i]) / avg_pore_widths[i]
+        pore_avg_area = (vol_area_ratio * pore_volume / avg_pore_widths[i])
+        sum_area_factor += pore_area_correction * pore_avg_area
+
+        pore_volumes.append(pore_volume)
+
+    pore_dist = pore_volumes / d_pore_widths
+
+    return pore_widths[::-1], pore_dist[::-1]
+
+
+def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
+                       thickness_model, condensation_model):
     r"""
     Calculate a pore size distribution using the Dollimore-Heal method.
 
@@ -241,7 +297,7 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
 
     """
     # Checks
-    if len(pressure) != len(loading):
+    if len(volume_adsorbed) != len(relative_pressure):
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
 
@@ -252,17 +308,16 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     if pore_geometry == 'sphere':
         raise NotImplementedError
 
-    # Calculate the adsorbed volume of liquid and diff
-    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000
+    # Calculate the first differential of volume adsorbed
     d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
-    thickness_curve = thickness_model(pressure)
+    thickness_curve = thickness_model(relative_pressure)
     avg_thickness = numpy.add(thickness_curve[:-1], thickness_curve[1:]) / 2
     d_thickness = -numpy.diff(thickness_curve)
 
     # Generate the Kelvin pore radii and average
-    kelvin_radius = condensation_model(pressure)
+    kelvin_radius = condensation_model(relative_pressure)
     avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
 
     # Critical pore radii as a combination of the adsorbed
@@ -272,26 +327,23 @@ def psd_dollimore_heal(loading, pressure, pore_geometry,
     d_pore_radii = -numpy.diff(pore_radii)
 
     # Now we can iteratively calculate the pore size distribution
-    d_area = 0
-    length = 0
-    sum_d_area = 0
-    sum_length = 0
+    sum_area_factor = 0
+    sum_length_factor = 0
     pore_volumes = []
 
-    for i, _ in enumerate(avg_pore_radii):
+    for i in range(len(avg_pore_radii)):
 
         R_factor = (avg_pore_radii[i] /
                     (avg_k_radius[i] + d_thickness[i] / 2))**2
-        D_var = d_thickness[i] * sum_d_area
-        E_var = 2 * const.pi * \
-            d_thickness[i] * avg_thickness[i] * sum_length
+        D_var = d_thickness[i] * sum_area_factor
+        E_var = d_thickness[i] * avg_thickness[i] * sum_length_factor
 
         pore_volume = (d_volume[i] - D_var + E_var) * R_factor
 
         d_area = 2 * pore_volume / avg_pore_radii[i]
-        length = d_area / (2 * const.pi * avg_pore_radii[i])
-        sum_d_area += d_area
-        sum_length += length
+        length = d_area / avg_pore_radii[i]
+        sum_area_factor += d_area
+        sum_length_factor += length
 
         pore_volumes.append(pore_volume)
 

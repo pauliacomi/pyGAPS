@@ -103,8 +103,6 @@ def kelvin_radius_std(pressure, meniscus_geometry, temperature,
         geometry_factor = 2.0
     elif meniscus_geometry == 'sphere':
         geometry_factor = 1.0
-    elif meniscus_geometry == 'slit':
-        geometry_factor = 0.5
     # for no meniscus (eg. adsorption on infinite slit pores)
     # there is no kelvin radius, only "flat" surface adsorption
     elif meniscus_geometry == 'none':

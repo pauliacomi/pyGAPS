@@ -144,6 +144,8 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     if loading is None:
         raise ParameterError("The isotherm does not have the required branch for"
                              " this calculation")
+    # calculated volume adsorbed
+    volume_adsorbed = loading * molar_mass / liquid_density / 1000
 
     # Thickness model definitions
     t_model = get_thickness_model(thickness_model)
@@ -164,14 +166,12 @@ def mesopore_size_distribution(isotherm, psd_model, pore_geometry='cylinder',
     # Call specified pore size distribution function
     if psd_model == 'BJH':
         pore_widths, pore_dist = psd_bjh(
-            loading, pressure, pore_geometry,
-            t_model, k_model,
-            liquid_density, molar_mass)
+            volume_adsorbed, pressure, pore_geometry,
+            t_model, k_model)
     elif psd_model == 'DH':
         pore_widths, pore_dist = psd_dollimore_heal(
-            loading, pressure, pore_geometry,
-            t_model, k_model,
-            liquid_density, molar_mass)
+            volume_adsorbed, pressure, pore_geometry,
+            t_model, k_model)
 
     # Package the results
     result_dict = {
