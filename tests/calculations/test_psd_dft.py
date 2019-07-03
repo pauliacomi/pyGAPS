@@ -44,7 +44,7 @@ class TestPSDDFT():
             pdft.psd_dft(basic_pointisotherm, branch='test')
 
     @pytest.mark.parametrize('kernel', [
-        'DFT-N2-77K-Carbon-Slit',
+        'DFT-N2-77K-carbon-slit',
     ])
     @pytest.mark.parametrize('sample', [
         sample for sample in list(DATA.values())

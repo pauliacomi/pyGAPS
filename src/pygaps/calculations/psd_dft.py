@@ -18,7 +18,7 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import bspline
 
 _KERNELS = {
-    'DFT-N2-77K-Carbon-Slit': os.path.join(os.path.dirname(__file__),
+    'DFT-N2-77K-carbon-slit': os.path.join(os.path.dirname(__file__),
                                            'kernels', 'dft - N2 - carbon.csv'),
 }
 
@@ -26,7 +26,7 @@ _LOADED = {}  # We will keep loaded kernels here
 
 
 def psd_dft(isotherm,
-            kernel='DFT-N2-77K-Carbon-Slit',
+            kernel='DFT-N2-77K-carbon-slit',
             branch='ads',
             bspline_order=2,
             verbose=False):
