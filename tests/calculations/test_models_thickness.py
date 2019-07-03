@@ -2,7 +2,7 @@
 Tests relating to thickness model validation.
 
 All functions in /calculations/models_thickness.py are tested here.
-There are two goals:
+The purposes are:
 
     - testing the output of the thickness functions
     - testing that the "function getter" is performing as expected.
@@ -20,9 +20,7 @@ from pygaps.utilities.exceptions import ParameterError
 
 @pytest.mark.characterisation
 class TestThicknessModels():
-    """
-    Test the thickness models.
-    """
+    """Test the thickness models."""
 
     @pytest.mark.parametrize('model, pressure, thickness', [
         (mt._THICKNESS_MODELS['Halsey'],
@@ -35,12 +33,16 @@ class TestThicknessModels():
         for index, value in enumerate(pressure):
             assert numpy.isclose(model(value), thickness[index], 0.01, 0.01)
 
-    def test_thickness_error(self):
+    def test_get_thickness(self):
+        """Get a regular model."""
+        assert mt.get_thickness_model('Halsey') == mt._THICKNESS_MODELS['Halsey']
+
+    def test_get_thickness_error(self):
         """When the model requested is not found we raise."""
         with pytest.raises(ParameterError):
             mt.get_thickness_model('bad_model')
 
-    def test_thickness_callable(self):
+    def test_get_thickness_callable(self):
         """When we pass a function, we receive it back."""
         def call_this():
             return 'called'

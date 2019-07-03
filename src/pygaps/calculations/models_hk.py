@@ -1,4 +1,7 @@
-"""Contains dictionaries for use in the Horvath-Kawazoe method."""
+"""
+Dictionaries or generators which provide properties
+for use in the Horvath-Kawazoe method.
+"""
 
 from ..utilities.exceptions import ParameterError
 
@@ -53,11 +56,11 @@ def get_hk_model(model):
     if isinstance(model, str):
         if model not in _ADSORBENT_MODELS:
             raise ParameterError(
-                "Model {} not an option for pore size distribution.".format(
+                "Model parameters {} not an option for pore size distribution.".format(
                     model),
-                "Available models are {}".format(_ADSORBENT_MODELS.keys()))
-        else:
-            a_model = _ADSORBENT_MODELS[model]
+                "Available model parameters are {}".format(_ADSORBENT_MODELS.keys()))
+
+        return _ADSORBENT_MODELS[model]
 
     # If the model is an dictionary, use it as is
     elif isinstance(model, dict):
@@ -69,7 +72,7 @@ def get_hk_model(model):
                     'in the units of {}'.format(key[0], key[1])
                 )
 
-        a_model = model
+        return model
 
     # Raise error if anything else is passed
     else:
@@ -77,5 +80,3 @@ def get_hk_model(model):
             "Not an option for pore size distribution.",
             "Available models are {}".format(_ADSORBENT_MODELS.keys()),
             "or pass a dictionary with the required parameters")
-
-    return a_model

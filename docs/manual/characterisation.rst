@@ -19,9 +19,9 @@ The framework currently provides the following functionality for material charac
     - Pore size distribution (PSD) calculations
         - Mesoporous PSD calculations function :meth:`~pygaps.calculations.psd_mesoporous.psd_mesoporous`
           with the module containing the individual model references: :mod:`pygaps.calculations.psd_mesoporous`
-        - Microporous PSD calculations function :meth:`~pygaps.calculations.psd.psd_microporous`
+        - Microporous PSD calculations function :meth:`~pygaps.calculations.psd_microporous`
           with the module containing the individual model references: :mod:`~pygaps.calculations.psd_microporous`
-        - DFT kernel fitting PSD function :meth:`~pygaps.calculations.psd.psd_dft`
+        - DFT kernel fitting PSD function :meth:`~pygaps.calculations.psd_dft`
           with the module containing the individual model references: :mod:`~pygaps.calculations.psd_dft`
     - Isosteric enthalpy of adsorption calculations :meth:`~pygaps.calculations.isosteric_enthalpy.isosteric_enthalpy`
     - Dubinin-Radushevitch and Dubinin-Astakov plots

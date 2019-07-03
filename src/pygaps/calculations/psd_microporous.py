@@ -1,5 +1,6 @@
 """
-Module contains 'classical' methods of calculating a pore size distribution for pores in
+Module contains 'classical' methods of calculating
+a pore size distribution for pores in
 the micropore range (<2 nm).
 """
 
@@ -16,8 +17,13 @@ _MICRO_PSD_MODELS = ['HK']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
-def psd_microporous(isotherm, psd_model, pore_geometry='slit',
-                    verbose=False, **model_parameters):
+def psd_microporous(isotherm,
+                    psd_model='HK',
+                    pore_geometry='slit',
+                    branch='ads',
+                    adsorbent_model='Carbon(HK)',
+                    adsorbate_model=None,
+                    verbose=False):
     """
     Calculate the microporous size distribution using a 'classical' model.
 
@@ -29,16 +35,15 @@ def psd_microporous(isotherm, psd_model, pore_geometry='slit',
         The pore size distribution model to use.
     pore_geometry : str
         The geometry of the adsorbent pores.
-    verbose : bool
-        Prints out extra information on the calculation and graphs the results.
-
-    Other Parameters
-    ----------------
-    adsorbate_model : dict
-        The adsorbate model to use for PSD, If null, properties are taken
-        from the adsorbate in the list.
+    branch : {'ads', 'des'}, optional
+        Branch of the isotherm to use. It defaults to adsorption.
     adsorbent_model : str or dict
         The adsorbent model to use for PSD, It defaults to Carbon(HK).
+    adsorbate_model : dict or `None`
+        The adsorbate properties to use for PSD, If null, properties are
+        automatically searched from the Adsorbent.
+    verbose : bool
+        Prints out extra information on the calculation and graphs the results.
 
     Returns
     -------
@@ -65,13 +70,13 @@ def psd_microporous(isotherm, psd_model, pore_geometry='slit',
 
     See Also
     --------
-    pygaps.calculations.psd_microporous.psd_horvath_kawazoe : the HK, of Horvath-Kawazoe method
+    pygaps.calculations.psd_microporous.psd_horvath_kawazoe : low level HK (Horvath-Kawazoe) method
 
     """
     # Function parameter checks
     if psd_model is None:
         raise ParameterError("Specify a model to generate the pore size"
-                             " distribution e.g. psd_model=\"BJH\"")
+                             " distribution e.g. psd_model=\"HK\"")
     if psd_model not in _MICRO_PSD_MODELS:
         raise ParameterError("Model {} not an option for psd.".format(psd_model),
                              "Available models are {}".format(_MICRO_PSD_MODELS))
@@ -83,14 +88,9 @@ def psd_microporous(isotherm, psd_model, pore_geometry='slit',
     if not isinstance(isotherm.adsorbate, Adsorbate):
         raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
-    adsorbent_model = model_parameters.get('adsorbent_model')
-    if adsorbent_model is None:
-        adsorbent_model = 'Carbon(HK)'
-
     # Get adsorbate properties
-    adsorbate_properties = model_parameters.get('adsorbate_model')
-    if adsorbate_properties is None:
-        adsorbate_properties = {
+    if adsorbate_model is None:
+        adsorbate_model = {
             'molecular_diameter': isotherm.adsorbate.get_prop('molecular_diameter'),
             'polarizability': isotherm.adsorbate.get_prop('polarizability'),
             'magnetic_susceptibility': isotherm.adsorbate.get_prop('magnetic_susceptibility'),
@@ -99,32 +99,29 @@ def psd_microporous(isotherm, psd_model, pore_geometry='slit',
             'adsorbate_molar_mass': isotherm.adsorbate.molar_mass(),
         }
 
+    # Get adsorbent properties
+    adsorbent_properties = get_hk_model(adsorbent_model)
+
     # Read data in
-    loading = isotherm.loading(branch='ads',
+    loading = isotherm.loading(branch=branch,
                                loading_basis='molar',
                                loading_unit='mmol')
-    pressure = isotherm.pressure(branch='ads',
+    pressure = isotherm.pressure(branch=branch,
                                  pressure_mode='relative')
-
-    # Adsorbent model definitions
-    adsorbent_properties = get_hk_model(adsorbent_model)
 
     # Call specified pore size distribution function
     if psd_model == 'HK':
         pore_widths, pore_dist = psd_horvath_kawazoe(
             loading, pressure, isotherm.t_iso, pore_geometry,
-            adsorbate_properties, adsorbent_properties)
-
-    # Package the results
-    result_dict = {
-        'pore_widths': pore_widths,
-        'pore_distribution': pore_dist,
-    }
+            adsorbate_model, adsorbent_properties)
 
     if verbose:
         psd_plot(pore_widths, pore_dist, log=False, right=2.5, method=psd_model)
 
-    return result_dict
+    return {
+        'pore_widths': pore_widths,
+        'pore_distribution': pore_dist,
+    }
 
 
 def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,

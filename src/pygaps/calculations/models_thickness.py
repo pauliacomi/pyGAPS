@@ -1,5 +1,6 @@
 """
-Functions calculating the thickness of an adsorbed layer as a function of pressure.
+Functions calculating the thickness of an adsorbed layer
+as a function of pressure.
 """
 import numpy
 

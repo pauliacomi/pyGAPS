@@ -27,6 +27,7 @@ _LOADED = {}  # We will keep loaded kernels here
 
 def psd_dft(isotherm,
             kernel='DFT-N2-77K-Carbon-Slit',
+            branch='ads',
             bspline_order=2,
             verbose=False):
     """
@@ -38,9 +39,13 @@ def psd_dft(isotherm,
         The isotherm for which the pore size distribution will be calculated.
     kernel : str
         The name of the kernel, or the path where it can be found.
+    branch : {'ads', 'des'}, optional
+        Branch of the isotherm to use. It defaults to adsorption.
     bspline_order : int
         The smoothing order of the b-splines fit to the data.
         If set to 0, data will be returned as-is.
+    verbose : bool
+        Prints out extra information on the calculation and graphs the results.
 
     Returns
     -------
@@ -117,7 +122,7 @@ def psd_dft(isotherm,
     # Check kernel
     if kernel is None:
         raise ParameterError(
-            "An existing kernel or a path to a user kernel to be used must be specified.")
+            "An existing kernel name or a path to a user kernel to be used must be specified.")
     if not isinstance(isotherm.adsorbate, Adsorbate):
         raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
@@ -128,10 +133,10 @@ def psd_dft(isotherm,
         kernel_path = kernel
 
     # Read data in
-    loading = isotherm.loading(branch='ads',
+    loading = isotherm.loading(branch=branch,
                                loading_basis='molar',
                                loading_unit='mmol')
-    pressure = isotherm.pressure(branch='ads',
+    pressure = isotherm.pressure(branch=branch,
                                  pressure_mode='relative')
 
     # Call the DFT function
@@ -151,7 +156,7 @@ def psd_dft(isotherm,
     if verbose:
         params = {
             'plot_type': 'isotherm',
-            'branch': 'ads',
+            'branch': branch,
             'logx': True,
             'fig_title': 'DFT Fit',
             'lgd_keys': ['material_name'],

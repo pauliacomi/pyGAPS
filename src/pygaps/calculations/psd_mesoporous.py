@@ -13,7 +13,7 @@ from .models_kelvin import get_kelvin_model
 from .models_kelvin import meniscus_geometry
 from .models_thickness import get_thickness_model
 
-_MESO_PSD_MODELS = ['BJH', 'DH']
+_MESO_PSD_MODELS = ['pygaps-DH', 'BJH', 'DH']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 

@@ -1,6 +1,7 @@
 """
-Module contains functions to calculate the critical evaporation/condensation pore radius
-the mesopore range.
+Module contains functions to calculate the critical
+evaporation/condensation pore radius the mesopore range,
+as a function of pressure.
 """
 from functools import partial
 
@@ -31,16 +32,16 @@ def meniscus_geometry(branch, pore_geometry):
         if pore_geometry == 'cylinder':
             m_geometry = 'cylindrical'
         elif pore_geometry == 'sphere':
-            m_geometry = 'spherical'
+            m_geometry = 'hemispherical'
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
             raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     elif branch == 'des':
         if pore_geometry == 'cylinder':
-            m_geometry = 'spherical'
+            m_geometry = 'hemispherical'
         elif pore_geometry == 'sphere':
-            m_geometry = 'spherical'
+            m_geometry = 'hemispherical'
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
@@ -60,7 +61,7 @@ def kelvin_radius(pressure, meniscus_geometry, temperature,
     Parameters
     ----------
     pressure :
-        Relative, unitless.
+        Relative pressure (p/p0), unitless.
     meniscus_geometry : str
         Geometry of the interface of the vapour and liquid phase.
         **WARNING**: it is not the same as the pore geometry.
@@ -97,31 +98,88 @@ def kelvin_radius(pressure, meniscus_geometry, temperature,
     Furthermore, the geometry of the pore itself is considered to be invariant accross the
     entire adsorbate.
 
+    See Also
+    --------
+    pygaps.calculations.models_kelvin.kelvin_radius_kjs : KJS corrected Kelvin function
+
     """
     # Define geometry factor depending on meniscus
     if meniscus_geometry == 'cylindrical':
         geometry_factor = 2.0
-    elif meniscus_geometry == 'spherical':
+    elif meniscus_geometry == 'hemispherical':
         geometry_factor = 1.0
     elif meniscus_geometry == 'hemicylindrical':
         geometry_factor = 0.5
 
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
-    coefficient = (2 * adsorbate_surface_tension *
-                   adsorbate_molar_density) / (geometry_factor *
-                                               const.gas_constant * temperature)
-
-    radius = - coefficient / numpy.log(pressure)
-
-    return radius
+    return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
+        (geometry_factor * const.gas_constant * temperature * numpy.log(pressure))
 
 
 def kelvin_radius_kjs(pressure, meniscus_geometry, temperature,
                       liquid_density, adsorbate_molar_mass, adsorbate_surface_tension):
+    r"""
+    Calculate the kelvin radius of the pore, using the
+    Kruck-Jaroniec-Sayari correction.
 
-    return kelvin_radius(pressure, meniscus_geometry, temperature,
-                         liquid_density, adsorbate_molar_mass, adsorbate_surface_tension) + 3
+    Parameters
+    ----------
+    pressure :
+        Relative pressure (p/p0), unitless.
+    meniscus_geometry : str
+        Geometry of the interface of the vapour and liquid phase.
+        **WARNING**: it is not the same as the pore geometry.
+    temperature : float
+        Temperature in kelvin.
+    liquid_density : float
+        Density of the adsorbed phase, assuming it can be approximated as a
+        liquid g/cm3.
+    adsorbate_molar_mass : float
+        Molar area of the adsorbate, g/mol.
+    adsorbate_surface_tension : float
+        Surface tension of the adsorbate, in mN/m.
+
+    Returns
+    -------
+    float
+        Kelvin radius(nm).
+
+    Notes
+    -----
+    *Description*
+
+    The KJS correction to the kelvin equation equation is corrected with a constant
+    term of 0.3 nm. The authors arrived at this constant by using the adsorption
+    branch of the isotherm on several MCM-41 materials calibrated with XRD data.
+
+    .. math::
+        \ln\Big(\frac{p}{p_0}\Big) = -\frac{2 \cos\theta M_m \gamma}{r_K\rho_l RT} + 0.3
+
+    *Limitations*
+
+    Besides the standard limitations of the Kelvin equation, the KJS correction
+    is empirical in nature.
+
+    References
+    ----------
+    .. [#] Kruk M, Jaroniec M, Sayari A (1997) Langmuir 13:6267
+
+    See Also
+    --------
+    pygaps.calculations.models_kelvin.kelvin_radius : standard Kelvin function
+
+    """
+    # Check for correct geometry
+    if meniscus_geometry != 'cylindrical':
+        raise ParameterError(
+            "The KJS Kelvin correction is not applicable for geometries "
+            "other than cylindrical.")
+
+    adsorbate_molar_density = adsorbate_molar_mass / liquid_density
+
+    return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
+        (const.gas_constant * temperature * numpy.log(pressure)) + 0.3
 
 
 _KELVIN_MODELS = {
@@ -170,4 +228,4 @@ def get_kelvin_model(model, **model_args):
 
     # If the model is an callable, return it instead
     else:
-        return model
+        return partial(model, **model_args)
