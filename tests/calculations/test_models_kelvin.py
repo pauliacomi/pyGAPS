@@ -33,7 +33,7 @@ class TestKelvinModels():
     ])
     def test_meniscus_geometry(self, branch, pore, geometry):
         """Test the meniscus geometry function."""
-        assert km.meniscus_geometry(branch, pore) == geometry
+        assert km.get_meniscus_geometry(branch, pore) == geometry
 
     @pytest.mark.parametrize('model, pressure', [
         (km._KELVIN_MODELS['Kelvin'], [0.1, 0.4, 0.9]),

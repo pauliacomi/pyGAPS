@@ -11,7 +11,7 @@ import scipy.constants as const
 from ..utilities.exceptions import ParameterError
 
 
-def meniscus_geometry(branch, pore_geometry):
+def get_meniscus_geometry(branch, pore_geometry):
     """
     Determine the meniscus geometry.
 

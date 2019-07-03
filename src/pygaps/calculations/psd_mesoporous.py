@@ -10,7 +10,7 @@ from ..classes.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
 from ..utilities.exceptions import ParameterError
 from .models_kelvin import get_kelvin_model
-from .models_kelvin import meniscus_geometry
+from .models_kelvin import get_meniscus_geometry
 from .models_thickness import get_thickness_model
 
 _MESO_PSD_MODELS = ['pygaps-DH', 'BJH', 'DH']
@@ -150,7 +150,7 @@ def psd_mesoporous(isotherm,
 
     # Kelvin model definitions
     k_model_args = {
-        "meniscus_geometry": meniscus_geometry(branch, pore_geometry),
+        "meniscus_geometry": get_meniscus_geometry(branch, pore_geometry),
         "temperature": isotherm.t_iso,
         "liquid_density": liquid_density,
         "adsorbate_molar_mass": molar_mass,
