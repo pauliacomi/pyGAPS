@@ -98,7 +98,7 @@ def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=Fal
         [max(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
 
     # Get temperatures
-    temperatures = list(x.t_iso for x in isotherms)
+    temperatures = list(x.temperature for x in isotherms)
 
     # Loading
     if loading_points is None:

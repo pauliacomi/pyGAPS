@@ -9,6 +9,10 @@ Major pyGAPS release, following peer review on related manuscript.
 Several breaking changes with previous codebase, in particular
 with several isotherm parameters.
 
+Breaking changes:
+
+ * Renamed isotherm parameter `t_iso` to `temperature` for clarity.
+
 New features:
 
 * After attempting a model guess for the creation of a ModelIsotherm,

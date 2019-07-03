@@ -445,6 +445,6 @@
     "material_name": "Sample_D",
     "pressure_mode": "relative",
     "pressure_unit": null,
-    "t_iso": 298.15,
+    "temperature": 298.15,
     "user": "User"
 }

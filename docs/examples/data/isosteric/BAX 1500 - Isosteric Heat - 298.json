@@ -230,5 +230,5 @@
     ],
     "material_batch": "TB",
     "material_name": "TEST",
-    "t_iso": 298.15
+    "temperature": 298.15
 }

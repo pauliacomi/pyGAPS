@@ -27,9 +27,9 @@ _FIELDS = {
         'row': 1,
         'column': 0,
     },
-    't_iso': {
+    'temperature': {
         'text': ['Experiment temperature (K)'],
-        'name': 't_iso',
+        'name': 'temperature',
         'row': 2,
         'column': 0,
     },

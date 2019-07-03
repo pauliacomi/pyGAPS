@@ -23,7 +23,7 @@ class TestPointIsotherm():
             'material_name': 'carbon',
             'material_batch': 'X1',
             'adsorbate': 'nitrogen',
-            't_iso': 77,
+            'temperature': 77,
         }
         pressure = [1, 2, 3, 4, 5, 3, 2]
         loading = [1, 2, 3, 4, 5, 3, 2]
@@ -105,7 +105,7 @@ class TestPointIsotherm():
 
         assert isotherm == basic_pointisotherm
 
-        isotherm.t_iso = 0
+        isotherm.temperature = 0
         assert isotherm != basic_pointisotherm
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):

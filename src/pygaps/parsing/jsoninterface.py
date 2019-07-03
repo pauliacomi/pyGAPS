@@ -203,7 +203,7 @@ def _from_json_nist(raw_dict):
     # Get regular isotherm parameters
     nist_dict['material_name'] = raw_dict['adsorbent']['name']
     nist_dict['material_batch'] = raw_dict.pop('adsorbent')['hashkey']
-    nist_dict['t_iso'] = raw_dict.pop('temperature')
+    nist_dict['temperature'] = raw_dict.pop('temperature')
 
     # Get adsorbate
     if len(raw_dict['adsorbates']) > 1:

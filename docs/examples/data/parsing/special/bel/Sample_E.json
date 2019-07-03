@@ -141,6 +141,6 @@
     "pressure_unit": "kPa",
     "material_batch": "bel",
     "material_name": "Sample_C",
-    "t_iso": 303.0,
+    "temperature": 303.0,
     "user": "User"
 }

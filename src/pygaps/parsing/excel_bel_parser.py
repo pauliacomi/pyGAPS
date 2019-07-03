@@ -25,7 +25,7 @@ _FIELDS = {
     },
     'temperature': {
         'text': ['adsorption temp'],
-        'name': 't_iso',
+        'name': 'temperature',
         'row': 0,
         'column': 2,
         'type': 'number'

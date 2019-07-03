@@ -52,9 +52,9 @@ class ModelIsotherm(Isotherm):
     material_batch : str
         Batch (or identifier) of the material on which the isotherm is measured.
     adsorbate : str
-        The adsorbate used in the experiment.
-    t_iso : float
-        Experiment temperature.
+        Isotherm adsorbate.
+    temperature : float
+        Isotherm temperature.
 
     Other Parameters
     ----------------
@@ -608,7 +608,7 @@ class ModelIsotherm(Isotherm):
                                  unit_from=self.pressure_unit,
                                  unit_to=pressure_unit,
                                  adsorbate_name=self.adsorbate,
-                                 temp=self.t_iso
+                                 temp=self.temperature
                                  )
         else:
             ret = self.pressure_at(
@@ -703,7 +703,7 @@ class ModelIsotherm(Isotherm):
                                 unit_from=self.loading_unit,
                                 unit_to=loading_unit,
                                 adsorbate_name=self.adsorbate,
-                                temp=self.t_iso
+                                temp=self.temperature
                                 )
         else:
             ret = self.loading_at(
@@ -798,7 +798,7 @@ class ModelIsotherm(Isotherm):
                                   unit_from=pressure_unit,
                                   unit_to=self.pressure_unit,
                                   adsorbate_name=self.adsorbate,
-                                  temp=self.t_iso)
+                                  temp=self.temperature)
 
         # Calculate loading using internal model
         loading = self.model.loading(pressure)
@@ -827,7 +827,7 @@ class ModelIsotherm(Isotherm):
                                 unit_from=self.loading_unit,
                                 unit_to=loading_unit,
                                 adsorbate_name=self.adsorbate,
-                                temp=self.t_iso
+                                temp=self.temperature
                                 )
 
         return loading
@@ -915,7 +915,7 @@ class ModelIsotherm(Isotherm):
                                 unit_from=loading_unit,
                                 unit_to=self.loading_unit,
                                 adsorbate_name=self.adsorbate,
-                                temp=self.t_iso
+                                temp=self.temperature
                                 )
 
         # Calculate pressure using internal model
@@ -934,7 +934,7 @@ class ModelIsotherm(Isotherm):
                                   unit_from=self.pressure_unit,
                                   unit_to=pressure_unit,
                                   adsorbate_name=self.adsorbate,
-                                  temp=self.t_iso)
+                                  temp=self.temperature)
 
         return pressure
 
@@ -997,7 +997,7 @@ class ModelIsotherm(Isotherm):
                                   unit_from=pressure_unit,
                                   unit_to=self.pressure_unit,
                                   adsorbate_name=self.adsorbate,
-                                  temp=self.t_iso)
+                                  temp=self.temperature)
 
         # based on model
         spreading_p = self.model.spreading_pressure(pressure)

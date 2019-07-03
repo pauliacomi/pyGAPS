@@ -95,7 +95,7 @@ The isotherm parameters must include:
     - The sample name (``material_name``)
     - The sample batch (``material_batch``)
     - The adsorbate used (``adsorbate``)
-    - The temperature, in K at which the data was recorded (``t_iso``)
+    - The temperature, in K at which the data was recorded (``temperature``)
 
 The isotherm units can also be specified here. If not specified, the framework will assume
 default values: absolute pressure in *bar* and the amount adsorbed in terms of
@@ -146,7 +146,7 @@ instantiation is below, with explanations.
         material_name='carbon',         # Required
         material_batch='X1',            # Required
         adsorbate='nitrogen',           # Required
-        t_iso=77,                       # Required
+        temperature=77,                 # Required
 
         t_act=150,                      # User specific
         user='John',                    # User specific
@@ -192,7 +192,7 @@ parameter.
         material_name='carbon',         # Required
         material_batch='X1',            # Required
         adsorbate='nitrogen',           # Required
-        t_iso=77,                       # Required
+        temperature=77,                 # Required
     )
 
 
@@ -254,7 +254,7 @@ The code to generate a ModelIsotherm is then:
         material_name='carbon',         # Required
         material_batch='X1',            # Required
         adsorbate='nitrogen',           # Required
-        t_iso=77,                       # Required
+        temperature=77,                 # Required
 
         t_act=150,                      # User specific
         user='John',                    # User specific

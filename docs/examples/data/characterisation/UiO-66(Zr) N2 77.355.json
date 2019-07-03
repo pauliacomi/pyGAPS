@@ -461,6 +461,6 @@
     "material_batch": "Test",
     "material_name": "UiO-66(Zr)",
     "t_act": 200.0,
-    "t_iso": 77.355,
+    "temperature": 77.355,
     "user": "PI"
 }

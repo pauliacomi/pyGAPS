@@ -125,8 +125,8 @@ def psd_mesoporous(isotherm,
 
     # Get required adsorbate properties
     molar_mass = isotherm.adsorbate.molar_mass()
-    liquid_density = isotherm.adsorbate.liquid_density(isotherm.t_iso)
-    surface_tension = isotherm.adsorbate.surface_tension(isotherm.t_iso)
+    liquid_density = isotherm.adsorbate.liquid_density(isotherm.temperature)
+    surface_tension = isotherm.adsorbate.surface_tension(isotherm.temperature)
 
     # Read data in, depending on branch requested
     loading = isotherm.loading(branch=branch,
@@ -151,7 +151,7 @@ def psd_mesoporous(isotherm,
     # Kelvin model definitions
     k_model_args = {
         "meniscus_geometry": get_meniscus_geometry(branch, pore_geometry),
-        "temperature": isotherm.t_iso,
+        "temperature": isotherm.temperature,
         "liquid_density": liquid_density,
         "adsorbate_molar_mass": molar_mass,
         "adsorbate_surface_tension": surface_tension

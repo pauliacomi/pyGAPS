@@ -112,6 +112,6 @@
     "material_batch": "Test",
     "material_name": "MOF-5(Zn)",
     "t_act": 150.0,
-    "t_iso": 298.0,
+    "temperature": 298.0,
     "user": "PI"
 }

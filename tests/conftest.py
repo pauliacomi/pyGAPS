@@ -38,7 +38,7 @@ def isotherm_parameters():
 
         'material_name': 'TEST',
         'material_batch': 'TB',
-        't_iso': 100.0,
+        'temperature': 100.0,
         'adsorbate': 'TA',
 
         'date': '26/06/92',

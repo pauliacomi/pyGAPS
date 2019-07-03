@@ -95,7 +95,7 @@ def psd_microporous(isotherm,
             'polarizability': isotherm.adsorbate.get_prop('polarizability'),
             'magnetic_susceptibility': isotherm.adsorbate.get_prop('magnetic_susceptibility'),
             'surface_density': isotherm.adsorbate.get_prop('surface_density'),
-            'liquid_density': isotherm.adsorbate.liquid_density(isotherm.t_iso),
+            'liquid_density': isotherm.adsorbate.liquid_density(isotherm.temperature),
             'adsorbate_molar_mass': isotherm.adsorbate.molar_mass(),
         }
 
@@ -112,7 +112,7 @@ def psd_microporous(isotherm,
     # Call specified pore size distribution function
     if psd_model == 'HK':
         pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
-            loading, pressure, isotherm.t_iso, pore_geometry,
+            loading, pressure, isotherm.temperature, pore_geometry,
             adsorbate_model, adsorbent_properties)
 
     if verbose:

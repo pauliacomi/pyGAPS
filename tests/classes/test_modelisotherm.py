@@ -25,7 +25,7 @@ class TestModelIsotherm():
             'material_name': 'carbon',
             'material_batch': 'X1',
             'adsorbate': 'nitrogen',
-            't_iso': 77,
+            'temperature': 77,
         }
 
         pressure = [1, 2, 3, 4, 5, 3, 2]
@@ -105,7 +105,7 @@ class TestModelIsotherm():
         pygaps.ModelIsotherm(
             model=model,
             material_name='Test', material_batch='Henry',
-            t_iso=303, adsorbate='nitrogen'
+            temperature=303, adsorbate='nitrogen'
         )
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):

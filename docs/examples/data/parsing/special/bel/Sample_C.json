@@ -97,6 +97,6 @@
     "material_name": "Sample_C",
     "pressure_mode": "relative",
     "pressure_unit": null,
-    "t_iso": 303.0,
+    "temperature": 303.0,
     "user": "User"
 }

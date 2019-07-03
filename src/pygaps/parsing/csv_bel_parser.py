@@ -8,7 +8,7 @@ from ..classes.pointisotherm import PointIsotherm
 
 _DATA = {
     'adsorptive': 'adsorbate',
-    'meas. temp': 't_iso',
+    'meas. temp': 'temperature',
     'sample weight': 'mass',
     'comment1': 'material_name',
     'comment2': 'user',

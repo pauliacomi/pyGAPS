@@ -2,7 +2,7 @@
     "material_name": "HKUST-1(Cu)",
     "material_batch": "KRICT",
     "adsorbate": "CO2",
-    "t_iso": 303.0,
+    "temperature": 303.0,
 
     "pressure_mode" : "absolute",
     "pressure_unit" : "bar",

@@ -99,7 +99,7 @@ def initial_henry_slope(isotherm,
             'plot_type': 'isotherm',
             'branch': 'ads',
             'fig_title': (' '.join([isotherm.material_name])),
-            'lgd_keys': ['material_batch', 'adsorbate', 't_iso'],
+            'lgd_keys': ['material_batch', 'adsorbate', 'temperature'],
             'lgd_pos': 'bottom'
         }
         params.update(plot_parameters)
@@ -107,7 +107,7 @@ def initial_henry_slope(isotherm,
             material_name=isotherm.material_name,
             material_batch='Henry model',
             adsorbate=isotherm.adsorbate,
-            t_iso=isotherm.t_iso,
+            temperature=isotherm.temperature,
             model=henry
         )
         plot_iso([isotherm, model_isotherm], **params)
@@ -154,7 +154,7 @@ def initial_henry_virial(isotherm, verbose=False, optimization_params=None, **pl
                 'branch': 'ads',
                 'logx': False,
                 'fig_title': (' '.join([isotherm.material_name, isotherm.material_batch])),
-                'lgd_keys': ['material_name', 'adsorbate', 't_iso']
+                'lgd_keys': ['material_name', 'adsorbate', 'temperature']
             }
             params.update(plot_parameters)
             plot_iso([isotherm, model_isotherm], **params)

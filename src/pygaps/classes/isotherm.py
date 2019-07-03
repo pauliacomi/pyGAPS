@@ -31,9 +31,9 @@ class Isotherm():
     material_batch : str
         Batch (or identifier) of the material on which the isotherm is measured.
     adsorbate : str
-        The adsorbate used in the experiment.
-    t_iso : float
-        Experiment temperature.
+        Isotherm adsorbate.
+    temperature : float
+        Isotherm temperature.
 
     Other Parameters
     ----------------
@@ -61,13 +61,13 @@ class Isotherm():
     implementation additions.
 
     The minimum arguments required to instantiate the class are
-    ``material_name``, ``material_batch``, ``t_iso', ``adsorbate``.
+    ``material_name``, ``material_batch``, ``temperature', ``adsorbate``.
     """
 
     _required_params = [
         'material_name',
         'material_batch',
-        't_iso',
+        'temperature',
         'adsorbate'
     ]
     _named_params = {
@@ -176,7 +176,7 @@ class Isotherm():
         #: Isotherm material batch.
         self.material_batch = str(properties.pop('material_batch'))
         #: Isotherm experimental temperature.
-        self.t_iso = float(properties.pop('t_iso'))
+        self.temperature = float(properties.pop('temperature'))
         #: Isotherm adsorbate used.
         self.adsorbate = str(properties.pop('adsorbate'))
 
@@ -224,7 +224,7 @@ class Isotherm():
     def __repr__(self):
         """Print key isotherm parameters."""
         return "{0}: '{1} - {2}' with '{3}' at {4} K".format(
-            self.iso_id, self.material_name, self.material_batch, self.adsorbate, self.t_iso)
+            self.iso_id, self.material_name, self.material_batch, self.adsorbate, self.temperature)
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
@@ -234,7 +234,7 @@ class Isotherm():
         string += ("Material: " + str(self.material_name) + '\n')
         string += ("Batch: " + str(self.material_batch) + '\n')
         string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
-        string += ("Isotherm temperature: " + str(self.t_iso) + "K" + '\n')
+        string += ("Isotherm temperature: " + str(self.temperature) + "K" + '\n')
 
         # Named
         for param in self._named_params:

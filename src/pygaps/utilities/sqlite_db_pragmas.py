@@ -49,12 +49,12 @@ PRAGMA_ISOTHERMS = """
             DROP TABLE IF EXISTS "isotherms";
 
             CREATE TABLE "isotherms" (
-                `id`            TEXT        NOT NULL PRIMARY KEY UNIQUE,
-                `material_name`   TEXT      NOT NULL,
-                `material_batch`  TEXT      NOT NULL,
-                `t_iso`         REAL        NOT NULL,
-                `adsorbate`     TEXT        NOT NULL,
-                `iso_type`      TEXT        NOT NULL,
+                `id`            TEXT          NOT NULL PRIMARY KEY UNIQUE,
+                `material_name`   TEXT        NOT NULL,
+                `material_batch`  TEXT        NOT NULL,
+                `temperature`     REAL        NOT NULL,
+                `adsorbate`       TEXT        NOT NULL,
+                `iso_type`        TEXT        NOT NULL,
 
                 FOREIGN KEY(`material_name`,`material_batch`)   REFERENCES `materials`(`name`,`batch`),
                 FOREIGN KEY(`iso_type`)         REFERENCES `isotherm_type`(`type`),

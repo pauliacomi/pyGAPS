@@ -60,7 +60,7 @@ class DA(IsothermBaseModel):
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -scipy.constants.gas_constant * parameters['t_iso']
+        self.minus_rt = -scipy.constants.gas_constant * parameters['temperature']
 
     def loading(self, pressure):
         """

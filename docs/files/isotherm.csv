@@ -1,6 +1,6 @@
 material_name,HKUST-1(Cu)
 material_batch,KRICT
-t_iso,303
+temperature,303
 adsorbate,CO2
 date,21/05/2010 00:00
 t_act,150

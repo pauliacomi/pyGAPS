@@ -417,6 +417,6 @@
     "material_batch": "Test",
     "material_name": "NaY",
     "t_act": 200.0,
-    "t_iso": 77.355,
+    "temperature": 77.355,
     "user": "PI"
 }

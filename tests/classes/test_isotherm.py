@@ -18,7 +18,7 @@ class TestIsotherm():
             material_name='carbon',
             material_batch='X1',
             adsorbate='nitrogen',
-            t_iso=77,
+            temperature=77,
         )
 
     def test_isotherm_id(self, basic_isotherm):
@@ -28,7 +28,7 @@ class TestIsotherm():
 
         basic_isotherm.new_param = 'changed'
         assert iso_id != basic_isotherm.iso_id
-        basic_isotherm.t_iso = 0
+        basic_isotherm.temperature = 0
         assert iso_id != basic_isotherm.iso_id
 
     @pytest.mark.parametrize('missing_param',

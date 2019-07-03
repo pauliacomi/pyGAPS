@@ -6,7 +6,7 @@ pressure_mode,absolute
 pressure_unit,bar
 material_name,HKUST-1(Cu)
 material_batch,Test
-t_iso,303.0
+temperature,303.0
 adsorbate,CO2
 iso_type,Calorimetrie
 user,ADW

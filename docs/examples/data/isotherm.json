@@ -146,6 +146,6 @@
     "material_batch": "KRICT",
     "material_name": "HKUST-1(Cu)",
     "t_act": 150.0,
-    "t_iso": 303.0,
+    "temperature": 303.0,
     "user": "ADW"
 }

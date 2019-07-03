@@ -62,9 +62,9 @@ class PointIsotherm(Isotherm):
     material_batch : str
         Batch (or identifier) of the material on which the isotherm is measured.
     adsorbate : str
-        The adsorbate used in the experiment.
-    t_iso : float
-        Experiment temperature.
+        Isotherm adsorbate.
+    temperature : float
+        Isotherm temperature.
 
     Other Parameters
     ----------------
@@ -345,7 +345,7 @@ class PointIsotherm(Isotherm):
                 unit_from=self.pressure_unit,
                 unit_to=unit_to,
                 adsorbate_name=self.adsorbate,
-                temp=self.t_iso)
+                temp=self.temperature)
 
             if unit_to != self.pressure_unit and mode_to == 'absolute':
                 self.pressure_unit = unit_to
@@ -399,7 +399,7 @@ class PointIsotherm(Isotherm):
                 unit_from=self.loading_unit,
                 unit_to=unit_to,
                 adsorbate_name=self.adsorbate,
-                temp=self.t_iso)
+                temp=self.temperature)
 
             if unit_to != self.loading_unit:
                 self.loading_unit = unit_to
@@ -616,7 +616,7 @@ class PointIsotherm(Isotherm):
                                  unit_from=self.pressure_unit,
                                  unit_to=pressure_unit,
                                  adsorbate_name=self.adsorbate,
-                                 temp=self.t_iso
+                                 temp=self.temperature
                                  )
 
             # Select required points
@@ -699,7 +699,7 @@ class PointIsotherm(Isotherm):
                                 unit_from=self.loading_unit,
                                 unit_to=loading_unit,
                                 adsorbate_name=self.adsorbate,
-                                temp=self.t_iso
+                                temp=self.temperature
                                 )
 
             # Select required points
@@ -869,7 +869,7 @@ class PointIsotherm(Isotherm):
                                   unit_from=pressure_unit,
                                   unit_to=self.pressure_unit,
                                   adsorbate_name=self.adsorbate,
-                                  temp=self.t_iso)
+                                  temp=self.temperature)
 
         # Interpolate using the internal interpolator
         loading = self.l_interpolator(pressure)
@@ -898,7 +898,7 @@ class PointIsotherm(Isotherm):
                                 unit_from=self.loading_unit,
                                 unit_to=loading_unit,
                                 adsorbate_name=self.adsorbate,
-                                temp=self.t_iso
+                                temp=self.temperature
                                 )
 
         return loading
@@ -1002,7 +1002,7 @@ class PointIsotherm(Isotherm):
                                 unit_from=loading_unit,
                                 unit_to=self.loading_unit,
                                 adsorbate_name=self.adsorbate,
-                                temp=self.t_iso
+                                temp=self.temperature
                                 )
 
         # Interpolate using the internal interpolator
@@ -1021,7 +1021,7 @@ class PointIsotherm(Isotherm):
                                   unit_from=self.pressure_unit,
                                   unit_to=pressure_unit,
                                   adsorbate_name=self.adsorbate,
-                                  temp=self.t_iso)
+                                  temp=self.temperature)
 
         return pressure
 

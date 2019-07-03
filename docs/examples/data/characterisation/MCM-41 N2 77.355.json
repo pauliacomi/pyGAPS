@@ -7,7 +7,7 @@
     "material_batch": "Test",
     "material_name": "MCM-41",
     "t_act": 150.0,
-    "t_iso": 77.355,
+    "temperature": 77.355,
     "user": "PI",
     "pressure_mode": "relative",
     "loading_basis": "molar",

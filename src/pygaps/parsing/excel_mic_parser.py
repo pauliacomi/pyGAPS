@@ -29,7 +29,7 @@ _FIELDS = {
     },
     'temperature': {
         'text': ['analysis bath'],
-        'name': 't_iso',
+        'name': 'temperature',
         'row': 0,
         'column': 1,
         'type': 'number'
@@ -146,7 +146,7 @@ def _handle_numbers(field, val):
     """
     if val:
         ret = float(_NUMBER_REGEX.search(val.replace(',', '')).group())
-        if field['name'] == 't_iso':
+        if field['name'] == 'temperature':
             if '°C' in val:
                 ret = ret + 273.15
         return ret
