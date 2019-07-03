@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import numpy
 
 from .mpl_styles import LABEL_STYLE
 from .mpl_styles import TICK_STYLE
@@ -245,7 +244,7 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
     return ax
 
 
-def psd_plot(pore_widths, pore_dist, method=None,
+def psd_plot(pore_widths, pore_dist, pore_vol_cum=None, method=None,
              labeldiff='distribution', labelcum='cumulative',
              line_style=None, log=True, right=None, left=None, ax=None):
     """
@@ -257,6 +256,8 @@ def psd_plot(pore_widths, pore_dist, method=None,
         Array of the pore radii which will become the x axis.
     pore_dist : array
         Contribution of each pore radius which will make up the y axis.
+    pore_vol_cum : array
+        Pre-calculated cumulative value.
     method : str
         The method used. Will be a string part of the title.
     labeldiff : str
@@ -295,7 +296,7 @@ def psd_plot(pore_widths, pore_dist, method=None,
     l1 = ax.plot(pore_widths, pore_dist, label=labeldiff, **lst)
     if labelcum:
         ax2 = ax.twinx()
-        l2 = ax2.plot(pore_widths[1:], numpy.cumsum(pore_dist[1:] * numpy.diff(pore_widths)),
+        l2 = ax2.plot(pore_widths, pore_vol_cum,
                       marker='', color='r', linestyle="--", label=labelcum)
 
     # Func formatter

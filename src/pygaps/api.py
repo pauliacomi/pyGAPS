@@ -19,9 +19,9 @@ from .calculations.initial_henry import initial_henry_slope
 from .calculations.initial_henry import initial_henry_virial
 from .calculations.isosteric_enthalpy import isosteric_enthalpy
 from .calculations.isosteric_enthalpy import isosteric_enthalpy_raw
-from .calculations.psd import dft_size_distribution
-from .calculations.psd import mesopore_size_distribution
-from .calculations.psd import micropore_size_distribution
+from .calculations.psd_dft import psd_dft
+from .calculations.psd_mesoporous import psd_mesoporous
+from .calculations.psd_microporous import psd_microporous
 from .calculations.tplot import t_plot
 from .calculations.tplot import t_plot_raw
 from .classes.adsorbate import Adsorbate

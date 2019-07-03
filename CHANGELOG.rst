@@ -14,6 +14,21 @@ New features:
   set the plotting vertical axes to be logarithmic.
 * To remove the legend now set the lgd_pos to None
 
+* Pore size distribution improvements:
+
+    * Changed names of PSD funtions to `psd_microporous`,
+      `psd_mesoporous` and `psd_dft`, respectively.
+    * Simplified functions for ease of use and understanding.
+    * Added cumulative pore volume to the return dictionary of all
+      psd functins.
+    * Generalized Kelvin methods (psd_mesoporous) to other
+      pore geometries, such as slit and sphere.
+    * Added a new Kelvin function, the Kelvin Kruck-Jaroniec-Sayari
+      correction (use with `kelvin_function='Kelvin-KJS'`
+    * Corrected a conversion error in the DFT fitting routing.
+    * Changed HK dictionary name OxideIon(SF) -> 'AlSiOxideIon'
+    * Added a new HK dictionary 'AlPhOxideIon'
+
 
 
 1.6.1 (2019-05-09)

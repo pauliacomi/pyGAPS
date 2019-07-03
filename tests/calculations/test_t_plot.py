@@ -83,7 +83,7 @@ class TestTPlot():
                        data['t_area'], err_relative, err_absolute_volume)
 
     @cleanup
-    def test_tplot_output(self, noplot):
+    def test_tplot_output(self):
         """Test verbosity"""
 
         data = DATA['MCM-41']

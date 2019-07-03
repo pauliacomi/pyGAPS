@@ -24,6 +24,8 @@ DATA = {
         'dr_potential': None,
         'da_volume': None,
         'da_potential': None,
+        'psd_meso_pore_size': 3.2,
+        'psd_dft_pore_size': 3.2,
     },
     'NaY': {
         'file': 'NaY N2 77.355.json',
@@ -63,6 +65,8 @@ DATA = {
         'dr_potential': 5.84,
         'da_volume': 0.346,
         'da_potential': 7.071,
+        'psd_micro_pore_size': 0.6,
+        'psd_dft_pore_size': 0.5,
     },
     'UiO-66(Zr)': {
         'file': 'UiO-66(Zr) N2 77.355.json',
@@ -76,6 +80,8 @@ DATA = {
         'dr_potential': None,
         'da_volume': None,
         'da_potential': None,
+        'psd_micro_pore_size': 0.7,
+        'psd_dft_pore_size': 0.6,
     },
 
 }
