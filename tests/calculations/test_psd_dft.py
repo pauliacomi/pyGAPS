@@ -57,7 +57,6 @@ class TestPSDDFT():
 
         result_dict = pdft.psd_dft(
             isotherm,
-            'internal',
             verbose=True)
 
         # max_error = 0.1  # 10 percent

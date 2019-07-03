@@ -26,10 +26,10 @@ class TestKelvinModels():
     @pytest.mark.parametrize('branch, pore, geometry', [
         ('ads', 'slit', 'hemicylindrical'),
         ('ads', 'cylinder', 'cylindrical'),
-        ('ads', 'sphere', 'spherical'),
+        ('ads', 'sphere', 'hemispherical'),
         ('des', 'slit', 'hemicylindrical'),
-        ('des', 'cylinder', 'spherical'),
-        ('des', 'sphere', 'spherical'),
+        ('des', 'cylinder', 'hemispherical'),
+        ('des', 'sphere', 'hemispherical'),
     ])
     def test_meniscus_geometry(self, branch, pore, geometry):
         """Test the meniscus geometry function."""

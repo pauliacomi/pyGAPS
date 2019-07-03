@@ -333,7 +333,7 @@ def psd_pygapsdh(volume_adsorbed, relative_pressure, pore_geometry,
 
     pore_dist = pore_volumes / d_pore_widths
 
-    return pore_widths[::-1], pore_dist[::-1]
+    return pore_widths[:0:-1], pore_dist[::-1]
 
 
 def psd_bjh(volume_adsorbed, relative_pressure, pore_geometry,
@@ -466,7 +466,7 @@ def psd_bjh(volume_adsorbed, relative_pressure, pore_geometry,
 
     pore_dist = pore_volumes / d_pore_widths
 
-    return pore_widths[::-1], pore_dist[::-1]
+    return pore_widths[:0:-1], pore_dist[::-1]
 
 
 def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
@@ -595,10 +595,10 @@ def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
 
         # Calculate the two factors in the DH method, for area and length
         pore_avg_area = (4 * pore_volume / avg_pore_widths[i])
-        pore_avg_length = (8 * pore_volume / avg_pore_widths[i] ^ 2)
+        pore_avg_length = (8 * pore_volume / avg_pore_widths[i] ** 2)
         sum_area_factor += pore_avg_area
         sum_length_factor += pore_avg_length
 
     pore_dist = pore_volumes / d_pore_widths
 
-    return pore_widths[::-1], pore_dist[::-1]
+    return pore_widths[:0:-1], pore_dist[::-1]
