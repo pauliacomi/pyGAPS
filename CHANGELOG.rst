@@ -2,8 +2,12 @@
 Changelog
 =========
 
-1.7.0 ()
+2.0.0 ()
 ------------------
+
+Major pyGAPS release, following peer review on related manuscript.
+Several breaking changes with previous codebase, in particular
+with several isotherm parameters.
 
 New features:
 
