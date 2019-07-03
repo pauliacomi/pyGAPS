@@ -111,16 +111,18 @@ def psd_microporous(isotherm,
 
     # Call specified pore size distribution function
     if psd_model == 'HK':
-        pore_widths, pore_dist = psd_horvath_kawazoe(
+        pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
             loading, pressure, isotherm.t_iso, pore_geometry,
             adsorbate_model, adsorbent_properties)
 
     if verbose:
-        psd_plot(pore_widths, pore_dist, log=False, right=2.5, method=psd_model)
+        psd_plot(pore_widths, pore_dist,
+                 pore_vol_cum=pore_vol_cum, log=False, right=2.5, method=psd_model)
 
     return {
         'pore_widths': pore_widths,
         'pore_distribution': pore_dist,
+        'pore_volume_cumulative': pore_vol_cum,
     }
 
 
@@ -163,6 +165,8 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         The widths of the pores.
     pore_dist : array
         The distributions for each width.
+    pore_vol_cum : array
+        Cumulative pore volume.
 
     Notes
     -----
@@ -346,4 +350,4 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000    # cm3/g
     pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
 
-    return avg_pore_widths, pore_dist
+    return avg_pore_widths, pore_dist, volume_adsorbed[1:]

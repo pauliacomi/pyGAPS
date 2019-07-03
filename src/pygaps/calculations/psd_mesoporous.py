@@ -160,25 +160,27 @@ def psd_mesoporous(isotherm,
 
     # Call specified pore size distribution function
     if psd_model == 'pygaps-DH':
-        pore_widths, pore_dist = psd_pygapsdh(
+        pore_widths, pore_dist, pore_vol_cum = psd_pygapsdh(
             volume_adsorbed, pressure, pore_geometry,
             t_model, k_model)
     elif psd_model == 'BJH':
-        pore_widths, pore_dist = psd_bjh(
+        pore_widths, pore_dist, pore_vol_cum = psd_bjh(
             volume_adsorbed, pressure, pore_geometry,
             t_model, k_model)
     elif psd_model == 'DH':
-        pore_widths, pore_dist = psd_dollimore_heal(
+        pore_widths, pore_dist, pore_vol_cum = psd_dollimore_heal(
             volume_adsorbed, pressure, pore_geometry,
             t_model, k_model)
 
     # Plot if verbose
     if verbose:
-        psd_plot(pore_widths, pore_dist, method=psd_model, left=1.5)
+        psd_plot(pore_widths, pore_dist,
+                 pore_vol_cum=pore_vol_cum, method=psd_model, left=1.5)
 
     return {
         'pore_widths': pore_widths,
         'pore_distribution': pore_dist,
+        'pore_volume_cumulative': pore_vol_cum,
     }
 
 
@@ -207,7 +209,8 @@ def psd_pygapsdh(volume_adsorbed, relative_pressure, pore_geometry,
         Widths of the pores.
     pore_dist : array
         Amount of each pore width.
-
+    pore_vol_cum : array
+        Cumulative pore volume.
 
     Notes
     -----
@@ -333,7 +336,7 @@ def psd_pygapsdh(volume_adsorbed, relative_pressure, pore_geometry,
 
     pore_dist = pore_volumes / d_pore_widths
 
-    return pore_widths[:0:-1], pore_dist[::-1]
+    return pore_widths[:0:-1], pore_dist[::-1], numpy.cumsum(pore_volumes[::-1])
 
 
 def psd_bjh(volume_adsorbed, relative_pressure, pore_geometry,
@@ -361,6 +364,8 @@ def psd_bjh(volume_adsorbed, relative_pressure, pore_geometry,
         Widths of the pores.
     pore_dist : array
         Amount of each pore width.
+    pore_vol_cum : array
+        Cumulative pore volume.
 
     Notes
     -----
@@ -466,7 +471,7 @@ def psd_bjh(volume_adsorbed, relative_pressure, pore_geometry,
 
     pore_dist = pore_volumes / d_pore_widths
 
-    return pore_widths[:0:-1], pore_dist[::-1]
+    return pore_widths[:0:-1], pore_dist[::-1], numpy.cumsum(pore_volumes[::-1])
 
 
 def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
@@ -494,6 +499,8 @@ def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
         Widths of the pores.
     pore_dist : array
         Amount of each pore width.
+    pore_vol_cum : array
+        Cumulative pore volume.
 
     Notes
     -----
@@ -601,4 +608,4 @@ def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
 
     pore_dist = pore_volumes / d_pore_widths
 
-    return pore_widths[:0:-1], pore_dist[::-1]
+    return pore_widths[:0:-1], pore_dist[::-1], numpy.cumsum(pore_volumes[::-1])

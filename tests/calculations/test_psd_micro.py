@@ -19,6 +19,7 @@ import os
 
 import pytest
 from matplotlib.testing.decorators import cleanup
+from numpy import isclose
 
 import pygaps
 import pygaps.calculations.psd_microporous as pmic
@@ -33,7 +34,7 @@ class TestPSDMicro():
     """Test pore size distribution calculation."""
 
     def test_psd_micro_checks(self, basic_pointisotherm):
-
+        """Checks for built-in safeguards."""
         # Will raise a "no model exception"
         with pytest.raises(ParameterError):
             pmic.psd_microporous(basic_pointisotherm, psd_model=None)
@@ -50,28 +51,40 @@ class TestPSDMicro():
         with pytest.raises(ParameterError):
             pmic.psd_microporous(basic_pointisotherm, branch='test')
 
-    @cleanup
     @pytest.mark.parametrize('method', [
         'HK',
     ])
-    @pytest.mark.parametrize('file', [
-        (data['file']) for data in list(DATA.values())
+    @pytest.mark.parametrize('sample', [
+        sample for sample in list(DATA.values())
     ])
-    def test_psd_micro(self, file, method):
+    def test_psd_micro(self, sample, method):
         """Test psd calculation with several model isotherms"""
+        # exclude datasets where it is not applicable
+        if sample.get('psd_micro_pore_volume', None):
 
-        filepath = os.path.join(DATA_N77_PATH, file)
+            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+
+            with open(filepath, 'r') as text_file:
+                isotherm = pygaps.isotherm_from_json(text_file.read())
+
+            result_dict = pmic.psd_microporous(isotherm, psd_model=method)
+
+            err_relative = 0.1  # 10 percent
+            err_absolute = 0.01  # 0.01 cm3/g
+
+            assert isclose(
+                result_dict['pore_volume_cumulative'][-1],
+                sample['psd_micro_pore_volume'],
+                err_relative, err_absolute)
+
+    @cleanup
+    def test_psd_micro_verbose(self):
+        """Test verbosity."""
+        data = DATA['MCM-41']
+        filepath = os.path.join(DATA_N77_PATH, data['file'])
 
         with open(filepath, 'r') as text_file:
             isotherm = pygaps.isotherm_from_json(
                 text_file.read())
 
-        result_dict = pmic.psd_microporous(
-            isotherm,
-            psd_model=method,
-            pore_geometry='slit',
-            verbose=True)
-
-        # max_error = 0.1  # 10 percent
-
-        assert result_dict is not None
+        pygaps.psd_microporous(isotherm, verbose=True)
