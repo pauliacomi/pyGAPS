@@ -1,7 +1,6 @@
 """
 Configuration file for pytest and commonly used fixtures
 """
-import matplotlib.pyplot as plt
 import pandas
 import pytest
 
