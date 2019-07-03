@@ -84,10 +84,6 @@ class TestKelvinModels():
                            basic_adsorbate.molar_mass(),
                            basic_adsorbate.surface_tension(temperature))
 
-    def test_get_kelvin(self):
-        """Get a regular model."""
-        assert km.get_kelvin_model('Kelvin') == km._KELVIN_MODELS['Kelvin']
-
     def test_get_kelvin_error(self):
         """When the model requested is not found we raise."""
         with pytest.raises(ParameterError):
