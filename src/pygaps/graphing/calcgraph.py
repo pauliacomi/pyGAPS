@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import numpy
 
 from .mpl_styles import LABEL_STYLE
 from .mpl_styles import TICK_STYLE

@@ -17,9 +17,9 @@ All pre-calculated data for characterization can be found in the
 
 import os
 
+import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
-from numpy import isclose
 
 import pygaps
 import pygaps.calculations.psd_dft as pdft
@@ -61,12 +61,15 @@ class TestPSDDFT():
 
             result_dict = pdft.psd_dft(isotherm, kernel=kernel)
 
-            err_relative = 0.1  # 10 percent
-            err_absolute = 0.01  # 0.01 cm3/g
+            loc = np.where(result_dict['pore_distribution'] == max(result_dict['pore_distribution']))
+            principal_peak = result_dict['pore_widths'][loc]
 
-            assert isclose(
-                result_dict['pore_volume_cumulative'][-1],
-                sample['psd_dft_pore_volume'],
+            err_relative = 0.05  # 5 percent
+            err_absolute = 0.01  # 0.01
+
+            assert np.isclose(
+                principal_peak,
+                sample['psd_micro_pore_size'],
                 err_relative, err_absolute)
 
     @cleanup

@@ -257,9 +257,9 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
     if pore_geometry == 'slit':
         pass
     elif pore_geometry == 'cylinder':
-        raise NotImplementedError
+        raise NotImplementedError('Currently only slit pores supported.')
     elif pore_geometry == 'sphere':
-        raise NotImplementedError
+        raise NotImplementedError('Currently only slit pores supported.')
 
     if adsorbent_properties is None:
         raise ParameterError(
@@ -296,36 +296,32 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
             "{}".format(' '.join(missing)))
 
     # dictionary unpacking
-    d_adsorbate = adsorbate_properties.get('molecular_diameter')
-    d_adsorbent = adsorbent_properties.get('molecular_diameter')
-    p_adsorbate = adsorbate_properties.get('polarizability') * 1e-27            # to m3
-    p_adsorbent = adsorbent_properties.get('polarizability') * 1e-27            # to m3
-    m_adsorbate = adsorbate_properties.get('magnetic_susceptibility') * 1e-27   # to m3
-    m_adsorbent = adsorbent_properties.get('magnetic_susceptibility') * 1e-27   # to m3
-    n_adsorbate = adsorbate_properties.get('surface_density')
-    n_adsorbent = adsorbent_properties.get('surface_density')
+    d_gas = adsorbate_properties.get('molecular_diameter')
+    d_mat = adsorbent_properties.get('molecular_diameter')
+    p_gas = adsorbate_properties.get('polarizability') * 1e-27            # to m3
+    p_mat = adsorbent_properties.get('polarizability') * 1e-27            # to m3
+    m_gas = adsorbate_properties.get('magnetic_susceptibility') * 1e-27   # to m3
+    m_mat = adsorbent_properties.get('magnetic_susceptibility') * 1e-27   # to m3
+    n_gas = adsorbate_properties.get('surface_density')
+    n_mat = adsorbent_properties.get('surface_density')
     liquid_density = adsorbate_properties.get('liquid_density')
     adsorbate_molar_mass = adsorbate_properties.get('adsorbate_molar_mass')
 
     # calculation of constants and terms
     e_m = const.electron_mass
     c_l = const.speed_of_light
-    effective_diameter = d_adsorbate + d_adsorbent
+    effective_diameter = d_gas + d_mat
     sigma = (2 / 5)**(1 / 6) * effective_diameter / 2
     sigma_si = sigma * 1e-9
 
-    a_adsorbent = 6 * e_m * c_l ** 2 * p_adsorbate * p_adsorbent /\
-        (p_adsorbate / m_adsorbate + p_adsorbent / m_adsorbent)
-    a_adsorbate = 3 * e_m * c_l**2 * p_adsorbate * m_adsorbate / 2
+    a_mat = 6 * e_m * c_l ** 2 * p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
+    a_gas = 3 * e_m * c_l**2 * p_gas * m_gas / 2
 
-    constant_coefficient = const.Avogadro / \
-        (const.gas_constant * temperature) * \
-        (n_adsorbate * a_adsorbate + n_adsorbent * a_adsorbent) / \
-        (sigma_si**4)
+    constant_coefficient = const.Avogadro / (const.gas_constant * temperature) * \
+        (n_gas * a_gas + n_mat * a_mat) / (sigma_si**4)
 
-    constant_interaction_term = - \
-        ((sigma**4) / (3 * (effective_diameter / 2)**3) -
-         (sigma**10) / (9 * (effective_diameter / 2)**9))
+    constant_interaction_term = - ((sigma**4) / (3 * (effective_diameter / 2)**3) -
+                                   (sigma**10) / (9 * (effective_diameter / 2)**9))
 
     def h_k_pressure(l_pore):
         pressure = numpy.exp(constant_coefficient / (l_pore - effective_diameter) *
@@ -342,7 +338,7 @@ def psd_horvath_kawazoe(loading, pressure, temperature, pore_geometry,
         def h_k_minimization(l_pore):
             return numpy.abs(h_k_pressure(l_pore) - p_point)
         res = opt.minimize_scalar(h_k_minimization)
-        p_w.append(res.x - d_adsorbent)
+        p_w.append(res.x - d_mat)
 
     # finally calculate pore distribution
     pore_widths = numpy.array(p_w)

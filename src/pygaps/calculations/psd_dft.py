@@ -144,12 +144,8 @@ def psd_dft(isotherm,
     pore_widths, pore_dist, pore_load_cum = psd_dft_kernel_fit(
         pressure, loading, kernel_path, bspline_order)  # mmol/g
 
-    # Convert to volume units
-    pore_dist = pore_dist * max(loading) * isotherm.adsorbate.molar_mass() \
-        / isotherm.adsorbate.liquid_density(isotherm.t_iso) / 1000
-
-    dpore_widths = numpy.diff(pore_widths)
-    pore_vol_cum = numpy.cumsum(pore_dist * numpy.append(dpore_widths[0], dpore_widths))
+    dpore_widths = numpy.ediff1d(pore_widths, to_begin=pore_widths[0])
+    pore_vol_cum = numpy.cumsum(pore_dist * dpore_widths)
 
     if verbose:
         params = {
@@ -193,7 +189,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     pore widths : array
         The widths of the pores.
     pore_dist : array
-        The distributions for each width.
+        The distributions for each width (dV/dw).
     pore_load_cum : array
         Cumulative pore loading.
 
@@ -255,8 +251,8 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
 
     # convert from preponderance to distribution
     final_loading = kernel_loading(result.x)
-    pore_dist = result.x[1:] / numpy.diff(pore_widths)
-    pore_widths, pore_dist = bspline(pore_widths[1:], pore_dist, degree=bspline_order)
+    pore_dist = result.x / numpy.ediff1d(pore_widths, to_begin=pore_widths[0])
+    pore_widths, pore_dist = bspline(pore_widths, pore_dist, degree=bspline_order)
 
     return pore_widths, pore_dist, final_loading
 

@@ -23,7 +23,7 @@ def psd_mesoporous(isotherm,
                    branch='des',
                    thickness_model='Harkins/Jura',
                    kelvin_model='Kelvin',
-                   verbose=False, **model_parameters):
+                   verbose=False):
     r"""
     Calculate the mesopore size distribution.
 
@@ -424,7 +424,7 @@ def psd_bjh(volume_adsorbed, relative_pressure, pore_geometry,
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
 
-    if pore_geometry == 'slit' or pore_geometry == 'sphere':
+    if pore_geometry in ('slit', 'sphere'):
         raise ParameterError(
             "The BJH method is provided for compatibility and only applicable"
             " to cylindrical pores. Use the pyGAPS-DH method for other options."
@@ -558,7 +558,7 @@ def psd_dollimore_heal(volume_adsorbed, relative_pressure, pore_geometry,
         raise ParameterError("The length of the pressure and loading arrays"
                              " do not match")
 
-    if pore_geometry == 'slit' or pore_geometry == 'sphere':
+    if pore_geometry in ('slit', 'sphere'):
         raise ParameterError(
             "The DH method is provided for compatibility and only applicable"
             " to cylindrical pores. Use the pyGAPS-DH method for other options."

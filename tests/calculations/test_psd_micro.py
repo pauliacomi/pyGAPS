@@ -69,14 +69,11 @@ class TestPSDMicro():
 
             result_dict = pmic.psd_microporous(isotherm, psd_model=method)
 
-            err_relative = 0.1  # 10 percent
-            err_absolute = 0.01  # 0.01 cm3/g
-
             loc = np.where(result_dict['pore_distribution'] == max(result_dict['pore_distribution']))
             principal_peak = result_dict['pore_widths'][loc]
 
-            err_relative = 0.1  # 10 percent
-            err_absolute = 0.01  # 0.01 cm3/g
+            err_relative = 0.05  # 5 percent
+            err_absolute = 0.01  # 0.01
 
             assert np.isclose(
                 principal_peak,
