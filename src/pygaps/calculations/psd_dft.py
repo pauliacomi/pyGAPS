@@ -18,8 +18,9 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import bspline
 
 _KERNELS = {
-    'DFT-N2-77K-carbon-slit': os.path.join(os.path.dirname(__file__),
-                                           'kernels', 'dft - N2 - carbon.csv'),
+    'DFT-N2-77K-carbon-slit': os.path.join(
+        os.path.dirname(__file__),
+        'kernels', 'DFT-N2-77K-carbon-slit.csv'),
 }
 
 _LOADED = {}  # We will keep loaded kernels here

@@ -17,16 +17,15 @@ the /.conftest file together with the other isotherm parameters.
 
 import os
 
+import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
-from numpy import isclose
 
 import pygaps
 import pygaps.calculations.psd_mesoporous as pmes
 from pygaps.utilities.exceptions import ParameterError
 
-from .conftest import DATA
-from .conftest import DATA_N77_PATH
+from .conftest import DATA, DATA_N77_PATH
 
 
 @pytest.mark.characterisation
@@ -62,7 +61,7 @@ class TestPSDMeso():
     def test_psd_meso(self, sample, method):
         """Test psd calculation with several model isotherms."""
         # exclude datasets where it is not applicable
-        if sample.get('psd_meso_pore_volume', None):
+        if sample.get('psd_meso_pore_size', None):
 
             filepath = os.path.join(DATA_N77_PATH, sample['file'])
 
@@ -74,12 +73,15 @@ class TestPSDMeso():
                 psd_model=method,
                 branch='des')
 
+            loc = np.where(result_dict['pore_distribution'] == max(result_dict['pore_distribution']))
+            principal_peak = result_dict['pore_widths'][loc]
+
             err_relative = 0.1  # 10 percent
             err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(
-                result_dict['pore_volume_cumulative'][-1],
-                sample['psd_meso_pore_volume'],
+            assert np.isclose(
+                principal_peak,
+                sample['psd_meso_pore_size'],
                 err_relative, err_absolute)
 
     @cleanup

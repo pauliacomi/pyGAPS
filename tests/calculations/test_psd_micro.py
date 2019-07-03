@@ -17,9 +17,9 @@ All pre-calculated data for characterization can be found in the
 
 import os
 
+import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
-from numpy import isclose
 
 import pygaps
 import pygaps.calculations.psd_microporous as pmic
@@ -60,7 +60,7 @@ class TestPSDMicro():
     def test_psd_micro(self, sample, method):
         """Test psd calculation with several model isotherms"""
         # exclude datasets where it is not applicable
-        if sample.get('psd_micro_pore_volume', None):
+        if sample.get('psd_micro_pore_size', None):
 
             filepath = os.path.join(DATA_N77_PATH, sample['file'])
 
@@ -72,9 +72,15 @@ class TestPSDMicro():
             err_relative = 0.1  # 10 percent
             err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(
-                result_dict['pore_volume_cumulative'][-1],
-                sample['psd_micro_pore_volume'],
+            loc = np.where(result_dict['pore_distribution'] == max(result_dict['pore_distribution']))
+            principal_peak = result_dict['pore_widths'][loc]
+
+            err_relative = 0.1  # 10 percent
+            err_absolute = 0.01  # 0.01 cm3/g
+
+            assert np.isclose(
+                principal_peak,
+                sample['psd_micro_pore_size'],
                 err_relative, err_absolute)
 
     @cleanup
