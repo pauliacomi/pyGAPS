@@ -18,7 +18,6 @@ def db_file(tmpdir_factory):
 
 
 @pytest.mark.parsing
-@pytest.mark.incremental
 class TestDatabase():
     def test_db_create(self, db_file):
         "Tests the database creation"

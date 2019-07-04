@@ -132,20 +132,10 @@ def area_BET(isotherm, limits=None, verbose=False):
      intercept, minimum, maximum, corr_coef) = area_BET_raw(
         pressure, loading, cross_section, limits=limits)
 
-    result_dict = {
-        'area': bet_area,
-        'c_const': c_const,
-        'n_monolayer': n_monolayer,
-        'p_monolayer': p_monolayer,
-        'bet_slope': slope,
-        'bet_intercept': intercept,
-        'corr_coef': corr_coef,
-    }
-
     if verbose:
 
         print("BET surface area: a =", int(round(bet_area, 0)),
-              "m²/{}".format(isotherm.adsorbent_unit))
+              "m2/{}".format(isotherm.adsorbent_unit))
         print("Minimum pressure point chosen is {0} and maximum is {1}".format(
             round(pressure[minimum], 3), round(pressure[maximum], 3)))
         print("The slope of the BET fit: s =", round(slope, 3))
@@ -169,7 +159,15 @@ def area_BET(isotherm, limits=None, verbose=False):
                  p_monolayer,
                  roq_transform(p_monolayer, n_monolayer))
 
-    return result_dict
+    return {
+        'area': bet_area,
+        'c_const': c_const,
+        'n_monolayer': n_monolayer,
+        'p_monolayer': p_monolayer,
+        'bet_slope': slope,
+        'bet_intercept': intercept,
+        'corr_coef': corr_coef,
+    }
 
 
 def area_BET_raw(pressure, loading, cross_section, limits=None):

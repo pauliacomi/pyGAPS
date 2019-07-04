@@ -164,21 +164,20 @@ class Adsorbate():
         ``ParameterError``
             If it does not exist in list.
         """
-        # See if adsorbate exists in master list
-        adsorbate = None
+        # Skip search if already adsorbate
+        if isinstance(adsorbate_name, Adsorbate):
+            return adsorbate_name
 
+        # See if adsorbate exists in master list
         for ads in pygaps.ADSORBATE_LIST:
             if ads == adsorbate_name:
-                adsorbate = ads
-                break
+                return ads
 
-        if adsorbate is None:
-            raise ParameterError(
-                "Adsorbate {0} does not exist in list of adsorbates. "
-                "First populate pygaps.ADSORBATE_LIST "
-                "with required adsorbate class".format(adsorbate_name))
-
-        return adsorbate
+        # Otherwise raise error
+        raise ParameterError(
+            "Adsorbate {0} does not exist in list of adsorbates. "
+            "First populate pygaps.ADSORBATE_LIST "
+            "with required adsorbate class".format(adsorbate_name))
 
     @property
     def backend(self):

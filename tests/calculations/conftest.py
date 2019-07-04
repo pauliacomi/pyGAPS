@@ -1,3 +1,34 @@
+"""
+This configuration file contains data required for testing
+scientific pygaps functions on real or model data.
+In this file there are:
+
+    - references to sample isotherm files
+    - pre-calculated values for each isotherm on various
+      characterization tests.
+
+'bet_area':             BET area value
+'s_bet_area':           BET area value in a selected range
+'langmuir_area':        Langmuir area value
+'s_langmuir_area':      Langmuir area value in a selected range
+'t_area':               t-plot calculated area
+'t_pore_volume':        t-plot calculated volume
+'s_t_area':             t-plot calculated area in a selected range
+'as_ref':               reference alpha-s isotherm
+'as_area':              alpha-s calculated area
+'as_pore_volume':       alpha-s calculated volume
+'s_as_area':            alpha-s calculated area in a selected range
+'Khi_slope':            initial henry constant (slope method)
+'Khi_virial':           initial henry constant (virial method)
+'dr_volume':            Dubinin-Radushkevitch calculated micropore volume
+'dr_potential':         Dubinin-Radushkevitch calculated surface potential
+'da_volume':            Dubinin-Astakov calculated micropore volume
+'da_potential':         Dubinin-Astakov calculated surface potential
+'psd_meso_pore_size':   Primary pore size peak, mesopore range
+'psd_micro_pore_size':  Primary pore size peak, micropore range
+'psd_dft_pore_size':    Primary pore size peak, DFT range
+"""
+
 import os
 
 DATA_PATH = os.path.join(
@@ -16,10 +47,15 @@ DATA = {
         's_bet_area': 350.0,
         'langmuir_area': 1450.0,
         's_langmuir_area': 500.0,
+        't_area': 340.0,
         't_pore_volume': 0.28,
-        't_area': 80.0,
-        'Khslope': 57000,
-        'Khvirial': 194297,
+        's_t_area': 55.0,
+        'as_ref': 'SiO2',
+        'as_area': 270,
+        'as_volume': 0.3,
+        's_as_area': 360,
+        'Khi_slope': 57000,
+        'Khi_virial': 194297,
         'dr_volume': None,
         'dr_potential': None,
         'da_volume': None,
@@ -31,10 +67,10 @@ DATA = {
         'file': 'NaY N2 77.355.json',
         'bet_area': 700.0,
         'langmuir_area': 1100.0,
+        't_area': 200.0,
         't_pore_volume': 0.26,
-        't_area': 120.0,
-        'Khslope': 1770000,
-        'Khvirial': 1259476,
+        'Khi_slope': 1770000,
+        'Khi_virial': 1259476,
         'dr_volume': None,
         'dr_potential': None,
         'da_volume': None,
@@ -44,10 +80,10 @@ DATA = {
         'file': 'SiO2 N2 77.355.json',
         'bet_area': 200.0,
         'langmuir_area': 850.0,
+        't_area': 250.0,
         't_pore_volume': 0.0,
-        't_area': 280.0,
-        'Khslope': 780,
-        'Khvirial': 249,
+        'Khi_slope': 780,
+        'Khi_virial': 249,
         'dr_volume': None,
         'dr_potential': None,
         'da_volume': None,
@@ -57,10 +93,10 @@ DATA = {
         'file': 'Takeda 5A N2 77.355.json',
         'bet_area': 1075.0,
         'langmuir_area': 1600.0,
+        't_area': 110.0,
         't_pore_volume': 0.43,
-        't_area': 130.0,
-        'Khslope': 1610219,
-        'Khvirial': 4307354,
+        'Khi_slope': 1610219,
+        'Khi_virial': 4307354,
         'dr_volume': 0.484,
         'dr_potential': 5.84,
         'da_volume': 0.346,
@@ -73,9 +109,9 @@ DATA = {
         'bet_area': 1250.0,
         'langmuir_area': 1350.0,
         't_pore_volume': 0.48,
-        't_area': 20.0,
-        'Khslope': 697654,
-        'Khvirial': 1365637,
+        't_area': 17.0,
+        'Khi_slope': 697654,
+        'Khi_virial': 1365637,
         'dr_volume': None,
         'dr_potential': None,
         'da_volume': None,

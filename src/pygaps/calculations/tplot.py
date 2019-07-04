@@ -133,14 +133,9 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
     results, t_curve = t_plot_raw(
         loading, pressure, t_model, liquid_density, molar_mass, limits)
 
-    result_dict = {
-        't_curve': t_curve,
-        'results': results,
-    }
-
     if verbose:
         if not results:
-            print('Could not find linear regions, attempt a manual limit')
+            print('Could not find linear regions, attempt a manual limit.')
         else:
             for index, result in enumerate(results):
                 print("For linear region {0}".format(index + 1))
@@ -159,7 +154,10 @@ def t_plot(isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False)
 
             plot_tp(t_curve, loading, results)
 
-    return result_dict
+    return {
+        't_curve': t_curve,
+        'results': results,
+    }
 
 
 def t_plot_raw(loading, pressure, thickness_model, liquid_density,

@@ -16,7 +16,7 @@ class TestInitialHenry():
     """Test all initial henry methods."""
 
     @pytest.mark.parametrize('file, expected',
-                             [(data['file'], data['Khslope']) for data in list(DATA.values())])
+                             [(data['file'], data['Khi_slope']) for data in list(DATA.values())])
     def test_ihenry_slope(self, file, expected):
         """Test initial slope method."""
 
@@ -34,7 +34,7 @@ class TestInitialHenry():
         assert isclose(ihenry_slope, expected, err_relative, err_absolute)
 
     @pytest.mark.parametrize('file, expected',
-                             [(data['file'], data['Khvirial']) for data in list(DATA.values())])
+                             [(data['file'], data['Khi_virial']) for data in list(DATA.values())])
     def test_ihenry_virial(self, file, expected):
         """Test virial method."""
 

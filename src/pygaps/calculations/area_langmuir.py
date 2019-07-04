@@ -112,15 +112,6 @@ def area_langmuir(isotherm, limits=None, verbose=False):
      intercept, minimum, maximum, corr_coef) = area_langmuir_raw(
         loading, pressure, cross_section, limits=limits)
 
-    result_dict = {
-        'area': langmuir_area,
-        'langmuir_const': langmuir_const,
-        'n_monolayer': n_monolayer,
-        'langmuir_slope': slope,
-        'langmuir_intercept': intercept,
-        'corr_coef': corr_coef,
-    }
-
     if verbose:
 
         print("Langmuir surface area: a =", int(
@@ -139,7 +130,14 @@ def area_langmuir(isotherm, limits=None, verbose=False):
                       minimum, maximum,
                       slope, intercept)
 
-    return result_dict
+    return {
+        'area': langmuir_area,
+        'langmuir_const': langmuir_const,
+        'n_monolayer': n_monolayer,
+        'langmuir_slope': slope,
+        'langmuir_intercept': intercept,
+        'corr_coef': corr_coef,
+    }
 
 
 def area_langmuir_raw(loading, pressure, cross_section, limits=None):
@@ -219,9 +217,9 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
 
     # Checks for consistency
     if langmuir_const < 0:
-        warnings.warn("The Langmuir constant is negative")
+        warnings.warn("The Langmuir constant is negative.")
     if corr_coef < 0.99:
-        warnings.warn("The correlation is not linear")
+        warnings.warn("The correlation is not linear.")
 
     return (langmuir_area, langmuir_const, n_monolayer,
             slope, intercept, minimum, maximum, corr_coef)

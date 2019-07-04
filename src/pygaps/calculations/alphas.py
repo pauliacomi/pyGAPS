@@ -5,6 +5,7 @@ import warnings
 import scipy
 
 from ..classes.adsorbate import Adsorbate
+from ..classes.isotherm import Isotherm
 from ..graphing.calcgraph import plot_tp
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
@@ -109,13 +110,12 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
 
     """
     # Check to see if reference isotherm is given
-    if reference_isotherm is None:
+    if reference_isotherm is None or not isinstance(reference_isotherm, Isotherm):
         raise ParameterError("No reference isotherm for alpha s calculation "
-                             "is provided.")
+                             "is provided. Must provide an Isotherm instance.")
     if reference_isotherm.adsorbate != isotherm.adsorbate:
         raise ParameterError("The reference isotherm adsorbate is different than the "
                              "calculated isotherm adsorbate.")
-
     if reducing_pressure < 0 or reducing_pressure > 1:
         raise ParameterError(
             "The reducing pressure is outside the bounds of 0-1")
@@ -143,14 +143,9 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
         loading, reference_loading, alpha_s_point, reference_area,
         liquid_density, molar_mass, limits=limits)
 
-    result_dict = {
-        'alpha_curve': alpha_curve,
-        'results': results,
-    }
-
     if verbose:
         if not results:
-            print('Could not find linear regions, attempt a manual limit')
+            print('Could not find linear regions, attempt a manual limit.')
         else:
             for index, result in enumerate(results):
                 print("For linear region {0}".format(index))
@@ -168,7 +163,10 @@ def alpha_s(isotherm, reference_isotherm, reference_area=None,
             plot_tp(alpha_curve, loading, results, alpha_s=True,
                     alpha_reducing_p=reducing_pressure)
 
-    return result_dict
+    return {
+        'alpha_curve': alpha_curve,
+        'results': results,
+    }
 
 
 def alpha_s_raw(loading, reference_loading, alpha_s_point, reference_area,

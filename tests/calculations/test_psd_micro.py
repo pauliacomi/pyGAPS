@@ -54,18 +54,15 @@ class TestPSDMicro():
     @pytest.mark.parametrize('method', [
         'HK',
     ])
-    @pytest.mark.parametrize('sample', [
-        sample for sample in list(DATA.values())
-    ])
+    @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_psd_micro(self, sample, method):
         """Test psd calculation with several model isotherms"""
+        sample = DATA[sample]
         # exclude datasets where it is not applicable
         if sample.get('psd_micro_pore_size', None):
 
             filepath = os.path.join(DATA_N77_PATH, sample['file'])
-
-            with open(filepath, 'r') as text_file:
-                isotherm = pygaps.isotherm_from_json(text_file.read())
+            isotherm = pygaps.isotherm_from_jsonf(filepath)
 
             result_dict = pmic.psd_microporous(isotherm, psd_model=method)
 
@@ -85,9 +82,5 @@ class TestPSDMicro():
         """Test verbosity."""
         data = DATA['MCM-41']
         filepath = os.path.join(DATA_N77_PATH, data['file'])
-
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(
-                text_file.read())
-
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.psd_microporous(isotherm, verbose=True)

@@ -1,5 +1,15 @@
 """
-This test module has tests relating to tplot calculations
+This test module has tests relating to t-plots
+
+All functions in /calculations/tplot.py are tested here.
+The purposes are:
+
+    - testing the user-facing API function (alpha_s)
+    - testing individual low level functions against known results.
+
+Functions are tested against pre-calculated values on real isotherms.
+All pre-calculated data for characterization can be found in the
+/.conftest file together with the other isotherm parameters.
 """
 
 import os
@@ -16,82 +26,60 @@ from .conftest import DATA_N77_PATH
 
 @pytest.mark.characterisation
 class TestTPlot():
-    """
-    Tests everything related to tplot calculation
-    """
+    """Tests t-plot calculations."""
 
-    def test_tplot_checks(self, basic_pointisotherm, basic_material):
-        """Test checks"""
+    def test_alphas_checks(self, basic_pointisotherm):
+        """Checks for built-in safeguards."""
 
         # Will raise a "no suitable model exception"
         with pytest.raises(pygaps.ParameterError):
             pygaps.t_plot(basic_pointisotherm, thickness_model='random')
 
-        return
+    @pytest.mark.parametrize('sample', [sample for sample in DATA])
+    def test_tplot(self, sample):
+        """Test calculation with several model isotherms."""
+        sample = DATA[sample]
+        # exclude datasets where it is not applicable
+        if sample.get('t_area', None):
 
-    @pytest.mark.parametrize('file, area, micropore_volume',
-                             [(data['file'],
-                               data['t_area'],
-                               data['t_pore_volume']) for data in list(DATA.values())]
-                             )
-    def test_tplot(self, file, area, micropore_volume):
-        """Test calculation with several model isotherms"""
+            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            isotherm = pygaps.isotherm_from_jsonf(filepath)
 
-        filepath = os.path.join(DATA_N77_PATH, file)
+            res = pygaps.t_plot(isotherm)
+            results = res.get('results')
 
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(
-                text_file.read())
+            err_relative = 0.1  # 10 percent
+            err_absolute_area = 0.1  # units
+            err_absolute_volume = 0.01  # units
 
-        res = pygaps.t_plot(
-            isotherm, thickness_model='Halsey')
-
-        results = res.get('results')
-        assert results is not None
-
-        err_relative = 0.3  # 30 percent
-        err_absolute_area = 0.1  # units
-        err_absolute_volume = 0.01  # units
-
-        assert isclose(results[-1].get('adsorbed_volume'),
-                       micropore_volume, err_relative, err_absolute_area)
-        assert isclose(results[-1].get('area'), area,
-                       err_relative, err_absolute_volume)
+            assert isclose(results[-1].get('adsorbed_volume'),
+                           sample['t_pore_volume'], err_relative, err_absolute_area)
+            assert isclose(results[0].get('area'),
+                           sample['t_area'], err_relative, err_absolute_volume)
 
     def test_tplot_choice(self):
-        """Test choice of points"""
+        """Test choice of points."""
 
-        data = DATA['MCM-41']
+        sample = DATA['MCM-41']
+        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
 
-        filepath = os.path.join(DATA_N77_PATH, data['file'])
-
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(
-                text_file.read())
-
-        res = pygaps.t_plot(
-            isotherm, 'Halsey', limits=[0.7, 1.0])
+        res = pygaps.t_plot(isotherm, limits=[0.7, 1.0])
         results = res.get('results')
 
-        err_relative = 0.3  # 30 percent
-        err_absolute_area = 0.1  # units
+        err_relative = 0.1          # 10 percent
+        err_absolute_area = 0.1     # units
         err_absolute_volume = 0.01  # units
 
         assert isclose(results[-1].get('adsorbed_volume'),
-                       data['t_pore_volume'], err_relative, err_absolute_area)
+                       sample['t_pore_volume'], err_relative, err_absolute_area)
         assert isclose(results[-1].get('area'),
-                       data['t_area'], err_relative, err_absolute_volume)
+                       sample['s_t_area'], err_relative, err_absolute_volume)
 
     @cleanup
     def test_tplot_output(self):
-        """Test verbosity"""
-
-        data = DATA['MCM-41']
-
-        filepath = os.path.join(DATA_N77_PATH, data['file'])
-
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(
-                text_file.read())
-
+        """Test verbosity."""
+        sample = DATA['MCM-41']
+        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.t_plot(isotherm, 'Halsey', verbose=True)
