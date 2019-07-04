@@ -31,7 +31,7 @@ class TestAreaLangmuir():
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_area_langmuir(self, sample):
-        """Test calculation with several model isotherms"""
+        """Test calculation with several model isotherms."""
         sample = DATA[sample]
         # exclude datasets where it is not applicable
         if sample.get('langmuir_area', None):
@@ -48,7 +48,7 @@ class TestAreaLangmuir():
                            err_relative, err_absolute)
 
     def test_area_langmuir_choice(self):
-        """Test choice of points"""
+        """Test choice of points."""
 
         sample = DATA['MCM-41']
         filepath = os.path.join(DATA_N77_PATH, sample['file'])
@@ -65,7 +65,7 @@ class TestAreaLangmuir():
 
     @cleanup
     def test_area_langmuir_output(self):
-        """Test verbosity"""
+        """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = os.path.join(DATA_N77_PATH, sample['file'])
         isotherm = pygaps.isotherm_from_jsonf(filepath)

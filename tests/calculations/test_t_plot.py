@@ -4,7 +4,7 @@ This test module has tests relating to t-plots
 All functions in /calculations/tplot.py are tested here.
 The purposes are:
 
-    - testing the user-facing API function (alpha_s)
+    - testing the user-facing API function (tplot)
     - testing individual low level functions against known results.
 
 Functions are tested against pre-calculated values on real isotherms.

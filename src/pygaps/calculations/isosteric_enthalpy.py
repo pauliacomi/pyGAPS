@@ -19,8 +19,9 @@ def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=Fal
         The isotherms to use in calculation of the isosteric enthalpy. They should all
         be measured on the same material.
     loading_points : array, optional
-        The loading points at which the isosteric enthalpy should be calculated. Take care,
-        as the points must be within the range of loading of all passed isotherms, or
+        The loading points at which the isosteric enthalpy should be calculated.
+        Default will be 50 equally spaced points in the available range.
+        The points must be within the range of loading of all passed isotherms, or
         else the calculation cannot complete.
     branch : str
         The branch of the isotherms to take, defaults to adsorption branch.
@@ -79,12 +80,10 @@ def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=Fal
     if len(isotherms) < 2:
         raise ParameterError('Pass at least two isotherms.')
 
-    # Check same sample
-    if not all(x.material_name == isotherms[0].material_name
-               and x.material_batch == isotherms[0].material_batch
-               for x in isotherms):
+    # Check same material
+    if not all(x.material_name == isotherms[0].material_name for x in isotherms):
         raise ParameterError(
-            'Isotherms passed are not measured on the same material and batch.')
+            'Isotherms passed are not measured on the same material.')
 
     # Check same basis
     if not all(x.adsorbent_basis == isotherms[0].adsorbent_basis for x in isotherms):
@@ -98,7 +97,7 @@ def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=Fal
         [max(x.loading(loading_basis='molar', loading_unit='mmol', branch=branch)) for x in isotherms])
 
     # Get temperatures
-    temperatures = list(x.temperature for x in isotherms)
+    temperatures = [x.temperature for x in isotherms]
 
     # Loading
     if loading_points is None:
@@ -116,17 +115,15 @@ def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=Fal
 
     iso_enthalpy, slopes, correlation = isosteric_enthalpy_raw(pressures, temperatures)
 
-    result_dict = {
+    if verbose:
+        isosteric_enthalpy_plot(loading, iso_enthalpy)
+
+    return {
         'loading': loading,
         'isosteric_enthalpy': iso_enthalpy,
         'slopes': slopes,
         'correlation': correlation,
     }
-
-    if verbose:
-        isosteric_enthalpy_plot(loading, iso_enthalpy)
-
-    return result_dict
 
 
 def isosteric_enthalpy_raw(pressures, temperatures):
@@ -141,15 +138,18 @@ def isosteric_enthalpy_raw(pressures, temperatures):
     Parameters
     ----------
     pressure : array of arrays
-        An array of arrays of pressures for each isotherm, in bar.
+        A two dimensional array of pressures for each isotherm, in bar.
         For example, if using two isotherms to calculate the isosteric enthalpy:
-        [[l1_iso1, l1_iso2], [l2_iso1, l2_iso2], [l3_iso1, l3_iso2], ...]
+        [[l1_iso1, l1_iso2],
+         [l2_iso1, l2_iso2],
+         [l3_iso1, l3_iso2],
+         ...]
     temperatures : array
-        Temperatures at which the isotherms are taken, kelvin.
+        Temperatures of the isotherms are taken, kelvin.
 
     Returns
     -------
-    isosteric_enthalpy : array
+    iso_enth : array
         Calculated isosteric enthalpy.
     slopes : array
         Slopes fitted for each point.
@@ -169,7 +169,7 @@ def isosteric_enthalpy_raw(pressures, temperatures):
     # Calculate inverse temperatures
     inv_t = 1 / temperatures
 
-    isosteric_enthalpy = []
+    iso_enth = []
     slopes = []
     correlations = []
 
@@ -179,8 +179,8 @@ def isosteric_enthalpy_raw(pressures, temperatures):
         slope, intercept, corr_coef, p, stderr = stats.linregress(
             inv_t, numpy.log(pressure))
 
-        isosteric_enthalpy.append(-const.gas_constant * slope / 1000)
+        iso_enth.append(-const.gas_constant * slope / 1000)
         slopes.append(slope)
         correlations.append(corr_coef)
 
-    return isosteric_enthalpy, slopes, correlations
+    return iso_enth, slopes, correlations
