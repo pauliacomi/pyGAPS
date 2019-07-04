@@ -73,7 +73,6 @@ install:
             pandas
             scipy
             matplotlib
-            coolprop
   - activate testenv-%PYTHON_VERSION%
 
   # Now build the module
