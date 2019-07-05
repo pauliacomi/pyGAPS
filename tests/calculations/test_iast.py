@@ -17,9 +17,9 @@ import os
 
 import numpy
 import pytest
+from matplotlib.testing.decorators import cleanup
 
 import pygaps
-from matplotlib.testing.decorators import cleanup
 from pygaps.utilities.exceptions import ParameterError
 
 from .conftest import DATA_IAST
