@@ -13,7 +13,8 @@ from ..utilities.exceptions import ParameterError
 
 def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess):
     r"""
-    Calculate an initial enthalpy based on a compound
+    Given an isotherm with previous differential adsorption enthalpy data,
+    calculate the enthalpy of adsorption at zero loading with a fitting
     method with separate contributions:
 
         * A constant contribution
@@ -358,8 +359,9 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
 
 def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
     """
-    Calculate the initial enthalpy of adsorption, assuming it is the
-    first point in the curve.
+    Given an isotherm with previous differential adsorption enthalpy data,
+    calculate the enthalpy of adsorption at zero loading by taking the
+    first point of the curve.
 
     Parameters
     ----------

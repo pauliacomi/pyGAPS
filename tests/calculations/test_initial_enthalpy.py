@@ -25,8 +25,15 @@ from .conftest import DATA_CALO_PATH
 
 
 @pytest.mark.characterisation
-class TestInitialEnthalpy():
-    """Test all initial enthalpy methods."""
+class TestInitialEnthalpyPoint():
+    """Test point initial enthalpy methods."""
+
+    def test_ienthalpy_point_checks(self, basic_pointisotherm):
+        """Checks for built-in safeguards."""
+
+        # Will raise a "can't find enthalpy column error"
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.initial_enthalpy_point(basic_pointisotherm, 'wrong')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])
     def test_ienthalpy_point(self, sample):
@@ -50,6 +57,18 @@ class TestInitialEnthalpy():
         filepath = os.path.join(DATA_CALO_PATH, sample['file'])
         isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.initial_enthalpy_point(isotherm, 'enthalpy', verbose=True)
+
+
+@pytest.mark.characterisation
+class TestInitialEnthalpyFit():
+    """Test fitting initial enthalpy methods."""
+
+    def test_ienthalpy_comp_checks(self, basic_pointisotherm):
+        """Checks for built-in safeguards."""
+
+        # Will raise a "can't find enthalpy column error"
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.initial_enthalpy_comp(basic_pointisotherm, 'wrong')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])
     def test_ienthalpy_comb(self, sample):

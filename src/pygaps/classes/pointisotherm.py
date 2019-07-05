@@ -548,6 +548,8 @@ class PointIsotherm(Isotherm):
 
         Parameters
         ----------
+        raw : bool
+            Whether to return the dataframe with internal columns.
         branch : {None, 'ads', 'des'}
             The branch of the isotherm to return. If ``None``, returns entire
             dataset.
