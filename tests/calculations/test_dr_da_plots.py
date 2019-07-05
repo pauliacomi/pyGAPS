@@ -1,8 +1,21 @@
-"""This test module has tests relating to Dubinin plots."""
+"""
+This test module has tests relating to Dubinin plots.
+
+All functions in /calculations/dr_da_plots.py are tested here.
+The purposes are:
+
+    - testing the user-facing API function (dr_plot, da_plot)
+    - testing individual low level functions against known results.
+
+Functions are tested against pre-calculated values on real isotherms.
+All pre-calculated data for characterization can be found in the
+/.conftest file together with the other isotherm parameters.
+"""
 
 import os
 
 import pytest
+from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
@@ -13,70 +26,61 @@ from .conftest import DATA_N77_PATH
 
 @pytest.mark.characterisation
 class TestDAPlot():
-    """
-    Tests everything related to the DA and related plots
-    """
+    """Tests DA and DR plots."""
 
-    @pytest.mark.parametrize('file, exp_vol, exp_pot',
-                             [(data['file'], data['dr_volume'], data['dr_potential']) for data in list(DATA.values())])
-    def test_dr_plot(self, file, exp_vol, exp_pot):
-        """Test calculation with takeda isotherm."""
+    def test_dr_checks(self, basic_pointisotherm):
+        """Checks for built-in safeguards."""
 
-        if exp_vol is None:
-            return
+        # Will raise a "no reference isotherm error"
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.da_plot(basic_pointisotherm, exp=-2)
 
-        filepath = os.path.join(DATA_N77_PATH, file)
+    @pytest.mark.parametrize('sample', [sample for sample in DATA])
+    def test_dr_plot(self, sample):
+        """Test calculation with several model isotherms."""
+        sample = DATA[sample]
+        # exclude datasets where it is not applicable
+        if sample.get('dr_volume', None):
 
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(
-                text_file.read())
+            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            isotherm = pygaps.isotherm_from_jsonf(filepath)
 
-        res = pygaps.dr_plot(isotherm)
+            res = pygaps.dr_plot(isotherm)
 
-        dr_vol = res.get("pore_volume")
-        dr_pot = res.get("adsorption_potential")
+            dr_vol = res.get("pore_volume")
+            dr_pot = res.get("adsorption_potential")
 
-        err_relative = 0.05  # 5 percent
-        err_absolute = 0.01  # 0.01 cm3/g
+            err_relative = 0.05  # 5 percent
+            err_absolute = 0.01  # 0.01 cm3/g
 
-        assert isclose(dr_vol, exp_vol, err_relative, err_absolute)
-        assert isclose(dr_pot, exp_pot, err_relative, err_absolute)
+            assert isclose(dr_vol, sample['dr_volume'], err_relative, err_absolute)
+            assert isclose(dr_pot, sample['dr_potential'], err_relative, err_absolute)
 
-    @pytest.mark.parametrize('file, exp_vol, exp_pot',
-                             [(data['file'], data['da_volume'], data['da_potential']) for data in list(DATA.values())])
-    def test_da_plot(self, file, exp_vol, exp_pot):
-        """Test calculation with takeda isotherm."""
-        if exp_vol is None:
-            return
+    @pytest.mark.parametrize('sample', [sample for sample in DATA])
+    def test_da_plot(self, sample):
+        """Test calculation with several model isotherms."""
+        sample = DATA[sample]
+        # exclude datasets where it is not applicable
+        if sample.get('da_volume', None):
 
-        filepath = os.path.join(DATA_N77_PATH, file)
+            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            isotherm = pygaps.isotherm_from_jsonf(filepath)
 
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(
-                text_file.read())
+            res = pygaps.da_plot(isotherm, limits=[0, 0.01])
 
-        res = pygaps.da_plot(isotherm, limits=[0, 0.01])
+            da_vol = res.get("pore_volume")
+            da_pot = res.get("adsorption_potential")
 
-        da_vol = res.get("pore_volume")
-        da_pot = res.get("adsorption_potential")
+            err_relative = 0.05  # 5 percent
+            err_absolute = 0.01  # 0.01 cm3/g
 
-        err_relative = 0.05  # 5 percent
-        err_absolute = 0.01  # 0.01 cm3/g
+            assert isclose(da_vol, sample['da_volume'], err_relative, err_absolute)
+            assert isclose(da_pot, sample['da_potential'], err_relative, err_absolute)
 
-        assert isclose(da_vol, exp_vol, err_relative, err_absolute)
-        assert isclose(da_pot, exp_pot, err_relative, err_absolute)
-
-    @pytest.mark.parametrize('file, exp_vol, exp_pot',
-                             [(data['file'], data['da_volume'], data['da_potential']) for data in list(DATA.values())])
-    def test_da_display(self, file, exp_vol, exp_pot):
-        """Test isotherm display."""
-        if exp_vol is None:
-            return
-
-        filepath = os.path.join(DATA_N77_PATH, file)
-
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(
-                text_file.read())
-
+    @cleanup
+    def test_da_output(self):
+        """Test verbosity."""
+        sample = DATA['Takeda 5A']
+        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.da_plot(isotherm, verbose=True)

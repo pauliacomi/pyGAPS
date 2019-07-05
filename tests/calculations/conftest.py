@@ -56,10 +56,6 @@ DATA = {
         's_as_area': 360,
         'Khi_slope': 57000,
         'Khi_virial': 195000,
-        'dr_volume': None,
-        'dr_potential': None,
-        'da_volume': None,
-        'da_potential': None,
         'psd_meso_pore_size': 3.2,
         'psd_dft_pore_size': 3.2,
     },
@@ -71,10 +67,6 @@ DATA = {
         't_pore_volume': 0.26,
         'Khi_slope': 1770000,
         'Khi_virial': 1260000,
-        'dr_volume': None,
-        'dr_potential': None,
-        'da_volume': None,
-        'da_potential': None,
     },
     'SiO2': {
         'file': 'SiO2 N2 77.355.json',
@@ -84,10 +76,6 @@ DATA = {
         't_pore_volume': 0.0,
         'Khi_slope': 780,
         'Khi_virial': 249,
-        'dr_volume': None,
-        'dr_potential': None,
-        'da_volume': None,
-        'da_potential': None,
     },
     'Takeda 5A': {
         'file': 'Takeda 5A N2 77.355.json',
@@ -112,10 +100,6 @@ DATA = {
         't_area': 17.0,
         'Khi_slope': 700000,
         'Khi_virial': 1350000,
-        'dr_volume': None,
-        'dr_potential': None,
-        'da_volume': None,
-        'da_potential': None,
         'psd_micro_pore_size': 0.7,
         'psd_dft_pore_size': 0.6,
     },
@@ -144,11 +128,11 @@ DATA_ISOSTERIC = {
 }
 
 DATA_CALO = {
-    't1': {
+    'HKUST-1': {
         'file': 'HKUST-1(Cu) KRICT.json',
         'ienth': 27,
     },
-    't2': {
+    'Takeda 5A': {
         'file': 'Takeda 5A Test CO2.json',
         'ienth': 35,
     },

@@ -1,5 +1,15 @@
 """
-This test module has tests relating to initial enthalpy of adsorption
+Tests relating to initial enthalpy of adsorption calculations.
+
+All functions in /calculations/initial_enthalpy.py are tested here.
+The purposes are:
+
+    - testing the user-facing API function (initial_enthalpy_x)
+    - testing individual low level functions against known results.
+
+Functions are tested against pre-calculated values on real isotherms.
+All pre-calculated data for characterization can be found in the
+/.conftest file together with the other isotherm parameters.
 """
 
 import os
@@ -18,39 +28,48 @@ from .conftest import DATA_CALO_PATH
 class TestInitialEnthalpy():
     """Test all initial enthalpy methods."""
 
-    @cleanup
-    @pytest.mark.parametrize('file, expected',
-                             [(data['file'], data['ienth']) for data in list(DATA_CALO.values())])
-    def test_ienthalpy_comb(self, file, expected):
-        """The combined polynomial method"""
-
-        filepath = os.path.join(DATA_CALO_PATH, file)
-
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(text_file.read())
-
-        ienth_poly = pygaps.initial_enthalpy_comp(
-            isotherm, 'enthalpy', verbose=True).get('initial_enthalpy')
-
-        err_relative = 0.1  # 10 percent
-        err_absolute = 1   #
-
-        assert isclose(ienth_poly, expected, err_relative, err_absolute)
-
-    @pytest.mark.parametrize('file, expected',
-                             [(data['file'], data['ienth']) for data in list(DATA_CALO.values())])
-    def test_ienthalpy_point(self, file, expected):
+    @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])
+    def test_ienthalpy_point(self, sample):
         """The point method."""
-
-        filepath = os.path.join(DATA_CALO_PATH, file)
-
-        with open(filepath, 'r') as text_file:
-            isotherm = pygaps.isotherm_from_json(text_file.read())
+        sample = DATA_CALO[sample]
+        filepath = os.path.join(DATA_CALO_PATH, sample['file'])
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
 
         ienth_poly = pygaps.initial_enthalpy_point(
-            isotherm, 'enthalpy', verbose=True).get('initial_enthalpy')
+            isotherm, 'enthalpy').get('initial_enthalpy')
 
         err_relative = 0.1  # 10 percent
         err_absolute = 1   #
 
-        assert isclose(ienth_poly, expected, err_relative, err_absolute)
+        assert isclose(ienth_poly, sample['ienth'], err_relative, err_absolute)
+
+    @cleanup
+    def test_ienthalpy_point_output(self):
+        """Test verbosity."""
+        sample = DATA_CALO['Takeda 5A']
+        filepath = os.path.join(DATA_CALO_PATH, sample['file'])
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        pygaps.initial_enthalpy_point(isotherm, 'enthalpy', verbose=True)
+
+    @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])
+    def test_ienthalpy_comb(self, sample):
+        """The combined polynomial method"""
+        sample = DATA_CALO[sample]
+        filepath = os.path.join(DATA_CALO_PATH, sample['file'])
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
+
+        ienth_poly = pygaps.initial_enthalpy_comp(
+            isotherm, 'enthalpy').get('initial_enthalpy')
+
+        err_relative = 0.1  # 10 percent
+        err_absolute = 1   #
+
+        assert isclose(ienth_poly, sample['ienth'], err_relative, err_absolute)
+
+    @cleanup
+    def test_ienthalpy_comb_output(self):
+        """Test verbosity."""
+        sample = DATA_CALO['Takeda 5A']
+        filepath = os.path.join(DATA_CALO_PATH, sample['file'])
+        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        pygaps.initial_enthalpy_comp(isotherm, 'enthalpy', verbose=True)
