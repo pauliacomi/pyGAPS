@@ -17,9 +17,9 @@ class IsothermBaseModel():
     calculates = None  # loading/pressure
     param_names = []
     param_bounds = None
-    rmse = None
-    pressure_range = None
-    loading_range = None
+    rmse = numpy.nan
+    pressure_range = [numpy.nan, numpy.nan]
+    loading_range = [numpy.nan, numpy.nan]
 
     def __init__(self):
         """Instantiate parameters."""

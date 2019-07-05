@@ -154,7 +154,7 @@ class BET(IsothermBaseModel):
         b = self.params['N']
         c = self.params['C']
 
-        x = loading * b * (b-c)
+        x = loading * b * (b - c)
         y = loading * c - 2 * loading * b - a * c
 
         res = (-y - numpy.sqrt(y**2 - 4*x*loading)) / (2*x)
