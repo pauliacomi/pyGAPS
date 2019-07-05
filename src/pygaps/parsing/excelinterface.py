@@ -6,10 +6,10 @@ import pandas
 import xlrd
 import xlwt
 
-from ..calculations.models_isotherm import get_isotherm_model
-from ..classes.isotherm import Isotherm
-from ..classes.modelisotherm import ModelIsotherm
-from ..classes.pointisotherm import PointIsotherm
+from ..core.isotherm import Isotherm
+from ..core.modelisotherm import ModelIsotherm
+from ..core.pointisotherm import PointIsotherm
+from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParsingError
 from .excel_bel_parser import read_bel_report
 from .excel_mic_parser import read_mic_report

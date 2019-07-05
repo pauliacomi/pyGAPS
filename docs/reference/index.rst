@@ -9,9 +9,9 @@ Reference
    :maxdepth: 3
    :glob:
 
-   classes
-   calculations
-   models
+   core
+   characterisation
+   modelling
    interfaces
    plotting
    utilities

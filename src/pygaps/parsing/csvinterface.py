@@ -4,9 +4,9 @@ import ast
 
 import pandas
 
-from ..calculations.models_isotherm import get_isotherm_model
-from ..classes.modelisotherm import ModelIsotherm
-from ..classes.pointisotherm import PointIsotherm
+from ..core.modelisotherm import ModelIsotherm
+from ..core.pointisotherm import PointIsotherm
+from ..modelling import get_isotherm_model
 
 
 def _is_float(s):

@@ -32,8 +32,8 @@ To use the IAST functionality, a list of pure component isotherms is needed. The
       Some models cannot be used for IAST calculations.
     - A PointIsotherm class, where the spreading pressure calculation will use interpolated data.
 
-The original pyIAST functions still exist, as :func:`~pygaps.calculations.iast.iast`
-and :func:`~pygaps.calculations.iast.reverse_iast`. They can be used to determine the
+The original pyIAST functions still exist, as :func:`~pygaps.characterisation.iast.iast`
+and :func:`~pygaps.characterisation.iast.reverse_iast`. They can be used to determine the
 adsorbed fraction of each adsorbate given their partial pressures, or vice-versa.
 
 To use:
@@ -49,7 +49,7 @@ To use:
 Since IAST is often used for binary mixture adsorption prediction, several new functions
 have been introduced which make it easier to do common calculations and generate graphs:
 
-    - :func:`~pygaps.calculations.iast.iast_binary_svp` is a function to calculate the
+    - :func:`~pygaps.characterisation.iast.iast_binary_svp` is a function to calculate the
       selectivity of a known composition mixture as a function of pressure.
 
       For example, this will plot selectivities over a pressure range of 0.01 to 10 of
@@ -70,7 +70,7 @@ have been introduced which make it easier to do common calculations and generate
         plt.show()
 
 
-    - :func:`~pygaps.calculations.iast.iast_binary_vle` is a function to calculate the
+    - :func:`~pygaps.characterisation.iast.iast_binary_vle` is a function to calculate the
       gas-adsorbed equilibrium at a constant pressure, over the entire range of
       molar fractions.
 

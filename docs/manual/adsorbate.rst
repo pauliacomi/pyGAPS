@@ -21,7 +21,7 @@ for an object which corresponds to the ``isotherm.adsorbate`` property.
 This list is populated as import-time with the adsorbates stored in the internal database. The user can also
 add their own adsorbate to the list, or upload it to the database for permanent storage.
 
-For a complete list of methods and individual descriptions look at the :class:`~pygaps.classes.adsorbate.Adsorbate`
+For a complete list of methods and individual descriptions look at the :class:`~pygaps.core.adsorbate.Adsorbate`
 reference.
 
 .. _adsorbate-manual-create:
@@ -98,7 +98,7 @@ the critical temperature for example.
 
     my_adsorbate.backend.T_critical()
 
-For all the adsorbate methods, see the :class:`~pygaps.classes.adsorbate.Adsorbate` reference
+For all the adsorbate methods, see the :class:`~pygaps.core.adsorbate.Adsorbate` reference
 
 .. _adsorbate-manual-manage:
 

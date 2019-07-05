@@ -27,7 +27,7 @@ It is left to the best judgement of the user when to apply a specific model.
 Modelling in pyGAPS
 -------------------
 
-In pyGAPS, the :meth:`~pygaps.classes.modelisotherm.ModelIsotherm` is the
+In pyGAPS, the :meth:`~pygaps.core.modelisotherm.ModelIsotherm` is the
 class which contains all the model parameters. While it is instantiated
 using discrete data, it does not store it directly. Another principal difference
 from the PointIsotherm class is that, while the former can contain both
@@ -36,28 +36,28 @@ contains a model for only one branch, determined at initialisation.
 
 Currently the models implemented are:
 
-    - :mod:`~pygaps.calculations.models_isotherm.henry` - Henry
-    - :mod:`~pygaps.calculations.models_isotherm.langmuir` - Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.dslangmuir` -
+    - :mod:`~pygaps.modelling.henry` - Henry
+    - :mod:`~pygaps.modelling.langmuir` - Langmuir
+    - :mod:`~pygaps.modelling.dslangmuir` -
       Double Site Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.tslangmuir` -
+    - :mod:`~pygaps.modelling.tslangmuir` -
       Triple Site Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.bet` -
+    - :mod:`~pygaps.modelling.bet` -
       Brunnauer-Emmet-Teller (BET)
-    - :mod:`~pygaps.calculations.models_isotherm.gab` -
+    - :mod:`~pygaps.modelling.gab` -
       Guggenheim-Anderson-de Boer (GAB)
-    - :mod:`~pygaps.calculations.models_isotherm.freundlich` - Freundlich
-    - :mod:`~pygaps.calculations.models_isotherm.dr` -
+    - :mod:`~pygaps.modelling.freundlich` - Freundlich
+    - :mod:`~pygaps.modelling.dr` -
       Dubinin-Radushkevitch (DR)
-    - :mod:`~pygaps.calculations.models_isotherm.da` - Dubinin-Astakov (DA)
-    - :mod:`~pygaps.calculations.models_isotherm.quadratic` - Quadratic
-    - :mod:`~pygaps.calculations.models_isotherm.temkinapprox` -
+    - :mod:`~pygaps.modelling.da` - Dubinin-Astakov (DA)
+    - :mod:`~pygaps.modelling.quadratic` - Quadratic
+    - :mod:`~pygaps.modelling.temkinapprox` -
       Temkin Approximation
-    - :mod:`~pygaps.calculations.models_isotherm.toth` - Toth
-    - :mod:`~pygaps.calculations.models_isotherm.jensenseaton` - Jensen-Seaton
-    - :mod:`~pygaps.calculations.models_isotherm.wvst` -
+    - :mod:`~pygaps.modelling.toth` - Toth
+    - :mod:`~pygaps.modelling.jensenseaton` - Jensen-Seaton
+    - :mod:`~pygaps.modelling.wvst` -
       Wilson Vacancy Solution Theory (W-VST)
-    - :mod:`~pygaps.calculations.models_isotherm.fhvst` -
+    - :mod:`~pygaps.modelling.fhvst` -
       Flory-Huggins Vacancy Solution Theory (FH-VST)
 
 For an explanation of each model, visit its respective reference page.
@@ -75,7 +75,7 @@ section <isotherms-manual-create>`. However, for most use case scenarios, the us
 to create a ModelIsotherm starting from a previously created PointIsotherm class.
 
 To do so, the class includes a specific method,
-:meth:`~pygaps.classes.modelisotherm.ModelIsotherm.from_pointisotherm`,
+:meth:`~pygaps.core.modelisotherm.ModelIsotherm.from_pointisotherm`,
 which allows a PointIsotherm to be used. An example is:
 
 ::
@@ -149,7 +149,7 @@ identical, a separate approach is needed.
 First, a new PointIsotherm must be created from the ModelIsotherm. This essentially uses the
 internal model of the ModelIsotherm isotherm to calculate loading at the points the user
 specifies, then save them in a DataFrame. This can be achieved with the
-:meth:`~pygaps.classes.pointisotherm.PointIsotherm.from_modelisotherm` method.
+:meth:`~pygaps.core.pointisotherm.PointIsotherm.from_modelisotherm` method.
 
 The class method takes as parameters a ModelIsotherm, as well as a ``pressure_points`` keyword.
 This can be used to specify the array of points where the loading is calculated. If a
@@ -187,7 +187,7 @@ Check it out in the ipython notebook in the `examples <../examples/modelling.ipy
 Custom models
 -------------
 
-Custom models can be implemented as well. In the *calculations/models_isotherm*
+Custom models can be implemented as well. In the `./modelling/`
 folder, there is a model template (`IsothermBaseModel` in *base_model.py*)
 which contains the functions which should be inherited by
 a custom model.

@@ -4,10 +4,10 @@ import json
 
 import pandas
 
-from ..calculations.models_isotherm import get_isotherm_model
-from ..classes.isotherm import Isotherm
-from ..classes.modelisotherm import ModelIsotherm
-from ..classes.pointisotherm import PointIsotherm
+from ..core.isotherm import Isotherm
+from ..core.modelisotherm import ModelIsotherm
+from ..core.pointisotherm import PointIsotherm
+from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _MOLAR_UNITS

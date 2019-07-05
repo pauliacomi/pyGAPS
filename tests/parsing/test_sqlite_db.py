@@ -187,7 +187,7 @@ class TestDatabase():
 
         # Property type upload
         for prop in isotherm_parameters:
-            if prop not in pygaps.classes.isotherm.Isotherm._db_columns and prop not in pygaps.classes.isotherm.Isotherm._unit_params:
+            if prop not in pygaps.core.isotherm.Isotherm._db_columns and prop not in pygaps.core.isotherm.Isotherm._unit_params:
                 pygaps.db_upload_isotherm_property_type(db_file, {
                     'type': prop,
                     'unit': "test unit"

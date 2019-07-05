@@ -9,8 +9,8 @@ Overview
 --------
 
 In pyGAPS, an isotherm can be represented in two ways: as a
-:meth:`~pygaps.classes.pointisotherm.PointIsotherm` object or as a
-:meth:`~pygaps.classes.modelisotherm.ModelIsotherm` object.
+:meth:`~pygaps.core.pointisotherm.PointIsotherm` object or as a
+:meth:`~pygaps.core.modelisotherm.ModelIsotherm` object.
 These two classes have many common methods and attributes, but they
 differ in the way they hold the relationship between pressure and loading:
 
@@ -22,7 +22,7 @@ differ in the way they hold the relationship between pressure and loading:
       to describe a model of adsorption behaviour. It can only model a single
       branch of the data, either adsorption or desorption.
 
-Both classes are derived from the :meth:`~pygaps.classes.isotherm.Isotherm` class.
+Both classes are derived from the :meth:`~pygaps.core.isotherm.Isotherm` class.
 This class holds all descriptions of the experiment, such as the adsorbate used, the material
 name and the temperature at which the isotherm was taken. These parameters are inherited
 in the two child isotherm objects, therefore, the user should not have to use this class
@@ -55,7 +55,7 @@ There are several ways to create a PointIsotherm object:
       PointIsotherm, as parameters can be manually specified.
     - A json string or file. This can be done either using the
       :meth:`~pygaps.parsing.jsoninterface.isotherm_from_json`
-      function, or with the :meth:`~pygaps.classes.pointisotherm.PointIsotherm.from_json`
+      function, or with the :meth:`~pygaps.core.pointisotherm.PointIsotherm.from_json`
       class method, which is just a wrapper around the other for convenience.
     - Parsing an excel file of a standard format. See :ref:`parsing from excel <parsing-manual-excel>`.
     - Parsing a csv file of a standard format. :ref:`See parsing from csv <parsing-manual-csv>`.
@@ -278,9 +278,9 @@ The isotherm classes can be inspected using the following functions:
 
     - The Python ``print(iso)`` will display all isotherm properties.
     - The ``iso.plot()`` function will display an isotherm plot.
-      (:meth:`~pygaps.classes.pointisotherm.PointIsotherm.plot`)
+      (:meth:`~pygaps.core.pointisotherm.PointIsotherm.plot`)
     - The ``iso.print_info()`` function combines the two above
-      (:meth:`~pygaps.classes.pointisotherm.PointIsotherm.print_info`)
+      (:meth:`~pygaps.core.pointisotherm.PointIsotherm.print_info`)
 
 To access the isotherm data, one of several functions can be used. There
 are individual methods for each data type: ``pressure``, ``loading`` and
@@ -289,13 +289,13 @@ ModelIsotherms. While PointIsotherm methods return the actual discrete data,
 ModelIsotherms use their internal model to generate
 data with the characteristics required.
 
-    - For loading: PointIsotherm :meth:`~pygaps.classes.pointisotherm.PointIsotherm.loading`
-      and ModelIsotherm :meth:`~pygaps.classes.modelisotherm.ModelIsotherm.loading`
+    - For loading: PointIsotherm :meth:`~pygaps.core.pointisotherm.PointIsotherm.loading`
+      and ModelIsotherm :meth:`~pygaps.core.modelisotherm.ModelIsotherm.loading`
 
-    - For pressure: PointIsotherm :meth:`~pygaps.classes.pointisotherm.PointIsotherm.pressure`
-      and ModelIsotherm :meth:`~pygaps.classes.modelisotherm.ModelIsotherm.pressure`
+    - For pressure: PointIsotherm :meth:`~pygaps.core.pointisotherm.PointIsotherm.pressure`
+      and ModelIsotherm :meth:`~pygaps.core.modelisotherm.ModelIsotherm.pressure`
 
-    - For tertiary data columns: PointIsotherm :meth:`~pygaps.classes.pointisotherm.PointIsotherm.other_data`
+    - For tertiary data columns: PointIsotherm :meth:`~pygaps.core.pointisotherm.PointIsotherm.other_data`
 
 All data-specific functions can return either a pandas.Series object, or a numpy array, depending on the
 parameters passed to it. Other optional parameters can specify the unit, the mode/basis, the branch the
@@ -331,7 +331,7 @@ be specified in the function call as the ``key`` parameter. It is only applicabl
         indexed = True,
     )
 
-For the PointIsotherm, a special :meth:`~pygaps.classes.pointisotherm.PointIsotherm.data` function returns all or a
+For the PointIsotherm, a special :meth:`~pygaps.core.pointisotherm.PointIsotherm.data` function returns all or a
 branch of the internal pandas.DataFrame. This is not as useful for processing, and also non-applicable
 to the ModelIsotherm object, but can be used to inspect the data directly or obtain the initial DataFrame that was used
 to construct it. To access the DataFrame directly, use the ``raw_data`` parameter.
@@ -362,11 +362,11 @@ convert the entire isotherm data in the required mode using the conversion funct
 
 The point methods are:
 
-    - For loading: PointIsotherm :meth:`~pygaps.classes.pointisotherm.PointIsotherm.loading_at`
-      and ModelIsotherm :meth:`~pygaps.classes.modelisotherm.ModelIsotherm.loading_at`
+    - For loading: PointIsotherm :meth:`~pygaps.core.pointisotherm.PointIsotherm.loading_at`
+      and ModelIsotherm :meth:`~pygaps.core.modelisotherm.ModelIsotherm.loading_at`
 
-    - For pressure: PointIsotherm :meth:`~pygaps.classes.pointisotherm.PointIsotherm.pressure_at`
-      and ModelIsotherm :meth:`~pygaps.classes.modelisotherm.ModelIsotherm.pressure_at`
+    - For pressure: PointIsotherm :meth:`~pygaps.core.pointisotherm.PointIsotherm.pressure_at`
+      and ModelIsotherm :meth:`~pygaps.core.modelisotherm.ModelIsotherm.pressure_at`
 
 The methods take parameters that describe the unit/mode of both the input parameters and the output parameters.
 
@@ -403,13 +403,13 @@ To understand how units work in pyGAPS, see :ref:`this section <units-manual>`.
 If what is desired is instead a slice of data in a particular format, it is easier to get it directly via the data access
 functions :ref:`above <isotherms-manual-data>`. The conversion functions are:
 
-    - :meth:`~pygaps.classes.pointisotherm.PointIsotherm.convert_loading`
+    - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_loading`
       will permanently convert the unit or basis
       loading of the isotherm, for example from molar in *mmol* to mass in *g*
-    - :meth:`~pygaps.classes.pointisotherm.PointIsotherm.convert_pressure`
+    - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_pressure`
       will permanently convert the unit or mode of
       pressure, for example from *bar* to *atm*
-    - :meth:`~pygaps.classes.pointisotherm.PointIsotherm.convert_adsorbent`
+    - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_adsorbent`
       will permanently convert the adsorbent units or
       basis, for example from a mass basis in *g* to a mass basis in *kg*
 

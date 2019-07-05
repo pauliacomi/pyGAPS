@@ -22,7 +22,7 @@ for an object which corresponds to the criteria above.
 This list is populated as import-time with the materials stored in the internal database. The user can also
 add their own material to the list, or upload it to the database for permanent storage.
 
-For a complete list of methods and individual descriptions look at the :class:`~pygaps.classes.material.Material`
+For a complete list of methods and individual descriptions look at the :class:`~pygaps.core.material.Material`
 reference.
 
 .. _material-manual-create:
@@ -61,7 +61,7 @@ Material management
 
 In pyGAPS, the materials can be stored in the internal sqlite database. At import-time, the list of all
 materials is automatically loaded into memory and stored in ``pygaps.MATERIAL_LIST``. The easiest way to retrieve
-a material from the list is to use the :meth:`~pygaps.classes.material.Material.find` class method. It takes the
+a material from the list is to use the :meth:`~pygaps.core.material.Material.find` class method. It takes the
 material name and material batch as parameters.
 
 ::

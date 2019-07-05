@@ -4,7 +4,7 @@ from io import StringIO
 
 import pandas
 
-from ..classes.pointisotherm import PointIsotherm
+from ..core.pointisotherm import PointIsotherm
 
 _DATA = {
     'adsorptive': 'adsorbate',
