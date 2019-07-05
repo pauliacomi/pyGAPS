@@ -27,7 +27,6 @@ class IsothermBaseModel():
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        pass
 
     def __repr__(self):
         """Print model name."""
@@ -53,6 +52,7 @@ class IsothermBaseModel():
         return ret_string
 
     def to_dict(self):
+        """Convert model to a dictionary."""
         return {
             'model': self.name,
             'rmse': self.rmse,
@@ -143,7 +143,7 @@ class IsothermBaseModel():
 
         # guess saturation loading to 10% more than highest loading
         saturation_loading = 1.1 * max(loading)
-        langmuir_k = loading[0] / pressure[0] / (saturation_loading - pressure[0])
+        langmuir_k = loading[0] / pressure[0] / (saturation_loading - loading[0])
 
         return saturation_loading, langmuir_k
 
@@ -205,6 +205,7 @@ class IsothermBaseModel():
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
+        # calculate RMSE
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:

@@ -77,10 +77,7 @@ def initial_henry_slope(isotherm,
 
         param_guess = henry.default_guess(pressure[:rows_taken], loading[:rows_taken])
         # fit model to isotherm data
-        henry.fit(
-            pressure[:rows_taken],
-            loading[:rows_taken],
-            param_guess, None, False)
+        henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
         adjrmsd = henry.rmse / numpy.ptp(loading)
 
         if adjrmsd > max_adjrms and rows_taken != 2:
@@ -91,10 +88,10 @@ def initial_henry_slope(isotherm,
 
     # logging for debugging
     if verbose:
-        print("Calculated K =", henry.params["K"])
+        print("Calculated K = {:.2e}".format(henry.params["K"]))
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
-        print("Final adjusted root mean square difference:", adjrmsd)
+        print("Final adjusted RMSE: {:.2e}".format(adjrmsd))
         params = {
             'plot_type': 'isotherm',
             'branch': 'ads',
@@ -103,6 +100,8 @@ def initial_henry_slope(isotherm,
             'lgd_pos': 'bottom'
         }
         params.update(plot_parameters)
+        henry.pressure_range = [pressure[0], pressure[:rows_taken][-1]]
+        henry.loading_range = [pressure[0], loading[:rows_taken][-1]]
         model_isotherm = ModelIsotherm(
             material_name=isotherm.material_name,
             material_batch='Henry model',
