@@ -7,6 +7,7 @@ from ..calculations.models_isotherm import get_isotherm_model
 from ..classes.modelisotherm import ModelIsotherm
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
+from ..utilities.exceptions import ParameterError
 
 
 def initial_henry_slope(isotherm,
@@ -40,22 +41,29 @@ def initial_henry_slope(isotherm,
 
     """
     # get the isotherm data on the adsorption branch
-    pressure = isotherm.pressure(branch='ads')
-    loading = isotherm.loading(branch='ads')
-    if p_limits:
-        if p_limits[0] is None:
-            p_limits[0] = -numpy.inf
-        if p_limits[1] is None:
-            p_limits[1] = numpy.inf
-        pressure = pressure[pressure > p_limits[0]]
-        pressure = pressure[pressure < p_limits[1]]
-    if l_limits:
-        if l_limits[0] is None:
-            l_limits[0] = -numpy.inf
-        if l_limits[1] is None:
-            l_limits[1] = numpy.inf
-        loading = loading[loading > p_limits[0]]
-        loading = loading[loading < p_limits[1]]
+    if p_limits or l_limits:
+
+        if not p_limits:
+            p_limits = [-numpy.inf, numpy.inf]
+        if not l_limits:
+            l_limits = [-numpy.inf, numpy.inf]
+
+        pressure = isotherm.pressure(
+            branch='ads', indexed=True,
+            min_range=p_limits[0], max_range=p_limits[1])
+        loading = isotherm.loading(
+            branch='ads', indexed=True,
+            min_range=l_limits[0], max_range=l_limits[1])
+
+        pressure, loading = pressure.align(loading, join='inner')
+        pressure, loading = pressure.values, loading.values
+
+        if len(pressure) == 0 or len(loading) == 0:
+            raise ParameterError("Limits chosen lead to no selected data.")
+
+    else:
+        pressure = isotherm.pressure(branch='ads')
+        loading = isotherm.loading(branch='ads')
 
     # add a zero point to the graph since the henry
     # constant must have a zero intercept (if needed)
