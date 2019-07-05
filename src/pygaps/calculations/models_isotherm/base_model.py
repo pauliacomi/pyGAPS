@@ -143,6 +143,7 @@ class IsothermBaseModel():
 
         # guess saturation loading to 10% more than highest loading
         saturation_loading = 1.1 * max(loading)
+        # guess langmuir constant from the starting point
         langmuir_k = loading[0] / pressure[0] / (saturation_loading - loading[0])
 
         return saturation_loading, langmuir_k

@@ -1,5 +1,7 @@
 """Module calculating IAST, given the pure-component adsorption isotherm model."""
 
+import warnings
+
 import numpy
 import scipy.optimize
 
@@ -10,12 +12,13 @@ from ..utilities.exceptions import ParameterError
 from .models_isotherm import is_iast_model
 
 
-def iast_binary_vle(isotherms, pressure,
+def iast_binary_vle(isotherms, total_pressure,
                     warningoff=False, adsorbed_mole_fraction_guess=None,
                     verbose=False, ax=None):
     """
     Perform IAST calculations to predict the vapour-liquid equilibrium curve
-    at a fixed pressure, over the entire range of partial pressures.
+    at a fixed pressure, over the entire range of gas phase composition
+    (0-1 of the first component).
 
     Pass a list of two of pure-component adsorption isotherms `isotherms`, with the
     first one being selected as a basis.
@@ -25,7 +28,7 @@ def iast_binary_vle(isotherms, pressure,
     isotherms : list of ModelIsotherms or PointIsotherms
         Model adsorption isotherms.
         e.g. [methane_isotherm, ethane_isotherm]
-    pressure : float
+    total_pressure : float
         Pressure at which the vapour-liquid equilibrium is to be
         calculated.
     warningoff: bool, optional
@@ -65,10 +68,8 @@ def iast_binary_vle(isotherms, pressure,
 
     # Run IAST
     for index, fraction in enumerate(binary_fractions):
-        # We assume ideal behaviour
-        partial_pressures = pressure * fraction
         component_loadings[index, :] = iast(
-            isotherms, partial_pressures, warningoff=warningoff,
+            isotherms, fraction, total_pressure, warningoff=warningoff,
             adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess)
 
     x_data = [x[0] / (x[0] + x[1]) for x in component_loadings]
@@ -81,7 +82,7 @@ def iast_binary_vle(isotherms, pressure,
     if verbose:
         plot_iast_vle(x_data, y_data,
                       isotherms[0], isotherms[1],
-                      pressure, isotherms[0].pressure_unit,
+                      total_pressure, isotherms[0].pressure_unit,
                       ax=ax)
 
     return dict(x=x_data, y=y_data)
@@ -147,9 +148,8 @@ def iast_binary_svp(isotherms, mole_fractions, pressures,
     component_loadings = numpy.zeros((len(pressures), 2))
 
     for index, pressure in enumerate(pressures):
-        partial_pressures = pressure * mole_fractions
         component_loadings[index, :] = iast(
-            isotherms, partial_pressures, warningoff=warningoff,
+            isotherms, mole_fractions, pressure, warningoff=warningoff,
             adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess)
 
     selectivities = [(x[0] / mole_fractions[0]) /
@@ -164,7 +164,8 @@ def iast_binary_svp(isotherms, mole_fractions, pressures,
     return dict(pressure=pressures, selectivity=selectivities)
 
 
-def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
+def iast(isotherms, gas_mole_fraction, total_pressure,
+         verbose=False, warningoff=False,
          adsorbed_mole_fraction_guess=None):
     """
     Perform IAST calculation to predict multi-component adsorption isotherm from
@@ -181,9 +182,11 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
     isotherms : list of ModelIsotherms or PointIsotherms
         Model adsorption isotherms.
         e.g. [methane_isotherm, ethane_isotherm]
-    partial_pressures : array or list
+    gas_mole_fraction : array or list
         Partial pressures of gas components,
-        e.g. [5.0, 10.0] (bar).
+        e.g. [0.5, 0.5].
+    total_pressure : float
+        Total gas phase pressure, e.g. 5 (bar)
     verbose : bool, optional
         Print off a lot of information.
     warningoff: bool, optional
@@ -196,8 +199,8 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
 
     Returns
     -------
-    array
-        Predicted uptakes of each component.
+    loading : array
+        Predicted uptakes of each component (mmol/g or equivalent in isotherm units).
 
     """
     for isotherm in isotherms:
@@ -206,14 +209,14 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
                 raise ParameterError(
                     "Model {} cannot be used with IAST.".format(isotherm.model.name))
 
-    partial_pressures = numpy.asarray(partial_pressures)
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:
         raise ParameterError("Pass list of pure component isotherms...")
 
+    partial_pressures = numpy.asarray(gas_mole_fraction) * total_pressure
     if numpy.size(partial_pressures) != n_components:
         print("""Example use:\n
-              IAST([0.5,0.5], [xe_isotherm, kr_isotherm], verbose=true)""")
+              pygaps.iast([xe_isotherm, kr_isotherm], [0.5,0.5], 1, verbose=true)""")
         raise ParameterError("Length of partial pressures != length of array of"
                              " isotherms...")
 
@@ -331,8 +334,9 @@ def iast(isotherms, partial_pressures, verbose=False, warningoff=False,
     if not warningoff:
         for i in range(n_components):
             if pressure0[i] > isotherms[i].pressure(branch='ads').max():
-                print("""WARNING:
-                      Component %d: p^0 = %f > %f, the highest pressure
+                warnings.warn(
+                    """WARNING:
+                      Component %d: p0 = %f > %f, the highest pressure
                       exhibited in the pure-component isotherm data. Thus,
                       pyGAPS had to extrapolate the isotherm data to achieve
                       this IAST result.""" % (i, pressure0[i],
@@ -378,7 +382,8 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
         Bulk gas mole fractions that yield desired adsorbed mole fractions
         `adsorbed_mole_fractions` at `total_pressure`.
     loadings : array
-        Adsorbed component loadings according to reverse IAST.
+        Adsorbed component loadings according to reverse IAST
+        (mmol/g or equivalent in isotherm units).
 
     """
     for isotherm in isotherms:
@@ -394,7 +399,7 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
 
     if numpy.size(adsorbed_mole_fractions) != n_components:
         print("""Example use:\n
-              reverse_IAST([0.5,0.5], 1.0, [xe_isotherm, kr_isotherm],
+              pygaps.reverse_iast([xe_isotherm, kr_isotherm], [0.5,0.5], 1.0,
               verbose=true)""")
         raise ParameterError("Length of desired adsorbed mole fractions != length of"
                              " array of isotherms...")
@@ -515,12 +520,13 @@ def reverse_iast(isotherms, adsorbed_mole_fractions, total_pressure,
     if not warningoff:
         for i in range(n_components):
             if pressure0[i] > isotherms[i].pressure(branch='ads').max():
-                print("""WARNING:
-                  Component %d: p0 = %f > %f, the highest pressure
-                  exhibited in the pure-component isotherm data. Thus,
-                  code had to extrapolate the isotherm data to achieve
-                  this IAST result.""" % (i, pressure0[i],
-                                          isotherms[i].pressure(branch='ads').max()))
+                warnings.warn(
+                    """WARNING:
+                    Component %d: p0 = %f > %f, the highest pressure
+                    exhibited in the pure-component isotherm data. Thus,
+                    code had to extrapolate the isotherm data to achieve
+                    this IAST result.""" % (i, pressure0[i],
+                                            isotherms[i].pressure(branch='ads').max()))
 
     # return mole fractions in gas phase, component loadings
     return gas_mole_fractions, loadings
