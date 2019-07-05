@@ -65,13 +65,28 @@ class TestIsothermModels():
             models.get_isotherm_model('bad_model')
 
     @pytest.mark.parametrize("name", MODELS_TESTED.keys())
-    def test_models_loading(self, name, capsys):
+    def test_models_default_guess(self, name):
+        """Test each model's default guess function."""
+
+        with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
+
+            model = models.get_isotherm_model(name)
+            model.params = ast.literal_eval(f.readline())
+            def_guess = model.default_guess(1, 1)
+            exp_def_guess = ast.literal_eval(f.readline())
+            for param in def_guess:
+                assert numpy.isclose(def_guess[param], exp_def_guess[param], 0.01)
+
+    @pytest.mark.parametrize("name", MODELS_TESTED.keys())
+    def test_models_loading(self, name):
         """Test each model's loading function."""
 
         with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
 
             model = models.get_isotherm_model(name)
             model.params = ast.literal_eval(f.readline())
+            # discard a line
+            f.readline()
 
             for line in f:
                 line_comp = list(map(float, line.split(',')))
@@ -79,13 +94,15 @@ class TestIsothermModels():
                 assert numpy.isclose(model.loading(pressure), loading, 0.001)
 
     @pytest.mark.parametrize("name", [key for key in MODELS_TESTED])
-    def test_models_pressure(self, name, capsys):
+    def test_models_pressure(self, name):
         """Test each model's pressure function."""
 
         with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
 
             model = models.get_isotherm_model(name)
             model.params = ast.literal_eval(f.readline())
+            # discard a line
+            f.readline()
 
             for line in f:
                 line_comp = list(map(float, line.split(',')))
@@ -100,6 +117,8 @@ class TestIsothermModels():
 
             model = models.get_isotherm_model(name)
             model.params = ast.literal_eval(f.readline())
+            # discard a line
+            f.readline()
 
             for line in f:
                 line_comp = list(map(float, line.split(',')))

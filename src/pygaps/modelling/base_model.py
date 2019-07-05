@@ -131,9 +131,9 @@ class IsothermBaseModel():
             Langmuir calculated constant.
 
         """
-        # ensure arrays
-        loading = numpy.asarray(loading)
-        pressure = numpy.asarray(pressure)
+        # ensure arrays of at least 1 dimension
+        loading = numpy.atleast_1d(loading)
+        pressure = numpy.atleast_1d(pressure)
 
         # remove invalid values in function
         zero_values = ~numpy.logical_and(pressure > 0, loading > 0)
