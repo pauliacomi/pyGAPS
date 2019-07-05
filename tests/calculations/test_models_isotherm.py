@@ -1,4 +1,17 @@
-"""Test all the isotherm model functions."""
+"""
+Test all the isotherm model functions.
+
+All models present in /calculations/models_isotherm/*.py are tested here.
+The purposes are:
+
+    - testing the overarching model interaction, and functions
+    - testing individual models against known outputs
+
+Models are tested against pre-calculated outputs for the model outputs.
+These include loading, pressure and spreading pressure.
+The pre-calculated outputs are found as files in the
+tests/calculations/isotherm_model_data/*.txt folder.
+"""
 
 import ast
 import os
@@ -53,7 +66,7 @@ class TestIsothermModels():
 
     @pytest.mark.parametrize("name", MODELS_TESTED.keys())
     def test_models_loading(self, name, capsys):
-        """Test each model loading function."""
+        """Test each model's loading function."""
 
         with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
 
@@ -67,7 +80,7 @@ class TestIsothermModels():
 
     @pytest.mark.parametrize("name", [key for key in MODELS_TESTED])
     def test_models_pressure(self, name, capsys):
-        """Test each model pressure function."""
+        """Test each model's pressure function."""
 
         with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
 
@@ -81,7 +94,7 @@ class TestIsothermModels():
 
     @pytest.mark.parametrize("name", [pytest.param(key, marks=MODELS_TESTED[key]) for key in MODELS_TESTED])
     def test_models_s_pressure(self, name):
-        """Test each model spreading pressure function."""
+        """Test each model's spreading pressure function."""
 
         with open(MODEL_DATA_PATH + "/" + name + ".txt") as f:
 
