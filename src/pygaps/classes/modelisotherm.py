@@ -550,7 +550,7 @@ class ModelIsotherm(Isotherm):
             return True
         return False
 
-    def pressure(self, points=20, branch=None,
+    def pressure(self, points=40, branch=None,
                  pressure_unit=None, pressure_mode=None,
                  min_range=None, max_range=None, indexed=False):
         """
@@ -630,7 +630,7 @@ class ModelIsotherm(Isotherm):
             return pandas.Series(ret)
         return ret
 
-    def loading(self, points=20, branch=None,
+    def loading(self, points=40, branch=None,
                 loading_unit=None, loading_basis=None,
                 adsorbent_unit=None, adsorbent_basis=None,
                 min_range=None, max_range=None, indexed=False):
