@@ -1,5 +1,0 @@
-{'K':2}     # parameters
-{'K':11}    # default guess
-0,0,0
-1,2,2
-3,6,6

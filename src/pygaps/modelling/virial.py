@@ -194,7 +194,6 @@ class Virial(IsothermBaseModel):
 
         # add point
         add_point = False
-        added_point = False
         if optimization_params:
             add_point = optimization_params.pop('add_point', None)
         fractional_loading = loading / max(loading)
@@ -212,7 +211,6 @@ class Virial(IsothermBaseModel):
                     record better isotherms.
                     """
                 )
-            added_point = True
             ln_p_over_n = numpy.hstack([ln_p_over_n[0], ln_p_over_n])
             loading = numpy.hstack([1e-1, loading])
 
@@ -252,14 +250,4 @@ class Virial(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            print("Model {0} success, rmse is {1}".format(
-                self.name, self.rmse))
-            n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
-            plt.plot(loading, ln_p_over_n, '.')
-            plt.plot(n_load, numpy.log(numpy.divide(self.pressure(n_load), n_load)), '-')
-            if added_point:
-                plt.plot(1e-1, ln_p_over_n[0], '.r')
-            plt.title("Virial fit")
-            plt.xlabel("Loading")
-            plt.ylabel("ln(p/n)")
-            plt.show()
+            print("Model {0} success, RMSE is {1:.3f}".format(self.name, self.rmse))

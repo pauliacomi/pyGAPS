@@ -1,7 +1,7 @@
 """Wilson-VST isotherm model."""
 
 import numpy
-import scipy
+import scipy.optimize as opt
 
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
@@ -99,7 +99,7 @@ class WVST(IsothermBaseModel):
         def fun(x):
             return self.pressure(x) - pressure
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        opt_res = opt.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError("""
@@ -194,3 +194,64 @@ class WVST(IsothermBaseModel):
                 guess[param] = self.param_bounds[param][1]
 
         return guess
+
+    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
+        """
+        Fit model to data using nonlinear optimization with least squares loss function.
+
+        Resulting parameters are assigned to self.
+
+        Parameters
+        ----------
+        pressure : ndarray
+            The pressures of each point.
+        loading : ndarray
+            The loading for each point.
+        optimization_params : dict
+            Custom parameters to pass to SciPy.optimize.least_squares.
+        verbose : bool, optional
+            Prints out extra information about steps taken.
+        """
+        if verbose:
+            print("Attempting to model using {}".format(self.name))
+
+        # parameter names (cannot rely on order in Dict)
+        param_names = [param for param in self.params]
+        guess = numpy.array([param_guess[param] for param in param_names])
+        bounds = [[self.param_bounds[param][0] for param in param_names],
+                  [self.param_bounds[param][1] for param in param_names]]
+
+        def fit_func(x, p, l):
+            for i, _ in enumerate(param_names):
+                self.params[param_names[i]] = x[i]
+            return self.pressure(l) - p
+
+        kwargs = dict(
+            bounds=bounds,                      # supply the bounds of the parameters
+        )
+        if optimization_params:
+            kwargs.update(optimization_params)
+
+        # minimize RSS
+        opt_res = opt.least_squares(
+            fit_func, guess,                    # provide the fit function and initial guess
+            args=(pressure, loading),        # supply the extra arguments to the fit function
+            **kwargs
+        )
+        if not opt_res.success:
+            raise CalculationError(
+                "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
+                "\n\t\t{1}"
+                "\n\tTry a different starting point in the nonlinear optimization"
+                "\n\tby passing a dictionary of parameter guesses, param_guess, to the constructor."
+                "\n\tDefault starting guess for parameters:"
+                "\n\t{2}".format(self.name, opt_res.message, param_guess))
+
+        # assign params
+        for index, _ in enumerate(param_names):
+            self.params[param_names[index]] = opt_res.x[index]
+
+        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
+
+        if verbose:
+            print("Model {0} success, RMSE is {1:.3f}".format(self.name, self.rmse))
