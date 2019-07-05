@@ -65,7 +65,7 @@ class TestInitialHenry():
     @cleanup
     def test_ihenry_slope_verbose(self):
         """Test verbosity."""
-        sample = DATA['SiO2']
+        sample = DATA['MCM-41']
         filepath = os.path.join(DATA_N77_PATH, sample['file'])
         isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.initial_henry_slope(
