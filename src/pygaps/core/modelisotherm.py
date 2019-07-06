@@ -6,7 +6,9 @@ import numpy
 import pandas
 
 from ..graphing.isothermgraphs import plot_iso
+from ..graphing.isothermgraphs import plot_iso_raw
 from ..modelling import _GUESS_MODELS
+from ..modelling import _MODELS
 from ..modelling import get_isotherm_model
 from ..modelling import is_base_model
 from ..utilities.exceptions import CalculationError
@@ -230,6 +232,23 @@ class ModelIsotherm(Isotherm):
 
                           **isotherm_parameters)
 
+        # Plot fit if verbose
+        if verbose and isotherm_parameters.get('plot_fit', True):
+            if self.model.calculates == 'pressure':
+                l = loading
+                p = self.pressure_at(l)
+            else:
+                p = pressure
+                l = self.loading_at(p)
+            ax = plot_iso_raw(
+                p, pressure_key,
+                l, loading_key,
+                y1_line_style=dict(markersize=0)
+            )
+            opts = {'mfc': 'none', 'markersize': 8, 'markeredgewidth': 1.5}
+            ax.plot(pressure, loading, 'ko', **opts)
+            ax.legend([self.model.name])
+
     @classmethod
     def from_isotherm(cls, isotherm,
                       pressure=None,
@@ -410,9 +429,9 @@ class ModelIsotherm(Isotherm):
         if models == 'all':
             guess_models = [md.name for md in _GUESS_MODELS]
         else:
-            guess_models = list(m for m in [md.name for md in _GUESS_MODELS] if m in models)
+            guess_models = [m for m in models if m in [md.name for md in _MODELS]]
             if len(guess_models) != len(models):
-                raise ParameterError('Not all models provided correspond to internal models')
+                raise ParameterError('Not all models provided correspond to internal models.')
 
         for model in guess_models:
             try:
@@ -426,14 +445,16 @@ class ModelIsotherm(Isotherm):
                                          optimization_params=optimization_params,
                                          branch=branch,
                                          verbose=verbose,
+                                         plot_fit=False,    # we only want one plot
 
                                          **isotherm_parameters)
 
                 attempts.append(isotherm)
 
-            except CalculationError:
+            except CalculationError as e:
                 if verbose:
-                    print("Modelling using {0} failed".format(model))
+                    print("Modelling using {0} failed. Fitting routine outputs:".format(model))
+                    print(e)
 
         if not attempts:
             raise CalculationError(
@@ -451,8 +472,8 @@ class ModelIsotherm(Isotherm):
                 y1_line_style=dict(markersize=0)
             )
             opts = {'mfc': 'none', 'markersize': 8, 'markeredgewidth': 1.5}
-            if loading:
-                ax.plot(loading, pressure, 'ko', **opts)
+            if loading is not None:
+                ax.plot(pressure, loading, 'ko', **opts)
             else:
                 ax.plot(isotherm_data[pressure_key], isotherm_data[loading_key], 'ko', **opts)
             ax.legend([m.model.name for m in attempts])
@@ -587,7 +608,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                "ModelIsotherm is not based off this isotherm branch")
+                "ModelIsotherm is based on an {} branch".format(self.branch) +
+                " (parameter supplied was {})".format(branch))
 
         # Generate pressure points
         if self.model.calculates == 'loading':
@@ -673,7 +695,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                "ModelIsotherm is not based off this isotherm branch")
+                "ModelIsotherm is based on an {} branch".format(self.branch) +
+                " (parameter supplied was {})".format(branch))
 
         if self.model.calculates == 'pressure':
             ret = numpy.linspace(self.model.loading_range[0],
@@ -779,7 +802,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                "ModelIsotherm is not based off this isotherm branch")
+                "ModelIsotherm is based on an {} branch".format(self.branch) +
+                " (parameter supplied was {})".format(branch))
 
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)
@@ -880,7 +904,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                "ModelIsotherm is not based off this isotherm branch")
+                "ModelIsotherm is based on an {} branch".format(self.branch) +
+                " (parameter supplied was {})".format(branch))
 
         # Convert to numpy array just in case
         loading = numpy.asarray(loading)
@@ -976,7 +1001,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                "ModelIsotherm is not based off this isotherm branch")
+                "ModelIsotherm is based on an {} branch".format(self.branch) +
+                " (parameter supplied was {})".format(branch))
 
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)

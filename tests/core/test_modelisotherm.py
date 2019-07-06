@@ -128,6 +128,7 @@ class TestModelIsotherm():
             model='Henry',
         )
 
+    @cleanup
     @pytest.mark.parametrize('file, ',
                              [(data['file']) for data in list(DATA.values())])
     def test_isotherm_create_guess(self, file):
