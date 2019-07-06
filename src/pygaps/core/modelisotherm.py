@@ -219,14 +219,14 @@ class ModelIsotherm(Isotherm):
         # Plot fit if verbose
         if verbose and isotherm_parameters.get('plot_fit', True):
             if self.model.calculates == 'pressure':
-                l = loading
-                p = self.pressure_at(l)
+                l_c = loading
+                p_c = self.pressure_at(l_c)
             else:
-                p = pressure
-                l = self.loading_at(p)
+                p_c = pressure
+                l_c = self.loading_at(p_c)
             ax = plot_iso_raw(
-                p, pressure_key,
-                l, loading_key,
+                p_c, pressure_key,
+                l_c, loading_key,
                 y1_line_style=dict(markersize=0)
             )
             opts = {'mfc': 'none', 'markersize': 8, 'markeredgewidth': 1.5}

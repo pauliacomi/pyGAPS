@@ -2,6 +2,12 @@
     "adsorbate": "N2",
     "iso_type": "Isotherme",
     "is_real": true,
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "loading": "0.510281",

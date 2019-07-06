@@ -2,6 +2,12 @@
     "adsorbate": "CH4",
     "iso_type": "Isotherm",
     "is_real": true,
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "loading": "4.30283490615e-05",

@@ -8,6 +8,12 @@
     "machine": "homemade1",
     "t_act": 150.0,
     "lab": "local",
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "loading": "0.426869211537",

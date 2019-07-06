@@ -2,6 +2,12 @@
     "adsorbate": "C4H10",
     "iso_type": "isotherm",
     "is_real": true,
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "loading": "0.446",

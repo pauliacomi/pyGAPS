@@ -9,6 +9,7 @@
     "t_act": 150.0,
     "temperature": 77.355,
     "user": "PI",
+    "pressure_unit": null,
     "pressure_mode": "relative",
     "loading_basis": "molar",
     "loading_unit": "mmol",

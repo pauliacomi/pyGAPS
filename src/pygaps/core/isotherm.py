@@ -28,8 +28,6 @@ class Isotherm():
     ----------
     material : str
         Name of the material on which the isotherm is measured.
-    material_batch : str
-        Batch (or identifier) of the material on which the isotherm is measured.
     adsorbate : str
         Isotherm adsorbate.
     temperature : float
@@ -37,6 +35,8 @@ class Isotherm():
 
     Other Parameters
     ----------------
+    material_batch : str
+        Batch (or identifier) of the material on which the isotherm is measured.
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
@@ -61,17 +61,17 @@ class Isotherm():
     implementation additions.
 
     The minimum arguments required to instantiate the class are
-    ``material``, ``material_batch``, ``temperature', ``adsorbate``.
+    ``material``, ``temperature', ``adsorbate``.
     """
 
     _required_params = [
         'material',
-        'material_batch',
         'temperature',
         'adsorbate'
     ]
     _named_params = {
         'iso_type': str,
+        'material_batch': str,
     }
 
     _unit_params = {
@@ -111,10 +111,10 @@ class Isotherm():
         warnings.formatwarning = custom_formatwarning
 
         for k in self._unit_params:
-            if k not in properties or properties[k] is None:
+            if k not in properties:
                 warnings.warn(
-                    "WARNING: A value for '{0}' was not specified.".format(k) +
-                    " It will therefore be automatically assumed as '{0}'".format(self._unit_params[k])
+                    "WARNING: '{0}' was not specified".format(k) +
+                    ", assumed as '{0}'".format(self._unit_params[k])
                 )
                 properties[k] = self._unit_params[k]
 
@@ -125,27 +125,23 @@ class Isotherm():
         loading_unit = properties.pop('loading_unit')
         loading_basis = properties.pop('loading_basis')
 
-        if adsorbent_basis not in _MATERIAL_MODE:
+        if adsorbent_basis is None or adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for adsorbent ({0}) is not an option."
                 "See viable values: {1}".format(adsorbent_basis, list(_MATERIAL_MODE.keys())))
 
-        if loading_basis not in _MATERIAL_MODE:
+        if loading_basis is None or loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for loading ({}) is not an option. See viable "
                 "values: {}".format(loading_basis, list(_MATERIAL_MODE.keys())))
 
-        if pressure_mode not in _PRESSURE_MODE:
+        if pressure_mode is None or pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
                 "Mode selected for pressure ({}) is not an option. See viable "
                 "values: {}".format(pressure_mode, list(_PRESSURE_MODE.keys())))
 
         # Units
-        if loading_unit is None or adsorbent_unit is None:
-            raise ParameterError(
-                "One of the units is not specified.")
-
-        if loading_unit not in _MATERIAL_MODE[loading_basis]:
+        if loading_unit is None or loading_unit not in _MATERIAL_MODE[loading_basis]:
             raise ParameterError(
                 "Unit selected for loading ({}) is not an option. See viable "
                 "values: {}".format(loading_unit, list(_MATERIAL_MODE[loading_basis].keys())))
@@ -155,7 +151,7 @@ class Isotherm():
                 "Unit selected for pressure ({}) is not an option. See viable "
                 "values: {}".format(pressure_unit, list(_PRESSURE_UNITS.keys())))
 
-        if adsorbent_unit not in _MATERIAL_MODE[adsorbent_basis]:
+        if adsorbent_unit is None or adsorbent_unit not in _MATERIAL_MODE[adsorbent_basis]:
             raise ParameterError(
                 "Unit selected for adsorbent ({}) is not an option. See viable "
                 "values: {}".format(adsorbent_unit, list(_MATERIAL_MODE[loading_basis].keys())))
@@ -182,8 +178,6 @@ class Isotherm():
 
         #: Isotherm material name.
         self.material = str(properties.pop('material'))
-        #: Isotherm material batch.
-        self.material_batch = str(properties.pop('material_batch'))
         #: Isotherm experimental temperature.
         self.temperature = float(properties.pop('temperature'))
         #: Isotherm adsorbate used.
@@ -200,6 +194,11 @@ class Isotherm():
             self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
 
         # Named properties of the isotherm
+
+        # Isotherm material batch.
+        self.material_batch = str(properties.pop('material_batch', None))
+
+        # Others
         for named_prop in self._named_params:
             prop_val = properties.pop(named_prop, None)
             if prop_val:
