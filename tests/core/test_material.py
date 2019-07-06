@@ -34,7 +34,7 @@ class TestMaterial():
             pygaps.Material.find('noname', 'nobatch')
 
     def test_material_get_properties(self, material_data, basic_material):
-        """Checks if properties of a material can be located."""
+        """Check if properties of a material can be located."""
 
         assert basic_material.get_prop(
             'density') == material_data.get('density')

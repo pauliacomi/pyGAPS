@@ -42,7 +42,7 @@ class TestAlphaSPlot():
         # Will raise a "adsorbate not same error"
         ref_iso = pygaps.PointIsotherm(
             pressure=[0, 1], loading=[0, 1],
-            material_name='test', material_batch='test',
+            material='test', material_batch='test',
             adsorbate='argon', temperature=87)
         with pytest.raises(pygaps.ParameterError):
             pygaps.alpha_s(basic_pointisotherm, ref_iso)

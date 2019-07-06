@@ -349,7 +349,7 @@
     "pressure_mode": "relative",
     "pressure_unit": null,
     "material_batch": "mic",
-    "material_name": "Sample A",
+    "material": "Sample A",
     "temperature": 77.3,
     "time": [
         110,

@@ -442,7 +442,7 @@
     "loading_unit": "mol",
     "mass": 0.0543,
     "material_batch": "bel",
-    "material_name": "Sample_D",
+    "material": "Sample_D",
     "pressure_mode": "relative",
     "pressure_unit": null,
     "temperature": 298.15,

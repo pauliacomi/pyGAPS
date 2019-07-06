@@ -229,6 +229,6 @@
         }
     ],
     "material_batch": "TB",
-    "material_name": "TEST",
+    "material": "TEST",
     "temperature": 298.15
 }

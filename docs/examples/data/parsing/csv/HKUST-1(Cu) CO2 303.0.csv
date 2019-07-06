@@ -4,7 +4,7 @@ loading_basis,molar
 loading_unit,mmol
 pressure_mode,absolute
 pressure_unit,bar
-material_name,HKUST-1(Cu)
+material,HKUST-1(Cu)
 material_batch,Test
 temperature,303.0
 adsorbate,CO2

@@ -15,9 +15,9 @@ from .excel_bel_parser import read_bel_report
 from .excel_mic_parser import read_mic_report
 
 _FIELDS = {
-    'material_name': {
+    'material': {
         'text': ['Material name'],
-        'name': 'material_name',
+        'name': 'material',
         'row': 0,
         'column': 0,
     },

@@ -5,7 +5,7 @@
     "lab": "MADIREL",
     "machine": "Triflex",
     "material_batch": "Test",
-    "material_name": "MCM-41",
+    "material": "MCM-41",
     "t_act": 150.0,
     "temperature": 77.355,
     "user": "PI",

@@ -33,10 +33,9 @@ OTHER_KEY = "enthalpy"
 @pytest.fixture(scope='function')
 def isotherm_parameters():
     """Create a dictionary with all parameters for an isotherm."""
-
     return {
 
-        'material_name': 'TEST',
+        'material': 'TEST',
         'material_batch': 'TB',
         'temperature': 100.0,
         'adsorbate': 'TA',
@@ -73,64 +72,51 @@ def isotherm_parameters():
 
 @pytest.fixture(scope='function')
 def isotherm_data():
-    """
-    Creates a dataframe with all data for an model isotherm
-    """
-    isotherm_data = pandas.DataFrame({
+    """Create a dataframe with all data for an model isotherm."""
+    return pandas.DataFrame({
         PRESSURE_KEY: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
         LOADING_KEY: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
         OTHER_KEY: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
     })
 
-    return isotherm_data
-
 
 @pytest.fixture(scope='function')
 def basic_isotherm(isotherm_parameters):
     """Create a basic isotherm from basic data."""
-    return pygaps.core.isotherm.Isotherm(no_warn=True, **isotherm_parameters)
+    return pygaps.core.isotherm.Isotherm(
+        no_warn=True, **isotherm_parameters)
 
 
 @pytest.fixture(scope='function')
 def basic_pointisotherm(isotherm_data, isotherm_parameters):
     """Create a point isotherm from basic data."""
-    other_keys = [OTHER_KEY]
-
-    isotherm = pygaps.PointIsotherm(
+    return pygaps.PointIsotherm(
         isotherm_data=isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
-        other_keys=other_keys,
+        other_keys=[OTHER_KEY],
         no_warn=True,
         **isotherm_parameters
     )
-
-    return isotherm
 
 
 @pytest.fixture()
 def basic_modelisotherm(isotherm_data, isotherm_parameters):
     """Creates a model isotherm from basic data."""
-    model = "Henry"
-
-    isotherm = pygaps.ModelIsotherm(
+    return pygaps.ModelIsotherm(
         isotherm_data=isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
-        model=model,
+        model="Henry",
         no_warn=True,
         **isotherm_parameters
     )
 
-    return isotherm
-
 
 @pytest.fixture(scope='function')
 def material_data():
-    """
-    Creates an dict with all data for an model material
-    """
-    m_data = {
+    """Create an dict with all data for an model material."""
+    return {
         'name': 'TEST',
         'batch': 'TB',
         'contact': 'TU',
@@ -146,25 +132,26 @@ def material_data():
         'molar_mass': 10,  # g/mol
     }
 
-    return m_data
-
 
 @pytest.fixture(scope='function')
 def basic_material(material_data):
-    """
-    Creates an material from model data
-    """
-    material = pygaps.Material(**material_data)
+    """Create a material from model data."""
+    return pygaps.Material(**material_data)
 
-    return material
+
+@pytest.fixture()
+def use_material(basic_material):
+    """Upload basic material to global list."""
+    material = next(
+        (x for x in pygaps.MATERIAL_LIST if basic_material.name == x.name and basic_material.batch == x.batch), None)
+    if not material:
+        pygaps.MATERIAL_LIST.append(basic_material)
 
 
 @pytest.fixture(scope='session')
 def adsorbate_data():
-    """
-    Creates an dict with all data for an model adsorbate
-    """
-    adsorbate_data = {
+    """Create a dict with all data for an model adsorbate."""
+    return {
         'name': 'TA',
         'formula': 'TA21',
 
@@ -189,42 +176,17 @@ def adsorbate_data():
         'enthalpy_liquefaction': 5.5796,
     }
 
-    return adsorbate_data
-
 
 @pytest.fixture(scope='function')
 def basic_adsorbate(adsorbate_data):
-    """
-    Creates an material from model data
-    """
-    adsorbate = pygaps.Adsorbate(**adsorbate_data)
-
-    return adsorbate
+    """Create a basic adsorbate from model data."""
+    return pygaps.Adsorbate(**adsorbate_data)
 
 
 @pytest.fixture()
 def use_adsorbate(basic_adsorbate):
-    """
-    Uploads adsorbate to list
-    """
-
+    """Upload basic adsorbate to global list."""
     adsorbate = next(
         (x for x in pygaps.ADSORBATE_LIST if basic_adsorbate.name == x.name), None)
     if not adsorbate:
         pygaps.ADSORBATE_LIST.append(basic_adsorbate)
-
-    return
-
-
-@pytest.fixture()
-def use_material(basic_material):
-    """
-    Uploads material to list
-    """
-
-    material = next(
-        (x for x in pygaps.MATERIAL_LIST if basic_material.name == x.name and basic_material.batch == x.batch), None)
-    if not material:
-        pygaps.MATERIAL_LIST.append(basic_material)
-
-    return

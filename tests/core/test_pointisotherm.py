@@ -18,7 +18,7 @@ class TestPointIsotherm():
         "Checks isotherm can be created from basic data"
 
         isotherm_param = {
-            'material_name': 'carbon',
+            'material': 'carbon',
             'material_batch': 'X1',
             'adsorbate': 'nitrogen',
             'temperature': 77,

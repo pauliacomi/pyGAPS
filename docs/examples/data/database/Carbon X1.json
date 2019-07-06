@@ -1,5 +1,5 @@
 {
-    "material_name": "Carbon",
+    "material": "Carbon",
     "material_batch": "X1",
     "adsorbate": "nitrogen",
     "temperature": 303.0,

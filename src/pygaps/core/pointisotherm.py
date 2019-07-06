@@ -57,7 +57,7 @@ class PointIsotherm(Isotherm):
         Alternatively, an iterable can be passed which contains
         detailed info for each data point if adsorption points ('False')
         or desorption points ('True'). eg: [False, False, True, True...]
-    material_name : str
+    material : str
         Name of the material on which the isotherm is measured.
     material_batch : str
         Batch (or identifier) of the material on which the isotherm is measured.
@@ -453,7 +453,7 @@ class PointIsotherm(Isotherm):
                 basis_to=basis_to,
                 unit_from=self.adsorbent_unit,
                 unit_to=unit_to,
-                material_name=self.material_name,
+                material=self.material,
                 material_batch=self.material_batch)
 
             if unit_to != self.adsorbent_unit:
@@ -526,7 +526,7 @@ class PointIsotherm(Isotherm):
             loading_unit=self.loading_unit,
             pressure_unit=self.pressure_unit,
             pressure_mode=self.pressure_mode,
-            fig_title=self.material_name,
+            fig_title=self.material,
             lgd_keys=['branch'],
         )
         plot_dict.update(plot_iso_args)
@@ -687,7 +687,7 @@ class PointIsotherm(Isotherm):
                                   basis_to=adsorbent_basis,
                                   unit_from=self.adsorbent_unit,
                                   unit_to=adsorbent_unit,
-                                  material_name=self.material_name,
+                                  material=self.material,
                                   material_batch=self.material_batch
                                   )
 
@@ -886,7 +886,7 @@ class PointIsotherm(Isotherm):
                                   basis_to=adsorbent_basis,
                                   unit_from=self.adsorbent_unit,
                                   unit_to=adsorbent_unit,
-                                  material_name=self.material_name,
+                                  material=self.material,
                                   material_batch=self.material_batch
                                   )
 
@@ -987,7 +987,7 @@ class PointIsotherm(Isotherm):
                                   basis_to=self.adsorbent_basis,
                                   unit_from=adsorbent_unit,
                                   unit_to=self.adsorbent_unit,
-                                  material_name=self.material_name,
+                                  material=self.material,
                                   material_batch=self.material_batch
                                   )
 

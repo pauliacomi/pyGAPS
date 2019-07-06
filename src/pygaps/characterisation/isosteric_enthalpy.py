@@ -80,7 +80,7 @@ def isosteric_enthalpy(isotherms, loading_points=None, branch='ads', verbose=Fal
         raise ParameterError('Pass at least two isotherms.')
 
     # Check same material
-    if not all(x.material_name == isotherms[0].material_name for x in isotherms):
+    if not all(x.material == isotherms[0].material for x in isotherms):
         raise ParameterError(
             'Isotherms passed are not measured on the same material.')
 

@@ -10,7 +10,7 @@ _DATA = {
     'adsorptive': 'adsorbate',
     'meas. temp': 'temperature',
     'sample weight': 'mass',
-    'comment1': 'material_name',
+    'comment1': 'material',
     'comment2': 'user',
     'comment3': 'comment',
     'comment4': 'exp_param',

@@ -59,7 +59,7 @@ class TestConversions():
             1,
             basis_from=basis_from, basis_to=basis_to,
             unit_from=unit_from, unit_to=unit_to,
-            material_name='TEST', material_batch='TB'
+            material='TEST', material_batch='TB'
         )
 
         assert numpy.isclose(result, value, 0.01, 0.01)

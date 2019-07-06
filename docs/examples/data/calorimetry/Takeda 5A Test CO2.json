@@ -172,7 +172,7 @@
     "lab": "MADIREL",
     "machine": "CV",
     "material_batch": "Test",
-    "material_name": "Takeda 5A",
+    "material": "Takeda 5A",
     "t_act": 150.0,
     "temperature": 303.0,
     "user": "ADW"

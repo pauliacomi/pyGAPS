@@ -13,7 +13,7 @@ class TestIsotherm():
         """Check isotherm can be created from test data."""
 
         pygaps.core.isotherm.Isotherm(
-            material_name='carbon',
+            material='carbon',
             material_batch='X1',
             adsorbate='nitrogen',
             temperature=77,

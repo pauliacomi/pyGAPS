@@ -103,7 +103,7 @@ def initial_henry_slope(isotherm,
         params = {
             'plot_type': 'isotherm',
             'branch': 'ads',
-            'fig_title': (' '.join([isotherm.material_name])),
+            'fig_title': (' '.join([isotherm.material])),
             'lgd_keys': ['material_batch', 'adsorbate', 'temperature'],
             'lgd_pos': 'bottom'
         }
@@ -111,7 +111,7 @@ def initial_henry_slope(isotherm,
         henry.pressure_range = [pressure[0], pressure[:rows_taken][-1]]
         henry.loading_range = [pressure[0], loading[:rows_taken][-1]]
         model_isotherm = ModelIsotherm(
-            material_name=isotherm.material_name,
+            material=isotherm.material,
             material_batch='Henry model',
             adsorbate=isotherm.adsorbate,
             temperature=isotherm.temperature,
@@ -154,14 +154,14 @@ def initial_henry_virial(isotherm, verbose=False, optimization_params=None, **pl
     )
 
     if verbose:
-        model_isotherm.material_name = 'model'
+        model_isotherm.material = 'model'
         try:
             params = {
                 'plot_type': 'isotherm',
                 'branch': 'ads',
                 'logx': False,
-                'fig_title': (' '.join([isotherm.material_name, isotherm.material_batch])),
-                'lgd_keys': ['material_name', 'adsorbate', 'temperature']
+                'fig_title': (' '.join([isotherm.material, isotherm.material_batch])),
+                'lgd_keys': ['material', 'adsorbate', 'temperature']
             }
             params.update(plot_parameters)
             plot_iso([isotherm, model_isotherm], **params)

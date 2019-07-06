@@ -4,7 +4,7 @@ loading_basis,molar
 loading_unit,mmol
 pressure_mode,absolute
 pressure_unit,bar
-material_name,MCM-41
+material,MCM-41
 material_batch,Test
 temperature,77.0
 adsorbate,N2

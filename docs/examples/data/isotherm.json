@@ -144,7 +144,7 @@
     "machine": "CV",
     "project": "EU MACADEMIA",
     "material_batch": "KRICT",
-    "material_name": "HKUST-1(Cu)",
+    "material": "HKUST-1(Cu)",
     "t_act": 150.0,
     "temperature": 303.0,
     "user": "ADW"

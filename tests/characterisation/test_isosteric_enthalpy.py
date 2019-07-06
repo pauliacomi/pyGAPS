@@ -45,10 +45,10 @@ class TestIsostericEnthalpy():
             ie.isosteric_enthalpy([isotherms[0]])
 
         # Will raise a "requires isotherms on the same material error"
-        isotherms[0].material_name = 'Test'
+        isotherms[0].material = 'Test'
         with pytest.raises(pygaps.ParameterError):
             ie.isosteric_enthalpy(isotherms)
-        isotherms[0].material_name = isotherms[1].material_name
+        isotherms[0].material = isotherms[1].material
 
         # Will raise a "requires isotherm on the same basis error"
         isotherms[0].convert_adsorbent(basis_to='volume', unit_to='cm3')

@@ -1,5 +1,5 @@
 {
-    "material_name": "HKUST-1(Cu)",
+    "material": "HKUST-1(Cu)",
     "material_batch": "KRICT",
     "adsorbate": "CO2",
     "temperature": 303.0,

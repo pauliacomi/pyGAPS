@@ -153,7 +153,7 @@ def psd_dft(isotherm,
             'branch': branch,
             'logx': True,
             'fig_title': 'DFT Fit',
-            'lgd_keys': ['material_name'],
+            'lgd_keys': ['material'],
             'y1_line_style': dict(markersize=5, linewidth=0)
         }
         ax = plot_iso(isotherm, **params)

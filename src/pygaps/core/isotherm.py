@@ -26,7 +26,7 @@ class Isotherm():
 
     Parameters
     ----------
-    material_name : str
+    material : str
         Name of the material on which the isotherm is measured.
     material_batch : str
         Batch (or identifier) of the material on which the isotherm is measured.
@@ -61,11 +61,11 @@ class Isotherm():
     implementation additions.
 
     The minimum arguments required to instantiate the class are
-    ``material_name``, ``material_batch``, ``temperature', ``adsorbate``.
+    ``material``, ``material_batch``, ``temperature', ``adsorbate``.
     """
 
     _required_params = [
-        'material_name',
+        'material',
         'material_batch',
         'temperature',
         'adsorbate'
@@ -172,7 +172,7 @@ class Isotherm():
         #
 
         #: Isotherm material name.
-        self.material_name = str(properties.pop('material_name'))
+        self.material = str(properties.pop('material'))
         #: Isotherm material batch.
         self.material_batch = str(properties.pop('material_batch'))
         #: Isotherm experimental temperature.
@@ -224,14 +224,14 @@ class Isotherm():
     def __repr__(self):
         """Print key isotherm parameters."""
         return "{0}: '{1} - {2}' with '{3}' at {4} K".format(
-            self.iso_id, self.material_name, self.material_batch, self.adsorbate, self.temperature)
+            self.iso_id, self.material, self.material_batch, self.adsorbate, self.temperature)
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
         string = ""
 
         # Required
-        string += ("Material: " + str(self.material_name) + '\n')
+        string += ("Material: " + str(self.material) + '\n')
         string += ("Batch: " + str(self.material_batch) + '\n')
         string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
         string += ("Isotherm temperature: " + str(self.temperature) + "K" + '\n')

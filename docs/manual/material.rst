@@ -13,7 +13,7 @@ the user might want to store a list of materials in the database, as well as to 
 This can range from the date of synthesis, the material density, the machine used to make the
 measurement, etc. For this case, pyGAPS provides the Material class.
 
-The isotherm required properties of ``material_name`` and ``material_batch`` are used to connect
+The isotherm required properties of ``material`` and ``material_batch`` are used to connect
 an Isotherm instance to a specific Material. The adsorbate class also contains two properties
 called ``name`` and ``batch`` which should be identical for a successful match.
 

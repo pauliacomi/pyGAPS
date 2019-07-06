@@ -15,7 +15,7 @@ _NUMBER_REGEX = re.compile(r'^(-)?\d+(.|,)?\d+')
 _FIELDS = {
     'sample:': {
         'text': ['sample:', 'echantillon:'],
-        'name': 'material_name',
+        'name': 'material',
         'row': 0,
         'column': 1,
         'type': 'string'

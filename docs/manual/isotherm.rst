@@ -92,8 +92,8 @@ used and so on.
 The isotherm parameters must include:
 
     - pressure and loading (either directly as arrays or in a pandas.DataFrame)
-    - The sample name (``material_name``)
-    - The sample batch (``material_batch``)
+    - The material name (``material``)
+    - The material batch (``material_batch``)
     - The adsorbate used (``adsorbate``)
     - The temperature, in K at which the data was recorded (``temperature``)
 
@@ -143,7 +143,7 @@ instantiation is below, with explanations.
         # Finally the isotherm description parameters
         # must be passed.
 
-        material_name='carbon',         # Required
+        material='carbon',         # Required
         material_batch='X1',            # Required
         adsorbate='nitrogen',           # Required
         temperature=77,                 # Required
@@ -189,7 +189,7 @@ parameter.
 
         # Required isotherm parameters
 
-        material_name='carbon',         # Required
+        material='carbon',         # Required
         material_batch='X1',            # Required
         adsorbate='nitrogen',           # Required
         temperature=77,                 # Required
@@ -251,7 +251,7 @@ The code to generate a ModelIsotherm is then:
         # Finally the isotherm description parameters
         # must be passed.
 
-        material_name='carbon',         # Required
+        material='carbon',         # Required
         material_batch='X1',            # Required
         adsorbate='nitrogen',           # Required
         temperature=77,                 # Required
