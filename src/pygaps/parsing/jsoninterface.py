@@ -33,7 +33,7 @@ def isotherm_to_jsonf(isotherm, path):
         file.write(isotherm_to_json(isotherm))
 
 
-def isotherm_to_json(isotherm, fmt=None):
+def isotherm_to_json(isotherm):
     """
     Convert an isotherm object to a json string.
 
@@ -43,9 +43,6 @@ def isotherm_to_json(isotherm, fmt=None):
     ----------
     isotherm : Isotherm
         Isotherm to be written to json.
-    fmt : {None, 'NIST'}, optional
-        If the format is set to NIST, then the json format a specific version
-        used by the NIST database of adsorbents.
 
     Returns
     -------

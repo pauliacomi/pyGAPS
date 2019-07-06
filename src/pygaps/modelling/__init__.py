@@ -54,6 +54,7 @@ _GUESS_MODELS = [
     Henry,
     Langmuir,
     DSLangmuir,
+    DR,
     Freundlich,
     Quadratic,
     BET,
