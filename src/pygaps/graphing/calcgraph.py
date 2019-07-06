@@ -48,7 +48,7 @@ def roq_plot(pressure, roq_points, minimum, maximum,
             marker='o', linestyle='', color='r', label='chosen points')
     ax.plot(p_monolayer, roq_monolayer,
             marker='X', markersize=10,
-            linestyle='', color='g', label='monolayer point')
+            linestyle='', color='k', label='monolayer point')
     ax.set_title("Rouquerol plot")
     ax.set_xlabel('p/p°', fontsize=15)
     ax.set_ylabel('$n ( 1 - p/p°)$', fontsize=10)
@@ -105,7 +105,7 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
     ax.plot(p_monolayer, bet_monolayer,
             marker='X', markersize=10,
-            linestyle='', color='g', label='monolayer point')
+            linestyle='', color='k', label='monolayer point')
 
     ax.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
     ax.set_xlim(
