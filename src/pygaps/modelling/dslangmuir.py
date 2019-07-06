@@ -132,7 +132,7 @@ class DSLangmuir(IsothermBaseModel):
             self.params["n_m2"] * numpy.log(
             1.0 + self.params["K2"] * pressure)
 
-    def default_guess(self, pressure, loading):
+    def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
@@ -148,7 +148,7 @@ class DSLangmuir(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
                  "n_m2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}

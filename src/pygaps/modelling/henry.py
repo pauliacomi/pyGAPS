@@ -115,7 +115,7 @@ class Henry(IsothermBaseModel):
         """
         return self.params["K"] * pressure
 
-    def default_guess(self, pressure, loading):
+    def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
@@ -131,7 +131,7 @@ class Henry(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k}
 

@@ -132,7 +132,7 @@ class JensenSeaton(IsothermBaseModel):
         """
         return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
-    def default_guess(self, pressure, loading):
+    def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
@@ -148,7 +148,7 @@ class JensenSeaton(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k, "a": 1, "b": 1, "c": 1}
 

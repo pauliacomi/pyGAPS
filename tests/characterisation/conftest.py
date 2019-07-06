@@ -7,6 +7,8 @@ In this file there are:
     - pre-calculated values for each isotherm on various
       characterisation tests.
 
+Explanation of parameters:
+
 'bet_area':             BET area value
 's_bet_area':           BET area value in a selected range
 'langmuir_area':        Langmuir area value

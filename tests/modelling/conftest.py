@@ -4,7 +4,29 @@ isotherm models on pre-calculated data.
 In this file there are:
 
     - references to sample isotherm files
-    - pre-calculated values for various models
+    - pre-calculated relationships for various models
+
+
+Explanation of parameters:
+
+'initial_guess' :
+
+    Ihe initial guess for the model parameters
+    that is passed to the optimisation routine,
+    at pressure=1 and loading=1.
+
+'test_parameters' :
+
+    Simple values for the model parameters which
+    are used to produce the test data.
+
+'test_data' :
+
+    Pressure, loading and spreading pressure values
+    pre-calculated with the 'test_parameters'.
+    These are used as a test to check if the model
+    outputs good values, as well as in a fitting
+    test.
 
 """
 
@@ -12,7 +34,7 @@ import pytest
 
 MODEL_DATA = {
     'Henry': {
-        'default_guess': {'K': 11},
+        'initial_guess': {'K': 11},
         'test_parameters': {'K': 2},
         'test_values': {
             'pressure': [0.0, 1.0, 3.0],
@@ -22,7 +44,7 @@ MODEL_DATA = {
         }
     },
     'Langmuir': {
-        'default_guess': {'K': 10, 'n_m': 1.1},
+        'initial_guess': {'K': 10, 'n_m': 1.1},
         'test_parameters': {'K': 3, 'n_m': 5},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -32,7 +54,7 @@ MODEL_DATA = {
         }
     },
     'DSLangmuir': {
-        'default_guess': {'K1': 4, 'n_m1': 0.55, 'K2': 6, 'n_m2': 0.55},
+        'initial_guess': {'K1': 4, 'n_m1': 0.55, 'K2': 6, 'n_m2': 0.55},
         'test_parameters': {'K1': 3, 'n_m1': 5, 'K2': 10, 'n_m2': 1},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -42,7 +64,7 @@ MODEL_DATA = {
         }
     },
     'TSLangmuir': {
-        'default_guess': {'K1': 2, 'n_m1': 0.44, 'K2': 4, 'n_m2': 0.44, 'K3': 4, 'n_m3': 0.22},
+        'initial_guess': {'K1': 2, 'n_m1': 0.44, 'K2': 4, 'n_m2': 0.44, 'K3': 4, 'n_m3': 0.22},
         'test_parameters': {'K1': 3, 'n_m1': 5, 'K2': 10, 'n_m2': 1, 'K3': 0.1, 'n_m3': 10},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -52,7 +74,7 @@ MODEL_DATA = {
         }
     },
     'BET': {
-        'default_guess': {'C': 10, 'N': 0.1, 'n_m': 1.1},
+        'initial_guess': {'C': 10, 'N': 0.1, 'n_m': 1.1},
         'test_parameters': {'C': 5, 'N': 0.05, 'n_m': 10},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -62,7 +84,7 @@ MODEL_DATA = {
         }
     },
     'GAB': {
-        'default_guess': {'C': 100, 'K': 0.1, 'n_m': 1.1},
+        'initial_guess': {'C': 100, 'K': 0.1, 'n_m': 1.1},
         'test_parameters': {'C': 50, 'K': 0.01, 'n_m': 10},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -72,7 +94,7 @@ MODEL_DATA = {
         }
     },
     'Freundlich': {
-        'default_guess': {'K': 11, 'm': 1},
+        'initial_guess': {'K': 11, 'm': 1},
         'test_parameters': {'K': 5, 'm': 5},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -82,7 +104,7 @@ MODEL_DATA = {
         }
     },
     'DA': {
-        'default_guess': {'e': 1000, 'n_m': 1.1, 'm': 1},
+        'initial_guess': {'e': 1000, 'n_m': 1.1, 'm': 1},
         'test_parameters': {'e': 3000, 'n_m': 10, 'm': 3},
         'test_values': {
             'pressure': [0.1, 0.5, 1.0],
@@ -92,7 +114,7 @@ MODEL_DATA = {
         }
     },
     'DR': {
-        'default_guess': {'e': 1000, 'n_m': 1.1},
+        'initial_guess': {'e': 1000, 'n_m': 1.1},
         'test_parameters': {'e': 2000, 'n_m': 10},
         'test_values': {
             'pressure': [0.1, 0.5, 1.0],
@@ -102,7 +124,7 @@ MODEL_DATA = {
         }
     },
     'Quadratic': {
-        'default_guess': {'n_m': 0.55, 'Ka': 10, 'Kb': 100},
+        'initial_guess': {'n_m': 0.55, 'Ka': 10, 'Kb': 100},
         'test_parameters': {'n_m': 10, 'Ka': 0.1, 'Kb': 1},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -112,7 +134,7 @@ MODEL_DATA = {
         }
     },
     'TemkinApprox': {
-        'default_guess': {'n_m': 1.1, 'K': 10, 'tht': 0},
+        'initial_guess': {'n_m': 1.1, 'K': 10, 'tht': 0},
         'test_parameters': {'n_m': 5, 'K': 5, 'tht': 1},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -122,7 +144,7 @@ MODEL_DATA = {
         }
     },
     'Toth': {
-        'default_guess': {'n_m': 1.1, 'K': 10, 't': 1},
+        'initial_guess': {'n_m': 1.1, 'K': 10, 't': 1},
         'test_parameters': {'n_m': 5, 'K': 3, 't': 2},
         'test_values': {
             'pressure': [0.1, 1.0, 10.0],
@@ -132,7 +154,7 @@ MODEL_DATA = {
         }
     },
     'Jensen-Seaton': {
-        'default_guess': {'K': 11, 'a': 1, 'b': 1, 'c': 1},
+        'initial_guess': {'K': 11, 'a': 1, 'b': 1, 'c': 1},
         'test_parameters': {'K': 10, 'a': 3, 'b': 0.1, 'c': 1},
         'test_values': {
             'pressure': [0.1, 1.0, 10.0],
@@ -142,7 +164,7 @@ MODEL_DATA = {
         }
     },
     'Virial': {
-        'default_guess': {'K': 11, 'A': 0.0, 'B': 0.0, 'C': 0.0},
+        'initial_guess': {'K': 11, 'A': 0.0, 'B': 0.0, 'C': 0.0},
         'test_parameters': {'K': 5, 'A': 0.001, 'B': 0.0001, 'C': 0.0001},
         'test_values': {
             'pressure': [0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144, 0.40128205],
@@ -152,7 +174,7 @@ MODEL_DATA = {
         }
     },
     'FH-VST': {
-        'default_guess': {'n_m': 1.1, 'K': 10, 'a1v': 0},
+        'initial_guess': {'n_m': 1.1, 'K': 10, 'a1v': 0},
         'test_parameters': {'n_m': 30, 'K': 2, 'a1v': 1},
         'test_values': {
             'pressure': [0.0, 0.10134005, 0.534198619, 44.75474093],
@@ -162,7 +184,7 @@ MODEL_DATA = {
         }
     },
     'W-VST': {
-        'default_guess': {'n_m': 1.1, 'K': 10, 'L1v': 1, 'Lv1': 1},
+        'initial_guess': {'n_m': 1.1, 'K': 10, 'L1v': 1, 'Lv1': 1},
         'test_parameters': {'n_m': 30, 'K': 2, 'L1v': 2, 'Lv1': 1},
         'test_values': {
             'pressure': [0.0, 0.101346218, 0.534999558],

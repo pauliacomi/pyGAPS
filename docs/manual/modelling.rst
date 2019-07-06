@@ -196,8 +196,8 @@ The things to be specified are the following:
 
     - The model name.
     - A dictionary with the model parameters names and possible bounds.
-    - A function that returns a default guess for the
-      model parameters (``default_guess()``).
+    - A function that returns an initial guess for the
+      model parameters (``initial_guess()``).
     - A fitting function that determines the model parameters
       starting from the loading and pressure data (``fit()``).
       Alternatively, the template fitting function can be used

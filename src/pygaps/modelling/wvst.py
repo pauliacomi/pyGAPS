@@ -166,7 +166,7 @@ class WVST(IsothermBaseModel):
         """
         return NotImplementedError
 
-    def default_guess(self, pressure, loading):
+    def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
@@ -182,7 +182,7 @@ class WVST(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k,
                  "L1v": 1, "Lv1": 1}

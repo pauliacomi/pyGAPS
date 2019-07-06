@@ -112,7 +112,7 @@ class IsothermBaseModel():
         """
         return
 
-    def default_guess(self, pressure, loading):
+    def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 

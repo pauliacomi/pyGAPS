@@ -47,8 +47,8 @@ class TestIsothermModels():
         """Test each model's default guess function."""
 
         model = models.get_isotherm_model(m_name)
-        exp_guess = MODEL_DATA[m_name]['default_guess']
-        def_guess = model.default_guess(1, 1)
+        exp_guess = MODEL_DATA[m_name]['initial_guess']
+        def_guess = model.initial_guess(1, 1)
         for param in def_guess:
             assert numpy.isclose(exp_guess[param], def_guess[param], 0.01)
 
@@ -97,7 +97,7 @@ class TestIsothermModels():
 
         model = models.get_isotherm_model(m_name)
         test_values = MODEL_DATA[m_name]['test_values']
-        param_guess = model.default_guess(
+        param_guess = model.initial_guess(
             numpy.array(test_values['pressure']),
             numpy.array(test_values['loading']),
         )

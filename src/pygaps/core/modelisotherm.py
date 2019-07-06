@@ -200,7 +200,7 @@ class ModelIsotherm(Isotherm):
             self.model.loading_range = [min(loading), max(loading)]
 
             #: Dictionary of parameters as a starting point for data fitting.
-            self.param_guess = self.model.default_guess(pressure, loading)
+            self.param_guess = self.model.initial_guess(pressure, loading)
 
             # Override defaults if user provides param_guess dictionary
             if param_guess is not None:

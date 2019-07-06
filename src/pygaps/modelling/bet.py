@@ -195,7 +195,7 @@ class BET(IsothermBaseModel):
             (1.0 - self.params["N"] * pressure + self.params["C"] * pressure) /
             (1.0 - self.params["N"] * pressure))
 
-    def default_guess(self, pressure, loading):
+    def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
@@ -211,7 +211,7 @@ class BET(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "C": langmuir_k, "N": langmuir_k * 0.01}
 

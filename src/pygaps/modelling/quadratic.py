@@ -126,7 +126,7 @@ class Quadratic(IsothermBaseModel):
         return self.params["n_m"] * numpy.log(1.0 + self.params["Ka"] * pressure +
                                               self.params["Kb"] * pressure ** 2)
 
-    def default_guess(self, pressure, loading):
+    def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
 
@@ -142,7 +142,7 @@ class Quadratic(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().default_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading / 2.0,
                  "Ka": langmuir_k,

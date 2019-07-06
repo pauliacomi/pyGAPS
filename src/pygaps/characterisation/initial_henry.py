@@ -83,7 +83,7 @@ def initial_henry_slope(isotherm,
 
     while rows_taken != 1:
 
-        param_guess = henry.default_guess(pressure[:rows_taken], loading[:rows_taken])
+        param_guess = henry.initial_guess(pressure[:rows_taken], loading[:rows_taken])
         # fit model to isotherm data
         henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
         adjrmsd = henry.rmse / numpy.ptp(loading)
