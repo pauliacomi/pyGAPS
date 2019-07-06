@@ -20,8 +20,9 @@ Breaking changes:
 
 New features:
 
-* After attempting a model guess for the creation of a ModelIsotherm,
-  all tested models are now plotted alongside the isotherm to
+* Not specifying units now raises a warning.
+* After attempting a model fit or guess for the creation of a
+  ModelIsotherm, a fit graph is now plotted alongside the data to
   be modelled.
 * Added a new parameters named logy1 and logy2 to
   set the plotting vertical axes to be logarithmic.

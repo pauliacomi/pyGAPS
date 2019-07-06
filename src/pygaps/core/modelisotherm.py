@@ -109,14 +109,6 @@ class ModelIsotherm(Isotherm):
                  optimization_params=None,
                  branch='ads',
                  verbose=False,
-
-                 adsorbent_basis="mass",
-                 adsorbent_unit="g",
-                 loading_basis="molar",
-                 loading_unit="mmol",
-                 pressure_mode="absolute",
-                 pressure_unit="bar",
-
                  **isotherm_parameters):
         """
         Instantiation is done by passing the data to be fitted, model to be
@@ -222,15 +214,7 @@ class ModelIsotherm(Isotherm):
         isotherm_parameters['is_real'] = False
 
         # Run base class constructor
-        Isotherm.__init__(self,
-                          adsorbent_basis=adsorbent_basis,
-                          adsorbent_unit=adsorbent_unit,
-                          loading_basis=loading_basis,
-                          loading_unit=loading_unit,
-                          pressure_mode=pressure_mode,
-                          pressure_unit=pressure_unit,
-
-                          **isotherm_parameters)
+        Isotherm.__init__(self, **isotherm_parameters)
 
         # Plot fit if verbose
         if verbose and isotherm_parameters.get('plot_fit', True):

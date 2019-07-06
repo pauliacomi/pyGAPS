@@ -57,15 +57,10 @@ class TestIsotherm():
 
     @pytest.mark.parametrize('prop, set_to', [
         ('pressure_unit', 'something'),
-        ('pressure_mode', None),
         ('pressure_mode', 'something'),
-        ('loading_unit', None),
         ('loading_unit', 'something'),
-        ('loading_basis', None),
         ('loading_basis', 'something'),
-        ('adsorbent_unit', None),
         ('adsorbent_unit', 'something'),
-        ('adsorbent_basis', None),
         ('adsorbent_basis', 'something')
     ])
     def test_isotherm_mode_and_units_bad(self, isotherm_parameters, prop, set_to):

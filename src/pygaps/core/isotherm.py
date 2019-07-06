@@ -74,32 +74,24 @@ class Isotherm():
         'iso_type': str,
     }
 
-    _unit_params = [
-        'pressure_unit',
-        'pressure_mode',
-        'adsorbent_unit',
-        'adsorbent_basis',
-        'loading_unit',
-        'loading_basis',
-    ]
+    _unit_params = {
+        'pressure_unit': 'bar',
+        'pressure_mode': 'absolute',
+        'adsorbent_unit': 'g',
+        'adsorbent_basis': 'mass',
+        'loading_unit': 'mmol',
+        'loading_basis': 'molar',
+    }
 
     _reserved_params = []
 
     _db_columns = ['id'] + _required_params + list(_named_params)
-    _id_params = _required_params + _unit_params
+    _id_params = _required_params + list(_unit_params)
 
 ##########################################################
 #   Instantiation and classmethods
 
-    def __init__(self,
-                 adsorbent_basis="mass",
-                 adsorbent_unit="g",
-                 loading_basis="molar",
-                 loading_unit="mmol",
-                 pressure_mode="absolute",
-                 pressure_unit="bar",
-
-                 **properties):
+    def __init__(self, **properties):
         """
         Instantiate is done by passing a dictionary with the parameters,
         as well as the info about units, modes and data columns.
@@ -111,10 +103,27 @@ class Isotherm():
             raise ParameterError(
                 "Isotherm MUST have the following properties:{0}".format(self._required_params))
 
-        # Basis and mode
-        if adsorbent_basis is None or pressure_mode is None or loading_basis is None:
-            raise ParameterError(
-                "One of the modes or bases is not specified.")
+        # We create a custom warning format that only displays the message.
+        def custom_formatwarning(msg, *args, **kwargs):
+            # ignore everything except the message
+            return str(msg) + '\n'
+
+        warnings.formatwarning = custom_formatwarning
+
+        for k in self._unit_params:
+            if k not in properties or properties[k] is None:
+                warnings.warn(
+                    "WARNING: A value for '{0}' was not specified.".format(k) +
+                    " It will therefore be automatically assumed as '{0}'".format(self._unit_params[k])
+                )
+                properties[k] = self._unit_params[k]
+
+        pressure_unit = properties.pop('pressure_unit')
+        pressure_mode = properties.pop('pressure_mode')
+        adsorbent_unit = properties.pop('adsorbent_unit')
+        adsorbent_basis = properties.pop('adsorbent_basis')
+        loading_unit = properties.pop('loading_unit')
+        loading_basis = properties.pop('loading_basis')
 
         if adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
@@ -161,7 +170,7 @@ class Isotherm():
         self.loading_unit = str(loading_unit)
         #: Mode for the pressure.
         self.pressure_mode = str(pressure_mode)
-        if pressure_mode == 'relative':
+        if self.pressure_mode == 'relative':
             #: Units for pressure.
             self.pressure_unit = None
         else:
@@ -223,8 +232,8 @@ class Isotherm():
 
     def __repr__(self):
         """Print key isotherm parameters."""
-        return "{0}: '{1} - {2}' with '{3}' at {4} K".format(
-            self.iso_id, self.material, self.material_batch, self.adsorbate, self.temperature)
+        return "{0}: '{1}' on '{2}' at {3} K".format(
+            self.iso_id, self.adsorbate, self.material, self.temperature)
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
@@ -253,7 +262,8 @@ class Isotherm():
 
         string += ("Other properties: \n")
         for prop in vars(self):
-            if prop not in self._required_params + list(self._named_params) + self._unit_params + self._reserved_params:
+            if prop not in self._required_params + list(self._named_params) + \
+                    list(self._unit_params) + self._reserved_params:
                 string += ('\t' + prop + ": " + str(getattr(self, prop)) + '\n')
 
         return string
