@@ -39,17 +39,19 @@ def roq_plot(pressure, roq_points, minimum, maximum,
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, roq_points,
-            marker='', color='g', label='all points')
+    ax.plot(pressure, roq_points, label='all points',
+            color='grey', marker='o', mfc='none', markersize=6,
+            markeredgewidth=1.5, linewidth=0,)
     ax.plot(pressure[minimum:maximum], roq_points[minimum:maximum],
             marker='o', linestyle='', color='r', label='chosen points')
     ax.plot(p_monolayer, roq_monolayer,
-            marker='x', linestyle='', color='black', label='monolayer point')
+            marker='X', markersize=10,
+            linestyle='', color='g', label='monolayer point')
     ax.set_title("Rouquerol plot")
-    ax.set_xlabel('p/p°')
-    ax.set_ylabel('(p/p°)/(n(1-(P/P°))')
+    ax.set_xlabel('p/p°', fontsize=15)
+    ax.set_ylabel('$n ( 1 - p/p°)$', fontsize=10)
     ax.legend(loc='best')
 
     return ax
@@ -90,10 +92,11 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, bet_points,
-            marker='', color='g')
+    ax.plot(pressure, bet_points, label='all points',
+            color='grey', marker='o', mfc='none', markersize=6,
+            markeredgewidth=1.5, linewidth=0,)
     ax.plot(pressure[minimum:maximum], bet_points[minimum:maximum],
             marker='o', linestyle='', color='r', label='chosen points')
     x_lim = [0, pressure[maximum]]
@@ -101,14 +104,15 @@ def bet_plot(pressure, bet_points, minimum, maximum,
              slope * x_lim[1] + intercept]
     ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
     ax.plot(p_monolayer, bet_monolayer,
-            marker='x', linestyle='', color='black', label='monolayer point')
+            marker='X', markersize=10,
+            linestyle='', color='g', label='monolayer point')
 
     ax.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
     ax.set_xlim(
         left=0, right=pressure[maximum] * 1.2)
     ax.set_title("BET plot")
-    ax.set_xlabel('p/p°')
-    ax.set_ylabel('(p/p°)/(n(1-(P/P°))')
+    ax.set_xlabel('p/p°', fontsize=15)
+    ax.set_ylabel('$\\frac{p/p°}{n ( 1- p/p°)}$', fontsize=15)
     ax.legend(loc='best')
 
     return ax
@@ -145,10 +149,11 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, langmuir_points,
-            marker='', color='g')
+    ax.plot(pressure, langmuir_points, label='all points',
+            color='grey', marker='o', mfc='none', markersize=6,
+            markeredgewidth=1.5, linewidth=0,)
     ax.plot(pressure[minimum:maximum], langmuir_points[minimum:maximum],
             marker='o', linestyle='', color='r', label='chosen points')
     x_lim = [0, pressure[maximum]]
@@ -160,8 +165,8 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
     ax.set_xlim(
         left=0, right=pressure[maximum] * 1.2)
     ax.set_title("Langmuir plot")
-    ax.set_xlabel('p/p°')
-    ax.set_ylabel('(p/p°)/n')
+    ax.set_xlabel('p/p°', fontsize=15)
+    ax.set_ylabel('(p/p°)/n', fontsize=15)
     ax.legend(loc='best')
 
     return ax
