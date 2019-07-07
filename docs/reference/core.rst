@@ -22,8 +22,8 @@ Isotherms
 ---------
 
 
-Master Isotherm
-...............
+Isotherm
+........
 
 .. automodule:: pygaps.core.isotherm
     :members:
@@ -31,6 +31,8 @@ Master Isotherm
 
 Point Isotherm
 ...............
+
+.. _isotherms-pointisotherm:
 
 .. automodule:: pygaps.core.pointisotherm
     :members:

@@ -16,7 +16,7 @@ class Material():
     ----------
     name : str
         The name of the material.
-    batch : str
+    batch : str, None
         A batch number or secondary identifier for the material.
 
     Other Parameters
@@ -34,7 +34,7 @@ class Material():
 
     """
 
-    def __init__(self, name, batch, **properties):
+    def __init__(self, name, batch=None, **properties):
         """Instantiate by passing all the parameters."""
         #: Material name
         self.name = name
@@ -45,11 +45,9 @@ class Material():
         #: Rest of material properties
         self.properties = properties
 
-        return
-
     def __repr__(self):
-        """Print material name and batch."""
-        return ' '.join([self.name, self.batch])
+        """Print material name."""
+        return ' '.join([self.name])
 
     def __str__(self):
         """Print a short summary of all the material parameters."""
@@ -64,17 +62,17 @@ class Material():
         return string
 
     def __hash__(self):
-        """Override hashing as a hash of name and batch."""
+        """Override hashing as a hash of name."""
         return hash(self.__repr__())
 
     def __eq__(self, other):
-        """Overload equality operator to use name and batch."""
+        """Overload equality operator to use name."""
         if isinstance(other, Material):
-            return self.name == other.name and self.batch == other.batch
+            return self.name == other.name
         return self.__repr__() == other
 
     @classmethod
-    def find(cls, material_name, material_batch):
+    def find(cls, material_name, material_batch=None):
         """
         Get the material from the master list using its name.
 
@@ -159,7 +157,7 @@ class Material():
             except AttributeError:
                 raise ParameterError("The {0} entry was not found in the "
                                      "material properties "
-                                     "for material {1} {2}".format(
-                                         prop, self.name, self.batch))
+                                     "for material {1}.".format(
+                                         prop, self.name))
 
         return req_prop

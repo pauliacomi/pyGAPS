@@ -11,10 +11,10 @@ class TestMaterial():
 
     def test_material_basic(self):
         """Basic creation tests."""
-        mat = pygaps.Material('material', 'batch')
-        assert mat == 'material batch'
-        assert mat != 'Material Batch'
-        mat2 = pygaps.Material('material', 'batch')
+        mat = pygaps.Material('material1', 'batch')
+        assert mat == 'material1'
+        assert mat != 'Material1'
+        mat2 = pygaps.Material('material1', 'batch')
         assert mat == mat2
 
     def test_material_create(self, material_data, basic_material):

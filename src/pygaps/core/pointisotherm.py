@@ -200,22 +200,6 @@ class PointIsotherm(Isotherm):
                                                     interp_branch=None)
 
     @classmethod
-    def from_json(cls, json_string, **isotherm_parameters):
-        """
-        Construct a PointIsotherm from a standard json-represented isotherm.
-        This function is just a wrapper around the more powerful .isotherm_from_json
-        function.
-
-        Parameters
-        ----------
-        json_string : str
-            A json standard isotherm representation.
-        isotherm_parameters :
-            Any other options to be passed to the isotherm creation, like mode, basis or unit.
-        """
-        return pygaps.isotherm_from_json(json_string, **isotherm_parameters)
-
-    @classmethod
     def from_isotherm(cls, isotherm,
                       pressure=None,
                       loading=None,
