@@ -174,7 +174,7 @@ def isotherm_from_json(json_isotherm, fmt=None,
 
         # Update dictionary with any user parameters
         raw_dict.update(isotherm_parameters)
-    
+
         # generate the isotherm
         isotherm = PointIsotherm(isotherm_data=data,
                                  loading_key=loading_key,
@@ -202,7 +202,7 @@ def isotherm_from_json(json_isotherm, fmt=None,
                 new_mod.params[param] = model['parameters'][param]
             except KeyError as err:
                 raise KeyError("The JSON is missing parameter '{0}'".format(param)) from err
-        
+
         # Update dictionary with any user parameters
         raw_dict.update(isotherm_parameters)
 
