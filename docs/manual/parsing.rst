@@ -189,7 +189,7 @@ Isotherms from the NIST ISODB
 
 The NIST ISODB is a database of adsorption isotherms.
 pyGAPS can pull a specific isotherm from the NIST ISODB
-by using the :meth:`~pygaps.parsing.isodb_interface.isotherm_from_isodb`
+by using the :meth:`~pygaps.parsing.isodbinterface.isotherm_from_isodb`
 function. The ISODB isotherm filename should be specified as a parameter.
 
 ::

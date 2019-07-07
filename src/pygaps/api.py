@@ -36,7 +36,7 @@ from .parsing.csvinterface import isotherm_from_csv
 from .parsing.csvinterface import isotherm_to_csv
 from .parsing.excelinterface import isotherm_from_xl
 from .parsing.excelinterface import isotherm_to_xl
-from .parsing.isodb_interface import isotherm_from_isodb
+from .parsing.isodbinterface import isotherm_from_isodb
 from .parsing.jsoninterface import isotherm_from_json
 from .parsing.jsoninterface import isotherm_from_jsonf
 from .parsing.jsoninterface import isotherm_to_json

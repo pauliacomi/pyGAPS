@@ -48,8 +48,8 @@ def isotherm_to_json(isotherm):
     -------
     str
         A string with the json-formatted Isotherm.
-    """
 
+    """
     # Isotherm properties
     raw_dict = isotherm.to_dict()
 
