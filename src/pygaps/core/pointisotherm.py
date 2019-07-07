@@ -144,7 +144,7 @@ class PointIsotherm(Isotherm):
             columns.extend(self.other_keys)
             if not all([a in isotherm_data.columns for a in columns]):
                 raise ParameterError(
-                    "Could not find some specified columns in the adsorption DataFrame")
+                    "Could not find some specified columns in the adsorption DataFrame.")
             self.raw_data = isotherm_data[columns].sort_index(axis=1)
 
         elif pressure is not None or loading is not None:

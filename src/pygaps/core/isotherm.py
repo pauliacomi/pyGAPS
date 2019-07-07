@@ -253,12 +253,12 @@ class Isotherm():
 
         # Units/basis
         string += ("Units: \n")
-        string += ("\tUnit for loading: " + str(self.loading_unit) +
+        string += ("\tUptake in: " + str(self.loading_unit) +
                    "/" + str(self.adsorbent_unit) + '\n')
         if self.pressure_mode == 'relative':
             string += ("\tRelative pressure \n")
         else:
-            string += ("\tUnit for pressure: " + str(self.pressure_unit) + '\n')
+            string += ("\tPressure in: " + str(self.pressure_unit) + '\n')
 
         string += ("Other properties: \n")
         for prop in vars(self):

@@ -55,9 +55,24 @@ def isotherm_to_json(isotherm):
 
     # Isotherm data
     if isinstance(isotherm, PointIsotherm):
-        isotherm_data_dict = isotherm.data().to_dict(orient='index')
-        raw_dict["isotherm_data"] = [{p: str(t) for p, t in v.items()}
-                                     for k, v in isotherm_data_dict.items()]
+
+        # we turn the raw dataframe into a dictionary
+        isotherm_data_dict = isotherm.data(raw=True).to_dict(orient='index')
+
+        def process_data(value):
+            """
+            Specifically mark only the desorption branch
+            then turn numbers into strings to avoid floating
+            point conversion issues
+            """
+            if value.get('branch', False) is False:
+                del value['branch']
+            else:
+                value['branch'] = 'des'
+            return {p: str(t) for p, t in value.items()}
+
+        raw_dict["isotherm_data"] = [process_data(v) for k, v in isotherm_data_dict.items()]
+
     elif isinstance(isotherm, ModelIsotherm):
         raw_dict["isotherm_model"] = isotherm.model.to_dict()
 
@@ -141,25 +156,31 @@ def isotherm_from_json(json_isotherm, fmt=None,
     model = raw_dict.pop("isotherm_model", None)
 
     if data:
-        # Rename keys and get units if needed depending on format
+        # rename keys and get units if needed depending on format
         if fmt == 'NIST':
             loading_key = 'total_adsorption'
             pressure_key = 'pressure'
             raw_dict = _from_json_nist(raw_dict)
             data = _from_data_nist(data)
 
-        # Build pandas dataframe of data
+        # build pandas dataframe of data
         data = pandas.DataFrame(data, dtype='float64')
+
+        # process isotherm branches if they exist
+        branch = 'guess'
+        if 'branch' in data.columns:
+            branch = data['branch'].fillna(False).replace('des', True).values
 
         # get the other data in the json
         other_keys = [column for column in data.columns.values
-                      if column not in [loading_key, pressure_key]]
+                      if column not in [loading_key, pressure_key, 'branch']]
 
         # generate the isotherm
         isotherm = PointIsotherm(isotherm_data=data,
                                  loading_key=loading_key,
                                  pressure_key=pressure_key,
                                  other_keys=other_keys,
+                                 branch=branch,
                                  **raw_dict)
     elif model:
 
