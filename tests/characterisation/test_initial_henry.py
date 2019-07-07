@@ -88,10 +88,10 @@ class TestInitialHenry():
             assert isclose(ihenry_virial, sample['Khi_virial'],
                            err_relative, err_absolute)
 
-    @cleanup
-    def test_ihenry_virial_verbose(self):
-        """Test verbosity."""
-        sample = DATA['SiO2']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
-        pygaps.initial_henry_virial(isotherm, verbose=True)
+    # @cleanup
+    # def test_ihenry_virial_verbose(self):
+    #     """Test verbosity."""
+    #     sample = DATA['SiO2']
+    #     filepath = os.path.join(DATA_N77_PATH, sample['file'])
+    #     isotherm = pygaps.isotherm_from_jsonf(filepath)
+    #     pygaps.initial_henry_virial(isotherm, verbose=True)
