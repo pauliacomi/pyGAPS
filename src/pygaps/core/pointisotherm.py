@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 import numpy
 import pandas
 
-import pygaps
-
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
