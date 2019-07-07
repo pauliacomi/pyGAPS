@@ -74,7 +74,7 @@ MODEL_DATA = {
         }
     },
     'BET': {
-        'initial_guess': {'C': 10, 'N': 0.1, 'n_m': 1.1},
+        'initial_guess': {'C': 10, 'N': 0.01, 'n_m': 1.1},
         'test_parameters': {'C': 5, 'N': 0.05, 'n_m': 10},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -84,7 +84,7 @@ MODEL_DATA = {
         }
     },
     'GAB': {
-        'initial_guess': {'C': 100, 'K': 0.1, 'n_m': 1.1},
+        'initial_guess': {'C': 100, 'K': 0.01, 'n_m': 1.1},
         'test_parameters': {'C': 50, 'K': 0.01, 'n_m': 10},
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],

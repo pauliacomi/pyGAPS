@@ -41,7 +41,7 @@ class ModelIsotherm(Isotherm):
         Column of the pandas DataFrame where the pressure is stored.
     loading_key : str
         Column of the pandas DataFrame where the loading is stored.
-    model : str
+    model : str or Model class
         The model to be used to describe the isotherm.
     param_guess : dict
         Starting guess for model parameters in the data fitting routine.

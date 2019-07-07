@@ -139,7 +139,7 @@ class GAB(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
-        guess = {"n_m": saturation_loading, "C": 10 * langmuir_k, "K": langmuir_k * 0.01}
+        guess = {"n_m": saturation_loading, "C": 10 * langmuir_k, "K": 0.01}
 
         for param in guess:
             if guess[param] < self.param_bounds[param][0]:

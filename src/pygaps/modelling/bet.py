@@ -213,7 +213,7 @@ class BET(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
-        guess = {"n_m": saturation_loading, "C": langmuir_k, "N": langmuir_k * 0.01}
+        guess = {"n_m": saturation_loading, "C": langmuir_k, "N": 0.01}
 
         for param in guess:
             if guess[param] < self.param_bounds[param][0]:
