@@ -20,7 +20,8 @@ Breaking changes:
 
 New features:
 
-* The isotherm branches are now saved in the JSON representation.
+* The isotherm branches are now saved in the file representation
+  (JSON, CSV, Excel).
 * Not specifying units now raises a warning.
 * After attempting a model fit or guess for the creation of a
   ModelIsotherm, a fit graph is now plotted alongside the data to

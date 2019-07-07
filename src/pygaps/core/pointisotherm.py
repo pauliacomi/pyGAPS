@@ -177,13 +177,14 @@ class PointIsotherm(Isotherm):
         Isotherm.__init__(self, **isotherm_parameters)
 
         # Deal with the isotherm branches (ads/des)
-        if branch == 'guess':
-            # Split the data in adsorption/desorption
-            self.raw_data = self._splitdata(self.raw_data, self.pressure_key)
-        elif branch == 'ads':
-            self.raw_data.insert(len(self.raw_data.columns), 'branch', False)
-        elif branch == 'des':
-            self.raw_data.insert(len(self.raw_data.columns), 'branch', True)
+        if isinstance(branch, str):
+            if branch == 'guess':
+                # Split the data in adsorption/desorption
+                self.raw_data = self._splitdata(self.raw_data, self.pressure_key)
+            elif branch == 'ads':
+                self.raw_data.insert(len(self.raw_data.columns), 'branch', False)
+            elif branch == 'des':
+                self.raw_data.insert(len(self.raw_data.columns), 'branch', True)
         else:
             try:
                 self.raw_data.insert(len(self.raw_data.columns), 'branch', branch)

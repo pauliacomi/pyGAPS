@@ -108,6 +108,7 @@ class Isotherm():
             # ignore everything except the message
             return str(msg) + '\n'
 
+        old_formatter = warnings.formatwarning
         warnings.formatwarning = custom_formatwarning
 
         for k in self._unit_params:
@@ -117,6 +118,8 @@ class Isotherm():
                     ", assumed as '{0}'".format(self._unit_params[k])
                 )
                 properties[k] = self._unit_params[k]
+
+        warnings.formatwarning = old_formatter
 
         pressure_unit = properties.pop('pressure_unit')
         pressure_mode = properties.pop('pressure_mode')
