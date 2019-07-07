@@ -10,7 +10,7 @@ the `github folder <https://github.com/pauliacomi/pyGAPS/tree/master/docs/exampl
 
 .. toctree::
     :glob:
-    :maxdepth: 1
+    :maxdepth: 2
 
     import
     characterisation

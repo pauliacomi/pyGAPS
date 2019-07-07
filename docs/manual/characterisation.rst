@@ -17,12 +17,14 @@ The framework currently provides the following functionality for material charac
     - The t-plot method :mod:`~pygaps.characterisation.tplot`
     - The :math:`\alpha_s` method :mod:`~pygaps.characterisation.alphas`
     - Pore size distribution (PSD) calculations
+
         - Mesoporous PSD calculations function :meth:`~pygaps.characterisation.psd_mesoporous.psd_mesoporous`
           with the module containing the individual model references: :mod:`pygaps.characterisation.psd_mesoporous`
         - Microporous PSD calculations function :meth:`~pygaps.characterisation.psd_microporous`
           with the module containing the individual model references: :mod:`~pygaps.characterisation.psd_microporous`
         - DFT kernel fitting PSD function :meth:`~pygaps.characterisation.psd_dft`
           with the module containing the individual model references: :mod:`~pygaps.characterisation.psd_dft`
+
     - Isosteric enthalpy of adsorption calculations :meth:`~pygaps.characterisation.isosteric_enthalpy.isosteric_enthalpy`
     - Dubinin-Radushevitch and Dubinin-Astakov plots
       (:meth:`~pygaps.characterisation.dr_da_plots.dr_plot`,
