@@ -68,8 +68,7 @@ class TestInitialHenry():
         sample = DATA['MCM-41']
         filepath = os.path.join(DATA_N77_PATH, sample['file'])
         isotherm = pygaps.isotherm_from_jsonf(filepath)
-        pygaps.initial_henry_slope(
-            isotherm, max_adjrms=0.01, verbose=True)
+        pygaps.initial_henry_slope(isotherm, verbose=True)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_ihenry_virial(self, sample):
@@ -81,7 +80,7 @@ class TestInitialHenry():
             filepath = os.path.join(DATA_N77_PATH, sample['file'])
             isotherm = pygaps.isotherm_from_jsonf(filepath)
 
-            ihenry_virial = pygaps.initial_henry_virial(isotherm, verbose=False)
+            ihenry_virial = pygaps.initial_henry_virial(isotherm)
 
             err_relative = 0.1  # 10 percent
             err_absolute = 10   #
@@ -95,5 +94,4 @@ class TestInitialHenry():
         sample = DATA['SiO2']
         filepath = os.path.join(DATA_N77_PATH, sample['file'])
         isotherm = pygaps.isotherm_from_jsonf(filepath)
-        pygaps.initial_henry_virial(
-            isotherm, max_adjrms=0.01, verbose=True)
+        pygaps.initial_henry_virial(isotherm, verbose=True)
