@@ -186,8 +186,8 @@ class Isotherm():
         if self.adsorbate.lower() not in pygaps.ADSORBATE_NAME_LIST:
             if not properties.pop('no_warn', False):
                 warnings.warn(
-                    ("Specified adsorbent is not in internal list"
-                     "(or name cannot be resolved to an existing one)."
+                    ("Specified adsorbent is not in internal list "
+                     "(or name cannot be resolved to an existing one). "
                      "CoolProp backend disabled for this adsorbent.")
                 )
         else:
@@ -202,6 +202,7 @@ class Isotherm():
         for named_prop in self._named_params:
             prop_val = properties.pop(named_prop, None)
             if prop_val:
+                print(prop_val)
                 prop_val = self._named_params[named_prop](prop_val)
                 setattr(self, named_prop, prop_val)
 
@@ -217,6 +218,7 @@ class Isotherm():
 
     @property
     def iso_id(self):
+        """Return an unique identifier of the isotherm."""
         return isotherm_to_hash(self)
 
     def __eq__(self, other_isotherm):
@@ -240,9 +242,8 @@ class Isotherm():
 
         # Required
         string += ("Material: " + str(self.material) + '\n')
-        string += ("Batch: " + str(self.material_batch) + '\n')
-        string += ("Adsorbate used: " + str(self.adsorbate) + '\n')
-        string += ("Isotherm temperature: " + str(self.temperature) + "K" + '\n')
+        string += ("Adsorbate: " + str(self.adsorbate) + '\n')
+        string += ("Temperature: " + str(self.temperature) + "K" + '\n')
 
         # Named
         for param in self._named_params:
