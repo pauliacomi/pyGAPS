@@ -101,7 +101,7 @@ class TestIsothermModels():
             numpy.array(test_values['pressure']),
             numpy.array(test_values['loading']),
         )
-        param_real = MODEL_DATA[m_name]['test_parameters']
+        # param_real = MODEL_DATA[m_name]['test_parameters']
 
         model.fit(
             numpy.array(test_values['pressure']),
