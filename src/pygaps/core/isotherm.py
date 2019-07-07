@@ -205,7 +205,6 @@ class Isotherm():
         for named_prop in self._named_params:
             prop_val = properties.pop(named_prop, None)
             if prop_val:
-                print(prop_val)
                 prop_val = self._named_params[named_prop](prop_val)
                 setattr(self, named_prop, prop_val)
 
