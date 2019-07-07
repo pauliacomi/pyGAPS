@@ -190,4 +190,4 @@ This also applies to any features which you think might benefit the project.
 I'm also more than happy to answer any questions.
 Shoot an email to
 mail( at )pauliacomi.com or find me on
-at https://www.pauliacomi.com or on `Twitter <https://twitter.com/i0_stream>`__.
+at https://pauliacomi.com or on `Twitter <https://twitter.com/i0_stream>`__.

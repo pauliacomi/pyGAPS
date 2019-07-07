@@ -4,9 +4,9 @@ The pyGAPS documentation
 
 Welcome to the documentation for the pyGAPS framework.
 
-========
-Contents
-========
+
+.. include:: ../README.rst
+
 
 .. toctree::
    :hidden:
@@ -15,21 +15,29 @@ Contents
 
 .. toctree::
    :maxdepth: 4
+   :hidden:
+   :caption: Getting started
 
-   readme
    installation
    examples/quickstart
+
+.. toctree::
+   :maxdepth: 4
+   :hidden:
+   :caption: Resources
+
    manual/index
    examples/index
    reference/index
+
+.. toctree::
+   :maxdepth: 4
+   :hidden:
+   :caption: Development
+
+   changelog
    contributing
    authors
-   changelog
+   indices
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
