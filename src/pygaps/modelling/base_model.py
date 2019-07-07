@@ -57,8 +57,8 @@ class IsothermBaseModel():
             'model': self.name,
             'rmse': self.rmse,
             'parameters': self.params,
-            'pressure_range': self.pressure_range,
-            'loading_range': self.loading_range,
+            'pressure_range': list(map(float, self.pressure_range)),
+            'loading_range': list(map(float, self.loading_range)),
         }
 
     @abc.abstractmethod
