@@ -62,13 +62,13 @@ class TestInitialHenry():
             pygaps.initial_henry_slope(
                 isotherm, max_adjrms=0.01, l_limits=[25, None])
 
-    @cleanup
-    def test_ihenry_slope_verbose(self):
-        """Test verbosity."""
-        sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
-        pygaps.initial_henry_slope(isotherm, verbose=True)
+    # @cleanup
+    # def test_ihenry_slope_verbose(self):
+    #     """Test verbosity."""
+    #     sample = DATA['MCM-41']
+    #     filepath = os.path.join(DATA_N77_PATH, sample['file'])
+    #     isotherm = pygaps.isotherm_from_jsonf(filepath)
+    #     pygaps.initial_henry_slope(isotherm, verbose=True)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_ihenry_virial(self, sample):
