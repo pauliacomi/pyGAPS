@@ -91,9 +91,8 @@ class TestIsothermModels():
             assert numpy.isclose(
                 model.spreading_pressure(p), test_values['spreading_pressure'][i], 0.001)
 
-    @pytest.mark.modelfit
     @pytest.mark.parametrize("m_name", [key for key in MODEL_DATA])
-    def test_models_fit_function(self, m_name, capsys):
+    def test_models_fit_function(self, m_name):
 
         model = models.get_isotherm_model(m_name)
         test_values = MODEL_DATA[m_name]['test_values']

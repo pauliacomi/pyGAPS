@@ -158,7 +158,7 @@ class PointIsotherm(Isotherm):
             if other_keys:
                 raise ParameterError(
                     "Cannot specify other isotherm components in this mode."
-                    " Use the ``isotherm_data`` method")
+                    " Use the ``isotherm_data`` method.")
 
             # Standard column names
             self.pressure_key = 'pressure'
