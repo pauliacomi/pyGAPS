@@ -2,12 +2,13 @@
 Changelog
 =========
 
-2.0.0 ()
+2.0.0 (2019-07-08)
 ------------------
 
-Major pyGAPS release, following peer review on related manuscript.
+Major pyGAPS release following peer review on related manuscript.
 Several breaking changes with previous codebase, in particular
 with basic isotherm parameters and module structure.
+Several function names and parameters have changed as well.
 
 Breaking changes:
 

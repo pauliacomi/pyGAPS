@@ -23,7 +23,7 @@ def read(*names, **kwargs):
 
 setup(
     name='pygaps',
-    version='1.6.1',
+    version='2.0.0',
     license='MIT license',
     description='A framework for processing adsorption data for porous materials',
     long_description='%s' % (
@@ -44,21 +44,23 @@ setup(
     zip_safe=False,
     classifiers=[
         # complete classifier list: https://pypi.org/pypi?%3Aaction=list_classifiers
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
         'Operating System :: Unix',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         # 'Programming Language :: Python :: Implementation :: PyPy3',
+        'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Physics',
     ],
     keywords=[
-        'adsorption', 'science', 'porous materials'
+        'adsorption', 'characterization', 'porous materials'
     ],
     setup_requires=[
         'pytest-runner',
