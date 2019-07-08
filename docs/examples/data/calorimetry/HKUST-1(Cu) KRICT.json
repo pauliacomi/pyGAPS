@@ -3,6 +3,12 @@
     "date": "2010-05-21 00:00:00",
     "iso_type": "Calorimetrie",
     "is_real": true,
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "enthalpy": "28.7879686051",
@@ -143,8 +149,8 @@
     "lab": "MADIREL",
     "machine": "CV",
     "material_batch": "Test",
-    "material_name": "HKUST-1(Cu)",
+    "material": "HKUST-1(Cu)",
     "t_act": 150.0,
-    "t_iso": 303.0,
+    "temperature": 303.0,
     "user": "ADW"
 }

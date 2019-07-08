@@ -1,4 +1,5 @@
 """Tests JSON parsing."""
+
 import os
 
 import pytest

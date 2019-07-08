@@ -27,8 +27,8 @@
     "pressure_mode": "relative",
     "pressure_unit": null,
     "material_batch": "mic",
-    "material_name": "Sample B",
-    "t_iso": 77.3,
+    "material": "Sample B",
+    "temperature": 77.3,
     "time": [
         93,
         99

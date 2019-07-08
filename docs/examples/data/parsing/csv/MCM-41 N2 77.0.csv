@@ -4,9 +4,9 @@ loading_basis,molar
 loading_unit,mmol
 pressure_mode,absolute
 pressure_unit,bar
-material_name,MCM-41
+material,MCM-41
 material_batch,Test
-t_iso,77.0
+temperature,77.0
 adsorbate,N2
 iso_type,Isotherme
 user,PI

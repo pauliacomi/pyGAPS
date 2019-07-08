@@ -38,11 +38,13 @@ init:
   - echo %PYTHON_VERSION% %MINICONDA%
 install:
   - powershell .\ci\appveyor-bootstrap.ps1
-  - set PATH=%CONDA_ROOT%;%CONDA_ROOT%\Scripts;%PATH%
+  - CALL "%CONDA_ROOT%\\Scripts\\activate.bat"
 
   # install our build environment
-  - cmd: conda config --set always_yes yes --set changeps1 no
-  - cmd: conda update -q conda
+  - conda config --set always_yes yes               # always yes
+  - conda config --append channels conda-forge      # add conda forge to channel list
+  - conda update -q conda                           # update (quiet)
+  - activate
 
   # get the conda info
   - cmd: conda info -a

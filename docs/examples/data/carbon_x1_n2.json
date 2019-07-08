@@ -2,6 +2,12 @@
     "adsorbate": "N2",
     "iso_type": "Isotherme",
     "is_real": true,
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
+    "adsorbent_basis": "mass",
+    "adsorbent_unit": "g",
     "isotherm_data": [
         {
             "loading": "0.510281",
@@ -531,8 +537,8 @@
     "lab": "MADIREL",
     "machine": "Triflex",
     "material_batch": "Test",
-    "material_name": "Takeda 5A",
+    "material": "Takeda 5A",
     "t_act": 200.0,
-    "t_iso": 77.355,
+    "temperature": 77.355,
     "user": "PI"
 }

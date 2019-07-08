@@ -1,13 +1,19 @@
 {
-    "material_name": "Carbon",
+    "material": "Carbon",
     "material_batch": "X1",
     "adsorbate": "nitrogen",
-    "t_iso": 303.0,
+    "temperature": 303.0,
     "iso_type": "physisorption",
     "user": "Bob",
     "machine": "homemade1",
     "t_act": 150.0,
     "lab": "local",
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "loading": "0.426869211537",

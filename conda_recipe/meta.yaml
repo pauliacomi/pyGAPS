@@ -1,0 +1,60 @@
+{% set name = "pygaps" %}
+{% set version = "2.0.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: "d18e5ee173237e719cc064ad0eab9c267769bcaa8f26e6c56606ed495effbecd"
+
+build:
+  number: 0
+  skip: True  # [py<35]
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv "
+
+requirements:
+  host:
+    - python
+    - pip
+    - numpy >=1.13
+    - scipy >=1.0.0
+    - pandas >=0.21.1
+    - matplotlib >=2.1
+    - coolprop >=6.0
+    - requests
+    - xlrd >=1.1
+    - xlwt >=1.3
+  run:
+    - python
+    - numpy >=1.13
+    - scipy >=1.0.0
+    - pandas >=0.21.1
+    - matplotlib >=2.1
+    - coolprop >=6.0
+    - requests
+    - xlrd >=1.1
+    - xlwt >=1.3
+
+test:
+  requires:
+    - pytest
+    - pytest-cov
+    - coverage
+    - nose
+  imports:
+    - pygaps
+
+about:
+  home: "https://github.com/pauliacomi/pygaps"
+  license: "MIT"
+  license_family: "MIT"
+  license_file: "LICENSE"
+  summary: "A framework for processing adsorption data for porous materials"
+  doc_url: "https://pygaps.readthedocs.io"
+  dev_url: "https://github.com/pauliacomi/pygaps"
+
+extra:
+  recipe-maintainers:
+    - pauliacomi

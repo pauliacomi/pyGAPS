@@ -2,6 +2,12 @@
     "adsorbate": "CH4",
     "iso_type": "Isotherm",
     "is_real": true,
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "loading": "4.30283490615e-05",
@@ -110,8 +116,8 @@
     ],
     "lab": "MADIREL",
     "material_batch": "Test",
-    "material_name": "MOF-5(Zn)",
+    "material": "MOF-5(Zn)",
     "t_act": 150.0,
-    "t_iso": 298.0,
+    "temperature": 298.0,
     "user": "PI"
 }

@@ -8,10 +8,10 @@ import sqlite3
 
 import pandas
 
-from ..classes.adsorbate import Adsorbate
-from ..classes.material import Material
-from ..classes.pointisotherm import Isotherm
-from ..classes.pointisotherm import PointIsotherm
+from ..core.adsorbate import Adsorbate
+from ..core.material import Material
+from ..core.pointisotherm import Isotherm
+from ..core.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.python_utilities import grouped
 from ..utilities.sqlite_utilities import build_delete

@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import numpy
 
 from .mpl_styles import LABEL_STYLE
 from .mpl_styles import TICK_STYLE
@@ -40,17 +39,19 @@ def roq_plot(pressure, roq_points, minimum, maximum,
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, roq_points,
-            marker='', color='g', label='all points')
+    ax.plot(pressure, roq_points, label='all points',
+            color='grey', marker='o', mfc='none', markersize=6,
+            markeredgewidth=1.5, linewidth=0,)
     ax.plot(pressure[minimum:maximum], roq_points[minimum:maximum],
             marker='o', linestyle='', color='r', label='chosen points')
     ax.plot(p_monolayer, roq_monolayer,
-            marker='x', linestyle='', color='black', label='monolayer point')
+            marker='X', markersize=10,
+            linestyle='', color='k', label='monolayer point')
     ax.set_title("Rouquerol plot")
-    ax.set_xlabel('p/p°')
-    ax.set_ylabel('(p/p°)/(n(1-(P/P°))')
+    ax.set_xlabel('p/p°', fontsize=15)
+    ax.set_ylabel('$n ( 1 - p/p°)$', fontsize=10)
     ax.legend(loc='best')
 
     return ax
@@ -91,10 +92,11 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, bet_points,
-            marker='', color='g')
+    ax.plot(pressure, bet_points, label='all points',
+            color='grey', marker='o', mfc='none', markersize=6,
+            markeredgewidth=1.5, linewidth=0,)
     ax.plot(pressure[minimum:maximum], bet_points[minimum:maximum],
             marker='o', linestyle='', color='r', label='chosen points')
     x_lim = [0, pressure[maximum]]
@@ -102,14 +104,15 @@ def bet_plot(pressure, bet_points, minimum, maximum,
              slope * x_lim[1] + intercept]
     ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
     ax.plot(p_monolayer, bet_monolayer,
-            marker='x', linestyle='', color='black', label='monolayer point')
+            marker='X', markersize=10,
+            linestyle='', color='k', label='monolayer point')
 
     ax.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
     ax.set_xlim(
         left=0, right=pressure[maximum] * 1.2)
     ax.set_title("BET plot")
-    ax.set_xlabel('p/p°')
-    ax.set_ylabel('(p/p°)/(n(1-(P/P°))')
+    ax.set_xlabel('p/p°', fontsize=15)
+    ax.set_ylabel('$\\frac{p/p°}{n ( 1- p/p°)}$', fontsize=15)
     ax.legend(loc='best')
 
     return ax
@@ -146,10 +149,11 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, langmuir_points,
-            marker='', color='g')
+    ax.plot(pressure, langmuir_points, label='all points',
+            color='grey', marker='o', mfc='none', markersize=6,
+            markeredgewidth=1.5, linewidth=0,)
     ax.plot(pressure[minimum:maximum], langmuir_points[minimum:maximum],
             marker='o', linestyle='', color='r', label='chosen points')
     x_lim = [0, pressure[maximum]]
@@ -161,8 +165,8 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
     ax.set_xlim(
         left=0, right=pressure[maximum] * 1.2)
     ax.set_title("Langmuir plot")
-    ax.set_xlabel('p/p°')
-    ax.set_ylabel('(p/p°)/n')
+    ax.set_xlabel('p/p°', fontsize=15)
+    ax.set_ylabel('(p/p°)/n', fontsize=15)
     ax.legend(loc='best')
 
     return ax
@@ -245,7 +249,7 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
     return ax
 
 
-def psd_plot(pore_widths, pore_dist, method=None,
+def psd_plot(pore_widths, pore_dist, pore_vol_cum=None, method=None,
              labeldiff='distribution', labelcum='cumulative',
              line_style=None, log=True, right=None, left=None, ax=None):
     """
@@ -257,6 +261,8 @@ def psd_plot(pore_widths, pore_dist, method=None,
         Array of the pore radii which will become the x axis.
     pore_dist : array
         Contribution of each pore radius which will make up the y axis.
+    pore_vol_cum : array
+        Pre-calculated cumulative value.
     method : str
         The method used. Will be a string part of the title.
     labeldiff : str
@@ -295,7 +301,7 @@ def psd_plot(pore_widths, pore_dist, method=None,
     l1 = ax.plot(pore_widths, pore_dist, label=labeldiff, **lst)
     if labelcum:
         ax2 = ax.twinx()
-        l2 = ax2.plot(pore_widths[1:], numpy.cumsum(pore_dist[1:] * numpy.diff(pore_widths)),
+        l2 = ax2.plot(pore_widths, pore_vol_cum,
                       marker='', color='r', linestyle="--", label=labelcum)
 
     # Func formatter

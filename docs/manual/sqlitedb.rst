@@ -56,11 +56,12 @@ to be used, the parameter passed should be the ``pygaps.DATABASE`` constant.
 
 There are a few types of database functions:
 
-    - :class:`~pygaps.classes.adsorbate.Adsorbate` management functions
-    - :class:`~pygaps.classes.material.Material` management functions.
-    - :class:`~pygaps.classes.pointisotherm.PointIsotherm` management functions
+    - :class:`~pygaps.core.adsorbate.Adsorbate` management functions
+    - :class:`~pygaps.core.material.Material` management functions.
+    - :class:`~pygaps.core.pointisotherm.PointIsotherm` management functions
 
-A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinterface` reference.
+A complete list of methods can be found in the
+:mod:`~pygaps.parsing.sqliteinterface` reference.
 
 .. note::
 
@@ -72,7 +73,7 @@ A complete list of methods can be found in the :mod:`~pygaps.parsing.sqliteinter
 Database example
 ----------------
 
-Check it out in the ipython notebook in the `examples <../examples/database.ipynb>`_ section
+Check out the Jupyter notebook in the `examples <../examples/database.ipynb>`_ section
 
 
 .. _sqlite-manual-creation:

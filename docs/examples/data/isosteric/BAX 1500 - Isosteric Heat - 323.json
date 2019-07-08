@@ -2,6 +2,12 @@
     "adsorbate": "C4H10",
     "iso_type": "isotherm",
     "is_real": true,
+    "pressure_mode" : "absolute",
+    "pressure_unit" : "bar",
+    "adsorbent_basis" : "mass",
+    "adsorbent_unit" : "g",
+    "loading_basis" : "molar",
+    "loading_unit" : "mmol",
     "isotherm_data": [
         {
             "loading": "0.441",
@@ -197,6 +203,6 @@
         }
     ],
     "material_batch": "TB",
-    "material_name": "TEST",
-    "t_iso": 323.15
+    "material": "TEST",
+    "temperature": 323.15
 }

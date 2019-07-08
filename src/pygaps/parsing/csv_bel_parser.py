@@ -4,13 +4,13 @@ from io import StringIO
 
 import pandas
 
-from ..classes.pointisotherm import PointIsotherm
+from ..core.pointisotherm import PointIsotherm
 
 _DATA = {
     'adsorptive': 'adsorbate',
-    'meas. temp': 't_iso',
+    'meas. temp': 'temperature',
     'sample weight': 'mass',
-    'comment1': 'material_name',
+    'comment1': 'material',
     'comment2': 'user',
     'comment3': 'comment',
     'comment4': 'exp_param',

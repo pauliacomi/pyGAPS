@@ -4,9 +4,9 @@ import ast
 
 import pandas
 
-from ..calculations.models_isotherm import get_isotherm_model
-from ..classes.modelisotherm import ModelIsotherm
-from ..classes.pointisotherm import PointIsotherm
+from ..core.modelisotherm import ModelIsotherm
+from ..core.pointisotherm import PointIsotherm
+from ..modelling import get_isotherm_model
 
 
 def _is_float(s):
@@ -87,9 +87,13 @@ def isotherm_to_csv(isotherm, path, separator=','):
             ]
             if isotherm.other_keys:
                 headings.extend(isotherm.other_keys)
-            data = isotherm.data()[headings]
 
-            file.write('data:[pressure, loading, other...]\n')
+            # also get the branch data in a regular format
+            headings.append('branch')
+            data = isotherm.data(raw=True)[headings]
+            data['branch'] = data['branch'].replace(False, 'ads').replace(True, 'des')
+
+            file.write('data:[pressure,loading,[otherdata],branch data]\n')
             data.to_csv(file, sep=separator, index=False, header=True)
 
         elif isinstance(isotherm, ModelIsotherm):
@@ -103,7 +107,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
                              for param in isotherm.model.params])
 
 
-def isotherm_from_csv(path, separator=',', branch='guess'):
+def isotherm_from_csv(path, separator=',', **isotherm_parameters):
     """
     Load an isotherm from a CSV file.
 
@@ -112,7 +116,9 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
     path : str
         Path to the file to be read.
     separator : str, optional
-        Separator used int the csv file. Defaults to '',''.
+        Separator used int the csv file. Defaults to `,`.
+    isotherm_parameters :
+        Any other options to be overridden in the isotherm creation.
 
     Returns
     -------
@@ -122,7 +128,7 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
     """
     with open(path) as file:
         line = file.readline().rstrip()
-        material_info = {}
+        raw_dict = {}
 
         while not (line.startswith('data') or line.startswith('model') or line == ""):
             values = line.split(sep=separator)
@@ -135,19 +141,30 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
                 val = _from_list(values[1])
             else:
                 val = values[1]
-            material_info.update({values[0]: val})
+            raw_dict.update({values[0]: val})
             line = file.readline().rstrip()
 
         if line.startswith('data'):
-            data_df = pandas.read_csv(file, sep=separator)
+            data = pandas.read_csv(file, sep=separator)
+
+            # process isotherm branches if they exist
+            raw_dict['branch'] = 'guess'
+            if 'branch' in data.columns:
+                raw_dict['branch'] = data['branch'].replace('ads', False).replace('des', True).values
+
+            # generate other keys
+            other_keys = [column for column in data.columns.values
+                          if column not in [data.columns[0], data.columns[1], 'branch']]
+
+            # Update dictionary with any user parameters
+            raw_dict.update(isotherm_parameters)
 
             isotherm = PointIsotherm(
-                isotherm_data=data_df,
-                branch=branch,
-                pressure_key=data_df.columns[0],
-                loading_key=data_df.columns[1],
-                other_keys=list(data_df.columns[2:]),
-                **material_info)
+                isotherm_data=data,
+                pressure_key=data.columns[0],
+                loading_key=data.columns[1],
+                other_keys=other_keys,
+                **raw_dict)
 
         if line.startswith('model'):
 
@@ -177,6 +194,9 @@ def isotherm_from_csv(path, separator=',', branch='guess'):
                 except KeyError as err:
                     raise KeyError("The CSV is missing parameter {}".format(param)) from err
 
-            isotherm = ModelIsotherm(model=new_mod, **material_info)
+            # Update dictionary with any user parameters
+            raw_dict.update(isotherm_parameters)
+
+            isotherm = ModelIsotherm(model=new_mod, **raw_dict)
 
     return isotherm

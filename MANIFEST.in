@@ -8,6 +8,7 @@ include .pylintrc
 include .cookiecutterrc
 include .editorconfig
 include .vscode/settings.json
+include conda_recipe/*.yaml
 
 include AUTHORS.rst
 include CHANGELOG.rst

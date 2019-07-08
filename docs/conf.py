@@ -61,10 +61,10 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pygaps'
-year = '2018'
+year = '2019'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '1.6.1'
+version = release = '2.0.0'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.']

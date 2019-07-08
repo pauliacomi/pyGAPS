@@ -103,7 +103,7 @@ def c_pressure(value,
             sign = -1
 
         value = value * \
-            pygaps.classes.adsorbate.Adsorbate.find(adsorbate_name).saturation_pressure(
+            pygaps.core.adsorbate.Adsorbate.find(adsorbate_name).saturation_pressure(
                 temp, unit=unit) ** sign
 
     elif unit_to and mode_from == 'absolute':
@@ -172,31 +172,31 @@ def c_loading(value,
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = pygaps.classes.adsorbate.Adsorbate.find(
+                constant = pygaps.core.adsorbate.Adsorbate.find(
                     adsorbate_name).gas_density(temp=temp)
                 sign = -1
             elif basis_to == 'molar':
-                constant = pygaps.classes.adsorbate.Adsorbate.find(
+                constant = pygaps.core.adsorbate.Adsorbate.find(
                     adsorbate_name).molar_mass()
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = pygaps.classes.adsorbate.Adsorbate.find(
+                constant = pygaps.core.adsorbate.Adsorbate.find(
                     adsorbate_name).gas_density(temp=temp)
                 sign = 1
             elif basis_to == 'molar':
-                adsorbate = pygaps.classes.adsorbate.Adsorbate.find(
+                adsorbate = pygaps.core.adsorbate.Adsorbate.find(
                     adsorbate_name)
                 constant = adsorbate.gas_density(
                     temp=temp) / adsorbate.molar_mass()
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = pygaps.classes.adsorbate.Adsorbate.find(
+                constant = pygaps.core.adsorbate.Adsorbate.find(
                     adsorbate_name).molar_mass()
                 sign = 1
             elif basis_to == 'volume':
-                adsorbate = pygaps.classes.adsorbate.Adsorbate.find(
+                adsorbate = pygaps.core.adsorbate.Adsorbate.find(
                     adsorbate_name)
                 constant = adsorbate.gas_density(
                     temp=temp) / adsorbate.molar_mass()
@@ -215,7 +215,7 @@ def c_loading(value,
 def c_adsorbent(value,
                 basis_from, basis_to,
                 unit_from, unit_to,
-                material_name=None, material_batch=None):
+                material=None, material_batch=None):
     """
     Convert adsorbent units and basis.
 
@@ -234,7 +234,7 @@ def c_adsorbent(value,
         Unit from which to convert.
     unit_from : str
         Unit to which to convert.
-    material_name : str
+    material : str
         Name of the material on which the value is based.
     material_batch : float
         Batch of the material on which the value is based.
@@ -272,32 +272,32 @@ def c_adsorbent(value,
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = pygaps.classes.material.Material.find(
-                    material_name, material_batch).get_prop('density')
+                constant = pygaps.core.material.Material.find(
+                    material, material_batch).get_prop('density')
                 sign = -1
             elif basis_to == 'molar':
-                constant = pygaps.classes.material.Material.find(
-                    material_name, material_batch).get_prop('molar_mass')
+                constant = pygaps.core.material.Material.find(
+                    material, material_batch).get_prop('molar_mass')
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = pygaps.classes.material.Material.find(
-                    material_name, material_batch).get_prop('density')
+                constant = pygaps.core.material.Material.find(
+                    material, material_batch).get_prop('density')
                 sign = 1
             elif basis_to == 'molar':
-                material = pygaps.classes.material.Material.find(
-                    material_name, material_batch)
+                material = pygaps.core.material.Material.find(
+                    material, material_batch)
                 constant = material.get_prop(
                     'density') / material.get_prop('molar_mass')
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = pygaps.classes.material.Material.find(
-                    material_name, material_batch).get_prop('molar_mass')
+                constant = pygaps.core.material.Material.find(
+                    material, material_batch).get_prop('molar_mass')
                 sign = 1
             elif basis_to == 'volume':
-                material = pygaps.classes.material.Material.find(
-                    material_name, material_batch)
+                material = pygaps.core.material.Material.find(
+                    material, material_batch)
                 constant = material.get_prop(
                     'density') / material.get_prop('molar_mass')
                 sign = -1

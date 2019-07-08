@@ -8,15 +8,21 @@ Isotherm modelling
 Overview
 --------
 
-In adsorption, a model is a physical or empirical relationship between adsorbate pressure
-and its loading. Therefore it can be expressed as a function:
+In adsorption, a model is a physical or empirical relationship
+between adsorbate pressure and its loading.
+Therefore it can be expressed as a function:
 
 .. math::
 
     n = f(p, ...)
 
-Many types of models have been developed which attempt to describe the phenomenon of adsorption.
-While none can accurately describe all situations, different behaviours, interactions and pressure
+    or
+
+    p = f(n, ...)
+
+Many types of models have been developed which attempt to
+describe the phenomenon of adsorption. While none can accurately describe
+all situations, different behaviours, interactions and pressure
 ranges, the data can be fitted reliably if a suitable model is chosen.
 
 It is left to the best judgement of the user when to apply a specific model.
@@ -27,37 +33,38 @@ It is left to the best judgement of the user when to apply a specific model.
 Modelling in pyGAPS
 -------------------
 
-In pyGAPS, the :meth:`~pygaps.classes.modelisotherm.ModelIsotherm` is the
+In pyGAPS, the :meth:`~pygaps.core.modelisotherm.ModelIsotherm` is the
 class which contains all the model parameters. While it is instantiated
-using discrete data, it does not store it directly. Another principal difference
-from the PointIsotherm class is that, while the former can contain both
-the adsorption and desorption branch of the physical isotherm, the latter
+using discrete data, it does not store it directly. Another principal
+difference from the PointIsotherm class is that, while the former can
+contain both the adsorption and desorption branch of the physical
+isotherm, the latter
 contains a model for only one branch, determined at initialisation.
 
 Currently the models implemented are:
 
-    - :mod:`~pygaps.calculations.models_isotherm.henry` - Henry
-    - :mod:`~pygaps.calculations.models_isotherm.langmuir` - Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.dslangmuir` -
+    - :mod:`~pygaps.modelling.henry` - Henry
+    - :mod:`~pygaps.modelling.langmuir` - Langmuir
+    - :mod:`~pygaps.modelling.dslangmuir` -
       Double Site Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.tslangmuir` -
+    - :mod:`~pygaps.modelling.tslangmuir` -
       Triple Site Langmuir
-    - :mod:`~pygaps.calculations.models_isotherm.bet` -
+    - :mod:`~pygaps.modelling.bet` -
       Brunnauer-Emmet-Teller (BET)
-    - :mod:`~pygaps.calculations.models_isotherm.gab` -
+    - :mod:`~pygaps.modelling.gab` -
       Guggenheim-Anderson-de Boer (GAB)
-    - :mod:`~pygaps.calculations.models_isotherm.freundlich` - Freundlich
-    - :mod:`~pygaps.calculations.models_isotherm.dr` -
+    - :mod:`~pygaps.modelling.freundlich` - Freundlich
+    - :mod:`~pygaps.modelling.dr` -
       Dubinin-Radushkevitch (DR)
-    - :mod:`~pygaps.calculations.models_isotherm.da` - Dubinin-Astakov (DA)
-    - :mod:`~pygaps.calculations.models_isotherm.quadratic` - Quadratic
-    - :mod:`~pygaps.calculations.models_isotherm.temkinapprox` -
+    - :mod:`~pygaps.modelling.da` - Dubinin-Astakov (DA)
+    - :mod:`~pygaps.modelling.quadratic` - Quadratic
+    - :mod:`~pygaps.modelling.temkinapprox` -
       Temkin Approximation
-    - :mod:`~pygaps.calculations.models_isotherm.toth` - Toth
-    - :mod:`~pygaps.calculations.models_isotherm.jensenseaton` - Jensen-Seaton
-    - :mod:`~pygaps.calculations.models_isotherm.wvst` -
+    - :mod:`~pygaps.modelling.toth` - Toth
+    - :mod:`~pygaps.modelling.jensenseaton` - Jensen-Seaton
+    - :mod:`~pygaps.modelling.wvst` -
       Wilson Vacancy Solution Theory (W-VST)
-    - :mod:`~pygaps.calculations.models_isotherm.fhvst` -
+    - :mod:`~pygaps.modelling.fhvst` -
       Flory-Huggins Vacancy Solution Theory (FH-VST)
 
 For an explanation of each model, visit its respective reference page.
@@ -70,12 +77,14 @@ See the procedure :ref:`below <modelling-custom>`.
 Working with models
 -------------------
 
-A ModelIsotherm can be created from raw values, as detailed in the :ref:`isotherms
-section <isotherms-manual-create>`. However, for most use case scenarios, the user will want
-to create a ModelIsotherm starting from a previously created PointIsotherm class.
+A ModelIsotherm can be created from raw values, as detailed
+in the :ref:`isotherms section <isotherms-manual-create>`.
+However, for most use case scenarios, the user will want
+to create a ModelIsotherm starting from a previously created
+PointIsotherm class.
 
 To do so, the class includes a specific method,
-:meth:`~pygaps.classes.modelisotherm.ModelIsotherm.from_pointisotherm`,
+:meth:`~pygaps.core.modelisotherm.ModelIsotherm.from_pointisotherm`,
 which allows a PointIsotherm to be used. An example is:
 
 ::
@@ -86,21 +95,24 @@ which allows a PointIsotherm to be used. An example is:
         model='Henry',
     )
 
-Alternatively, the ``guess_model`` parameter allows for the ModelIsotherm to attempt
-to fit some of the available models and then return the best fitting one. This mode should
-be used carefully, as there's no guarantee that the the best fitting model is the
-one with any physical significance. It it also worth noting that, since a lot of
-models may be evaluated, this option will take significantly more resources than
-simply specifying the model manually. As a consequence, some models which require
-a lot of overhead, or whose loading must be calculated numerically, such as the
+Alternatively, the ``guess_model`` parameter allows for the
+ModelIsotherm to attempt to fit some of the available models
+and then return the best fitting one. This mode should
+be used carefully, as there's no guarantee that the the best
+fitting model is the one with any physical significance.
+It it also worth noting that, since a lot of
+models may be evaluated, this option will take significantly more
+resources than simply specifying the model manually.
+As a consequence, some models which require
+a lot of overhead, such as the
 virial model, have been excluded from this option.
 
-Alternatively, the user can specify a list of models to the ``guess_model`` parameter.
-An example:
+Alternatively, the user can specify a list of models
+to the ``guess_model`` parameter. An example:
 
 ::
 
-    # Attempting all models
+    # Attempting all basic models
     model_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
         point_isotherm,
         branch='des'
@@ -111,22 +123,27 @@ An example:
     model_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
         point_isotherm,
         branch='des'
-        guess_model=['Henry', 'Langmuir', 'BET'],
+        guess_model=['Henry', 'Langmuir', 'BET', 'Virial'],
     )
 
-Once the a ModelIsotherm is generated, it can be used as a regular PointIsotherm, as
-it contains the same common methods. Some slight differences exist:
+Once the a ModelIsotherm is generated, it can be used as a regular
+PointIsotherm, as it contains the same common methods.
+Some slight differences exist:
 
-    - ModelIsotherms do not contain the ``data`` function, as they contain no data.
-      Instead the user can access the ``model.params`` property, to get a dictionary of the
+    - ModelIsotherms do not contain the ``data`` function,
+      as they contain no data.
+      Instead the user can access the ``model.params``
+      property, to get a dictionary of the
       calculated model parameters.
 
-    - The ``loading`` and ``pressure`` functions will return equidistant points over the
-      whole range of the isotherm instead of returning actual datapoints.
+    - The ``loading`` and ``pressure`` functions will return
+      equidistant points over the whole range of the isotherm
+      instead of returning actual datapoints.
 
-    - While loading is calculated directly in most cases, in others it has to be
-      computed using numerical fitting methods. Depending on the model, the minimisation
-      may or may not converge.
+    - While loading is calculated directly in most cases,
+      in others it has to be
+      computed using numerical fitting methods. Depending on
+      the model, the minimisation may or may not converge.
 
 
 .. _modelling-compare:
@@ -134,26 +151,30 @@ it contains the same common methods. Some slight differences exist:
 Comparing models and data
 -------------------------
 
-The ModelIsotherms created can easily be plotted using the same function as PointIsotherms.
-For example, to compare graphically a model and an experimental isotherm:
+The ModelIsotherms created can easily be plotted using
+the same function as PointIsotherms. For example, to graphically
+compare a model and an experimental isotherm:
 
 ::
 
     pygaps.plot_iso([model_isotherm, point_isotherm])
 
 
-One may notice that the loading is calculated at different pressure points from the PointIsotherm.
-This is done to keep the plotting function general. If the user wants the pressure points to be
+One may notice that the loading is calculated at different
+pressure points from the PointIsotherm. This is done to keep
+the plotting function general. If the user wants the pressure points to be
 identical, a separate approach is needed.
 
-First, a new PointIsotherm must be created from the ModelIsotherm. This essentially uses the
-internal model of the ModelIsotherm isotherm to calculate loading at the points the user
+First, a new PointIsotherm must be created from the ModelIsotherm.
+This essentially uses the internal model of the ModelIsotherm
+isotherm to calculate loading at the points the user
 specifies, then save them in a DataFrame. This can be achieved with the
-:meth:`~pygaps.classes.pointisotherm.PointIsotherm.from_modelisotherm` method.
+:meth:`~pygaps.core.pointisotherm.PointIsotherm.from_modelisotherm` method.
 
-The class method takes as parameters a ModelIsotherm, as well as a ``pressure_points`` keyword.
-This can be used to specify the array of points where the loading is calculated. If a
-PointIsotherm is passed instead, the loading is calculated at each of the points of the
+The class method takes as parameters a ModelIsotherm, as well as
+a ``pressure_points`` keyword. This can be used to specify the array
+of points where the loading is calculated. If a PointIsotherm is passed
+instead, the loading is calculated at each of the points of the
 isotherm.
 
 ::
@@ -179,7 +200,7 @@ isotherm.
 Modelling examples
 ------------------
 
-Check it out in the ipython notebook in the `examples <../examples/modelling.ipynb>`_ section
+Check out in Jupyter notebook in the `examples <../examples/modelling.ipynb>`_ section
 
 
 .. _modelling-custom:
@@ -187,7 +208,7 @@ Check it out in the ipython notebook in the `examples <../examples/modelling.ipy
 Custom models
 -------------
 
-Custom models can be implemented as well. In the *calculations/models_isotherm*
+Custom models can be implemented as well. In the `./modelling/`
 folder, there is a model template (`IsothermBaseModel` in *base_model.py*)
 which contains the functions which should be inherited by
 a custom model.
@@ -196,8 +217,8 @@ The things to be specified are the following:
 
     - The model name.
     - A dictionary with the model parameters names and possible bounds.
-    - A function that returns a default guess for the
-      model parameters (``default_guess()``).
+    - A function that returns an initial guess for the
+      model parameters (``initial_guess()``).
     - A fitting function that determines the model parameters
       starting from the loading and pressure data (``fit()``).
       Alternatively, the template fitting function can be used
@@ -210,8 +231,8 @@ The things to be specified are the following:
       is to be used for IAST calculations (``spreading_pressure(pressure)``).
 
 Once the model is written, it should be added to the list of usable models.
-This can be found in the *models/isotherm__init__.py* file.
+This can be found in the */pygaps/modelling/__init__.py* file.
 
 Don't forget to write some tests to make sure that the model works as
 intended. You can find the current parametrised tests in
-*tests/calculations/test_models_isotherm.py*.
+*tests/modelling/test_models_isotherm.py*.

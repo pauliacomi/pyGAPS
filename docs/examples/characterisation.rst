@@ -18,8 +18,8 @@ can be found in the :ref:`manual <characterisation-manual>`.
     alphas
     psd
     dr_da_plots
-    isostericenthalpy
-    henryc
-    initialenthalpy
+    isosteric_enthalpy
+    initial_henryc
+    initial_enthalpy
 
 

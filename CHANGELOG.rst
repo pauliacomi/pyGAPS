@@ -2,6 +2,52 @@
 Changelog
 =========
 
+2.0.0 (2019-07-08)
+------------------
+
+Major pyGAPS release following peer review on related manuscript.
+Several breaking changes with previous codebase, in particular
+with basic isotherm parameters and module structure.
+Several function names and parameters have changed as well.
+
+Breaking changes:
+
+ * Renamed isotherm parameter `t_iso` to `temperature` for clarity.
+ * Renamed isotherm parameter `material_name` to `material`.
+ * Made `material_batch` an optional parameter.
+ * Renamed the `pytest.calculations` submodule to
+   `pytest.characterisation`.
+ * Placed all isotherm models in a `pytest.modelling` submodule.
+
+New features:
+
+* The isotherm branches are now saved in the file representation
+  (JSON, CSV, Excel).
+* Not specifying units now raises a warning.
+* After attempting a model fit or guess for the creation of a
+  ModelIsotherm, a fit graph is now plotted alongside the data to
+  be modelled.
+* Added a new parameters named logy1 and logy2 to
+  set the plotting vertical axes to be logarithmic.
+* To remove the legend now set the lgd_pos to None
+
+* Pore size distribution improvements:
+
+    * Changed names of PSD functions to `psd_microporous`,
+      `psd_mesoporous` and `psd_dft`, respectively.
+    * Simplified functions for ease of use and understanding.
+    * Added cumulative pore volume to the return dictionary of all
+      psd functions.
+    * Generalized Kelvin methods (psd_mesoporous) to other
+      pore geometries, such as slit and sphere.
+    * Added a new Kelvin function, the Kelvin Kruck-Jaroniec-Sayari
+      correction (use with `kelvin_function='Kelvin-KJS'`
+    * Corrected a conversion error in the DFT fitting routing.
+    * Changed HK dictionary name OxideIon(SF) -> 'AlSiOxideIon'
+    * Added a new HK dictionary 'AlPhOxideIon'
+
+
+
 1.6.1 (2019-05-09)
 ------------------
 

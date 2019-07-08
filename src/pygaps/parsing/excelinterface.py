@@ -6,18 +6,18 @@ import pandas
 import xlrd
 import xlwt
 
-from ..calculations.models_isotherm import get_isotherm_model
-from ..classes.isotherm import Isotherm
-from ..classes.modelisotherm import ModelIsotherm
-from ..classes.pointisotherm import PointIsotherm
+from ..core.isotherm import Isotherm
+from ..core.modelisotherm import ModelIsotherm
+from ..core.pointisotherm import PointIsotherm
+from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParsingError
 from .excel_bel_parser import read_bel_report
 from .excel_mic_parser import read_mic_report
 
 _FIELDS = {
-    'material_name': {
+    'material': {
         'text': ['Material name'],
-        'name': 'material_name',
+        'name': 'material',
         'row': 0,
         'column': 0,
     },
@@ -27,9 +27,9 @@ _FIELDS = {
         'row': 1,
         'column': 0,
     },
-    't_iso': {
+    'temperature': {
         'text': ['Experiment temperature (K)'],
-        'name': 't_iso',
+        'name': 'temperature',
         'row': 2,
         'column': 0,
     },
@@ -150,12 +150,17 @@ def isotherm_to_xl(isotherm, path):
         headings = [isotherm.loading_key, isotherm.pressure_key]
         headings.extend(isotherm.other_keys)
 
+        # We also write the branch data
+        headings.append('branch')
+        data = isotherm.data(raw=True)[headings]
+        data['branch'] = data['branch'].replace(False, 'ads').replace(True, 'des')
+
         # Write all data
         for col_index, heading in enumerate(headings):
             sht.write(data_row,
                       col_index,
                       heading)
-            for row_index, datapoint in enumerate(isotherm.data()[heading]):
+            for row_index, datapoint in enumerate(data[heading]):
                 sht.write(data_row + row_index + 1,
                           col_index,
                           datapoint)
@@ -197,7 +202,7 @@ def isotherm_to_xl(isotherm, path):
     return
 
 
-def isotherm_from_xl(path, fmt=None):
+def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
     """
     Load an isotherm from an Excel file.
 
@@ -207,6 +212,8 @@ def isotherm_from_xl(path, fmt=None):
         Path to the file to be read.
     fmt : {None, 'mic', 'bel'}, optional
         The format of the import for the isotherm.
+    isotherm_parameters :
+        Any other options to be overridden in the isotherm creation.
 
     Returns
     -------
@@ -221,44 +228,43 @@ def isotherm_from_xl(path, fmt=None):
     # isotherm type
     isotype = 0
 
-    material_info = {}
-    loading_key = 'loading'
-    pressure_key = 'pressure'
-    other_keys = []
-    branch_data = 'guess'
+    raw_dict = {
+        'pressure_key': 'pressure',
+        'loading_key': 'loading',
+        'branch': 'guess',
+    }
 
     if fmt == 'mic':
         isotype = 1
-        material_info = read_mic_report(path)
-        material_info['material_batch'] = 'mic'
+        raw_dict.update(read_mic_report(path))
 
-        pressure_mode = 'relative'
-        pressure_unit = 'kPa'
-        loading_basis = 'molar'
-        adsorbent_basis = 'mass'
-        loading_unit = material_info.pop('loading_unit')
-        adsorbent_unit = material_info.pop('adsorbent_unit')
+        # Add required props
+        raw_dict['material_batch'] = 'mic'
+        raw_dict['pressure_mode'] = 'relative'
+        raw_dict['pressure_unit'] = 'kPa'
+        raw_dict['loading_basis'] = 'molar'
+        raw_dict['adsorbent_basis'] = 'mass'
 
-        experiment_data_df = pandas.DataFrame({
-            pressure_key: material_info.pop(pressure_key)['relative'],
-            loading_key: material_info.pop(loading_key),
+        data = pandas.DataFrame({
+            raw_dict['pressure_key']: raw_dict.pop(raw_dict['pressure_key'])['relative'],
+            raw_dict['loading_key']: raw_dict.pop(raw_dict['loading_key']),
         })
+
     elif fmt == 'bel':
         isotype = 1
-        material_info = read_bel_report(path)
-        material_info['material_batch'] = 'bel'
+        raw_dict.update(read_bel_report(path))
 
-        pressure_mode = 'relative'
-        pressure_unit = None
-        loading_basis = 'molar'
-        adsorbent_basis = 'mass'
-        branch_data = material_info.pop('measurement')
-        loading_unit = material_info.pop('loading_unit')
-        adsorbent_unit = material_info.pop('adsorbent_unit')
+        # Add required props
+        raw_dict['material_batch'] = 'bel'
+        raw_dict['pressure_mode'] = 'relative'
+        raw_dict['pressure_unit'] = None
+        raw_dict['loading_basis'] = 'molar'
+        raw_dict['adsorbent_basis'] = 'mass'
+        raw_dict['branch'] = raw_dict.pop('measurement')
 
-        experiment_data_df = pandas.DataFrame({
-            pressure_key: material_info.pop(pressure_key)['relative'],
-            loading_key: material_info.pop(loading_key),
+        data = pandas.DataFrame({
+            raw_dict['pressure_key']: raw_dict.pop(raw_dict['pressure_key'])['relative'],
+            raw_dict['loading_key']: raw_dict.pop(raw_dict['loading_key']),
         })
 
     else:
@@ -274,8 +280,8 @@ def isotherm_from_xl(path, fmt=None):
 
         # read the main isotherm parameters
         for field in fields:
-            material_info[field] = sht.cell(fields[field]['row'],
-                                            fields[field]['column'] + 1).value
+            raw_dict[field] = sht.cell(fields[field]['row'],
+                                       fields[field]['column'] + 1).value
 
         # find data/model limits
         type_row = fields['isotherm_data']['row']
@@ -306,11 +312,16 @@ def isotherm_from_xl(path, fmt=None):
                 headers.append(header)
                 experiment_data[header] = [sht.cell(i, header_col).value for i in range(start_row, final_row)]
                 header_col += 1
-            loading_key = headers[0]
-            pressure_key = headers[1]
-            other_keys = headers[2:]
+            data = pandas.DataFrame(experiment_data)
 
-            experiment_data_df = pandas.DataFrame(experiment_data)
+            raw_dict['loading_key'] = headers[0]
+            raw_dict['pressure_key'] = headers[1]
+            raw_dict['other_keys'] = [column for column in data.columns.values
+                                      if column not in [raw_dict['loading_key'], raw_dict['pressure_key'], 'branch']]
+
+            # process isotherm branches if they exist
+            if 'branch' in data.columns:
+                raw_dict['branch'] = data['branch'].replace('ads', False).replace('des', True).values
 
         if sht.cell(type_row, 1).value.lower().startswith('model'):
 
@@ -354,55 +365,20 @@ def isotherm_from_xl(path, fmt=None):
                     val = None
                 else:
                     val = valc.value
-                material_info[namec.value] = val
+                raw_dict[namec.value] = val
                 row_index += 1
 
         # Put data in order
-        material_info.pop('isotherm_data')                      # remove useless field
-        material_info.pop('iso_id', None)                       # make sure id is not passed
-        pressure_mode = material_info.pop('pressure_mode')
-        pressure_unit = material_info.pop('pressure_unit')
-        loading_basis = material_info.pop('loading_basis')
-        loading_unit = material_info.pop('loading_unit')
-        adsorbent_basis = material_info.pop('adsorbent_basis')
-        adsorbent_unit = material_info.pop('adsorbent_unit')
+        raw_dict.pop('isotherm_data')                      # remove useless field
+        raw_dict.pop('iso_id', None)                       # make sure id is not passed
+
+    # Update dictionary with any user parameters
+    raw_dict.update(isotherm_parameters)
 
     if isotype == 1:
-        return PointIsotherm(
-            isotherm_data=experiment_data_df,
-            loading_key=loading_key,
-            pressure_key=pressure_key,
-            other_keys=other_keys,
-
-            pressure_unit=pressure_unit,
-            pressure_mode=pressure_mode,
-            loading_basis=loading_basis,
-            loading_unit=loading_unit,
-            adsorbent_basis=adsorbent_basis,
-            adsorbent_unit=adsorbent_unit,
-            branch=branch_data,
-
-            **material_info)
+        return PointIsotherm(isotherm_data=data, **raw_dict)
 
     if isotype == 2:
-        return ModelIsotherm(
-            model=new_mod,
+        return ModelIsotherm(model=new_mod, **raw_dict)
 
-            pressure_unit=pressure_unit,
-            pressure_mode=pressure_mode,
-            loading_basis=loading_basis,
-            loading_unit=loading_unit,
-            adsorbent_basis=adsorbent_basis,
-            adsorbent_unit=adsorbent_unit,
-
-            **material_info)
-
-    return Isotherm(
-        pressure_unit=pressure_unit,
-        pressure_mode=pressure_mode,
-        loading_basis=loading_basis,
-        loading_unit=loading_unit,
-        adsorbent_basis=adsorbent_basis,
-        adsorbent_unit=adsorbent_unit,
-        **material_info
-    )
+    return Isotherm(**raw_dict)

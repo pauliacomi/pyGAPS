@@ -4,10 +4,10 @@ import json
 
 import pandas
 
-from ..calculations.models_isotherm import get_isotherm_model
-from ..classes.isotherm import Isotherm
-from ..classes.modelisotherm import ModelIsotherm
-from ..classes.pointisotherm import PointIsotherm
+from ..core.isotherm import Isotherm
+from ..core.modelisotherm import ModelIsotherm
+from ..core.pointisotherm import PointIsotherm
+from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParsingError
 from ..utilities.unit_converter import _MASS_UNITS
 from ..utilities.unit_converter import _MOLAR_UNITS
@@ -33,7 +33,7 @@ def isotherm_to_jsonf(isotherm, path):
         file.write(isotherm_to_json(isotherm))
 
 
-def isotherm_to_json(isotherm, fmt=None):
+def isotherm_to_json(isotherm):
     """
     Convert an isotherm object to a json string.
 
@@ -43,24 +43,36 @@ def isotherm_to_json(isotherm, fmt=None):
     ----------
     isotherm : Isotherm
         Isotherm to be written to json.
-    fmt : {None, 'NIST'}, optional
-        If the format is set to NIST, then the json format a specific version
-        used by the NIST database of adsorbents.
 
     Returns
     -------
     str
         A string with the json-formatted Isotherm.
-    """
 
+    """
     # Isotherm properties
     raw_dict = isotherm.to_dict()
 
     # Isotherm data
     if isinstance(isotherm, PointIsotherm):
-        isotherm_data_dict = isotherm.data().to_dict(orient='index')
-        raw_dict["isotherm_data"] = [{p: str(t) for p, t in v.items()}
-                                     for k, v in isotherm_data_dict.items()]
+
+        # we turn the raw dataframe into a dictionary
+        isotherm_data_dict = isotherm.data(raw=True).to_dict(orient='index')
+
+        def process_data(value):
+            """
+            Specifically mark only the desorption branch
+            then turn numbers into strings to avoid floating
+            point conversion issues
+            """
+            if value.get('branch', False) is False:
+                del value['branch']
+            else:
+                value['branch'] = 'des'
+            return {p: str(t) for p, t in value.items()}
+
+        raw_dict["isotherm_data"] = [process_data(v) for k, v in isotherm_data_dict.items()]
+
     elif isinstance(isotherm, ModelIsotherm):
         raw_dict["isotherm_model"] = isotherm.model.to_dict()
 
@@ -137,26 +149,31 @@ def isotherm_from_json(json_isotherm, fmt=None,
     # Parse isotherm in dictionary
     raw_dict = json.loads(json_isotherm)
 
-    # Update dictionary with passed parameters
-    raw_dict.update(isotherm_parameters)
-
     data = raw_dict.pop("isotherm_data", None)
     model = raw_dict.pop("isotherm_model", None)
 
     if data:
-        # Rename keys and get units if needed depending on format
+        # rename keys and get units if needed depending on format
         if fmt == 'NIST':
             loading_key = 'total_adsorption'
             pressure_key = 'pressure'
             raw_dict = _from_json_nist(raw_dict)
             data = _from_data_nist(data)
 
-        # Build pandas dataframe of data
+        # build pandas dataframe of data
         data = pandas.DataFrame(data, dtype='float64')
+
+        # process isotherm branches if they exist
+        raw_dict['branch'] = 'guess'
+        if 'branch' in data.columns:
+            raw_dict['branch'] = data['branch'].fillna(False).replace('des', True).values
 
         # get the other data in the json
         other_keys = [column for column in data.columns.values
-                      if column not in [loading_key, pressure_key]]
+                      if column not in [loading_key, pressure_key, 'branch']]
+
+        # Update dictionary with any user parameters
+        raw_dict.update(isotherm_parameters)
 
         # generate the isotherm
         isotherm = PointIsotherm(isotherm_data=data,
@@ -186,6 +203,10 @@ def isotherm_from_json(json_isotherm, fmt=None,
             except KeyError as err:
                 raise KeyError("The JSON is missing parameter '{0}'".format(param)) from err
 
+        # Update dictionary with any user parameters
+        raw_dict.update(isotherm_parameters)
+
+        # generate the isotherm
         isotherm = ModelIsotherm(model=new_mod, **raw_dict)
 
     else:
@@ -201,9 +222,9 @@ def _from_json_nist(raw_dict):
     nist_dict = dict()
 
     # Get regular isotherm parameters
-    nist_dict['material_name'] = raw_dict['adsorbent']['name']
+    nist_dict['material'] = raw_dict['adsorbent']['name']
     nist_dict['material_batch'] = raw_dict.pop('adsorbent')['hashkey']
-    nist_dict['t_iso'] = raw_dict.pop('temperature')
+    nist_dict['temperature'] = raw_dict.pop('temperature')
 
     # Get adsorbate
     if len(raw_dict['adsorbates']) > 1:
