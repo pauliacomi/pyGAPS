@@ -167,6 +167,7 @@ def area_BET(isotherm, limits=None, verbose=False):
         'bet_slope': slope,
         'bet_intercept': intercept,
         'corr_coef': corr_coef,
+        'limits': [minimum, maximum]
     }
 
 
