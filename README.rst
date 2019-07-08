@@ -98,29 +98,28 @@ Documentation
 =============
 
 The framework is well documented, with in-depth explanations, examples and
-theory. An `online manual <https://pygaps.readthedocs.io/>`__ is available
+theory. An `online documentation <https://pygaps.readthedocs.io/>`__ is available
 for this purpose.
-
 If you are familiar with Python and adsorption theory and want to jump right
-in, look at the `quickstart
-section <https://pygaps.readthedocs.io/en/latest/examples/quickstart.html>`__.
-Further examples on each of the capabilities specified above can be found
-in the `examples section <https://pygaps.readthedocs.io/en/latest/examples/index.html>`__.
+in, look at the `quickstart section
+<https://pygaps.readthedocs.io/en/latest/examples/quickstart.html>`__.
+Examples on each of the capabilities specified above can be found
+in the `examples <https://pygaps.readthedocs.io/en/latest/examples/index.html>`__.
 Most of the examples in the documentation are actually Jupyter Notebooks.
 You can download them and run them yourself from the
 `/docs/examples <https://github.com/pauliacomi/pyGAPS/tree/master/docs/examples>`__
 folder.
 
-It is recommended to be familiarised with the concepts introduced by pyGAPS,
+To become well familiarised with the concepts introduced by pyGAPS,
 such as what is an Isotherm, how units work, what data is required
-and can be stored etc. An in-depth presentation is written in the
-`manual section <https://pygaps.readthedocs.io/en/latest/manual/index.html>`__.
+and can be stored etc., a deep dive is available in the
+`manual <https://pygaps.readthedocs.io/en/latest/manual/index.html>`__.
 
 Finally, having a strong grasp of the science of adsorption is recommended,
 to understand the strengths and shortcomings of various methods. We have
 done our best to explain the theory and application range of each
 capability and model. To learn more, look at the
-`reference section <https://pygaps.readthedocs.io/en/latest/reference/index.html>`__
+`reference <https://pygaps.readthedocs.io/en/latest/reference/index.html>`__
 or simply call ``help()`` from a python interpreter (for example
 ``help(pygaps.area_BET)``.
 
@@ -154,7 +153,7 @@ instalation). Then use pip inside your environment.
 
 .. code-block:: bat
 
-    conda create -n myenv python=3 numpy scipy pandas matplotlib CoolProp
+    conda create -n myenv python=3 numpy scipy pandas matplotlib
     conda activate myenv
     pip install pygaps
 
@@ -176,7 +175,7 @@ Development
 
 If you want to contribute to pyGAPS or develop your own code
 from the package, check out the detailed information
-`here <https://pygaps.readthedocs.io/en/latest/contributing.html>`__.
+`here <CONTRIBUTING.rst>`__.
 
 Bugs or questions?
 ==================
@@ -186,8 +185,6 @@ For any bugs found, please open an
 submit a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__.
 It'll make my life easier.
 This also applies to any features which you think might benefit the project.
-
-I'm also more than happy to answer any questions.
-Shoot an email to
+I'm also more than happy to answer any questions. Shoot an email to
 mail( at )pauliacomi.com or find me on
 at https://pauliacomi.com or on `Twitter <https://twitter.com/i0_stream>`__.
