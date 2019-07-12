@@ -152,22 +152,4 @@ def initial_henry_virial(isotherm, verbose=False, optimization_params=None, **pl
         optimization_params=optimization_params,
         verbose=verbose
     )
-
-    if verbose:
-        model_isotherm.material = 'model'
-        try:
-            params = {
-                'plot_type': 'isotherm',
-                'branch': 'ads',
-                'logx': False,
-                'fig_title': (' '.join([isotherm.material, isotherm.material_batch])),
-                'lgd_keys': ['material', 'adsorbate', 'temperature']
-            }
-            params.update(plot_parameters)
-            plot_iso([isotherm, model_isotherm], **params)
-            plt.show()
-        except CalculationError:
-            plt.close()
-            print('Cannot plot comparison due to model instability')
-
     return model_isotherm.model.params['K']
