@@ -30,7 +30,9 @@ def psd_dft(isotherm,
             kernel='DFT-N2-77K-carbon-slit',
             branch='ads',
             bspline_order=2,
-            verbose=False):
+            kernel_units=None,
+            verbose=False,
+            ):
     """
     Calculate the pore size distribution using a DFT kernel from a PointIsotherm.
 
@@ -45,6 +47,10 @@ def psd_dft(isotherm,
     bspline_order : int
         The smoothing order of the b-splines fit to the data.
         If set to 0, data will be returned as-is.
+    kernel_units : dict
+        A dictionary of kernel basis and units, contains ``loading_basis``,
+        ``loading_unit``, ``adsorbent_basis``, ``adsorbent_unit``, ``pressure_mode``
+        and "pressure_unit". Defaults to mmol/g in relative pressure.
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
 
@@ -133,12 +139,26 @@ def psd_dft(isotherm,
     else:
         kernel_path = kernel
 
+    # Get units
+    if kernel_units is None:
+        kernel_units = {}
+
+    loading_basis = kernel_units.get('loading_basis', 'molar')
+    loading_unit = kernel_units.get('loading_unit', 'mmol')
+    adsorbent_basis = kernel_units.get('adsorbate_basis', 'mass')
+    adsorbent_unit = kernel_units.get('adsorbate_unit', 'g')
+    pressure_mode = kernel_units.get('pressure_mode', 'relative')
+    pressure_unit = kernel_units.get('pressure_unit', None)
+
     # Read data in
     loading = isotherm.loading(branch=branch,
-                               loading_basis='molar',
-                               loading_unit='mmol')
+                               loading_basis=loading_basis,
+                               loading_unit=loading_unit,
+                               adsorbent_basis=adsorbent_basis,
+                               adsorbent_unit=adsorbent_unit)
     pressure = isotherm.pressure(branch=branch,
-                                 pressure_mode='relative')
+                                 pressure_mode=pressure_mode,
+                                 pressure_unit=pressure_unit)
 
     # Call the DFT function
     pore_widths, pore_dist, pore_load_cum = psd_dft_kernel_fit(
@@ -149,12 +169,17 @@ def psd_dft(isotherm,
 
     if verbose:
         params = {
-            'plot_type': 'isotherm',
             'branch': branch,
             'logx': True,
             'fig_title': 'DFT Fit',
             'lgd_keys': ['material'],
-            'y1_line_style': dict(markersize=5, linewidth=0)
+            'y1_line_style': dict(markersize=5, linewidth=0),
+            'loading_basis': loading_basis,
+            'loading_unit': loading_unit,
+            'adsorbent_basis': adsorbent_basis,
+            'adsorbent_unit': adsorbent_unit,
+            'pressure_mode': pressure_mode,
+            'pressure_unit': pressure_unit,
         }
         ax = plot_iso(isotherm, **params)
         ax.plot(pressure, pore_load_cum, 'r-')
@@ -217,7 +242,13 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     kernel = _load_kernel(kernel_path)
 
     # generate the numpy arrays
-    kernel_points = numpy.asarray([kernel[size](pressure) for size in kernel])
+    try:
+        kernel_points = numpy.asarray([kernel[size](pressure) for size in kernel])
+    except ValueError:
+        raise CalculationError(
+            "Could not get kernel values at isotherm points. "
+            "Does your kernel pressure range apply to this isotherm?"
+        )
     pore_widths = numpy.asarray(list(kernel.keys()), dtype='float64')
 
     # define the minimization function
@@ -246,7 +277,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
 
     if not result.success:
         raise CalculationError(
-            "Minimization of DFT failed with error {}".format(result.message)
+            "Minimization of DFT failed with error: {}".format(result.message)
         )
 
     # convert from preponderance to distribution
@@ -262,7 +293,7 @@ def _load_kernel(path):
     Load a kernel from disk or from memory.
 
     Essentially takes a kernel stored as a pressure-loading
-    table, then creates a cubic interpolator for each
+    table, creates an interpolator for each
     isotherm, then stores them as a dictionary of
     pore-size keys to interpolator values.
 
@@ -295,6 +326,6 @@ def _load_kernel(path):
         kernel.update({pore_size: interpolator})
 
     # Save the kernel in memory
-    _KERNELS[path] = kernel
+    _LOADED[path] = kernel
 
     return kernel

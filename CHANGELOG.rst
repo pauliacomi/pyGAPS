@@ -2,6 +2,12 @@
 Changelog
 =========
 
+2.0.1 (2019-07-08)
+------------------
+
+ * Fixed error in dft kernel acquisition.
+ * Removed duplicate plot generation from virial initial henry.
+
 2.0.0 (2019-07-08)
 ------------------
 
