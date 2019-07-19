@@ -255,11 +255,11 @@ class Virial(IsothermBaseModel):
             print("Model {0} success, rmse is {1}".format(
                 self.name, self.rmse))
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
-            plt.plot(loading, ln_p_over_n, '.')
-            plt.plot(n_load, numpy.log(numpy.divide(self.pressure(n_load), n_load)), '-')
+            fig, ax = plt.subplots()
+            ax.plot(loading, ln_p_over_n, '.')
+            ax.plot(n_load, numpy.log(numpy.divide(self.pressure(n_load), n_load)), '-')
             if added_point:
-                plt.plot(1e-1, ln_p_over_n[0], '.r')
-            plt.title("Virial fit")
-            plt.xlabel("Loading")
-            plt.ylabel("ln(p/n)")
-            plt.show()
+                ax.plot(1e-1, ln_p_over_n[0], '.r')
+            ax.set_title("Virial fit")
+            ax.set_xlabel("Loading")
+            ax.set_ylabel("ln(p/n)")

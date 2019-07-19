@@ -1,12 +1,10 @@
 """Module calculating the initial henry constant."""
 
-import matplotlib.pyplot as plt
 import numpy
 
 from ..core.modelisotherm import ModelIsotherm
 from ..graphing.isothermgraphs import plot_iso
 from ..modelling import get_isotherm_model
-from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
 
@@ -110,22 +108,20 @@ def initial_henry_slope(isotherm,
         params.update(plot_parameters)
         henry.pressure_range = [pressure[0], pressure[:rows_taken][-1]]
         henry.loading_range = [pressure[0], loading[:rows_taken][-1]]
+
+        iso_params = isotherm.to_dict()
+        iso_params['material_batch'] = 'Henry model'
         model_isotherm = ModelIsotherm(
-            material=isotherm.material,
-            material_batch='Henry model',
-            adsorbate=isotherm.adsorbate,
-            temperature=isotherm.temperature,
-            model=henry
+            model=henry,
+            **iso_params,
         )
         plot_iso([isotherm, model_isotherm], **params)
-
-        plt.show()
 
     # return the henry constant
     return henry.params["K"]
 
 
-def initial_henry_virial(isotherm, verbose=False, optimization_params=None, **plot_parameters):
+def initial_henry_virial(isotherm, optimization_params=None, verbose=False):
     """
     Calculate an initial Henry constant based on fitting the virial equation.
 
@@ -137,8 +133,6 @@ def initial_henry_virial(isotherm, verbose=False, optimization_params=None, **pl
         Whether to print out extra information.
     optimization_params : dict
         Custom parameters to pass to SciPy.optimize.least_squares.
-    plot_parameters : dict
-        Custom parameters to pass to pygaps.plot_iso.
 
     Returns
     -------
