@@ -7,9 +7,9 @@ dependencies:
     - scipy >=1.0.0
     - pandas >=0.21.1
     - matplotlib >=2.1
-    - requests
     - xlrd >=1.1
     - xlwt >=1.3
+    - requests
 # testing
     - pytest
     - pytest-cov

@@ -1,13 +1,19 @@
+# vm image to use
 image:
 - Visual Studio 2017
-# We always use a 64-bit machine, but can build x86 distributions
-# with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
-platform:
-  - x64
+
+# version number to title
 version: '{branch}-{build}'
+
+# Not an MSBuild project
 build: off
+
+# preserve pip caches between builds
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
+
+# no need to clone entire repo
+clone_depth: 5
 
 # If required to fail fast
 # matrix:
@@ -18,10 +24,22 @@ environment:
 
   matrix:
     - PYTHON_VERSION: '3.5'
+      platform: x86
+
+    - PYTHON_VERSION: '3.5'
+      platform: x64
 
     - PYTHON_VERSION: '3.6'
+      platform: x86
+
+    - PYTHON_VERSION: '3.6'
+      platform: x64
 
     - PYTHON_VERSION: '3.7'
+      platform: x86
+
+    - PYTHON_VERSION: '3.7'
+      platform: x64
 
 # initial commands
 init:
@@ -40,9 +58,9 @@ install:
   # get the conda info
   - conda info -a
 
-  # create environment
+  # create environment with dependencies
   - conda env create -q -n testenv-%PYTHON_VERSION% -f ./conda_recipe/requirements.yaml python=%PYTHON_VERSION%
-  - activate testenv-%PYTHON_VERSION%
+  - conda activate testenv-%PYTHON_VERSION%
 
   # Now install the module
   - 'pip install -ve .'
@@ -53,7 +71,6 @@ test_script:
 
 # cleanup the environment
 after_test:
-  - conda deactivate
 
 # stuff to do on fail
 on_failure:
