@@ -41,7 +41,7 @@ install:
   - conda info -a
 
   # create environment
-  - conda create -q -n testenv-%PYTHON_VERSION% python=%PYTHON_VERSION% -f ./conda_recipe/environment.yml
+  - conda create -q -n testenv-%PYTHON_VERSION% python=%PYTHON_VERSION% -f ./conda_recipe/requirements.yaml
   - activate testenv-%PYTHON_VERSION%
 
   # Now install the module
