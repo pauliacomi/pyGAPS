@@ -151,7 +151,7 @@ environments for you. First create a new environment and use conda to
 install the dependencies (or start with one that already has a full
 instalation). Then use pip inside your environment.
 
-.. code-block:: bat
+.. code-block:: bash
 
     conda create -n myenv python=3 numpy scipy pandas matplotlib
     conda activate myenv
@@ -164,10 +164,10 @@ Then install the package with pip either in regular or developer mode.
 
     git clone https://github.com/pauliacomi/pyGAPS
 
-    // then install
+    # then install
     pip install pyGAPS/
 
-    // or developer mode
+    # or developer mode
     pip install -e pyGAPS/
 
 Development
