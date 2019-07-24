@@ -14,7 +14,7 @@ cache:
 #     fast_finish: true
 
 environment:
-    CONDA_ROOT: 'C:\Miniconda3-x64'
+  CONDA_ROOT: 'C:\Miniconda3-x64'
 
   matrix:
     - PYTHON_VERSION: '3.5'
