@@ -1,91 +1,77 @@
+# vm image to use
+image:
+- Visual Studio 2017
+
+# version number to title
 version: '{branch}-{build}'
+
+# Not an MSBuild project
 build: off
+
+# preserve pip caches between builds
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
 
-matrix:
-    fast_finish: true
+# no need to clone entire repo
+clone_depth: 5
+
+# If required to fail fast
+# matrix:
+#     fast_finish: true
 
 environment:
-  global:
-    WITH_COMPILER: 'cmd /E:ON /V:ON /C .\ci\appveyor-with-compiler.cmd'
+  CONDA_ROOT: 'C:\Miniconda3-x64'
 
   matrix:
-    - CONDA_ROOT: 'C:\Miniconda3_64'
-      PYTHON_VERSION: '3.5'
-      PYTHON_ARCH: '32'
-      CONDA_PY: '35'
+    - PYTHON_VERSION: '3.5'
+      platform: x86
 
-    - CONDA_ROOT: 'C:\Miniconda3_64'
-      PYTHON_VERSION: '3.5'
-      PYTHON_ARCH: '64'
-      CONDA_PY: '35'
+    - PYTHON_VERSION: '3.5'
+      platform: x64
 
-    - CONDA_ROOT: 'C:\Miniconda3_64'
-      PYTHON_VERSION: '3.6'
-      PYTHON_ARCH: '32'
-      CONDA_PY: '36'
+    - PYTHON_VERSION: '3.6'
+      platform: x86
 
-    - CONDA_ROOT: 'C:\Miniconda3_64'
-      PYTHON_VERSION: '3.6'
-      PYTHON_ARCH: '64'
-      CONDA_PY: '36'
+    - PYTHON_VERSION: '3.6'
+      platform: x64
 
-    - CONDA_ROOT: 'C:\Miniconda3_64'
-      PYTHON_VERSION: '3.7'
-      PYTHON_ARCH: '32'
-      CONDA_PY: '37'
+    - PYTHON_VERSION: '3.7'
+      platform: x86
 
-    - CONDA_ROOT: 'C:\Miniconda3_64'
-      PYTHON_VERSION: '3.7'
-      PYTHON_ARCH: '64'
-      CONDA_PY: '37'
+    - PYTHON_VERSION: '3.7'
+      platform: x64
 
-
-# We always use a 64-bit machine, but can build x86 distributions
-# with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
-platform:
-  - x64
-
+# initial commands
 init:
-  - echo %PYTHON_VERSION% %MINICONDA%
+  - echo %PYTHON_VERSION%
+
+# setup stage
 install:
-  - powershell .\ci\appveyor-bootstrap.ps1
-  - CALL "%CONDA_ROOT%\\Scripts\\activate.bat"
 
   # install our build environment
+  - CALL "%CONDA_ROOT%\\Scripts\\activate.bat"      # run activation script
   - conda config --set always_yes yes               # always yes
-  - conda config --append channels conda-forge      # add conda forge to channel list
   - conda update -q conda                           # update (quiet)
-  - activate
+  - conda install conda-build                       # install conda-build
 
   # get the conda info
   - conda info -a
 
-  # install required packages
-  - conda create -q -n testenv-%PYTHON_VERSION% python=%PYTHON_VERSION%
-            setuptools
-            pip
-            coverage
-            pytest>3.1
-            pytest-cov
-            numpy
-            pandas
-            scipy
-            matplotlib
-  - activate testenv-%PYTHON_VERSION%
+  # create environment with dependencies
+  - conda env create -q -n testenv-%PYTHON_VERSION% -f ./conda_recipe/requirements.yaml python=%PYTHON_VERSION%
+  - conda activate testenv-%PYTHON_VERSION%
 
-  # Now build the module
-  - '%WITH_COMPILER% pip install -ve .'
+  # Now install the module
+  - 'pip install -ve .'
 
+# actual testing performed
 test_script:
   - pytest --cov --cov-report=term-missing -vv
 
-
+# cleanup the environment
 after_test:
-  # cleanup the environment
-  - deactivate
 
+# stuff to do on fail
 on_failure:
 
 artifacts:
