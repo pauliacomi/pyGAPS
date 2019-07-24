@@ -23,45 +23,40 @@ environment:
 
     - PYTHON_VERSION: '3.7'
 
-
+# initial commands
 init:
   - echo %PYTHON_VERSION%
 
+# setup stage
 install:
 
   # install our build environment
-  - CALL "%CONDA_ROOT%\\Scripts\\activate.bat"
+  - conda init                                      # initialize
+  - CALL "%CONDA_ROOT%\\Scripts\\activate.bat"      # run activation script
   - conda config --set always_yes yes               # always yes
   - conda config --append channels conda-forge      # add conda forge to channel list
   - conda update -q conda                           # update (quiet)
+  - conda install conda-build                       # install conda-build
 
   # get the conda info
   - conda info -a
 
-  # install required packages
-  - conda create -q -n testenv-%PYTHON_VERSION% python=%PYTHON_VERSION%
-            setuptools
-            pip
-            coverage
-            pytest>3.1
-            pytest-cov
-            numpy
-            pandas
-            scipy
-            matplotlib
+  # create environment
+  - conda create -q -n testenv-%PYTHON_VERSION% python=%PYTHON_VERSION% -f ./conda_recipe/environment.yml
   - activate testenv-%PYTHON_VERSION%
 
   # Now install the module
   - 'pip install -ve .'
 
+# actual testing performed
 test_script:
   - pytest --cov --cov-report=term-missing -vv
 
-
+# cleanup the environment
 after_test:
-  # cleanup the environment
-  - CALL "%CONDA_ROOT%\\Scripts\\deactivate.bat"
+  - conda deactivate
 
+# stuff to do on fail
 on_failure:
 
 artifacts:
