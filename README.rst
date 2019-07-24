@@ -32,7 +32,7 @@ adsorption data analysis and fitting written in Python 3.
 
 .. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.6.1/develop.svg
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v2.0.0...develop
+    :target: https://github.com/pauliacomi/pygaps/compare/v2.0.1...develop
 
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
