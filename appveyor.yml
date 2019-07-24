@@ -51,7 +51,6 @@ install:
   # install our build environment
   - CALL "%CONDA_ROOT%\\Scripts\\activate.bat"      # run activation script
   - conda config --set always_yes yes               # always yes
-  - conda config --append channels conda-forge      # add conda forge to channel list
   - conda update -q conda                           # update (quiet)
   - conda install conda-build                       # install conda-build
 
