@@ -8,24 +8,20 @@ version: '{branch}-{build}'
 build: off
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
-matrix:
-    fast_finish: true
+
+# If required to fail fast
+# matrix:
+#     fast_finish: true
 
 environment:
+    CONDA_ROOT: 'C:\Miniconda3-x64'
 
   matrix:
-    - CONDA_ROOT: 'C:\Miniconda3-x64'
-      PYTHON_VERSION: '3.5'
-      CONDA_PY: '35'
+    - PYTHON_VERSION: '3.5'
 
-    - CONDA_ROOT: 'C:\Miniconda3-x64'
-      PYTHON_VERSION: '3.6'
-      CONDA_PY: '36'
+    - PYTHON_VERSION: '3.6'
 
-
-    - CONDA_ROOT: 'C:\Miniconda3-x64'
-      PYTHON_VERSION: '3.7'
-      CONDA_PY: '37'
+    - PYTHON_VERSION: '3.7'
 
 
 init:
@@ -64,7 +60,7 @@ test_script:
 
 after_test:
   # cleanup the environment
-  - deactivate
+  - CALL "%CONDA_ROOT%\\Scripts\\deactivate.bat"
 
 on_failure:
 
