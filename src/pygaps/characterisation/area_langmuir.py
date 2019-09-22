@@ -126,7 +126,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
         # Generate plot of the langmuir points chosen
         langmuir_plot(pressure,
-                      langmuir_transform(loading, pressure),
+                      langmuir_transform(pressure, loading),
                       minimum, maximum,
                       slope, intercept)
 
@@ -208,7 +208,7 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
 
     # calculate the Langmuir slope and intercept
     langmuir_array = langmuir_transform(
-        loading[minimum:maximum], pressure[minimum:maximum])
+        pressure[minimum:maximum], loading[minimum:maximum])
     slope, intercept, corr_coef = langmuir_optimisation(
         pressure[minimum:maximum], langmuir_array)
 
@@ -226,7 +226,7 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
             slope, intercept, minimum, maximum, corr_coef)
 
 
-def langmuir_transform(loading, pressure):
+def langmuir_transform(pressure, loading):
     """Langmuir transform function."""
     return pressure / loading
 
