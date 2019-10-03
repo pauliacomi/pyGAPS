@@ -126,9 +126,8 @@ or simply call ``help()`` from a python interpreter (for example
 Citing
 ======
 
-A peer-reviewed paper regarding pyGAPS is currently in the process of being
-published. In the meantime, consider citing the *preprint* if you use the
-program in your work.
+Please consider citing the related paper we published if you use
+the program in your research.
 
 Paul Iacomi, Philip L. Llewellyn, *Adsorption* (2019).
 pyGAPS: A Python-Based Framework for Adsorption Isotherm
