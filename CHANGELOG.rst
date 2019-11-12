@@ -2,6 +2,19 @@
 Changelog
 =========
 
+2.x.x (2000-00-00)
+------------------
+
+New features:
+
+ * Added fluids to database: n-pentane, n-hexane, n-octane, o-xylene, m-xylene, p-xylene,
+   cyclohexane, hydrogen sulfide and sulfur hexafluoride.
+
+Fixes:
+
+ * Converting Adsorbates to a dictionary now correctly outputs the list of aliases.
+ * Changed stored critical point molar mass values for some adsorbates.
+
 2.0.1 (2019-07-08)
 ------------------
 
