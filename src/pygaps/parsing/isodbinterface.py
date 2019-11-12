@@ -27,7 +27,7 @@ def isotherm_from_isodb(filename):
     url = r"{0}/isotherm/{1}.json".format(_ISODB_API, filename)
 
     try:
-        resp = requests.get(url, timeout=0.5)
+        resp = requests.get(url, timeout=5)
 
     except requests.exceptions.Timeout:
         warnings.warn('Connection timeout')
