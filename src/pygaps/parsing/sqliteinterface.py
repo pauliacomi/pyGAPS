@@ -820,7 +820,7 @@ def db_upload_adsorbate(path, adsorbate, overwrite=False, verbose=True, **kwargs
     """
     Uploads adsorbates to the database.
 
-    If overwrite is set to true, the isotherm is overwritten.
+    If overwrite is set to true, the adsorbate is overwritten.
     Overwrite is done based on adsorbate.name
 
     Parameters
