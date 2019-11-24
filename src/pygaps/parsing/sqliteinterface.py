@@ -386,7 +386,7 @@ def db_delete_material_property_type(path, material_prop_type, verbose=True, **k
                   'material property types', verbose)
 
 
-# ---------------------- Experiments
+# ---------------------- Isotherms
 
 
 @with_connection
@@ -921,7 +921,7 @@ def db_upload_adsorbate(path, adsorbate, overwrite=False, verbose=True, **kwargs
 
     if verbose:
         # Print success
-        print("Adsorbate uploaded", adsorbate.name)
+        print("Adsorbate uploaded: '", adsorbate.name, "'")
 
 
 @with_connection
