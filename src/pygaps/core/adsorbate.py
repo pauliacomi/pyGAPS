@@ -83,22 +83,23 @@ class Adsorbate():
 
     """
 
-    def __init__(self, name=None, alias=None, **properties):
+    def __init__(self, name=None, **properties):
         """Instantiate by passing a dictionary with the parameters."""
-        #: Adsorbate name
+        # Adsorbate name
         if name is None:
             raise ParameterError("Must provide a name for the created adsorbate.")
         self.name = name
-        #: List of aliases
-        self.alias = alias
 
-        # Generate the list of aliases
+        # List of aliases
+        alias = properties.pop('alias', None)
+
+        # Generate list of aliases
         _name = name.lower()
         if alias is None:
             self.alias = [_name]
         else:
-            alias = [a.lower() for a in alias]
-            if _name not in alias:
+            self.alias = [a.lower() for a in alias]
+            if _name not in self.alias:
                 self.alias.append(_name)
 
         #: Adsorbate properties
