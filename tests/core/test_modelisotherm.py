@@ -90,6 +90,14 @@ class TestModelIsotherm():
                 **isotherm_param
             )
 
+        # Wrong branch
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.ModelIsotherm(
+                isotherm_data=isotherm_data,
+                model='Henry',
+                branch='random',
+            )
+
         # Wrong parameters
         with pytest.raises(pygaps.ParameterError):
             pygaps.ModelIsotherm(

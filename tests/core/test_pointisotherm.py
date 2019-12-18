@@ -48,8 +48,8 @@ class TestPointIsotherm():
         iso_id = basic_pointisotherm.iso_id
         basic_pointisotherm.new_param = 'changed'
         assert iso_id != basic_pointisotherm.iso_id
-        # basic_pointisotherm.raw_data = basic_pointisotherm.raw_data[:5]
-        # assert iso_id != basic_pointisotherm.iso_id
+        basic_pointisotherm.raw_data = basic_pointisotherm.raw_data[:5]
+        assert iso_id != basic_pointisotherm.iso_id
 
     @pytest.mark.parametrize('missing_key',
                              ['loading_key', 'pressure_key'])
@@ -128,14 +128,14 @@ class TestPointIsotherm():
             basic_modelisotherm,
             pressure_points=None
         )
-        assert isotherm.loading_at(3) == basic_modelisotherm.loading_at(3)
+        assert isotherm.loading_at(3) == pytest.approx(basic_modelisotherm.loading_at(3))
 
         # Specifying points
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
             basic_modelisotherm,
             pressure_points=[1, 2, 3, 4]
         )
-        assert isotherm.loading_at(3) == basic_modelisotherm.loading_at(3)
+        assert isotherm.loading_at(3) == pytest.approx(basic_modelisotherm.loading_at(3))
 
         # Specifying isotherm
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
@@ -143,7 +143,7 @@ class TestPointIsotherm():
             pressure_points=basic_pointisotherm
         )
 
-        assert isotherm.loading_at(3) == basic_modelisotherm.loading_at(3)
+        assert isotherm.loading_at(3) == pytest.approx(basic_modelisotherm.loading_at(3))
 
 ##########################
     def test_isotherm_ret_has_branch(self, basic_pointisotherm):

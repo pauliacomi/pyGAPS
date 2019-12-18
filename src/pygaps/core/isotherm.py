@@ -2,7 +2,7 @@
 
 import warnings
 
-import pandas
+import numpy
 
 import pygaps
 
@@ -279,25 +279,26 @@ class Isotherm():
         return parameter_dict
 
     # Figure out the adsorption and desorption branches
-    def _splitdata(self, _data, pressure_key):
+    def _splitdata(self, data, pressure_key):
         """
-        Splits isotherm data into an adsorption and desorption part and
-        adds a column to mark the transition between the two.
+        Split isotherm data into an adsorption and desorption part and
+        return a column which marks the transition between the two.
         """
-        # Get a column where all increasing are False and all decreasing are True
-        increasing = _data.loc[:, pressure_key].diff().fillna(0) < 0
-        # Get the first inflexion point (assume where des starts)
-        inflexion = increasing.idxmax()
+        # Generate array
+        split = numpy.array([False for p in range(0, len(data.index))])
 
-        # If there is an inflexion point
-        if inflexion != _data.index[0]:
-            # If the first point is where the isotherm starts decreasing
-            # Then it is a complete desorption curve
-            if inflexion == _data.index[1]:
+        # Get the maximum pressure point (assume where desorption starts)
+        inflexion = data.index.get_loc(data[pressure_key].idxmax()) + 1
+
+        # If the maximum is not the last point
+        if inflexion != len(split):
+
+            # If the first point is the maximum, then it is purely desorption
+            if inflexion == data.index[0]:
                 inflexion = 0
 
             # Set all instances after the inflexion point to True
-            increasing[inflexion:] = True
+            split[inflexion:] = True
 
         # Return the new array with the branch column
-        return pandas.concat([_data, increasing.rename('branch')], axis=1)
+        return split

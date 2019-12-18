@@ -2,6 +2,20 @@
 Changelog
 =========
 
+2.1.0 (2019-xx-xx)
+------------------
+
+New features:
+
+ * Perform isotherm branch separation based on maximum pressure,
+   rather than first derivative. In such way, slight uncertainty
+   in pressures won't lead to a wrong assignment.
+
+Fixes:
+
+ * ModelIsotherm creation could in some cases ignore isotherm branch
+   splitting.
+
 2.0.2 (2019-12-18)
 ------------------
 
