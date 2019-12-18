@@ -56,7 +56,7 @@ adsorption data analysis and fitting written in Python 3.
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/pauliacomi/pygaps.svg
     :alt: Coverage Status
-    :target: https://codecov.io/github/pauliacomi/pygaps
+    :target: https://codecov.io/gh/pauliacomi/pyGAPS
 
 .. |version| image:: https://img.shields.io/pypi/v/pygaps.svg
     :alt: PyPI Package latest release
