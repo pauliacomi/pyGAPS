@@ -8,4 +8,8 @@ pytest --cov --cov-report xml:coverage.xml
 ## Increase version
 bumpversion major/minor/patch
 
-##
+## Finish branch
+git flow release finish x.y.z
+
+## Push, including tags
+git push --tags
