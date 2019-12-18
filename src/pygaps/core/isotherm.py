@@ -64,16 +64,18 @@ class Isotherm():
     ``material``, ``temperature', ``adsorbate``.
     """
 
+    # strictly required attributes
     _required_params = [
         'material',
         'temperature',
         'adsorbate'
     ]
+    # specific attributes which are named
     _named_params = {
         'iso_type': str,
         'material_batch': str,
     }
-
+    # unit-related attributes
     _unit_params = {
         'pressure_unit': 'bar',
         'pressure_mode': 'absolute',
@@ -82,10 +84,12 @@ class Isotherm():
         'loading_unit': 'mmol',
         'loading_basis': 'molar',
     }
-
+    # attributes which will not be in the output
+    # subclasses overwrite this
     _reserved_params = []
-
+    # attributes which are kept in the database
     _db_columns = ['id'] + _required_params + list(_named_params)
+    # attributes which are used in the ID hash procedure
     _id_params = _required_params + list(_unit_params)
 
 ##########################################################
