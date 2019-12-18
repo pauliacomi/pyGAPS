@@ -13,7 +13,7 @@ class JensenSeaton(IsothermBaseModel):
 
     .. math::
 
-        n(p) = K p \Big(1 + \frac{K p}{(a (1 + b p))^c}\Big)^{(-1/c)}
+        n(p) = K p \Big[1 + \Big(\frac{K p}{(a (1 + b p)}\Big)^c\Big]^{-1/c}
 
     Notes
     -----

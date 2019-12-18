@@ -236,7 +236,7 @@ def _from_json_nist(raw_dict):
     comp = loading_string.split('/')
     if len(comp) != 2:
         raise ParsingError(
-            "Isotherm cannot be parsed due to loading string format")
+            "Isotherm cannot be parsed due to loading string format.")
 
     loading_unit = comp[0]
     if loading_unit in _MOLAR_UNITS:
@@ -246,7 +246,7 @@ def _from_json_nist(raw_dict):
     elif loading_unit in _VOLUME_UNITS:
         loading_basis = 'volume'
     else:
-        raise ParsingError("Isotherm cannot be parsed due to loading unit")
+        raise ParsingError("Isotherm cannot be parsed due to loading unit.")
 
     adsorbent_unit = comp[1]
     if adsorbent_unit in _MASS_UNITS:
@@ -256,7 +256,7 @@ def _from_json_nist(raw_dict):
     elif adsorbent_unit in _MOLAR_UNITS:
         adsorbent_basis = "molar"
     else:
-        raise ParsingError("Isotherm cannot be parsed due to adsorbent basis")
+        raise ParsingError("Isotherm cannot be parsed due to adsorbent basis.")
 
     # Get pressure mode and unit
     pressure_mode = "absolute"
@@ -265,7 +265,7 @@ def _from_json_nist(raw_dict):
     if pressure_string in _PRESSURE_UNITS:
         pressure_unit = pressure_string
     else:
-        raise ParsingError("Isotherm cannot be parsed due to pressure unit")
+        raise ParsingError("Isotherm cannot be parsed due to pressure unit.")
 
     # Add all the rest of the parameters
     nist_dict['iso_type'] = raw_dict.pop('category')      # exp/sim/mod/qua

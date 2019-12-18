@@ -32,27 +32,28 @@ class Adsorbate():
 
     Other Parameters
     ----------------
-    formula : str
-        A chemical formula for the adsorbate in the form He/N2/CO etc.
     alias : list
-        Other names that the adsorbate might be used as.
-        Example: name=propanol, alias=['1-propanol']
+        Other names the same adsorbate might take.
+        Example: name=propanol, alias=['1-propanol'].
+        pyGAPS disregards capitalisation (Propanol = propanol = PROPANOL).
+    formula : str
+        A chemical formula for the adsorbate in LaTeX form: He/N_{2}/C_{2}H_{4} etc.
     backend_name : str
         Used for integration with CoolProp/REFPROP. For a list of names
         look at the CoolProp `list of fluids
         <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
     molar_mass : float
-        A user-provided value for the molar mass.
+        Custom value for molar mass (otherwise obtained through CoolProp).
     saturation_pressure : float
-        A user-provided value for the saturation pressure.
+        Custom value for saturation pressure (otherwise obtained through CoolProp).
     surface_tension : float
-        A user-provided value for the surface tension.
+        Custom value for surface tension (otherwise obtained through CoolProp).
     liquid_density : float
-        A user-provided value for the liquid density.
+        Custom value for liquid density (otherwise obtained through CoolProp).
     gas_density : float
-        A user-provided value for the gas density.
+        Custom value for gas density (otherwise obtained through CoolProp).
     enthalpy_liquefaction : float
-        A user-provided value for the enthalpy of liquefaction.
+        Custom value for enthalpy of liquefaction (otherwise obtained through CoolProp).
 
     Notes
     -----
@@ -82,20 +83,23 @@ class Adsorbate():
 
     """
 
-    def __init__(self, name, alias=None, **properties):
+    def __init__(self, name=None, **properties):
         """Instantiate by passing a dictionary with the parameters."""
-        #: Adsorbate name
+        # Adsorbate name
+        if name is None:
+            raise ParameterError("Must provide a name for the created adsorbate.")
         self.name = name
-        #: List of aliases
-        self.alias = alias
 
-        # Generate the list of aliases
+        # List of aliases
+        alias = properties.pop('alias', None)
+
+        # Generate list of aliases
         _name = name.lower()
         if alias is None:
             self.alias = [_name]
         else:
-            alias = [a.lower() for a in alias]
-            if _name not in alias:
+            self.alias = [a.lower() for a in alias]
+            if _name not in self.alias:
                 self.alias.append(_name)
 
         #: Adsorbate properties
@@ -211,6 +215,7 @@ class Adsorbate():
         """
         parameters_dict = {
             'name': self.name,
+            'alias': self.alias,
         }
         parameters_dict.update(self.properties)
 

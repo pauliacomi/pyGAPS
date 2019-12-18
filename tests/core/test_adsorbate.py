@@ -13,16 +13,24 @@ class TestAdsorbate():
 
     def test_adsorbate_basic(self):
         """Basic creation tests."""
+        with pytest.raises(pygaps.ParameterError):
+            ads = pygaps.Adsorbate()
         ads = pygaps.Adsorbate('Test')
         assert ads == 'Test'
         assert ads == 'test'
-        ads = pygaps.Adsorbate('Test', alias=['test2'])
-        assert ads == 'test2'
         assert repr(ads) == 'Test'
         assert str(ads) == 'Test'
-        assert hash(ads) == hash('Test')
         assert ads + '2' == 'Test2'
         assert 'i' + ads == 'iTest'
+        assert hash(ads) == hash('Test')
+
+    def test_adsorbate_alias(self):
+        """Aliasing tests."""
+        ads = pygaps.Adsorbate(name='Test', alias=['Test2'])
+        assert ads == 'TEST'
+        assert ads == 'test2'
+        assert ads == 'Test2'
+        assert all([True if alias in ads.alias else False for alias in ['test', 'test2']])
 
     def test_adsorbate_create(self, adsorbate_data, basic_adsorbate):
         """Check adsorbate can be created from test data."""

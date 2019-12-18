@@ -110,7 +110,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
     # use the langmuir function
     (langmuir_area, langmuir_const, n_monolayer, slope,
      intercept, minimum, maximum, corr_coef) = area_langmuir_raw(
-        loading, pressure, cross_section, limits=limits)
+        pressure, loading, cross_section, limits=limits)
 
     if verbose:
 
@@ -126,7 +126,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
         # Generate plot of the langmuir points chosen
         langmuir_plot(pressure,
-                      langmuir_transform(loading, pressure),
+                      langmuir_transform(pressure, loading),
                       minimum, maximum,
                       slope, intercept)
 
@@ -141,7 +141,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
     }
 
 
-def area_langmuir_raw(loading, pressure, cross_section, limits=None):
+def area_langmuir_raw(pressure, loading, cross_section, limits=None):
     """
     Calculate Langmuir-determined surface area.
 
@@ -151,10 +151,10 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
 
     Parameters
     ----------
-    loading : array
-        Loadings, in mol/basis.
     pressure : array
         Pressures, relative.
+    loading : array
+        Loadings, in mol/basis.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
     limits : [float, float], optional
@@ -208,7 +208,7 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
 
     # calculate the Langmuir slope and intercept
     langmuir_array = langmuir_transform(
-        loading[minimum:maximum], pressure[minimum:maximum])
+        pressure[minimum:maximum], loading[minimum:maximum])
     slope, intercept, corr_coef = langmuir_optimisation(
         pressure[minimum:maximum], langmuir_array)
 
@@ -226,7 +226,7 @@ def area_langmuir_raw(loading, pressure, cross_section, limits=None):
             slope, intercept, minimum, maximum, corr_coef)
 
 
-def langmuir_transform(loading, pressure):
+def langmuir_transform(pressure, loading):
     """Langmuir transform function."""
     return pressure / loading
 

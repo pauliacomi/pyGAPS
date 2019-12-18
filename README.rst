@@ -30,9 +30,9 @@ adsorption data analysis and fitting written in Python 3.
     :target: https://www.repostatus.org/#active
     :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v1.6.1/develop.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v2.0.2/develop.svg
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v2.0.1...develop
+    :target: https://github.com/pauliacomi/pygaps/compare/v2.0.2...develop
 
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
@@ -56,7 +56,7 @@ adsorption data analysis and fitting written in Python 3.
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/pauliacomi/pygaps.svg
     :alt: Coverage Status
-    :target: https://codecov.io/github/pauliacomi/pygaps
+    :target: https://codecov.io/gh/pauliacomi/pyGAPS
 
 .. |version| image:: https://img.shields.io/pypi/v/pygaps.svg
     :alt: PyPI Package latest release
@@ -126,14 +126,13 @@ or simply call ``help()`` from a python interpreter (for example
 Citing
 ======
 
-A peer-reviewed paper regarding pyGAPS is currently in the process of being
-published. In the meantime, consider citing the *preprint* if you use the
-program in your work.
+Please consider citing the related paper we published if you use
+the program in your research.
 
-Paul Iacomi, Philip L. Llewellyn, 2019.
+Paul Iacomi, Philip L. Llewellyn, *Adsorption* (2019).
 pyGAPS: A Python-Based Framework for Adsorption Isotherm
 Processing and Material Characterisation.
-https://doi.org/10.26434/chemrxiv.7970402.v1
+DOI: https://doi.org/10.1007/s10450-019-00168-5
 
 Installation
 ============
@@ -187,4 +186,4 @@ It'll make my life easier.
 This also applies to any features which you think might benefit the project.
 I'm also more than happy to answer any questions. Shoot an email to
 mail( at )pauliacomi.com or find me on
-at https://pauliacomi.com or on `Twitter <https://twitter.com/i0_stream>`__.
+at https://pauliacomi.com or on `Twitter <https://twitter.com/iacomip>`__.

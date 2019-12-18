@@ -41,6 +41,7 @@ environment:
     - PYTHON_VERSION: '3.7'
       platform: x64
 
+
 # initial commands
 init:
   - echo %PYTHON_VERSION%

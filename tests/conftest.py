@@ -153,6 +153,7 @@ def adsorbate_data():
     """Create a dict with all data for an model adsorbate."""
     return {
         'name': 'TA',
+        'alias': ['ta'],
         'formula': 'TA21',
 
         'backend_name': 'nitrogen',
