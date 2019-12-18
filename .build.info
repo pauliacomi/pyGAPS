@@ -8,9 +8,4 @@ pytest --cov --cov-report xml:coverage.xml
 ## Increase version
 bumpversion major/minor/patch
 
-## Clean things from ancient builds
-rm -rf build
-rm -rf src/*.egg-info
-
-## Build sdist and wheels
-python setup.py clean --all sdist bdist_wheel
+##
