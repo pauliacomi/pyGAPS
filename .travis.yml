@@ -82,6 +82,10 @@ jobs:
       dist: xenial
       env:
         - TOXENV=py37-cover,report,codecov
+    - stage: test
+      python: '3.8'
+      env:
+        - TOXENV=py38-cover,report,codecov
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.7'     # specify python 3.7
