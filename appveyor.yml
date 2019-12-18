@@ -41,12 +41,6 @@ environment:
     - PYTHON_VERSION: '3.7'
       platform: x64
 
-    - PYTHON_VERSION: '3.8'
-      platform: x86
-
-    - PYTHON_VERSION: '3.8'
-      platform: x64
-
 
 # initial commands
 init:

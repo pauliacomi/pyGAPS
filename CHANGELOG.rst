@@ -15,10 +15,6 @@ Fixes:
  * Converting Adsorbates to a dictionary now correctly outputs the list of aliases.
  * Changed stored critical point molar mass values for some adsorbates.
 
-Other:
-
- * Python 3.8 aproned.
-
 2.0.1 (2019-07-08)
 ------------------
 
