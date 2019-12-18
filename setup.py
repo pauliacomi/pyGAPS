@@ -23,7 +23,7 @@ def read(*names, **kwargs):
 
 setup(
     name='pygaps',
-    version='2.0.1',
+    version='2.0.2',
     license='MIT license',
     description='A framework for processing adsorption data for porous materials',
     long_description='%s' % (
