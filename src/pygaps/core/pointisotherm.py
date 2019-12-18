@@ -183,6 +183,8 @@ class PointIsotherm(Isotherm):
                 self.raw_data['branch'] = False
             elif branch == 'des':
                 self.raw_data['branch'] = True
+            else:
+                raise ParameterError("Isotherm branch parameter must be 'guess ,'ads' or 'des'")
         else:
             try:
                 self.raw_data.insert(len(self.raw_data.columns), 'branch', branch)

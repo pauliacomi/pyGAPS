@@ -42,6 +42,15 @@ class TestPointIsotherm():
             **isotherm_param
         )
 
+        # Wrong branch
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.PointIsotherm(
+                pressure=pressure,
+                loading=loading,
+                branch='random',
+                **isotherm_param
+            )
+
     def test_isotherm_id(self, basic_pointisotherm):
         "Checks isotherm id works as intended"
 
