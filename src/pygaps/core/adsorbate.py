@@ -126,7 +126,7 @@ class Adsorbate():
         if isinstance(other, Adsorbate):
             other = other.name
         else:
-            other = other.lower()
+            other = str(other).lower()
         return self.name == other or other in self.alias
 
     def __add__(self, other):

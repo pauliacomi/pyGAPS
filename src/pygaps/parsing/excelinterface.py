@@ -241,7 +241,7 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         # Add required props
         raw_dict['material_batch'] = 'mic'
         raw_dict['pressure_mode'] = 'relative'
-        raw_dict['pressure_unit'] = 'kPa'
+        raw_dict['pressure_unit'] = None
         raw_dict['loading_basis'] = 'molar'
         raw_dict['adsorbent_basis'] = 'mass'
 

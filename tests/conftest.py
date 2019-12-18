@@ -83,8 +83,7 @@ def isotherm_data():
 @pytest.fixture(scope='function')
 def basic_isotherm(isotherm_parameters):
     """Create a basic isotherm from basic data."""
-    return pygaps.core.isotherm.Isotherm(
-        no_warn=True, **isotherm_parameters)
+    return pygaps.core.isotherm.Isotherm(**isotherm_parameters)
 
 
 @pytest.fixture(scope='function')
@@ -95,7 +94,6 @@ def basic_pointisotherm(isotherm_data, isotherm_parameters):
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         other_keys=[OTHER_KEY],
-        no_warn=True,
         **isotherm_parameters
     )
 
@@ -108,7 +106,6 @@ def basic_modelisotherm(isotherm_data, isotherm_parameters):
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         model="Henry",
-        no_warn=True,
         **isotherm_parameters
     )
 

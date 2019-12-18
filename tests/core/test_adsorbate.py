@@ -47,6 +47,9 @@ class TestAdsorbate():
         with pytest.raises(pygaps.ParameterError):
             pygaps.Adsorbate.find('noname')
 
+        with pytest.raises(pygaps.ParameterError):
+            pygaps.Adsorbate.find(2)
+
     def test_adsorbate_find_equals(self):
         """Check standard adsorbates can be found."""
         ads = pygaps.Adsorbate.find('N2')

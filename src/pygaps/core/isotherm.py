@@ -97,12 +97,31 @@ class Isotherm():
         as well as the info about units, modes and data columns.
 
         """
-        # Checks
+        # Must-have properties of the isotherm
+        #
+        # Basic checks
         if any(k not in properties
                for k in self._required_params):
             raise ParameterError(
                 "Isotherm MUST have the following properties:{0}".format(self._required_params))
 
+        #: Isotherm material name.
+        self.material = str(properties.pop('material'))
+        #: Isotherm experimental temperature.
+        self.temperature = float(properties.pop('temperature'))
+        #: Isotherm adsorbate.
+        self.adsorbate = properties.pop('adsorbate')
+        try:
+            self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
+        except pygaps.ParameterError:
+            warnings.warn(
+                ("Specified adsorbent is not in internal list "
+                    "(or name cannot be resolved to an existing one). "
+                    "CoolProp backend disabled for this adsorbent.")
+            )
+
+        # Isotherm units
+        #
         # We create a custom warning format that only displays the message.
         def custom_formatwarning(msg, *args, **kwargs):
             # ignore everything except the message
@@ -121,98 +140,62 @@ class Isotherm():
 
         warnings.formatwarning = old_formatter
 
-        pressure_unit = properties.pop('pressure_unit')
-        pressure_mode = properties.pop('pressure_mode')
-        adsorbent_unit = properties.pop('adsorbent_unit')
-        adsorbent_basis = properties.pop('adsorbent_basis')
-        loading_unit = properties.pop('loading_unit')
-        loading_basis = properties.pop('loading_basis')
+        self.pressure_mode = properties.pop('pressure_mode', None)
+        self.pressure_unit = properties.pop('pressure_unit', None)
+        if self.pressure_mode == 'relative':
+            self.pressure_unit = None
+        self.adsorbent_basis = properties.pop('adsorbent_basis', None)
+        self.adsorbent_unit = properties.pop('adsorbent_unit', None)
+        self.loading_basis = properties.pop('loading_basis', None)
+        self.loading_unit = properties.pop('loading_unit', None)
 
-        if adsorbent_basis is None or adsorbent_basis not in _MATERIAL_MODE:
+        # Check basis
+        if self.adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for adsorbent ({0}) is not an option."
-                "See viable values: {1}".format(adsorbent_basis, list(_MATERIAL_MODE.keys())))
+                "See viable values: {1}".format(self.adsorbent_basis, list(_MATERIAL_MODE.keys())))
 
-        if loading_basis is None or loading_basis not in _MATERIAL_MODE:
+        if self.loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 "Basis selected for loading ({}) is not an option. See viable "
-                "values: {}".format(loading_basis, list(_MATERIAL_MODE.keys())))
+                "values: {}".format(self.loading_basis, list(_MATERIAL_MODE.keys())))
 
-        if pressure_mode is None or pressure_mode not in _PRESSURE_MODE:
+        if self.pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
                 "Mode selected for pressure ({}) is not an option. See viable "
-                "values: {}".format(pressure_mode, list(_PRESSURE_MODE.keys())))
+                "values: {}".format(self.pressure_mode, list(_PRESSURE_MODE.keys())))
 
-        # Units
-        if loading_unit is None or loading_unit not in _MATERIAL_MODE[loading_basis]:
+        # Check units
+        if self.loading_unit not in _MATERIAL_MODE[self.loading_basis]:
             raise ParameterError(
                 "Unit selected for loading ({}) is not an option. See viable "
-                "values: {}".format(loading_unit, list(_MATERIAL_MODE[loading_basis].keys())))
+                "values: {}".format(self.loading_unit, list(_MATERIAL_MODE[self.loading_basis].keys())))
 
-        if pressure_mode == 'absolute' and pressure_unit not in _PRESSURE_UNITS:
+        if self.pressure_mode == 'absolute' and self.pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
                 "Unit selected for pressure ({}) is not an option. See viable "
-                "values: {}".format(pressure_unit, list(_PRESSURE_UNITS.keys())))
+                "values: {}".format(self.pressure_unit, list(_PRESSURE_UNITS.keys())))
 
-        if adsorbent_unit is None or adsorbent_unit not in _MATERIAL_MODE[adsorbent_basis]:
+        if self.adsorbent_unit not in _MATERIAL_MODE[self.adsorbent_basis]:
             raise ParameterError(
                 "Unit selected for adsorbent ({}) is not an option. See viable "
-                "values: {}".format(adsorbent_unit, list(_MATERIAL_MODE[loading_basis].keys())))
+                "values: {}".format(self.adsorbent_unit, list(_MATERIAL_MODE[self.loading_basis].keys())))
 
-        #: Basis for the adsorbent.
-        self.adsorbent_basis = str(adsorbent_basis)
-        #: Unit for the adsorbent.
-        self.adsorbent_unit = str(adsorbent_unit)
-        #: Basis for the loading.
-        self.loading_basis = str(loading_basis)
-        #: Units for loading.
-        self.loading_unit = str(loading_unit)
-        #: Mode for the pressure.
-        self.pressure_mode = str(pressure_mode)
-        if self.pressure_mode == 'relative':
-            #: Units for pressure.
-            self.pressure_unit = None
-        else:
-            #: Units for pressure.
-            self.pressure_unit = str(pressure_unit)
+        # Other named properties of the isotherm
 
-        # Must-have properties of the isotherm
-        #
-
-        #: Isotherm material name.
-        self.material = str(properties.pop('material'))
-        #: Isotherm experimental temperature.
-        self.temperature = float(properties.pop('temperature'))
-        #: Isotherm adsorbate used.
-        self.adsorbate = str(properties.pop('adsorbate'))
-
-        if self.adsorbate.lower() not in pygaps.ADSORBATE_NAME_LIST:
-            if not properties.pop('no_warn', False):
-                warnings.warn(
-                    ("Specified adsorbent is not in internal list "
-                     "(or name cannot be resolved to an existing one). "
-                     "CoolProp backend disabled for this adsorbent.")
-                )
-        else:
-            self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
-
-        # Named properties of the isotherm
-
-        # Isotherm material batch.
+        # Isotherm material batch, deprecated.
         self.material_batch = str(properties.pop('material_batch', None))
 
         # Others
         for named_prop in self._named_params:
             prop_val = properties.pop(named_prop, None)
             if prop_val:
-                prop_val = self._named_params[named_prop](prop_val)
-                setattr(self, named_prop, prop_val)
+                setattr(self, named_prop, self._named_params[named_prop](prop_val))
 
         # Save the rest of the properties as members
-        #: Other properties of the isotherm.
         for attr in properties:
             if hasattr(self, attr):
-                raise ParameterError("Cannot override standard class member '{}'".format(attr))
+                raise ParameterError("Cannot override standard Isotherm class member '{}'".format(attr))
             setattr(self, attr, properties[attr])
 
     ##########################################################
@@ -287,8 +270,7 @@ class Isotherm():
 
         # Remove reserved parameters
         for param in self._reserved_params:
-            if param in parameter_dict:
-                parameter_dict.pop(param, None)
+            parameter_dict.pop(param, None)
 
         return parameter_dict
 
