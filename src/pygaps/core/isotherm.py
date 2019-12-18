@@ -279,7 +279,8 @@ class Isotherm():
         return parameter_dict
 
     # Figure out the adsorption and desorption branches
-    def _splitdata(self, data, pressure_key):
+    @staticmethod
+    def _splitdata(data, pressure_key):
         """
         Split isotherm data into an adsorption and desorption part and
         return a column which marks the transition between the two.
