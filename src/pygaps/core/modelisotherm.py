@@ -127,24 +127,25 @@ class ModelIsotherm(Isotherm):
                     "Pass loading_key and pressure_key, the names of the loading and"
                     " pressure columns in the DataFrame, to the constructor.")
 
+            data = isotherm_data.copy()
             # If branch column is already set
-            if 'branch' in isotherm_data.columns:
-                data = isotherm_data
-            else:
-                data = self._splitdata(isotherm_data, pressure_key)
+            if 'branch' not in isotherm_data.columns:
+                data['branch'] = self._splitdata(data, pressure_key)
 
             if branch == 'ads':
                 data = data.loc[~data['branch']]
             elif branch == 'des':
                 data = data.loc[data['branch']]
+            else:
+                raise ParameterError("Isotherm branch must be 'ads' or 'des'")
 
             if data.empty:
                 raise ParameterError(
                     "The isotherm branch does not contain enough points")
 
             # Get just the pressure and loading columns
-            pressure = isotherm_data[pressure_key].values
-            loading = isotherm_data[loading_key].values
+            pressure = data[pressure_key].values
+            loading = data[loading_key].values
 
             process = True
 
