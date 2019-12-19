@@ -489,7 +489,7 @@ class PointIsotherm(Isotherm):
         return axes
 
     ##########################################################
-    #   Functions that return parts of the isotherm data
+    #   Functions that return part of the isotherm data
 
     def data(self, branch=None):
         """
