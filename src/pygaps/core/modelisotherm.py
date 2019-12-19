@@ -552,13 +552,11 @@ class ModelIsotherm(Isotherm):
             Whether the data exists or not.
 
         """
-        if self.branch == branch:
-            return True
-        return False
+        return self.branch == branch
 
     def pressure(self, points=40, branch=None,
                  pressure_unit=None, pressure_mode=None,
-                 min_range=None, max_range=None, indexed=False):
+                 limits=None, indexed=False):
         """
         Return a numpy.linspace generated array with
         a fixed number of equidistant points within the
@@ -577,10 +575,9 @@ class ModelIsotherm(Isotherm):
         pressure_mode : {None, 'absolute', 'relative'}
             The mode in which to return the pressure, if possible. If ``None``,
             returns mode the isotherm is currently in.
-        min_range : float, optional
-            The lower limit for the pressure to select.
-        max_range : float, optional
-            The higher limit for the pressure to select.
+        limits : [float, float], optional
+            Minimum and maximum pressure limits.
+            Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
             pandas.Series with the columns requested instead of an array.
@@ -625,13 +622,10 @@ class ModelIsotherm(Isotherm):
             )
 
         # Select required points
-        if max_range is not None or min_range is not None:
-            if min_range is None:
-                min_range = min(ret)
-            if max_range is None:
-                max_range = max(ret)
-
-            ret = list(filter(lambda x: min_range <= x <= max_range, ret))
+        if limits:
+            ret = ret[
+                    ((-numpy.inf if limits[0] is None else limits[0]) < ret) &
+                    (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
@@ -640,7 +634,7 @@ class ModelIsotherm(Isotherm):
     def loading(self, points=40, branch=None,
                 loading_unit=None, loading_basis=None,
                 adsorbent_unit=None, adsorbent_basis=None,
-                min_range=None, max_range=None, indexed=False):
+                limits=None, indexed=False):
         """
         Return the loading calculated at equidistant pressure
         points within the pressure range the model was created.
@@ -664,10 +658,9 @@ class ModelIsotherm(Isotherm):
         adsorbent_basis : {None, 'mass', 'volume'}
             The basis on which to return the adsorbent, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
-        min_range : float, optional
-            The lower limit for the loading to select.
-        max_range : float, optional
-            The higher limit for the loading to select.
+        limits : [float, float], optional
+            Minimum and maximum loading limits.
+            Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
             pandas.Series with the columns requested instead of an array.
@@ -723,21 +716,17 @@ class ModelIsotherm(Isotherm):
             )
 
         # Select required points
-        if max_range is not None or min_range is not None:
-            if min_range is None:
-                min_range = min(ret)
-            if max_range is None:
-                max_range = max(ret)
-
-            ret = list(filter(lambda x: min_range <= x <= max_range, ret))
+        if limits:
+            ret = ret[
+                ((-numpy.inf if limits[0] is None else limits[0]) < ret) &
+                (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
-        else:
-            return ret
+        return ret
 
-##########################################################
-#   Functions that calculate values of the isotherm data
+    ##########################################################
+    #   Functions that calculate values of the isotherm data
 
     def loading_at(self, pressure, branch=None,
 

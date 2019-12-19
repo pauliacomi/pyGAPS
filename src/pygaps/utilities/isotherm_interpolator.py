@@ -60,8 +60,6 @@ class isotherm_interpolator():
                                        fill_value=interp_fill,
                                        bounds_error=False)
 
-        return
-
     def __call__(self, data):
         """Override direct call."""
         return self.interp_fun(data)

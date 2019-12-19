@@ -57,7 +57,7 @@ def isotherm_to_json(isotherm):
     if isinstance(isotherm, PointIsotherm):
 
         # we turn the raw dataframe into a dictionary
-        isotherm_data_dict = isotherm.data(raw=True).to_dict(orient='index')
+        isotherm_data_dict = isotherm.data_raw.to_dict(orient='index')
 
         def process_data(value):
             """
@@ -284,10 +284,10 @@ def _from_json_nist(raw_dict):
     return nist_dict
 
 
-def _from_data_nist(raw_data):
+def _from_data_nist(data_raw):
     """Convert a NIST data format to an internal format."""
 
-    for point in raw_data:
+    for point in data_raw:
         point.pop('species_data')
 
-    return raw_data
+    return data_raw

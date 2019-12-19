@@ -560,8 +560,7 @@ def _get_data(isotherm, data_name, current_branch, drange, **kwargs):
             branch=current_branch,
             pressure_mode=kwargs['pressure_mode'],
             pressure_unit=kwargs['pressure_unit'],
-            min_range=drange[0],
-            max_range=drange[1],
+            limits=drange,
             indexed=True,
         )
     elif data_name == 'loading':
@@ -571,16 +570,14 @@ def _get_data(isotherm, data_name, current_branch, drange, **kwargs):
             loading_unit=kwargs['loading_unit'],
             adsorbent_basis=kwargs['adsorbent_basis'],
             adsorbent_unit=kwargs['adsorbent_unit'],
-            min_range=drange[0],
-            max_range=drange[1],
+            limits=drange,
             indexed=True,
         )
     else:
         data = isotherm.other_data(
             data_name,
             branch=current_branch,
-            min_range=drange[0],
-            max_range=drange[1],
+            limits=drange,
             indexed=True,
         )
     return data

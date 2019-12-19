@@ -152,7 +152,7 @@ def isotherm_to_xl(isotherm, path):
 
         # We also write the branch data
         headings.append('branch')
-        data = isotherm.data(raw=True)[headings]
+        data = isotherm.data_raw[headings]
         data['branch'] = data['branch'].replace(False, 'ads').replace(True, 'des')
 
         # Write all data

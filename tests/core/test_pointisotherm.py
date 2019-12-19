@@ -57,7 +57,7 @@ class TestPointIsotherm():
         iso_id = basic_pointisotherm.iso_id
         basic_pointisotherm.new_param = 'changed'
         assert iso_id != basic_pointisotherm.iso_id
-        basic_pointisotherm.raw_data = basic_pointisotherm.raw_data[:5]
+        basic_pointisotherm.data_raw = basic_pointisotherm.data_raw[:5]
         assert iso_id != basic_pointisotherm.iso_id
 
     @pytest.mark.parametrize('missing_key',
@@ -190,6 +190,10 @@ class TestPointIsotherm():
             basic_pointisotherm.pressure_key: [4.5, 2.5],
         }, index=[6, 7]))
 
+        # Wrong branch
+        with pytest.raises(pygaps.ParameterError):
+            basic_pointisotherm.data(branch='random')
+
     def test_isotherm_ret_pressure(self, basic_pointisotherm, use_adsorbate):
         """Checks that all the functions in pointIsotherm return their specified parameter"""
 
@@ -215,7 +219,7 @@ class TestPointIsotherm():
                                             pressure_mode='relative')[0] == pytest.approx(0.12849, 0.001)
 
         # Range specified
-        assert set(basic_pointisotherm.pressure(branch='ads', min_range=2.3, max_range=5.0)) == set(
+        assert set(basic_pointisotherm.pressure(branch='ads', limits=(2.3, 5.0))) == set(
             [3.0, 4.0, 5.0])
 
         # Indexed option specified
@@ -261,7 +265,7 @@ class TestPointIsotherm():
             0], 280.1, 0.1, 0.1)
 
         # Range specified
-        assert set(basic_pointisotherm.loading(branch='ads', min_range=2.3, max_range=5.0)) == set(
+        assert set(basic_pointisotherm.loading(branch='ads', limits=(2.3, 5.0))) == set(
             [3.0, 4.0, 5.0])
 
         # Indexed option specified
@@ -283,13 +287,16 @@ class TestPointIsotherm():
                    ) == set([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
 
         # Range specified
-        assert set(basic_pointisotherm.other_data(other_key, min_range=3, max_range=4.5)
-                   ) == set([4.0, 4.0])
+        assert set(basic_pointisotherm.other_data(other_key, limits=(3, 4.5))) == set([4.0, 4.0])
 
         # Indexed option specified
         assert basic_pointisotherm.other_data(other_key, indexed=True).equals(pandas.Series(
             [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0]
         ))
+        
+        # Error 
+        with pytest.raises(pygaps.ParameterError):
+            basic_pointisotherm.other_data('random')
 
     ##########################
 

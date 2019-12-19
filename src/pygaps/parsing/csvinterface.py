@@ -90,7 +90,7 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
             # also get the branch data in a regular format
             headings.append('branch')
-            data = isotherm.data(raw=True)[headings]
+            data = isotherm.data_raw[headings]
             data['branch'] = data['branch'].replace(False, 'ads').replace(True, 'des')
 
             file.write('data:[pressure,loading,[otherdata],branch data]\n')

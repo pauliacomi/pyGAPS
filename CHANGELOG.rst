@@ -5,11 +5,18 @@ Changelog
 2.1.0 (2019-xx-xx)
 ------------------
 
+Breaking changes:
+
+ * For isotherm pressure/loading, a `limits` tuple is now passed instead of
+   `min_range` and `max_range`, as for other functions in pyGAPS.
+
 New features:
 
  * Perform isotherm branch separation based on maximum pressure,
    rather than first derivative. In such way, slight uncertainty
    in pressures won't lead to a wrong assignment.
+ * Improved performance for isotherm conversions.
+ * General core refactoring and speed-ups.
 
 Fixes:
 

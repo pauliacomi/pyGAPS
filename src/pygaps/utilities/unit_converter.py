@@ -345,33 +345,5 @@ def c_unit(unit_list, value, unit_from, unit_to, sign=1):
             "Units selected for conversion (from {} to {}) are not an option. Viable"
             " units are {}".format(unit_from, unit_to, unit_list.keys()))
 
-    value = value * \
+    return value * \
         (unit_list[unit_from] / unit_list[unit_to]) ** sign
-
-    return value
-
-
-def find_basis(unit):
-    """Find the basis of a given unit."""
-    if unit in _VOLUME_UNITS:
-        basis = 'molar'
-    elif unit in _MASS_UNITS:
-        basis = 'mass'
-    elif unit in _MOLAR_UNITS:
-        basis = 'molar'
-    else:
-        raise ParameterError('Unit is in unknown basis')
-
-    return basis
-
-
-def find_mode(unit):
-    """Find the mode of a given pressure."""
-    if unit in _PRESSURE_UNITS:
-        mode = 'absolute'
-    elif unit == 'p/p0':
-        mode = 'relative'
-    else:
-        raise ParameterError('Unit is unknown')
-
-    return mode

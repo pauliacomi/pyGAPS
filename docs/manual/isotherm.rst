@@ -330,8 +330,7 @@ data should be selected in. For example:
     isotherm.loading(
         branch='ads',
         loading_unit='cm3 STP',
-        min_range = 0.5,
-        max_range = 0.9,
+        limits = (0.5, 0.9),
     )
 
 The ``other_data`` function is built for accessing
@@ -344,14 +343,13 @@ It is only applicable to the PointIsotherm object.
 ::
 
     # Will return the enthalpy points of the desorption part of the
-    # isotherm in the range if 0.5-0.9 cm3 STP as an indexed
+    # isotherm in the range if 10-40 kJ/mol as an indexed
     # pandas.Series
 
     isotherm.other_data(
         'enthalpy',
         branch = 'des',
-        min_range = 0.5,
-        max_range = 0.9,
+        limits = (10, 40),
         indexed = True,
     )
 
@@ -361,7 +359,7 @@ all or parts of the internal pandas.DataFrame.
 This is not as useful for processing, and also non-applicable
 to the ModelIsotherm object, but can be used to inspect the data
 directly or retrieve the DataFrame.
-To access the DataFrame directly, use the ``raw_data`` parameter.
+To access the DataFrame directly, use the ``data_raw`` parameter.
 
 ::
 
@@ -372,7 +370,7 @@ To access the DataFrame directly, use the ``raw_data`` parameter.
 
     # Or access the underlying DataFrame
 
-    isotherm.raw_data
+    isotherm.data_raw
 
 Besides functions which give access to the internal datapoints,
 the isotherm object can also return the value of pressure and

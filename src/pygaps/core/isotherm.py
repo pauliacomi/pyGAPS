@@ -19,7 +19,7 @@ class Isotherm():
 
     The isotherm class is the parent class that both PointIsotherm and
     ModelIsotherm inherit. It is designed to contain the information about
-    an isotherm, such as material, adsorbate, data units etc., but without
+    an isotherm (such as material, adsorbate, data units etc.) but without
     any of the data itself.
 
     Think of this class as a extended python dictionary.

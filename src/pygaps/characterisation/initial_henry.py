@@ -47,11 +47,9 @@ def initial_henry_slope(isotherm,
             l_limits = [-numpy.inf, numpy.inf]
 
         pressure = isotherm.pressure(
-            branch='ads', indexed=True,
-            min_range=p_limits[0], max_range=p_limits[1])
+            branch='ads', indexed=True, limits=p_limits)
         loading = isotherm.loading(
-            branch='ads', indexed=True,
-            min_range=l_limits[0], max_range=l_limits[1])
+            branch='ads', indexed=True, limits=l_limits)
 
         pressure, loading = pressure.align(loading, join='inner')
         pressure, loading = pressure.values, loading.values

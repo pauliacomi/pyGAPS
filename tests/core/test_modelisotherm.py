@@ -163,20 +163,17 @@ class TestModelIsotherm():
             basic_modelisotherm.pressure(branch='des')
 
         # Regular return
-        assert set(basic_modelisotherm.pressure(5)) == set(
-            [1.0, 2.25, 3.5, 4.75, 6.0])
+        assert numpy.array_equal(basic_modelisotherm.pressure(5), [1.0, 2.25, 3.5, 4.75, 6.0])
 
         # Unit specified
-        assert set(basic_modelisotherm.pressure(5, pressure_unit='Pa')) == set(
-            [100000, 225000, 350000, 475000, 600000])
+        assert numpy.array_equal(basic_modelisotherm.pressure(5, pressure_unit='Pa'), [100000, 225000, 350000, 475000, 600000])
 
         # Mode specified
         assert basic_modelisotherm.pressure(5, pressure_mode='relative')[
             0] == pytest.approx(0.12849, 0.001)
 
         # Range specified
-        assert set(basic_modelisotherm.pressure(5, min_range=2, max_range=5)) == set(
-            [2.25, 3.5, 4.75])
+        assert numpy.array_equal(basic_modelisotherm.pressure(5, limits=(2, 5)), [2.25, 3.5, 4.75])
 
         # Indexed option specified
         assert basic_modelisotherm.pressure(5, indexed=True).equals(pandas.Series(
@@ -210,8 +207,7 @@ class TestModelIsotherm():
                                            adsorbent_unit='cm3')[0] == pytest.approx(10, 1e-5)
 
         # Range specified
-        assert basic_modelisotherm.loading(5, min_range=2, max_range=5)[
-            0] == pytest.approx(2.25, 1e-5)
+        assert basic_modelisotherm.loading(5, limits=(2, 5))[0] == pytest.approx(2.25, 1e-5)
 
         # Indexed option specified
         assert isinstance(basic_modelisotherm.loading(
