@@ -65,11 +65,12 @@ def c_pressure(value,
         Unit from which to convert.
     unit_from : str
         Unit to which to convert.
-    adsorbate_name : str
+    adsorbate_name : str, optional
         Name of the adsorbate on which the pressure is to be
-        converted.
-    temp : float
+        converted. Required for mode change.
+    temp : float, optional
         Temperature at which the pressure is measured, in K.
+        Required for mode change.
 
     Returns
     -------
@@ -93,22 +94,24 @@ def c_pressure(value,
                 raise ParameterError("Specify unit to convert to.")
             if unit_to not in _PRESSURE_UNITS:
                 raise ParameterError(
-                    "Unit to is not an option. Viable"
-                    " units are {}".format(list(_PRESSURE_UNITS)))
+                    "Unit to desired ({}) is not an option. Viable"
+                    " units are {}".format(unit_to, list(_PRESSURE_UNITS)))
 
             unit = unit_to
             sign = 1
-        elif mode_to == "relative":
+
+        if mode_to == "relative":
             unit = unit_from
             sign = -1
 
-        value = value * \
-            pygaps.core.adsorbate.Adsorbate.find(adsorbate_name).saturation_pressure(
+        return value * \
+            pygaps.Adsorbate.find(adsorbate_name).saturation_pressure(
                 temp, unit=unit) ** sign
 
     elif unit_to and mode_from == 'absolute':
-        value = c_unit(_PRESSURE_MODE[mode_from], value, unit_from, unit_to)
+        return c_unit(_PRESSURE_MODE[mode_from], value, unit_from, unit_to)
 
+    # otherwise no change
     return value
 
 
@@ -162,44 +165,36 @@ def c_loading(value,
 
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
-                "Unit to is not an option. Viable"
-                " units are {}".format(list(_MATERIAL_MODE[basis_to])))
+                "Unit to desired ({}) is not an option. Viable"
+                " units are {}".format(unit_to, list(_MATERIAL_MODE[basis_to])))
 
         if unit_from not in _MATERIAL_MODE[basis_from]:
             raise ParameterError(
-                "Unit from is not an option. Viable"
-                " units are {}".format(list(_MATERIAL_MODE[basis_from])))
+                "Unit from desired ({}) is not an option. Viable"
+                " units are {}".format(unit_from, list(_MATERIAL_MODE[basis_from])))
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = pygaps.core.adsorbate.Adsorbate.find(
-                    adsorbate_name).gas_density(temp=temp)
+                constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(temp=temp)
                 sign = -1
             elif basis_to == 'molar':
-                constant = pygaps.core.adsorbate.Adsorbate.find(
-                    adsorbate_name).molar_mass()
+                constant = pygaps.Adsorbate.find(adsorbate_name).molar_mass()
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = pygaps.core.adsorbate.Adsorbate.find(
-                    adsorbate_name).gas_density(temp=temp)
+                constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(temp=temp)
                 sign = 1
             elif basis_to == 'molar':
-                adsorbate = pygaps.core.adsorbate.Adsorbate.find(
-                    adsorbate_name)
-                constant = adsorbate.gas_density(
-                    temp=temp) / adsorbate.molar_mass()
+                adsorbate = pygaps.Adsorbate.find(adsorbate_name)
+                constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(temp=temp) / adsorbate.molar_mass()
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = pygaps.core.adsorbate.Adsorbate.find(
-                    adsorbate_name).molar_mass()
+                constant = pygaps.Adsorbate.find(adsorbate_name).molar_mass()
                 sign = 1
             elif basis_to == 'volume':
-                adsorbate = pygaps.core.adsorbate.Adsorbate.find(
-                    adsorbate_name)
-                constant = adsorbate.gas_density(
-                    temp=temp) / adsorbate.molar_mass()
+                adsorbate = pygaps.Adsorbate.find(adsorbate_name)
+                constant = adsorbate.gas_density(temp=temp) / adsorbate.molar_mass()
                 sign = -1
 
         value = value * _MATERIAL_MODE[basis_from][unit_from] \
@@ -207,7 +202,7 @@ def c_loading(value,
             / _MATERIAL_MODE[basis_to][unit_to]
 
     elif unit_to and unit_from != unit_to:
-        value = c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to)
+        return c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to)
 
     return value
 
@@ -302,13 +297,12 @@ def c_adsorbent(value,
                     'density') / material.get_prop('molar_mass')
                 sign = -1
 
-        value = value / _MATERIAL_MODE[basis_from][unit_from] \
+        return value / _MATERIAL_MODE[basis_from][unit_from] \
             / constant ** sign \
             * _MATERIAL_MODE[basis_to][unit_to]
 
     elif unit_to and unit_from != unit_to:
-        value = c_unit(_MATERIAL_MODE[basis_from],
-                       value, unit_from, unit_to, sign=-1)
+        return c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to, sign=-1)
 
     return value
 
