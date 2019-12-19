@@ -10,7 +10,7 @@ import pandas
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..utilities.isotherm_interpolator import isotherm_interpolator
+from ..utilities.isotherm_interpolator import IsothermInterpolator
 from ..utilities.unit_converter import c_adsorbent
 from ..utilities.unit_converter import c_loading
 from ..utilities.unit_converter import c_pressure
@@ -773,14 +773,11 @@ class PointIsotherm(Isotherm):
                 self.p_interpolator.interp_kind != interpolation_type or \
                 self.p_interpolator.interp_fill != interp_fill:
 
-            self.p_interpolator = isotherm_interpolator('pressure',
-                                                        self.loading(
-                                                            branch=branch),
-                                                        self.pressure(
-                                                            branch=branch),
-                                                        interp_branch=branch,
-                                                        interp_kind=interpolation_type,
-                                                        interp_fill=interp_fill)
+            self.p_interpolator = IsothermInterpolator(self.loading(branch=branch),
+                                                       self.pressure(branch=branch),
+                                                       interp_branch=branch,
+                                                       interp_kind=interpolation_type,
+                                                       interp_fill=interp_fill)
 
         # Ensure loading is in correct units and basis for the internal model
         if adsorbent_basis or adsorbent_unit:
@@ -896,14 +893,11 @@ class PointIsotherm(Isotherm):
                 self.l_interpolator.interp_kind != interpolation_type or \
                 self.l_interpolator.interp_fill != interp_fill:
 
-            self.l_interpolator = isotherm_interpolator('loading',
-                                                        self.pressure(
-                                                            branch=branch),
-                                                        self.loading(
-                                                            branch=branch),
-                                                        interp_branch=branch,
-                                                        interp_kind=interpolation_type,
-                                                        interp_fill=interp_fill)
+            self.l_interpolator = IsothermInterpolator(self.pressure(branch=branch),
+                                                       self.loading(branch=branch),
+                                                       interp_branch=branch,
+                                                       interp_kind=interpolation_type,
+                                                       interp_fill=interp_fill)
 
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:

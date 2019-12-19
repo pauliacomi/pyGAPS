@@ -3,7 +3,7 @@
 from scipy.interpolate import interp1d
 
 
-class isotherm_interpolator():
+class IsothermInterpolator():
     """
     Class used to interpolate between isotherm points.
 
@@ -31,19 +31,17 @@ class isotherm_interpolator():
 
     """
 
-    def __init__(self, interp_type, known_data, interp_data,
+    def __init__(self, known_data, interp_data,
                  interp_branch='ads',
                  interp_kind='linear',
                  interp_fill=None,
                  ):
-        """Instantiate function."""
-        #: The kind of variable the interpolator will process.
-        self.output_var = interp_type
-        #: The branch the internal interpolator is on.
+        """Instantiate."""
+        # The branch the internal interpolator is on.
         self.interp_branch = interp_branch
-        #: The kind of interpolator in the internal interpolator.
+        # The kind of interpolator in the internal interpolator.
         self.interp_kind = interp_kind
-        #: Value of loading to assume beyond highest pressure in the data.
+        # Value of loading to assume beyond highest pressure in the data.
         self.interp_fill = interp_fill
 
         # The actual interpolator. This is generated
