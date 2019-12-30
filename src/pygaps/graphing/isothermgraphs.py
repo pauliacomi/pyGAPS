@@ -16,8 +16,13 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.string_utilities import convert_chemformula
 from .mpl_styles import ISO_STYLES
 
-# ! list of branch types
-_BRANCH_TYPES = ("ads", "des", "all", "all-nol")
+# list of branch types
+_BRANCH_TYPES = {
+    "ads": (True, False),
+    "des": (False, True),
+    "all": (True, True),
+    "all-nol": (True, True)
+}
 
 
 def plot_iso(isotherms,
@@ -169,7 +174,7 @@ def plot_iso(isotherms,
     # Initial checks
     # Make iterable if not already
     if not isinstance(isotherms, abc.Iterable):
-        isotherms = [isotherms]
+        isotherms = (isotherms,)
 
     # Check for plot type validity
     if None in [x_data, y1_data]:
@@ -178,23 +183,21 @@ def plot_iso(isotherms,
 
     # Check if required keys are present in isotherms
     def keys(iso):
-        ks = ['loading', 'pressure']
-        ks.extend(getattr(iso, 'other_keys', []))
-        return ks
+        return ['loading', 'pressure'] + getattr(iso, 'other_keys', [])
 
     if any(x_data not in keys(isotherm) for isotherm in isotherms):
         raise GraphingError(
-            "None of the isotherms supplied have {} data".format(x_data))
+            "One of the isotherms supplied does not have {} data".format(x_data))
 
     if any(y1_data not in keys(isotherm) for isotherm in isotherms):
         raise GraphingError(
-            "None of the isotherms supplied have {} data".format(y1_data))
+            "One of the isotherms supplied does not have {} data".format(y1_data))
 
     if y2_data is not None:
         if all(y2_data not in keys(isotherm) for isotherm in isotherms):
             raise GraphingError(
                 "None of the isotherms supplied have {} data".format(y2_data))
-        elif any(y2_data not in keys(isotherm) for isotherm in isotherms):
+        if any(y2_data not in keys(isotherm) for isotherm in isotherms):
             warnings.warn('Some isotherms do not have {} data'.format(y2_data))
 
     # Store which branches will be displayed
@@ -205,20 +208,11 @@ def plot_iso(isotherms,
         raise GraphingError("The supplied branch type is not valid."
                             "Viable types are {}".format(_BRANCH_TYPES))
 
-    ads = False
-    des = False
-    if branch == 'ads':
-        ads = True
-    elif branch == 'des':
-        des = True
-    else:
-        ads = True
-        des = True
+    ads, des = _BRANCH_TYPES[branch]
 
-    log_params = dict(
-        logx=logx, logy1=logy1, logy2=logy2)
-    range_params = dict(
-        x_range=x_range, y1_range=y1_range, y2_range=y2_range)
+    # Pack other parameters
+    log_params = dict(logx=logx, logy1=logy1, logy2=logy2)
+    range_params = dict(x_range=x_range, y1_range=y1_range, y2_range=y2_range)
     iso_params = dict(
         pressure_mode=pressure_mode,
         pressure_unit=pressure_unit,
@@ -242,19 +236,16 @@ def plot_iso(isotherms,
             styles[style].update(new_style)
 
     #
-    # Generate the graph itself
+    # Generate or assign the figure and the axes
     if ax:
+        fig = ax.get_figure()
         ax1 = ax
-        fig = ax1.get_figure()
     else:
         fig = plt.figure(**styles['fig_style'])
         ax1 = plt.subplot(111)
 
-    # Create empty axes object
-    ax2 = None
-    # Populate it if required
-    if y2_data:
-        ax2 = ax1.twinx()
+    # Create second axes object, populate it if required
+    ax2 = ax1.twinx() if y2_data else None
 
     # Build the name of the axes
     def get_name(key):
@@ -264,7 +255,7 @@ def plot_iso(isotherms,
             elif pressure_mode == "relative":
                 text = "$p/p^0$"
         elif key == 'loading':
-            text = 'Loading ($' + loading_unit + '/' + adsorbent_unit + '$)'
+            text = 'Loading ($' + loading_unit + '\/' + adsorbent_unit + '^{-1}$)'
         elif key == 'enthalpy':
             text = r'$\Delta_{ads}h$ $(-kJ\/mol^{-1})$'
         else:
@@ -277,12 +268,13 @@ def plot_iso(isotherms,
         y2_label = get_name(y2_data)
 
     # Get a cycling style for the graph
+    # Color styling
     if color:
         if isinstance(color, bool):
-            colors = [cm.jet(x) for x in numpy.linspace(0, 1, 7)]
+            colors = (cm.jet(x) for x in numpy.linspace(0, 1, 7))
         elif isinstance(color, int):
-            colors = [cm.jet(x) for x in numpy.linspace(0, 1, color)]
-        elif isinstance(color, list):
+            colors = (cm.jet(x) for x in numpy.linspace(0, 1, color))
+        elif isinstance(color, abc.Iterable):
             colors = color
         else:
             raise ParameterError("Unknown ``color`` parameter type.")
@@ -292,7 +284,8 @@ def plot_iso(isotherms,
     else:
         color_cy = cycler('color', ['black', 'grey', 'silver'])
 
-    all_markers = ['o', 's', 'D', 'P', '*', '<', '>', 'X', 'v', '^']
+    # Marker styling
+    all_markers = ('o', 's', 'D', 'P', '*', '<', '>', 'X', 'v', '^')
     if marker is None:
         marker = True
 
@@ -302,11 +295,11 @@ def plot_iso(isotherms,
             cycle_compose = False
             markers = all_markers
         else:
-            markers = []
+            markers = ()
     elif isinstance(marker, int):
         marker = len(all_markers) if marker > len(all_markers) else marker
         markers = all_markers[:marker]
-    elif isinstance(marker, list):
+    elif isinstance(marker, abc.Iterable):
         markers = marker
     else:
         raise ParameterError("Unknown ``marker`` parameter type.")
@@ -314,6 +307,7 @@ def plot_iso(isotherms,
     y1_marker_cy = cycler('marker', markers)
     y2_marker_cy = cycler('marker', markers[::-1])
 
+    # Combine cycles
     def extend_cycle(cy_1, cy_2):
         l_1 = len(cy_1)
         l_2 = len(cy_2)
@@ -345,25 +339,26 @@ def plot_iso(isotherms,
         """Build a label for the legend depending on requested parameters."""
         if branch == 'all-nol' and current_branch == 'des':
             return ''
-        else:
-            if lbl_components is None:
-                return isotherm.material + ' ' + convert_chemformula(isotherm)
-            text = []
-            for selected in lbl_components:
-                if selected == 'branch':
-                    text.append(current_branch)
-                    continue
-                elif selected == 'key':
-                    text.append(key)
-                    continue
-                val = getattr(isotherm, selected)
-                if val:
-                    if selected == 'adsorbate':
-                        text.append(convert_chemformula(isotherm))
-                    else:
-                        text.append(str(val))
 
-            return " ".join(text)
+        if lbl_components is None:
+            return isotherm.material + ' ' + convert_chemformula(isotherm)
+
+        text = []
+        for selected in lbl_components:
+            if selected == 'branch':
+                text.append(current_branch)
+                continue
+            if selected == 'key':
+                text.append(key)
+                continue
+            val = getattr(isotherm, selected)
+            if val:
+                if selected == 'adsorbate':
+                    text.append(convert_chemformula(isotherm))
+                else:
+                    text.append(str(val))
+
+        return " ".join(text)
 
     ###########################################
     #
@@ -373,6 +368,10 @@ def plot_iso(isotherms,
     def graph_caller(isotherm, current_branch,
                      y1_style, y2_style, **iso_params):
         """Convenience function to call other graphing functions."""
+
+        # Check for branch existence
+        if not isotherm.has_branch(branch=current_branch):
+            return
 
         # Labels and ticks
         ax1.set_xlabel(x_label, **styles['label_style'])
@@ -419,13 +418,9 @@ def plot_iso(isotherms,
 
         # If there's an adsorption branch, plot it
         if ads:
-            current_branch = 'ads'
-            if isotherm.has_branch(branch=current_branch):
-
-                # Call the plotting function
-                graph_caller(isotherm, current_branch,
-                             y1_line_style, y2_line_style,
-                             **iso_params)
+            graph_caller(isotherm, 'ads',
+                         y1_line_style, y2_line_style,
+                         **iso_params)
 
         # Switch to desorption linestyle (dotted, open marker)
         y1_line_style['markerfacecolor'] = 'none'
@@ -434,13 +429,9 @@ def plot_iso(isotherms,
 
         # If there's a desorption branch, plot it
         if des:
-            current_branch = 'des'
-            if isotherm.has_branch(branch=current_branch):
-
-                # Call the plotting function
-                graph_caller(isotherm, current_branch,
-                             y1_line_style, y2_line_style,
-                             **iso_params)
+            graph_caller(isotherm, 'des',
+                         y1_line_style, y2_line_style,
+                         **iso_params)
 
     #####################################
     #
@@ -457,10 +448,8 @@ def plot_iso(isotherms,
 
 def plot_iso_raw(x_data,
                  x_label,
-                 y1_data,
-                 y1_label,
-                 y2_data=None,
-                 y2_label=None,
+                 y1_data, y1_label,
+                 y2_data=None, y2_label=None,
                  ax=None,
 
                  logx=False,
@@ -474,8 +463,7 @@ def plot_iso_raw(x_data,
                  fig_title=None,
                  **other_parameters):
 
-    log_params = dict(
-        logx=logx, logy1=logy1, logy2=logy2)
+    log_params = dict(logx=logx, logy1=logy1, logy2=logy2)
     range_params = dict(
         x_range=x_range, y1_range=y1_range, y2_range=y2_range)
 
@@ -501,11 +489,8 @@ def plot_iso_raw(x_data,
         fig = plt.figure(**styles['fig_style'])
         ax1 = plt.subplot(111)
 
-    # Create empty axes object
-    ax2 = None
-    # Populate it if required
-    if y2_data:
-        ax2 = ax1.twinx()
+    # Create second axes object, populate it if required
+    ax2 = ax1.twinx() if y2_data else None
 
     # Put grid on plot
     ax1.grid(True, zorder=5)
@@ -556,15 +541,15 @@ def plot_iso_raw(x_data,
 def _get_data(isotherm, data_name, current_branch, drange, **kwargs):
     """Get different data from an isotherm."""
     if data_name == 'pressure':
-        data = isotherm.pressure(
+        return isotherm.pressure(
             branch=current_branch,
             pressure_mode=kwargs['pressure_mode'],
             pressure_unit=kwargs['pressure_unit'],
             limits=drange,
             indexed=True,
         )
-    elif data_name == 'loading':
-        data = isotherm.loading(
+    if data_name == 'loading':
+        return isotherm.loading(
             branch=current_branch,
             loading_basis=kwargs['loading_basis'],
             loading_unit=kwargs['loading_unit'],
@@ -573,14 +558,12 @@ def _get_data(isotherm, data_name, current_branch, drange, **kwargs):
             limits=drange,
             indexed=True,
         )
-    else:
-        data = isotherm.other_data(
-            data_name,
-            branch=current_branch,
-            limits=drange,
-            indexed=True,
-        )
-    return data
+    return isotherm.other_data(
+        data_name,
+        branch=current_branch,
+        limits=drange,
+        indexed=True,
+    )
 
 
 def _final_styling(fig, ax1, ax2,
