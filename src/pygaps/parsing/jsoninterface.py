@@ -149,6 +149,9 @@ def isotherm_from_json(json_isotherm, fmt=None,
     # Parse isotherm in dictionary
     raw_dict = json.loads(json_isotherm)
 
+    # Update dictionary with any user parameters
+    raw_dict.update(isotherm_parameters)
+
     data = raw_dict.pop("isotherm_data", None)
     model = raw_dict.pop("isotherm_model", None)
 
@@ -164,16 +167,14 @@ def isotherm_from_json(json_isotherm, fmt=None,
         data = pandas.DataFrame(data, dtype='float64')
 
         # process isotherm branches if they exist
-        raw_dict['branch'] = 'guess'
         if 'branch' in data.columns:
             raw_dict['branch'] = data['branch'].fillna(False).replace('des', True).values
+        else:
+            raw_dict['branch'] = 'guess'
 
         # get the other data in the json
         other_keys = [column for column in data.columns.values
                       if column not in [loading_key, pressure_key, 'branch']]
-
-        # Update dictionary with any user parameters
-        raw_dict.update(isotherm_parameters)
 
         # generate the isotherm
         isotherm = PointIsotherm(isotherm_data=data,
@@ -202,9 +203,6 @@ def isotherm_from_json(json_isotherm, fmt=None,
                 new_mod.params[param] = model['parameters'][param]
             except KeyError as err:
                 raise KeyError("The JSON is missing parameter '{0}'".format(param)) from err
-
-        # Update dictionary with any user parameters
-        raw_dict.update(isotherm_parameters)
 
         # generate the isotherm
         isotherm = ModelIsotherm(model=new_mod, **raw_dict)
