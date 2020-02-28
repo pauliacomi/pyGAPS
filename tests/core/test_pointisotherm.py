@@ -293,8 +293,8 @@ class TestPointIsotherm():
         assert basic_pointisotherm.other_data(other_key, indexed=True).equals(pandas.Series(
             [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0]
         ))
-        
-        # Error 
+
+        # Error
         with pytest.raises(pygaps.ParameterError):
             basic_pointisotherm.other_data('random')
 

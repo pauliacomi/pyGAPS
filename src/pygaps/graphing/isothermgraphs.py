@@ -255,7 +255,7 @@ def plot_iso(isotherms,
             elif pressure_mode == "relative":
                 text = "$p/p^0$"
         elif key == 'loading':
-            text = 'Loading ($' + loading_unit + '\/' + adsorbent_unit + '^{-1}$)'
+            text = 'Loading ($' + loading_unit + r'\/' + adsorbent_unit + '^{-1}$)'
         elif key == 'enthalpy':
             text = r'$\Delta_{ads}h$ $(-kJ\/mol^{-1})$'
         else:
