@@ -5,7 +5,6 @@ import os
 import sys
 from unittest.mock import MagicMock
 
-
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -21,13 +20,12 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = ['matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker',
-                'numpy',
-                'pandas', 'pandas.util',
-                'scipy', 'scipy.constants', 'scipy.stats',
-                'scipy.optimize', 'scipy.interpolate']
+MOCK_MODULES = [
+    'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker', 'numpy', 'pandas',
+    'pandas.util', 'scipy', 'scipy.constants', 'scipy.stats', 'scipy.optimize',
+    'scipy.interpolate'
+]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
 
 # -- General configuration -----------------------------------------------------
 
@@ -51,7 +49,6 @@ if os.getenv('SPELLCHECK'):
     extensions += 'sphinxcontrib.spelling',
     spelling_show_suggestions = True
     spelling_lang = 'en_US'
-
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -87,6 +84,8 @@ extlinks = {
 
 linkcheck_ignore = [
     r'https://github.com/pauliacomi/pygaps/compare/.+',
+    r'https://requires.io/github/pauliacomi/pyGAPS/requirements/?branch=master',
+    r'https://requires.io/github/pauliacomi/pyGAPS/requirements.svg??branch=master',
 ]
 
 # Checking for internal links
@@ -109,7 +108,6 @@ html_sidebars = {
     '**': ['searchbox.html', 'globaltoc.html', 'sourcelink.html'],
 }
 html_short_title = '%s-%s' % (project, version)
-
 
 # -- napoleon configuration -----------------------------------------------------
 

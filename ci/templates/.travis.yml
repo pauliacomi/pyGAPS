@@ -72,9 +72,7 @@ jobs:
 {%- for env, config in tox_environments|dictsort %}{{ '' }}
     - stage: test
       python: '{{ env.split("-")[0] if env.startswith("pypy") else "{0[2]}.{0[3]}".format(env) }}'
-    {% if env.startswith('py37') %}
       dist: bionic
-      {% endif %}
       env:
         - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
 {% endfor %}

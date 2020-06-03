@@ -71,6 +71,7 @@ jobs:
     # Create an test job on the test stage for each python version
     - stage: test
       python: '3.6'
+      dist: bionic
       env:
         - TOXENV=py36-cover,report,codecov
     - stage: test
@@ -80,6 +81,7 @@ jobs:
         - TOXENV=py37-cover,report,codecov
     - stage: test
       python: '3.8'
+      dist: bionic
       env:
         - TOXENV=py38-cover,report,codecov
     # If all goes well, we want to deploy to PyPi
