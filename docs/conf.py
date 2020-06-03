@@ -82,6 +82,8 @@ extlinks = {
     'pr': ('https://github.com/pauliacomi/pygaps/pull/%s', 'PR #'),
 }
 
+linkcheck_timeout = 3
+linkcheck_retries = 2
 linkcheck_ignore = [
     r'https://github.com/pauliacomi/pygaps/compare/.+',
     r'https://requires.io/.+',
