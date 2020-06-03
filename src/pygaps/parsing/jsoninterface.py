@@ -15,7 +15,7 @@ from ..utilities.unit_converter import _PRESSURE_UNITS
 from ..utilities.unit_converter import _VOLUME_UNITS
 
 
-def isotherm_to_jsonf(isotherm, path):
+def isotherm_to_jsonf(isotherm, path, **args_to_json):
     """
     Write an isotherm object to a json file.
 
@@ -27,13 +27,15 @@ def isotherm_to_jsonf(isotherm, path):
         Isotherm to be written to json.
     path : str
         Path to the file to be written.
+    args_to_json : dict
+        Custom arguments to be passed to "json.dump".
 
     """
     with open(path, mode='w') as file:
-        file.write(isotherm_to_json(isotherm))
+        file.write(isotherm_to_json(isotherm, **args_to_json))
 
 
-def isotherm_to_json(isotherm):
+def isotherm_to_json(isotherm, **args_to_json):
     """
     Convert an isotherm object to a json string.
 
@@ -43,6 +45,8 @@ def isotherm_to_json(isotherm):
     ----------
     isotherm : Isotherm
         Isotherm to be written to json.
+    args_to_json : dict
+        Custom arguments to be passed to "json.dump".
 
     Returns
     -------
@@ -71,18 +75,25 @@ def isotherm_to_json(isotherm):
                 value['branch'] = 'des'
             return {p: str(t) for p, t in value.items()}
 
-        raw_dict["isotherm_data"] = [process_data(v) for k, v in isotherm_data_dict.items()]
+        raw_dict["isotherm_data"] = [
+            process_data(v) for k, v in isotherm_data_dict.items()
+        ]
 
     elif isinstance(isotherm, ModelIsotherm):
         raw_dict["isotherm_model"] = isotherm.model.to_dict()
 
-    json_isotherm = json.dumps(raw_dict, sort_keys=True)
+    args_to_json = {} if args_to_json is None else args_to_json
+    args_to_json['sort_keys'] = True  # we will sort always
+
+    json_isotherm = json.dumps(raw_dict, **args_to_json)
 
     return json_isotherm
 
 
-def isotherm_from_jsonf(path, fmt=None,
-                        loading_key='loading', pressure_key='pressure',
+def isotherm_from_jsonf(path,
+                        fmt=None,
+                        loading_key='loading',
+                        pressure_key='pressure',
                         **isotherm_parameters):
     """
     Load an isotherm from a JSON file.
@@ -109,14 +120,17 @@ def isotherm_from_jsonf(path, fmt=None,
         The isotherm contained in the json file.
     """
     with open(path) as file:
-        return isotherm_from_json(
-            file.read(), fmt=fmt,
-            loading_key=loading_key, pressure_key=pressure_key,
-            **isotherm_parameters)
+        return isotherm_from_json(file.read(),
+                                  fmt=fmt,
+                                  loading_key=loading_key,
+                                  pressure_key=pressure_key,
+                                  **isotherm_parameters)
 
 
-def isotherm_from_json(json_isotherm, fmt=None,
-                       loading_key='loading', pressure_key='pressure',
+def isotherm_from_json(json_isotherm,
+                       fmt=None,
+                       loading_key='loading',
+                       pressure_key='pressure',
                        **isotherm_parameters):
     """
     Convert a json isotherm format to a pygaps Isotherm.
@@ -168,13 +182,16 @@ def isotherm_from_json(json_isotherm, fmt=None,
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
-            raw_dict['branch'] = data['branch'].fillna(False).replace('des', True).values
+            raw_dict['branch'] = data['branch'].fillna(False).replace(
+                'des', True).values
         else:
             raw_dict['branch'] = 'guess'
 
         # get the other data in the json
-        other_keys = [column for column in data.columns.values
-                      if column not in [loading_key, pressure_key, 'branch']]
+        other_keys = [
+            column for column in data.columns.values
+            if column not in [loading_key, pressure_key, 'branch']
+        ]
 
         # generate the isotherm
         isotherm = PointIsotherm(isotherm_data=data,
@@ -202,7 +219,8 @@ def isotherm_from_json(json_isotherm, fmt=None,
             try:
                 new_mod.params[param] = model['parameters'][param]
             except KeyError as err:
-                raise KeyError("The JSON is missing parameter '{0}'".format(param)) from err
+                raise KeyError("The JSON is missing parameter '{0}'".format(
+                    param)) from err
 
         # generate the isotherm
         isotherm = ModelIsotherm(model=new_mod, **raw_dict)
@@ -227,14 +245,17 @@ def _from_json_nist(raw_dict):
     # Get adsorbate
     if len(raw_dict['adsorbates']) > 1:
         raise ParsingError('Cannot currently read multicomponent isotherms')
-    nist_dict['adsorbate'] = raw_dict.pop('adsorbates')[0]['name']
+    nist_dict['adsorbate'] = raw_dict.pop('adsorbates')[0]['name'].lower()
 
     # Get loading basis and unit
     loading_string = raw_dict.pop("adsorptionUnits")
     comp = loading_string.split('/')
     if len(comp) != 2:
-        raise ParsingError(
-            "Isotherm cannot be parsed due to loading string format.")
+        if comp[0] == 'wt%':
+            comp = ('g', 'g')
+        else:
+            raise ParsingError(
+                "Isotherm cannot be parsed due to loading string format.")
 
     loading_unit = comp[0]
     if loading_unit in _MOLAR_UNITS:
@@ -266,7 +287,7 @@ def _from_json_nist(raw_dict):
         raise ParsingError("Isotherm cannot be parsed due to pressure unit.")
 
     # Add all the rest of the parameters
-    nist_dict['iso_type'] = raw_dict.pop('category')      # exp/sim/mod/qua
+    nist_dict['iso_type'] = raw_dict.pop('category')  # exp/sim/mod/qua
     nist_dict['iso_ref'] = raw_dict.pop('isotherm_type')  # excess/absolute
     nist_dict.update(raw_dict)
 
