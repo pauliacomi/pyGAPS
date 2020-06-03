@@ -1,6 +1,7 @@
 """This module contains Langmuir area calculations."""
 
 import warnings
+import textwrap
 
 import scipy.constants as const
 import scipy.stats as stats
@@ -104,31 +105,30 @@ def area_langmuir(isotherm, limits=None, verbose=False):
     loading = isotherm.loading(branch='ads',
                                loading_unit='mol',
                                loading_basis='molar')
-    pressure = isotherm.pressure(branch='ads',
-                                 pressure_mode='relative')
+    pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
 
     # use the langmuir function
-    (langmuir_area, langmuir_const, n_monolayer, slope,
-     intercept, minimum, maximum, corr_coef) = area_langmuir_raw(
-        pressure, loading, cross_section, limits=limits)
+    (langmuir_area, langmuir_const, n_monolayer, slope, intercept, minimum,
+     maximum, corr_coef) = area_langmuir_raw(pressure,
+                                             loading,
+                                             cross_section,
+                                             limits=limits)
 
     if verbose:
 
-        print("Langmuir surface area: a =", int(
-            round(langmuir_area, 0)), "m²/{}".format(isotherm.adsorbent_unit))
-        print("Minimum pressure point chosen is {0} and maximum is {1}".format(
-            round(pressure[minimum], 3), round(pressure[maximum], 3)))
-        print("The slope of the Langmuir line: s =", round(slope, 3))
-        print("The intercept of the Langmuir line: i =", round(intercept, 3))
-        print("The Langmuir constant is: K =", int(round(langmuir_const, 3)))
-        print("Amount for a monolayer: n =",
-              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
+        print(
+            textwrap.dedent(f"""\
+            Langmuir surface area: a ={langmuir_area:.2e} m2/{isotherm.adsorbent_unit}
+            Minimum pressure point is {pressure[minimum]:.2f} and maximum is {pressure[maximum]:.2f}
+            The slope of the Langmuir line: s = {slope:.2e}
+            The intercept of the Langmuir line: i = {intercept:.2e}
+            The Langmuir constant is: K = {langmuir_const:.1f}")
+            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.adsorbent_unit}"""
+                            ))
 
         # Generate plot of the langmuir points chosen
-        langmuir_plot(pressure,
-                      langmuir_transform(pressure, loading),
-                      minimum, maximum,
-                      slope, intercept)
+        langmuir_plot(pressure, langmuir_transform(pressure, loading), minimum,
+                      maximum, slope, intercept)
 
     return {
         'area': langmuir_area,
@@ -203,12 +203,13 @@ def area_langmuir_raw(pressure, loading, cross_section, limits=None):
                 break
 
     if maximum - minimum < 3:
-        raise CalculationError("The isotherm does not have enough points in the chosen "
-                               "region. Unable to calculate Langmuir area.")
+        raise CalculationError(
+            "The isotherm does not have enough points in the chosen "
+            "region. Unable to calculate Langmuir area.")
 
     # calculate the Langmuir slope and intercept
-    langmuir_array = langmuir_transform(
-        pressure[minimum:maximum], loading[minimum:maximum])
+    langmuir_array = langmuir_transform(pressure[minimum:maximum],
+                                        loading[minimum:maximum])
     slope, intercept, corr_coef = langmuir_optimisation(
         pressure[minimum:maximum], langmuir_array)
 
@@ -222,8 +223,8 @@ def area_langmuir_raw(pressure, loading, cross_section, limits=None):
     if corr_coef < 0.99:
         warnings.warn("The correlation is not linear.")
 
-    return (langmuir_area, langmuir_const, n_monolayer,
-            slope, intercept, minimum, maximum, corr_coef)
+    return (langmuir_area, langmuir_const, n_monolayer, slope, intercept,
+            minimum, maximum, corr_coef)
 
 
 def langmuir_transform(pressure, loading):

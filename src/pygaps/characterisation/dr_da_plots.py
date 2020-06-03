@@ -168,9 +168,7 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
     if exp is None:
         find_exp = True
     elif exp < 0:
-        raise ParameterError(
-            """Exponent cannot be negative."""
-        )
+        raise ParameterError("""Exponent cannot be negative.""")
 
     # Get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
@@ -182,8 +180,7 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
     loading = isotherm.loading(branch='ads',
                                loading_unit='mol',
                                loading_basis='molar')
-    pressure = isotherm.pressure(branch='ads',
-                                 pressure_mode='relative')
+    pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
 
     if limits:
         maximum = len(pressure) - 1
@@ -212,14 +209,11 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
         dra_plot(logv, log_n_p0p, slope, intercept, exp)
 
         if find_exp:
-            print("Exponent is: {:.2f}".format(exp))
-        print("Micropore volume is: {:.3f} cm3".format(microp_volume))
-        print("Effective adsorption potential is : {:.3f} kj/mol".format(potential))
+            print(f"Exponent is: {exp:.2f}")
+        print(f"Micropore volume is: {microp_volume:.3f} cm3")
+        print(f"Effective adsorption potential is : {potential:.3f} kj/mol")
 
-    res = {
-        "pore_volume": microp_volume,
-        "adsorption_potential": potential
-    }
+    res = {"pore_volume": microp_volume, "adsorption_potential": potential}
 
     if find_exp:
         res["exponent"] = exp
@@ -289,7 +283,8 @@ def da_plot_raw(pressure, loading, iso_temp, molar_mass, liquid_density, exp):
         res = opt.minimize_scalar(fit, bounds=[1, 3], method='bounded')
 
         if not res.success:
-            raise CalculationError("""Could not obtain a linear fit on the data provided.""")
+            raise CalculationError(
+                """Could not obtain a linear fit on the data provided.""")
 
         exp = res.x
 
@@ -297,7 +292,8 @@ def da_plot_raw(pressure, loading, iso_temp, molar_mass, liquid_density, exp):
 
     # Obtain result values
     microp_volume = 10**intercept
-    potential = (-numpy.log(10)**(exp-1) *
-                 (const.gas_constant * iso_temp)**(exp)/slope)**(1/exp) / 1000
+    potential = (-numpy.log(10)**(exp - 1) *
+                 (const.gas_constant * iso_temp)**(exp) / slope)**(1 /
+                                                                   exp) / 1000
 
     return slope, intercept, log_n_p0p, logv, exp, microp_volume, potential
