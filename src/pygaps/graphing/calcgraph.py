@@ -8,8 +8,13 @@ from .mpl_styles import TICK_STYLE
 from .mpl_styles import TITLE_STYLE
 
 
-def roq_plot(pressure, roq_points, minimum, maximum,
-             p_monolayer, roq_monolayer, ax=None):
+def roq_plot(pressure,
+             roq_points,
+             minimum,
+             maximum,
+             p_monolayer,
+             roq_monolayer,
+             ax=None):
     """
     Draw a Rouquerol plot.
 
@@ -41,14 +46,30 @@ def roq_plot(pressure, roq_points, minimum, maximum,
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, roq_points, label='all points',
-            color='grey', marker='o', mfc='none', markersize=6,
-            markeredgewidth=1.5, linewidth=0,)
-    ax.plot(pressure[minimum:maximum], roq_points[minimum:maximum],
-            marker='o', linestyle='', color='r', label='chosen points')
-    ax.plot(p_monolayer, roq_monolayer,
-            marker='X', markersize=10,
-            linestyle='', color='k', label='monolayer point')
+    ax.plot(
+        pressure,
+        roq_points,
+        label='all points',
+        color='grey',
+        marker='o',
+        mfc='none',
+        markersize=6,
+        markeredgewidth=1.5,
+        linewidth=0,
+    )
+    ax.plot(pressure[minimum:maximum],
+            roq_points[minimum:maximum],
+            marker='o',
+            linestyle='',
+            color='r',
+            label='chosen points')
+    ax.plot(p_monolayer,
+            roq_monolayer,
+            marker='X',
+            markersize=10,
+            linestyle='',
+            color='k',
+            label='monolayer point')
     ax.set_title("Rouquerol plot")
     ax.set_xlabel('p/p°', fontsize=15)
     ax.set_ylabel('$n ( 1 - p/p°)$', fontsize=10)
@@ -57,8 +78,15 @@ def roq_plot(pressure, roq_points, minimum, maximum,
     return ax
 
 
-def bet_plot(pressure, bet_points, minimum, maximum,
-             slope, intercept, p_monolayer, bet_monolayer, ax=None):
+def bet_plot(pressure,
+             bet_points,
+             minimum,
+             maximum,
+             slope,
+             intercept,
+             p_monolayer,
+             bet_monolayer,
+             ax=None):
     """
     Draw a BET plot.
 
@@ -94,22 +122,36 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, bet_points, label='all points',
-            color='grey', marker='o', mfc='none', markersize=6,
-            markeredgewidth=1.5, linewidth=0,)
-    ax.plot(pressure[minimum:maximum], bet_points[minimum:maximum],
-            marker='o', linestyle='', color='r', label='chosen points')
+    ax.plot(
+        pressure,
+        bet_points,
+        label='all points',
+        color='grey',
+        marker='o',
+        mfc='none',
+        markersize=6,
+        markeredgewidth=1.5,
+        linewidth=0,
+    )
+    ax.plot(pressure[minimum:maximum],
+            bet_points[minimum:maximum],
+            marker='o',
+            linestyle='',
+            color='r',
+            label='chosen points')
     x_lim = [0, pressure[maximum]]
-    y_lim = [slope * x_lim[0] + intercept,
-             slope * x_lim[1] + intercept]
+    y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
     ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
-    ax.plot(p_monolayer, bet_monolayer,
-            marker='X', markersize=10,
-            linestyle='', color='k', label='monolayer point')
+    ax.plot(p_monolayer,
+            bet_monolayer,
+            marker='X',
+            markersize=10,
+            linestyle='',
+            color='k',
+            label='monolayer point')
 
     ax.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
-    ax.set_xlim(
-        left=0, right=pressure[maximum] * 1.2)
+    ax.set_xlim(left=0, right=pressure[maximum] * 1.2)
     ax.set_title("BET plot")
     ax.set_xlabel('p/p°', fontsize=15)
     ax.set_ylabel('$\\frac{p/p°}{n ( 1- p/p°)}$', fontsize=15)
@@ -118,8 +160,13 @@ def bet_plot(pressure, bet_points, minimum, maximum,
     return ax
 
 
-def langmuir_plot(pressure, langmuir_points, minimum, maximum,
-                  slope, intercept, ax=None):
+def langmuir_plot(pressure,
+                  langmuir_points,
+                  minimum,
+                  maximum,
+                  slope,
+                  intercept,
+                  ax=None):
     """
     Draw a Langmuir plot.
 
@@ -151,19 +198,29 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(pressure, langmuir_points, label='all points',
-            color='grey', marker='o', mfc='none', markersize=6,
-            markeredgewidth=1.5, linewidth=0,)
-    ax.plot(pressure[minimum:maximum], langmuir_points[minimum:maximum],
-            marker='o', linestyle='', color='r', label='chosen points')
+    ax.plot(
+        pressure,
+        langmuir_points,
+        label='all points',
+        color='grey',
+        marker='o',
+        mfc='none',
+        markersize=6,
+        markeredgewidth=1.5,
+        linewidth=0,
+    )
+    ax.plot(pressure[minimum:maximum],
+            langmuir_points[minimum:maximum],
+            marker='o',
+            linestyle='',
+            color='r',
+            label='chosen points')
     x_lim = [0, pressure[maximum]]
-    y_lim = [slope * x_lim[0] + intercept,
-             slope * x_lim[1] + intercept]
+    y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
     ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
 
     ax.set_ylim(bottom=0, top=langmuir_points[maximum] * 1.2)
-    ax.set_xlim(
-        left=0, right=pressure[maximum] * 1.2)
+    ax.set_xlim(left=0, right=pressure[maximum] * 1.2)
     ax.set_title("Langmuir plot")
     ax.set_xlabel('p/p°', fontsize=15)
     ax.set_ylabel('(p/p°)/n', fontsize=15)
@@ -172,7 +229,12 @@ def langmuir_plot(pressure, langmuir_points, minimum, maximum,
     return ax
 
 
-def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=None, ax=None):
+def plot_tp(thickness_curve,
+            loading,
+            results,
+            alpha_s=False,
+            alpha_reducing_p=None,
+            ax=None):
     """
     Draw a t-plot (also used for the alpha-s plot).
 
@@ -221,23 +283,29 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
         label1 = 't transform'
         label2 = 'Layer thickness (nm)'
         label3 = 't-plot method'
-    ax.plot(thickness_curve, loading,
-            marker='', color='g', label=label1)
+    ax.plot(thickness_curve, loading, marker='', color='g', label=label1)
 
     for index, result in enumerate(results):
         # plot chosen points
-        ax.plot(thickness_curve[result.get('section')], loading[result.get('section')],
-                marker='.', linestyle='')
+        ax.plot(thickness_curve[result.get('section')],
+                loading[result.get('section')],
+                marker='.',
+                linestyle='')
 
         # plot line
         min_lim = 0
         max_lim = max(thickness_curve[result.get('section')]) * 1.2
         x_lim = [min_lim, max_lim]
-        y_lim = [result.get('slope') * min_lim + result.get('intercept'),
-                 result.get('slope') * max_lim + result.get('intercept')]
+        y_lim = [
+            result.get('slope') * min_lim + result.get('intercept'),
+            result.get('slope') * max_lim + result.get('intercept')
+        ]
 
-        ax.plot(x_lim, y_lim, linestyle='--',
-                color='black', label='linear' + str(index + 1))
+        ax.plot(x_lim,
+                y_lim,
+                linestyle='--',
+                color='black',
+                label='linear' + str(index + 1))
 
     ax.set_title(label3)
     ax.set_xlim(left=0)
@@ -249,9 +317,17 @@ def plot_tp(thickness_curve, loading, results, alpha_s=False, alpha_reducing_p=N
     return ax
 
 
-def psd_plot(pore_widths, pore_dist, pore_vol_cum=None, method=None,
-             labeldiff='distribution', labelcum='cumulative',
-             line_style=None, log=True, right=None, left=None, ax=None):
+def psd_plot(pore_widths,
+             pore_dist,
+             pore_vol_cum=None,
+             method=None,
+             labeldiff='distribution',
+             labelcum='cumulative',
+             line_style=None,
+             log=True,
+             right=None,
+             left=None,
+             ax=None):
     """
     Draw a pore size distribution plot.
 
@@ -301,8 +377,12 @@ def psd_plot(pore_widths, pore_dist, pore_vol_cum=None, method=None,
     l1 = ax.plot(pore_widths, pore_dist, label=labeldiff, **lst)
     if labelcum:
         ax2 = ax.twinx()
-        l2 = ax2.plot(pore_widths, pore_vol_cum,
-                      marker='', color='r', linestyle="--", label=labelcum)
+        l2 = ax2.plot(pore_widths,
+                      pore_vol_cum,
+                      marker='',
+                      color='r',
+                      linestyle="--",
+                      label=labelcum)
 
     # Func formatter
 
@@ -313,12 +393,18 @@ def psd_plot(pore_widths, pore_dist, pore_vol_cum=None, method=None,
         ax.set_xscale('log')
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
         ax.xaxis.set_major_formatter(ticker.FuncFormatter(formatter))
-        ax.xaxis.set_major_locator(ticker.LogLocator(
-            base=10.0, numticks=15, numdecs=20))
-        ax.tick_params(axis='x', which='minor', width=0.75,
-                       length=2.5, **TICK_STYLE)
-        ax.tick_params(axis='x', which='major',
-                       width=2, length=10, **TICK_STYLE)
+        ax.xaxis.set_major_locator(
+            ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
+        ax.tick_params(axis='x',
+                       which='minor',
+                       width=0.75,
+                       length=2.5,
+                       **TICK_STYLE)
+        ax.tick_params(axis='x',
+                       which='major',
+                       width=2,
+                       length=10,
+                       **TICK_STYLE)
         ax.set_xlim(left=left, right=right)
     else:
         if not left:
@@ -335,8 +421,7 @@ def psd_plot(pore_widths, pore_dist, pore_vol_cum=None, method=None,
     lns = l1
     if labelcum:
         lns = l1 + l2
-    labs = [l.get_label() for l in lns]
-    ax.legend(lns, labs, loc='lower right')
+    ax.legend(lns, [lbl.get_label() for lbl in lns], loc='lower right')
     ax.set_ylim(bottom=0)
     if labelcum:
         ax2.set_ylim(bottom=0)
@@ -372,12 +457,15 @@ def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.plot(loading, isosteric_enthalpy,
-            marker='o', color='g', label='enthalpy')
+    ax.plot(loading,
+            isosteric_enthalpy,
+            marker='o',
+            color='g',
+            label='enthalpy')
     if log:
         ax.set_xscale('log')
-        ax.xaxis.set_major_locator(ticker.LogLocator(
-            base=10.0, numticks=15, numdecs=20))
+        ax.xaxis.set_major_locator(
+            ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
     ax.set_title("Isosteric enthalpy plot")
     ax.set_xlabel('Loading')
     ax.set_ylabel('Isosteric enthalpy')
@@ -389,8 +477,13 @@ def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
     return ax
 
 
-def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
-                          title=None, extras=None, ax=None):
+def initial_enthalpy_plot(loading,
+                          enthalpy,
+                          fitted_enthalpy,
+                          log=False,
+                          title=None,
+                          extras=None,
+                          ax=None):
     """
     Draws the initial enthalpy calculation plot.
 
@@ -421,18 +514,21 @@ def initial_enthalpy_plot(loading, enthalpy, fitted_enthalpy, log=False,
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.plot(loading, enthalpy,
-            marker='o', color='black', label='original', linestyle='')
-    ax.plot(loading, fitted_enthalpy,
-            color='r', label='fitted', linestyle='-')
+    ax.plot(loading,
+            enthalpy,
+            marker='o',
+            color='black',
+            label='original',
+            linestyle='')
+    ax.plot(loading, fitted_enthalpy, color='r', label='fitted', linestyle='-')
 
     if extras is not None:
         for param in extras:
             ax.plot(param[0], param[1], label=param[2], linestyle='--')
     if log:
         ax.set_xscale('log')
-        ax.xaxis.set_major_locator(ticker.LogLocator(
-            base=10.0, numticks=15, numdecs=20))
+        ax.xaxis.set_major_locator(
+            ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
 
     ax.set_title(title + " initial enthalpy fit")
     ax.set_xlabel('Loading')
@@ -478,7 +574,11 @@ def dra_plot(logv, log_n_p0p, slope, intercept, exp, ax=None):
 
     linear = slope * log_n_p0p(exp) + intercept
     ax.plot(log_n_p0p(exp), logv, "o")
-    ax.plot(log_n_p0p(exp), linear, linestyle='--', color='black', label='trendline')
+    ax.plot(log_n_p0p(exp),
+            linear,
+            linestyle='--',
+            color='black',
+            label='trendline')
     ax.set_xlabel('log $p^0/p$')
     ax.set_ylabel('log $V/V_0$')
     ax.legend()
