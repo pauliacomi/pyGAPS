@@ -54,12 +54,12 @@ jobs:
   include:
     # Checks and docks
     - stage: test
-      python: '3.7'     # specify python 3.8
+      python: '3.8'     # specify python 3.8
       dist: xenial
       env:
         - TOXENV=check
     - stage: test
-      python: '3.7'     # specify python 3.8
+      python: '3.8'     # specify python 3.8
       dist: xenial
       env:
         - TOXENV=docs
@@ -84,7 +84,7 @@ jobs:
         - TOXENV=py38-cover,report,codecov
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
-      python: '3.7'     # specify python 3.8
+      python: '3.8'     # specify python 3.8
       dist: xenial
       env: TOXENV=none  # overwrite environment var
       install: skip     # no need to install tox

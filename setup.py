@@ -23,8 +23,8 @@ setup(
     name='pygaps',
     version='2.0.2',
     license='MIT license',
-    description=
-    'A framework for processing adsorption data for porous materials',
+    description=  # noqa: E251
+    """A framework for processing adsorption data for porous materials""",
     long_description='%s' %
     (re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub(
         '', read('README.rst'))),
