@@ -14,10 +14,8 @@ from setuptools import setup
 
 
 def read(*names, **kwargs):
-    with io.open(
-            join(dirname(__file__), *names),
-            encoding=kwargs.get('encoding', 'utf8')
-    ) as fh:
+    with io.open(join(dirname(__file__), *names),
+                 encoding=kwargs.get('encoding', 'utf8')) as fh:
         return fh.read()
 
 
@@ -25,11 +23,11 @@ setup(
     name='pygaps',
     version='2.0.2',
     license='MIT license',
-    description='A framework for processing adsorption data for porous materials',
-    long_description='%s' % (
-        re.compile('^.. start-badges.*^.. end-badges',
-                   re.M | re.S).sub('', read('README.rst'))
-    ),
+    description=
+    'A framework for processing adsorption data for porous materials',
+    long_description='%s' %
+    (re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub(
+        '', read('README.rst'))),
     author='Paul Iacomi',
     author_email='iacomi.paul@gmail.com',
     url='https://github.com/pauliacomi/pygaps',
@@ -51,17 +49,15 @@ setup(
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython',
         # 'Programming Language :: Python :: Implementation :: PyPy3',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Physics',
     ],
-    keywords=[
-        'adsorption', 'characterization', 'porous materials'
-    ],
+    keywords=['adsorption', 'characterization', 'porous materials'],
     setup_requires=[
         'pytest-runner',
     ],

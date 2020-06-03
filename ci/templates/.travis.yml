@@ -54,12 +54,12 @@ jobs:
   include:
     # Checks and docks
     - stage: test
-      python: '3.7'     # specify python 3.7
+      python: '3.8'     # specify python 3.8
       dist: xenial
       env:
         - TOXENV=check
     - stage: test
-      python: '3.7'     # specify python 3.7
+      python: '3.8'     # specify python 3.8
       dist: xenial
       env:
         - TOXENV=docs
