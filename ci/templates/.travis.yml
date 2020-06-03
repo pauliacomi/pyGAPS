@@ -55,12 +55,12 @@ jobs:
     # Checks and docks
     - stage: test
       python: '3.8'     # specify python 3.8
-      dist: xenial
+      dist: bionic
       env:
         - TOXENV=check
     - stage: test
       python: '3.8'     # specify python 3.8
-      dist: xenial
+      dist: bionic
       env:
         - TOXENV=docs
       addons:
@@ -73,7 +73,7 @@ jobs:
     - stage: test
       python: '{{ env.split("-")[0] if env.startswith("pypy") else "{0[2]}.{0[3]}".format(env) }}'
     {% if env.startswith('py37') %}
-      dist: xenial
+      dist: bionic
       {% endif %}
       env:
         - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
@@ -82,7 +82,7 @@ jobs:
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.8'     # specify python 3.8
-      dist: xenial
+      dist: bionic
       env: TOXENV=none  # overwrite environment var
       install: skip     # no need to install tox
       script: skip      # run no tests

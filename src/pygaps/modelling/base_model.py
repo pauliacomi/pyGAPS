@@ -27,27 +27,22 @@ class IsothermBaseModel():
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-
     def __repr__(self):
         """Print model name."""
         return "pyGAPS Model, type {}".format(self.name)
 
     def __str__(self):
         """Print model name and parameters."""
-        ret_string = (
-            "{0} isotherm model.\n".format(self.name) +
-            "RMSE = {:.4f}\n".format(self.rmse) +
-            "Model parameters:\n"
-        )
+        ret_string = ("{0} isotherm model.\n".format(self.name) +
+                      "RMSE = {:.4f}\n".format(self.rmse) +
+                      "Model parameters:\n")
         for param, val in self.params.items():
             ret_string += "\t%s = %f\n" % (param, val)
-        ret_string += (
-            "Model applicable range:\n" +
-            "\tPressure range: {:.2f} - {:.2f}\n".format(
-                self.pressure_range[0], self.pressure_range[1]) +
-            "\tLoading range: {:.2f} - {:.2f}\n".format(
-                self.loading_range[0], self.loading_range[1])
-        )
+        ret_string += ("Model applicable range:\n" +
+                       "\tPressure range: {:.2f} - {:.2f}\n".format(
+                           self.pressure_range[0], self.pressure_range[1]) +
+                       "\tLoading range: {:.2f} - {:.2f}\n".format(
+                           self.loading_range[0], self.loading_range[1]))
 
         return ret_string
 
@@ -144,11 +139,17 @@ class IsothermBaseModel():
         # guess saturation loading to 10% more than highest loading
         saturation_loading = 1.1 * max(loading)
         # guess langmuir constant from the starting point
-        langmuir_k = loading[0] / pressure[0] / (saturation_loading - loading[0])
+        langmuir_k = loading[0] / pressure[0] / (saturation_loading -
+                                                 loading[0])
 
         return saturation_loading, langmuir_k
 
-    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
+    def fit(self,
+            pressure,
+            loading,
+            param_guess,
+            optimization_params=None,
+            verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -176,23 +177,24 @@ class IsothermBaseModel():
         bounds = [[self.param_bounds[param][0] for param in param_names],
                   [self.param_bounds[param][1] for param in param_names]]
 
-        def fit_func(x, p, l):
+        def fit_func(x, p, L):
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = x[i]
-            return self.loading(p) - l
+            return self.loading(p) - L
 
         kwargs = dict(
-            bounds=bounds,                      # supply the bounds of the parameters
+            bounds=bounds,  # supply the bounds of the parameters
         )
         if optimization_params:
             kwargs.update(optimization_params)
 
         # minimize RSS
         opt_res = opt.least_squares(
-            fit_func, guess,                    # provide the fit function and initial guess
-            args=(pressure, loading),           # supply the extra arguments to the fit function
-            **kwargs
-        )
+            fit_func,
+            guess,  # provide the fit function and initial guess
+            args=(pressure,
+                  loading),  # supply the extra arguments to the fit function
+            **kwargs)
         if not opt_res.success:
             raise CalculationError(
                 "\nFitting routine with model {0} failed with error:"
@@ -210,4 +212,5 @@ class IsothermBaseModel():
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            print("Model {0} success, RMSE is {1:.3f}".format(self.name, self.rmse))
+            print("Model {0} success, RMSE is {1:.3f}".format(
+                self.name, self.rmse))

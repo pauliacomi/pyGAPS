@@ -182,10 +182,15 @@ class WVST(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading)
 
-        guess = {"n_m": saturation_loading, "K": langmuir_k,
-                 "L1v": 1, "Lv1": 1}
+        guess = {
+            "n_m": saturation_loading,
+            "K": langmuir_k,
+            "L1v": 1,
+            "Lv1": 1
+        }
 
         for param in guess:
             if guess[param] < self.param_bounds[param][0]:
@@ -195,7 +200,12 @@ class WVST(IsothermBaseModel):
 
         return guess
 
-    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
+    def fit(self,
+            pressure,
+            loading,
+            param_guess,
+            optimization_params=None,
+            verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -221,23 +231,24 @@ class WVST(IsothermBaseModel):
         bounds = [[self.param_bounds[param][0] for param in param_names],
                   [self.param_bounds[param][1] for param in param_names]]
 
-        def fit_func(x, p, l):
+        def fit_func(x, p, L):
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = x[i]
-            return self.pressure(l) - p
+            return self.pressure(L) - p
 
         kwargs = dict(
-            bounds=bounds,                      # supply the bounds of the parameters
+            bounds=bounds,  # supply the bounds of the parameters
         )
         if optimization_params:
             kwargs.update(optimization_params)
 
         # minimize RSS
         opt_res = opt.least_squares(
-            fit_func, guess,                    # provide the fit function and initial guess
-            args=(pressure, loading),        # supply the extra arguments to the fit function
-            **kwargs
-        )
+            fit_func,
+            guess,  # provide the fit function and initial guess
+            args=(pressure,
+                  loading),  # supply the extra arguments to the fit function
+            **kwargs)
         if not opt_res.success:
             raise CalculationError(
                 "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
@@ -254,4 +265,5 @@ class WVST(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            print("Model {0} success, RMSE is {1:.3f}".format(self.name, self.rmse))
+            print("Model {0} success, RMSE is {1:.3f}".format(
+                self.name, self.rmse))
