@@ -46,10 +46,10 @@ def initial_henry_slope(isotherm,
         if not l_limits:
             l_limits = [-numpy.inf, numpy.inf]
 
-        pressure = isotherm.pressure(
-            branch='ads', indexed=True, limits=p_limits)
-        loading = isotherm.loading(
-            branch='ads', indexed=True, limits=l_limits)
+        pressure = isotherm.pressure(branch='ads',
+                                     indexed=True,
+                                     limits=p_limits)
+        loading = isotherm.loading(branch='ads', indexed=True, limits=l_limits)
 
         pressure, loading = pressure.align(loading, join='inner')
         pressure, loading = pressure.values, loading.values
@@ -79,7 +79,8 @@ def initial_henry_slope(isotherm,
 
     while rows_taken != 1:
 
-        param_guess = henry.initial_guess(pressure[:rows_taken], loading[:rows_taken])
+        param_guess = henry.initial_guess(pressure[:rows_taken],
+                                          loading[:rows_taken])
         # fit model to isotherm data
         henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
         adjrmsd = henry.rmse / numpy.ptp(loading)
@@ -92,10 +93,10 @@ def initial_henry_slope(isotherm,
 
     # logging for debugging
     if verbose:
-        print("Calculated K = {:.2e}".format(henry.params["K"]))
+        print(f"Calculated K = {henry.params['K']:.2e}")
         print("Starting points:", initial_rows)
         print("Selected points:", rows_taken)
-        print("Final adjusted RMSE: {:.2e}".format(adjrmsd))
+        print(f"Final adjusted RMSE: {adjrmsd:.2e}")
         params = {
             'plot_type': 'isotherm',
             'branch': 'ads',
@@ -142,6 +143,5 @@ def initial_henry_virial(isotherm, optimization_params=None, verbose=False):
         isotherm,
         model='Virial',
         optimization_params=optimization_params,
-        verbose=verbose
-    )
+        verbose=verbose)
     return model_isotherm.model.params['K']

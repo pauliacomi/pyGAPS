@@ -30,26 +30,24 @@ def plot_iso(isotherms,
              x_data='pressure',
              y1_data='loading',
              y2_data=None,
-
-             branch="all", logx=False,
-             logy1=False, logy2=False,
-             color=True, marker=None,
-
+             branch="all",
+             logx=False,
+             logy1=False,
+             logy2=False,
+             color=True,
+             marker=None,
              adsorbent_basis="mass",
              adsorbent_unit="g",
              loading_basis="molar",
              loading_unit="mmol",
              pressure_mode="absolute",
              pressure_unit="bar",
-
              x_range=(None, None),
              y1_range=(None, None),
              y2_range=(None, None),
-
              fig_title=None,
              lgd_keys=None,
              lgd_pos='best',
-
              save_path=None,
              **other_parameters):
     """
@@ -174,7 +172,7 @@ def plot_iso(isotherms,
     # Initial checks
     # Make iterable if not already
     if not isinstance(isotherms, abc.Iterable):
-        isotherms = (isotherms,)
+        isotherms = (isotherms, )
 
     # Check for plot type validity
     if None in [x_data, y1_data]:
@@ -187,18 +185,18 @@ def plot_iso(isotherms,
 
     if any(x_data not in keys(isotherm) for isotherm in isotherms):
         raise GraphingError(
-            "One of the isotherms supplied does not have {} data".format(x_data))
+            f"One of the isotherms supplied does not have {x_data} data.")
 
     if any(y1_data not in keys(isotherm) for isotherm in isotherms):
         raise GraphingError(
-            "One of the isotherms supplied does not have {} data".format(y1_data))
+            f"One of the isotherms supplied does not have {y1_data} data.")
 
     if y2_data is not None:
         if all(y2_data not in keys(isotherm) for isotherm in isotherms):
             raise GraphingError(
-                "None of the isotherms supplied have {} data".format(y2_data))
+                f"None of the isotherms supplied have {y2_data} data")
         if any(y2_data not in keys(isotherm) for isotherm in isotherms):
-            warnings.warn('Some isotherms do not have {} data'.format(y2_data))
+            warnings.warn(f"Some isotherms do not have {y2_data} data")
 
     # Store which branches will be displayed
     if branch is None:
@@ -206,7 +204,7 @@ def plot_iso(isotherms,
                              " e.g. branch=\'ads\'")
     if branch not in _BRANCH_TYPES:
         raise GraphingError("The supplied branch type is not valid."
-                            "Viable types are {}".format(_BRANCH_TYPES))
+                            f"Viable types are {_BRANCH_TYPES}")
 
     ads, des = _BRANCH_TYPES[branch]
 
@@ -365,8 +363,8 @@ def plot_iso(isotherms,
     # Generic axes graphing function
     #
 
-    def graph_caller(isotherm, current_branch,
-                     y1_style, y2_style, **iso_params):
+    def graph_caller(isotherm, current_branch, y1_style, y2_style,
+                     **iso_params):
         """Convenience function to call other graphing functions."""
 
         # Check for branch existence
@@ -381,22 +379,22 @@ def plot_iso(isotherms,
         # Plot line 1
         label = build_label(isotherm, lgd_keys, current_branch, y1_data)
 
-        x_p, y_p = _get_data(
-            isotherm, x_data, current_branch, x_range, **iso_params).align(
-            _get_data(
-                isotherm, y1_data, current_branch, y1_range, **iso_params),
-            join='inner')
+        x_p, y_p = _get_data(isotherm, x_data, current_branch, x_range,
+                             **iso_params).align(_get_data(
+                                 isotherm, y1_data, current_branch, y1_range,
+                                 **iso_params),
+                                                 join='inner')
 
         ax1.plot(x_p, y_p, label=label, **y1_style)
 
         # Plot line 2 (if applicable)
         if y2_data and y2_data in keys(isotherm):
 
-            x_p, y2_p = _get_data(
-                isotherm, x_data, current_branch, x_range, **iso_params).align(
-                _get_data(
-                    isotherm, y2_data, current_branch, y2_range, **iso_params),
-                join='inner')
+            x_p, y2_p = _get_data(isotherm, x_data, current_branch, x_range,
+                                  **iso_params).align(_get_data(
+                                      isotherm, y2_data, current_branch,
+                                      y2_range, **iso_params),
+                                                      join='inner')
 
             label = build_label(isotherm, lgd_keys, current_branch, y2_data)
             ax2.set_ylabel(y2_label, **styles['label_style'])
@@ -418,8 +416,7 @@ def plot_iso(isotherms,
 
         # If there's an adsorption branch, plot it
         if ads:
-            graph_caller(isotherm, 'ads',
-                         y1_line_style, y2_line_style,
+            graph_caller(isotherm, 'ads', y1_line_style, y2_line_style,
                          **iso_params)
 
         # Switch to desorption linestyle (dotted, open marker)
@@ -429,17 +426,15 @@ def plot_iso(isotherms,
 
         # If there's a desorption branch, plot it
         if des:
-            graph_caller(isotherm, 'des',
-                         y1_line_style, y2_line_style,
+            graph_caller(isotherm, 'des', y1_line_style, y2_line_style,
                          **iso_params)
 
     #####################################
     #
     # Final settings
 
-    _final_styling(fig, ax1, ax2,
-                   log_params, range_params,
-                   lgd_pos, styles, save_path)
+    _final_styling(fig, ax1, ax2, log_params, range_params, lgd_pos, styles,
+                   save_path)
 
     if ax2:
         return [ax1, ax2]
@@ -448,24 +443,24 @@ def plot_iso(isotherms,
 
 def plot_iso_raw(x_data,
                  x_label,
-                 y1_data, y1_label,
-                 y2_data=None, y2_label=None,
+                 y1_data,
+                 y1_label,
+                 y2_data=None,
+                 y2_label=None,
                  ax=None,
-
                  logx=False,
-                 logy1=False, logy2=False,
-                 color=cm.jet(0.8), marker='o',
-
+                 logy1=False,
+                 logy2=False,
+                 color=cm.jet(0.8),
+                 marker='o',
                  x_range=(None, None),
                  y1_range=(None, None),
                  y2_range=(None, None),
-
                  fig_title=None,
                  **other_parameters):
 
     log_params = dict(logx=logx, logy1=logy1, logy2=logy2)
-    range_params = dict(
-        x_range=x_range, y1_range=y1_range, y2_range=y2_range)
+    range_params = dict(x_range=x_range, y1_range=y1_range, y2_range=y2_range)
 
     #######################################
     #
@@ -523,15 +518,13 @@ def plot_iso_raw(x_data,
 
         ax2.set_ylabel(y2_label, **styles['label_style'])
         ax2.tick_params(axis='both', which='major', **styles['tick_style'])
-        ax2.plot(x_data, y2_data,  **y2_line_style)
+        ax2.plot(x_data, y2_data, **y2_line_style)
 
     #####################################
     #
     # Final settings
 
-    _final_styling(fig, ax1, ax2,
-                   log_params, range_params,
-                   None, styles, None)
+    _final_styling(fig, ax1, ax2, log_params, range_params, None, styles, None)
 
     if ax2:
         return [ax1, ax2]
@@ -566,9 +559,8 @@ def _get_data(isotherm, data_name, current_branch, drange, **kwargs):
     )
 
 
-def _final_styling(fig, ax1, ax2,
-                   log_params, range_params,
-                   lgd_pos, styles, save_path):
+def _final_styling(fig, ax1, ax2, log_params, range_params, lgd_pos, styles,
+                   save_path):
     """Axes scales and limits, legend and graph saving."""
     # Convert the axes into logarithmic if required
     if log_params['logx']:

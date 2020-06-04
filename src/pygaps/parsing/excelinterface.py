@@ -348,7 +348,7 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
                 try:
                     new_mod.params[param] = model_param[param]
                 except KeyError as err:
-                    raise KeyError("The JSON is missing parameter '{0}'".format(param)) from err
+                    raise KeyError(f"The JSON is missing parameter '{param}'") from err
 
         # read the secondary isotherm parameters
         if 'otherdata' in wb.sheet_names():

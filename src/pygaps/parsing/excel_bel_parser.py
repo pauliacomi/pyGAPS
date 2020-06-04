@@ -112,9 +112,9 @@ def read_bel_report(path):
     for row, col in product(range(sheet.nrows), range(sheet.ncols)):
         cell_value = str(sheet.cell(row, col).value).lower()
         try:
-            field = next(v for k, v in _FIELDS.items() if
-                         any([cell_value.startswith(n) for
-                              n in v.get('text')]))
+            field = next(
+                v for k, v in _FIELDS.items()
+                if any([cell_value.startswith(n) for n in v.get('text')]))
         except StopIteration:
             continue
         if field['type'] == 'number':
@@ -122,22 +122,24 @@ def read_bel_report(path):
             data[field['name']] = val
         if field['type'] == 'date':
             day = sheet.cell(row + field['row'], col + field['column']).value
-            time = sheet.cell(
-                row + 1 + field['row'], col + field['column']).value
+            time = sheet.cell(row + 1 + field['row'],
+                              col + field['column']).value
             data[field['name']] = _handle_date(sheet, day + time)
         elif field['type'] == 'string':
             val = sheet.cell(row + field['row'], col + field['column']).value
             data[field['name']] = _handle_string(val)
         elif field['type'] == 'isotherm data':
             data['pressure'] = {}
-            (ads_start, ads_end,
-             des_start, des_end) = _find_datapoints(sheet, row, col)
+            (ads_start, ads_end, des_start,
+             des_end) = _find_datapoints(sheet, row, col)
 
             for i, item in enumerate(_get_data_labels(sheet, row, col)):
-                ads_points = [sheet.cell(r, i).value
-                              for r in range(ads_start, ads_end)]
-                des_points = [sheet.cell(r, i).value
-                              for r in range(des_start, des_end)]
+                ads_points = [
+                    sheet.cell(r, i).value for r in range(ads_start, ads_end)
+                ]
+                des_points = [
+                    sheet.cell(r, i).value for r in range(des_start, des_end)
+                ]
                 _assign_data(item, field, data, ads_points, des_points)
         elif field['type'] == 'error':
             errors += _get_errors(sheet, row, col)
@@ -154,7 +156,8 @@ def _handle_date(sheet, val):
     Input is a cell of type 'date'.
     """
     if val:
-        return xlrd.xldate.xldate_as_datetime(val, sheet.book.datemode).strftime("%Y-%m-%d %H:%M:%S")
+        return xlrd.xldate.xldate_as_datetime(
+            val, sheet.book.datemode).strftime("%Y-%m-%d %H:%M:%S")
     else:
         return None
 
@@ -175,14 +178,17 @@ def _get_data_labels(sheet, row, col):
     # Abstract this sort of thing
     header = re.sub(_RSPACE_REGEX, '',
                     sheet.cell(row + header_row, final_column).value)
-    while any(header.startswith(label) for label
-              in _FIELDS['isotherm data']['labels']):
+    while any(
+            header.startswith(label)
+            for label in _FIELDS['isotherm data']['labels']):
         final_column += 1
         header = re.sub(_RSPACE_REGEX, '',
                         sheet.cell(row + header_row, final_column).value)
-    return [re.sub(_RSPACE_REGEX, '',
-                   sheet.cell(row + header_row, i).value)
-            for i in range(col, final_column)]
+    return [
+        re.sub(_RSPACE_REGEX, '',
+               sheet.cell(row + header_row, i).value)
+        for i in range(col, final_column)
+    ]
 
 
 def _find_datapoints(sheet, row, col):
@@ -228,7 +234,8 @@ def _assign_data(item, field, data, ads_points, des_points):
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'loading':
         data['loading'] = ads_points + des_points
-        for (u, c) in (('/mmol', 'mmol'), ('/mol', 'mol'), ('/cm3(STP)', 'cm3(STP)')):
+        for (u, c) in (('/mmol', 'mmol'), ('/mol', 'mol'), ('/cm3(STP)',
+                                                            'cm3(STP)')):
             if u in item:
                 data['loading_unit'] = c
         for (u, c) in (('g-1', 'g'), ('kg-1', 'kg')):
@@ -237,12 +244,13 @@ def _assign_data(item, field, data, ads_points, des_points):
     elif field['labels'][name] == 'measurement':
         data['measurement'] = [False] * \
             len(ads_points) + [True] * len(des_points)
-    elif field['labels'][name] in ['relative', 'absolute', 'saturation',
-                                   'absolute2', 'internal']:
+    elif field['labels'][name] in [
+            'relative', 'absolute', 'saturation', 'absolute2', 'internal'
+    ]:
         data['pressure'][field['labels'][name]] = ads_points + des_points
     else:
-        raise ValueError("Label name '{}' not recognized."
-                         .format(field['labels'][name]))
+        raise ValueError(
+            f"Label name '{field['labels'][name]}' not recognized.")
 
 
 def _get_errors(sheet, row, col):
@@ -260,8 +268,10 @@ def _get_errors(sheet, row, col):
     while error:
         final_row += 1
         error = sheet.cell(final_row, col + field['column']).value
-    return [sheet.cell(i, col + field['column']).value
-            for i in range(row + field['row'], final_row)]
+    return [
+        sheet.cell(i, col + field['column']).value
+        for i in range(row + field['row'], final_row)
+    ]
 
 
 def _check(data, path):
@@ -273,7 +283,6 @@ def _check(data, path):
     if 'loading' in data:
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
-            logging.info('No data collected for {} in file {}.'
-                         .format(empty, path))
+            logging.info(f"No data collected for {empty} in file {path}.")
     if 'errors' in data:
         logging.warning('\n'.join(data['errors']))

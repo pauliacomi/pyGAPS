@@ -65,8 +65,10 @@ class TemkinApprox(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        lang_load = self.params["K"] * pressure / (1.0 + self.params["K"] * pressure)
-        return self.params["n_m"] * (lang_load + self.params["tht"] * lang_load ** 2 *
+        lang_load = self.params["K"] * pressure / (1.0 +
+                                                   self.params["K"] * pressure)
+        return self.params["n_m"] * (lang_load +
+                                     self.params["tht"] * lang_load**2 *
                                      (lang_load - 1))
 
     def pressure(self, loading):
@@ -92,9 +94,7 @@ class TemkinApprox(IsothermBaseModel):
         opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+            raise CalculationError(f"Root finding for value {loading} failed.")
 
         return opt_res.x
 
@@ -126,9 +126,9 @@ class TemkinApprox(IsothermBaseModel):
             Spreading pressure at specified pressure.
         """
         one_plus_kp = 1.0 + self.params["K"] * pressure
-        return self.params["n_m"] * (numpy.log(one_plus_kp) +
-                                     self.params["tht"] * (2.0 * self.params["K"] * pressure + 1.0) /
-                                     (2.0 * one_plus_kp ** 2))
+        return self.params["n_m"] * (
+            numpy.log(one_plus_kp) + self.params["tht"] *
+            (2.0 * self.params["K"] * pressure + 1.0) / (2.0 * one_plus_kp**2))
 
     def initial_guess(self, pressure, loading):
         """
@@ -146,7 +146,8 @@ class TemkinApprox(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k, "tht": 0.0}
 

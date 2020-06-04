@@ -82,12 +82,12 @@ class Adsorbate():
         adsorbate.backend.p_critical()
 
     """
-
     def __init__(self, name=None, **properties):
         """Instantiate by passing a dictionary with the parameters."""
         # Adsorbate name
         if name is None:
-            raise ParameterError("Must provide a name for the created adsorbate.")
+            raise ParameterError(
+                "Must provide a name for the created adsorbate.")
         self.name = name
 
         # List of aliases
@@ -179,17 +179,17 @@ class Adsorbate():
 
         # Otherwise raise error
         raise ParameterError(
-            "Adsorbate {0} does not exist in list of adsorbates. "
-            "First populate pygaps.ADSORBATE_LIST "
-            "with required adsorbate class".format(adsorbate_name))
+            f"Adsorbate {adsorbate_name} does not exist in list of adsorbates. "
+            "First populate pygaps.ADSORBATE_LIST with required adsorbate class"
+        )
 
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
         if not self._backend_mode or self._backend_mode != pygaps.COOLPROP_BACKEND:
             self._backend_mode = pygaps.COOLPROP_BACKEND
-            self._state = CoolProp.AbstractState(
-                pygaps.COOLPROP_BACKEND, self.backend_name())
+            self._state = CoolProp.AbstractState(pygaps.COOLPROP_BACKEND,
+                                                 self.backend_name())
 
         return self._state
 
@@ -244,8 +244,7 @@ class Adsorbate():
         req_prop = self.properties.get(prop)
         if req_prop is None:
             raise ParameterError(
-                "Adsorbate {0} does not have a property named "
-                "{1}.".format(self.name, prop))
+                f"Adsorbate {self.name} does not have a property named {prop}")
 
         return req_prop
 
@@ -267,9 +266,9 @@ class Adsorbate():
         c_name = self.properties.get("backend_name")
         if c_name is None:
             raise ParameterError(
-                "Adsorbate {0} does not have a property named "
-                "backend_name. This must be available for CoolProp "
-                "interaction".format(self.name))
+                f"Adsorbate {self.name} does not have a property named "
+                "backend_name. This must be available for CoolProp interaction"
+            )
         return c_name
 
     def molar_mass(self, calculate=True):
@@ -311,8 +310,8 @@ class Adsorbate():
             mol_m = self.properties.get("molar_mass")
             if mol_m is None:
                 raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "molar_mass.".format(self.name))
+                    f"Adsorbate {self.name} does not have a property named molar_mass."
+                )
 
         return mol_m
 
@@ -355,7 +354,8 @@ class Adsorbate():
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
                 try:
-                    sat_p = self.saturation_pressure(temp, unit=unit,
+                    sat_p = self.saturation_pressure(temp,
+                                                     unit=unit,
                                                      calculate=False)
                 except ParameterError:
                     raise CalculationError
@@ -366,8 +366,8 @@ class Adsorbate():
             sat_p = self.properties.get("saturation_pressure")
             if sat_p is None:
                 raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "saturation_pressure.".format(self.name))
+                    f"Adsorbate {self.name} does not have a property named saturation_pressure"
+                )
 
         return sat_p
 
@@ -415,8 +415,8 @@ class Adsorbate():
             surf_t = self.properties.get("surface_tension")
             if surf_t is None:
                 raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "surface_tension.".format(self.name))
+                    f"Adsorbate {self.name} does not have a property named surface_tension"
+                )
 
         return surf_t
 
@@ -464,8 +464,8 @@ class Adsorbate():
             liq_d = self.properties.get("liquid_density")
             if liq_d is None:
                 raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "liquid_density.".format(self.name))
+                    f"Adsorbate {self.name} does not have a property named liquid_density"
+                )
 
         return liq_d
 
@@ -513,8 +513,8 @@ class Adsorbate():
             gas_d = self.properties.get("gas_density")
             if gas_d is None:
                 raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "gas_density.".format(self.name))
+                    f"Adsorbate {self.name} does not have a property named gas_density"
+                )
 
         return gas_d
 
@@ -568,7 +568,7 @@ class Adsorbate():
             enth_liq = self.properties.get("enthalpy_liquefaction")
             if enth_liq is None:
                 raise ParameterError(
-                    "Adsorbate {0} does not have a property named "
-                    "enthalpy_liquefaction.".format(self.name))
+                    f"Adsorbate {self.name} does not have a property named enthalpy_liquefaction"
+                )
 
         return enth_liq

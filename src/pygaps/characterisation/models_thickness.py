@@ -76,8 +76,9 @@ def get_thickness_model(model):
     # If the model is a string, get a model from the _THICKNESS_MODELS
     if isinstance(model, str):
         if model not in _THICKNESS_MODELS:
-            raise ParameterError("Model {} not a thickness function.".format(model),
-                                 "Available models are {}".format(_THICKNESS_MODELS.keys()))
+            raise ParameterError(
+                f"Model {model} not an implemented thickness function. ",
+                f"Available models are {_THICKNESS_MODELS.keys()}")
 
         return _THICKNESS_MODELS[model]
 

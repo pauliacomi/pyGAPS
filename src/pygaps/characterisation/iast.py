@@ -242,10 +242,11 @@ def iast(isotherms,
             " isotherms...")
 
     if verbose:
-        print("%d components." % n_components)
+        print(f"{n_components:d} components.")
         for i in range(n_components):
-            print("\tPartial pressure component %d = %f" %
-                  (i, partial_pressures[i]))
+            print(
+                f"\tPartial pressure component {i:d} = {partial_pressures[i]:f}"
+            )
 
     # Assert that the spreading pressures of each component are equal
     def spreading_pressure_differences(adsorbed_mole_fractions):
@@ -437,11 +438,10 @@ def reverse_iast(isotherms,
             "Desired adsorbed mole fractions should sum to 1.0...")
 
     if verbose:
-        print("%d components." % n_components)
+        print(f"{n_components:d} components.")
         for i in range(n_components):
-            print(
-                "\tDesired adsorbed phase mole fraction of component %d = %f" %
-                (i, adsorbed_mole_fractions[i]))
+            print(f"\tDesired adsorbed phase mole fraction of component"
+                  f"{i:d} = {adsorbed_mole_fractions[i]:f}")
 
     # assert that the spreading pressures of each component are equal
     def spreading_pressure_differences(gas_mole_fractions):

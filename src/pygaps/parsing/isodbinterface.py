@@ -24,7 +24,7 @@ def isotherm_from_isodb(filename):
         The isotherm from ISODB.
 
     """
-    url = r"{0}/isotherm/{1}.json".format(_ISODB_API, filename)
+    url = fr"{_ISODB_API}/isotherm/{filename}.json"
 
     try:
         resp = requests.get(url, timeout=5)

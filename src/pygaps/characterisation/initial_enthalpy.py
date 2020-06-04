@@ -336,23 +336,21 @@ def initial_enthalpy_comp(isotherm,
 
     if verbose:
         print('\n')
-        print("The initial enthalpy of adsorption is: \n\tE =",
-              round(initial_enthalpy, 2))
-        print("The constant contribution is \n\t{:.2f}".format(
-            params['const']))
+        print(
+            f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}"
+        )
+        print(f"The constant contribution is \n\t{params['const']:.2f}")
         if params['const'] < enth_liq:
             warnings.warn(
                 'CARE: Base enthalpy of adsorption is lower than enthalpy of liquefaction.'
             )
-        print(
-            "The exponential contribution is \n\t{:.2f} * exp({:.2E} * n)".
-            format(params['preexp'], params['exp']),
-            "with the limit at {:.2f}".format(params['exploc']))
-        print(
-            "The guest-guest attractive contribution is \n\t{:.2g} * n^{:.2}".
-            format(params['prepowa'], params['powa']))
-        print("The guest-guest repulsive contribution is \n\t{:.2g} * n^{:.2}".
-              format(params['prepowr'], params['powr']))
+        print("The exponential contribution is \n\t"
+              f"{params['preexp']:.2f} * exp({params['exp']:.2E} * n)"
+              f"with the limit at {params['exploc']:.2f}")
+        print("The guest-guest attractive contribution is \n\t"
+              f"{params['prepowa']:.2g} * n^{params['powa']:.2}")
+        print("The guest-guest repulsive contribution is \n\t"
+              f"{params['prepowr']:.2g} * n^{params['powr']:.2}")
 
         x_axis = numpy.linspace(0, 1)
         baseline = constant_term(x_axis)
@@ -363,9 +361,7 @@ def initial_enthalpy_comp(isotherm,
             (x_axis, baseline + power_term_repulsive(x_axis), 'power rep'),
         )
 
-        title = '{0} {1} {2}'.format(isotherm.material,
-                                     isotherm.material_batch,
-                                     isotherm.adsorbate)
+        title = f'{isotherm.material} {isotherm.material_batch} {isotherm.adsorbate}'
         initial_enthalpy_plot(loading,
                               enthalpy,
                               enthalpy_approx(loading),
@@ -416,9 +412,7 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads',
         loading = isotherm.loading(branch=branch,
                                    loading_unit='mmol',
                                    loading_basis='molar')
-        title = '{0} {1} {2}'.format(isotherm.material,
-                                     isotherm.material_batch,
-                                     isotherm.adsorbate)
+        title = f'{isotherm.material} {isotherm.material_batch} {isotherm.adsorbate}'
         initial_enthalpy_plot(loading,
                               enthalpy, [initial_enthalpy for i in loading],
                               title=title)

@@ -29,20 +29,20 @@ class IsothermBaseModel():
         """Initialize model parameters from isotherm data."""
     def __repr__(self):
         """Print model name."""
-        return "pyGAPS Model, type {}".format(self.name)
+        return f"pyGAPS Isotherm Model, type {self.name}"
 
     def __str__(self):
         """Print model name and parameters."""
-        ret_string = ("{0} isotherm model.\n".format(self.name) +
-                      "RMSE = {:.4f}\n".format(self.rmse) +
+        ret_string = (f"{self.name} isotherm model.\n"
+                      f"RMSE = {self.rmse:.4f}\n"
                       "Model parameters:\n")
         for param, val in self.params.items():
-            ret_string += "\t%s = %f\n" % (param, val)
-        ret_string += ("Model applicable range:\n" +
-                       "\tPressure range: {:.2f} - {:.2f}\n".format(
-                           self.pressure_range[0], self.pressure_range[1]) +
-                       "\tLoading range: {:.2f} - {:.2f}\n".format(
-                           self.loading_range[0], self.loading_range[1]))
+            ret_string += f"\t{param} = {val:.2f}\n"
+        ret_string += (
+            "Model applicable range:\n" +
+            f"\tPressure range: {self.pressure_range[0]:.2f} - {self.pressure_range[1]:.2f}\n"
+            f"\tLoading range: {self.loading_range[0]:.2f} - {self.loading_range[1]:.2f}\n"
+        )
 
         return ret_string
 
@@ -169,7 +169,7 @@ class IsothermBaseModel():
             Prints out extra information about steps taken.
         """
         if verbose:
-            print("Attempting to model using {0}".format(self.name))
+            print(f"Attempting to model using {self.name}")
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
@@ -197,12 +197,12 @@ class IsothermBaseModel():
             **kwargs)
         if not opt_res.success:
             raise CalculationError(
-                "\nFitting routine with model {0} failed with error:"
-                "\n\t{1}"
-                "\nTry a different starting point in the nonlinear optimization"
-                "\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
-                "\nDefault starting guess for parameters:"
-                "\n{2}\n".format(self.name, opt_res.message, param_guess))
+                f"\nFitting routine with model {self.name} failed with error:"
+                f"\n\t{opt_res.message}"
+                f"\nTry a different starting point in the nonlinear optimization"
+                f"\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
+                f"\nDefault starting guess for parameters:"
+                f"\n{param_guess}\n")
 
         # assign params
         for index, _ in enumerate(param_names):
@@ -212,5 +212,4 @@ class IsothermBaseModel():
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            print("Model {0} success, RMSE is {1:.3f}".format(
-                self.name, self.rmse))
+            print(f"Model {self.name} success, RMSE is {self.rmse:.3f}")

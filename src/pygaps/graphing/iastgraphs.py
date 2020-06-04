@@ -6,11 +6,13 @@ from ..utilities.string_utilities import convert_chemformula
 from .mpl_styles import IAST_STYLES
 
 
-def plot_iast_vle(
-        x_data, y_data,
-        adsorbate1, adsorbate2,
-        pressure, p_unit,
-        ax=None):
+def plot_iast_vle(x_data,
+                  y_data,
+                  adsorbate1,
+                  adsorbate2,
+                  pressure,
+                  p_unit,
+                  ax=None):
     """
     Plot a vapour-adsorbed equilibrium graph from IAST data.
 
@@ -73,11 +75,13 @@ def plot_iast_vle(
     return ax
 
 
-def plot_iast_svp(
-        p_data, s_data,
-        adsorbate1, adsorbate2,
-        fraction, p_unit,
-        ax=None):
+def plot_iast_svp(p_data,
+                  s_data,
+                  adsorbate1,
+                  adsorbate2,
+                  fraction,
+                  p_unit,
+                  ax=None):
     """
     Plot a selectivity-vs-pressure graph from IAST data.
 
