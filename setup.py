@@ -14,22 +14,32 @@ from setuptools import setup
 
 
 def read(*names, **kwargs):
-    with io.open(join(dirname(__file__), *names),
-                 encoding=kwargs.get('encoding', 'utf8')) as fh:
+    with io.open(
+        join(dirname(__file__), *names),
+        encoding=kwargs.get('encoding', 'utf8')
+    ) as fh:
         return fh.read()
+
+
+def remove_badges(text):
+    """Remove badge text from the readme."""
+    return re.compile('^.. start-badges.*^.. end-badges',
+                      re.M | re.S).sub('', text)
 
 
 setup(
     name='pygaps',
-    version='2.0.2',
+    use_scm_version={
+        'local_scheme': 'dirty-tag',
+        'write_to': 'src/pygaps/_version.py',
+        'fallback_version': '2.0.2',
+    },
     license='MIT license',
     description=  # noqa: E251
     """A framework for processing adsorption data for porous materials""",
-    long_description='%s' %
-    (re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub(
-        '', read('README.rst'))),
+    long_description=remove_badges(read('README.rst')),
     author='Paul Iacomi',
-    author_email='iacomi.paul@gmail.com',
+    author_email='mail@pauliacomi.com',
     url='https://github.com/pauliacomi/pygaps',
     project_urls={
         "Documentation": 'https://pygaps.readthedocs.io',
@@ -40,8 +50,7 @@ setup(
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,
-    classifiers=[
-        # complete classifier list: https://pypi.org/pypi?%3Aaction=list_classifiers
+    classifiers=[  # Classifier list at https://pypi.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
@@ -53,12 +62,13 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython',
-        # 'Programming Language :: Python :: Implementation :: PyPy3',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Physics',
     ],
     keywords=['adsorption', 'characterization', 'porous materials'],
+    python_requires='>=3.6',
     setup_requires=[
+        'setuptools_scm',
         'pytest-runner',
     ],
     install_requires=[

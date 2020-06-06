@@ -1,7 +1,7 @@
 """Module calculating IAST, given the pure-component adsorption isotherm model."""
 
-import warnings
 import textwrap
+import warnings
 
 import numpy
 import scipy.optimize

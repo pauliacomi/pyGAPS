@@ -2,10 +2,11 @@
 This module contains the main class that describes an isotherm through discrete points.
 """
 
+import textwrap
+
 import matplotlib.pyplot as plt
 import numpy
 import pandas
-import textwrap
 
 from ..graphing.isothermgraphs import plot_iso
 from ..utilities.exceptions import CalculationError

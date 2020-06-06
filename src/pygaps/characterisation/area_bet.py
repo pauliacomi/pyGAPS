@@ -1,7 +1,7 @@
 """This module contains BET area calculations."""
 
-import warnings
 import textwrap
+import warnings
 
 import scipy.constants as const
 import scipy.stats
