@@ -387,7 +387,7 @@ def psd_plot(pore_widths,
     # Func formatter
 
     def formatter(x, pos):
-        return "{0:g}".format(x)
+        return f"{x:g}"
 
     if log:
         ax.set_xscale('log')

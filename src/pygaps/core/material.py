@@ -33,7 +33,6 @@ class Material():
     which can be set as seen above.
 
     """
-
     def __init__(self, name, batch=None, **properties):
         """Instantiate by passing all the parameters."""
         #: Material name
@@ -94,18 +93,15 @@ class Material():
             If it does not exist or cannot be calculated.
         """
         # Checks to see if material exists in master list
-        material = next(
-            (material for material in pygaps.MATERIAL_LIST
-             if material_name == material.name
-             and material_batch == material.batch),
-            None)
+        material = next((material for material in pygaps.MATERIAL_LIST
+                         if material_name == material.name
+                         and material_batch == material.batch), None)
 
         if material is None:
             raise ParameterError(
-                "Material {0} {1} does not exist in list of materials. "
-                "First populate pygaps.MATERIAL_LIST "
-                "with required material class".format(
-                    material_name, material_batch))
+                f"Material {material_name} {material_batch} does not exist in list of materials. "
+                "First populate pygaps.MATERIAL_LIST with required material class"
+            )
 
         return material
 
@@ -121,10 +117,7 @@ class Material():
             Dictionary of all parameters.
 
         """
-        parameters_dict = {
-            'name': self.name,
-            'batch': self.batch
-        }
+        parameters_dict = {'name': self.name, 'batch': self.batch}
 
         parameters_dict.update(self.properties)
 
@@ -155,9 +148,8 @@ class Material():
             try:
                 req_prop = getattr(self, prop)
             except AttributeError:
-                raise ParameterError("The {0} entry was not found in the "
-                                     "material properties "
-                                     "for material {1}.".format(
-                                         prop, self.name))
+                raise ParameterError(
+                    f"The {prop} entry was not found in the "
+                    f"material properties for material {self.name}.")
 
         return req_prop

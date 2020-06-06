@@ -114,9 +114,9 @@ def read_mic_report(path):
     for row, col in product(range(sheet.nrows), range(sheet.ncols)):
         cell_value = str(sheet.cell(row, col).value).lower()
         try:
-            field = next(v for k, v in _FIELDS.items() if
-                         any([cell_value.startswith(n) for
-                              n in v.get('text')]))
+            field = next(
+                v for k, v in _FIELDS.items()
+                if any([cell_value.startswith(n) for n in v.get('text')]))
         except StopIteration:
             continue
         if field['type'] == 'number':
@@ -178,12 +178,15 @@ def _get_data_labels(sheet, row, col):
     header_row = _FIELDS['cell_value']['header']['row']
     # Abstract this sort of thing
     header = sheet.cell(row + header_row, final_column).value
-    while any(header.startswith(label) for label
-              in _FIELDS['isotherm tabular']['labels']):
+    while any(
+            header.startswith(label)
+            for label in _FIELDS['isotherm tabular']['labels']):
         final_column += 1
         header = sheet.cell(row + header_row, final_column).value
-    return [sheet.cell(row + header_row, i).value for i in
-            range(col, final_column)]
+    return [
+        sheet.cell(row + header_row, i).value
+        for i in range(col, final_column)
+    ]
 
 
 def _get_datapoints(sheet, row, col):
@@ -215,7 +218,8 @@ def _assign_data(item, field, data, points):
         data['time'] = _convert_time(points)
     elif field['labels'][name] == 'loading':
         data['loading'] = points
-        for (u, c) in (('(mmol/', 'mmol'), ('(mol/', 'mol'), ('(cm³/', 'cm3(STP)')):
+        for (u, c) in (('(mmol/', 'mmol'), ('(mol/', 'mol'), ('(cm³/',
+                                                              'cm3(STP)')):
             if u in item:
                 data['loading_unit'] = c
         for (u, c) in (('/g', 'g'), ('/kg', 'kg')):
@@ -224,8 +228,8 @@ def _assign_data(item, field, data, points):
     elif field['labels'][name] in ['relative', 'absolute', 'saturation']:
         data['pressure'][field['labels'][name]] = points
     else:
-        raise ValueError("Label name '{}' not recognized."
-                         .format(field['labels'][name]))
+        raise ValueError(
+            f"Label name '{field['labels'][name]}' not recognized.")
 
 
 def _get_errors(sheet, row, col):
@@ -243,8 +247,10 @@ def _get_errors(sheet, row, col):
     while error:
         final_row += 1
         error = sheet.cell(final_row, col + field['column']).value
-    return [sheet.cell(i, col + field['column']).value
-            for i in range(row + field['row'], final_row)]
+    return [
+        sheet.cell(i, col + field['column']).value
+        for i in range(row + field['row'], final_row)
+    ]
 
 
 def _check(data, path):

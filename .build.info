@@ -1,15 +1,20 @@
-## Create new branch for release (git flow)
+# This file contains details about how to
+# perform a release of pygaps (mostly for me).
+
+# Create new branch for release (we use git flow)
+# Respect semantic versioning for the releases
 git flow release start x.y.z
 
-## Ensure all tests are passing
+# Ensure all tests are passing
 # or use Travis to run automatically
 pytest --cov --cov-report xml:coverage.xml
 
-## Increase version
+# Run bumpversion to change any version strings
+# scattered throughout the source code
 bumpversion major/minor/patch
 
-## Finish branch
+# Finish branch
 git flow release finish x.y.z
 
-## Push, including tags
+# Push, including tags
 git push --tags

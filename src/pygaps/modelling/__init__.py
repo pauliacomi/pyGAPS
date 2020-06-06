@@ -1,6 +1,5 @@
 # pylint: disable=W0614,W0401,W0611,W0622
 # flake8: noqa
-
 """
 Lists all isotherm models which are available.
 
@@ -29,53 +28,24 @@ from .wvst import WVST
 
 # This list has all the available models
 _MODELS = [
-    Henry,
-    Langmuir,
-    DSLangmuir,
-    TSLangmuir,
-    BET,
-    GAB,
-    Freundlich,
-    DA,
-    DR,
-    Quadratic,
-    TemkinApprox,
-    Virial,
-    Toth,
-    JensenSeaton,
-    FHVST,
-    WVST
+    Henry, Langmuir, DSLangmuir, TSLangmuir, BET, GAB, Freundlich, DA, DR,
+    Quadratic, TemkinApprox, Virial, Toth, JensenSeaton, FHVST, WVST
 ]
 
 # This list has all the models which will be used when attempting to
 # guess an isotherm model. They are the ones where the fitting
 # is fast enough to be acceptable
 _GUESS_MODELS = [
-    Henry,
-    Langmuir,
-    DSLangmuir,
-    DR,
-    Freundlich,
-    Quadratic,
-    BET,
-    TemkinApprox,
-    Toth,
-    JensenSeaton
+    Henry, Langmuir, DSLangmuir, DR, Freundlich, Quadratic, BET, TemkinApprox,
+    Toth, JensenSeaton
 ]
 
 # This list has all the models which work with IAST.
 # This is required as some models (such as Freundlich)
 # are not physically consistent.
 _IAST_MODELS = [
-    Henry,
-    Langmuir,
-    DSLangmuir,
-    TSLangmuir,
-    Quadratic,
-    BET,
-    TemkinApprox,
-    Toth,
-    JensenSeaton
+    Henry, Langmuir, DSLangmuir, TSLangmuir, Quadratic, BET, TemkinApprox,
+    Toth, JensenSeaton
 ]
 
 
@@ -102,8 +72,8 @@ def get_isotherm_model(model_name):
         if model_name == _model.name:
             return _model()
 
-    raise ParameterError("Model {0} not an option. Viable models "
-                         "are {1}.".format(model_name, [model.name for model in _MODELS]))
+    raise ParameterError(f"Model {model_name} not an option. Viable models "
+                         f"are {[model.name for model in _MODELS]}")
 
 
 def is_iast_model(model_name):

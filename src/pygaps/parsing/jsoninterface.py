@@ -219,8 +219,8 @@ def isotherm_from_json(json_isotherm,
             try:
                 new_mod.params[param] = model['parameters'][param]
             except KeyError as err:
-                raise KeyError("The JSON is missing parameter '{0}'".format(
-                    param)) from err
+                raise KeyError(
+                    f"The JSON is missing parameter '{param}'") from err
 
         # generate the isotherm
         isotherm = ModelIsotherm(model=new_mod, **raw_dict)

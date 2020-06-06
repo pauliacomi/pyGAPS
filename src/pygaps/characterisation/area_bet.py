@@ -1,5 +1,6 @@
 """This module contains BET area calculations."""
 
+import textwrap
 import warnings
 
 import scipy.constants as const
@@ -124,40 +125,35 @@ def area_BET(isotherm, limits=None, verbose=False):
     loading = isotherm.loading(branch='ads',
                                loading_unit='mol',
                                loading_basis='molar')
-    pressure = isotherm.pressure(branch='ads',
-                                 pressure_mode='relative')
+    pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
 
     # use the bet function
-    (bet_area, c_const, n_monolayer, p_monolayer, slope,
-     intercept, minimum, maximum, corr_coef) = area_BET_raw(
-        pressure, loading, cross_section, limits=limits)
+    (bet_area, c_const, n_monolayer, p_monolayer, slope, intercept, minimum,
+     maximum, corr_coef) = area_BET_raw(pressure,
+                                        loading,
+                                        cross_section,
+                                        limits=limits)
 
     if verbose:
 
-        print("BET surface area: a =", int(round(bet_area, 0)),
-              "m2/{}".format(isotherm.adsorbent_unit))
-        print("Minimum pressure point chosen is {0} and maximum is {1}".format(
-            round(pressure[minimum], 3), round(pressure[maximum], 3)))
-        print("The slope of the BET fit: s =", round(slope, 3))
-        print("The intercept of the BET fit: i =", round(intercept, 3))
-        print("The BET constant is: C =", int(round(c_const, 1)))
-        print("Amount for a monolayer: n =",
-              round(n_monolayer, 5), "mol/{}".format(isotherm.adsorbent_unit))
+        print(
+            textwrap.dedent(f"""\
+            BET surface area: a ={bet_area:.2e} m2/{isotherm.adsorbent_unit}
+            Minimum pressure point is {pressure[minimum]:.2f} and maximum is {pressure[maximum]:.2f}
+            The slope of the BET fit: s = {slope:.2e}
+            The intercept of the BET fit: i = {intercept:.2e}
+            The BET constant is: C = {c_const:.1f}")
+            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.adsorbent_unit}"""
+                            ))
 
         # Generate plot of the BET points chosen
-        bet_plot(pressure,
-                 bet_transform(pressure, loading),
-                 minimum, maximum,
-                 slope, intercept,
-                 p_monolayer,
+        bet_plot(pressure, bet_transform(pressure, loading), minimum, maximum,
+                 slope, intercept, p_monolayer,
                  bet_transform(p_monolayer, n_monolayer))
 
         # Generate plot of the Rouquerol points chosen
-        roq_plot(pressure,
-                 roq_transform(pressure, loading),
-                 minimum, maximum,
-                 p_monolayer,
-                 roq_transform(p_monolayer, n_monolayer))
+        roq_plot(pressure, roq_transform(pressure, loading), minimum, maximum,
+                 p_monolayer, roq_transform(p_monolayer, n_monolayer))
 
     return {
         'area': bet_area,
@@ -253,14 +249,15 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
                     break
 
     if maximum - minimum < 3:
-        raise CalculationError("The isotherm does not have enough points in the BET "
-                               "region. Unable to calculate BET area.")
+        raise CalculationError(
+            "The isotherm does not have enough points in the BET "
+            "region. Unable to calculate BET area.")
 
     # calculate the BET transform, slope and intercept
-    bet_t_array = bet_transform(
-        pressure[minimum:maximum], loading[minimum:maximum])
-    slope, intercept, corr_coef = bet_optimisation(
-        pressure[minimum:maximum], bet_t_array)
+    bet_t_array = bet_transform(pressure[minimum:maximum],
+                                loading[minimum:maximum])
+    slope, intercept, corr_coef = bet_optimisation(pressure[minimum:maximum],
+                                                   bet_t_array)
 
     # calculate the BET parameters
     n_monolayer, p_monolayer, c_const, bet_area = bet_parameters(
@@ -274,8 +271,8 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
     if (loading[minimum] > n_monolayer) or (loading[maximum] < n_monolayer):
         warnings.warn("The monolayer point is not within the BET region")
 
-    return (bet_area, c_const, n_monolayer, p_monolayer,
-            slope, intercept, minimum, maximum, corr_coef)
+    return (bet_area, c_const, n_monolayer, p_monolayer, slope, intercept,
+            minimum, maximum, corr_coef)
 
 
 def roq_transform(pressure, loading):

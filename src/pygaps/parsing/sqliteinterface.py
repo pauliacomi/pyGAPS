@@ -519,18 +519,14 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
 
         # Get isotherm properties from database
         cursor.execute(
-            """
-                SELECT iso_id, type, value FROM "isotherm_properties"
-                WHERE iso_id IN (%s);
-                """ % ','.join('?' * len(ids)), ids)
+            f"""SELECT iso_id, type, value FROM "isotherm_properties"
+                WHERE iso_id IN ({','.join('?' * len(ids))});""", ids)
         isotherm_props = cursor.fetchall()
 
         # Get the properties from the data table
         cursor.execute(
-            """
-                SELECT iso_id, type, data FROM "isotherm_data"
-                WHERE iso_id IN (%s);
-                """ % ','.join('?' * len(ids)), ids)
+            f"""SELECT iso_id, type, data FROM "isotherm_data"
+                WHERE iso_id IN ({','.join('?' * len(ids))});""", ids)
         isotherm_data = cursor.fetchall()
 
         for row in rows:

@@ -14,10 +14,8 @@ if sys.version_info[0] != 3:
     print("Code requires Python 3.")
     sys.exit(1)
 
-
 # Let users know if they're missing any of our hard dependencies
-hard_dependencies = ("numpy", "pandas", "scipy",
-                     "matplotlib", "CoolProp")
+hard_dependencies = ("numpy", "pandas", "scipy", "matplotlib", "CoolProp")
 missing_dependencies = []
 dependency = None
 
@@ -28,8 +26,7 @@ for dependency in hard_dependencies:
         missing_dependencies.append(dependency)
 
 if missing_dependencies:
-    raise ImportError(
-        "Missing required dependencies {0}".format(missing_dependencies))
+    raise ImportError(f"Missing required dependencies {missing_dependencies}")
 del hard_dependencies, dependency, missing_dependencies
 
 from .data import DATABASE

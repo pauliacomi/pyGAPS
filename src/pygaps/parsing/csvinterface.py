@@ -75,8 +75,10 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
         isotherm_data = isotherm.to_dict()
 
-        file.writelines([x + separator + _to_string(y) + '\n'
-                         for (x, y) in isotherm_data.items()])
+        file.writelines([
+            x + separator + _to_string(y) + '\n'
+            for (x, y) in isotherm_data.items()
+        ])
 
         if isinstance(isotherm, PointIsotherm):
 
@@ -91,7 +93,8 @@ def isotherm_to_csv(isotherm, path, separator=','):
             # also get the branch data in a regular format
             headings.append('branch')
             data = isotherm.data_raw[headings]
-            data['branch'] = data['branch'].replace(False, 'ads').replace(True, 'des')
+            data['branch'] = data['branch'].replace(False, 'ads').replace(
+                True, 'des')
 
             file.write('data:[pressure,loading,[otherdata],branch data]\n')
             data.to_csv(file, sep=separator, index=False, header=True)
@@ -100,11 +103,16 @@ def isotherm_to_csv(isotherm, path, separator=','):
 
             file.write('model:[name and parameters]\n')
             file.write(('name' + separator + isotherm.model.name + '\n'))
-            file.write(('rmse' + separator + _to_string(isotherm.model.rmse) + '\n'))
-            file.write(('pressure range' + separator + _to_string(isotherm.model.pressure_range) + '\n'))
-            file.write(('loading range' + separator + _to_string(isotherm.model.loading_range) + '\n'))
-            file.writelines([param + separator + str(isotherm.model.params[param]) + '\n'
-                             for param in isotherm.model.params])
+            file.write(
+                ('rmse' + separator + _to_string(isotherm.model.rmse) + '\n'))
+            file.write(('pressure range' + separator +
+                        _to_string(isotherm.model.pressure_range) + '\n'))
+            file.write(('loading range' + separator +
+                        _to_string(isotherm.model.loading_range) + '\n'))
+            file.writelines([
+                param + separator + str(isotherm.model.params[param]) + '\n'
+                for param in isotherm.model.params
+            ])
 
 
 def isotherm_from_csv(path, separator=',', **isotherm_parameters):
@@ -130,7 +138,8 @@ def isotherm_from_csv(path, separator=',', **isotherm_parameters):
         line = file.readline().rstrip()
         raw_dict = {}
 
-        while not (line.startswith('data') or line.startswith('model') or line == ""):
+        while not (line.startswith('data') or line.startswith('model')
+                   or line == ""):
             values = line.split(sep=separator)
 
             if _is_bool(values[1]):
@@ -150,21 +159,23 @@ def isotherm_from_csv(path, separator=',', **isotherm_parameters):
             # process isotherm branches if they exist
             raw_dict['branch'] = 'guess'
             if 'branch' in data.columns:
-                raw_dict['branch'] = data['branch'].replace('ads', False).replace('des', True).values
+                raw_dict['branch'] = data['branch'].replace(
+                    'ads', False).replace('des', True).values
 
             # generate other keys
-            other_keys = [column for column in data.columns.values
-                          if column not in [data.columns[0], data.columns[1], 'branch']]
+            other_keys = [
+                column for column in data.columns.values
+                if column not in [data.columns[0], data.columns[1], 'branch']
+            ]
 
             # Update dictionary with any user parameters
             raw_dict.update(isotherm_parameters)
 
-            isotherm = PointIsotherm(
-                isotherm_data=data,
-                pressure_key=data.columns[0],
-                loading_key=data.columns[1],
-                other_keys=other_keys,
-                **raw_dict)
+            isotherm = PointIsotherm(isotherm_data=data,
+                                     pressure_key=data.columns[0],
+                                     loading_key=data.columns[1],
+                                     other_keys=other_keys,
+                                     **raw_dict)
 
         if line.startswith('model'):
 
@@ -192,7 +203,8 @@ def isotherm_from_csv(path, separator=',', **isotherm_parameters):
                 try:
                     new_mod.params[param] = model['parameters'][param]
                 except KeyError as err:
-                    raise KeyError("The CSV is missing parameter {}".format(param)) from err
+                    raise KeyError(
+                        f"The CSV is missing parameter '{param}'") from err
 
             # Update dictionary with any user parameters
             raw_dict.update(isotherm_parameters)

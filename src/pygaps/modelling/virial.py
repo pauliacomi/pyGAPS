@@ -76,9 +76,8 @@ class Virial(IsothermBaseModel):
         opt_res = opt.minimize(fun, pressure, method='Nelder-Mead')
 
         if not opt_res.success:
-            raise CalculationError("""
-            Root finding for failed. Error: \n\t{}
-            """.format(opt_res.message))
+            raise CalculationError(
+                f"Root finding failed. Error: \n\t{opt_res.message}")
 
         return opt_res.x
 
@@ -181,7 +180,7 @@ class Virial(IsothermBaseModel):
             Prints out extra information about steps taken.
         """
         if verbose:
-            print("Attempting to model using {}".format(self.name))
+            print(f"Attempting to model using {self.name}")
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
@@ -245,12 +244,12 @@ class Virial(IsothermBaseModel):
             **kwargs)
         if not opt_res.success:
             raise CalculationError(
-                "\n\tMinimization of RSS for {0} isotherm fitting failed with error:"
-                "\n\t\t{1}"
-                "\n\tTry a different starting point in the nonlinear optimization"
-                "\n\tby passing a dictionary of parameter guesses, param_guess, to the constructor."
-                "\n\tDefault starting guess for parameters:"
-                "\n\t{2}".format(self.name, opt_res.message, param_guess))
+                f"\nFitting routine with model {self.name} failed with error:"
+                f"\n\t{opt_res.message}"
+                f"\nTry a different starting point in the nonlinear optimization"
+                f"\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
+                f"\nDefault starting guess for parameters:"
+                f"\n{param_guess}\n")
 
         # assign params
         for index, _ in enumerate(param_names):
@@ -259,8 +258,7 @@ class Virial(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            print("Model {0} success, rmse is {1}".format(
-                self.name, self.rmse))
+            print(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
             fig, ax = plt.subplots()
             ax.plot(loading, ln_p_over_n, '.')

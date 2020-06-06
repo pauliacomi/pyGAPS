@@ -65,11 +65,7 @@ class Isotherm():
     """
 
     # strictly required attributes
-    _required_params = [
-        'material',
-        'temperature',
-        'adsorbate'
-    ]
+    _required_params = ['material', 'temperature', 'adsorbate']
     # specific attributes which are named
     _named_params = {
         'iso_type': str,
@@ -92,8 +88,8 @@ class Isotherm():
     # attributes which are used in the ID hash procedure
     _id_params = _required_params + list(_unit_params)
 
-##########################################################
-#   Instantiation and classmethods
+    ##########################################################
+    #   Instantiation and classmethods
 
     def __init__(self, **properties):
         """
@@ -104,10 +100,10 @@ class Isotherm():
         # Must-have properties of the isotherm
         #
         # Basic checks
-        if any(k not in properties
-               for k in self._required_params):
+        if any(k not in properties for k in self._required_params):
             raise ParameterError(
-                "Isotherm MUST have the following properties:{0}".format(self._required_params))
+                f"Isotherm MUST have the following properties:{self._required_params}"
+            )
 
         #: Isotherm material name.
         self.material = str(properties.pop('material'))
@@ -118,11 +114,9 @@ class Isotherm():
         try:
             self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
         except pygaps.ParameterError:
-            warnings.warn(
-                ("Specified adsorbent is not in internal list "
-                    "(or name cannot be resolved to an existing one). "
-                    "CoolProp backend disabled for this adsorbent.")
-            )
+            warnings.warn(("Specified adsorbent is not in internal list "
+                           "(or name cannot be resolved to an existing one). "
+                           "CoolProp backend disabled for this adsorbent."))
 
         # Isotherm units
         #
@@ -137,8 +131,7 @@ class Isotherm():
         for k in self._unit_params:
             if k not in properties:
                 warnings.warn(
-                    "WARNING: '{0}' was not specified".format(k) +
-                    ", assumed as '{0}'".format(self._unit_params[k])
+                    f"WARNING: '{k}' was not specified , assumed as '{self._unit_params[k]}'"
                 )
                 properties[k] = self._unit_params[k]
 
@@ -156,34 +149,36 @@ class Isotherm():
         # Check basis
         if self.adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for adsorbent ({0}) is not an option."
-                "See viable values: {1}".format(self.adsorbent_basis, list(_MATERIAL_MODE.keys())))
+                f"Basis selected for adsorbent ({self.adsorbent_basis}) is not an option. "
+                f"See viable values: {_MATERIAL_MODE.keys()}")
 
         if self.loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                "Basis selected for loading ({}) is not an option. See viable "
-                "values: {}".format(self.loading_basis, list(_MATERIAL_MODE.keys())))
+                f"Basis selected for loading ({self.loading_basis}) is not an option. "
+                f"See viable values: {_MATERIAL_MODE.keys()}")
 
         if self.pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
-                "Mode selected for pressure ({}) is not an option. See viable "
-                "values: {}".format(self.pressure_mode, list(_PRESSURE_MODE.keys())))
+                f"Mode selected for pressure ({self.pressure_mode}) is not an option. "
+                f"See viable values: {_PRESSURE_MODE.keys()}")
 
         # Check units
         if self.loading_unit not in _MATERIAL_MODE[self.loading_basis]:
             raise ParameterError(
-                "Unit selected for loading ({}) is not an option. See viable "
-                "values: {}".format(self.loading_unit, list(_MATERIAL_MODE[self.loading_basis].keys())))
+                f"Unit selected for loading ({self.loading_unit}) is not an option. "
+                f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
+            )
 
         if self.pressure_mode == 'absolute' and self.pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
-                "Unit selected for pressure ({}) is not an option. See viable "
-                "values: {}".format(self.pressure_unit, list(_PRESSURE_UNITS.keys())))
+                f"Unit selected for pressure ({self.pressure_unit}) is not an option. "
+                f"See viable values: {_PRESSURE_UNITS.keys()}")
 
         if self.adsorbent_unit not in _MATERIAL_MODE[self.adsorbent_basis]:
             raise ParameterError(
-                "Unit selected for adsorbent ({}) is not an option. See viable "
-                "values: {}".format(self.adsorbent_unit, list(_MATERIAL_MODE[self.loading_basis].keys())))
+                f"Unit selected for adsorbent ({self.adsorbent_unit}) is not an option. "
+                f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
+            )
 
         # Other named properties of the isotherm
 
@@ -194,12 +189,15 @@ class Isotherm():
         for named_prop in self._named_params:
             prop_val = properties.pop(named_prop, None)
             if prop_val:
-                setattr(self, named_prop, self._named_params[named_prop](prop_val))
+                setattr(self, named_prop,
+                        self._named_params[named_prop](prop_val))
 
         # Save the rest of the properties as members
         for attr in properties:
             if hasattr(self, attr):
-                raise ParameterError("Cannot override standard Isotherm class member '{}'".format(attr))
+                raise ParameterError(
+                    "Cannot override standard Isotherm class member '{}'".
+                    format(attr))
             setattr(self, attr, properties[attr])
 
     ##########################################################
@@ -222,8 +220,7 @@ class Isotherm():
 
     def __repr__(self):
         """Print key isotherm parameters."""
-        return "{0}: '{1}' on '{2}' at {3} K".format(
-            self.iso_id, self.adsorbate, self.material, self.temperature)
+        return f"{self.iso_id}: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
@@ -242,8 +239,8 @@ class Isotherm():
 
         # Units/basis
         string += ("Units: \n")
-        string += ("\tUptake in: " + str(self.loading_unit) +
-                   "/" + str(self.adsorbent_unit) + '\n')
+        string += ("\tUptake in: " + str(self.loading_unit) + "/" +
+                   str(self.adsorbent_unit) + '\n')
         if self.pressure_mode == 'relative':
             string += ("\tRelative pressure \n")
         else:
@@ -253,7 +250,8 @@ class Isotherm():
         for prop in vars(self):
             if prop not in self._required_params + list(self._named_params) + \
                     list(self._unit_params) + self._reserved_params:
-                string += ('\t' + prop + ": " + str(getattr(self, prop)) + '\n')
+                string += ('\t' + prop + ": " + str(getattr(self, prop)) +
+                           '\n')
 
         return string
 

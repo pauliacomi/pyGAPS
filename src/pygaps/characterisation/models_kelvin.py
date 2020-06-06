@@ -36,7 +36,8 @@ def get_meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
+            raise ParameterError(
+                "Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     elif branch == 'des':
         if pore_geometry == 'cylinder':
             m_geometry = 'hemispherical'
@@ -45,15 +46,17 @@ def get_meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
+            raise ParameterError(
+                "Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     else:
-        raise ParameterError("Adsorption branch must be either 'ads' or 'des'.")
+        raise ParameterError(
+            "Adsorption branch must be either 'ads' or 'des'.")
 
     return m_geometry
 
 
-def kelvin_radius(pressure, meniscus_geometry, temperature,
-                  liquid_density, adsorbate_molar_mass, adsorbate_surface_tension):
+def kelvin_radius(pressure, meniscus_geometry, temperature, liquid_density,
+                  adsorbate_molar_mass, adsorbate_surface_tension):
     r"""
     Calculate the kelvin radius of the pore, using the standard
     form of the kelvin equation.
@@ -117,8 +120,8 @@ def kelvin_radius(pressure, meniscus_geometry, temperature,
         (geometry_factor * const.gas_constant * temperature * numpy.log(pressure))
 
 
-def kelvin_radius_kjs(pressure, meniscus_geometry, temperature,
-                      liquid_density, adsorbate_molar_mass, adsorbate_surface_tension):
+def kelvin_radius_kjs(pressure, meniscus_geometry, temperature, liquid_density,
+                      adsorbate_molar_mass, adsorbate_surface_tension):
     r"""
     Calculate the kelvin radius of the pore, using the
     Kruck-Jaroniec-Sayari correction.
@@ -221,8 +224,9 @@ def get_kelvin_model(model, **model_args):
     # If the model is a string, get a model from the _THICKNESS_MODELS
     if isinstance(model, str):
         if model not in _KELVIN_MODELS:
-            raise ParameterError("Model {} not a kelvin model.".format(model),
-                                 "Available models are {}".format(_KELVIN_MODELS.keys()))
+            raise ParameterError(
+                f"Model {model} not an implemented Kelvin model. ",
+                f"Available models are {_KELVIN_MODELS.keys()}")
 
         return partial(_KELVIN_MODELS[model], **model_args)
 
