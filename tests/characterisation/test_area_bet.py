@@ -16,7 +16,8 @@ import os
 
 import pytest
 from matplotlib.testing.decorators import cleanup
-from numpy import isclose, linspace
+from numpy import isclose
+from numpy import linspace
 
 import pygaps
 import pygaps.characterisation.area_bet as ab
