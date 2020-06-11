@@ -34,8 +34,9 @@ Explanation of parameters:
 import os
 
 DATA_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-    'docs', 'examples', 'data')
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'docs',
+    'examples', 'data'
+)
 
 DATA_N77_PATH = os.path.join(DATA_PATH, 'characterisation')
 DATA_IAST_PATH = os.path.join(DATA_PATH, 'iast')
@@ -45,10 +46,10 @@ DATA_CALO_PATH = os.path.join(DATA_PATH, 'calorimetry')
 DATA = {
     'MCM-41': {
         'file': 'MCM-41 N2 77.355.json',
-        'bet_area': 400.0,
+        'bet_area': 350.0,
         's_bet_area': 350.0,
         'langmuir_area': 1450.0,
-        's_langmuir_area': 500.0,
+        's_langmuir_area': 550.0,
         't_area': 340.0,
         't_pore_volume': 0.28,
         's_t_area': 55.0,
@@ -73,7 +74,7 @@ DATA = {
     'SiO2': {
         'file': 'SiO2 N2 77.355.json',
         'bet_area': 200.0,
-        'langmuir_area': 850.0,
+        'langmuir_area': 992.5,
         't_area': 250.0,
         't_pore_volume': 0.0,
         'Khi_slope': 780,
@@ -105,7 +106,6 @@ DATA = {
         'psd_micro_pore_size': 0.7,
         'psd_dft_pore_size': 0.6,
     },
-
 }
 
 DATA_IAST = {

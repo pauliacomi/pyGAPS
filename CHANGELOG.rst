@@ -2,7 +2,7 @@
 Changelog
 =========
 
-2.1.0 (2019-xx-xx)
+2.1.0 (2020-xx-xx)
 ------------------
 
 Breaking changes:
@@ -26,6 +26,7 @@ Fixes:
 
  * ModelIsotherm creation could in some cases ignore isotherm branch
    splitting.
+ * BET/Langmuir area maximum calculation was offset by one point
 
 2.0.2 (2019-12-18)
 ------------------
