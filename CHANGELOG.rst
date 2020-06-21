@@ -26,7 +26,9 @@ Fixes:
 
  * ModelIsotherm creation could in some cases ignore isotherm branch
    splitting.
- * BET/Langmuir area maximum calculation was offset by one point
+ * BET/Langmuir area maximum calculation was offset by one point.
+ * The "section" returned in tplot/alphas is now consistent for both
+   manual and automatic limits: a list indices for selected points
 
 2.0.2 (2019-12-18)
 ------------------

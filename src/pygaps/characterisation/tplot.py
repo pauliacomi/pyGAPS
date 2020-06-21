@@ -2,6 +2,7 @@
 
 import warnings
 
+import numpy
 import scipy
 
 from ..core.adsorbate import Adsorbate
@@ -11,10 +12,9 @@ from ..utilities.math_utilities import find_linear_sections
 from .models_thickness import get_thickness_model
 
 
-def t_plot(isotherm,
-           thickness_model='Harkins/Jura',
-           limits=None,
-           verbose=False):
+def t_plot(
+    isotherm, thickness_model='Harkins/Jura', limits=None, verbose=False
+):
     r"""
     Calculate surface area and pore volume using a t-plot.
 
@@ -114,8 +114,10 @@ def t_plot(isotherm,
     """
     # Function parameter checks
     if thickness_model is None:
-        raise ParameterError("Specify a model to generate the thickness curve"
-                             " e.g. thickness_model=\"Halsey\"")
+        raise ParameterError(
+            "Specify a model to generate the thickness curve"
+            " e.g. thickness_model=\"Halsey\""
+        )
 
     # Get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
@@ -123,17 +125,18 @@ def t_plot(isotherm,
     liquid_density = adsorbate.liquid_density(isotherm.temperature)
 
     # Read data in
-    loading = isotherm.loading(branch='ads',
-                               loading_unit='mol',
-                               loading_basis='molar')
+    loading = isotherm.loading(
+        branch='ads', loading_unit='mol', loading_basis='molar'
+    )
     pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
 
     # Get thickness model
     t_model = get_thickness_model(thickness_model)
 
     # Call t-plot function
-    results, t_curve = t_plot_raw(loading, pressure, t_model, liquid_density,
-                                  molar_mass, limits)
+    results, t_curve = t_plot_raw(
+        loading, pressure, t_model, liquid_density, molar_mass, limits
+    )
 
     if verbose:
         if not results:
@@ -159,12 +162,14 @@ def t_plot(isotherm,
     }
 
 
-def t_plot_raw(loading,
-               pressure,
-               thickness_model,
-               liquid_density,
-               adsorbate_molar_mass,
-               limits=None):
+def t_plot_raw(
+    loading,
+    pressure,
+    thickness_model,
+    liquid_density,
+    adsorbate_molar_mass,
+    limits=None
+):
     """
     Calculate surface area and pore volume using a t-plot.
 
@@ -192,7 +197,7 @@ def t_plot_raw(loading,
     results : list
         A list of dictionaries with the following components:
 
-            - ``section`` (array) : the points of the plot chosen for the line
+            - ``section`` (array) : the indices of points chosen for the line fit
             - ``area`` (float) : calculated surface area, from the section parameters
             - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated
               per section
@@ -205,8 +210,13 @@ def t_plot_raw(loading,
 
     """
     if len(pressure) != len(loading):
-        raise ParameterError("The length of the pressure and loading arrays"
-                             " do not match")
+        raise ParameterError(
+            "The length of the pressure and loading arrays do not match."
+        )
+
+    # Ensure numpy arrays, if not already
+    loading = numpy.asarray(loading)
+    pressure = numpy.asarray(pressure)
 
     # Generate the thickness curve for the pressure points
     thickness_curve = thickness_model(pressure)
@@ -215,10 +225,14 @@ def t_plot_raw(loading,
 
     # If limits are not None, then the user requested specific limits
     if limits is not None:
-        section = (thickness_curve > limits[0]) & (thickness_curve < limits[1])
+        section = numpy.flatnonzero((thickness_curve > limits[0])
+                                    & (thickness_curve < limits[1]))
         results.append(
-            t_plot_parameters(thickness_curve, section, loading,
-                              adsorbate_molar_mass, liquid_density))
+            t_plot_parameters(
+                thickness_curve, section, loading, adsorbate_molar_mass,
+                liquid_density
+            )
+        )
 
     # If not, attempt to find limits manually
     else:
@@ -228,24 +242,29 @@ def t_plot_raw(loading,
 
         # For each section we compute the linear fit
         for section in linear_sections:
-            params = t_plot_parameters(thickness_curve, section, loading,
-                                       adsorbate_molar_mass, liquid_density)
+            params = t_plot_parameters(
+                thickness_curve, section, loading, adsorbate_molar_mass,
+                liquid_density
+            )
             if params is not None:
                 results.append(params)
 
         if len(results) == 0:
             warnings.warn(
-                'Could not find linear regions, attempt a manual limit')
+                'Could not find linear regions, attempt a manual limit'
+            )
 
     return results, thickness_curve
 
 
-def t_plot_parameters(thickness_curve, section, loading, molar_mass,
-                      liquid_density):
-    """Calculates the parameters from a linear section of the t-plot."""
+def t_plot_parameters(
+    thickness_curve, section, loading, molar_mass, liquid_density
+):
+    """Calculate the parameters from a linear section of the t-plot."""
 
     slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
-        thickness_curve[section], loading[section])
+        thickness_curve[section], loading[section]
+    )
 
     # Check if slope is good
 
