@@ -38,15 +38,29 @@ class TestAreaBET():
         with pytest.raises(pygaps.ParameterError):
             ab.area_BET_raw(P[1:], L, 1)
 
-        # should not take less than 2 points
+        # should not take less than 3 points
         with pytest.raises(pygaps.CalculationError):
             ab.area_BET_raw(P[:2], L[:2], 1, limits=[-1, 10])
 
         # 3 will work
         ab.area_BET_raw(P[:3], L[:3], 1, limits=[-1, 10])
 
-        # test using rouquerol
+        # Basic automatic limit test (using rouquerol)
         ab.area_BET_raw(P, L, 1)
+
+    def test_limit_selection(self):
+        """Test the automatic selection of limits."""
+
+        P = [0.001, 0.004, 0.009, 0.042, 0.093, 0.124, 0.156, 0.186]
+        L = [118, 135, 146, 172, 189, 195, 200, 203]
+
+        # This will automatically extend to select 3 points
+        ab.area_BET_raw(P, L, 1)
+
+        # This will automatically extend to select points
+        # but find that there aren't enough, so error
+        with pytest.raises(pygaps.CalculationError):
+            ab.area_BET_raw(P[3:], L[3:], 1)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_area_bet(self, sample):

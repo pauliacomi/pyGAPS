@@ -26,6 +26,8 @@ Fixes:
 
  * ModelIsotherm creation could in some cases ignore isotherm branch
    splitting.
+ * BET area now attempts to pick at least 3 points if physically consistent.
+   Should stop failing on some isotherms.
  * BET/Langmuir area maximum calculation was offset by one point.
  * The "section" returned in tplot/alphas is now consistent for both
    manual and automatic limits: a list indices for selected points

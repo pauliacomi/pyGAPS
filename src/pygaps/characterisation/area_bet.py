@@ -243,23 +243,35 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
                 maximum = index + 1
                 break
 
-        # Min pressure is taken as 10% of max
+        # Min pressure is initially taken as 10% of max
         min_p = pressure[maximum] / 10
         minimum = numpy.searchsorted(pressure, min_p)
 
+        # Try to extend if not enough points
+        if maximum - minimum < 3:  # (for 3 point minimum)
+            if maximum > 2:  # Can only extend if enough points available
+                minimum = maximum - 3
+            else:
+                raise CalculationError(
+                    "The isotherm does not have enough points (at least 3) "
+                    "in the BET region. Unable to calculate BET area."
+                )
+
     else:
 
+        # Determine the limits
         if limits[1]:
             maximum = numpy.searchsorted(pressure, limits[1])
 
         if limits[0]:
             minimum = numpy.searchsorted(pressure, limits[0])
 
-    if maximum - minimum < 3:  # (for 2 point minimum)
-        raise CalculationError(
-            "The isotherm does not have enough points (at least 2) "
-            "in the BET region. Unable to calculate BET area."
-        )
+        if maximum - minimum < 3:  # (for 3 point minimum)
+            raise CalculationError(
+                "The isotherm does not have enough points (at least 3) "
+                "in the BET region. Unable to calculate BET area."
+            )
+
     # calculate the BET transform, slope and intercept
     bet_t_array = bet_transform(
         pressure[minimum:maximum], loading[minimum:maximum]
