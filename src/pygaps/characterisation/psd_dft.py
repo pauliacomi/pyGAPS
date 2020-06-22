@@ -4,7 +4,7 @@ kernel. Please note that calculation of DFT/NLDFT/QSDFT kernels is outside the
 scope of this program.
 """
 
-import os
+from pathlib import Path
 
 import numpy
 import pandas
@@ -19,20 +19,19 @@ from ..utilities.math_utilities import bspline
 
 _KERNELS = {
     'DFT-N2-77K-carbon-slit':
-    os.path.join(os.path.dirname(__file__), 'kernels',
-                 'DFT-N2-77K-carbon-slit.csv'),
+    Path(__file__).parent / 'kernels' / 'DFT-N2-77K-carbon-slit.csv',
 }
 
 _LOADED = {}  # We will keep loaded kernels here
 
 
 def psd_dft(
-        isotherm,
-        kernel='DFT-N2-77K-carbon-slit',
-        branch='ads',
-        bspline_order=2,
-        kernel_units=None,
-        verbose=False,
+    isotherm,
+    kernel='DFT-N2-77K-carbon-slit',
+    branch='ads',
+    bspline_order=2,
+    kernel_units=None,
+    verbose=False,
 ):
     """
     Calculate the pore size distribution using a DFT kernel from a PointIsotherm.
@@ -134,7 +133,8 @@ def psd_dft(
         )
     if not isinstance(isotherm.adsorbate, Adsorbate):
         raise ParameterError(
-            "Isotherm adsorbate is not known, cannot calculate PSD.")
+            "Isotherm adsorbate is not known, cannot calculate PSD."
+        )
 
     # Get an internal kernel, otherwise assume it is a path
     if kernel in _KERNELS:
@@ -154,18 +154,23 @@ def psd_dft(
     pressure_unit = kernel_units.get('pressure_unit', None)
 
     # Read data in
-    loading = isotherm.loading(branch=branch,
-                               loading_basis=loading_basis,
-                               loading_unit=loading_unit,
-                               adsorbent_basis=adsorbent_basis,
-                               adsorbent_unit=adsorbent_unit)
-    pressure = isotherm.pressure(branch=branch,
-                                 pressure_mode=pressure_mode,
-                                 pressure_unit=pressure_unit)
+    loading = isotherm.loading(
+        branch=branch,
+        loading_basis=loading_basis,
+        loading_unit=loading_unit,
+        adsorbent_basis=adsorbent_basis,
+        adsorbent_unit=adsorbent_unit
+    )
+    pressure = isotherm.pressure(
+        branch=branch,
+        pressure_mode=pressure_mode,
+        pressure_unit=pressure_unit
+    )
 
     # Call the DFT function
     pore_widths, pore_dist, pore_load_cum = psd_dft_kernel_fit(
-        pressure, loading, kernel_path, bspline_order)  # mmol/g
+        pressure, loading, kernel_path, bspline_order
+    )  # mmol/g
 
     dpore_widths = numpy.ediff1d(pore_widths, to_begin=pore_widths[0])
     pore_vol_cum = numpy.cumsum(pore_dist * dpore_widths)
@@ -186,10 +191,9 @@ def psd_dft(
         }
         ax = plot_iso(isotherm, **params)
         ax.plot(pressure, pore_load_cum, 'r-')
-        psd_plot(pore_widths,
-                 pore_dist,
-                 pore_vol_cum=pore_vol_cum,
-                 method='DFT')
+        psd_plot(
+            pore_widths, pore_dist, pore_vol_cum=pore_vol_cum, method='DFT'
+        )
 
     return {
         'pore_widths': pore_widths,
@@ -240,28 +244,32 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     """
     # Parameter checks
     if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays"
-                        " do not match")
+        raise Exception(
+            "The length of the pressure and loading arrays"
+            " do not match"
+        )
 
     # get the interpolation kernel
     kernel = _load_kernel(kernel_path)
 
     # generate the numpy arrays
     try:
-        kernel_points = numpy.asarray(
-            [kernel[size](pressure) for size in kernel])
+        kernel_points = numpy.asarray([
+            kernel[size](pressure) for size in kernel
+        ])
     except ValueError:
         raise CalculationError(
             "Could not get kernel values at isotherm points. "
-            "Does your kernel pressure range apply to this isotherm?")
+            "Does your kernel pressure range apply to this isotherm?"
+        )
     pore_widths = numpy.asarray(list(kernel.keys()), dtype='float64')
 
     # define the minimization function
     def kernel_loading(pore_dist):
         return numpy.multiply(
             kernel_points,
-            pore_dist[:, numpy.
-                      newaxis]  # -> multiply each loading with its contribution
+            pore_dist[:, numpy.newaxis
+                      ]  # -> multiply each loading with its contribution
         ).sum(axis=0)  # -> add the contributions together at each pressure
 
     def sum_squares(pore_dist):
@@ -279,23 +287,26 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     # # run the optimisation algorithm
     guess = numpy.array([0 for pore in pore_widths])
     bounds = [(0, None) for pore in pore_widths]
-    result = scipy.optimize.minimize(sum_squares,
-                                     guess,
-                                     method='SLSQP',
-                                     bounds=bounds,
-                                     constraints=cons,
-                                     options={'ftol': 1e-04})
+    result = scipy.optimize.minimize(
+        sum_squares,
+        guess,
+        method='SLSQP',
+        bounds=bounds,
+        constraints=cons,
+        options={'ftol': 1e-04}
+    )
 
     if not result.success:
         raise CalculationError(
-            f"Minimization of DFT failed with error: {result.message}")
+            f"Minimization of DFT failed with error: {result.message}"
+        )
 
     # convert from preponderance to distribution
     final_loading = kernel_loading(result.x)
     pore_dist = result.x / numpy.ediff1d(pore_widths, to_begin=pore_widths[0])
-    pore_widths, pore_dist = bspline(pore_widths,
-                                     pore_dist,
-                                     degree=bspline_order)
+    pore_widths, pore_dist = bspline(
+        pore_widths, pore_dist, degree=bspline_order
+    )
 
     return pore_widths, pore_dist, final_loading
 
@@ -328,13 +339,16 @@ def _load_kernel(path):
     raw_kernel = raw_kernel.append(
         pandas.DataFrame([0 for col in raw_kernel.columns],
                          index=raw_kernel.columns,
-                         columns=[0]).transpose())
+                         columns=[0]).transpose()
+    )
 
     kernel = {}
     for pore_size in raw_kernel:
-        interpolator = scipy.interpolate.interp1d(raw_kernel[pore_size].index,
-                                                  raw_kernel[pore_size].values,
-                                                  kind='cubic')
+        interpolator = scipy.interpolate.interp1d(
+            raw_kernel[pore_size].index,
+            raw_kernel[pore_size].values,
+            kind='cubic'
+        )
 
         kernel.update({pore_size: interpolator})
 

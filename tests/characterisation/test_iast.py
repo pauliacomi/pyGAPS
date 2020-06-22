@@ -13,7 +13,6 @@ Functions are tested against pre-calculated values on real isotherms.
 All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
-import os
 
 import numpy
 import pytest
@@ -28,9 +27,9 @@ from .conftest import DATA_IAST_PATH
 @pytest.fixture()
 def load_iast():
     """A fixture which loads files from the disk."""
-    filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['CH4'].get('file'))
+    filepath = DATA_IAST_PATH / DATA_IAST['CH4']['file']
     ch4 = pygaps.isotherm_from_jsonf(filepath)
-    filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['C2H6'].get('file'))
+    filepath = DATA_IAST_PATH / DATA_IAST['C2H6']['file']
     c2h6 = pygaps.isotherm_from_jsonf(filepath)
     return ch4, c2h6
 
@@ -47,7 +46,6 @@ def load_iast_models(load_iast):
 @pytest.mark.modelling
 class TestIAST():
     """Test IAST calculations."""
-
     def test_iast_checks(self, load_iast, load_iast_models):
         """Checks for built-in safeguards."""
 
@@ -99,7 +97,6 @@ class TestIAST():
 @pytest.mark.modelling
 class TestReverseIAST():
     """Test reverse IAST calculations."""
-
     def test_reverse_iast_checks(self, load_iast, load_iast_models):
         """Checks for built-in safeguards."""
 
@@ -133,12 +130,15 @@ class TestReverseIAST():
         ideal_gas_fraction = [0.815, 0.185]
 
         gas_fraction, actual_loading = pygaps.reverse_iast(
-            load_iast, ideal_ads_fraction, 1)
+            load_iast, ideal_ads_fraction, 1
+        )
 
         actual_ads_fraction = actual_loading / numpy.sum(actual_loading)
 
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
-        assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
+        assert numpy.isclose(
+            ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05
+        )
 
     def test_reverse_iast_model(self, load_iast_models):
         """Test on pre-calculated data."""
@@ -147,12 +147,15 @@ class TestReverseIAST():
         ideal_gas_fraction = [0.885, 0.115]
 
         gas_fraction, actual_loading = pygaps.reverse_iast(
-            load_iast_models, ideal_ads_fraction, 1)
+            load_iast_models, ideal_ads_fraction, 1
+        )
 
         actual_ads_fraction = actual_loading / numpy.sum(actual_loading)
 
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
-        assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
+        assert numpy.isclose(
+            ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05
+        )
 
     @cleanup
     def test_reverse_iast_verbose(self, load_iast):
@@ -163,7 +166,6 @@ class TestReverseIAST():
 @pytest.mark.modelling
 class TestIASTVLE():
     """Test IAST VLE function."""
-
     def test_iast_vle_checks(self, load_iast):
         """Checks for built-in safeguards."""
 
@@ -208,7 +210,6 @@ class TestIASTVLE():
 @pytest.mark.modelling
 class TestIASTSVP():
     """Test IAST SVP function."""
-
     def test_iast_svp_checks(self, load_iast):
         """Checks for built-in safeguards."""
 

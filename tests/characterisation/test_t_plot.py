@@ -12,8 +12,6 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
-import os
-
 import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
@@ -41,7 +39,7 @@ class TestTPlot():
         # exclude datasets where it is not applicable
         if sample.get('t_area', None):
 
-            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            filepath = DATA_N77_PATH / sample['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
 
             res = pygaps.t_plot(isotherm)
@@ -64,7 +62,7 @@ class TestTPlot():
         """Test choice of points."""
 
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
 
         res = pygaps.t_plot(isotherm, limits=[0.7, 1.0])
@@ -87,6 +85,6 @@ class TestTPlot():
     def test_tplot_output(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.t_plot(isotherm, 'Halsey', verbose=True)

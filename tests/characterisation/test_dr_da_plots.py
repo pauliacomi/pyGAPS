@@ -12,8 +12,6 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
-import os
-
 import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
@@ -34,7 +32,7 @@ class TestDAPlot():
         with pytest.raises(pygaps.ParameterError):
             pygaps.da_plot(basic_pointisotherm, exp=-2)
 
-        filepath = os.path.join(DATA_N77_PATH, DATA['Takeda 5A']['file'])
+        filepath = DATA_N77_PATH / DATA['Takeda 5A']['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
 
         # Will raise "bad limits" error.
@@ -51,7 +49,7 @@ class TestDAPlot():
         # Exclude datasets where it is not applicable.
         if sample.get('dr_volume', None):
 
-            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            filepath = DATA_N77_PATH / sample['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
 
             res = pygaps.dr_plot(isotherm)
@@ -76,7 +74,7 @@ class TestDAPlot():
         # exclude datasets where it is not applicable
         if sample.get('da_volume', None):
 
-            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            filepath = DATA_N77_PATH / sample['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
 
             res = pygaps.da_plot(isotherm, limits=[0, 0.01])
@@ -98,6 +96,6 @@ class TestDAPlot():
     def test_da_output(self):
         """Test verbosity."""
         sample = DATA['Takeda 5A']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.da_plot(isotherm, verbose=True)

@@ -12,8 +12,6 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
-import os
-
 import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
@@ -56,7 +54,7 @@ class TestAreaLangmuir():
         # exclude datasets where it is not applicable
         if sample.get('langmuir_area', None):
 
-            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            filepath = DATA_N77_PATH / sample['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
 
             bet_area = al.area_langmuir(isotherm).get("area")
@@ -72,7 +70,7 @@ class TestAreaLangmuir():
         """Test choice of points."""
 
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
 
         langmuir_area = al.area_langmuir(isotherm, limits=[0.05,
@@ -90,6 +88,6 @@ class TestAreaLangmuir():
     def test_area_langmuir_output(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
         al.area_langmuir(isotherm, verbose=True)

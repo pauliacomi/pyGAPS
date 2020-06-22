@@ -12,8 +12,6 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
-import os
-
 import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
@@ -73,11 +71,9 @@ class TestAlphaSPlot():
         # exclude datasets where it is not applicable
         if sample.get('as_area', None):
 
-            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            filepath = DATA_N77_PATH / sample['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
-            ref_filepath = os.path.join(
-                DATA_N77_PATH, DATA[sample['as_ref']]['file']
-            )
+            ref_filepath = DATA_N77_PATH / DATA[sample['as_ref']]['file']
             ref_isotherm = pygaps.isotherm_from_jsonf(ref_filepath)
             mref_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
                 ref_isotherm, model='BET'
@@ -103,7 +99,7 @@ class TestAlphaSPlot():
         """Test choice of points."""
 
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
 
         res = pygaps.alpha_s(isotherm, isotherm, limits=[0.7, 1.0])
@@ -126,6 +122,6 @@ class TestAlphaSPlot():
     def test_alphas_output(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
         pygaps.alpha_s(isotherm, isotherm, verbose=True)

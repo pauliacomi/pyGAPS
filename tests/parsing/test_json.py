@@ -1,6 +1,6 @@
 """Tests JSON parsing."""
 
-import os
+from pathlib import Path
 
 import pytest
 
@@ -33,7 +33,9 @@ class TestJson():
 
         assert basic_modelisotherm.to_dict() == new_isotherm.to_dict()
 
-    def test_isotherm_from_json_file(self, basic_pointisotherm, tmpdir_factory):
+    def test_isotherm_from_json_file(
+        self, basic_pointisotherm, tmpdir_factory
+    ):
         """Test the parsing of an isotherm to a json file."""
 
         path = tmpdir_factory.mktemp('json').join('isotherm.json').strpath
@@ -45,9 +47,9 @@ class TestJson():
     def test_isotherm_from_json_nist(self):
         """Test the parsing of an isotherm from json."""
 
-        JSON_PATH_NIST = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            'docs', 'examples', 'data', 'parsing', 'nist', 'nist_iso.json')
+        JSON_PATH_NIST = Path(
+            __file__
+        ).parent.parent.parent / 'docs' / 'examples' / 'data' / 'parsing' / 'nist' / 'nist_iso.json'
 
         with open(JSON_PATH_NIST) as file:
             pygaps.isotherm_from_json(file.read(), fmt='NIST')

@@ -11,8 +11,6 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
-import os
-
 import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import average
@@ -28,15 +26,13 @@ from .conftest import DATA_ISOSTERIC_PATH
 @pytest.mark.characterisation
 class TestIsostericEnthalpy():
     """Tests isosteric enthalpy calculations."""
-
     def test_iso_enthalpy_checks(self, use_material):
         """Checks for built-in safeguards."""
         isotherms = []
 
         # load test data
         for sample in DATA_ISOSTERIC:
-            filepath = os.path.join(
-                DATA_ISOSTERIC_PATH, DATA_ISOSTERIC[sample]['file'])
+            filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
             isotherms.append(isotherm)
 
@@ -60,8 +56,7 @@ class TestIsostericEnthalpy():
         isotherms = []
 
         for sample in DATA_ISOSTERIC:
-            filepath = os.path.join(
-                DATA_ISOSTERIC_PATH, DATA_ISOSTERIC[sample]['file'])
+            filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
             isotherms.append(isotherm)
 
@@ -75,8 +70,7 @@ class TestIsostericEnthalpy():
         isotherms = []
 
         for sample in DATA_ISOSTERIC:
-            filepath = os.path.join(
-                DATA_ISOSTERIC_PATH, DATA_ISOSTERIC[sample]['file'])
+            filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
             isotherms.append(isotherm)
 

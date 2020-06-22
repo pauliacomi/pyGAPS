@@ -31,17 +31,13 @@ Explanation of parameters:
 'psd_dft_pore_size':    Primary pore size peak, DFT range
 """
 
-import os
+from pathlib import Path
 
-DATA_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'docs',
-    'examples', 'data'
-)
-
-DATA_N77_PATH = os.path.join(DATA_PATH, 'characterisation')
-DATA_IAST_PATH = os.path.join(DATA_PATH, 'iast')
-DATA_ISOSTERIC_PATH = os.path.join(DATA_PATH, 'isosteric')
-DATA_CALO_PATH = os.path.join(DATA_PATH, 'calorimetry')
+DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
+DATA_N77_PATH = DATA_PATH / 'characterisation'
+DATA_IAST_PATH = DATA_PATH / 'iast'
+DATA_ISOSTERIC_PATH = DATA_PATH / 'isosteric'
+DATA_CALO_PATH = DATA_PATH / 'calorimetry'
 
 DATA = {
     'MCM-41': {

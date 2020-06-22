@@ -1,22 +1,16 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
-import io
 import re
-from glob import glob
-from os.path import basename
-from os.path import dirname
-from os.path import join
-from os.path import splitext
+from pathlib import Path
 
 from setuptools import find_packages
 from setuptools import setup
 
 
-def read(*names, **kwargs):
-    with io.open(
-        join(dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8')
+def read(name, **kwargs):
+    """Read and return file contents."""
+    with open(
+        Path(__file__).parent / name, encoding=kwargs.get('encoding', 'utf8')
     ) as fh:
         return fh.read()
 
@@ -47,7 +41,7 @@ setup(
     },
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    py_modules=[path.name.suffix for path in Path('./src').glob('*.py')],
     include_package_data=True,
     zip_safe=False,
     classifiers=[  # Classifier list at https://pypi.org/pypi?%3Aaction=list_classifiers

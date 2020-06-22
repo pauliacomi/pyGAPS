@@ -23,6 +23,8 @@ New features:
  * The reference area for an alpha_s calculation can now be specified
    as either "BET" or "Langmuir".
  * Nicer Dubinin-Astakov and Dubinin-Radushkevich plots.
+ * Changed the `util_get_file_paths` function to be more intuitive (no . needed).
+ * Now using `pathlib` throughout the code.
  * General core refactoring and speed-ups.
 
 Fixes:

@@ -9,7 +9,6 @@ from os.path import dirname
 from os.path import exists
 from os.path import join
 
-
 if __name__ == "__main__":
     base_path = dirname(dirname(abspath(__file__)))
     print("Project path: {0}".format(base_path))
@@ -25,9 +24,13 @@ if __name__ == "__main__":
         try:
             subprocess.check_call(["virtualenv", env_path])
         except subprocess.CalledProcessError:
-            subprocess.check_call([sys.executable, "-m", "virtualenv", env_path])
+            subprocess.check_call([
+                sys.executable, "-m", "virtualenv", env_path
+            ])
         print("Installing `jinja2` and `matrix` into bootstrap environment...")
-        subprocess.check_call([join(bin_path, "pip"), "install", "jinja2", "matrix"])
+        subprocess.check_call([
+            join(bin_path, "pip"), "install", "jinja2", "matrix"
+        ])
     python_executable = join(bin_path, "python.exe")
     if not os.path.samefile(python_executable, sys.executable):
         print("Re-executing with: {0}".format(python_executable))
@@ -45,14 +48,18 @@ if __name__ == "__main__":
     )
 
     tox_environments = {}
-    for (alias, conf) in matrix.from_file(join(base_path, "setup.cfg")).items():
+    for (alias, conf) in matrix.from_file(join(base_path,
+                                               "setup.cfg")).items():
         python = conf["python_versions"]
         deps = conf["dependencies"]
         tox_environments[alias] = {
             "deps": deps.split(),
         }
         if "coverage_flags" in conf:
-            cover = {"false": False, "true": True}[conf["coverage_flags"].lower()]
+            cover = {
+                "false": False,
+                "true": True
+            }[conf["coverage_flags"].lower()]
             tox_environments[alias].update(cover=cover)
         if "environment_variables" in conf:
             env_vars = conf["environment_variables"]
@@ -60,6 +67,10 @@ if __name__ == "__main__":
 
     for name in os.listdir(join("ci", "templates")):
         with open(join(base_path, name), "w") as fh:
-            fh.write(jinja.get_template(name).render(tox_environments=tox_environments))
+            fh.write(
+                jinja.get_template(name).render(
+                    tox_environments=tox_environments
+                )
+            )
         print("Wrote {}".format(name))
 print("DONE.")

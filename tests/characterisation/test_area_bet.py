@@ -12,8 +12,6 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
-import os
-
 import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
@@ -69,7 +67,7 @@ class TestAreaBET():
         # exclude datasets where it is not applicable
         if sample.get('bet_area', None):
 
-            filepath = os.path.join(DATA_N77_PATH, sample['file'])
+            filepath = DATA_N77_PATH / sample['file']
             isotherm = pygaps.isotherm_from_jsonf(filepath)
 
             bet_area = ab.area_BET(isotherm).get("area")
@@ -85,7 +83,7 @@ class TestAreaBET():
         """Test choice of points."""
 
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
 
         bet_area = ab.area_BET(isotherm, limits=[0.05, 0.30]).get("area")
@@ -101,6 +99,6 @@ class TestAreaBET():
     def test_area_BET_output(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, sample['file'])
+        filepath = DATA_N77_PATH / sample['file']
         isotherm = pygaps.isotherm_from_jsonf(filepath)
         ab.area_BET(isotherm, verbose=True)
