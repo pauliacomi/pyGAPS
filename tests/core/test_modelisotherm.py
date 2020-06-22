@@ -1,7 +1,5 @@
 """Tests relating to the ModelIsotherm class."""
 
-import os
-
 import numpy
 import pandas
 import pytest
