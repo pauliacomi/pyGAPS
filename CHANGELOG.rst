@@ -2,7 +2,7 @@
 Changelog
 =========
 
-2.1.0 (2020-xx-xx)
+3.0.0 (2020-xx-xx)
 ------------------
 
 Breaking changes:

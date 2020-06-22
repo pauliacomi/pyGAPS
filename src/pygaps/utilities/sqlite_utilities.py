@@ -19,19 +19,13 @@ def build_update(table, to_set, where, prefix=None):
     Returns
     -------
     str
-        Built query.
+        Built query string.
 
     """
-    sql_q = 'UPDATE \"' + table + '\"'
-    sql_q += " SET "
-    sql_q += ', '.join('{0} = :{0}'.format(w) for w in to_set)
-    sql_q += ' WHERE '
-    if prefix is not None:
-        sql_q += ' AND '.join('{0} = :{1}{0}'.format(w, prefix) for w in where)
-    else:
-        sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
-
-    return sql_q
+    return (
+        f"UPDATE \"{table}\" SET " + ", ".join(f"{w} = :{w}" for w in to_set) +
+        " WHERE " + " AND ".join(f"{w} = :{prefix or ''}{w}" for w in where)
+    )
 
 
 def build_insert(table, to_insert):
@@ -48,21 +42,18 @@ def build_insert(table, to_insert):
     Returns
     -------
     str
-        Built query.
+        Built query string.
 
     """
-    sql_q = 'INSERT INTO \"' + table + '\" ('
-    sql_q += ', '.join('{0}'.format(w) for w in to_insert)
-    sql_q += ') VALUES ('
-    sql_q += ', '.join(':{0}'.format(w) for w in to_insert)
-    sql_q += ')'
-
-    return sql_q
+    return (
+        f"INSERT INTO \"{table}\" (" + ", ".join(f"{w}" for w in to_insert) +
+        ") VALUES (" + ", ".join(f":{w}" for w in to_insert) + ")"
+    )
 
 
-def build_select(table, to_select, where):
+def build_select(table, to_select, where=None):
     """
-    Build an select request.
+    Build a select request.
 
     Parameters
     ----------
@@ -76,20 +67,21 @@ def build_select(table, to_select, where):
     Returns
     -------
     str
-        Built query.
+        Built query string.
 
     """
-    sql_q = "SELECT "
-    sql_q += ', '.join('{0}'.format(w) for w in to_select)
-    sql_q += ' FROM \"' + table + '\"'
-    if len(where) > 0:
-        sql_q += ' WHERE '
-        sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
+    if where:
+        return (
+            "SELECT " + ", ".join(f"{w}" for w in to_select) +
+            f" FROM \"{table}\" WHERE " +
+            " AND ".join(f"{w} = :{w}" for w in where)
+        )
+    return (
+        "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\""
+    )
 
-    return sql_q
 
-
-def build_select_unnamed(table, to_select, where, join='AND'):
+def build_select_unnamed(table, to_select, where, join="AND"):
     """
     Build an select request with multiple parameters.
 
@@ -107,17 +99,14 @@ def build_select_unnamed(table, to_select, where, join='AND'):
     Returns
     -------
     str
-        Built query.
+        Built query string.
 
     """
-    sql_q = "SELECT "
-    sql_q += ', '.join('{0}'.format(w) for w in to_select)
-    sql_q += ' FROM \"' + table + '\"'
-    if len(where) > 0:
-        sql_q += ' WHERE '
-        sql_q += (' ' + join + ' ').join('{0} = ?'.format(w) for w in where)
-
-    return sql_q
+    return (
+        "SELECT " + ", ".join(f"{w}" for w in to_select) +
+        f" FROM \"{table}\" WHERE " +
+        (" " + join + " ").join(f"{w} = ?" for w in where)
+    )
 
 
 def build_delete(table, where):
@@ -134,12 +123,10 @@ def build_delete(table, where):
     Returns
     -------
     str
-        Built query.
+        Built query string.
 
     """
-    sql_q = "DELETE "
-    sql_q += 'FROM \"' + table + '\"'
-    sql_q += ' WHERE '
-    sql_q += ' AND '.join('{0} = :{0}'.format(w) for w in where)
-
-    return sql_q
+    return (
+        f"DELETE FROM \"{table}\" WHERE " +
+        " AND ".join(f"{w} = :{w}" for w in where)
+    )

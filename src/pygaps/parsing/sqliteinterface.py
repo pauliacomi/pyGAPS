@@ -34,21 +34,22 @@ def with_connection(func):
             # Get a cursor object
             cursor = conn.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
-
             ret = func(*args, **kwargs, cursor=cursor)
 
         except sqlite3.IntegrityError as e:
             conn.rollback()
             if kwargs.get('verbose', False):
-                print("Error")
+                print("Sqlite IntegrityError raised.")
             raise ParsingError from e
         except sqlite3.InterfaceError as e:
             conn.rollback()
             if kwargs.get('verbose', False):
-                print("Error")
+                print("Sqlite InterfaceError raised.")
             raise ParsingError from e
+
         else:
             conn.commit()
+
         finally:
             conn.close()
 
@@ -61,10 +62,17 @@ def with_connection(func):
 
 
 def _upload_one_all_columns(
-    cursor, table_name, table_id, columns, input_dict, overwrite, print_string,
-    verbose, **kwargs
+    cursor,
+    table_name,
+    table_id,
+    columns,
+    input_dict,
+    overwrite,
+    print_string,
+    verbose,
+    **kwargs,
 ):
-    """Gets all elements from a table as a dictionary, excluding id"""
+    """Insert or overwrite a list of things in a table."""
 
     to_insert = [table_id] + columns
 
@@ -75,7 +83,7 @@ def _upload_one_all_columns(
     else:
         sql_com = build_insert(table=table_name, to_insert=to_insert)
 
-    # Upload or modify data in machines table
+    # Upload or modify data
     insert_dict = {key: input_dict.get(key) for key in to_insert}
     cursor.execute(sql_com, insert_dict)
 
@@ -85,9 +93,14 @@ def _upload_one_all_columns(
 
 
 def _get_all_no_id(
-    cursor, table_name, table_id, print_string, verbose, **kwargs
+    cursor,
+    table_name,
+    table_id,
+    print_string,
+    verbose,
+    **kwargs,
 ):
-    """Gets all elements from a table as a dictionary, excluding id"""
+    """Get all elements from a table as a dictionary, excluding id."""
 
     cursor.execute("""SELECT * FROM """ + table_name)
 
@@ -101,9 +114,15 @@ def _get_all_no_id(
 
 
 def _delete_by_id(
-    cursor, table_name, table_id, element_id, print_string, verbose, **kwargs
+    cursor,
+    table_name,
+    table_id,
+    element_id,
+    print_string,
+    verbose,
+    **kwargs,
 ):
-    """Deletes elements in a database by using their ID"""
+    """Delete elements in a table by using their ID."""
 
     # Check if exists
     ids = cursor.execute(
@@ -132,10 +151,15 @@ def _delete_by_id(
 
 @with_connection
 def db_upload_material(
-    path, material, overwrite=False, verbose=True, **kwargs
+    path,
+    material,
+    overwrite=False,
+    verbose=True,
+    **kwargs,
 ):
     """
-    Uploads materials to the database.
+    Upload a material to the database.
+
     If overwrite is set to true, the material is overwritten.
     Overwrite is done based on material.name + material.batch
 
@@ -241,7 +265,7 @@ def db_upload_material(
 @with_connection
 def db_get_materials(path, verbose=True, **kwargs):
     """
-    Gets all materials and their properties.
+    Get all materials and their properties.
 
     The number of materials is usually small, so all can be loaded in memory at once.
 
@@ -370,18 +394,22 @@ def db_upload_material_property_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _upload_one_all_columns(
-        cursor, 'material_properties_type', 'type', ['unit', 'description'],
-        type_dict, overwrite, 'Material properties type', verbose
+        kwargs['cursor'],
+        'material_properties_type',
+        'type',
+        ['unit', 'description'],
+        type_dict,
+        overwrite,
+        'Material properties type',
+        verbose,
     )
 
 
 @with_connection
 def db_get_material_property_types(path, verbose=True, **kwargs):
     """
-    Gets all material property types.
+    Get all material property types.
 
     Parameters
     ----------
@@ -395,11 +423,12 @@ def db_get_material_property_types(path, verbose=True, **kwargs):
     dict
         dict of property types
     """
-
-    cursor = kwargs.pop('cursor', None)
     return _get_all_no_id(
-        cursor, 'material_properties_type', 'id', 'material property types',
-        verbose
+        kwargs['cursor'],
+        'material_properties_type',
+        'id',
+        'material property types',
+        verbose,
     )
 
 
@@ -419,11 +448,13 @@ def db_delete_material_property_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _delete_by_id(
-        cursor, 'material_properties_type', 'type', material_prop_type,
-        'material property types', verbose
+        kwargs['cursor'],
+        'material_properties_type',
+        'type',
+        material_prop_type,
+        'material property types',
+        verbose,
     )
 
 
@@ -521,7 +552,7 @@ def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
 @with_connection
 def db_get_isotherms(path, criteria, verbose=True, **kwargs):
     """
-    Gets isotherms with the selected criteria from the database.
+    Get isotherms with the selected criteria from the database.
 
     Parameters
     ----------
@@ -672,7 +703,7 @@ def db_upload_isotherm_type(
     path, type_dict, overwrite=False, verbose=True, **kwargs
 ):
     """
-    Uploads a isotherm type.
+    Upload an isotherm type.
 
     The type_dict takes the form of::
 
@@ -694,18 +725,22 @@ def db_upload_isotherm_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _upload_one_all_columns(
-        cursor, 'isotherm_type', 'type', ['description'], type_dict, overwrite,
-        'Experiment type', verbose
+        kwargs['cursor'],
+        'isotherm_type',
+        'type',
+        ['description'],
+        type_dict,
+        overwrite,
+        'Experiment type',
+        verbose,
     )
 
 
 @with_connection
 def db_get_isotherm_types(path, verbose=True, **kwargs):
     """
-    Gets all isotherm types.
+    Get all isotherm types.
 
     Parameters
     ----------
@@ -719,10 +754,12 @@ def db_get_isotherm_types(path, verbose=True, **kwargs):
     dict
         dict of isotherm types
     """
-
-    cursor = kwargs.pop('cursor', None)
     return _get_all_no_id(
-        cursor, 'isotherm_type', 'id', 'isotherm types', verbose
+        kwargs['cursor'],
+        'isotherm_type',
+        'id',
+        'isotherm types',
+        verbose,
     )
 
 
@@ -740,10 +777,13 @@ def db_delete_isotherm_type(path, iso_type, verbose=True, **kwargs):
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _delete_by_id(
-        cursor, 'isotherm_type', 'type', iso_type, 'isotherm types', verbose
+        kwargs['cursor'],
+        'isotherm_type',
+        'type',
+        iso_type,
+        'isotherm types',
+        verbose,
     )
 
 
@@ -774,18 +814,22 @@ def db_upload_isotherm_property_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _upload_one_all_columns(
-        cursor, 'isotherm_properties_type', 'type', ['unit', 'description'],
-        type_dict, overwrite, 'Experiment property type', verbose
+        kwargs['cursor'],
+        'isotherm_properties_type',
+        'type',
+        ['unit', 'description'],
+        type_dict,
+        overwrite,
+        'Experiment property type',
+        verbose,
     )
 
 
 @with_connection
 def db_get_isotherm_property_types(path, verbose=True, **kwargs):
     """
-    Gets all isotherm property types.
+    Get all isotherm property types.
 
     Parameters
     ----------
@@ -799,11 +843,12 @@ def db_get_isotherm_property_types(path, verbose=True, **kwargs):
     dict
         dict of property types
     """
-
-    cursor = kwargs.pop('cursor', None)
     return _get_all_no_id(
-        cursor, 'isotherm_properties_type', 'id', 'isotherm property types',
-        verbose
+        kwargs['cursor'],
+        'isotherm_properties_type',
+        'id',
+        'isotherm property types',
+        verbose,
     )
 
 
@@ -823,11 +868,13 @@ def db_delete_isotherm_property_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _delete_by_id(
-        cursor, 'isotherm_properties_type', 'type', property_type,
-        'isotherm property types', verbose
+        kwargs['cursor'],
+        'isotherm_properties_type',
+        'type',
+        property_type,
+        'isotherm property types',
+        verbose,
     )
 
 
@@ -836,7 +883,7 @@ def db_upload_isotherm_data_type(
     path, type_dict, overwrite=False, verbose=True, **kwargs
 ):
     """
-    Uploads a data type.
+    Upload a data type.
 
     The type_dict takes the form of::
 
@@ -858,18 +905,22 @@ def db_upload_isotherm_data_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _upload_one_all_columns(
-        cursor, 'isotherm_data_type', 'type', ['unit', 'description'],
-        type_dict, overwrite, 'Experiment data type', verbose
+        kwargs['cursor'],
+        'isotherm_data_type',
+        'type',
+        ['unit', 'description'],
+        type_dict,
+        overwrite,
+        'Experiment data type',
+        verbose,
     )
 
 
 @with_connection
 def db_get_isotherm_data_types(path, verbose=True, **kwargs):
     """
-    Gets all isotherm data types.
+    Get all isotherm data types.
 
     Parameters
     ----------
@@ -883,10 +934,12 @@ def db_get_isotherm_data_types(path, verbose=True, **kwargs):
     dict
         dict of data types
     """
-
-    cursor = kwargs.pop('cursor', None)
     return _get_all_no_id(
-        cursor, 'isotherm_data_type', 'id', 'isotherm data types', verbose
+        kwargs['cursor'],
+        'isotherm_data_type',
+        'id',
+        'isotherm data types',
+        verbose,
     )
 
 
@@ -904,11 +957,13 @@ def db_delete_isotherm_data_type(path, data_type, verbose=True, **kwargs):
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _delete_by_id(
-        cursor, 'isotherm_data_type', 'type', data_type, 'isotherm data types',
-        verbose
+        kwargs['cursor'],
+        'isotherm_data_type',
+        'type',
+        data_type,
+        'isotherm data types',
+        verbose,
     )
 
 
@@ -920,7 +975,7 @@ def db_upload_adsorbate(
     path, adsorbate, overwrite=False, verbose=True, **kwargs
 ):
     """
-    Uploads adsorbates to the database.
+    Upload an adsorbate to the database.
 
     If overwrite is set to true, the adsorbate is overwritten.
     Overwrite is done based on adsorbate.name
@@ -940,25 +995,26 @@ def db_upload_adsorbate(
 
     cursor = kwargs.pop('cursor', None)
 
-    if not overwrite:
-        # Upload in material table
+    # If we need to overwrite, we find the id of existing adsorbate.
+    if overwrite:
+        ids = cursor.execute(
+            build_select(table='adsorbates', to_select=['id'], where=['name']),
+            {
+                'name': adsorbate.name
+            }
+        ).fetchone()
+        if ids is None:
+            raise sqlite3.IntegrityError(
+                "Adsorbate to overwrite does not exist in database."
+            )
+        ads_id = ids[0]
+    # If overwrite is not specified, we upload it to the adsorbates table
+    else:
         cursor.execute(
             build_insert(table="adsorbates", to_insert=['name']),
             {'name': adsorbate.name}
         )
-
-    # Get id of adsorbate
-    ids = cursor.execute(
-        build_select(table='adsorbates', to_select=['id'], where=['name']), {
-            'name': adsorbate.name
-        }
-    ).fetchone()
-
-    if ids is None:
-        raise sqlite3.IntegrityError(
-            "Adsorbate to overwrite does not exist in database"
-        )
-    ads_id = ids[0]
+        ads_id = cursor.lastrowid
 
     # Upload or modify data in the associated tables
     if adsorbate.properties:
@@ -1041,13 +1097,13 @@ def db_upload_adsorbate(
 
     if verbose:
         # Print success
-        print("Adsorbate uploaded: '", adsorbate.name, "'")
+        print(f"Adsorbate uploaded: '{adsorbate.name}''")
 
 
 @with_connection
 def db_get_adsorbates(path, verbose=True, **kwargs):
     """
-    Gets all adsorbates and their properties.
+    Get all adsorbates and their properties.
 
     The number of adsorbates is usually small, so all can be
     loaded in memory at once.
@@ -1068,7 +1124,7 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
     cursor = kwargs.pop('cursor', None)
 
     # Get required adsorbate from database
-    cursor.execute("""SELECT * FROM adsorbates""")
+    cursor.execute("""SELECT * FROM 'adsorbates'""")
 
     rows = cursor.fetchall()
 
@@ -1076,6 +1132,7 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
     adsorbates = []
     for row in rows:
 
+        # Get adsorbate properties
         cursor.execute(
             build_select(
                 table='adsorbate_properties',
@@ -1083,9 +1140,9 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
                 where=['ads_id']
             ), {'ads_id': row['id']}
         )
-
         adsorbate_params = {r[0]: r[1] for r in cursor}
 
+        # Get adsorbate aliases
         cursor.execute(
             build_select(
                 table='adsorbate_names', to_select=['name'], where=['ads_id']
@@ -1100,7 +1157,7 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
 
     # Print success
     if verbose:
-        print("Selected", len(adsorbates), "adsorbates")
+        print(f"Selected {len(adsorbates)} adsorbates")
 
     return adsorbates
 
@@ -1141,13 +1198,13 @@ def db_delete_adsorbate(path, adsorbate, verbose=True, **kwargs):
         {'ads_id': ads_id}
     )
 
-    # Delete names from adsorbate_names table
+    # Delete aliases from adsorbate_names table
     cursor.execute(
         build_delete(table='adsorbate_names', where=['ads_id']),
         {'ads_id': ads_id}
     )
 
-    # Delete material in adsorbates table
+    # Delete original name in adsorbates table
     cursor.execute(
         build_delete(table='adsorbates', where=['id']), {'id': ads_id}
     )
@@ -1184,18 +1241,22 @@ def db_upload_adsorbate_property_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _upload_one_all_columns(
-        cursor, 'adsorbate_properties_type', 'type', ['unit', 'description'],
-        type_dict, overwrite, 'Property type', verbose
+        kwargs['cursor'],
+        'adsorbate_properties_type',
+        'type',
+        ['unit', 'description'],
+        type_dict,
+        overwrite,
+        'Property type',
+        verbose,
     )
 
 
 @with_connection
 def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
     """
-    Gets all adsorbate property types.
+    Get all adsorbate property types.
 
     Parameters
     ----------
@@ -1209,11 +1270,12 @@ def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
     dict
         dict of property types
     """
-
-    cursor = kwargs.pop('cursor', None)
     return _get_all_no_id(
-        cursor, 'adsorbate_properties_type', 'id', 'adsorbate property types',
-        verbose
+        kwargs['cursor'],
+        'adsorbate_properties_type',
+        'id',
+        'adsorbate property types',
+        verbose,
     )
 
 
@@ -1233,18 +1295,20 @@ def db_delete_adsorbate_property_type(
     verbose : bool
         Print to console on success or error.
     """
-
-    cursor = kwargs.pop('cursor', None)
     _delete_by_id(
-        cursor, 'adsorbate_properties_type', 'type', property_type,
-        'adsorbate property types', verbose
+        kwargs['cursor'],
+        'adsorbate_properties_type',
+        'type',
+        property_type,
+        'adsorbate property types',
+        verbose,
     )
 
 
 @with_connection
 def db_get_adsorbate_names(path, verbose=True, **kwargs):
     """
-    Gets all adsorbate aliases.
+    Get all adsorbate aliases.
 
     Parameters
     ----------
@@ -1258,6 +1322,10 @@ def db_get_adsorbate_names(path, verbose=True, **kwargs):
     dict
         dict of aliases
     """
-
-    cursor = kwargs.pop('cursor', None)
-    return _get_all_no_id(cursor, 'adsorbate_names', 'id', '', verbose)
+    return _get_all_no_id(
+        kwargs['cursor'],
+        'adsorbate_names',
+        'id',
+        '',
+        verbose,
+    )
