@@ -140,7 +140,7 @@ def t_plot(
 
     if verbose:
         if not results:
-            print('Could not find linear regions, attempt a manual limit.')
+            print("Could not find linear regions, attempt a manual limit.")
         else:
             for index, result in enumerate(results):
                 print(f"For linear region {index + 1}")
@@ -251,7 +251,7 @@ def t_plot_raw(
 
         if len(results) == 0:
             warnings.warn(
-                'Could not find linear regions, attempt a manual limit'
+                "Could not find linear regions, attempt a manual limit."
             )
 
     return results, thickness_curve

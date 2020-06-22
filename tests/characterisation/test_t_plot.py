@@ -27,7 +27,6 @@ from .conftest import DATA_N77_PATH
 @pytest.mark.characterisation
 class TestTPlot():
     """Tests t-plot calculations."""
-
     def test_alphas_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
 
@@ -52,10 +51,14 @@ class TestTPlot():
             err_absolute_area = 0.1  # units
             err_absolute_volume = 0.01  # units
 
-            assert isclose(results[-1].get('adsorbed_volume'),
-                           sample['t_pore_volume'], err_relative, err_absolute_area)
-            assert isclose(results[0].get('area'),
-                           sample['t_area'], err_relative, err_absolute_volume)
+            assert isclose(
+                results[-1].get('adsorbed_volume'), sample['t_pore_volume'],
+                err_relative, err_absolute_area
+            )
+            assert isclose(
+                results[0].get('area'), sample['t_area'], err_relative,
+                err_absolute_volume
+            )
 
     def test_tplot_choice(self):
         """Test choice of points."""
@@ -67,14 +70,18 @@ class TestTPlot():
         res = pygaps.t_plot(isotherm, limits=[0.7, 1.0])
         results = res.get('results')
 
-        err_relative = 0.1          # 10 percent
-        err_absolute_area = 0.1     # units
+        err_relative = 0.1  # 10 percent
+        err_absolute_area = 0.1  # units
         err_absolute_volume = 0.01  # units
 
-        assert isclose(results[-1].get('adsorbed_volume'),
-                       sample['t_pore_volume'], err_relative, err_absolute_area)
-        assert isclose(results[-1].get('area'),
-                       sample['s_t_area'], err_relative, err_absolute_volume)
+        assert isclose(
+            results[-1].get('adsorbed_volume'), sample['t_pore_volume'],
+            err_relative, err_absolute_area
+        )
+        assert isclose(
+            results[-1].get('area'), sample['s_t_area'], err_relative,
+            err_absolute_volume
+        )
 
     @cleanup
     def test_tplot_output(self):

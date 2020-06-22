@@ -8,15 +8,16 @@ import scipy
 from ..core.adsorbate import Adsorbate
 from ..core.isotherm import Isotherm
 from ..graphing.calcgraph import plot_tp
-from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import ParameterError, CalculationError
 from ..utilities.math_utilities import find_linear_sections
 from .area_bet import area_BET
+from .area_langmuir import area_langmuir
 
 
 def alpha_s(
     isotherm,
     reference_isotherm,
-    reference_area=None,
+    reference_area='BET',
     reducing_pressure=0.4,
     limits=None,
     verbose=False
@@ -36,9 +37,10 @@ def alpha_s(
         The isotherm of which to calculate the alpha-s plot parameters.
     reference_isotherm : PointIsotherm or ModelIsotherm
         The isotherm to use as reference.
-    reference_area : str, optional
-        Area of the reference material.
-        If not specified, the BET method is used to calculate it.
+    reference_area : either (area, 'BET' or 'langmuir'), optional
+        Area of the reference material or function to calculate it
+        using the reference isotherm.
+        If not specified, the BET method is used.
     reducing_pressure : float, optional
         p/p0 value at which the loading is reduced.
         Default is 0.4 as it is the closing point for the nitrogen
@@ -133,8 +135,31 @@ def alpha_s(
         raise ParameterError(
             "The reducing pressure is outside the bounds of 0-1"
         )
-    if reference_area is None:
-        reference_area = area_BET(reference_isotherm).get('area')
+
+    # Deal with reference area
+    if reference_area in ['BET', None]:
+        try:
+            reference_area = area_BET(reference_isotherm).get('area')
+        except Exception as e:
+            raise CalculationError(
+                "Could not calculate a BET area for the reference isotherm. "
+                "Either solve the issue or provide a value for reference_area. "
+                f"BET area error is :\n{e}"
+            )
+    elif reference_area == 'Langmuir':
+        try:
+            reference_area = area_langmuir(reference_isotherm).get('area')
+        except Exception as e:
+            raise CalculationError(
+                "Could not calculate a Langmuir area for the reference isotherm. "
+                "Either solve the issue or provide a value for reference_area. "
+                f"Langmuir area error is :\n{e}"
+            )
+    elif not isinstance(reference_area, float):
+        raise ParameterError(
+            "The reference area should be either a numeric value, 'BET' or 'Langmuir'. "
+            f"The value specified was {reference_area}"
+        )
 
     # Get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
@@ -168,7 +193,7 @@ def alpha_s(
 
     if verbose:
         if not results:
-            print('Could not find linear regions, attempt a manual limit.')
+            print("Could not find linear regions, attempt a manual limit.")
         else:
             for index, result in enumerate(results):
                 print(f"For linear region {index}")

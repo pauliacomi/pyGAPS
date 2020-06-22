@@ -20,6 +20,8 @@ New features:
    rather than first derivative. In such way, slight uncertainty
    in pressures won't lead to a wrong assignment.
  * Improved performance for isotherm conversions.
+ * The reference area for an alpha_s calculation can now be specified
+   as either "BET" or "Langmuir".
  * General core refactoring and speed-ups.
 
 Fixes:
