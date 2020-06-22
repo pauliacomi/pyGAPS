@@ -87,7 +87,8 @@ class Adsorbate():
         # Adsorbate name
         if name is None:
             raise ParameterError(
-                "Must provide a name for the created adsorbate.")
+                "Must provide a name for the created adsorbate."
+            )
         self.name = name
 
         # List of aliases
@@ -188,8 +189,9 @@ class Adsorbate():
         """Return the CoolProp state associated with the fluid."""
         if not self._backend_mode or self._backend_mode != pygaps.COOLPROP_BACKEND:
             self._backend_mode = pygaps.COOLPROP_BACKEND
-            self._state = CoolProp.AbstractState(pygaps.COOLPROP_BACKEND,
-                                                 self.backend_name())
+            self._state = CoolProp.AbstractState(
+                pygaps.COOLPROP_BACKEND, self.backend_name()
+            )
 
         return self._state
 
@@ -244,7 +246,8 @@ class Adsorbate():
         req_prop = self.properties.get(prop)
         if req_prop is None:
             raise ParameterError(
-                f"Adsorbate {self.name} does not have a property named {prop}")
+                f"Adsorbate {self.name} does not have a property named {prop}"
+            )
 
         return req_prop
 
@@ -354,9 +357,9 @@ class Adsorbate():
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
                 try:
-                    sat_p = self.saturation_pressure(temp,
-                                                     unit=unit,
-                                                     calculate=False)
+                    sat_p = self.saturation_pressure(
+                        temp, unit=unit, calculate=False
+                    )
                 except ParameterError:
                     raise CalculationError
 
