@@ -1,6 +1,7 @@
 """General functions for stepping through folders."""
 
 from pathlib import Path
+
 from .exceptions import pgError
 
 
