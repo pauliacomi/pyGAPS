@@ -8,12 +8,14 @@ from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParameterError
 
 
-def initial_henry_slope(isotherm,
-                        max_adjrms=0.02,
-                        p_limits=None,
-                        l_limits=None,
-                        verbose=False,
-                        **plot_parameters):
+def initial_henry_slope(
+    isotherm,
+    max_adjrms=0.02,
+    p_limits=None,
+    l_limits=None,
+    verbose=False,
+    **plot_parameters
+):
     """
     Calculate a henry constant based on the initial slope.
 
@@ -46,9 +48,9 @@ def initial_henry_slope(isotherm,
         if not l_limits:
             l_limits = [-numpy.inf, numpy.inf]
 
-        pressure = isotherm.pressure(branch='ads',
-                                     indexed=True,
-                                     limits=p_limits)
+        pressure = isotherm.pressure(
+            branch='ads', indexed=True, limits=p_limits
+        )
         loading = isotherm.loading(branch='ads', indexed=True, limits=l_limits)
 
         pressure, loading = pressure.align(loading, join='inner')
@@ -79,8 +81,9 @@ def initial_henry_slope(isotherm,
 
     while rows_taken != 1:
 
-        param_guess = henry.initial_guess(pressure[:rows_taken],
-                                          loading[:rows_taken])
+        param_guess = henry.initial_guess(
+            pressure[:rows_taken], loading[:rows_taken]
+        )
         # fit model to isotherm data
         henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
         adjrmsd = henry.rmse / numpy.ptp(loading)
@@ -143,5 +146,6 @@ def initial_henry_virial(isotherm, optimization_params=None, verbose=False):
         isotherm,
         model='Virial',
         optimization_params=optimization_params,
-        verbose=verbose)
+        verbose=verbose
+    )
     return model_isotherm.model.params['K']
