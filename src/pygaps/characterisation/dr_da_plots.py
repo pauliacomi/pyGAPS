@@ -16,7 +16,7 @@ def dr_plot(isotherm, limits=None, verbose=False):
     Calculate pore volume and effective adsorption potential
     through a Dubinin-Radushkevich (DR) plot.
 
-    The function accepts a pyGAPS isotherm, with an ability
+    The function accepts a pyGAPS isotherm, and has the ability
     to select the pressure limits for point selection.
 
     Parameters
@@ -164,11 +164,12 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
 
     """
 
+    # Check consistency of exponent
     find_exp = False
-    if exp is None:
+    if not exp:
         find_exp = True
     elif exp < 0:
-        raise ParameterError("""Exponent cannot be negative.""")
+        raise ParameterError("Exponent cannot be negative.")
 
     # Get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
@@ -177,43 +178,42 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
     iso_temp = isotherm.temperature
 
     # Read data in
-    loading = isotherm.loading(branch='ads',
-                               loading_unit='mol',
-                               loading_basis='molar')
+    loading = isotherm.loading(
+        branch='ads', loading_unit='mol', loading_basis='molar'
+    )
     pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
 
-    if limits:
-        maximum = len(pressure) - 1
-        if limits[1]:
-            for index, value in reversed(list(enumerate(pressure))):
-                if value < limits[1]:
-                    maximum = index
-                    break
-
-        minimum = 0
-        if limits[0]:
-            for index, value in enumerate(pressure):
-                if value > limits[0]:
-                    minimum = index
-                    break
-
-        pressure = pressure[minimum:maximum]
-        loading = loading[minimum:maximum]
-
-    # Calculate x points
-    slope, intercept, log_n_p0p, logv, exp, microp_volume, potential = da_plot_raw(
-        pressure, loading, iso_temp, molar_mass, liquid_density, exp)
+    # Call the raw function
+    (
+        microp_volume,
+        potential,
+        exp,
+        slope,
+        intercept,
+        minimum,
+        maximum,
+        corr_coef,
+    ) = da_plot_raw(
+        pressure, loading, iso_temp, molar_mass, liquid_density, exp, limits
+    )
 
     if verbose:
-
-        dra_plot(logv, log_n_p0p, slope, intercept, exp)
-
         if find_exp:
             print(f"Exponent is: {exp:.2f}")
         print(f"Micropore volume is: {microp_volume:.3f} cm3")
         print(f"Effective adsorption potential is : {potential:.3f} kj/mol")
+        # Plot
+        dra_plot(
+            log_v_adj(loading, molar_mass, liquid_density),
+            log_p_exp(pressure, exp), minimum, maximum, slope, intercept, exp
+        )
 
-    res = {"pore_volume": microp_volume, "adsorption_potential": potential}
+    res = {
+        "pore_volume": microp_volume,
+        "adsorption_potential": potential,
+        'corr_coef': corr_coef,
+        'limits': [minimum, maximum],
+    }
 
     if find_exp:
         res["exponent"] = exp
@@ -221,7 +221,15 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
     return res
 
 
-def da_plot_raw(pressure, loading, iso_temp, molar_mass, liquid_density, exp):
+def da_plot_raw(
+    pressure,
+    loading,
+    iso_temp,
+    molar_mass,
+    liquid_density,
+    exp=None,
+    limits=None
+):
     """
     Calculate a DA fit, a 'bare-bones' function.
 
@@ -243,39 +251,67 @@ def da_plot_raw(pressure, loading, iso_temp, molar_mass, liquid_density, exp):
     exp : float, None
         Exponent used in the DA equation.
         Pass None to automatically calculate.
+    limits : [float, float], optional
+        Manual limits for region selection.
 
     Returns
     -------
+    microp_volume : float
+        Calculated DA pore volume.
+    potential : float
+        Effective DA adsorption potential.
+    exp : float
+        The exponent (useful if fitting was desired).
     slope : float
         Slope of the fitted DA line.
     intercept : float
         Intercept of the DA line.
-    log_n_p0p : array
-        Base 10 logarithm of p_0/p raised to the DA exponent.
-    logv : array
-        Base 10 logarithm of the volumetric uptake.
-    exp : float
-        The exponent (useful if fitting was desired)
-    microp_volume : float
-        Calculated DA pore volume
-    potential : float
-        Effective DA adsorption potential
+    minimum : float
+        Minimum point taken.
+    maximum : float
+        Maximum point taken.
+    corr_coef : float
+        Correlation coefficient of the fit line.
 
     """
-    # Calculate x points
-    logv = numpy.log10(loading * molar_mass / liquid_density)
+    # Check lengths
+    if len(pressure) != len(loading):
+        raise ParameterError(
+            "The length of the pressure and loading arrays do not match."
+        )
+    # Ensure numpy arrays, if not already
+    loading = numpy.asarray(loading)
+    pressure = numpy.asarray(pressure)
 
-    def log_n_p0p(exp):
-        """Calculate y points."""
-        return (-numpy.log10(pressure))**exp
+    maximum = len(pressure)
+    minimum = 0
+    if limits:
+
+        if limits[1]:
+            maximum = numpy.searchsorted(pressure, limits[1])
+
+        if limits[0]:
+            minimum = numpy.searchsorted(pressure, limits[0])
+
+        if maximum - minimum < 2:  # (for 2 point minimum)
+            raise CalculationError(
+                "The desired limits are infeasible (at least 2 points selected)."
+            )
+
+        pressure = pressure[minimum:maximum]
+        loading = loading[minimum:maximum]
+
+    # Calculate x-axis points
+    logv = log_v_adj(loading, molar_mass, liquid_density)
 
     def fit(exp, ret=False):
         """Linear fit."""
         slope, intercept, corr_coef, p_val, stderr = stats.linregress(
-            log_n_p0p(exp), logv)
+            log_p_exp(pressure, exp), logv
+        )
 
         if ret:
-            return slope, intercept
+            return slope, intercept, corr_coef
         return stderr
 
     if exp is None:
@@ -284,16 +320,37 @@ def da_plot_raw(pressure, loading, iso_temp, molar_mass, liquid_density, exp):
 
         if not res.success:
             raise CalculationError(
-                """Could not obtain a linear fit on the data provided.""")
+                """Could not obtain a linear fit on the data provided."""
+            )
 
         exp = res.x
 
-    slope, intercept = fit(exp, True)
+    slope, intercept, corr_coef = fit(exp, True)
 
-    # Obtain result values
+    # Calculate final result values
     microp_volume = 10**intercept
-    potential = (-numpy.log(10)**(exp - 1) *
-                 (const.gas_constant * iso_temp)**(exp) / slope)**(1 /
-                                                                   exp) / 1000
+    potential = (
+        -numpy.log(10)**(exp - 1) *
+        (const.gas_constant * iso_temp)**(exp) / slope
+    )**(1 / exp) / 1000
 
-    return slope, intercept, log_n_p0p, logv, exp, microp_volume, potential
+    return (
+        microp_volume,
+        potential,
+        exp,
+        slope,
+        intercept,
+        minimum,
+        maximum,
+        corr_coef,
+    )
+
+
+def log_v_adj(loading, molar_mass, liquid_density):
+    """Base 10 logarithm of volumetric uptake."""
+    return numpy.log10(loading * molar_mass / liquid_density)
+
+
+def log_p_exp(pressure, exp):
+    """Base 10 logarithm of p_0/p raised to the DA exponent."""
+    return (-numpy.log10(pressure))**exp

@@ -219,6 +219,7 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
         Correlation coefficient of the straight line in the BET plot.
 
     """
+    # Check lengths
     if len(pressure) != len(loading):
         raise ParameterError(
             "The length of the pressure and loading arrays do not match."
@@ -294,8 +295,15 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
         warnings.warn("The monolayer point is not within the BET region")
 
     return (
-        bet_area, c_const, n_monolayer, p_monolayer, slope, intercept, minimum,
-        maximum, corr_coef
+        bet_area,
+        c_const,
+        n_monolayer,
+        p_monolayer,
+        slope,
+        intercept,
+        minimum,
+        maximum,
+        corr_coef,
     )
 
 

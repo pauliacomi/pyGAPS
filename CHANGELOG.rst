@@ -22,6 +22,7 @@ New features:
  * Improved performance for isotherm conversions.
  * The reference area for an alpha_s calculation can now be specified
    as either "BET" or "Langmuir".
+ * Nicer Dubinin-Astakov and Dubinin-Radushkevich plots.
  * General core refactoring and speed-ups.
 
 Fixes:
