@@ -348,8 +348,8 @@ def iast(
         numpy.asarray([1.0 - numpy.sum(adsorbed_mole_fractions)])
     ))
 
-    if (numpy.sum(adsorbed_mole_fractions < 0.0) !=
-        0) | (numpy.sum(adsorbed_mole_fractions > 1.0) != 0):
+    if numpy.sum(adsorbed_mole_fractions < 0.0
+                 ) != 0 or numpy.sum(adsorbed_mole_fractions > 1.0) != 0:
         raise CalculationError(
             textwrap.dedent(
                 """\
@@ -561,8 +561,8 @@ def reverse_iast(
         gas_mole_fractions, numpy.array([1.0 - numpy.sum(gas_mole_fractions)])
     ))
 
-    if (numpy.sum(gas_mole_fractions < 0.0) !=
-        0) | (numpy.sum(gas_mole_fractions > 1.0) != 0):
+    if numpy.sum(gas_mole_fractions < 0.0
+                 ) != 0 or numpy.sum(gas_mole_fractions > 1.0) != 0:
         raise CalculationError(
             """Gas phase mole fraction not in [0,1]. Try a different
         starting guess for the gas phase mole fractions by passing an array or
