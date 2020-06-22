@@ -37,7 +37,7 @@ class TestInitialEnthalpyPoint():
         """The point method."""
         sample = DATA_CALO[sample]
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         ienth_poly = pygaps.initial_enthalpy_point(isotherm, 'enthalpy'
                                                    ).get('initial_enthalpy')
@@ -52,7 +52,7 @@ class TestInitialEnthalpyPoint():
         """Test verbosity."""
         sample = DATA_CALO['Takeda 5A']
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.initial_enthalpy_point(isotherm, 'enthalpy', verbose=True)
 
 
@@ -71,7 +71,7 @@ class TestInitialEnthalpyFit():
         """The combined polynomial method"""
         sample = DATA_CALO[sample]
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         ienth_poly = pygaps.initial_enthalpy_comp(isotherm, 'enthalpy'
                                                   ).get('initial_enthalpy')
@@ -86,5 +86,5 @@ class TestInitialEnthalpyFit():
         """Test verbosity."""
         sample = DATA_CALO['Takeda 5A']
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.initial_enthalpy_comp(isotherm, 'enthalpy', verbose=True)

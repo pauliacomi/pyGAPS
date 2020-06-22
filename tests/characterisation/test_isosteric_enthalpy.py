@@ -33,7 +33,7 @@ class TestIsostericEnthalpy():
         # load test data
         for sample in DATA_ISOSTERIC:
             filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
         # Will raise a "requires more than one isotherm error"
@@ -57,7 +57,7 @@ class TestIsostericEnthalpy():
 
         for sample in DATA_ISOSTERIC:
             filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
         result_dict = ie.isosteric_enthalpy(isotherms)
@@ -71,7 +71,7 @@ class TestIsostericEnthalpy():
 
         for sample in DATA_ISOSTERIC:
             filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
         ie.isosteric_enthalpy(isotherms, verbose=True)

@@ -68,7 +68,7 @@ class TestAreaBET():
         if sample.get('bet_area', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             bet_area = ab.area_BET(isotherm).get("area")
 
@@ -84,7 +84,7 @@ class TestAreaBET():
 
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         bet_area = ab.area_BET(isotherm, limits=[0.05, 0.30]).get("area")
 
@@ -100,5 +100,5 @@ class TestAreaBET():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         ab.area_BET(isotherm, verbose=True)

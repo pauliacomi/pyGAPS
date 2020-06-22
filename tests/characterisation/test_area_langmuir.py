@@ -55,7 +55,7 @@ class TestAreaLangmuir():
         if sample.get('langmuir_area', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             bet_area = al.area_langmuir(isotherm).get("area")
 
@@ -71,7 +71,7 @@ class TestAreaLangmuir():
 
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         langmuir_area = al.area_langmuir(isotherm, limits=[0.05,
                                                            0.30]).get("area")
@@ -89,5 +89,5 @@ class TestAreaLangmuir():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         al.area_langmuir(isotherm, verbose=True)

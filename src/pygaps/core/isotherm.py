@@ -114,9 +114,11 @@ class Isotherm():
         try:
             self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
         except pygaps.ParameterError:
-            warnings.warn(("Specified adsorbent is not in internal list "
-                           "(or name cannot be resolved to an existing one). "
-                           "CoolProp backend disabled for this adsorbent."))
+            warnings.warn((
+                "Specified adsorbent is not in internal list "
+                "(or name cannot be resolved to an existing one). "
+                "CoolProp backend disabled for this adsorbent."
+            ))
 
         # Isotherm units
         #
@@ -150,17 +152,20 @@ class Isotherm():
         if self.adsorbent_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 f"Basis selected for adsorbent ({self.adsorbent_basis}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE.keys()}")
+                f"See viable values: {_MATERIAL_MODE.keys()}"
+            )
 
         if self.loading_basis not in _MATERIAL_MODE:
             raise ParameterError(
                 f"Basis selected for loading ({self.loading_basis}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE.keys()}")
+                f"See viable values: {_MATERIAL_MODE.keys()}"
+            )
 
         if self.pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
                 f"Mode selected for pressure ({self.pressure_mode}) is not an option. "
-                f"See viable values: {_PRESSURE_MODE.keys()}")
+                f"See viable values: {_PRESSURE_MODE.keys()}"
+            )
 
         # Check units
         if self.loading_unit not in _MATERIAL_MODE[self.loading_basis]:
@@ -172,7 +177,8 @@ class Isotherm():
         if self.pressure_mode == 'absolute' and self.pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
                 f"Unit selected for pressure ({self.pressure_unit}) is not an option. "
-                f"See viable values: {_PRESSURE_UNITS.keys()}")
+                f"See viable values: {_PRESSURE_UNITS.keys()}"
+            )
 
         if self.adsorbent_unit not in _MATERIAL_MODE[self.adsorbent_basis]:
             raise ParameterError(
@@ -189,15 +195,17 @@ class Isotherm():
         for named_prop in self._named_params:
             prop_val = properties.pop(named_prop, None)
             if prop_val:
-                setattr(self, named_prop,
-                        self._named_params[named_prop](prop_val))
+                setattr(
+                    self, named_prop, self._named_params[named_prop](prop_val)
+                )
 
         # Save the rest of the properties as members
         for attr in properties:
             if hasattr(self, attr):
                 raise ParameterError(
-                    "Cannot override standard Isotherm class member '{}'".
-                    format(attr))
+                    "Cannot override standard Isotherm class member '{}'"
+                    .format(attr)
+                )
             setattr(self, attr, properties[attr])
 
     ##########################################################
@@ -239,8 +247,10 @@ class Isotherm():
 
         # Units/basis
         string += ("Units: \n")
-        string += ("\tUptake in: " + str(self.loading_unit) + "/" +
-                   str(self.adsorbent_unit) + '\n')
+        string += (
+            "\tUptake in: " + str(self.loading_unit) + "/" +
+            str(self.adsorbent_unit) + '\n'
+        )
         if self.pressure_mode == 'relative':
             string += ("\tRelative pressure \n")
         else:
@@ -250,8 +260,9 @@ class Isotherm():
         for prop in vars(self):
             if prop not in self._required_params + list(self._named_params) + \
                     list(self._unit_params) + self._reserved_params:
-                string += ('\t' + prop + ": " + str(getattr(self, prop)) +
-                           '\n')
+                string += (
+                    '\t' + prop + ": " + str(getattr(self, prop)) + '\n'
+                )
 
         return string
 
@@ -275,6 +286,56 @@ class Isotherm():
             parameter_dict.pop(param, None)
 
         return parameter_dict
+
+    def to_json(self, path=None, **kwargs):
+        """
+        Convert the isotherm to a JSON representation.
+
+        Parameters
+        ----------
+        path
+            File path or object. If not specified, the result is returned as a string.
+        kwargs
+            Custom arguments to be passed to "json.dump", like `indent`.
+
+        Returns
+        -------
+        None or str
+            If path is None, returns the resulting json format as a string.
+            Otherwise returns None.
+        """
+        return pygaps.isotherm_to_json(self, path, **kwargs)
+
+    def to_csv(self, path=None, separator=',', **kwargs):
+        """
+        Convert the isotherm to a CSV representation.
+
+        Parameters
+        ----------
+        path
+            File path or object. If not specified, the result is returned as a string.
+        separator : str, optional
+            Separator used int the csv file. Defaults to '',''.
+
+        Returns
+        -------
+        None or str
+            If path is None, returns the resulting json format as a string.
+            Otherwise returns None.
+        """
+        return pygaps.isotherm_to_csv(self, path, separator, **kwargs)
+
+    def to_xl(self, path, **kwargs):
+        """
+        Save the isotherm as an Excel file.
+
+        Parameters
+        ----------
+        path
+            Path where to save Excel file.
+
+        """
+        return pygaps.isotherm_to_xl(self, path, **kwargs)
 
     # Figure out the adsorption and desorption branches
     @staticmethod

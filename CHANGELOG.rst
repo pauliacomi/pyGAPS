@@ -10,11 +10,17 @@ Breaking changes:
  * Included Python 3.8 as latest python and deprecated Python 3.5.
  * For isotherm pressure/loading, a `limits` tuple is now passed instead of
    `min_range` and `max_range`, as for other functions in pyGAPS.
+ * The `isotherm_to_jsonf` and `isotherm_from_jsonf` functions have been
+   removed. Functionality has been merged with `isotherm_to_json` similarly to
+   the `pandas model
+   <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_json.html>`_.
 
 New features:
 
  * Isotherm JSON parser (``isotherm_to_json``) now passes extra parameters to the
    ``json.dump`` function.
+ * New convenience functions for isotherm parsing: `isotherm.to_json()`,
+   `isotherm.to_csv()` and `isotherm.to_xl()`.
  * The NIST isotherms based on "wt%" can also be converted.
  * Perform isotherm branch separation based on maximum pressure,
    rather than first derivative. In such way, slight uncertainty

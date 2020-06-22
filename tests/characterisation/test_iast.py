@@ -28,9 +28,9 @@ from .conftest import DATA_IAST_PATH
 def load_iast():
     """A fixture which loads files from the disk."""
     filepath = DATA_IAST_PATH / DATA_IAST['CH4']['file']
-    ch4 = pygaps.isotherm_from_jsonf(filepath)
+    ch4 = pygaps.isotherm_from_json(filepath)
     filepath = DATA_IAST_PATH / DATA_IAST['C2H6']['file']
-    c2h6 = pygaps.isotherm_from_jsonf(filepath)
+    c2h6 = pygaps.isotherm_from_json(filepath)
     return ch4, c2h6
 
 

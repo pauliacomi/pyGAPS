@@ -32,7 +32,7 @@ class TestInitialHenry():
         if sample.get('Khi_slope', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             ihenry_slope = pygaps.initial_henry_slope(
                 isotherm, max_adjrms=0.01
@@ -49,7 +49,7 @@ class TestInitialHenry():
         """Test introducing limits in the initial slope method."""
         sample = DATA['SiO2']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.initial_henry_slope(
             isotherm, max_adjrms=0.01, p_limits=[0, 0.2]
         )
@@ -70,7 +70,7 @@ class TestInitialHenry():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.initial_henry_slope(isotherm, verbose=True)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
@@ -81,7 +81,7 @@ class TestInitialHenry():
         if sample.get('Khi_slope', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             ihenry_virial = pygaps.initial_henry_virial(isotherm)
 
@@ -97,5 +97,5 @@ class TestInitialHenry():
         """Test verbosity."""
         sample = DATA['SiO2']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.initial_henry_virial(isotherm, verbose=True)

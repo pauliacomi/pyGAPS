@@ -134,7 +134,7 @@ class TestModelIsotherm():
         """Check isotherm can be guessed from PointIsotherm."""
 
         filepath = DATA_N77_PATH / file
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         pygaps.ModelIsotherm.from_pointisotherm(
             isotherm, guess_model='all', verbose=True

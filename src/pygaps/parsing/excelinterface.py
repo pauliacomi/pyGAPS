@@ -83,7 +83,6 @@ _FIELDS = {
     },
 }
 
-
 _FORMATS = ['bel', 'mic']
 
 
@@ -118,23 +117,25 @@ def isotherm_to_xl(isotherm, path):
 
     # Add the required named properties
     prop_style = xlwt.easyxf(
-        'align: horiz left; pattern: pattern solid, fore_colour grey25;')
+        'align: horiz left; pattern: pattern solid, fore_colour grey25;'
+    )
     for field in fields:
         val = iso_dict.pop(field, None)
-        sht.write(fields[field]['row'],
-                  fields[field]['column'],
-                  fields[field]['text'][0],
-                  prop_style)
+        sht.write(
+            fields[field]['row'], fields[field]['column'],
+            fields[field]['text'][0], prop_style
+        )
         if val:
-            sht.write(fields[field]['row'],
-                      fields[field]['column'] + 1,
-                      val, prop_style)
+            sht.write(
+                fields[field]['row'], fields[field]['column'] + 1, val,
+                prop_style
+            )
 
     # Get the isotherm type header
     type_row = fields['isotherm_data']['row']
     type_col = fields['isotherm_data']['column']
 
-    col_width = 256 * 25              # 25 characters wide (-ish)
+    col_width = 256 * 25  # 25 characters wide (-ish)
     sht.col(type_col).width = col_width
     sht.col(type_col + 1).width = col_width
 
@@ -153,17 +154,14 @@ def isotherm_to_xl(isotherm, path):
         # We also write the branch data
         headings.append('branch')
         data = isotherm.data_raw[headings]
-        data['branch'] = data['branch'].replace(False, 'ads').replace(True, 'des')
+        data['branch'] = data['branch'].replace(False,
+                                                'ads').replace(True, 'des')
 
         # Write all data
         for col_index, heading in enumerate(headings):
-            sht.write(data_row,
-                      col_index,
-                      heading)
+            sht.write(data_row, col_index, heading)
             for row_index, datapoint in enumerate(data[heading]):
-                sht.write(data_row + row_index + 1,
-                          col_index,
-                          datapoint)
+                sht.write(data_row + row_index + 1, col_index, datapoint)
 
     if isinstance(isotherm, ModelIsotherm):
 
@@ -186,7 +184,9 @@ def isotherm_to_xl(isotherm, path):
         model_row = model_row + 5
         for row_index, param in enumerate(isotherm.model.params):
             sht.write(model_row + row_index + 1, 0, param)
-            sht.write(model_row + row_index + 1, 1, isotherm.model.params[param])
+            sht.write(
+                model_row + row_index + 1, 1, isotherm.model.params[param]
+            )
 
     # Now add the other keys
     sht = wb.add_sheet('otherdata')
@@ -246,8 +246,10 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict['adsorbent_basis'] = 'mass'
 
         data = pandas.DataFrame({
-            raw_dict['pressure_key']: raw_dict.pop(raw_dict['pressure_key'])['relative'],
-            raw_dict['loading_key']: raw_dict.pop(raw_dict['loading_key']),
+            raw_dict['pressure_key']:
+            raw_dict.pop(raw_dict['pressure_key'])['relative'],
+            raw_dict['loading_key']:
+            raw_dict.pop(raw_dict['loading_key']),
         })
 
     elif fmt == 'bel':
@@ -263,8 +265,10 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict['branch'] = raw_dict.pop('measurement')
 
         data = pandas.DataFrame({
-            raw_dict['pressure_key']: raw_dict.pop(raw_dict['pressure_key'])['relative'],
-            raw_dict['loading_key']: raw_dict.pop(raw_dict['loading_key']),
+            raw_dict['pressure_key']:
+            raw_dict.pop(raw_dict['pressure_key'])['relative'],
+            raw_dict['loading_key']:
+            raw_dict.pop(raw_dict['loading_key']),
         })
 
     else:
@@ -280,8 +284,9 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
 
         # read the main isotherm parameters
         for field in fields:
-            raw_dict[field] = sht.cell(fields[field]['row'],
-                                       fields[field]['column'] + 1).value
+            raw_dict[field] = sht.cell(
+                fields[field]['row'], fields[field]['column'] + 1
+            ).value
 
         # find data/model limits
         type_row = fields['isotherm_data']['row']
@@ -310,18 +315,26 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
                 if header == '':
                     break
                 headers.append(header)
-                experiment_data[header] = [sht.cell(i, header_col).value for i in range(start_row, final_row)]
+                experiment_data[header] = [
+                    sht.cell(i, header_col).value
+                    for i in range(start_row, final_row)
+                ]
                 header_col += 1
             data = pandas.DataFrame(experiment_data)
 
             raw_dict['loading_key'] = headers[0]
             raw_dict['pressure_key'] = headers[1]
-            raw_dict['other_keys'] = [column for column in data.columns.values
-                                      if column not in [raw_dict['loading_key'], raw_dict['pressure_key'], 'branch']]
+            raw_dict['other_keys'] = [
+                column for column in data.columns.values if column not in
+                [raw_dict['loading_key'], raw_dict['pressure_key'], 'branch']
+            ]
 
             # process isotherm branches if they exist
             if 'branch' in data.columns:
-                raw_dict['branch'] = data['branch'].replace('ads', False).replace('des', True).values
+                raw_dict['branch'] = data['branch'].replace('ads',
+                                                            False).replace(
+                                                                'des', True
+                                                            ).values
 
         if sht.cell(type_row, 1).value.lower().startswith('model'):
 
@@ -330,8 +343,12 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
 
             new_mod = get_isotherm_model(sht.cell(type_row + 1, 1).value)
             new_mod.rmse = sht.cell(type_row + 2, 1).value
-            new_mod.pressure_range = ast.literal_eval(sht.cell(type_row + 3, 1).value)
-            new_mod.loading_range = ast.literal_eval(sht.cell(type_row + 4, 1).value)
+            new_mod.pressure_range = ast.literal_eval(
+                sht.cell(type_row + 3, 1).value
+            )
+            new_mod.loading_range = ast.literal_eval(
+                sht.cell(type_row + 4, 1).value
+            )
 
             final_row = type_row + 6
 
@@ -348,7 +365,9 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
                 try:
                     new_mod.params[param] = model_param[param]
                 except KeyError as err:
-                    raise KeyError(f"The JSON is missing parameter '{param}'") from err
+                    raise KeyError(
+                        f"The JSON is missing parameter '{param}'"
+                    ) from err
 
         # read the secondary isotherm parameters
         if 'otherdata' in wb.sheet_names():
@@ -369,8 +388,8 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
                 row_index += 1
 
         # Put data in order
-        raw_dict.pop('isotherm_data')                      # remove useless field
-        raw_dict.pop('iso_id', None)                       # make sure id is not passed
+        raw_dict.pop('isotherm_data')  # remove useless field
+        raw_dict.pop('iso_id', None)  # make sure id is not passed
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)

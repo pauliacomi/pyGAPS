@@ -72,9 +72,9 @@ class TestAlphaSPlot():
         if sample.get('as_area', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
             ref_filepath = DATA_N77_PATH / DATA[sample['as_ref']]['file']
-            ref_isotherm = pygaps.isotherm_from_jsonf(ref_filepath)
+            ref_isotherm = pygaps.isotherm_from_json(ref_filepath)
             mref_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
                 ref_isotherm, model='BET'
             )
@@ -100,7 +100,7 @@ class TestAlphaSPlot():
 
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         res = pygaps.alpha_s(isotherm, isotherm, limits=[0.7, 1.0])
         results = res.get('results')
@@ -123,5 +123,5 @@ class TestAlphaSPlot():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.alpha_s(isotherm, isotherm, verbose=True)

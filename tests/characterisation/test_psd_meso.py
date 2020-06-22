@@ -61,7 +61,7 @@ class TestPSDMeso():
         if sample.get('psd_meso_pore_size', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             result_dict = pmes.psd_mesoporous(
                 isotherm, psd_model=method, branch='des'
@@ -86,5 +86,5 @@ class TestPSDMeso():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.psd_mesoporous(isotherm, verbose=True)

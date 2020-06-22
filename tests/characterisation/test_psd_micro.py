@@ -58,7 +58,7 @@ class TestPSDMicro():
         if sample.get('psd_micro_pore_size', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             result_dict = pmic.psd_microporous(isotherm, psd_model=method)
 
@@ -81,5 +81,5 @@ class TestPSDMicro():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.psd_microporous(isotherm, verbose=True)

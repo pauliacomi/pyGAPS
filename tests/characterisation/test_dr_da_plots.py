@@ -33,7 +33,7 @@ class TestDAPlot():
             pygaps.da_plot(basic_pointisotherm, exp=-2)
 
         filepath = DATA_N77_PATH / DATA['Takeda 5A']['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         # Will raise "bad limits" error.
         with pytest.raises(pygaps.CalculationError):
@@ -50,7 +50,7 @@ class TestDAPlot():
         if sample.get('dr_volume', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             res = pygaps.dr_plot(isotherm)
 
@@ -75,7 +75,7 @@ class TestDAPlot():
         if sample.get('da_volume', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             res = pygaps.da_plot(isotherm, limits=[0, 0.01])
 
@@ -97,5 +97,5 @@ class TestDAPlot():
         """Test verbosity."""
         sample = DATA['Takeda 5A']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.da_plot(isotherm, verbose=True)

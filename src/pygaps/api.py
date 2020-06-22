@@ -38,9 +38,7 @@ from .parsing.excelinterface import isotherm_from_xl
 from .parsing.excelinterface import isotherm_to_xl
 from .parsing.isodbinterface import isotherm_from_isodb
 from .parsing.jsoninterface import isotherm_from_json
-from .parsing.jsoninterface import isotherm_from_jsonf
 from .parsing.jsoninterface import isotherm_to_json
-from .parsing.jsoninterface import isotherm_to_jsonf
 from .utilities.coolprop_utilities import COOLPROP_BACKEND
 from .utilities.coolprop_utilities import backend_use_coolprop
 from .utilities.coolprop_utilities import backend_use_refprop

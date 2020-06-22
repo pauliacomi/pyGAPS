@@ -15,43 +15,28 @@ from ..utilities.unit_converter import _PRESSURE_UNITS
 from ..utilities.unit_converter import _VOLUME_UNITS
 
 
-def isotherm_to_jsonf(isotherm, path, **args_to_json):
+def isotherm_to_json(isotherm, path=None, **args_to_json):
     """
-    Write an isotherm object to a json file.
+    Convert an isotherm object to a json representation.
 
-    Convenience function wrapping ``isotherm_to_json``.
-
-    Parameters
-    ----------
-    isotherm : Isotherm
-        Isotherm to be written to json.
-    path : str
-        Path to the file to be written.
-    args_to_json : dict
-        Custom arguments to be passed to "json.dump".
-
-    """
-    with open(path, mode='w') as file:
-        file.write(isotherm_to_json(isotherm, **args_to_json))
-
-
-def isotherm_to_json(isotherm, **args_to_json):
-    """
-    Convert an isotherm object to a json string.
-
+    If the path is specified, the isotherm is saved as a file,
+    otherwise it is returned as a string.
     Structure is inspired by the NIST format.
 
     Parameters
     ----------
     isotherm : Isotherm
         Isotherm to be written to json.
+    path : str, None
+        Path to the file to be written.
     args_to_json : dict
         Custom arguments to be passed to "json.dump".
 
     Returns
     -------
-    str
-        A string with the json-formatted Isotherm.
+    None or str
+        If path is None, returns the resulting json format as a string.
+        Otherwise returns None.
 
     """
     # Isotherm properties
@@ -85,62 +70,30 @@ def isotherm_to_json(isotherm, **args_to_json):
     args_to_json = {} if args_to_json is None else args_to_json
     args_to_json['sort_keys'] = True  # we will sort always
 
-    json_isotherm = json.dumps(raw_dict, **args_to_json)
+    if path:
+        with open(path, mode='w') as file:
+            json.dump(raw_dict, file, **args_to_json)
+    else:
+        return json.dumps(raw_dict, **args_to_json)
 
-    return json_isotherm
 
-
-def isotherm_from_jsonf(path,
-                        fmt=None,
-                        loading_key='loading',
-                        pressure_key='pressure',
-                        **isotherm_parameters):
+def isotherm_from_json(
+    str_or_path,
+    fmt=None,
+    loading_key='loading',
+    pressure_key='pressure',
+    **isotherm_parameters
+):
     """
-    Load an isotherm from a JSON file.
-
-    Convenience function wrapping ``isotherm_from_json``.
-
-    Parameters
-    ----------
-    path : str
-        Path to the file to be read.
-    loading_key : str
-        The title of the pressure data in the json provided.
-    pressure_key
-        The title of the loading data in the json provided.
-    fmt : {None, 'NIST'}, optional
-        If the format is set to NIST, then the json format a specific version
-        used by the NIST database of adsorbents.
-    isotherm_parameters :
-        Any other options to be overridden in the isotherm creation.
-
-    Returns
-    -------
-    Isotherm
-        The isotherm contained in the json file.
-    """
-    with open(path) as file:
-        return isotherm_from_json(file.read(),
-                                  fmt=fmt,
-                                  loading_key=loading_key,
-                                  pressure_key=pressure_key,
-                                  **isotherm_parameters)
-
-
-def isotherm_from_json(json_isotherm,
-                       fmt=None,
-                       loading_key='loading',
-                       pressure_key='pressure',
-                       **isotherm_parameters):
-    """
-    Convert a json isotherm format to a pygaps Isotherm.
+    Read a pyGAPS isotherm from a file or from a string.
 
     Structure is inspired by the NIST format.
 
     Parameters
     ----------
-    json_isotherm : str
-        The isotherm in a json format, as a string.
+    str_or_path : str
+        The isotherm in a json string format or a path
+        to where one can be read.
     loading_key : str
         The title of the pressure data in the json provided.
     pressure_key
@@ -157,11 +110,21 @@ def isotherm_from_json(json_isotherm,
     Returns
     -------
     Isotherm
-        The isotherm contained in the json string.
+        The isotherm contained in the json string or file.
 
     """
     # Parse isotherm in dictionary
-    raw_dict = json.loads(json_isotherm)
+    try:
+        with open(str_or_path) as f:
+            raw_dict = json.load(f)
+    except OSError:
+        try:
+            raw_dict = json.loads(str_or_path)
+        except Exception:
+            raise ParsingError(
+                "Could not parse JSON isotherm. "
+                "The `str_or_path` is invalid or does not exist. "
+            )
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)
@@ -183,7 +146,8 @@ def isotherm_from_json(json_isotherm,
         # process isotherm branches if they exist
         if 'branch' in data.columns:
             raw_dict['branch'] = data['branch'].fillna(False).replace(
-                'des', True).values
+                'des', True
+            ).values
         else:
             raw_dict['branch'] = 'guess'
 
@@ -194,11 +158,13 @@ def isotherm_from_json(json_isotherm,
         ]
 
         # generate the isotherm
-        isotherm = PointIsotherm(isotherm_data=data,
-                                 loading_key=loading_key,
-                                 pressure_key=pressure_key,
-                                 other_keys=other_keys,
-                                 **raw_dict)
+        isotherm = PointIsotherm(
+            isotherm_data=data,
+            loading_key=loading_key,
+            pressure_key=pressure_key,
+            other_keys=other_keys,
+            **raw_dict
+        )
     elif model:
 
         new_mod = get_isotherm_model(model['model'])
@@ -220,7 +186,8 @@ def isotherm_from_json(json_isotherm,
                 new_mod.params[param] = model['parameters'][param]
             except KeyError as err:
                 raise KeyError(
-                    f"The JSON is missing parameter '{param}'") from err
+                    f"The JSON is missing parameter '{param}'"
+                ) from err
 
         # generate the isotherm
         isotherm = ModelIsotherm(model=new_mod, **raw_dict)
@@ -255,7 +222,8 @@ def _from_json_nist(raw_dict):
             comp = ('g', 'g')
         else:
             raise ParsingError(
-                "Isotherm cannot be parsed due to loading string format.")
+                "Isotherm cannot be parsed due to loading string format."
+            )
 
     loading_unit = comp[0]
     if loading_unit in _MOLAR_UNITS:

@@ -40,7 +40,7 @@ class TestTPlot():
         if sample.get('t_area', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             res = pygaps.t_plot(isotherm)
             results = res.get('results')
@@ -63,7 +63,7 @@ class TestTPlot():
 
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
 
         res = pygaps.t_plot(isotherm, limits=[0.7, 1.0])
         results = res.get('results')
@@ -86,5 +86,5 @@ class TestTPlot():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.t_plot(isotherm, 'Halsey', verbose=True)

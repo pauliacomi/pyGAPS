@@ -50,7 +50,7 @@ class TestPSDDFT():
         if sample.get('psd_dft_pore_volume', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             result_dict = pdft.psd_dft(isotherm, kernel=kernel)
 
@@ -73,5 +73,5 @@ class TestPSDDFT():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.psd_dft(isotherm, verbose=True)
