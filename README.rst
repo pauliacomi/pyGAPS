@@ -129,10 +129,10 @@ Citing
 Please consider citing the related paper we published if you use
 the program in your research.
 
-Paul Iacomi, Philip L. Llewellyn, *Adsorption* (2019).
-pyGAPS: A Python-Based Framework for Adsorption Isotherm
-Processing and Material Characterisation.
-DOI: https://doi.org/10.1007/s10450-019-00168-5
+    Paul Iacomi, Philip L. Llewellyn, *Adsorption* (2019).
+    pyGAPS: A Python-Based Framework for Adsorption Isotherm
+    Processing and Material Characterisation.
+    DOI: https://doi.org/10.1007/s10450-019-00168-5
 
 Installation
 ============
