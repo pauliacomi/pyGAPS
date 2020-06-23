@@ -31,6 +31,5 @@ del hard_dependencies, dependency, missing_dependencies
 
 from .data import DATABASE
 from .data import ADSORBATE_LIST
-from .data import ADSORBATE_NAME_LIST
 from .data import MATERIAL_LIST
 from .api import *

@@ -5,7 +5,7 @@ import warnings
 
 import numpy
 import scipy.constants as const
-import scipy.stats
+import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calcgraph import bet_plot
@@ -319,7 +319,7 @@ def bet_transform(pressure, loading):
 
 def bet_optimisation(pressure, bet_points):
     """Find the slope and intercept of the BET region."""
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         pressure, bet_points
     )
     return slope, intercept, corr_coef

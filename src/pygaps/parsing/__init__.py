@@ -2,7 +2,6 @@
 # flake8: noqa
 # isort:skip_file
 
-
 from .sqliteinterface import db_get_adsorbates
 from .sqliteinterface import db_upload_adsorbate
 from .sqliteinterface import db_delete_adsorbate
@@ -26,6 +25,3 @@ from .sqliteinterface import db_delete_isotherm_type
 from .sqliteinterface import db_upload_isotherm_property_type
 from .sqliteinterface import db_get_isotherm_property_types
 from .sqliteinterface import db_delete_isotherm_property_type
-from .sqliteinterface import db_upload_isotherm_data_type
-from .sqliteinterface import db_get_isotherm_data_types
-from .sqliteinterface import db_delete_isotherm_data_type

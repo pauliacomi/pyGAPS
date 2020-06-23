@@ -85,7 +85,12 @@ def _upload_one_all_columns(
 
     # Upload or modify data
     insert_dict = {key: input_dict.get(key) for key in to_insert}
-    cursor.execute(sql_com, insert_dict)
+    try:
+        cursor.execute(sql_com, insert_dict)
+    except sqlite3.Error as e:
+        raise type(e)(
+            f"Error inserting dict {insert_dict}. Original error:\n {e}"
+        )
 
     if verbose:
         # Print success
@@ -102,7 +107,12 @@ def _get_all_no_id(
 ):
     """Get all elements from a table as a dictionary, excluding id."""
 
-    cursor.execute("""SELECT * FROM """ + table_name)
+    try:
+        cursor.execute("""SELECT * FROM """ + table_name)
+    except sqlite3.Error as e:
+        raise type(e)(
+            f"Error getting data from {table_name}. Original error:\n {e}"
+        )
 
     values = []
     for row in cursor:
@@ -134,16 +144,315 @@ def _delete_by_id(
 
     if ids is None:
         raise sqlite3.IntegrityError(
-            "Element to delete does not exist in database"
+            f"Element to delete ({element_id}) does not exist in table {table_name}."
         )
 
     sql_com = build_delete(table=table_name, where=[table_id])
 
-    cursor.execute(sql_com, {table_id: element_id})
+    try:
+        cursor.execute(sql_com, {table_id: element_id})
+    except sqlite3.Error as e:
+        raise type(e)(
+            f"Error deleting {element_id} from {table_name}. Original error:\n {e}"
+        )
 
     if verbose:
         # Print success
         print("Success, deleted", print_string, element_id)
+
+
+# ---------------------- Adsorbates
+
+
+@with_connection
+def db_upload_adsorbate(
+    path, adsorbate, overwrite=False, verbose=True, **kwargs
+):
+    """
+    Upload an adsorbate to the database.
+
+    If overwrite is set to true, the adsorbate is overwritten.
+    Overwrite is done based on adsorbate.name
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    adsorbate : Adsorbate
+        Adsorbate class to upload to the database.
+    overwrite : bool
+        Whether to upload the adsorbate or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
+    """
+
+    cursor = kwargs.pop('cursor', None)
+
+    # If we need to overwrite, we find the id of existing adsorbate.
+    if overwrite:
+        ids = cursor.execute(
+            build_select(table='adsorbates', to_select=['id'], where=['name']),
+            {
+                'name': adsorbate.name
+            }
+        ).fetchone()
+        if ids is None:
+            raise sqlite3.IntegrityError(
+                f"Adsorbate to overwrite ({adsorbate.name}) does not exist in database."
+            )
+        ads_id = ids[0]
+    # If overwrite is not specified, we upload it to the adsorbates table
+    else:
+        cursor.execute(
+            build_insert(table="adsorbates", to_insert=['name']),
+            {'name': adsorbate.name}
+        )
+        ads_id = cursor.lastrowid
+
+    # Upload or modify data in the associated tables
+    properties = adsorbate.to_dict()
+    del properties['name']  # no need for this
+
+    if overwrite:
+        # Delete existing properties
+        _delete_by_id(
+            cursor,
+            'adsorbate_properties',
+            'type',
+            ads_id,
+            'adsorbate properties',
+            verbose,
+        )
+
+    for prop, val in properties.items():
+
+        sql_insert = build_insert(
+            table='adsorbate_properties',
+            to_insert=['ads_id', 'type', 'value']
+        )
+
+        if not isinstance(val, (list, set, tuple)):
+            val = [val]
+
+        for vl in val:
+            try:
+                cursor.execute(
+                    sql_insert, {
+                        'ads_id': ads_id,
+                        'type': prop,
+                        'value': vl
+                    }
+                )
+            except sqlite3.InterfaceError as e:
+                raise type(e)(
+                    f"Cannot process property {prop}: {vl}"
+                    f"Original error:\n{e}"
+                )
+
+    if verbose:
+        # Print success
+        print(f"Adsorbate uploaded: '{adsorbate.name}'")
+
+
+@with_connection
+def db_get_adsorbates(path, verbose=True, **kwargs):
+    """
+    Get all adsorbates and their properties.
+
+    The number of adsorbates is usually small, so all can be
+    loaded in memory at once.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
+
+    Returns
+    -------
+    list
+        list of Adsorbates
+    """
+
+    cursor = kwargs.pop('cursor', None)
+
+    # Get required adsorbate from database
+    cursor.execute("""SELECT * FROM 'adsorbates'""")
+
+    # Get everything in memory, cursor will be reused
+    rows = cursor.fetchall()
+
+    # Get other data and create adsorbates
+    adsorbates = []
+    for row in rows:
+
+        # Get all properties
+        props = cursor.execute(
+            build_select(
+                table='adsorbate_properties',
+                to_select=['type', 'value'],
+                where=['ads_id']
+            ), {
+                'ads_id': row['id']
+            }
+        ).fetchall()
+
+        # Iterate for props
+        adsorbate_params = {}
+        for prop in props:
+            if prop[0] in adsorbate_params:
+                o = adsorbate_params[prop[0]]
+                adsorbate_params[
+                    prop[0]] = (o if isinstance(o, list) else [o]) + [prop[1]]
+            else:
+                adsorbate_params[prop[0]] = prop[1]
+
+        # Build adsorbate objects
+        adsorbates.append(Adsorbate(row['name'], **adsorbate_params))
+
+    # Print success
+    if verbose:
+        print(f"Selected {len(adsorbates)} adsorbates")
+
+    return adsorbates
+
+
+@with_connection
+def db_delete_adsorbate(path, adsorbate, verbose=True, **kwargs):
+    """
+    Delete adsorbate from the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    adsorbate : Adsorbate
+        The Adsorbate class to delete.
+    verbose : bool
+        Print to console on success or error.
+    """
+
+    cursor = kwargs.pop('cursor', None)
+
+    # Get id of adsorbate
+    ids = cursor.execute(
+        build_select(table='adsorbates', to_select=['id'], where=['name']), {
+            'name': adsorbate.name
+        }
+    ).fetchone()
+    if ids is None:
+        raise sqlite3.IntegrityError(
+            "Adsorbate to delete does not exist in database"
+        )
+    ads_id = ids[0]
+
+    # Delete data from adsorbate_properties table
+    cursor.execute(
+        build_delete(table='adsorbate_properties', where=['ads_id']),
+        {'ads_id': ads_id}
+    )
+
+    # Delete original name in adsorbates table
+    cursor.execute(
+        build_delete(table='adsorbates', where=['id']), {'id': ads_id}
+    )
+
+    if verbose:
+        # Print success
+        print("Success", adsorbate.name)
+
+
+@with_connection
+def db_upload_adsorbate_property_type(
+    path, type_dict, overwrite=False, verbose=True, **kwargs
+):
+    """
+    Uploads an adsorbate property type.
+
+    The type_dict takes the form of::
+
+        {
+            'type' : 'the_type',
+            'unit': 'the_unit',
+            'description': 'the_description'
+        }
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    type_dict : dict
+        A dictionary that contains property type.
+    overwrite : bool
+        Whether to upload the property type or overwrite it.
+        WARNING: Overwrite is done on ALL fields.
+    verbose : bool
+        Print to console on success or error.
+    """
+    _upload_one_all_columns(
+        kwargs['cursor'],
+        'adsorbate_properties_type',
+        'type',
+        ['unit', 'description'],
+        type_dict,
+        overwrite,
+        'Property type',
+        verbose,
+    )
+
+
+@with_connection
+def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
+    """
+    Get all adsorbate property types.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    verbose : bool
+        Print to console on success or error.
+
+    Returns
+    -------
+    dict
+        dict of property types
+    """
+    return _get_all_no_id(
+        kwargs['cursor'],
+        'adsorbate_properties_type',
+        'id',
+        'adsorbate property types',
+        verbose,
+    )
+
+
+@with_connection
+def db_delete_adsorbate_property_type(
+    path, property_type, verbose=True, **kwargs
+):
+    """
+    Delete property type in the database.
+
+    Parameters
+    ----------
+    path : str
+        Path to the database. Use pygaps.DATABASE for internal access.
+    property_type : str
+        Name of the property type to delete.
+    verbose : bool
+        Print to console on success or error.
+    """
+    _delete_by_id(
+        kwargs['cursor'],
+        'adsorbate_properties_type',
+        'type',
+        property_type,
+        'adsorbate property types',
+        verbose,
+    )
 
 
 # ---------------------- Materials
@@ -874,458 +1183,5 @@ def db_delete_isotherm_property_type(
         'type',
         property_type,
         'isotherm property types',
-        verbose,
-    )
-
-
-@with_connection
-def db_upload_isotherm_data_type(
-    path, type_dict, overwrite=False, verbose=True, **kwargs
-):
-    """
-    Upload a data type.
-
-    The type_dict takes the form of::
-
-        {
-            'type' : 'the_type',
-            'unit': 'the_unit',
-            'description': 'the_description'
-        }
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    type_dict : dict
-        A dictionary that contains data type.
-    overwrite : bool
-        Whether to upload the data type or overwrite it.
-        WARNING: Overwrite is done on ALL fields.
-    verbose : bool
-        Print to console on success or error.
-    """
-    _upload_one_all_columns(
-        kwargs['cursor'],
-        'isotherm_data_type',
-        'type',
-        ['unit', 'description'],
-        type_dict,
-        overwrite,
-        'Experiment data type',
-        verbose,
-    )
-
-
-@with_connection
-def db_get_isotherm_data_types(path, verbose=True, **kwargs):
-    """
-    Get all isotherm data types.
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    verbose : bool
-        Print to console on success or error.
-
-    Returns
-    -------
-    dict
-        dict of data types
-    """
-    return _get_all_no_id(
-        kwargs['cursor'],
-        'isotherm_data_type',
-        'id',
-        'isotherm data types',
-        verbose,
-    )
-
-
-@with_connection
-def db_delete_isotherm_data_type(path, data_type, verbose=True, **kwargs):
-    """
-    Delete isotherm data type in the database.
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    data_type : str
-        The type to delete.
-    verbose : bool
-        Print to console on success or error.
-    """
-    _delete_by_id(
-        kwargs['cursor'],
-        'isotherm_data_type',
-        'type',
-        data_type,
-        'isotherm data types',
-        verbose,
-    )
-
-
-# ---------------------- Adsorbates
-
-
-@with_connection
-def db_upload_adsorbate(
-    path, adsorbate, overwrite=False, verbose=True, **kwargs
-):
-    """
-    Upload an adsorbate to the database.
-
-    If overwrite is set to true, the adsorbate is overwritten.
-    Overwrite is done based on adsorbate.name
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    adsorbate : Adsorbate
-        Adsorbate class to upload to the database.
-    overwrite : bool
-        Whether to upload the adsorbate or overwrite it.
-        WARNING: Overwrite is done on ALL fields.
-    verbose : bool
-        Print to console on success or error.
-    """
-
-    cursor = kwargs.pop('cursor', None)
-
-    # If we need to overwrite, we find the id of existing adsorbate.
-    if overwrite:
-        ids = cursor.execute(
-            build_select(table='adsorbates', to_select=['id'], where=['name']),
-            {
-                'name': adsorbate.name
-            }
-        ).fetchone()
-        if ids is None:
-            raise sqlite3.IntegrityError(
-                "Adsorbate to overwrite does not exist in database."
-            )
-        ads_id = ids[0]
-    # If overwrite is not specified, we upload it to the adsorbates table
-    else:
-        cursor.execute(
-            build_insert(table="adsorbates", to_insert=['name']),
-            {'name': adsorbate.name}
-        )
-        ads_id = cursor.lastrowid
-
-    # Upload or modify data in the associated tables
-    if adsorbate.properties:
-
-        # Sql of update routine
-        sql_update = build_update(
-            table='adsorbate_properties',
-            to_set=['value'],
-            where=['ads_id', 'type']
-        )
-        # Sql of insert routine
-        sql_insert = build_insert(
-            table='adsorbate_properties',
-            to_insert=['ads_id', 'type', 'value']
-        )
-        # Sql of delete routine
-        sql_delete = build_delete(
-            table='adsorbate_properties', where=['ads_id']
-        )
-
-        updates = []
-
-        if overwrite:
-            # Find existing properties
-            cursor.execute(
-                build_select(
-                    table='adsorbate_properties',
-                    to_select=['type'],
-                    where=['ads_id']
-                ), {'ads_id': ads_id}
-            )
-            updates = [elt[0] for elt in cursor.fetchall()]
-
-        for prop in adsorbate.properties:
-            if prop in updates:
-                updates.remove(prop)
-                sql_com_prop = sql_update
-            else:
-                sql_com_prop = sql_insert
-
-            try:
-                cursor.execute(
-                    sql_com_prop, {
-                        'ads_id': ads_id,
-                        'type': prop,
-                        'value': adsorbate.properties[prop]
-                    }
-                )
-            except sqlite3.InterfaceError as e:
-                if verbose:
-                    print(
-                        "Cannot process property", prop,
-                        adsorbate.properties[prop]
-                    )
-                raise e
-
-        # delete the rest
-        for prop in updates:
-            cursor.execute(sql_delete, {'ads_id': ads_id})
-
-    if adsorbate.alias:
-
-        if overwrite:
-            # Delete existing names
-            cursor.execute(
-                build_delete(table='adsorbate_names', where=['ads_id']),
-                {'ads_id': ads_id}
-            )
-
-        # Sql of insert routine
-        sql_insert = build_insert(
-            table='adsorbate_names', to_insert=['ads_id', 'name']
-        )
-
-        for alias in adsorbate.alias:
-            cursor.execute(sql_insert, {
-                'ads_id': ads_id,
-                'name': alias,
-            })
-
-    if verbose:
-        # Print success
-        print(f"Adsorbate uploaded: '{adsorbate.name}''")
-
-
-@with_connection
-def db_get_adsorbates(path, verbose=True, **kwargs):
-    """
-    Get all adsorbates and their properties.
-
-    The number of adsorbates is usually small, so all can be
-    loaded in memory at once.
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    verbose : bool
-        Print to console on success or error.
-
-    Returns
-    -------
-    list
-        list of Adsorbates
-    """
-
-    cursor = kwargs.pop('cursor', None)
-
-    # Get required adsorbate from database
-    cursor.execute("""SELECT * FROM 'adsorbates'""")
-
-    rows = cursor.fetchall()
-
-    # Create the adsorbates
-    adsorbates = []
-    for row in rows:
-
-        # Get adsorbate properties
-        cursor.execute(
-            build_select(
-                table='adsorbate_properties',
-                to_select=['type', 'value'],
-                where=['ads_id']
-            ), {'ads_id': row['id']}
-        )
-        adsorbate_params = {r[0]: r[1] for r in cursor}
-
-        # Get adsorbate aliases
-        cursor.execute(
-            build_select(
-                table='adsorbate_names', to_select=['name'], where=['ads_id']
-            ), {'ads_id': row['id']}
-        )
-        alias = [r[0] for r in cursor]
-
-        # Build adsorbate objects
-        adsorbates.append(
-            Adsorbate(row['name'], alias=alias, **adsorbate_params)
-        )
-
-    # Print success
-    if verbose:
-        print(f"Selected {len(adsorbates)} adsorbates")
-
-    return adsorbates
-
-
-@with_connection
-def db_delete_adsorbate(path, adsorbate, verbose=True, **kwargs):
-    """
-    Delete adsorbate from the database.
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    adsorbate : Adsorbate
-        The Adsorbate class to delete.
-    verbose : bool
-        Print to console on success or error.
-    """
-
-    cursor = kwargs.pop('cursor', None)
-
-    # Get id of adsorbate
-    ids = cursor.execute(
-        build_select(table='adsorbates', to_select=['id'], where=['name']), {
-            'name': adsorbate.name
-        }
-    ).fetchone()
-
-    if ids is None:
-        raise sqlite3.IntegrityError(
-            "Adsorbate to delete does not exist in database"
-        )
-    ads_id = ids[0]
-
-    # Delete data from adsorbate_properties table
-    cursor.execute(
-        build_delete(table='adsorbate_properties', where=['ads_id']),
-        {'ads_id': ads_id}
-    )
-
-    # Delete aliases from adsorbate_names table
-    cursor.execute(
-        build_delete(table='adsorbate_names', where=['ads_id']),
-        {'ads_id': ads_id}
-    )
-
-    # Delete original name in adsorbates table
-    cursor.execute(
-        build_delete(table='adsorbates', where=['id']), {'id': ads_id}
-    )
-
-    if verbose:
-        # Print success
-        print("Success", adsorbate.name)
-
-
-@with_connection
-def db_upload_adsorbate_property_type(
-    path, type_dict, overwrite=False, verbose=True, **kwargs
-):
-    """
-    Uploads an adsorbate property type.
-
-    The type_dict takes the form of::
-
-        {
-            'type' : 'the_type',
-            'unit': 'the_unit',
-            'description': 'the_description'
-        }
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    type_dict : dict
-        A dictionary that contains property type.
-    overwrite : bool
-        Whether to upload the property type or overwrite it.
-        WARNING: Overwrite is done on ALL fields.
-    verbose : bool
-        Print to console on success or error.
-    """
-    _upload_one_all_columns(
-        kwargs['cursor'],
-        'adsorbate_properties_type',
-        'type',
-        ['unit', 'description'],
-        type_dict,
-        overwrite,
-        'Property type',
-        verbose,
-    )
-
-
-@with_connection
-def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
-    """
-    Get all adsorbate property types.
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    verbose : bool
-        Print to console on success or error.
-
-    Returns
-    -------
-    dict
-        dict of property types
-    """
-    return _get_all_no_id(
-        kwargs['cursor'],
-        'adsorbate_properties_type',
-        'id',
-        'adsorbate property types',
-        verbose,
-    )
-
-
-@with_connection
-def db_delete_adsorbate_property_type(
-    path, property_type, verbose=True, **kwargs
-):
-    """
-    Delete property type in the database.
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    property_type : str
-        Name of the property type to delete.
-    verbose : bool
-        Print to console on success or error.
-    """
-    _delete_by_id(
-        kwargs['cursor'],
-        'adsorbate_properties_type',
-        'type',
-        property_type,
-        'adsorbate property types',
-        verbose,
-    )
-
-
-@with_connection
-def db_get_adsorbate_names(path, verbose=True, **kwargs):
-    """
-    Get all adsorbate aliases.
-
-    Parameters
-    ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
-    verbose : bool
-        Print to console on success or error.
-
-    Returns
-    -------
-    dict
-        dict of aliases
-    """
-    return _get_all_no_id(
-        kwargs['cursor'],
-        'adsorbate_names',
-        'id',
-        '',
         verbose,
     )

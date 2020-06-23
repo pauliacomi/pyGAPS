@@ -1,0 +1,3295 @@
+[
+    {
+        "name": "helium",
+        "alias": [
+            "he",
+            "helium"
+        ],
+        "formula": "He",
+        "inchikey": "SWQJXJOGLNCZEY-UHFFFAOYSA-N",
+        "backend_name": "HELIUM",
+        "molar_mass": 4.002602,
+        "cross_sectional_area": 0.123,
+        "kinetic_diameter": 0.2551,
+        "polarizability": 0.00020496,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.0,
+        "acentric_factor": -0.39,
+        "t_triple": 2.1768,
+        "t_critical": 5.1953,
+        "p_critical": 2.2832,
+        "rhomass_critical": 69.58,
+        "rhomolar_critical": 18130.0
+    },
+    {
+        "name": "neon",
+        "alias": [
+            "ne",
+            "neon"
+        ],
+        "formula": "Ne",
+        "inchikey": "GKAOGPIIYCISHV-UHFFFAOYSA-N",
+        "backend_name": "NEON",
+        "molar_mass": 20.179,
+        "cross_sectional_area": 0.1,
+        "kinetic_diameter": 0.228,
+        "polarizability": 0.0003956,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.0,
+        "acentric_factor": -0.0387,
+        "t_triple": 24.556,
+        "p_triple": 0.433,
+        "t_critical": 44.4,
+        "p_critical": 26.6163,
+        "rhomass_critical": 486.3139,
+        "rhomolar_critical": 24100.0
+    },
+    {
+        "name": "argon",
+        "alias": [
+            "ar",
+            "argon"
+        ],
+        "formula": "Ar",
+        "inchikey": "XKRFYHLGVUSROY-UHFFFAOYSA-N",
+        "backend_name": "ARGON",
+        "molar_mass": 39.948,
+        "cross_sectional_area": 0.138,
+        "kinetic_diameter": 0.3542,
+        "polarizability": 0.0016411,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.0,
+        "acentric_factor": -0.002,
+        "t_triple": 83.806,
+        "p_triple": 0.698,
+        "t_critical": 150.687,
+        "p_critical": 48.63,
+        "rhomass_critical": 535.6,
+        "rhomolar_critical": 13407.43
+    },
+    {
+        "name": "krypton",
+        "alias": [
+            "kr",
+            "krypton"
+        ],
+        "formula": "Kr",
+        "inchikey": "DNNSSWSSYDEUBZ-UHFFFAOYSA-N",
+        "backend_name": "KRYPTON",
+        "molar_mass": 83.798,
+        "cross_sectional_area": 0.202,
+        "kinetic_diameter": 0.3655,
+        "polarizability": 0.0024844,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.0,
+        "t_triple": 115.78,
+        "acentric_factor": -0.00089,
+        "p_triple": 0.731,
+        "t_critical": 209.48,
+        "p_critical": 55.25,
+        "rhomass_critical": 909.2083,
+        "rhomolar_critical": 10850.0
+    },
+    {
+        "name": "xenon",
+        "alias": [
+            "xe",
+            "xenon"
+        ],
+        "formula": "Xe",
+        "inchikey": "FHNFHKCVQCLJFQ-UHFFFAOYSA-N",
+        "backend_name": "XENON",
+        "molar_mass": 131.293,
+        "cross_sectional_area": 0.232,
+        "kinetic_diameter": 0.4047,
+        "polarizability": 0.004044,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.0,
+        "acentric_factor": 0.00363,
+        "t_triple": 161.41,
+        "p_triple": 0.81,
+        "t_critical": 289.733,
+        "p_critical": 58.42,
+        "rhomass_critical": 1102.8612,
+        "rhomolar_critical": 8400.0
+    },
+    {
+        "name": "hydrogen",
+        "alias": [
+            "h2",
+            "hydrogen",
+            "dihydrogen",
+            "molecular hydrogen"
+        ],
+        "formula": "H_{2}",
+        "inchikey": "UFHFLCQGNIYNRP-UHFFFAOYSA-N",
+        "backend_name": "HYDROGEN",
+        "molar_mass": 2.01588,
+        "cross_sectional_area": 0.124,
+        "kinetic_diameter": 0.289,
+        "polarizability": 0.0008042,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.662,
+        "acentric_factor": -0.21,
+        "t_triple": 13.957,
+        "p_triple": 0.07,
+        "t_critical": 33.145,
+        "p_critical": 12.964,
+        "rhomass_critical": 31.262,
+        "rhomolar_critical": 15508.0
+    },
+    {
+        "name": "deuterium",
+        "alias": [
+            "d2",
+            "deuterium"
+        ],
+        "formula": "D_{2}",
+        "inchikey": "UFHFLCQGNIYNRP-VVKOMZTBSA-N",
+        "backend_name": "DEUTERIUM",
+        "molar_mass": 4.0282,
+        "acentric_factor": -0.136290274128,
+        "t_triple": 18.724,
+        "t_critical": 38.34,
+        "p_critical": 16.796,
+        "rhomass_critical": 69.405886,
+        "rhomolar_critical": 17230.0
+    },
+    {
+        "name": "oxygen",
+        "alias": [
+            "o2",
+            "oxygen",
+            "dioxygen",
+            "molecular oxygen",
+            "oxygen molecule"
+        ],
+        "formula": "O_{2}",
+        "inchikey": "MYMOFIZGZYHOMD-UHFFFAOYSA-N",
+        "backend_name": "OXYGEN",
+        "molar_mass": 31.9988,
+        "cross_sectional_area": 0.141,
+        "kinetic_diameter": 0.3467,
+        "polarizability": 0.0015812,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.39,
+        "acentric_factor": 0.022,
+        "t_triple": 54.361,
+        "t_critical": 154.581,
+        "p_critical": 50.43,
+        "rhomass_critical": 436.143644,
+        "rhomolar_critical": 13630.0
+    },
+    {
+        "name": "nitrogen",
+        "alias": [
+            "n2",
+            "nitrogen",
+            "dinitrogen",
+            "molecular nitrogen",
+            "nitrogen molecule"
+        ],
+        "formula": "N_{2}",
+        "inchikey": "IJGRMHOSHXDMSA-UHFFFAOYSA-N",
+        "backend_name": "NITROGEN",
+        "molar_mass": 28.01348,
+        "cross_sectional_area": 0.162,
+        "kinetic_diameter": 0.364,
+        "polarizability": 0.0017403,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 1.52,
+        "acentric_factor": 0.037,
+        "magnetic_susceptibility": 3.6e-08,
+        "surface_density": 6.71e+18,
+        "molecular_diameter": 0.3,
+        "t_triple": 63.151,
+        "p_triple": 0.125,
+        "t_critical": 126.192,
+        "p_critical": 33.958,
+        "rhomass_critical": 313.3,
+        "rhomolar_critical": 11183.9
+    },
+    {
+        "name": "nitrous oxide",
+        "alias": [
+            "n2o",
+            "nitrous oxide",
+            "dinitrogen oxide"
+        ],
+        "formula": "N_{2}O",
+        "inchikey": "GQPLMRYTRLFLPF-UHFFFAOYSA-N",
+        "backend_name": "NITROUSOXIDE",
+        "molar_mass": 44.013,
+        "acentric_factor": 0.1613,
+        "t_triple": 182.33,
+        "t_critical": 309.52,
+        "p_critical": 72.45,
+        "rhomass_critical": 452.01,
+        "rhomolar_critical": 10270.0
+    },
+    {
+        "name": "nitric oxide",
+        "alias": [
+            "no",
+            "nitricoxide",
+            "nitric oxide",
+            "nitrogen monoxide",
+            "nitrogen oxide"
+        ],
+        "formula": "NO",
+        "inchikey": "MWUXSHHQAYIFBG-UHFFFAOYSA-N",
+        "molar_mass": 30.0061,
+        "kinetic_diameter": 0.3492,
+        "polarizability": 0.00302,
+        "dipole_moment": 0.1587,
+        "quadrupole_moment": -1.8,
+        "acentric_factor": 0.582,
+        "t_triple": 109.5,
+        "p_triple": 0.218,
+        "t_critical": 180.15,
+        "p_critical": 64.8
+    },
+    {
+        "name": "nitrogen dioxide",
+        "alias": [
+            "no2",
+            "nitrogen dioxide",
+            "nitrogendioxide"
+        ],
+        "formula": "NO_{2}",
+        "inchikey": "JCXJVPUVTGWSNB-UHFFFAOYSA-N",
+        "molar_mass": 46.0055,
+        "t_triple": 261.9,
+        "p_triple": 0.18728,
+        "t_critical": 431.0,
+        "p_critical": 101.325,
+        "rhomass_critical": 557.71
+    },
+    {
+        "name": "ammonia",
+        "alias": [
+            "nh3",
+            "azane",
+            "ammonia"
+        ],
+        "formula": "NH_{3}",
+        "inchikey": "QGZKDVFQNNGYKY-UHFFFAOYSA-N",
+        "backend_name": "AMMONIA",
+        "molar_mass": 17.03052,
+        "cross_sectional_area": 0.148,
+        "dipole_moment": 1.47,
+        "acentric_factor": 0.253,
+        "t_triple": 195.5,
+        "p_triple": 0.061111,
+        "t_critical": 405.56,
+        "p_critical": 113.634,
+        "rhomass_critical": 233.25,
+        "rhomolar_critical": 13211.78
+    },
+    {
+        "name": "carbon monoxide",
+        "alias": [
+            "co",
+            "carbon monoxide",
+            "carbonmonoxide"
+        ],
+        "formula": "CO",
+        "inchikey": "UGFAIRIUMAVXCW-UHFFFAOYSA-N",
+        "backend_name": "CARBONMONOXIDE",
+        "molar_mass": 28.0101,
+        "cross_sectional_area": 0.168,
+        "kinetic_diameter": 0.369,
+        "polarizability": 0.00195,
+        "dipole_moment": 0.1098,
+        "quadrupole_moment": 2.5,
+        "acentric_factor": 0.045,
+        "t_triple": 68.16,
+        "p_triple": 0.153,
+        "t_critical": 132.86,
+        "p_critical": 34.94,
+        "rhomass_critical": 303.909,
+        "rhomolar_critical": 10850.0
+    },
+    {
+        "name": "carbon dioxide",
+        "alias": [
+            "co2",
+            "carbondioxide",
+            "carbon dioxide",
+            "carbon oxide"
+        ],
+        "formula": "CO_{2}",
+        "inchikey": "CURLTUGMZLYLDI-UHFFFAOYSA-N",
+        "backend_name": "CARBONDIOXIDE",
+        "molar_mass": 44.0098,
+        "cross_sectional_area": 0.17,
+        "kinetic_diameter": 0.33,
+        "polarizability": 0.002911,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 4.3,
+        "acentric_factor": 0.2239,
+        "t_triple": 216.59,
+        "p_triple": 5.1867,
+        "t_critical": 304.1282,
+        "p_critical": 73.773,
+        "rhomass_critical": 467.6,
+        "rhomolar_critical": 10624.91
+    },
+    {
+        "name": "carbon disulfide",
+        "alias": [
+            "cs2",
+            "methanedithione",
+            "carbon disulfide",
+            "carbondisulfide"
+        ],
+        "formula": "CS_{2}",
+        "inchikey": "QGJOPFRUJISHPQ-UHFFFAOYSA-N",
+        "molar_mass": 76.13
+    },
+    {
+        "name": "carbonylsulfide",
+        "alias": [
+            "carbon oxide sulfide",
+            "carbon oxysulfide",
+            "cos",
+            "carbonyl sulfide"
+        ],
+        "formula": "COS",
+        "inchikey": "JJWKPURADFRFRB-UHFFFAOYSA-N",
+        "backend_name": "CARBONYLSULFIDE",
+        "molar_mass": 60.08,
+        "acentric_factor": 0.0978,
+        "t_triple": 134.3,
+        "t_critical": 378.77,
+        "p_critical": 63.7,
+        "rhomass_critical": 445.16,
+        "rhomolar_critical": 7410.0
+    },
+    {
+        "name": "water",
+        "alias": [
+            "h2o",
+            "water",
+            "dihydrogen oxide",
+            "oxidane"
+        ],
+        "formula": "H_{2}O",
+        "inchikey": "XLYOFNOQVPJJNP-UHFFFAOYSA-N",
+        "backend_name": "WATER",
+        "molar_mass": 18.015268,
+        "cross_sectional_area": 0.125,
+        "kinetic_diameter": 0.2641,
+        "polarizability": 0.00145,
+        "dipole_moment": 1.8546,
+        "acentric_factor": 0.344,
+        "t_triple": 273.16,
+        "p_triple": 0.006117,
+        "t_critical": 647.096,
+        "p_critical": 220.64,
+        "rhomass_critical": 322.0,
+        "rhomolar_critical": 17873.728
+    },
+    {
+        "name": "sulphur dioxide",
+        "alias": [
+            "so2",
+            "sulphur dioxide",
+            "sulphurdioxide",
+            "sulfur dioxide"
+        ],
+        "formula": "SO_{2}",
+        "inchikey": "RAHZWNYVWXNFOC-UHFFFAOYSA-N",
+        "backend_name": "SULFURDIOXIDE",
+        "molar_mass": 64.0638,
+        "acentric_factor": 0.25613,
+        "t_triple": 197.7,
+        "p_triple": 0.016744,
+        "t_critical": 430.64,
+        "p_critical": 78.866,
+        "rhomass_critical": 517.5073764,
+        "rhomolar_critical": 8195.0
+    },
+    {
+        "name": "sulfur hexafluoride",
+        "alias": [
+            "sf6",
+            "f6s",
+            "sulphur hexafluoride",
+            "sulfurhexafluoride",
+            "sulphurhexafluoride",
+            "sulfur hexafluoride"
+        ],
+        "formula": "SF_{6}",
+        "backend_name": "SULFURHEXAFLUORIDE",
+        "inchikey": "SFZCNBIFKDRMGX-UHFFFAOYSA-N",
+        "molar_mass": 146.05,
+        "acentric_factor": 0.21,
+        "t_triple": 223.555,
+        "t_critical": 318.7232,
+        "p_critical": 37.54983,
+        "rhomass_critical": 742.3,
+        "rhomolar_critical": 5082.32
+    },
+    {
+        "name": "hydrogen sulfide",
+        "alias": [
+            "h2s",
+            "sh2",
+            "hydrogen disulfide",
+            "hydrogensulfide",
+            "hydrogendisulfide",
+            "hydrogen sulphide",
+            "hydrogen sulfide"
+        ],
+        "formula": "H_{2}S",
+        "backend_name": "HydrogenSulfide",
+        "inchikey": "RWSOTUBLDIXVET-UHFFFAOYSA-N",
+        "molar_mass": 34.08088,
+        "acentric_factor": 0.1005,
+        "t_triple": 187.7,
+        "t_critical": 373.1,
+        "p_critical": 90.0,
+        "rhomass_critical": 347.2841672,
+        "rhomolar_critical": 10190.0
+    },
+    {
+        "name": "fluorine",
+        "alias": [
+            "fluorine",
+            "F2"
+        ],
+        "formula": "F_{2}",
+        "inchikey": "PXGOKWXKJXAPGV-UHFFFAOYSA-N",
+        "backend_name": "FLUORINE",
+        "molar_mass": 37.99,
+        "acentric_factor": 0.0449,
+        "t_triple": 53.48110000000001,
+        "t_critical": 144.41400000000002,
+        "p_critical": 51.724,
+        "rhomass_critical": 592.86,
+        "rhomolar_critical": 15603.0
+    },
+    {
+        "name": "methane",
+        "alias": [
+            "ch4",
+            "methane"
+        ],
+        "formula": "CH_{4}",
+        "inchikey": "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+        "backend_name": "METHANE",
+        "molar_mass": 16.0428,
+        "cross_sectional_area": 0.158,
+        "kinetic_diameter": 0.3758,
+        "polarizability": 0.002593,
+        "dipole_moment": 0.0,
+        "acentric_factor": 0.0114,
+        "t_triple": 90.694,
+        "p_triple": 0.11696,
+        "t_critical": 190.564,
+        "p_critical": 45.992,
+        "rhomass_critical": 162.66,
+        "rhomolar_critical": 10139.128
+    },
+    {
+        "name": "ethane",
+        "alias": [
+            "c2h6",
+            "ethane"
+        ],
+        "formula": "C_{2}H_{6}",
+        "inchikey": "OTMSDBZUPAUEDD-UHFFFAOYSA-N",
+        "backend_name": "ETHANE",
+        "molar_mass": 30.06904,
+        "cross_sectional_area": 0.227,
+        "kinetic_diameter": 0.4443,
+        "polarizability": 0.00447,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 0.65,
+        "acentric_factor": 0.099,
+        "t_triple": 90.368,
+        "p_triple": 1.13e-05,
+        "t_critical": 305.322,
+        "p_critical": 48.722,
+        "rhomass_critical": 206.18,
+        "rhomolar_critical": 6856.88
+    },
+    {
+        "name": "ethene",
+        "alias": [
+            "c2h4",
+            "ethylene",
+            "ethene"
+        ],
+        "formula": "C_{2}H_{4}",
+        "inchikey": "VGGSQFUCUMXWEO-UHFFFAOYSA-N",
+        "backend_name": "ETHYLENE",
+        "molar_mass": 28.05376,
+        "cross_sectional_area": 0.231,
+        "kinetic_diameter": 0.4163,
+        "polarizability": 0.004252,
+        "dipole_moment": 0.0,
+        "quadrupole_moment": 1.5,
+        "acentric_factor": 0.087,
+        "t_triple": 103.99,
+        "p_triple": 0.00122,
+        "t_critical": 282.35,
+        "p_critical": 50.418,
+        "rhomass_critical": 214.24,
+        "rhomolar_critical": 7636.766
+    },
+    {
+        "name": "acetylene",
+        "alias": [
+            "c2h2",
+            "ethine",
+            "ethyne",
+            "acetylene"
+        ],
+        "formula": "C_{2}H_{2}",
+        "inchikey": "HSFWRNGVRCDJHI-UHFFFAOYSA-N",
+        "molar_mass": 26.03728,
+        "cross_sectional_area": 0.187,
+        "kinetic_diameter": 0.33,
+        "polarizability": 0.00393,
+        "dipole_moment": 0.0,
+        "acentric_factor": 0.189,
+        "t_triple": 192.4,
+        "p_triple": 1.2745,
+        "t_critical": 308.3,
+        "p_critical": 59.882,
+        "rhomass_critical": 229.91,
+        "rhomolar_critical": 8.83
+    },
+    {
+        "name": "propane",
+        "alias": [
+            "c3h8",
+            "propane",
+            "r-290",
+            "n-propane"
+        ],
+        "formula": "C_{3}H_{8}",
+        "inchikey": "ATUOYWHBWRKTHZ-UHFFFAOYSA-N",
+        "backend_name": "N-PROPANE",
+        "molar_mass": 44.09562,
+        "cross_sectional_area": 0.35,
+        "kinetic_diameter": 0.5118,
+        "polarizability": 0.00631,
+        "dipole_moment": 0.084,
+        "acentric_factor": 0.152,
+        "t_triple": 85.53,
+        "p_triple": 1.7e-09,
+        "t_critical": 369.89,
+        "p_critical": 42.512,
+        "rhomolar_critical": 5000.0,
+        "rhomass_critical": 220.478
+    },
+    {
+        "name": "propene",
+        "alias": [
+            "c3h6",
+            "propene",
+            "propylene",
+            "1-propene",
+            "1-propylene",
+            "prop-1-ene"
+        ],
+        "formula": "C_{3}H_{6}",
+        "inchikey": "QQONPFPTGQHPMA-UHFFFAOYSA-N",
+        "backend_name": "PROPYLENE",
+        "molar_mass": 42.07974,
+        "cross_sectional_area": 0.32,
+        "kinetic_diameter": 0.4678,
+        "polarizability": 0.00626,
+        "dipole_moment": 0.366,
+        "acentric_factor": 0.142,
+        "t_triple": 87.953,
+        "p_triple": 7.4e-09,
+        "t_critical": 364.211,
+        "p_critical": 45.55,
+        "rhomolar_critical": 5457.0,
+        "rhomass_critical": 229.629
+    },
+    {
+        "name": "propyne",
+        "alias": [
+            "c3h4",
+            "propyne",
+            "1-propyne",
+            "prop-1-yne"
+        ],
+        "formula": "C_{3}H_{4}",
+        "inchikey": "MWWATHDPGQKSAR-UHFFFAOYSA-N",
+        "backend_name": "PROPYNE",
+        "molar_mass": 40.06386,
+        "cross_sectional_area": 0.265,
+        "polarizability": 0.00618,
+        "dipole_moment": 0.78,
+        "quadrupole_moment": 4.82,
+        "acentric_factor": 0.204,
+        "t_triple": 170.5,
+        "p_triple": 0.004171,
+        "t_critical": 402.38,
+        "p_critical": 56.26,
+        "rhomolar_critical": 6113.33,
+        "rhomass_critical": 244.92
+    },
+    {
+        "name": "n-butane",
+        "alias": [
+            "c4h10",
+            "butane",
+            "n-butane",
+            "n-c4h10",
+            "nc4h10"
+        ],
+        "formula": "n-C_{4}H_{10}",
+        "inchikey": "IJDNQMDRQITEOD-UHFFFAOYSA-N",
+        "backend_name": "N-BUTANE",
+        "molar_mass": 58.1222,
+        "cross_sectional_area": 0.444,
+        "kinetic_diameter": 0.4687,
+        "polarizability": 0.0082,
+        "dipole_moment": 0.05,
+        "acentric_factor": 0.2,
+        "t_triple": 134.9,
+        "p_triple": 6.736e-06,
+        "t_critical": 425.125,
+        "p_critical": 37.96,
+        "rhomolar_critical": 3922.77,
+        "rhomass_critical": 228.0
+    },
+    {
+        "name": "isobutane",
+        "alias": [
+            "ic4h10",
+            "i-c4h10",
+            "i-butane",
+            "isobutane",
+            "2-methylpropane"
+        ],
+        "formula": "i-C_{4}H_{10}",
+        "inchikey": "NNPPMTNAJDCUHE-UHFFFAOYSA-N",
+        "backend_name": "ISOBUTANE",
+        "molar_mass": 58.1222,
+        "acentric_factor": 0.1835,
+        "t_triple": 113.73,
+        "p_triple": 1.206e-07,
+        "t_critical": 407.81,
+        "p_critical": 36.29,
+        "rhomass_critical": 225.5,
+        "rhomolar_critical": 3879.75
+    },
+    {
+        "name": "1-butene",
+        "alias": [
+            "1-c4h8",
+            "but-1-ene",
+            "1-butene"
+        ],
+        "formula": "1-C_{4}H_{8}",
+        "inchikey": "VXNZUUAINFGPBY-UHFFFAOYSA-N",
+        "backend_name": "1-BUTENE",
+        "molar_mass": 56.10632,
+        "acentric_factor": 0.1919,
+        "t_triple": 87.8,
+        "t_critical": 419.29,
+        "p_critical": 40.051,
+        "rhomass_critical": 237.89,
+        "rhomolar_critical": 4240.0
+    },
+    {
+        "name": "cis-2-butene",
+        "alias": [
+            "(z)-2-butene",
+            "(z)-but-2-ene",
+            "cis-2-c4h8",
+            "2-cis-butene",
+            "cis-2-butene"
+        ],
+        "formula": "cis-2-C_{4}H_{8}",
+        "inchikey": "IAQRGUVFOMOMEM-ARJAWSKDSA-N",
+        "backend_name": "CIS-2-BUTENE",
+        "molar_mass": 56.10632,
+        "acentric_factor": 0.20236,
+        "t_triple": 134.3,
+        "p_triple": 2.72e-06,
+        "t_critical": 435.75,
+        "p_critical": 42.255,
+        "rhomass_critical": 238.12,
+        "rhomolar_critical": 4244.0
+    },
+    {
+        "name": "trans-2-butene",
+        "alias": [
+            "(e)-2-butene",
+            "(e)-but-2-ene",
+            "2-trans-butene",
+            "trans-2-c4h8",
+            "trans-2-butene"
+        ],
+        "formula": "trans-2-C_{4}H_{8}",
+        "inchikey": "IAQRGUVFOMOMEM-ONEGZZNKSA-N",
+        "backend_name": "TRANS-2-BUTENE",
+        "molar_mass": 56.10632,
+        "acentric_factor": 0.21,
+        "t_triple": 167.6,
+        "p_triple": 0.000745,
+        "t_critical": 428.61,
+        "p_critical": 40.273,
+        "rhomass_critical": 236.37,
+        "rhomolar_critical": 4213.0
+    },
+    {
+        "name": "isobutene",
+        "alias": [
+            "2-methyl-1-propene",
+            "2-methylprop-1-ene",
+            "ic4h8",
+            "i-c4h8",
+            "isobutylene",
+            "isobutene"
+        ],
+        "formula": "i-C_{4}H_{8}",
+        "inchikey": "VQTUBCCKSQIDNK-UHFFFAOYSA-N",
+        "backend_name": "ISOBUTENE",
+        "molar_mass": 56.10632,
+        "acentric_factor": 0.1926,
+        "t_triple": 132.4,
+        "p_triple": 6.449e-06,
+        "t_critical": 418.09,
+        "p_critical": 40.098,
+        "rhomass_critical": 233.96,
+        "rhomolar_critical": 4170.0
+    },
+    {
+        "name": "1,3-butadiene",
+        "family": [
+            "aliphatic",
+            "unsaturated"
+        ],
+        "inchikey": "KAKZBPTYRLMSJV-UHFFFAOYSA-N",
+        "alias": [
+            "biethylene",
+            "buta-1,3-diene",
+            "divinyl",
+            "vinylethylene",
+            "1,3-butadiene"
+        ],
+        "molar_mass": 54.09
+    },
+    {
+        "name": "n-pentane",
+        "alias": [
+            "npentane",
+            "pentane",
+            "c5h12",
+            "n-c5h12",
+            "nc5h12",
+            "n-pentane"
+        ],
+        "formula": "n-C_{5}H_{12}",
+        "inchikey": "OFBQJSOFQDEBGM-UHFFFAOYSA-N",
+        "backend_name": "N-PENTANE",
+        "molar_mass": 72.14878,
+        "acentric_factor": 0.251,
+        "t_triple": 143.47,
+        "t_critical": 469.7,
+        "p_critical": 33.67,
+        "rhomass_critical": 232.0,
+        "rhomolar_critical": 3215.58
+    },
+    {
+        "name": "isopentane",
+        "alias": [
+            "isopentane",
+            "2-methylbutane",
+            "2-methyl-butane"
+        ],
+        "inchikey": "QWTDNUCVQCZILF-UHFFFAOYSA-N",
+        "backend_name": "ISOPENTANE",
+        "molar_mass": 72.14878,
+        "acentric_factor": 0.2274,
+        "t_triple": 112.65,
+        "p_triple": 9e-10,
+        "t_critical": 460.35,
+        "p_critical": 33.78,
+        "rhomass_critical": 235.99,
+        "rhomolar_critical": 3271.0
+    },
+    {
+        "name": "neopentane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "branched"
+        ],
+        "inchikey": "CRSOQBOWXPBRES-UHFFFAOYSA-N",
+        "backend_name": "NEOPENTANE",
+        "alias": [
+            "2,2-dimethylpropane",
+            "neo-c5h12",
+            "neopentane"
+        ],
+        "molar_mass": 72.15,
+        "acentric_factor": 0.1961,
+        "t_triple": 256.6,
+        "t_critical": 433.74,
+        "p_critical": 31.96,
+        "rhomass_critical": 235.926,
+        "rhomolar_critical": 3270.0
+    },
+    {
+        "name": "isoprene",
+        "family": [
+            "aliphatic",
+            "unsaturated"
+        ],
+        "inchikey": "RRHGJUQNOFWUDK-UHFFFAOYSA-N",
+        "alias": [
+            "2-methyl-1,3-butadiene",
+            "2-methylbuta-1,3-diene",
+            "isoprene"
+        ],
+        "molar_mass": 68.12
+    },
+    {
+        "name": "cis-piperylene",
+        "family": [
+            "aliphatic",
+            "unsaturated"
+        ],
+        "inchikey": "PMJHHCWVYXUKFD-PLNGDYQASA-N",
+        "alias": [
+            "(3z)-penta-1,3-diene",
+            "cis-piperylene"
+        ],
+        "molar_mass": 68.12
+    },
+    {
+        "name": "trans-piperylene",
+        "family": [
+            "aliphatic",
+            "unsaturated"
+        ],
+        "inchikey": "PMJHHCWVYXUKFD-SNAWJCMRSA-N",
+        "alias": [
+            "(3e)-penta-1,3-diene",
+            "trans-piperylene"
+        ],
+        "molar_mass": 68.12
+    },
+    {
+        "name": "n-hexane",
+        "alias": [
+            "n-c6h14",
+            "hexane",
+            "nhexane",
+            "n-hexane"
+        ],
+        "formula": "n-C_{6}H_{14}",
+        "inchikey": "VLKZOEOYAKHREP-UHFFFAOYSA-N",
+        "backend_name": "N-HEXANE",
+        "molar_mass": 86.1766,
+        "acentric_factor": 0.3,
+        "t_triple": 177.83,
+        "p_triple": 1.27714e-05,
+        "t_critical": 507.82,
+        "p_critical": 3.034,
+        "rhomass_critical": 233.18,
+        "rhomolar_critical": 2706.0
+    },
+    {
+        "name": "2-methylpentane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "branched"
+        ],
+        "inchikey": "AFABGHUZZDYHJO-UHFFFAOYSA-N",
+        "backend_name": "ISOHEXANE",
+        "alias": [
+            "2-methyl pentane",
+            "2-methylpentane",
+            "isohexane"
+        ],
+        "molar_mass": 86.18,
+        "acentric_factor": 0.2797,
+        "t_triple": 119.6,
+        "t_critical": 497.7,
+        "p_critical": 30.4,
+        "rhomass_critical": 233.96,
+        "rhomolar_critical": 2715.0
+    },
+    {
+        "name": "3-methylpentane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "branched"
+        ],
+        "inchikey": "PFEOZHBOMNWTJB-UHFFFAOYSA-N",
+        "alias": [
+            "(c2h5)2chch3",
+            "3-methyl pentane",
+            "diethylmethylmethane",
+            "un 1208",
+            "un 2462",
+            "3-methylpentane"
+        ],
+        "molar_mass": 86.18
+    },
+    {
+        "name": "neohexane",
+        "alias": [
+            "neohexane",
+            "2,2-dimethyl-butane",
+            "2,2-dimethylbutane"
+        ],
+        "inchikey": "HNRMPXKDFBEGFZ-UHFFFAOYSA-N",
+        "molar_mass": 86.17536,
+        "t_critical": 490.0,
+        "p_critical": 31.38,
+        "rhomass_critical": 239.57,
+        "rhomolar_critical": 2.78
+    },
+    {
+        "name": "1-hexene",
+        "family": [
+            "aliphatic",
+            "unsaturated"
+        ],
+        "inchikey": "LIKMAJRDDDTEIG-UHFFFAOYSA-N",
+        "alias": [
+            "1-c6h12",
+            "1-hexene",
+            "hex-1-ene"
+        ],
+        "molar_mass": 84.16
+    },
+    {
+        "name": "n-heptane",
+        "alias": [
+            "nheptane",
+            "heptane",
+            "c7h16",
+            "n-c7h16",
+            "nc7h16",
+            "n-heptane"
+        ],
+        "formula": "n-C_{7}H_{16}",
+        "inchikey": "IMNFDUFMRHMDMM-UHFFFAOYSA-N",
+        "backend_name": "N-HEPTANE",
+        "molar_mass": 100.202,
+        "acentric_factor": 0.349,
+        "t_triple": 182.55,
+        "t_critical": 540.13,
+        "p_critical": 27.36,
+        "rhomass_critical": 232.0,
+        "rhomolar_critical": 2315.32
+    },
+    {
+        "name": "2-methylhexane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "branched"
+        ],
+        "inchikey": "GXDHCNNESPLIKD-UHFFFAOYSA-N",
+        "alias": [
+            "2-methylhexane",
+            "ic7h16",
+            "isoheptane"
+        ],
+        "molar_mass": 100.2
+    },
+    {
+        "name": "n-octane",
+        "alias": [
+            "noctane",
+            "octane",
+            "c8h18",
+            "n-c8h18",
+            "nc8h18",
+            "n-octane"
+        ],
+        "formula": "n-C_{8}H_{18}",
+        "inchikey": "TVMXDCGIABBOFY-UHFFFAOYSA-N",
+        "backend_name": "N-OCTANE",
+        "molar_mass": 114.229,
+        "acentric_factor": 0.397,
+        "t_triple": 216.37,
+        "t_critical": 568.74,
+        "p_critical": 24.836,
+        "rhomass_critical": 232.2,
+        "rhomolar_critical": 2031.0
+    },
+    {
+        "name": "1-octene",
+        "family": [
+            "aliphatic",
+            "unsaturated"
+        ],
+        "inchikey": "KWKAKUADMBZCLK-UHFFFAOYSA-N",
+        "alias": [
+            "caprylene",
+            "octylene",
+            "1-octene"
+        ],
+        "molar_mass": 112.21
+    },
+    {
+        "name": "2-methylheptane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "branched"
+        ],
+        "inchikey": "JVSWJIKNEAIKJW-UHFFFAOYSA-N",
+        "alias": [
+            "(ch3)2ch(ch2)4ch3",
+            "methylheptane",
+            "2-methylheptane"
+        ],
+        "molar_mass": 114.23
+    },
+    {
+        "name": "2,5-dimethylhexane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "branched"
+        ],
+        "inchikey": "UWNADWZGEHDQAB-UHFFFAOYSA-N",
+        "alias": [
+            "biisobutyl",
+            "2,5-dimethylhexane"
+        ],
+        "molar_mass": 114.23
+    },
+    {
+        "name": "n-nonane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "linear"
+        ],
+        "formula": "n-C_{9}H_{20}",
+        "inchikey": "BKIMMITUMNQMOS-UHFFFAOYSA-N",
+        "backend_name": "N-NONANE",
+        "alias": [
+            "c9h20",
+            "n-c9h20",
+            "nonane",
+            "n-nonane"
+        ],
+        "molar_mass": 128.25,
+        "acentric_factor": 0.4433,
+        "t_triple": 219.7,
+        "t_critical": 594.55,
+        "p_critical": 22.81,
+        "rhomass_critical": 232.141,
+        "rhomolar_critical": 1810.0
+    },
+    {
+        "name": "n-decane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "linear"
+        ],
+        "inchikey": "DIOQZVSQGTUSAI-UHFFFAOYSA-N",
+        "backend_name": "N-DECANE",
+        "alias": [
+            "c10h22",
+            "decane",
+            "nc10h22",
+            "n-decane"
+        ],
+        "molar_mass": 142.28,
+        "acentric_factor": 0.4884,
+        "t_triple": 243.5,
+        "t_critical": 617.7,
+        "p_critical": 21.03,
+        "rhomass_critical": 233.342,
+        "rhomolar_critical": 1640.0
+    },
+    {
+        "name": "n-undecane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "linear"
+        ],
+        "inchikey": "RSJKGSCJYJTIGS-UHFFFAOYSA-N",
+        "backend_name": "N-UNDECANE",
+        "alias": [
+            "c11h24",
+            "nc11h24",
+            "undecane",
+            "n-undecane"
+        ],
+        "molar_mass": 156.31,
+        "acentric_factor": 0.5390371013718567,
+        "t_triple": 247.541,
+        "t_critical": 638.8000000000001,
+        "p_critical": 19.904,
+        "rhomass_critical": 236.794,
+        "rhomolar_critical": 1514.92
+    },
+    {
+        "name": "n-dodecane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "linear"
+        ],
+        "inchikey": "SNRUBQQJIBEYMU-UHFFFAOYSA-N",
+        "backend_name": "N-DODECANE",
+        "alias": [
+            "c12h26",
+            "dodecane",
+            "nc12h26",
+            "n-dodecane"
+        ],
+        "molar_mass": 170.33,
+        "acentric_factor": 0.574182221240689,
+        "t_triple": 263.6,
+        "t_critical": 658.1,
+        "p_critical": 18.17,
+        "rhomass_critical": 226.54,
+        "rhomolar_critical": 1330.0
+    },
+    {
+        "name": "n-tridecane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "linear"
+        ],
+        "inchikey": "IIYFAKIEWZDVMP-UHFFFAOYSA-N",
+        "alias": [
+            "c13h28",
+            "nc13h28",
+            "tridecane",
+            "tridekan",
+            "n-tridecane"
+        ],
+        "molar_mass": 184.36
+    },
+    {
+        "name": "n-tetradecane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "linear"
+        ],
+        "inchikey": "BGHCVCJVXZWKCC-UHFFFAOYSA-N",
+        "alias": [
+            "c14h30",
+            "nc14h30",
+            "tetradecane",
+            "n-tetradecane"
+        ],
+        "molar_mass": 198.39
+    },
+    {
+        "name": "n-pentadecane",
+        "family": [
+            "aliphatic",
+            "saturated",
+            "linear"
+        ],
+        "inchikey": "YCOZIPAWZNQLMR-UHFFFAOYSA-N",
+        "alias": [
+            "c15h32",
+            "nc15h32",
+            "pentadecane",
+            "n-pentadecane"
+        ],
+        "molar_mass": 212.41,
+        "formula": "C15H32"
+    },
+    {
+        "name": "cyclopropane",
+        "family": [
+            "cyclic_aliphatic",
+            "saturated"
+        ],
+        "inchikey": "LVZWSLJZHVFIQJ-UHFFFAOYSA-N",
+        "backend_name": "CYCLOPROPANE",
+        "alias": [
+            "cyclopentane"
+        ],
+        "molar_mass": 42.08,
+        "acentric_factor": 0.1305,
+        "t_triple": 273.0,
+        "t_critical": 398.3,
+        "p_critical": 55.797,
+        "rhomass_critical": 258.5,
+        "rhomolar_critical": 6142.91
+    },
+    {
+        "name": "cyclopentane",
+        "family": [
+            "cyclic_aliphatic",
+            "saturated"
+        ],
+        "inchikey": "RGSFGYAAUTVSQA-UHFFFAOYSA-N",
+        "backend_name": "CYCLOPENTANE",
+        "alias": [
+            "cyclopentane"
+        ],
+        "molar_mass": 70.13,
+        "acentric_factor": 0.201,
+        "t_triple": 179.7,
+        "t_critical": 511.72,
+        "p_critical": 45.712,
+        "rhomass_critical": 267.9,
+        "rhomolar_critical": 3820.0
+    },
+    {
+        "name": "cyclopentadiene",
+        "inchikey": "ZSWFCLXCOIISFI-UHFFFAOYSA-N",
+        "alias": [
+            "1,3-cyclopentadiene",
+            "cyclopentadiene",
+            "cyclopentadienyl",
+            "cycloalkadiene"
+        ],
+        "molar_mass": 66.1,
+        "formula": "C5H6"
+    },
+    {
+        "name": "cyclohexane",
+        "alias": [
+            "cyclohex",
+            "cyclohexane"
+        ],
+        "inchikey": "XDTMQSROBMDMFD-UHFFFAOYSA-N",
+        "backend_name": "CYCLOHEXANE",
+        "molar_mass": 84.15948,
+        "acentric_factor": 0.20926,
+        "t_triple": 279.47,
+        "t_critical": 553.6,
+        "p_critical": 40.824,
+        "rhomass_critical": 271.33,
+        "rhomolar_critical": 3224.0
+    },
+    {
+        "name": "cyclohexene",
+        "inchikey": "HGCIXCUEYOPUTN-UHFFFAOYSA-N",
+        "alias": [
+            "c-c6h10",
+            "cyclohexene"
+        ],
+        "molar_mass": 82.14,
+        "formula": "C6H10"
+    },
+    {
+        "name": "methylcyclohexane",
+        "family": [
+            "cyclic_aliphatic",
+            "saturated"
+        ],
+        "inchikey": "UAEPNZWRGJTJPN-UHFFFAOYSA-N",
+        "alias": [
+            "methylcyclohexane"
+        ],
+        "molar_mass": 98.19
+    },
+    {
+        "name": "benzene",
+        "alias": [
+            "c6h6",
+            "benzene",
+            "benzen"
+        ],
+        "formula": "C_{6}H_{6}",
+        "inchikey": "UHOVQNZJYSORNB-UHFFFAOYSA-N",
+        "backend_name": "BENZENE",
+        "molar_mass": 78.11184,
+        "acentric_factor": 0.211,
+        "t_triple": 278.674,
+        "t_critical": 562.02,
+        "p_critical": 49.07277,
+        "rhomass_critical": 304.71,
+        "rhomolar_critical": 3902.0
+    },
+    {
+        "name": "toluene",
+        "alias": [
+            "c6h5ch3",
+            "c6h5-ch3",
+            "toluene",
+            "methylbenzene",
+            "methylbenzol",
+            "monomethyl benzene",
+            "phenyl methane"
+        ],
+        "formula": "C_{6}H_{5}CH_{3}",
+        "inchikey": "YXFVVABEGXRONW-UHFFFAOYSA-N",
+        "backend_name": "TOLUENE",
+        "molar_mass": 92.13842,
+        "t_critical": 591.75,
+        "p_critical": 41.263,
+        "rhomass_critical": 291.98,
+        "rhomolar_critical": 3169.0,
+        "acentric_factor": 0.2657,
+        "t_triple": 178.0
+    },
+    {
+        "name": "ethylbenzene",
+        "inchikey": "YNQLUTRBYVCPMQ-UHFFFAOYSA-N",
+        "backend_name": "ETHYLBENZENE",
+        "alias": [
+            "ethylbenzol",
+            "phenylethane",
+            "ethylbenzene"
+        ],
+        "molar_mass": 106.16,
+        "acentric_factor": 0.304,
+        "t_triple": 178.2,
+        "t_critical": 617.12,
+        "p_critical": 36.224,
+        "rhomass_critical": 291,
+        "rhomolar_critical": 2741.016
+    },
+    {
+        "name": "n-propylbenzene",
+        "family": [
+            "aromatic"
+        ],
+        "inchikey": "ODLMAHJVESYWTB-UHFFFAOYSA-N",
+        "alias": [
+            "propyl-benzene",
+            "propylbenzene",
+            "n-propylbenzene"
+        ],
+        "molar_mass": 120.19
+    },
+    {
+        "name": "n-butylbenzene",
+        "family": [
+            "aromatic"
+        ],
+        "alias": [
+            "butyl-benzene",
+            "butylbenzene",
+            "n-butylbenzene"
+        ],
+        "inchikey": "OCKPCBLVNKHBMX-UHFFFAOYSA-N",
+        "molar_mass": 134.22
+    },
+    {
+        "name": "styrene",
+        "family": [
+            "aromatic"
+        ],
+        "inchikey": "PPBRXRYQALVLMV-UHFFFAOYSA-N",
+        "alias": [
+            "ethenylbenzene",
+            "phenylethylene",
+            "vinyl-benzene",
+            "styrene"
+        ],
+        "molar_mass": 104.15
+    },
+    {
+        "name": "o-xylene",
+        "alias": [
+            "oxylene",
+            "orthoxylene",
+            "ortho-xylene",
+            "o-xylene",
+            "1,2-dimethylbenzene",
+            "1,2-xylene",
+            "o-dimethylbenzene",
+            "o-methyltoluene"
+        ],
+        "inchikey": "CTQNGGLPUBDAKN-UHFFFAOYSA-N",
+        "backend_name": "O-XYLENE",
+        "molar_mass": 106.165,
+        "acentric_factor": 0.312,
+        "t_triple": 247.985,
+        "t_critical": 630.259,
+        "p_critical": 37.375,
+        "rhomass_critical": 285.0,
+        "rhomolar_critical": 2684.5
+    },
+    {
+        "name": "m-xylene",
+        "alias": [
+            "1,3-dimethylbenzene",
+            "1,3-xylene",
+            "mxylene",
+            "metaxylene",
+            "meta-xylene",
+            "m-xylene"
+        ],
+        "inchikey": "IVSZLXZYQVIEFR-UHFFFAOYSA-N",
+        "backend_name": "M-XYLENE",
+        "molar_mass": 106.165,
+        "acentric_factor": 0.326,
+        "t_triple": 225.3,
+        "t_critical": 616.89,
+        "p_critical": 35.346,
+        "rhomass_critical": 282.93,
+        "rhomolar_critical": 2665.0
+    },
+    {
+        "name": "p-xylene",
+        "alias": [
+            "1,4-dimethylbenzene",
+            "1,4-xylene",
+            "p-methyltoluene",
+            "pxylene",
+            "paraoxylene",
+            "para-xylene",
+            "p-xylene"
+        ],
+        "inchikey": "URLKBWYHVLBVBO-UHFFFAOYSA-N",
+        "backend_name": "P-XYLENE",
+        "molar_mass": 106.165,
+        "acentric_factor": 0.324,
+        "t_triple": 286.4,
+        "t_critical": 616.168,
+        "p_critical": 35.315,
+        "rhomass_critical": 286.0,
+        "rhomolar_critical": 2693.92
+    },
+    {
+        "name": "o-ethyltoluene",
+        "family": [
+            "aromatic"
+        ],
+        "inchikey": "HYFLWBNQFMXCPA-UHFFFAOYSA-N",
+        "alias": [
+            "1-ethyl-2-methyl-benzene",
+            "1-ethyl-2-methylbenzene",
+            "2-ethyltoluene",
+            "o-methylethylbenzene",
+            "o-ethyltoluene"
+        ],
+        "molar_mass": 120.19,
+        "formula": "C9H12"
+    },
+    {
+        "name": "m-ethyltoluene",
+        "family": [
+            "aromatic"
+        ],
+        "inchikey": "ZLCSFXXPPANWQY-UHFFFAOYSA-N",
+        "alias": [
+            "1-ethyl-3-methyl-benzene",
+            "1-ethyl-3-methylbenzene",
+            "1-methyl-3-ethylbenzene",
+            "3-ethyltoluene",
+            "m-ethyltoluene"
+        ],
+        "molar_mass": 120.19
+    },
+    {
+        "name": "p-ethyltoluene",
+        "family": [
+            "aromatic"
+        ],
+        "inchikey": "JRLPEMVDPFPYPJ-UHFFFAOYSA-N",
+        "alias": [
+            "1-ethyl-4-methyl-benzene",
+            "1-ethyl-4-methylbenzene",
+            "p-ethyltoluene"
+        ],
+        "molar_mass": 120.19
+    },
+    {
+        "name": "cumene",
+        "family": [
+            "aromatic"
+        ],
+        "alias": [
+            "(1-methylethyl)benzene",
+            "2-phenylpropane",
+            "isopropylbenzene",
+            "propan-2-ylbenzene",
+            "cumene"
+        ],
+        "inchikey": "RWGFKTVRMDUZSP-UHFFFAOYSA-N",
+        "molar_mass": 120.19
+    },
+    {
+        "name": "1,2,4-trimethylbenzene",
+        "family": [
+            "aromatic"
+        ],
+        "alias": [
+            "1,2,4-trimethylbenzene"
+        ],
+        "inchikey": "GWHJZXXIDMPWGX-UHFFFAOYSA-N",
+        "molar_mass": 120.19
+    },
+    {
+        "name": "1,3,5-triisopropylbenzene",
+        "family": [
+            "aromatic"
+        ],
+        "alias": [
+            "1,3,5-trimethylbenzene",
+            "mestylene"
+        ],
+        "inchikey": "AUHZEENZYGFFBQ-UHFFFAOYSA-N",
+        "molar_mass": 120.19
+    },
+    {
+        "name": "naphthalene",
+        "family": [
+            "aromatic",
+            "polyciclic"
+        ],
+        "inchikey": "UFWIBTONFRDIAS-UHFFFAOYSA-N",
+        "alias": [
+            "naphthalene"
+        ],
+        "molar_mass": 128.17
+    },
+    {
+        "name": "ethylene oxide",
+        "family": [
+            "heterocycle",
+            "oxocycle"
+        ],
+        "inchikey": "IAYPIBMASNFSPL-UHFFFAOYSA-N",
+        "backend_name": "ETHYLENEOXIDE",
+        "alias": [
+            "oxirane",
+            "ethylene oxide"
+        ],
+        "molar_mass": 44.05,
+        "acentric_factor": 0.2102,
+        "t_triple": 160.65,
+        "t_critical": 468.92,
+        "p_critical": 73.047,
+        "rhomass_critical": 315.87,
+        "rhomolar_critical": 7170.0
+    },
+    {
+        "name": "tetrahydrofuran",
+        "family": [
+            "heterocycle",
+            "oxocycle"
+        ],
+        "alias": [
+            "1,4-epoxy-butane",
+            "1,4-epoxybutane",
+            "butane a,d-oxide",
+            "butane alpha,delta-oxide",
+            "butylene oxide",
+            "cyclotetramethylene",
+            "cyclotetramethylene oxide",
+            "diethylene oxide",
+            "furanidine",
+            "hydrofuran",
+            "oxacyclopentane",
+            "oxolane",
+            "polytetrahydrofuran",
+            "tetrahydro-furan",
+            "tetrahydrofurane",
+            "tetramethylene oxide",
+            "thf",
+            "tetrahydrofuran"
+        ],
+        "inchikey": "WYURNTSHIVDZCO-UHFFFAOYSA-N",
+        "molar_mass": 72.11
+    },
+    {
+        "name": "tetrahydrothiophene",
+        "family": [
+            "heterocycle",
+            "oxocycle"
+        ],
+        "inchikey": "RAOIDOHSFRTOEL-UHFFFAOYSA-N",
+        "alias": [
+            "thiolane",
+            "tetrahydrothiophene"
+        ],
+        "molar_mass": 88.17
+    },
+    {
+        "name": "furfural",
+        "family": [
+            "heterocycle",
+            "oxocycle",
+            "aldehyde"
+        ],
+        "inchikey": "HYBBIBNJHNGZAN-UHFFFAOYSA-N",
+        "alias": [
+            "2-furaldehyde",
+            "2-furancarboxaldehyde",
+            "furan-2-carbaldehyde",
+            "furfural"
+        ],
+        "molar_mass": 96.08
+    },
+    {
+        "name": "thiophene",
+        "family": [
+            "heterocycle",
+            "thiocycle"
+        ],
+        "inchikey": "YTPLMLYBLZKORZ-UHFFFAOYSA-N",
+        "alias": [
+            "c4h4s",
+            "thiophene"
+        ],
+        "molar_mass": 84.14
+    },
+    {
+        "name": "pyridine",
+        "family": [
+            "heterocycle",
+            "nitrocyle"
+        ],
+        "inchikey": "JUJWROOIHBZHMG-UHFFFAOYSA-N",
+        "alias": [
+            "0py",
+            "pyridin",
+            "pyridine-ring",
+            "pyridine"
+        ],
+        "molar_mass": 79.1
+    },
+    {
+        "name": "pyrazine",
+        "family": [
+            "heterocycle",
+            "nitrocyle"
+        ],
+        "inchikey": "KYQCOXFCLRTKLS-UHFFFAOYSA-N",
+        "alias": [
+            "pyrazine"
+        ],
+        "molar_mass": 80.09
+    },
+    {
+        "name": "formaldehyde",
+        "family": [
+            "aldehyde",
+            "saturated"
+        ],
+        "formula": "CH_{2}O",
+        "inchikey": "WSFSSNUMVMOOMR-UHFFFAOYSA-N",
+        "alias": [
+            "ch2o",
+            "fannoform",
+            "formalin",
+            "formalina",
+            "formaline",
+            "formol",
+            "methaldehyde",
+            "methanal",
+            "paraform",
+            "formaldehyde"
+        ],
+        "molar_mass": 30.026
+    },
+    {
+        "name": "acetaldehyde",
+        "family": [
+            "aldehyde",
+            "saturated"
+        ],
+        "formula": "CH_{3}CHO",
+        "inchikey": "IKHGUXGNUITLKF-UHFFFAOYSA-N",
+        "alias": [
+            "acetic aldehyde",
+            "ch3cho",
+            "ethanal",
+            "ethyl aldehyde",
+            "acetaldehyde"
+        ],
+        "molar_mass": 44.05
+    },
+    {
+        "name": "n-propanal",
+        "family": [
+            "aldehyde",
+            "saturated"
+        ],
+        "inchikey": "NBBJYMSMWIIQGU-UHFFFAOYSA-N",
+        "alias": [
+            "1-propanal",
+            "1-propanone",
+            "n-propionaldehyde",
+            "propaldehyde",
+            "propanal",
+            "propanalaldehyde",
+            "propanaldehyde",
+            "propional",
+            "propionaldehyde",
+            "propionic aldehyde",
+            "proprionaldehyde",
+            "propyl aldehyde",
+            "propylaldehyde",
+            "propylic aldehyde",
+            "n-propanal"
+        ],
+        "molar_mass": 58.08
+    },
+    {
+        "name": "n-butanal",
+        "family": [
+            "aldehyde",
+            "saturated"
+        ],
+        "alias": [
+            "butyraldehyde",
+            "butanal",
+            "n-butanal"
+        ],
+        "inchikey": "ZTQSAGDEMFDKMZ-UHFFFAOYSA-N",
+        "molar_mass": 72.11
+    },
+    {
+        "name": "3-methylbutanal",
+        "family": [
+            "aldehyde",
+            "saturated"
+        ],
+        "alias": [
+            "isovaleraldehyde",
+            "3-methylbutanal"
+        ],
+        "inchikey": "YGHRJJRRZDOVPD-UHFFFAOYSA-N",
+        "molar_mass": 86.13
+    },
+    {
+        "name": "n-pentanal",
+        "family": [
+            "aldehyde",
+            "saturated"
+        ],
+        "alias": [
+            "valeraldehyde",
+            "pentanal",
+            "n-pentanal"
+        ],
+        "inchikey": "HGBOYTHUEUWSSQ-UHFFFAOYSA-N",
+        "molar_mass": 86.13
+    },
+    {
+        "name": "hexanal",
+        "family": [
+            "aldehyde",
+            "saturated"
+        ],
+        "alias": [
+            "hexanal",
+            "n-hexanaldehyde",
+            "hexanaldehyde"
+        ],
+        "inchikey": "JARKCYVAAOWBJS-UHFFFAOYSA-N",
+        "molar_mass": 100.16
+    },
+    {
+        "name": "benzaldehyde",
+        "family": [
+            "aldehyde",
+            "aromatic"
+        ],
+        "alias": [
+            "benzaldehyde"
+        ],
+        "inchikey": "HUMNYLRZRPPJDN-UHFFFAOYSA-N",
+        "molar_mass": 106.12
+    },
+    {
+        "name": "acrolein",
+        "family": [
+            "aldehyde",
+            "unsaturated"
+        ],
+        "formula": "CH_{2}CHCHO",
+        "inchikey": "HGINCPLSRVDWNT-UHFFFAOYSA-N",
+        "alias": [
+            "Acrylaldehyde",
+            "acrolein"
+        ],
+        "molar_mass": 56.06
+    },
+    {
+        "name": "acetone",
+        "alias": [
+            "(ch3)2co",
+            "acetone",
+            "dimethyl ketone",
+            "dimethylformaldehyde",
+            "dimethylketone"
+        ],
+        "formula": "(CH_{3})_{2}CO",
+        "inchikey": "CSCPPACGZOOCGX-UHFFFAOYSA-N",
+        "backend_name": "ACETONE",
+        "molar_mass": 58.07914,
+        "acentric_factor": 0.3071,
+        "t_triple": 178.5,
+        "t_critical": 508.1,
+        "p_critical": 46.924,
+        "rhomass_critical": 272.97,
+        "rhomolar_critical": 4699.99
+    },
+    {
+        "name": "2-butanone",
+        "family": [
+            "ketone",
+            "saturated"
+        ],
+        "inchikey": "ZWEHNKRNPOVVGH-UHFFFAOYSA-N",
+        "alias": [
+            "2-butanone",
+            "butan-2-one",
+            "butanone",
+            "ethyl methyl ketone",
+            "ethylmethylketone",
+            "MEK",
+            "methylethylketone"
+        ],
+        "molar_mass": 72.11
+    },
+    {
+        "name": "2-pentanone",
+        "family": [
+            "ketone",
+            "saturated"
+        ],
+        "inchikey": "XNLICIUVMPYHGG-UHFFFAOYSA-N",
+        "alias": [
+            "ethyl acetone",
+            "methyl n-propyl ketone",
+            "methyl propyl ketone",
+            "2-pentanone"
+        ],
+        "molar_mass": 86.13
+    },
+    {
+        "name": "3-pentanone",
+        "family": [
+            "ketone",
+            "saturated"
+        ],
+        "alias": [
+            "diethyl ketone",
+            "3-pentanone"
+        ],
+        "inchikey": "FDPIMTJIUBPUKL-UHFFFAOYSA-N",
+        "molar_mass": 86.13
+    },
+    {
+        "name": "formic acid",
+        "family": [
+            "carboxyacid",
+            "saturated"
+        ],
+        "formula": "HCOOH",
+        "inchikey": "BDAGIHXWWSANSR-UHFFFAOYSA-N",
+        "alias": [
+            "formic acid"
+        ],
+        "molar_mass": 46.025
+    },
+    {
+        "name": "acetic acid",
+        "family": [
+            "carboxyacid",
+            "saturated"
+        ],
+        "formula": "CH_{3}COOH",
+        "inchikey": "QTBSBXVTEAMEQO-UHFFFAOYSA-N",
+        "alias": [
+            "acetic acid"
+        ],
+        "molar_mass": 60.05
+    },
+    {
+        "name": "propionic acid",
+        "family": [
+            "carboxyacid",
+            "saturated"
+        ],
+        "formula": "CH_{3}CH_{2}COOH",
+        "inchikey": "XBDQKXXYIPTUBI-UHFFFAOYSA-N",
+        "alias": [
+            "propionic acid",
+            "1-propionic acid"
+        ],
+        "molar_mass": 74.08
+    },
+    {
+        "name": "butyric acid",
+        "family": [
+            "carboxyacid",
+            "saturated"
+        ],
+        "inchikey": "FERIUCNNQQJTOY-UHFFFAOYSA-N",
+        "alias": [
+            "butyric acid",
+            "1-butanoic acid"
+        ],
+        "molar_mass": 88.11
+    },
+    {
+        "name": "isobutyric acid",
+        "family": [
+            "carboxyacid",
+            "saturated"
+        ],
+        "inchikey": "KQNPFQTWMSNSAP-UHFFFAOYSA-N",
+        "alias": [
+            "isobutyric acid",
+            "2-methylpropanoic acid"
+        ],
+        "molar_mass": 88.11
+    },
+    {
+        "name": "valeric acid",
+        "family": [
+            "carboxyacid",
+            "saturated"
+        ],
+        "inchikey": "NQPDZGIKBAWPEJ-UHFFFAOYSA-N",
+        "alias": [
+            "valeric acid",
+            "1-pentanoic acid"
+        ],
+        "molar_mass": 102.13
+    },
+    {
+        "name": "isovaleric acid",
+        "family": [
+            "carboxyacid",
+            "saturated"
+        ],
+        "inchikey": "GWYFCOCPABKNJV-UHFFFAOYSA-N",
+        "alias": [
+            "isovaleric acid",
+            "3-methylbutanoic acid"
+        ],
+        "molar_mass": 102.13
+    },
+    {
+        "name": "methanol",
+        "alias": [
+            "ch3oh",
+            "methanol",
+            "meoh",
+            "methyl alcohol",
+            "methyl hydroxide",
+            "methylol"
+        ],
+        "formula": "CH_{3}OH",
+        "inchikey": "OKKJLVBELUTLKV-UHFFFAOYSA-N",
+        "backend_name": "METHANOL",
+        "molar_mass": 32.04216,
+        "cross_sectional_area": 0.18,
+        "kinetic_diameter": 0.3626,
+        "polarizability": 0.00323,
+        "dipole_moment": 1.7,
+        "acentric_factor": 0.565,
+        "t_triple": 175.61,
+        "p_triple": 1.86e-06,
+        "t_critical": 513.38,
+        "p_critical": 82.1585,
+        "rhomass_critical": 281.5,
+        "rhomolar_critical": 8520.02
+    },
+    {
+        "name": "ethanol",
+        "alias": [
+            "c2h5oh",
+            "ch3ch2oh",
+            "ethanol",
+            "ethyl alcohol",
+            "etoh",
+            "hydroxyethane"
+        ],
+        "formula": "CH_{3}CH_{2}OH",
+        "inchikey": "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+        "backend_name": "ETHANOL",
+        "molar_mass": 46.06844,
+        "cross_sectional_area": 0.283,
+        "kinetic_diameter": 0.453,
+        "polarizability": 0.005112,
+        "dipole_moment": 1.69,
+        "acentric_factor": 0.649,
+        "t_triple": 159.0,
+        "t_critical": 514.71,
+        "p_critical": 62.68,
+        "rhomolar_critical": 5930.0,
+        "rhomass_critical": 273.186
+    },
+    {
+        "name": "1-propanol",
+        "alias": [
+            "1-c3h7oh",
+            "1-propanol",
+            "propanol",
+            "propanol-1",
+            "propan-1-ol",
+            "propane-1-ol",
+            "n-propanol",
+            "1-hydroxypropane",
+            "1-propyl alcohol",
+            "ethylcarbinol",
+            "hydroxypropane",
+            "n-propan-1-ol",
+            "n-propyl alcohol",
+            "propanolen",
+            "propyl alcohol",
+            "propylalcohol",
+            "propylic alcohol",
+            "un 1274"
+        ],
+        "inchikey": "BDERNNFJNOPAEC-UHFFFAOYSA-N",
+        "molar_mass": 60.095,
+        "t_critical": 536.2,
+        "p_critical": 52.0
+    },
+    {
+        "name": "2-propanol",
+        "alias": [
+            "2-c3h7oh",
+            "2-propanol",
+            "2-hydroxypropane",
+            "2-propyl alcohol",
+            "ipa",
+            "iso-propylalcohol",
+            "isopropanol",
+            "isopropyl alcohol",
+            "propan-2-ol"
+        ],
+        "inchikey": "KFZMGEQAYNKOFK-UHFFFAOYSA-N",
+        "molar_mass": 60.095,
+        "t_critical": 509.0,
+        "p_critical": 49.0
+    },
+    {
+        "name": "1-butanol",
+        "alias": [
+            "1-c4h9oh",
+            "1-butanol",
+            "1-butyl alcohol",
+            "1-hydroxybutane",
+            "butan-1-ol",
+            "butanol",
+            "butyl alcohol",
+            "butyl hydroxide",
+            "n-butanol",
+            "n-butyl alcohol",
+            "nbu"
+        ],
+        "inchikey": "LRHPLDYGYMQRHN-UHFFFAOYSA-N",
+        "molar_mass": 74.1216,
+        "t_critical": 562.0,
+        "p_critical": 45.0
+    },
+    {
+        "name": "2-butanol",
+        "family": [
+            "alcohol"
+        ],
+        "alias": [
+            "2-butyl alcohol",
+            "2-c4h9oh",
+            "2-hydroxybutane",
+            "butan-2-ol",
+            "2-butanol"
+        ],
+        "inchikey": "BTANRVKWQNVYAZ-UHFFFAOYSA-N",
+        "molar_mass": 74.12
+    },
+    {
+        "name": "isobutanol",
+        "family": [
+            "alcohol"
+        ],
+        "alias": [
+            "1-hydroxymethylpropane",
+            "2-methyl propanol",
+            "2-methyl-1-propanol",
+            "2-methyl-1-propanyl alcohol",
+            "2-methylpropan-1-ol",
+            "2-methylpropanoi",
+            "2-methylpropanol",
+            "2-methylpropanol-1",
+            "2-methylpropyl alcohol",
+            "i-butanol",
+            "i-butyl alcohol",
+            "ic4h9oh",
+            "iso-butyl alcohol",
+            "isobutyl alcohol",
+            "methyl-2 propanol-1",
+            "isobutanol"
+        ],
+        "inchikey": "ZXEKIIBDNHEJCQ-UHFFFAOYSA-N",
+        "molar_mass": 74.12
+    },
+    {
+        "name": "tert-butanol",
+        "family": [
+            "alcohol"
+        ],
+        "inchikey": "DKGAVHZHDRPRBM-UHFFFAOYSA-N",
+        "alias": [
+            "2-methyl-2-propanol",
+            "2-methylpropan-2-ol",
+            "tert-c4h9oh",
+            "tertiary-butyl alcohol",
+            "tert-butanol",
+            "tertbutanol"
+        ],
+        "molar_mass": 74.12
+    },
+    {
+        "name": "1-pentanol",
+        "family": [
+            "alcohol"
+        ],
+        "alias": [
+            "1-c5h11oh",
+            "1-pentol",
+            "1-pentyl alcohol",
+            "amyl alcohol",
+            "amylol",
+            "c5 alcohol",
+            "n-amyl alcohol",
+            "n-pentan-1-ol",
+            "n-pentanol",
+            "n-pentyl alcohol",
+            "n-pentyl-alcohol",
+            "pentalcohol",
+            "pentan-1-ol",
+            "pentanol",
+            "pentanol-1",
+            "pentyl alcohol",
+            "pentyl-alcohol",
+            "petan-1-ol",
+            "1-pentanol"
+        ],
+        "inchikey": "AMQJEAYHLZJPGS-UHFFFAOYSA-N",
+        "molar_mass": 88.15
+    },
+    {
+        "name": "1-hexanol",
+        "family": [
+            "alcohol"
+        ],
+        "alias": [
+            "1-c6h13oh",
+            "1-hexyl alcohol",
+            "1-hydroxyhexane",
+            "c6 alcohol",
+            "capric alcohol",
+            "caproalcohol",
+            "caproic alcohol",
+            "caproyl alcohol",
+            "hexalcohol",
+            "hexan-1-ol",
+            "hexanol",
+            "hexanol-(1)",
+            "hexyl alcohol",
+            "hydroxyhexane",
+            "n-hexan-1-ol",
+            "n-hexanol",
+            "n-hexenol",
+            "n-hexyl alcohol",
+            "1-hexanol"
+        ],
+        "inchikey": "ZSIAUFGUXNUGDI-UHFFFAOYSA-N",
+        "molar_mass": 102.17
+    },
+    {
+        "name": "phenol",
+        "family": [
+            "alcohol",
+            "aromatic"
+        ],
+        "alias": [
+            "benzenol",
+            "benzophenol",
+            "carbolic acid",
+            "carbolic oil",
+            "fenol",
+            "fenolo",
+            "hydroxy-benzene",
+            "hydroxybenzene",
+            "monohydroxy benzene",
+            "monohydroxybenzene",
+            "monophenol",
+            "phenole",
+            "phenol"
+        ],
+        "inchikey": "ISWSIDIOOBJBQZ-UHFFFAOYSA-N",
+        "molar_mass": 94.11
+    },
+    {
+        "name": "o-cresol",
+        "family": [
+            "alcohol",
+            "aromatic"
+        ],
+        "alias": [
+            "2-methylphenol",
+            "o-cresol"
+        ],
+        "inchikey": "QWVGKYWNOKOFNN-UHFFFAOYSA-N",
+        "molar_mass": 108.14
+    },
+    {
+        "name": "m-cresol",
+        "family": [
+            "alcohol",
+            "aromatic"
+        ],
+        "alias": [
+            "3-methylphenol",
+            "m-cresol"
+        ],
+        "inchikey": "RLSSMJSEOOYNOY-UHFFFAOYSA-N",
+        "molar_mass": 108.14
+    },
+    {
+        "name": "p-cresol",
+        "family": [
+            "alcohol",
+            "aromatic"
+        ],
+        "alias": [
+            "4-methylphenol",
+            "p-cresol"
+        ],
+        "inchikey": "IWDCLRJOBJJRNH-UHFFFAOYSA-N",
+        "molar_mass": 108.14
+    },
+    {
+        "name": "ethylene glycol",
+        "family": [
+            "alcohol"
+        ],
+        "alias": [
+            "1,2-ethanediol",
+            "ethane-1,2-diol",
+            "ethanedial",
+            "ethanediol",
+            "ethylene glycol"
+        ],
+        "inchikey": "LYCAIKOWRPUZTN-UHFFFAOYSA-N",
+        "molar_mass": 62.07
+    },
+    {
+        "name": "glycerin",
+        "family": [
+            "alcohol"
+        ],
+        "alias": [
+            "glycerine",
+            "glyceritol",
+            "glycerol",
+            "glycyl alcohol",
+            "glyrol",
+            "glysanin",
+            "propane-1,2,3-triol",
+            "trihydroxypropane",
+            "tryhydroxypropane",
+            "glycerin"
+        ],
+        "inchikey": "PEDCQBHIVMGVHV-UHFFFAOYSA-N",
+        "molar_mass": 92.09
+    },
+    {
+        "name": "chloromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "chloromethane",
+            "freon 40",
+            "r40",
+            "r-40"
+        ],
+        "formula": "CH_{3}Cl",
+        "inchikey": "NEHMKBQYUWJMIP-UHFFFAOYSA-N",
+        "backend_name": "R40",
+        "molar_mass": 50.49,
+        "acentric_factor": 0.15,
+        "t_triple": 230.0,
+        "t_critical": 416.3,
+        "p_critical": 66.71686977141843,
+        "rhomass_critical": 363.22,
+        "rhomolar_critical": 7194.233
+    },
+    {
+        "name": "dichloromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "bis(chloranyl)methane",
+            "ch2cl2",
+            "methylene chloride",
+            "methylene dichloride",
+            "dichloromethane"
+        ],
+        "formula": "CH_{2}Cl_{2}",
+        "inchikey": "YMWUJEATGCHHMB-UHFFFAOYSA-N",
+        "molar_mass": 84.93
+    },
+    {
+        "name": "trichloromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "chcl3",
+            "chloroform",
+            "formyl trichloride",
+            "methane trichloride",
+            "methenyl trichloride",
+            "methyl trichloride",
+            "trichloroform",
+            "tris(chloranyl)methane",
+            "trichloromethane"
+        ],
+        "formula": "CHCl_{3}",
+        "inchikey": "HEDRZPFGACZZDS-UHFFFAOYSA-N",
+        "molar_mass": 119.37
+    },
+    {
+        "name": "tetrachloromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "ccl4",
+            "methane tetrachloride",
+            "perchorormethane",
+            "tetrachloromethane",
+            "tetrachorocarbon",
+            "tetrakis(chloranyl)methane",
+            "carbon tetrachloride"
+        ],
+        "formula": "CCl_{4}",
+        "inchikey": "VZGDMQKNWNREIO-UHFFFAOYSA-N",
+        "molar_mass": 153.8
+    },
+    {
+        "name": "bromomethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "bromomethane"
+        ],
+        "formula": "CH_{3}Br",
+        "inchikey": "GZUXJHMPEANEGY-UHFFFAOYSA-N",
+        "molar_mass": 94.94
+    },
+    {
+        "name": "dibromomethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "dibromomethane"
+        ],
+        "formula": "CH_{2}Br_{2}",
+        "inchikey": "FJBFPHVGVWTDIP-UHFFFAOYSA-N",
+        "molar_mass": 173.83
+    },
+    {
+        "name": "tribromomethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "bromoform",
+            "chbr3",
+            "tris(bromanyl)methane",
+            "tribromomethane"
+        ],
+        "formula": "CHBr_{3}",
+        "inchikey": "DIKBFYAXUHHXCS-UHFFFAOYSA-N",
+        "molar_mass": 252.73
+    },
+    {
+        "name": "tetrabromomethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "carbon tetrabromide",
+            "tetrabromomethane"
+        ],
+        "formula": "CBr_{4}",
+        "inchikey": "HJUGFYREWKUQJT-UHFFFAOYSA-N",
+        "molar_mass": 331.63
+    },
+    {
+        "name": "fluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "freon 41",
+            "methyl fluoride",
+            "fluoromethane",
+            "r-41",
+            "r41"
+        ],
+        "formula": "CH_{3}F",
+        "inchikey": "NBVXSUQYWXRMNV-UHFFFAOYSA-N",
+        "backend_name": "R41",
+        "molar_mass": 34.03,
+        "acentric_factor": 0.2004,
+        "t_triple": 129.82,
+        "t_critical": 317.28,
+        "p_critical": 58.97,
+        "rhomass_critical": 316.51,
+        "rhomolar_critical": 9300.0
+    },
+    {
+        "name": "difluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "freon 32",
+            "methyl difluoride",
+            "difluoromethane",
+            "r-32",
+            "r32"
+        ],
+        "formula": "CH_{2}F_{2}",
+        "inchikey": "RWRIWBAIICGTTQ-UHFFFAOYSA-N",
+        "backend_name": "R32",
+        "molar_mass": 34.03,
+        "acentric_factor": 0.2769,
+        "t_triple": 136.34,
+        "t_critical": 351.255,
+        "p_critical": 57.82,
+        "rhomass_critical": 424.0,
+        "rhomolar_critical": 8150.08
+    },
+    {
+        "name": "trifluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "fluoroform",
+            "freon 23",
+            "hfc-23",
+            "methyl trifluoride",
+            "trifluoromethane",
+            "r-23",
+            "r23"
+        ],
+        "formula": "CHF_{3}",
+        "inchikey": "XPDWGBQVDMORPB-UHFFFAOYSA-N",
+        "backend_name": "R23",
+        "molar_mass": 70.014,
+        "acentric_factor": 0.262964892496154,
+        "t_triple": 118.02,
+        "t_critical": 299.293,
+        "p_critical": 48.32,
+        "rhomass_critical": 526.5,
+        "rhomolar_critical": 7520.0
+    },
+    {
+        "name": "tetrafluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "cf4",
+            "tetrafluoromethane",
+            "tetrakis(fluoranyl)methane",
+            "carbon tetrafluoride",
+            "cfc-14",
+            "f-14",
+            "freon 14",
+            "r-14",
+            "r14"
+        ],
+        "formula": "CF_{4}",
+        "inchikey": "TXEYQDLBPFQVAA-UHFFFAOYSA-N",
+        "backend_name": "R14",
+        "molar_mass": 88.004,
+        "acentric_factor": 0.1785,
+        "t_triple": 120.0,
+        "t_critical": 227.51,
+        "p_critical": 37.5,
+        "rhomass_critical": 625.66,
+        "rhomolar_critical": 7109.42
+    },
+    {
+        "name": "dichlorofluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "cfc-21",
+            "dichlorofluoromethane",
+            "f-21",
+            "freon 21",
+            "r-21",
+            "r21"
+        ],
+        "formula": "CHCl_{2}F",
+        "inchikey": "UMNKXPULIDJLSU-UHFFFAOYSA-N",
+        "backend_name": "R21",
+        "molar_mass": 102.92,
+        "acentric_factor": 0.2061,
+        "t_triple": 200.0,
+        "t_critical": 451.48,
+        "p_critical": 51.812,
+        "rhomass_critical": 526.0,
+        "rhomolar_critical": 5110.77
+    },
+    {
+        "name": "chlorodifluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "cfc-22",
+            "chlorodifluoromethane",
+            "difluorochloromethane",
+            "freon 22",
+            "r-22",
+            "r22"
+        ],
+        "formula": "CHClF_{2}",
+        "inchikey": "VOPWNXZWBYDODV-UHFFFAOYSA-N",
+        "backend_name": "R22",
+        "molar_mass": 86.47,
+        "acentric_factor": 0.22082,
+        "t_triple": 115.73,
+        "t_critical": 369.295,
+        "p_critical": 49.9,
+        "rhomass_critical": 523.84,
+        "rhomolar_critical": 6058.22
+    },
+    {
+        "name": "chlorotrifluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "cfc-13",
+            "chlorotrifluoromethane",
+            "freon 13",
+            "r-13",
+            "r13"
+        ],
+        "formula": "CClF_{3}",
+        "inchikey": "AFYPFACVUDMOHA-UHFFFAOYSA-N",
+        "backend_name": "R13",
+        "molar_mass": 86.47,
+        "acentric_factor": 0.174586327798,
+        "t_triple": 98.15,
+        "t_critical": 301.88,
+        "p_critical": 38.79,
+        "rhomass_critical": 582.88,
+        "rhomolar_critical": 5580.0
+    },
+    {
+        "name": "dichlorodifluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "cfc-12",
+            "dichlorodifluoromethane",
+            "f-12",
+            "freon 12",
+            "r-12",
+            "r12"
+        ],
+        "formula": "CCl_{2}F_{2}",
+        "inchikey": "PXBRQCKWGAHEHS-UHFFFAOYSA-N",
+        "backend_name": "R12",
+        "molar_mass": 137.37,
+        "acentric_factor": 0.1795,
+        "t_triple": 116.099,
+        "t_critical": 385.12,
+        "p_critical": 41.361,
+        "rhomass_critical": 565.0,
+        "rhomolar_critical": 4672.78
+    },
+    {
+        "name": "trichlorofluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "cfc-11",
+            "trichlorofluoromethane",
+            "f-11",
+            "freon 11",
+            "r-11",
+            "r11"
+        ],
+        "formula": "CCl_{3}F",
+        "inchikey": "CYRMSUTZVYGINF-UHFFFAOYSA-N",
+        "backend_name": "R11",
+        "molar_mass": 137.37,
+        "acentric_factor": 0.1887,
+        "t_triple": 162.68,
+        "t_critical": 471.06,
+        "p_critical": 43.94,
+        "rhomass_critical": 565.0,
+        "rhomolar_critical": 4113.04
+    },
+    {
+        "name": "bromo-chloro-fluoromethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "bromanyl-chloranyl-fluoranyl-methane",
+            "bromo-chloro-fluoro-methane",
+            "chbrclf",
+            "bromo-chloro-fluoromethane"
+        ],
+        "formula": "CHBrClF",
+        "inchikey": "YNKZSBSRKWVMEZ-UHFFFAOYSA-N",
+        "molar_mass": 147.37
+    },
+    {
+        "name": "1,2-dichloroethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "1,2-bis(chloranyl)ethane",
+            "1,2-dichloro-ethane",
+            "c2h4cl2",
+            "ethylene dichloride",
+            "glycol dichloride",
+            "1,2-dichloroethane"
+        ],
+        "formula": "CH_{2}ClCH_{2}Cl",
+        "inchikey": "WSLDOOZREJYCGB-UHFFFAOYSA-N",
+        "backend_name": "1,2-DICHLOROETHANE",
+        "molar_mass": 98.96,
+        "acentric_factor": 0.2686,
+        "t_triple": 237.52,
+        "t_critical": 561.6,
+        "p_critical": 52.276,
+        "rhomass_critical": 428.49,
+        "rhomolar_critical": 4330.0
+    },
+    {
+        "name": "1,1,1-trichloroethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "1,1,1-trichloroethane",
+            "1,1,1-tris(chloranyl)ethane",
+            "trichloroethane"
+        ],
+        "formula": "CCl_{3}CH_{3}",
+        "inchikey": "UOCLXMDMGBRAIB-UHFFFAOYSA-N",
+        "molar_mass": 133.4
+    },
+    {
+        "name": "chloroethylene",
+        "family": [
+            "halogenated",
+            "unsaturated"
+        ],
+        "alias": [
+            "chloroethylene",
+            "chloroethene",
+            "vinyl chloride",
+            "1-chloroethene",
+            "1-chloroethylene",
+            "c2h3cl",
+            "1-c2h3cl"
+        ],
+        "formula": "CHClCH_{2}",
+        "inchikey": "BZHJMEDXRYGGRV-UHFFFAOYSA-N",
+        "molar_mass": 96.94
+    },
+    {
+        "name": "1,1-dichloroethylene",
+        "family": [
+            "halogenated",
+            "unsaturated"
+        ],
+        "alias": [
+            "1,1,-dichloroethene",
+            "1,1-bis(chloranyl)ethene",
+            "1,1-dce",
+            "1,1-dichloro-ethene",
+            "1,1-dichloroethene",
+            "1-c2h2cl2",
+            "vinylidene chloride",
+            "1,1-dichloroethylene"
+        ],
+        "formula": "CCl_{2}CH_{2}",
+        "inchikey": "LGXVIGDEPROXKC-UHFFFAOYSA-N",
+        "molar_mass": 96.94
+    },
+    {
+        "name": "1,2-dichloroethylene",
+        "family": [
+            "halogenated",
+            "unsaturated"
+        ],
+        "alias": [
+            "1,2,-dichloroethene",
+            "1,2-dce",
+            "1,2-dichloro-ethene",
+            "1,2-dichloroethene",
+            "1,2-dichloroethylene"
+        ],
+        "formula": "CHClCHCl",
+        "inchikey": "KFUSEUYYWQURPO-UHFFFAOYSA-N",
+        "molar_mass": 96.94
+    },
+    {
+        "name": "trichloroethylene",
+        "family": [
+            "halogenated",
+            "unsaturated"
+        ],
+        "alias": [
+            "1,1,2-tris(chloranyl)ethene",
+            "c2hcl3",
+            "trichloroethene",
+            "trichloroethylene",
+            "1,1,2-trichloroethene",
+            "1,1,2-trichloroethylene"
+        ],
+        "formula": "CCl_{2}CHCl",
+        "inchikey": "XSTXAVWGXDQKEL-UHFFFAOYSA-N",
+        "molar_mass": 131.38
+    },
+    {
+        "name": "tetrachloroethene",
+        "family": [
+            "halogenated",
+            "unsaturated"
+        ],
+        "alias": [
+            "1,1,2,2-tetrachloroethene",
+            "1,1,2,2-tetrachloroethylene",
+            "1,1,2,2-tetrakis(chloranyl)ethene",
+            "c2cl4",
+            "perchloroethylene",
+            "tetrachloroethylene",
+            "tetrachloroethene",
+            "PERC"
+        ],
+        "formula": "CCl_{2}CCl_{2}",
+        "inchikey": "CYTYCFOTNPOANT-UHFFFAOYSA-N",
+        "molar_mass": 165.8
+    },
+    {
+        "name": "n-perfluoroethane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "c2f6",
+            "f-116",
+            "freon 116",
+            "hexafluoroethane",
+            "hfc-116",
+            "perfluoroethane",
+            "r-116",
+            "r116",
+            "n-perfluoroethane"
+        ],
+        "inchikey": "WMIYKQLTONQJES-UHFFFAOYSA-N",
+        "backend_name": "R116",
+        "formula": "CF_{3}CF_{3}",
+        "molar_mass": 138.01,
+        "acentric_factor": 0.2566,
+        "t_triple": 173.1,
+        "t_critical": 293.03,
+        "p_critical": 30.48,
+        "rhomass_critical": 613.32,
+        "rhomolar_critical": 4444.0
+    },
+    {
+        "name": "r-115",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "cfc-115",
+            "chloropentafluoroethane",
+            "f-115",
+            "freon 115",
+            "perfluoroethyl chloride",
+            "r-115",
+            "r115"
+        ],
+        "formula": "CClF_{2}CF_{3}",
+        "inchikey": "RFCAUADVODFSLZ-UHFFFAOYSA-N",
+        "backend_name": "R115",
+        "molar_mass": 154.46,
+        "acentric_factor": 0.248,
+        "t_triple": 173.57,
+        "t_critical": 353.1,
+        "p_critical": 31.29,
+        "rhomass_critical": 614.77,
+        "rhomolar_critical": 3980.0
+    },
+    {
+        "name": "r-124",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "1-chloro-1,2,2,2-tetrafluoroethane",
+            "2-chloro-1,1,1,2-tetrafluoroethane",
+            "cfc-124",
+            "freon 124",
+            "r-124",
+            "r124"
+        ],
+        "formula": "CH_{2}ClCF_{3}",
+        "inchikey": "BOUGCJDAQLKBQH-UHFFFAOYSA-N",
+        "backend_name": "R124",
+        "molar_mass": 136.47,
+        "acentric_factor": 0.2881,
+        "t_triple": 120.0,
+        "t_critical": 395.425,
+        "p_critical": 36.24295,
+        "rhomass_critical": 560.0,
+        "rhomolar_critical": 4103.28
+    },
+    {
+        "name": "r-125",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "1,1,1,2,2-pentafluoroethane",
+            "fc-125",
+            "genetron hfc 125",
+            "hfc-125",
+            "pentalfluoroethane",
+            "r-125",
+            "r125"
+        ],
+        "formula": "CF_{3}CHF_{2}",
+        "inchikey": "GTLACDSXYULKMZ-UHFFFAOYSA-N",
+        "backend_name": "R125",
+        "molar_mass": 120.02,
+        "acentric_factor": 0.3052,
+        "t_triple": 172.52,
+        "t_critical": 339.173,
+        "p_critical": 36.177,
+        "rhomass_critical": 573.58,
+        "rhomolar_critical": 4779.0
+    },
+    {
+        "name": "r-134a",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "1,1,1,2-tetrafluoroethane",
+            "1,1,1,2-tetrakis(fluoranyl)ethane",
+            "hfa-134-a",
+            "hfc-134a",
+            "norflurane",
+            "norflurane (usan/inn)",
+            "r-134a",
+            "r134a"
+        ],
+        "formula": "CF_{3}CH_{2}F",
+        "inchikey": "LVGUZGTVOIAKKC-UHFFFAOYSA-N",
+        "backend_name": "R134a",
+        "molar_mass": 102.03,
+        "acentric_factor": 0.32684,
+        "t_triple": 169.85,
+        "t_critical": 374.21,
+        "p_critical": 40.5928,
+        "rhomass_critical": 511.9,
+        "rhomolar_critical": 5017.053
+    },
+    {
+        "name": "n-perfluorohexane",
+        "family": [
+            "halogenated"
+        ],
+        "alias": [
+            "af 0150",
+            "fluorinert fc72",
+            "flutec pp1",
+            "n-tetradecafluorohexane",
+            "perfluoro-compound fc-72",
+            "perfluoro-n-hexane",
+            "perfluorohexane",
+            "pp1 fluorocarbon",
+            "tetradecafluorohexane",
+            "n-perfluorohexane"
+        ],
+        "formula": "C_{6}F_{14}",
+        "inchikey": "ZJIJAJXFLBMLCK-UHFFFAOYSA-N",
+        "molar_mass": 338.04
+    },
+    {
+        "name": "dimethylformamide",
+        "family": [
+            "amide"
+        ],
+        "alias": [
+            "dimethyl formamide",
+            "dimethyl-formamide",
+            "dimethylformamide",
+            "dimetilformamide",
+            "formyldimethylamine",
+            "n,n-dimethyl-formamide",
+            "n,n-dimethylformamide",
+            "n,n-dimethylmethanamide",
+            "n-formyldimethylamine",
+            "dimethylforamide"
+        ],
+        "inchikey": "ZMXDDKWLCZADIW-UHFFFAOYSA-N",
+        "molar_mass": 73.09
+    },
+    {
+        "name": "acetamide",
+        "family": [
+            "amide"
+        ],
+        "alias": [
+            "acetamide",
+            "ethanamide"
+        ],
+        "inchikey": "DLFVBJFMPXGRIB-UHFFFAOYSA-N",
+        "molar_mass": 59.07
+    },
+    {
+        "name": "dimethylamine",
+        "family": [
+            "amine"
+        ],
+        "alias": [
+            "(ch3)2nh",
+            "dimethyl-amine",
+            "dimethylammonium",
+            "n,n-dimethylamine",
+            "n-methyl-methanamine",
+            "n-methylmethanamine",
+            "dimethylamine"
+        ],
+        "inchikey": "ROSDSFDQCJNGOL-UHFFFAOYSA-N",
+        "molar_mass": 45.08
+    },
+    {
+        "name": "trimethylamine",
+        "family": [
+            "amine"
+        ],
+        "alias": [
+            "trimethy-amine",
+            "trimethyammonium",
+            "trimethylamine"
+        ],
+        "inchikey": "GETQZCLCWQTVFV-UHFFFAOYSA-N",
+        "molar_mass": 59.11
+    },
+    {
+        "name": "dimethyl ether",
+        "family": [
+            "ether"
+        ],
+        "alias": [
+            "ch3och3",
+            "methoxymethane",
+            "dimethyl ether"
+        ],
+        "inchikey": "LCGLNKUTAGEVQW-UHFFFAOYSA-N",
+        "backend_name": "DIMETHYLETHER",
+        "molar_mass": 46.07,
+        "acentric_factor": 0.196,
+        "t_triple": 131.66,
+        "t_critical": 400.378,
+        "p_critical": 53.368,
+        "rhomass_critical": 273.65,
+        "rhomolar_critical": 5940.0
+    },
+    {
+        "name": "diethyl ether",
+        "family": [
+            "ether"
+        ],
+        "alias": [
+            "diethylether",
+            "ether",
+            "ethoxyethane",
+            "ethyl ether",
+            "diethyl ether"
+        ],
+        "inchikey": "RTZKZFJDLAIYFH-UHFFFAOYSA-N",
+        "backend_name": "DEE",
+        "molar_mass": 74.12,
+        "acentric_factor": 0.282,
+        "t_triple": 270.0,
+        "t_critical": 466.7,
+        "p_critical": 36.49,
+        "rhomass_critical": 264.0,
+        "rhomolar_critical": 3561.7148
+    },
+    {
+        "name": "methyl acetate",
+        "family": [
+            "ester"
+        ],
+        "alias": [
+            "methyl ethanoate",
+            "methyl acetate",
+            "acetic acid methyl ester"
+        ],
+        "inchikey": "KXKVLQRXCPHEJC-UHFFFAOYSA-N",
+        "molar_mass": 74.08
+    },
+    {
+        "name": "acetonitrile",
+        "family": [
+            "nitrile"
+        ],
+        "alias": [
+            "ch3cn",
+            "ethanenitrile",
+            "acetonitrile"
+        ],
+        "formula": "CH_{3}CN",
+        "inchikey": "WEVYAHXRMPXWCK-UHFFFAOYSA-N",
+        "molar_mass": 41.05
+    },
+    {
+        "name": "nitromethane",
+        "family": [
+            "nitrate"
+        ],
+        "alias": [
+            "ch3no2",
+            "nitromethane"
+        ],
+        "formula": "CH_{3}NO_{2}",
+        "inchikey": "LYGJENNIWJXYER-UHFFFAOYSA-N",
+        "molar_mass": 61.04
+    },
+    {
+        "name": "methanethiol",
+        "family": [
+            "sulphurus"
+        ],
+        "alias": [
+            "ch3sh",
+            "mercaptomethane",
+            "methyl mercaptan",
+            "methyl thioalcohol",
+            "methylmercaptaan",
+            "methanethiol"
+        ],
+        "formula": "CH_{3}SH",
+        "inchikey": "LSDPWZHWYPCBBB-UHFFFAOYSA-N",
+        "molar_mass": 48.11
+    },
+    {
+        "name": "ethanethiol",
+        "family": [
+            "sulphurus"
+        ],
+        "alias": [
+            "c2h5sh",
+            "ethyl mercaptan",
+            "ethyl thioalcohol",
+            "ethylmercaptan",
+            "thioethanol",
+            "ethanethiol"
+        ],
+        "formula": "CH_{3}CH_{2}SH",
+        "inchikey": "DNJIEGIFACGWOD-UHFFFAOYSA-N",
+        "molar_mass": 62.14
+    },
+    {
+        "name": "hexamethyldisiloxane",
+        "family": [
+            "siloxanes"
+        ],
+        "alias": [
+            "hexamethyldisiloxane",
+            "MM",
+            "L2"
+        ],
+        "inchikey": "UQEAIHBTYFGYIE-UHFFFAOYSA-N",
+        "backend_name": "HEXAMETHYLDISILOXANE",
+        "molar_mass": 162.37,
+        "acentric_factor": 0.418,
+        "t_triple": 204.93,
+        "t_critical": 518.75,
+        "p_critical": 19.39,
+        "rhomass_critical": 258.15,
+        "rhomolar_critical": 1589.825
+    },
+    {
+        "name": "octamethyltrisiloxane",
+        "family": [
+            "siloxanes"
+        ],
+        "alias": [
+            "octamethyltrisiloxane",
+            "MDM",
+            "L3"
+        ],
+        "inchikey": "CXQXSVUQTKDNFP-UHFFFAOYSA-N",
+        "backend_name": "OCTAMETHYLTRISILOXANE",
+        "molar_mass": 236.53,
+        "acentric_factor": 0.528,
+        "t_triple": 187.2,
+        "t_critical": 564.09,
+        "p_critical": 14.1,
+        "rhomass_critical": 256.74,
+        "rhomolar_critical": 1085.44
+    },
+    {
+        "name": "decamethyltetrasiloxane",
+        "family": [
+            "siloxanes"
+        ],
+        "alias": [
+            "decamethyltetrasiloxane",
+            "MD2M",
+            "L4"
+        ],
+        "inchikey": "YFCGDEUVHLPRCZ-UHFFFAOYSA-N",
+        "backend_name": "DECAMETHYLTETRASILOXANE",
+        "molar_mass": 310.68,
+        "acentric_factor": 0.635,
+        "t_triple": 205.2,
+        "t_critical": 599.4,
+        "p_critical": 11.44,
+        "rhomass_critical": 268.43,
+        "rhomolar_critical": 864.0
+    },
+    {
+        "name": "dodecamethylpentasiloxane",
+        "family": [
+            "siloxane"
+        ],
+        "alias": [
+            "dodecamethylpentasiloxane",
+            "MD3M",
+            "L5"
+        ],
+        "inchikey": "FBZANXDWQAVSTQ-UHFFFAOYSA-N",
+        "backend_name": "DODECAMETHYLPENTASILOXANE",
+        "molar_mass": 384.84,
+        "acentric_factor": 0.7296,
+        "t_triple": 192.0,
+        "t_critical": 628.0,
+        "p_critical": 9.5395,
+        "rhomass_critical": 269.39,
+        "rhomolar_critical": 700.0
+    },
+    {
+        "name": "tetradecamethylhexasiloxane",
+        "family": [
+            "siloxane"
+        ],
+        "alias": [
+            "tetradecamethylhexasiloxane",
+            "MD4M",
+            "L6"
+        ],
+        "inchikey": "ADANNTOYRVPQLJ-UHFFFAOYSA-N",
+        "backend_name": "TETRADECAMETHYLHEXASILOXANE",
+        "molar_mass": 384.84,
+        "acentric_factor": 0.800062145272709,
+        "t_triple": 214.15,
+        "t_critical": 653.2,
+        "p_critical": 8.28559,
+        "rhomass_critical": 261.63,
+        "rhomolar_critical": 570.0
+    },
+    {
+        "name": "hexamethylcyclotrisiloxane",
+        "family": [
+            "siloxane"
+        ],
+        "alias": [
+            "hexamethylcyclotrisiloxane",
+            "D3"
+        ],
+        "inchikey": "HTDJPCNNEPUOOQ-UHFFFAOYSA-N",
+        "molar_mass": 222.46
+    },
+    {
+        "name": "octamethylcyclotetrasiloxane",
+        "family": [
+            "siloxane"
+        ],
+        "alias": [
+            "octamethylcyclotetrasiloxane",
+            "D4"
+        ],
+        "inchikey": "HMMGMWAXVFQUOA-UHFFFAOYSA-N",
+        "backend_name": "OCTAMETHYLCYCLOTETRASILOXANE",
+        "molar_mass": 296.61,
+        "acentric_factor": 0.5981248267987835,
+        "t_triple": 290.25,
+        "t_critical": 586.5,
+        "p_critical": 13.472,
+        "rhomass_critical": 309.37,
+        "rhomolar_critical": 1043.0
+    },
+    {
+        "name": "decamethylcyclopentasiloxane",
+        "family": [
+            "siloxane"
+        ],
+        "alias": [
+            "decamethylcyclopentasiloxane",
+            "D5"
+        ],
+        "inchikey": "XMSXQFUHVRWGNA-UHFFFAOYSA-N",
+        "backend_name": "DECAMETHYLCYCLOPENTASILOXANE",
+        "molar_mass": 370.77,
+        "acentric_factor": 0.631,
+        "t_triple": 226.0,
+        "t_critical": 618.3,
+        "p_critical": 10.777,
+        "rhomass_critical": 300.32,
+        "rhomolar_critical": 810.0
+    },
+    {
+        "name": "dodecamethylcyclohexasiloxane",
+        "family": [
+            "siloxane"
+        ],
+        "alias": [
+            "dodecamethylcyclohexasiloxane",
+            "D6"
+        ],
+        "inchikey": "IUMSDRXLFWAGNT-UHFFFAOYSA-N",
+        "backend_name": "DODECAMETHYLCYCLOHEXASILOXANE",
+        "molar_mass": 444.92,
+        "acentric_factor": 0.736,
+        "t_triple": 270.2,
+        "t_critical": 645.78,
+        "p_critical": 9.61,
+        "rhomass_critical": 279.096,
+        "rhomolar_critical": 627.23
+    }
+]

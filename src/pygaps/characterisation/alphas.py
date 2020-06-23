@@ -3,7 +3,7 @@
 import warnings
 
 import numpy
-import scipy
+import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
 from ..core.isotherm import Isotherm
@@ -323,7 +323,7 @@ def alpha_s_plot_parameters(
 ):
     """Get the parameters for the linear region of the alpha-s plot."""
 
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         alpha_curve[section], loading[section]
     )
 

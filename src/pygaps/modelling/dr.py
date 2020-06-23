@@ -1,7 +1,8 @@
 """Dubinin-Radushkevitch isotherm model."""
 
 import numpy
-import scipy
+import scipy.integrate as integrate
+import scipy.constants as const
 
 from .base_model import IsothermBaseModel
 
@@ -57,7 +58,7 @@ class DR(IsothermBaseModel):
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -scipy.constants.gas_constant * parameters['temperature']
+        self.minus_rt = -const.gas_constant * parameters['temperature']
 
     def loading(self, pressure):
         """
@@ -98,8 +99,9 @@ class DR(IsothermBaseModel):
 
         """
         return numpy.exp(
-            self.params['e']/self.minus_rt *
-            numpy.sqrt(-numpy.log(loading/self.params['n_m'])))
+            self.params['e'] / self.minus_rt *
+            numpy.sqrt(-numpy.log(loading / self.params['n_m']))
+        )
 
     def spreading_pressure(self, pressure):
         r"""
@@ -125,7 +127,7 @@ class DR(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
+        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -143,7 +145,9 @@ class DR(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
         guess = {"n_m": saturation_loading, "e": -self.minus_rt}
 

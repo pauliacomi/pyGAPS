@@ -1,7 +1,8 @@
 """Dubinin-Astakov isotherm model."""
 
 import numpy
-import scipy
+import scipy.integrate as integrate
+import scipy.constants as const
 
 from .base_model import IsothermBaseModel
 
@@ -56,11 +57,11 @@ class DA(IsothermBaseModel):
         "e": [0, numpy.inf],
         "m": [1, 3],
     }
-    minus_rt = - 1000  # base value
+    minus_rt = -1000  # base value
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -scipy.constants.gas_constant * parameters['temperature']
+        self.minus_rt = -const.gas_constant * parameters['temperature']
 
     def loading(self, pressure):
         """
@@ -102,8 +103,10 @@ class DA(IsothermBaseModel):
 
         """
         return numpy.exp(
-            self.params['e']/self.minus_rt *
-            numpy.power(-numpy.log(loading/self.params['n_m']), 1/self.params['m']))
+            self.params['e'] / self.minus_rt * numpy.power(
+                -numpy.log(loading / self.params['n_m']), 1 / self.params['m']
+            )
+        )
 
     def spreading_pressure(self, pressure):
         r"""
@@ -129,7 +132,7 @@ class DA(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
+        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -147,7 +150,9 @@ class DA(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
         guess = {"n_m": saturation_loading, "e": -self.minus_rt, "m": 1}
 
