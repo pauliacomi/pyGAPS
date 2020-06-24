@@ -1,8 +1,8 @@
 """Dubinin-Radushkevitch isotherm model."""
 
 import numpy
-import scipy.integrate as integrate
 import scipy.constants as const
+import scipy.integrate as integrate
 
 from .base_model import IsothermBaseModel
 
