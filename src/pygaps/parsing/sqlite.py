@@ -8,12 +8,12 @@ import sqlite3
 
 import pandas
 
-from pygaps.data import DATABASE
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.isotherm import Isotherm
 from pygaps.core.material import Material
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.data import DATABASE
 from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.python_utilities import checktype
 from pygaps.utilities.python_utilities import grouped
