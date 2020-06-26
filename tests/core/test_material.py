@@ -8,7 +8,6 @@ import pygaps
 @pytest.mark.core
 class TestMaterial():
     """Test the material class."""
-
     def test_material_basic(self):
         """Basic creation tests."""
         mat = pygaps.Material('material1', 'batch')
@@ -24,20 +23,18 @@ class TestMaterial():
     def test_material_retrieved_list(self, material_data, basic_material):
         """Check material can be retrieved from master list."""
         pygaps.data.MATERIAL_LIST.append(basic_material)
-        uploaded_material = pygaps.Material.find(
-            material_data.get('name'),
-            material_data.get('batch'))
+        uploaded_material = pygaps.Material.find(material_data.get('name'))
 
         assert material_data == uploaded_material.to_dict()
 
         with pytest.raises(pygaps.ParameterError):
-            pygaps.Material.find('noname', 'nobatch')
+            pygaps.Material.find('noname')
 
     def test_material_get_properties(self, material_data, basic_material):
         """Check if properties of a material can be located."""
 
-        assert basic_material.get_prop(
-            'density') == material_data.get('density')
+        assert basic_material.get_prop('density'
+                                       ) == material_data.get('density')
 
         density = basic_material.properties.pop('density')
         with pytest.raises(pygaps.ParameterError):

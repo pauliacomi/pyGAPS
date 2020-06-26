@@ -11,31 +11,36 @@ import pygaps
 @pytest.mark.graphing
 class TestIsothermGraphs():
     """Tests regular isotherm graphs"""
-
     @cleanup
     def test_basic_plot(self, basic_pointisotherm):
         pygaps.plot_iso(basic_pointisotherm)
 
     @cleanup
     def test_multi_plot(self, basic_pointisotherm):
-        pygaps.plot_iso(
-            [basic_pointisotherm, basic_pointisotherm, basic_pointisotherm])
+        pygaps.plot_iso([
+            basic_pointisotherm, basic_pointisotherm, basic_pointisotherm
+        ])
 
     @cleanup
     def test_data_plot(self, basic_pointisotherm):
-        pygaps.plot_iso(basic_pointisotherm,
-                        x_data='pressure',
-                        y1_data='loading',
-                        y2_data='enthalpy')
-        pygaps.plot_iso(basic_pointisotherm,
-                        x_data='loading', y1_data='enthalpy')
+        pygaps.plot_iso(
+            basic_pointisotherm,
+            x_data='pressure',
+            y1_data='loading',
+            y2_data='enthalpy'
+        )
+        pygaps.plot_iso(
+            basic_pointisotherm, x_data='loading', y1_data='enthalpy'
+        )
 
     @cleanup
     def test_branch_plot(self, basic_pointisotherm):
         pygaps.plot_iso(basic_pointisotherm, branch='ads', fig_title='ads')
         pygaps.plot_iso(basic_pointisotherm, branch='des', fig_title='des')
         pygaps.plot_iso(basic_pointisotherm, branch='all', fig_title='all')
-        pygaps.plot_iso(basic_pointisotherm, branch='all-nol', fig_title='all-nol')
+        pygaps.plot_iso(
+            basic_pointisotherm, branch='all-nol', fig_title='all-nol'
+        )
 
     @cleanup
     def test_convert_plot(self, basic_pointisotherm, basic_adsorbate):
@@ -63,8 +68,7 @@ class TestIsothermGraphs():
 
     @cleanup
     def test_title_plot(self, basic_pointisotherm):
-        pygaps.plot_iso(basic_pointisotherm,
-                        fig_title='Testing figure title')
+        pygaps.plot_iso(basic_pointisotherm, fig_title='Testing figure title')
 
     @cleanup
     def test_style_plot(self, basic_pointisotherm):
@@ -72,5 +76,7 @@ class TestIsothermGraphs():
 
     @cleanup
     def test_legend_plot(self, basic_pointisotherm):
-        pygaps.plot_iso(basic_pointisotherm,
-                        lgd_keys=['material', 'material_batch', 'adsorbate', 'temperature'])
+        pygaps.plot_iso(
+            basic_pointisotherm,
+            lgd_keys=['material', 'adsorbate', 'temperature']
+        )

@@ -1,7 +1,6 @@
 {
     "adsorbate": "N2",
     "iso_type": "Isotherme",
-    "is_real": true,
     "lab": "MADIREL",
     "machine": "Triflex",
     "material_batch": "Test",

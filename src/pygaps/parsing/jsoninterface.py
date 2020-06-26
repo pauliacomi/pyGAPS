@@ -50,15 +50,13 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
 
         def process_data(value):
             """
-            Specifically mark only the desorption branch
-            then turn numbers into strings to avoid floating
-            point conversion issues
+            Specifically mark only the desorption branch.
             """
             if value.get('branch', False) is False:
                 del value['branch']
             else:
                 value['branch'] = 'des'
-            return {p: str(t) for p, t in value.items()}
+            return value
 
         raw_dict["isotherm_data"] = [
             process_data(v) for k, v in isotherm_data_dict.items()

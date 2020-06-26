@@ -35,8 +35,6 @@ class Isotherm():
 
     Other Parameters
     ----------------
-    material_batch : str
-        Batch (or identifier) of the material on which the isotherm is measured.
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
@@ -66,11 +64,6 @@ class Isotherm():
 
     # strictly required attributes
     _required_params = ['material', 'temperature', 'adsorbate']
-    # specific attributes which are named
-    _named_params = {
-        'iso_type': str,
-        'material_batch': str,
-    }
     # unit-related attributes
     _unit_params = {
         'pressure_unit': 'bar',
@@ -80,13 +73,9 @@ class Isotherm():
         'loading_unit': 'mmol',
         'loading_basis': 'molar',
     }
-    # attributes which will not be in the output
+    # other special reserved parameters
     # subclasses overwrite this
     _reserved_params = []
-    # attributes which are kept in the database
-    _db_columns = ['id'] + _required_params + list(_named_params)
-    # attributes which are used in the ID hash procedure
-    _id_params = _required_params + list(_unit_params)
 
     ##########################################################
     #   Instantiation and classmethods
@@ -191,14 +180,6 @@ class Isotherm():
         # Isotherm material batch, deprecated.
         self.material_batch = str(properties.pop('material_batch', None))
 
-        # Others
-        for named_prop in self._named_params:
-            prop_val = properties.pop(named_prop, None)
-            if prop_val:
-                setattr(
-                    self, named_prop, self._named_params[named_prop](prop_val)
-                )
-
         # Save the rest of the properties as members
         for attr in properties:
             if hasattr(self, attr):
@@ -239,12 +220,6 @@ class Isotherm():
         string += ("Adsorbate: " + str(self.adsorbate) + '\n')
         string += ("Temperature: " + str(self.temperature) + "K" + '\n')
 
-        # Named
-        for param in self._named_params:
-            param_val = getattr(self, param, None)
-            if param_val:
-                string += (param + ': ' + str(param_val) + '\n')
-
         # Units/basis
         string += ("Units: \n")
         string += (
@@ -258,7 +233,7 @@ class Isotherm():
 
         string += ("Other properties: \n")
         for prop in vars(self):
-            if prop not in self._required_params + list(self._named_params) + \
+            if prop not in self._required_params + \
                     list(self._unit_params) + self._reserved_params:
                 string += (
                     '\t' + prop + ": " + str(getattr(self, prop)) + '\n'

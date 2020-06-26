@@ -71,7 +71,7 @@ class Material():
         return self.__repr__() == other
 
     @classmethod
-    def find(cls, material_name, material_batch=None):
+    def find(cls, material_name):
         """
         Get the material from the master list using its name.
 
@@ -79,8 +79,6 @@ class Material():
         ----------
         material_name : str
             The name of the material to search.
-        material_batch : str
-            The batch of the material to search.
 
         Returns
         -------
@@ -93,13 +91,14 @@ class Material():
             If it does not exist or cannot be calculated.
         """
         # Checks to see if material exists in master list
-        material = next((material for material in pygaps.MATERIAL_LIST
-                         if material_name == material.name
-                         and material_batch == material.batch), None)
+        material = next((
+            material for material in pygaps.MATERIAL_LIST
+            if material_name == material.name
+        ), None)
 
         if material is None:
             raise ParameterError(
-                f"Material {material_name} {material_batch} does not exist in list of materials. "
+                f"Material {material_name} does not exist in list of materials. "
                 "First populate pygaps.MATERIAL_LIST with required material class"
             )
 
@@ -150,6 +149,7 @@ class Material():
             except AttributeError:
                 raise ParameterError(
                     f"The {prop} entry was not found in the "
-                    f"material properties for material {self.name}.")
+                    f"material properties for material {self.name}."
+                )
 
         return req_prop

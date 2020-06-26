@@ -103,5 +103,30 @@
         "type" : "rhomass_critical",
         "unit" : "kg m^{-3}",
         "description" : "Critical point mass density."
+    },
+    {
+        "type" : "gas_density",
+        "unit" : "g/cm3",
+        "description" : "Gas phase density, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "liquid_density",
+        "unit" : "g/cm3",
+        "description" : "Liquid phase density, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "surface_tension",
+        "unit" : "mN/m",
+        "description" : "Surface tension, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "saturation_pressure",
+        "unit" : "bar",
+        "description" : "Vapour saturation pressure, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "enthalpy_liquefaction",
+        "unit" : "kJ/mol",
+        "description" : "Liquefaction/vaporization enthalpy, WARNING: temperature dependent and usually calculated from thermodynamic backend."
     }
 ]

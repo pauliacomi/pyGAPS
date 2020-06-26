@@ -99,8 +99,11 @@ class Adsorbate():
         if alias is None:
             self.alias = [_name]
         else:
-            self.alias = [a.lower() for a in alias]
-            if _name not in self.alias:
+            if isinstance(alias, str):
+                self.alias = [alias.lower()]
+            else:
+                self.alias = [a.lower() for a in alias]
+            if _name.lower() not in self.alias:
                 self.alias.append(_name)
 
         #: Adsorbate properties

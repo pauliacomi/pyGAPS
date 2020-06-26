@@ -43,13 +43,15 @@ _MATERIAL_MODE = {
 }
 
 
-def c_pressure(value,
-               mode_from,
-               mode_to,
-               unit_from,
-               unit_to,
-               adsorbate_name=None,
-               temp=None):
+def c_pressure(
+    value,
+    mode_from,
+    mode_to,
+    unit_from,
+    unit_to,
+    adsorbate_name=None,
+    temp=None
+):
     """
     Convert pressure units and modes.
 
@@ -90,7 +92,8 @@ def c_pressure(value,
         if mode_to not in _PRESSURE_MODE:
             raise ParameterError(
                 f"Mode selected for pressure ({mode_to}) is not an option. "
-                f"Viable modes are {list(_PRESSURE_MODE)}")
+                f"Viable modes are {list(_PRESSURE_MODE)}"
+            )
 
         if mode_to == "absolute":
             if not unit_to:
@@ -98,7 +101,8 @@ def c_pressure(value,
             if unit_to not in _PRESSURE_UNITS:
                 raise ParameterError(
                     f"Unit selected for pressure ({unit_to}) is not an option. "
-                    f"Viable units are {list(_PRESSURE_UNITS)}")
+                    f"Viable units are {list(_PRESSURE_UNITS)}"
+                )
 
             unit = unit_to
             sign = 1
@@ -118,13 +122,15 @@ def c_pressure(value,
     return value
 
 
-def c_loading(value,
-              basis_from,
-              basis_to,
-              unit_from,
-              unit_to,
-              adsorbate_name=None,
-              temp=None):
+def c_loading(
+    value,
+    basis_from,
+    basis_to,
+    unit_from,
+    unit_to,
+    adsorbate_name=None,
+    temp=None
+):
     """
     Convert loading units and basis.
 
@@ -164,7 +170,8 @@ def c_loading(value,
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
                 f"Basis selected for loading ({basis_to}) is not an option. "
-                f"Viable bases are {list(_MATERIAL_MODE)}")
+                f"Viable bases are {list(_MATERIAL_MODE)}"
+            )
 
         if not unit_to or not unit_from:
             raise ParameterError("Specify both from and to units")
@@ -172,17 +179,20 @@ def c_loading(value,
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
                 f"Unit selected for loading unit_to ({unit_to}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[basis_to])}")
+                f"Viable units are {list(_MATERIAL_MODE[basis_to])}"
+            )
 
         if unit_from not in _MATERIAL_MODE[basis_from]:
             raise ParameterError(
                 f"Unit selected for loading unit_from ({unit_from}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[basis_from])}")
+                f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
+            )
 
         if basis_from == 'mass':
             if basis_to == 'volume':
                 constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(
-                    temp=temp)
+                    temp=temp
+                )
                 sign = -1
             elif basis_to == 'molar':
                 constant = pygaps.Adsorbate.find(adsorbate_name).molar_mass()
@@ -190,12 +200,14 @@ def c_loading(value,
         elif basis_from == 'volume':
             if basis_to == 'mass':
                 constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(
-                    temp=temp)
+                    temp=temp
+                )
                 sign = 1
             elif basis_to == 'molar':
                 adsorbate = pygaps.Adsorbate.find(adsorbate_name)
                 constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(
-                    temp=temp) / adsorbate.molar_mass()
+                    temp=temp
+                ) / adsorbate.molar_mass()
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
@@ -203,8 +215,8 @@ def c_loading(value,
                 sign = 1
             elif basis_to == 'volume':
                 adsorbate = pygaps.Adsorbate.find(adsorbate_name)
-                constant = adsorbate.gas_density(
-                    temp=temp) / adsorbate.molar_mass()
+                constant = adsorbate.gas_density(temp=temp
+                                                 ) / adsorbate.molar_mass()
                 sign = -1
 
         value = value * _MATERIAL_MODE[basis_from][unit_from] \
@@ -217,13 +229,9 @@ def c_loading(value,
     return value
 
 
-def c_adsorbent(value,
-                basis_from,
-                basis_to,
-                unit_from,
-                unit_to,
-                material=None,
-                material_batch=None):
+def c_adsorbent(
+    value, basis_from, basis_to, unit_from, unit_to, material=None
+):
     """
     Convert adsorbent units and basis.
 
@@ -244,8 +252,6 @@ def c_adsorbent(value,
         Unit to which to convert.
     material : str
         Name of the material on which the value is based.
-    material_batch : float
-        Batch of the material on which the value is based.
 
     Returns
     -------
@@ -263,7 +269,8 @@ def c_adsorbent(value,
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
                 f"Basis selected for adsorbent ({basis_to}) is not an option. "
-                f"Viable bases are {list(_MATERIAL_MODE)}")
+                f"Viable bases are {list(_MATERIAL_MODE)}"
+            )
 
         if not unit_to or not unit_from:
             raise ParameterError("Specify both from and to units")
@@ -271,43 +278,49 @@ def c_adsorbent(value,
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
                 f"Unit selected for adsorbent unit_to ({unit_to}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[unit_to])}")
+                f"Viable units are {list(_MATERIAL_MODE[unit_to])}"
+            )
 
         if unit_from not in _MATERIAL_MODE[basis_from]:
             raise ParameterError(
                 f"Unit selected for adsorbent unit_from ({unit_from}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[basis_from])}")
+                f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
+            )
 
         if basis_from == 'mass':
             if basis_to == 'volume':
                 constant = pygaps.core.material.Material.find(
-                    material, material_batch).get_prop('density')
+                    material
+                ).get_prop('density')
                 sign = -1
             elif basis_to == 'molar':
                 constant = pygaps.core.material.Material.find(
-                    material, material_batch).get_prop('molar_mass')
+                    material
+                ).get_prop('molar_mass')
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
                 constant = pygaps.core.material.Material.find(
-                    material, material_batch).get_prop('density')
+                    material
+                ).get_prop('density')
                 sign = 1
             elif basis_to == 'molar':
-                material = pygaps.core.material.Material.find(
-                    material, material_batch)
+                material = pygaps.core.material.Material.find(material)
                 constant = material.get_prop('density') / material.get_prop(
-                    'molar_mass')
+                    'molar_mass'
+                )
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
                 constant = pygaps.core.material.Material.find(
-                    material, material_batch).get_prop('molar_mass')
+                    material
+                ).get_prop('molar_mass')
                 sign = 1
             elif basis_to == 'volume':
-                material = pygaps.core.material.Material.find(
-                    material, material_batch)
+                material = pygaps.core.material.Material.find(material)
                 constant = material.get_prop('density') / material.get_prop(
-                    'molar_mass')
+                    'molar_mass'
+                )
                 sign = -1
 
         return value / _MATERIAL_MODE[basis_from][unit_from] \
@@ -315,11 +328,9 @@ def c_adsorbent(value,
             * _MATERIAL_MODE[basis_to][unit_to]
 
     elif unit_to and unit_from != unit_to:
-        return c_unit(_MATERIAL_MODE[basis_from],
-                      value,
-                      unit_from,
-                      unit_to,
-                      sign=-1)
+        return c_unit(
+            _MATERIAL_MODE[basis_from], value, unit_from, unit_to, sign=-1
+        )
 
     return value
 
@@ -354,7 +365,8 @@ def c_unit(unit_list, value, unit_from, unit_to, sign=1):
     if unit_to not in unit_list or unit_from not in unit_list:
         raise ParameterError(
             f"Units selected for conversion (from {unit_from} to {unit_to}) are not an option. "
-            f"Viable units are {unit_list.keys()}")
+            f"Viable units are {unit_list.keys()}"
+        )
 
     return value * \
         (unit_list[unit_from] / unit_list[unit_to]) ** sign

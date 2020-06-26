@@ -10,8 +10,9 @@ import pandas
 
 from ..core.adsorbate import Adsorbate
 from ..core.material import Material
-from ..core.pointisotherm import Isotherm
+from ..core.isotherm import Isotherm
 from ..core.pointisotherm import PointIsotherm
+from ..core.modelisotherm import ModelIsotherm
 from ..utilities.exceptions import ParsingError
 from ..utilities.python_utilities import grouped
 from ..utilities.sqlite_utilities import build_delete
@@ -73,7 +74,6 @@ def _upload_one_all_columns(
     **kwargs,
 ):
     """Insert or overwrite a list of things in a table."""
-
     to_insert = [table_id] + columns
 
     if overwrite:
@@ -106,7 +106,6 @@ def _get_all_no_id(
     **kwargs,
 ):
     """Get all elements from a table as a dictionary, excluding id."""
-
     try:
         cursor.execute("""SELECT * FROM """ + table_name)
     except sqlite3.Error as e:
@@ -147,10 +146,11 @@ def _delete_by_id(
             f"Element to delete ({element_id}) does not exist in table {table_name}."
         )
 
-    sql_com = build_delete(table=table_name, where=[table_id])
-
     try:
-        cursor.execute(sql_com, {table_id: element_id})
+        cursor.execute(
+            build_delete(table=table_name, where=[table_id]),
+            {table_id: element_id}
+        )
     except sqlite3.Error as e:
         raise type(e)(
             f"Error deleting {element_id} from {table_name}. Original error:\n {e}"
@@ -158,7 +158,7 @@ def _delete_by_id(
 
     if verbose:
         # Print success
-        print("Success, deleted", print_string, element_id)
+        print(f"Success, deleted {print_string}: {element_id}")
 
 
 # ---------------------- Adsorbates
@@ -185,8 +185,8 @@ def db_upload_adsorbate(
         WARNING: Overwrite is done on ALL fields.
     verbose : bool
         Print to console on success or error.
-    """
 
+    """
     cursor = kwargs.pop('cursor', None)
 
     # If we need to overwrite, we find the id of existing adsorbate.
@@ -214,12 +214,12 @@ def db_upload_adsorbate(
     properties = adsorbate.to_dict()
     del properties['name']  # no need for this
 
-    if overwrite:
+    if overwrite and properties:
         # Delete existing properties
         _delete_by_id(
             cursor,
             'adsorbate_properties',
-            'type',
+            'ads_id',
             ads_id,
             'adsorbate properties',
             verbose,
@@ -229,7 +229,7 @@ def db_upload_adsorbate(
 
         sql_insert = build_insert(
             table='adsorbate_properties',
-            to_insert=['ads_id', 'type', 'value']
+            to_insert=['ads_id', 'type', 'value'],
         )
 
         if not isinstance(val, (list, set, tuple)):
@@ -258,7 +258,7 @@ def db_upload_adsorbate(
 @with_connection
 def db_get_adsorbates(path, verbose=True, **kwargs):
     """
-    Get all adsorbates and their properties.
+    Get database adsorbates and their properties.
 
     The number of adsorbates is usually small, so all can be
     loaded in memory at once.
@@ -278,10 +278,8 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
 
     cursor = kwargs.pop('cursor', None)
 
-    # Get required adsorbate from database
+    # Execute the query
     cursor.execute("""SELECT * FROM 'adsorbates'""")
-
-    # Get everything in memory, cursor will be reused
     rows = cursor.fetchall()
 
     # Get other data and create adsorbates
@@ -344,7 +342,7 @@ def db_delete_adsorbate(path, adsorbate, verbose=True, **kwargs):
     ).fetchone()
     if ids is None:
         raise sqlite3.IntegrityError(
-            "Adsorbate to delete does not exist in database"
+            "Adsorbate to delete does not exist in database."
         )
     ads_id = ids[0]
 
@@ -488,87 +486,70 @@ def db_upload_material(
 
     cursor = kwargs.pop('cursor', None)
 
-    if not overwrite:
-        cursor.execute(
-            build_insert(table="materials", to_insert=['name', 'batch']), {
-                'name': material.name,
-                'batch': material.batch
-            }
-        )
-
-    # Upload or modify data in material_properties table
-    if material.properties:
-        # Get id of material
-        material_ids = cursor.execute(
-            build_select(
-                table='materials', to_select=['id'], where=['name', 'batch']
-            ), {
-                'name': material.name,
-                'batch': material.batch,
+    # If we need to overwrite, we find the id of existing adsorbate.
+    if overwrite:
+        ids = cursor.execute(
+            build_select(table='materials', to_select=['id'], where=['name']),
+            {
+                'name': material.name
             }
         ).fetchone()
-
-        if material_ids is None:
+        if ids is None:
             raise sqlite3.IntegrityError(
-                "Material to overwrite does not exist in database"
+                f"Material to overwrite ({material.name}) does not exist in database."
             )
-        mat_id = material_ids[0]
-
-        # Sql of update routine
-        sql_update = build_update(
-            table='material_properties',
-            to_set=['value'],
-            where=['material_id', 'type']
+        mat_id = ids[0]
+    # If overwrite is not specified, we upload it to the adsorbates table
+    else:
+        cursor.execute(
+            build_insert(table="materials", to_insert=['name']),
+            {'name': material.name}
         )
-        # Sql of insert routine
+        mat_id = cursor.lastrowid
+
+    # Upload or modify data in material_properties table
+    properties = material.to_dict()
+    del properties['name']  # no need for this
+
+    if overwrite and properties:
+        # Delete existing properties
+        _delete_by_id(
+            cursor,
+            'material_properties',
+            'mat_id',
+            mat_id,
+            'material properties',
+            verbose,
+        )
+
+    for prop, val in properties.items():
+
         sql_insert = build_insert(
             table='material_properties',
-            to_insert=['material_id', 'type', 'value']
-        )
-        # Sql of delete routine
-        sql_delete = build_delete(
-            table='material_properties', where=['material_id']
+            to_insert=['mat_id', 'type', 'value'],
         )
 
-        updates = []
+        if not isinstance(val, (list, set, tuple)):
+            val = [val]
 
-        if overwrite:
-            # Find existing properties
-            cursor.execute(
-                build_select(
-                    table='material_properties',
-                    to_select=['type'],
-                    where=['material_id']
-                ), {
-                    'material_id': mat_id,
-                }
-            )
-            updates = [elt[0] for elt in cursor.fetchall()]
-
-        for prop in material.properties:
-            if prop is not None:
-                if prop in updates:
-                    updates.remove(prop)
-                    sql_com_prop = sql_update
-                else:
-                    sql_com_prop = sql_insert
-
+        for vl in val:
+            try:
                 cursor.execute(
-                    sql_com_prop, {
-                        'material_id': mat_id,
+                    sql_insert, {
+                        'mat_id': mat_id,
                         'type': prop,
-                        'value': material.properties[prop]
+                        'value': vl
                     }
                 )
-
-        for prop in updates:
-            cursor.execute(sql_delete, {'material_id': mat_id})
+            except sqlite3.InterfaceError as e:
+                raise type(e)(
+                    f"Cannot process property {prop}: {vl}"
+                    f"Original error:\n{e}"
+                )
 
     if verbose:
         # Print success
         print("Material uploaded", material.name, material.batch)
-
-    return
 
 
 @with_connection
@@ -597,9 +578,8 @@ def db_get_materials(path, verbose=True, **kwargs):
     cursor.execute("""SELECT * FROM materials""")
     rows = cursor.fetchall()
 
+    # Get other data and create materials
     materials = []
-
-    # Create the materials
     for row in rows:
 
         material_params = dict(zip(row.keys(), row))
@@ -609,8 +589,8 @@ def db_get_materials(path, verbose=True, **kwargs):
             build_select(
                 table='material_properties',
                 to_select=['type', 'value'],
-                where=['material_id']
-            ), {'material_id': material_params.pop('id')}
+                where=['mat_id']
+            ), {'mat_id': material_params.pop('id')}
         )
 
         material_params.update({row[0]: row[1] for row in cursor})
@@ -643,25 +623,21 @@ def db_delete_material(path, material, verbose=True, **kwargs):
     cursor = kwargs.pop('cursor', None)
 
     # Get id of material
-    material_ids = cursor.execute(
-        build_select(
-            table='materials', to_select=['id'], where=['name', 'batch']
-        ), {
+    mat_id = cursor.execute(
+        build_select(table='materials', to_select=['id'], where=['name']), {
             'name': material.name,
-            'batch': material.batch,
         }
     ).fetchone()
-
-    if material_ids is None:
+    if mat_id is None:
         raise sqlite3.IntegrityError(
-            "Material to delete does not exist in database"
+            "Material to delete does not exist in database."
         )
-    mat_id = material_ids[0]
+    mat_id = mat_id[0]
 
     # Delete data from material_properties table
     cursor.execute(
-        build_delete(table='material_properties', where=['material_id']),
-        {'material_id': mat_id}
+        build_delete(table='material_properties', where=['mat_id']),
+        {'mat_id': mat_id}
     )
 
     # Delete material info in materials table
@@ -792,20 +768,33 @@ def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
 
     # The isotherm is going to be inserted into the database
     # Build upload dict
-    upload_dict = {}
-    iso_dict = isotherm.to_dict()
     iso_id = isotherm.iso_id
-    for param in Isotherm._db_columns:
-        upload_dict.update({param: iso_dict.pop(param, None)})
-    upload_dict['id'] = iso_id
+    upload_dict = {'id': iso_id}
+
+    if isinstance(isotherm, PointIsotherm):
+        upload_dict['iso_type'] = 'pointisotherm'
+    elif isinstance(isotherm, ModelIsotherm):
+        upload_dict['iso_type'] = 'modelisotherm'
+    elif isinstance(isotherm, Isotherm):
+        upload_dict['iso_type'] = 'isotherm'
+    else:
+        raise ParsingError("Unknown isotherm type.")
+
+    iso_dict = isotherm.to_dict()
+
+    # attributes which are kept in the database
+    upload_dict.update({
+        param: iso_dict.pop(param, None)
+        for param in Isotherm._required_params
+    })
 
     # Upload isotherm info to database
+    db_columns = ["id", "iso_type"] + Isotherm._required_params
     cursor.execute(
-        build_insert(table='isotherms', to_insert=Isotherm._db_columns),
-        upload_dict
+        build_insert(table='isotherms', to_insert=db_columns), upload_dict
     )
 
-    # Then, the isotherm data will be uploaded into the isotherm_data table
+    # Then, the isotherm data/model will be uploaded into the isotherm_data table
 
     # Build sql request
     sql_insert = build_insert(
@@ -820,7 +809,6 @@ def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
             'data': isotherm.pressure().tobytes()
         }
     )
-
     cursor.execute(
         sql_insert, {
             'iso_id': iso_id,
@@ -838,10 +826,14 @@ def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
                 'data': isotherm.other_data(key).tobytes()
             }
         )
-
+    # TODO insert multiple
     # Upload the remaining data from the isotherm
     for key in iso_dict:
         if key not in isotherm._unit_params:
+            # Deal with bools
+            val = iso_dict[key]
+            if isinstance(val, bool):
+                val = 'TRUE' if val else 'FALSE'
             cursor.execute(
                 build_insert(
                     table='isotherm_properties',
@@ -849,7 +841,7 @@ def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
                 ), {
                     'iso_id': iso_id,
                     'type': key,
-                    'value': iso_dict[key]
+                    'value': val
                 }
             )
 
@@ -859,7 +851,7 @@ def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
 
 
 @with_connection
-def db_get_isotherms(path, criteria, verbose=True, **kwargs):
+def db_get_isotherms(path, criteria=None, verbose=True, **kwargs):
     """
     Get isotherms with the selected criteria from the database.
 
@@ -867,10 +859,11 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
     ----------
     path : str
         Path to the database. Use pygaps.DATABASE for internal access.
-    criteria : dict
+    criteria : dict, None
         Dictionary of isotherm parameters on which to filter database.
         For example {'name': 'a_name', 'date': 'a_date'}. Parameters
-        must exist for the filtering to take place.
+        must exist for the filtering to take place otherwise all
+        results are returned
     verbose : bool
         Print to console on success or error.
 
@@ -882,13 +875,20 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
 
     cursor = kwargs.pop('cursor', None)
 
+    # Default value
+    criteria = criteria if criteria else {}
+
+    def checktype(val):
+        if val in ['TRUE', 'FALSE']:
+            if val == 'TRUE':
+                return True
+            return False
+        return val
+
     # Get isotherm info from database
     cursor.execute(
-        build_select(
-            table='isotherms',
-            to_select=Isotherm._db_columns,
-            where=criteria.keys()
-        ), criteria
+        build_select(table='isotherms', to_select="*", where=criteria.keys()),
+        criteria
     )
 
     isotherms = []
@@ -915,34 +915,33 @@ def db_get_isotherms(path, criteria, verbose=True, **kwargs):
         for row in rows:
 
             # Generate the isotherm data
-            data_dict = {
+            iso_data = pandas.DataFrame({
                 data[1]: array.array('d', data[2])
                 for data in isotherm_data
                 if data[0] == row['id']
-            }
+            })
             other_keys = [
-                key for key in data_dict.keys()
+                key for key in iso_data.columns
                 if key not in ('pressure', 'loading')
             ]
-            exp_data = pandas.DataFrame(data_dict)
 
             # Generate the isotherm parameters dictionary
-            exp_params = dict(zip(row.keys(), row))
-            exp_params.update({
-                prop[1]: prop[2]
+            iso_params = dict(zip(row.keys(), row))
+            iso_params.update({
+                prop[1]: checktype(prop[2])
                 for prop in isotherm_props
                 if prop[0] == row['id']
             })
-            exp_params.update({'other_keys': other_keys})
-            exp_params.pop('id')
+            iso_params.update({'other_keys': other_keys})
+            iso_params.pop('id')
 
             # build isotherm object
             isotherms.append(
                 PointIsotherm(
-                    isotherm_data=exp_data,
+                    isotherm_data=iso_data,
                     pressure_key="pressure",
                     loading_key="loading",
-                    **exp_params
+                    **iso_params
                 )
             )
 
@@ -991,7 +990,7 @@ def db_delete_isotherm(path, iso_id, verbose=True, **kwargs):
         {'iso_id': iso_id}
     )
 
-    # Delete data from isotherm_data table
+    # Delete properties from isotherm_properties table
     cursor.execute(
         build_delete(table='isotherm_properties', where=['iso_id']),
         {'iso_id': iso_id}

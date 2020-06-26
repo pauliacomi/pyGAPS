@@ -12,7 +12,6 @@ iso_type,Calorimetrie
 user,ADW
 machine,CV
 date,21/05/2010 00:00
-is_real,True
 t_act,150.0
 lab,MADIREL
 data:[pressure, loading, other...]
