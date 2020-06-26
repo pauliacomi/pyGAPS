@@ -8,27 +8,29 @@ import sqlite3
 
 import pandas
 
-from ..core.adsorbate import Adsorbate
-from ..core.isotherm import Isotherm
-from ..core.material import Material
-from ..core.modelisotherm import ModelIsotherm
-from ..core.pointisotherm import PointIsotherm
-from ..utilities.exceptions import ParsingError
-from ..utilities.python_utilities import checktype
-from ..utilities.python_utilities import grouped
-from ..utilities.sqlite_utilities import build_delete
-from ..utilities.sqlite_utilities import build_insert
-from ..utilities.sqlite_utilities import build_select
-from ..utilities.sqlite_utilities import build_update
+from pygaps.data import DATABASE
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.isotherm import Isotherm
+from pygaps.core.material import Material
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.utilities.exceptions import ParsingError
+from pygaps.utilities.python_utilities import checktype
+from pygaps.utilities.python_utilities import grouped
+from pygaps.utilities.sqlite_utilities import build_delete
+from pygaps.utilities.sqlite_utilities import build_insert
+from pygaps.utilities.sqlite_utilities import build_select
+from pygaps.utilities.sqlite_utilities import build_update
 
 
 def with_connection(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
-        path = args[0]
+        db_path = kwargs.get('db_path', DATABASE)
+        print(db_path)
         conn = sqlite3.connect(
-            str(path)
+            str(db_path)
         )  # TODO remove 'str' call when dropping P3.6
         conn.row_factory = sqlite3.Row
 
@@ -40,13 +42,10 @@ def with_connection(func):
 
         except sqlite3.IntegrityError as e:
             conn.rollback()
-            if kwargs.get('verbose', False):
-                print("Sqlite IntegrityError raised.")
             raise ParsingError from e
+
         except sqlite3.InterfaceError as e:
             conn.rollback()
-            if kwargs.get('verbose', False):
-                print("Sqlite InterfaceError raised.")
             raise ParsingError from e
 
         else:
@@ -166,7 +165,9 @@ def _delete_by_id(
 
 
 @with_connection
-def adsorbate_to_db(path, adsorbate, overwrite=False, verbose=True, **kwargs):
+def adsorbate_to_db(
+    adsorbate, db_path=None, overwrite=False, verbose=True, **kwargs
+):
     """
     Upload an adsorbate to the database.
 
@@ -175,10 +176,10 @@ def adsorbate_to_db(path, adsorbate, overwrite=False, verbose=True, **kwargs):
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     adsorbate : Adsorbate
         Adsorbate class to upload to the database.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     overwrite : bool
         Whether to upload the adsorbate or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -186,7 +187,7 @@ def adsorbate_to_db(path, adsorbate, overwrite=False, verbose=True, **kwargs):
         Print to console on success or error.
 
     """
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # If we need to overwrite, we find the id of existing adsorbate.
     if overwrite:
@@ -255,7 +256,7 @@ def adsorbate_to_db(path, adsorbate, overwrite=False, verbose=True, **kwargs):
 
 
 @with_connection
-def adsorbate_from_db(path, verbose=True, **kwargs):
+def adsorbates_from_db(db_path=None, verbose=True, **kwargs):
     """
     Get database adsorbates and their properties.
 
@@ -264,8 +265,8 @@ def adsorbate_from_db(path, verbose=True, **kwargs):
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
 
@@ -275,7 +276,7 @@ def adsorbate_from_db(path, verbose=True, **kwargs):
         list of Adsorbates
     """
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # Execute the query
     cursor.execute("""SELECT * FROM 'adsorbates'""")
@@ -317,21 +318,21 @@ def adsorbate_from_db(path, verbose=True, **kwargs):
 
 
 @with_connection
-def adsorbate_delete_db(path, adsorbate, verbose=True, **kwargs):
+def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
     """
     Delete adsorbate from the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     adsorbate : Adsorbate
         The Adsorbate class to delete.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # Get id of adsorbate
     ids = cursor.execute(
@@ -363,7 +364,7 @@ def adsorbate_delete_db(path, adsorbate, verbose=True, **kwargs):
 
 @with_connection
 def adsorbate_property_type_to_db(
-    path, type_dict, overwrite=False, verbose=True, **kwargs
+    type_dict, db_path=None, overwrite=False, verbose=True, **kwargs
 ):
     """
     Uploads an adsorbate property type.
@@ -378,10 +379,10 @@ def adsorbate_property_type_to_db(
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     type_dict : dict
         A dictionary that contains property type.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     overwrite : bool
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -401,14 +402,14 @@ def adsorbate_property_type_to_db(
 
 
 @with_connection
-def adsorbate_property_types_from_db(path, verbose=True, **kwargs):
+def adsorbate_property_types_from_db(db_path=None, verbose=True, **kwargs):
     """
     Get all adsorbate property types.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
 
@@ -428,17 +429,17 @@ def adsorbate_property_types_from_db(path, verbose=True, **kwargs):
 
 @with_connection
 def adsorbate_property_type_delete_db(
-    path, property_type, verbose=True, **kwargs
+    property_type, db_path=None, verbose=True, **kwargs
 ):
     """
     Delete property type in the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     property_type : str
         Name of the property type to delete.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """
@@ -457,8 +458,8 @@ def adsorbate_property_type_delete_db(
 
 @with_connection
 def material_to_db(
-    path,
     material,
+    db_path=None,
     overwrite=False,
     verbose=True,
     **kwargs,
@@ -471,10 +472,10 @@ def material_to_db(
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     material : Material
         Material class to upload to the database.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     overwrite : bool
         Whether to upload the material or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -483,7 +484,7 @@ def material_to_db(
 
     """
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # If we need to overwrite, we find the id of existing adsorbate.
     if overwrite:
@@ -552,7 +553,7 @@ def material_to_db(
 
 
 @with_connection
-def materials_from_db(path, verbose=True, **kwargs):
+def materials_from_db(db_path=None, verbose=True, **kwargs):
     """
     Get all materials and their properties.
 
@@ -560,8 +561,8 @@ def materials_from_db(path, verbose=True, **kwargs):
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
 
@@ -571,7 +572,7 @@ def materials_from_db(path, verbose=True, **kwargs):
         list of Materials
     """
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # Execute the query
     cursor.execute("""SELECT * FROM materials""")
@@ -605,21 +606,21 @@ def materials_from_db(path, verbose=True, **kwargs):
 
 
 @with_connection
-def material_delete_db(path, material, verbose=True, **kwargs):
+def material_delete_db(material, db_path=None, verbose=True, **kwargs):
     """
     Delete material from the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     material : Material
         Material class to upload to the database.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # Get id of material
     mat_id = cursor.execute(
@@ -653,7 +654,7 @@ def material_delete_db(path, material, verbose=True, **kwargs):
 
 @with_connection
 def material_property_type_to_db(
-    path, type_dict, overwrite=False, verbose=True, **kwargs
+    type_dict, db_path=None, overwrite=False, verbose=True, **kwargs
 ):
     """
     Uploads a material property type.
@@ -668,10 +669,10 @@ def material_property_type_to_db(
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     type_dict : dict
         A dictionary that contains property type.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     overwrite : bool
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -691,14 +692,14 @@ def material_property_type_to_db(
 
 
 @with_connection
-def material_property_types_from_db(path, verbose=True, **kwargs):
+def material_property_types_from_db(db_path=None, verbose=True, **kwargs):
     """
     Get all material property types.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
 
@@ -718,17 +719,17 @@ def material_property_types_from_db(path, verbose=True, **kwargs):
 
 @with_connection
 def material_property_type_delete_db(
-    path, material_prop_type, verbose=True, **kwargs
+    material_prop_type, db_path=None, verbose=True, **kwargs
 ):
     """
     Delete material property type in the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     material_prop_type : str
         The type to delete.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """
@@ -746,7 +747,7 @@ def material_property_type_delete_db(
 
 
 @with_connection
-def isotherm_to_db(path, isotherm, verbose=True, **kwargs):
+def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
     """
     Uploads isotherm to the database.
 
@@ -755,15 +756,15 @@ def isotherm_to_db(path, isotherm, verbose=True, **kwargs):
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     isotherm : Isotherm
         Isotherm class to upload to the database.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # The isotherm is going to be inserted into the database
     # Build upload dict
@@ -850,19 +851,19 @@ def isotherm_to_db(path, isotherm, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherms_from_db(path, criteria=None, verbose=True, **kwargs):
+def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
     """
     Get isotherms with the selected criteria from the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     criteria : dict, None
         Dictionary of isotherm parameters on which to filter database.
         For example {'name': 'a_name', 'date': 'a_date'}. Parameters
         must exist for the filtering to take place otherwise all
         results are returned
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
 
@@ -872,7 +873,7 @@ def isotherms_from_db(path, criteria=None, verbose=True, **kwargs):
         list of Isotherms
     """
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # Default value
     criteria = criteria if criteria else {}
@@ -945,16 +946,16 @@ def isotherms_from_db(path, criteria=None, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherm_delete_db(path, iso_id, verbose=True, **kwargs):
+def isotherm_delete_db(iso_id, db_path=None, verbose=True, **kwargs):
     """
     Delete isotherm in the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     isotherm : Isotherm or Isotherm.iso_id
         The Isotherm object to delete from the database or its ID.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """
@@ -962,7 +963,7 @@ def isotherm_delete_db(path, iso_id, verbose=True, **kwargs):
     if isinstance(iso_id, Isotherm):
         iso_id = iso_id.iso_id
 
-    cursor = kwargs.pop('cursor', None)
+    cursor = kwargs['cursor']
 
     # Check if isotherm exists
     ids = cursor.execute(
@@ -1000,7 +1001,7 @@ def isotherm_delete_db(path, iso_id, verbose=True, **kwargs):
 
 @with_connection
 def isotherm_type_to_db(
-    path, type_dict, overwrite=False, verbose=True, **kwargs
+    type_dict, db_path=None, overwrite=False, verbose=True, **kwargs
 ):
     """
     Upload an isotherm type.
@@ -1015,10 +1016,10 @@ def isotherm_type_to_db(
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     type_dict : dict
         A dictionary that contains isotherm type.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     overwrite : bool
         Whether to upload the isotherm type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -1038,14 +1039,14 @@ def isotherm_type_to_db(
 
 
 @with_connection
-def isotherm_types_from_db(path, verbose=True, **kwargs):
+def isotherm_types_from_db(db_path=None, verbose=True, **kwargs):
     """
     Get all isotherm types.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
 
@@ -1064,16 +1065,16 @@ def isotherm_types_from_db(path, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherm_type_delete_db(path, iso_type, verbose=True, **kwargs):
+def isotherm_type_delete_db(iso_type, db_path=None, verbose=True, **kwargs):
     """
     Delete isotherm type in the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     data_type : str
         The type to delete.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """
@@ -1089,7 +1090,7 @@ def isotherm_type_delete_db(path, iso_type, verbose=True, **kwargs):
 
 @with_connection
 def isotherm_property_type_to_db(
-    path, type_dict, overwrite=False, verbose=True, **kwargs
+    type_dict, db_path=None, overwrite=False, verbose=True, **kwargs
 ):
     """
     Uploads a property type.
@@ -1104,10 +1105,10 @@ def isotherm_property_type_to_db(
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     type_dict : dict
         A dictionary that contains property type.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     overwrite : bool
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
@@ -1127,14 +1128,14 @@ def isotherm_property_type_to_db(
 
 
 @with_connection
-def isotherm_property_types_from_db(path, verbose=True, **kwargs):
+def isotherm_property_types_from_db(db_path=None, verbose=True, **kwargs):
     """
     Get all isotherm property types.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
 
@@ -1154,17 +1155,17 @@ def isotherm_property_types_from_db(path, verbose=True, **kwargs):
 
 @with_connection
 def isotherm_property_type_delete_db(
-    path, property_type, verbose=True, **kwargs
+    property_type, db_path=None, verbose=True, **kwargs
 ):
     """
     Delete isotherm property type in the database.
 
     Parameters
     ----------
-    path : str
-        Path to the database. Use pygaps.DATABASE for internal access.
     property_type : str
         Property type to delete.
+    db_path : str, None
+        Path to the database. If none is specified, internal database is used.
     verbose : bool
         Print to console on success or error.
     """

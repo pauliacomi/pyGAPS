@@ -21,7 +21,7 @@ def db_create(pth, verbose=False):
 
     """
     for pragma in PRAGMAS:
-        db_execute_general(pth, pragma, verbose=verbose)
+        db_execute_general(pragma, pth, verbose=verbose)
 
     # Load adsorbate paths
     import pkg_resources
@@ -36,7 +36,9 @@ def db_create(pth, verbose=False):
     with open(ads_props_path) as f:
         ads_props = json.load(f)
     for ap_type in ads_props:
-        pgsqlite.adsorbate_property_type_to_db(pth, ap_type, verbose=verbose)
+        pgsqlite.adsorbate_property_type_to_db(
+            ap_type, db_path=pth, verbose=verbose
+        )
 
     # Upload adsorbate property types
     with open(ads_path) as f:
@@ -44,24 +46,26 @@ def db_create(pth, verbose=False):
 
     # Upload adsorbates
     for ads in adsorbates:
-        pgsqlite.adsorbate_to_db(pth, pygaps.Adsorbate(**ads), verbose=verbose)
+        pgsqlite.adsorbate_to_db(
+            pygaps.Adsorbate(**ads), db_path=pth, verbose=verbose
+        )
 
     # Upload standard isotherm types
-    pgsqlite.isotherm_type_to_db(pth, {'type': 'isotherm'})
-    pgsqlite.isotherm_type_to_db(pth, {'type': 'pointisotherm'})
-    pgsqlite.isotherm_type_to_db(pth, {'type': 'modelisotherm'})
+    pgsqlite.isotherm_type_to_db({'type': 'isotherm'}, db_path=pth)
+    pgsqlite.isotherm_type_to_db({'type': 'pointisotherm'}, db_path=pth)
+    pgsqlite.isotherm_type_to_db({'type': 'modelisotherm'}, db_path=pth)
 
 
-def db_execute_general(pth, statement, verbose=False):
+def db_execute_general(statement, pth, verbose=False):
     """
     Execute general SQL statements.
 
     Parameters
     ----------
-    pth : str
-        Path where the database is located.
     statement : str
         SQL statement to execute.
+    pth : str
+        Path where the database is located.
 
     """
     # Attempt to connect

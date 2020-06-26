@@ -1,11 +1,10 @@
 # pylint: disable=W0614,W0611,W0622
 # flake8: noqa
+# isort:skip_file
 
 __author__ = 'Paul A. Iacomi'
 __docformat__ = 'restructuredtext'
 __version__ = '2.0.2'
-
-# isort:skip_file
 
 # This code is written for Python 3.
 import importlib
