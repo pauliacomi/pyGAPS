@@ -54,9 +54,9 @@ the ease of extensibility afforded by the structure.
 The framework provides two functions for JSON strings:
 
     - Import an isotherm from JSON:
-      :meth:`~pygaps.parsing.jsoninterface.isotherm_from_json`
+      :meth:`~pygaps.parsing.json.isotherm_from_json`
     - Export an isotherm to JSON:
-      :meth:`~pygaps.parsing.jsoninterface.isotherm_to_json`
+      :meth:`~pygaps.parsing.json.isotherm_to_json`
 
 Assuming we have an isotherm which was previously created,
 use the following code to convert it to a JSON string.
@@ -76,7 +76,7 @@ To convert the json back into an isotherm, use the *from* function.
 
 
 For more info about JSON parsing, check out the
-:mod:`~pygaps.parsing.jsoninterface` reference.
+:mod:`~pygaps.parsing.json` reference.
 
 
 .. _parsing-manual-excel:
@@ -92,9 +92,9 @@ An example excel isotherm can be found
 The framework provides two functions for Excel files:
 
     - Import an isotherm from Excel:
-      :meth:`~pygaps.parsing.excelinterface.isotherm_from_xl`
+      :meth:`~pygaps.parsing.excel.isotherm_from_xl`
     - Export an isotherm to Excel:
-      :meth:`~pygaps.parsing.excelinterface.isotherm_to_xl`
+      :meth:`~pygaps.parsing.excel.isotherm_to_xl`
 
 To export an isotherm to an Excel file, pass the isotherm object,
 as well as the path where the excel file
@@ -124,7 +124,7 @@ format argument. For example from a Micromeritics report:
 
 
 For more info about Excel parsing, check out the
-:mod:`~pygaps.parsing.excelinterface` reference.
+:mod:`~pygaps.parsing.excel` reference.
 
 
 .. _parsing-manual-csv:
@@ -158,7 +158,7 @@ To convert the file back into an isotherm, use the *from* function.
     my_isotherm = pygaps.isotherm_from_csv(path)
 
 For more info about CSV parsing, check out the
-:mod:`~pygaps.parsing.csvinterface` reference.
+:mod:`~pygaps.parsing.csv` reference.
 
 
 .. _parsing-manual-manufacturer:
@@ -173,12 +173,12 @@ and therefore imported.
 Currently pyGAPS includes functionality to import:
 
     - Microtrac BEL .dat files using
-      :meth:`~pygaps.parsing.csv_bel_parser.isotherm_from_bel`
+      :meth:`~pygaps.parsing.csv_bel.isotherm_from_bel`
     - Microtrac BEL .xls files using
-      :meth:`~pygaps.parsing.excelinterface.isotherm_from_xl`
+      :meth:`~pygaps.parsing.excel.isotherm_from_xl`
       and ``fmt="bel"``
     - Micromeritics .xls files using
-      :meth:`~pygaps.parsing.excelinterface.isotherm_from_xl`
+      :meth:`~pygaps.parsing.excel.isotherm_from_xl`
       and ``fmt="mic"``
 
 
@@ -189,7 +189,7 @@ Isotherms from the NIST ISODB
 
 The NIST ISODB is a database of adsorption isotherms.
 pyGAPS can pull a specific isotherm from the NIST ISODB
-by using the :meth:`~pygaps.parsing.isodbinterface.isotherm_from_isodb`
+by using the :meth:`~pygaps.parsing.isodb.isotherm_from_isodb`
 function. The ISODB isotherm filename should be specified as a parameter.
 
 ::

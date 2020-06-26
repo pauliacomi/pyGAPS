@@ -57,9 +57,9 @@ There are several ways to create a PointIsotherm object:
     - From a pandas.DataFrame. This is the most extensible way to create a
       PointIsotherm, as other data can be manually specified.
     - A json string or file. This can be done either using the
-      :meth:`~pygaps.parsing.jsoninterface.isotherm_from_json`
+      :meth:`~pygaps.parsing.json.isotherm_from_json`
       function (string input), or with the
-      :meth:`~pygaps.parsing.jsoninterface.isotherm_from_jsonf`
+      :meth:`~pygaps.parsing.json.isotherm_from_jsonf`
       function (file input).
       See :ref:`parsing from excel <parsing-manual-json>`.
     - Parsing an excel file of a standard format.
@@ -565,11 +565,11 @@ Exporting an isotherm
 To export an isotherm, pyGAPS provides several choices to the user:
 
     - Converting the isotherm in a JSON format, using
-      the :meth:`~pygaps.parsing.jsoninterface.isotherm_to_json` function
+      the :meth:`~pygaps.parsing.json.isotherm_to_json` function
     - Converting the isotherm to a CSV file, using
-      the :meth:`~pygaps.parsing.csvinterface.isotherm_to_csv` function
+      the :meth:`~pygaps.parsing.csv.isotherm_to_csv` function
     - Converting the isotherm to an Excel file, using
-      the :meth:`~pygaps.parsing.excelinterface.isotherm_to_xl` function
+      the :meth:`~pygaps.parsing.excel.isotherm_to_xl` function
     - Uploading the isotherm to a sqlite database, either using the
       internal database or a user-specified external one.
       For more info on interacting with the sqlite database

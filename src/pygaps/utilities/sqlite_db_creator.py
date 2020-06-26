@@ -4,6 +4,7 @@ import json
 import sqlite3
 
 import pygaps
+from pygaps.parsing import sqlite as pgsqlite
 
 from .exceptions import ParsingError
 from .sqlite_db_pragmas import PRAGMAS
@@ -35,7 +36,7 @@ def db_create(pth, verbose=False):
     with open(ads_props_path) as f:
         ads_props = json.load(f)
     for ap_type in ads_props:
-        pygaps.db_upload_adsorbate_property_type(pth, ap_type, verbose=verbose)
+        pgsqlite.adsorbate_property_type_to_db(pth, ap_type, verbose=verbose)
 
     # Upload adsorbate property types
     with open(ads_path) as f:
@@ -43,14 +44,12 @@ def db_create(pth, verbose=False):
 
     # Upload adsorbates
     for ads in adsorbates:
-        pygaps.db_upload_adsorbate(
-            pth, pygaps.Adsorbate(**ads), verbose=verbose
-        )
+        pgsqlite.adsorbate_to_db(pth, pygaps.Adsorbate(**ads), verbose=verbose)
 
     # Upload standard isotherm types
-    pygaps.db_upload_isotherm_type(pth, {'type': 'isotherm'})
-    pygaps.db_upload_isotherm_type(pth, {'type': 'pointisotherm'})
-    pygaps.db_upload_isotherm_type(pth, {'type': 'modelisotherm'})
+    pgsqlite.isotherm_type_to_db(pth, {'type': 'isotherm'})
+    pgsqlite.isotherm_type_to_db(pth, {'type': 'pointisotherm'})
+    pgsqlite.isotherm_type_to_db(pth, {'type': 'modelisotherm'})
 
 
 def db_execute_general(pth, statement, verbose=False):

@@ -4,7 +4,7 @@ import warnings
 
 import requests
 
-from .jsoninterface import isotherm_from_json
+from .json import isotherm_from_json
 
 _ISODB_API = "https://adsorption.nist.gov/isodb/api"
 

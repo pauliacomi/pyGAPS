@@ -14,6 +14,7 @@ from ..core.material import Material
 from ..core.modelisotherm import ModelIsotherm
 from ..core.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
+from ..utilities.python_utilities import checktype
 from ..utilities.python_utilities import grouped
 from ..utilities.sqlite_utilities import build_delete
 from ..utilities.sqlite_utilities import build_insert
@@ -165,9 +166,7 @@ def _delete_by_id(
 
 
 @with_connection
-def db_upload_adsorbate(
-    path, adsorbate, overwrite=False, verbose=True, **kwargs
-):
+def adsorbate_to_db(path, adsorbate, overwrite=False, verbose=True, **kwargs):
     """
     Upload an adsorbate to the database.
 
@@ -256,7 +255,7 @@ def db_upload_adsorbate(
 
 
 @with_connection
-def db_get_adsorbates(path, verbose=True, **kwargs):
+def adsorbate_from_db(path, verbose=True, **kwargs):
     """
     Get database adsorbates and their properties.
 
@@ -318,7 +317,7 @@ def db_get_adsorbates(path, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_adsorbate(path, adsorbate, verbose=True, **kwargs):
+def adsorbate_delete_db(path, adsorbate, verbose=True, **kwargs):
     """
     Delete adsorbate from the database.
 
@@ -363,7 +362,7 @@ def db_delete_adsorbate(path, adsorbate, verbose=True, **kwargs):
 
 
 @with_connection
-def db_upload_adsorbate_property_type(
+def adsorbate_property_type_to_db(
     path, type_dict, overwrite=False, verbose=True, **kwargs
 ):
     """
@@ -402,7 +401,7 @@ def db_upload_adsorbate_property_type(
 
 
 @with_connection
-def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
+def adsorbate_property_types_from_db(path, verbose=True, **kwargs):
     """
     Get all adsorbate property types.
 
@@ -428,7 +427,7 @@ def db_get_adsorbate_property_types(path, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_adsorbate_property_type(
+def adsorbate_property_type_delete_db(
     path, property_type, verbose=True, **kwargs
 ):
     """
@@ -457,7 +456,7 @@ def db_delete_adsorbate_property_type(
 
 
 @with_connection
-def db_upload_material(
+def material_to_db(
     path,
     material,
     overwrite=False,
@@ -553,7 +552,7 @@ def db_upload_material(
 
 
 @with_connection
-def db_get_materials(path, verbose=True, **kwargs):
+def materials_from_db(path, verbose=True, **kwargs):
     """
     Get all materials and their properties.
 
@@ -606,7 +605,7 @@ def db_get_materials(path, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_material(path, material, verbose=True, **kwargs):
+def material_delete_db(path, material, verbose=True, **kwargs):
     """
     Delete material from the database.
 
@@ -653,7 +652,7 @@ def db_delete_material(path, material, verbose=True, **kwargs):
 
 
 @with_connection
-def db_upload_material_property_type(
+def material_property_type_to_db(
     path, type_dict, overwrite=False, verbose=True, **kwargs
 ):
     """
@@ -692,7 +691,7 @@ def db_upload_material_property_type(
 
 
 @with_connection
-def db_get_material_property_types(path, verbose=True, **kwargs):
+def material_property_types_from_db(path, verbose=True, **kwargs):
     """
     Get all material property types.
 
@@ -718,7 +717,7 @@ def db_get_material_property_types(path, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_material_property_type(
+def material_property_type_delete_db(
     path, material_prop_type, verbose=True, **kwargs
 ):
     """
@@ -747,7 +746,7 @@ def db_delete_material_property_type(
 
 
 @with_connection
-def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
+def isotherm_to_db(path, isotherm, verbose=True, **kwargs):
     """
     Uploads isotherm to the database.
 
@@ -851,7 +850,7 @@ def db_upload_isotherm(path, isotherm, verbose=True, **kwargs):
 
 
 @with_connection
-def db_get_isotherms(path, criteria=None, verbose=True, **kwargs):
+def isotherms_from_db(path, criteria=None, verbose=True, **kwargs):
     """
     Get isotherms with the selected criteria from the database.
 
@@ -877,13 +876,6 @@ def db_get_isotherms(path, criteria=None, verbose=True, **kwargs):
 
     # Default value
     criteria = criteria if criteria else {}
-
-    def checktype(val):
-        if val in ['TRUE', 'FALSE']:
-            if val == 'TRUE':
-                return True
-            return False
-        return val
 
     # Get isotherm info from database
     cursor.execute(
@@ -953,7 +945,7 @@ def db_get_isotherms(path, criteria=None, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_isotherm(path, iso_id, verbose=True, **kwargs):
+def isotherm_delete_db(path, iso_id, verbose=True, **kwargs):
     """
     Delete isotherm in the database.
 
@@ -1007,7 +999,7 @@ def db_delete_isotherm(path, iso_id, verbose=True, **kwargs):
 
 
 @with_connection
-def db_upload_isotherm_type(
+def isotherm_type_to_db(
     path, type_dict, overwrite=False, verbose=True, **kwargs
 ):
     """
@@ -1046,7 +1038,7 @@ def db_upload_isotherm_type(
 
 
 @with_connection
-def db_get_isotherm_types(path, verbose=True, **kwargs):
+def isotherm_types_from_db(path, verbose=True, **kwargs):
     """
     Get all isotherm types.
 
@@ -1072,7 +1064,7 @@ def db_get_isotherm_types(path, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_isotherm_type(path, iso_type, verbose=True, **kwargs):
+def isotherm_type_delete_db(path, iso_type, verbose=True, **kwargs):
     """
     Delete isotherm type in the database.
 
@@ -1096,7 +1088,7 @@ def db_delete_isotherm_type(path, iso_type, verbose=True, **kwargs):
 
 
 @with_connection
-def db_upload_isotherm_property_type(
+def isotherm_property_type_to_db(
     path, type_dict, overwrite=False, verbose=True, **kwargs
 ):
     """
@@ -1135,7 +1127,7 @@ def db_upload_isotherm_property_type(
 
 
 @with_connection
-def db_get_isotherm_property_types(path, verbose=True, **kwargs):
+def isotherm_property_types_from_db(path, verbose=True, **kwargs):
     """
     Get all isotherm property types.
 
@@ -1161,7 +1153,7 @@ def db_get_isotherm_property_types(path, verbose=True, **kwargs):
 
 
 @with_connection
-def db_delete_isotherm_property_type(
+def isotherm_property_type_delete_db(
     path, property_type, verbose=True, **kwargs
 ):
     """

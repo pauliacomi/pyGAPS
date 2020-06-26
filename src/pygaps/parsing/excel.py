@@ -11,8 +11,8 @@ from ..core.modelisotherm import ModelIsotherm
 from ..core.pointisotherm import PointIsotherm
 from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParsingError
-from .excel_bel_parser import read_bel_report
-from .excel_mic_parser import read_mic_report
+from .excel_bel import read_bel_report
+from .excel_mic import read_mic_report
 
 _FIELDS = {
     'material': {
