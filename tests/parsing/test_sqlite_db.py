@@ -61,6 +61,9 @@ class TestDatabase():
         # Upload test
         pgsqlite.adsorbate_to_db(basic_adsorbate, db_path=db_file)
 
+        # Upload blank test
+        pgsqlite.adsorbate_to_db(pygaps.Adsorbate('name'), db_path=db_file)
+
         # Unique test
         with pytest.raises(pygaps.ParsingError):
             pgsqlite.adsorbate_to_db(basic_adsorbate, db_path=db_file)
@@ -251,3 +254,6 @@ class TestDatabase():
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
             pygaps.isotherm_delete_db(basic_modelisotherm, db_path=db_file)
+
+        # Convenience function test
+        basic_modelisotherm.to_db(db_file)

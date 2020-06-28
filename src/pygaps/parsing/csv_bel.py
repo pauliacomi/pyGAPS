@@ -53,49 +53,48 @@ def isotherm_from_bel(path):
             line = file.readline().rstrip()
             if len(values) < 2:
                 if values[0].strip().lower().startswith('adsorption data'):
-                    line = file.readline()          # header
-                    line = line.replace('"', '')    # remove quotes
-                    line = line.replace('\n', '')   # remove endline
+                    line = file.readline()  # header
+                    line = line.replace('"', '')  # remove quotes
+                    line = line.replace('\n', '')  # remove endline
                     headers = line.split('\t')
                     new_headers = ['br']
 
                     for h in headers:
-                        txt = next((_DATA['isotherm_data'][a]
-                                    for a in _DATA['isotherm_data']
-                                    if h.lower().startswith(a)), h)
+                        txt = next((
+                            _DATA['isotherm_data'][a]
+                            for a in _DATA['isotherm_data']
+                            if h.lower().startswith(a)
+                        ), h)
                         new_headers.append(txt)
 
                         if txt == 'loading':
                             material_info['loading_basis'] = 'molar'
-                            for (u, c) in (('/mmol', 'mmol'),
-                                           ('/mol', 'mol'),
+                            for (u, c) in (('/mmol', 'mmol'), ('/mol', 'mol'),
                                            ('/ml(STP)', 'cm3(STP)'),
                                            ('/cm3(STP)', 'cm3(STP)')):
                                 if u in h:
                                     material_info['loading_unit'] = c
                             material_info['adsorbent_basis'] = 'mass'
-                            for (u, c) in (('g-1', 'g'),
-                                           ('kg-1', 'kg')):
+                            for (u, c) in (('g-1', 'g'), ('kg-1', 'kg')):
                                 if u in h:
                                     material_info['adsorbent_unit'] = c
 
                         if txt == 'pressure':
                             material_info['pressure_mode'] = 'absolute'
-                            for (u, c) in (('/kPa', 'kPa'),
-                                           ('/Pa', 'Pa')):
+                            for (u, c) in (('/kPa', 'kPa'), ('/Pa', 'Pa')):
                                 if u in h:
                                     material_info['pressure_unit'] = c
 
                     adsdata.write('\t'.join(new_headers) + '\n')
 
-                    line = file.readline()          # firstline
+                    line = file.readline()  # firstline
                     while not line.startswith('0'):
                         adsdata.write('False\t' + line)
                         line = file.readline()
 
                 if values[0].strip().lower().startswith('desorption data'):
-                    file.readline()                 # header - discard
-                    line = file.readline()          # firstline
+                    file.readline()  # header - discard
+                    line = file.readline()  # firstline
                     while not line.startswith('0'):
                         adsdata.write('True\t' + line)
                         line = file.readline()
@@ -107,24 +106,24 @@ def isotherm_from_bel(path):
                     if values[0].lower().startswith(n):
                         material_info.update({_DATA[n]: values[1]})
 
-        adsdata.seek(0)                 # Reset string buffer to 0
+        adsdata.seek(0)  # Reset string buffer to 0
         data_df = pandas.read_csv(adsdata, sep='\t')
         data_df.dropna(inplace=True, how='all', axis='columns')
-        material_info['date'] = (material_info['date']
-                                 + ' ' +
-                                 material_info.pop('time'))
-        material_info['material_batch'] = 'bel'
+        material_info['date'] = (
+            material_info['date'] + ' ' + material_info.pop('time')
+        )
+        material_info['apparatus'] = 'bel'
         material_info['loading_key'] = 'loading'
         material_info['pressure_key'] = 'pressure'
-        material_info['other_keys'] = sorted([a for a in data_df.columns
-                                              if a != 'loading'
-                                              and a != 'pressure'
-                                              and a != 'measurement'
-                                              and a != 'br'])
+        material_info['other_keys'] = sorted([
+            a for a in data_df.columns if a != 'loading' and a != 'pressure'
+            and a != 'measurement' and a != 'br'
+        ])
 
         isotherm = PointIsotherm(
             isotherm_data=data_df,
             branch=data_df['br'].tolist(),
-            **material_info)
+            **material_info
+        )
 
     return isotherm

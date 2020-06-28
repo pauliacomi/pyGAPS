@@ -41,7 +41,6 @@ class TestAlphaSPlot():
             pressure=[0, 1],
             loading=[0, 1],
             material='test',
-            material_batch='test',
             adsorbate='argon',
             temperature=87
         )

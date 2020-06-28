@@ -8,13 +8,11 @@ import pygaps
 @pytest.mark.core
 class TestIsotherm():
     """Test the basic isotherm object."""
-
     def test_isotherm_create(self):
         """Check isotherm can be created from test data."""
 
         pygaps.core.isotherm.Isotherm(
             material='carbon',
-            material_batch='X1',
             adsorbate='nitrogen',
             temperature=77,
         )
@@ -29,8 +27,9 @@ class TestIsotherm():
         basic_isotherm.temperature = 0
         assert iso_id != basic_isotherm.iso_id
 
-    @pytest.mark.parametrize('missing_param',
-                             pygaps.core.isotherm.Isotherm._required_params)
+    @pytest.mark.parametrize(
+        'missing_param', pygaps.core.isotherm.Isotherm._required_params
+    )
     def test_isotherm_miss_param(self, isotherm_parameters, missing_param):
         """Test exception throw for missing required attributes."""
 
@@ -40,30 +39,54 @@ class TestIsotherm():
         with pytest.raises(pygaps.ParameterError):
             pygaps.core.isotherm.Isotherm(**isotherm_parameters)
 
-    @pytest.mark.parametrize('update', [
-        ({'pressure_unit': 'Pa'}),
-        ({'pressure_mode': 'absolute', 'pressure_unit': 'Pa'}),
-        ({'pressure_mode': 'relative', 'pressure_unit': None}),
-        ({'loading_basis': 'molar', 'loading_unit': 'mol'}),
-        ({'loading_basis': 'mass', 'loading_unit': 'g'}),
-        ({'adsorbent_basis': 'mass', 'adsorbent_unit': 'kg'}),
-        ({'adsorbent_basis': 'volume', 'adsorbent_unit': 'cm3'}),
-    ])
+    @pytest.mark.parametrize(
+        'update', [
+            ({
+                'pressure_unit': 'Pa'
+            }),
+            ({
+                'pressure_mode': 'absolute',
+                'pressure_unit': 'Pa'
+            }),
+            ({
+                'pressure_mode': 'relative',
+                'pressure_unit': None
+            }),
+            ({
+                'loading_basis': 'molar',
+                'loading_unit': 'mol'
+            }),
+            ({
+                'loading_basis': 'mass',
+                'loading_unit': 'g'
+            }),
+            ({
+                'adsorbent_basis': 'mass',
+                'adsorbent_unit': 'kg'
+            }),
+            ({
+                'adsorbent_basis': 'volume',
+                'adsorbent_unit': 'cm3'
+            }),
+        ]
+    )
     def test_isotherm_mode_and_units(self, isotherm_parameters, update):
         """Test exception throw for missing or wrong unit."""
 
         isotherm_parameters.update(update)
         pygaps.core.isotherm.Isotherm(**isotherm_parameters)
 
-    @pytest.mark.parametrize('prop, set_to', [
-        ('pressure_unit', 'something'),
-        ('pressure_mode', 'something'),
-        ('loading_unit', 'something'),
-        ('loading_basis', 'something'),
-        ('adsorbent_unit', 'something'),
-        ('adsorbent_basis', 'something')
-    ])
-    def test_isotherm_mode_and_units_bad(self, isotherm_parameters, prop, set_to):
+    @pytest.mark.parametrize(
+        'prop, set_to', [('pressure_unit', 'something'),
+                         ('pressure_mode', 'something'),
+                         ('loading_unit', 'something'),
+                         ('loading_basis', 'something'),
+                         ('adsorbent_unit', 'something'),
+                         ('adsorbent_basis', 'something')]
+    )
+    def test_isotherm_mode_and_units_bad(
+        self, isotherm_parameters, prop, set_to
+    ):
         """Test exception throw for missing or wrong unit."""
 
         isotherm_parameters[prop] = set_to
@@ -71,7 +94,9 @@ class TestIsotherm():
         with pytest.raises(pygaps.ParameterError):
             pygaps.core.isotherm.Isotherm(**isotherm_parameters)
 
-    def test_isotherm_get_parameters(self, isotherm_parameters, basic_isotherm):
+    def test_isotherm_get_parameters(
+        self, isotherm_parameters, basic_isotherm
+    ):
         """Check isotherm returns the same dict as was used to create it."""
 
         iso_dict = basic_isotherm.to_dict()

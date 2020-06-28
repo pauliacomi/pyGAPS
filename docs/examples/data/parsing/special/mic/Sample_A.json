@@ -348,7 +348,7 @@
     "mass": 0.1013,
     "pressure_mode": "relative",
     "pressure_unit": null,
-    "material_batch": "mic",
+    "apparatus": "mic",
     "material": "Sample A",
     "temperature": 77.3,
     "time": [

@@ -35,7 +35,6 @@ def isotherm_parameters():
     """Create a dictionary with all parameters for an isotherm."""
     return {
         'material': 'TEST',
-        'material_batch': 'TB',
         'temperature': 100.0,
         'adsorbate': 'TA',
         'date': '26/06/92',
@@ -131,10 +130,10 @@ def basic_material(material_data):
 @pytest.fixture()
 def use_material(basic_material):
     """Upload basic material to global list."""
-    material = next((
-        x for x in pygaps.MATERIAL_LIST
-        if basic_material.name == x.name and basic_material.batch == x.batch
-    ), None)
+    material = next(
+        (x for x in pygaps.MATERIAL_LIST if basic_material.name == x.name),
+        None
+    )
     if not material:
         pygaps.MATERIAL_LIST.append(basic_material)
 

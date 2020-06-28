@@ -163,7 +163,7 @@ instantiation is given below, with explanations.
         adsorbate='nitrogen',           # Required
         temperature=77,                 # Required
 
-        material_batch='X1',            # Recognised
+        apparatus='X1',                 # User specific
         t_act=150,                      # User specific
         user='John',                    # User specific
         DOI='10.000/mydoi',             # User specific
@@ -273,7 +273,7 @@ The code to generate a ModelIsotherm is then:
         adsorbate='nitrogen',           # Required
         temperature=77,                 # Required
 
-        material_batch='X1',            # Recognised
+        apparatus='X1',                 # User specific
         t_act=150,                      # User specific
         user='John',                    # User specific
         DOI='10.000/mydoi',             # User specific

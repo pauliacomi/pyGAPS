@@ -33,13 +33,10 @@ class Material():
     which can be set as seen above.
 
     """
-    def __init__(self, name, batch=None, **properties):
+    def __init__(self, name, **properties):
         """Instantiate by passing all the parameters."""
         #: Material name
         self.name = name
-
-        #: Material batch
-        self.batch = batch
 
         #: Rest of material properties
         self.properties = properties
@@ -50,9 +47,7 @@ class Material():
 
     def __str__(self):
         """Print a short summary of all the material parameters."""
-        string = ""
-        string += ("Material:" + self.name + '\n')
-        string += ("Batch:" + self.batch + '\n')
+        string = f"Material: {self.name}\n"
 
         if self.properties:
             for prop in self.properties:
@@ -116,7 +111,7 @@ class Material():
             Dictionary of all parameters.
 
         """
-        parameters_dict = {'name': self.name, 'batch': self.batch}
+        parameters_dict = {'name': self.name}
 
         parameters_dict.update(self.properties)
 

@@ -22,12 +22,6 @@ _FIELDS = {
         'row': 0,
         'column': 0,
     },
-    'material_batch': {
-        'text': ['Material batch'],
-        'name': 'material_batch',
-        'row': 1,
-        'column': 0,
-    },
     'temperature': {
         'text': ['Experiment temperature (K)'],
         'name': 'temperature',
@@ -240,7 +234,7 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict.update(read_mic_report(path))
 
         # Add required props
-        raw_dict['material_batch'] = 'mic'
+        raw_dict['apparatus'] = 'mic'
         raw_dict['pressure_mode'] = 'relative'
         raw_dict['pressure_unit'] = None
         raw_dict['loading_basis'] = 'molar'
@@ -258,7 +252,7 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict.update(read_bel_report(path))
 
         # Add required props
-        raw_dict['material_batch'] = 'bel'
+        raw_dict['apparatus'] = 'bel'
         raw_dict['pressure_mode'] = 'relative'
         raw_dict['pressure_unit'] = None
         raw_dict['loading_basis'] = 'molar'

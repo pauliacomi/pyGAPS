@@ -177,9 +177,6 @@ class Isotherm():
 
         # Other named properties of the isotherm
 
-        # Isotherm material batch, deprecated.
-        self.material_batch = str(properties.pop('material_batch', None))
-
         # Save the rest of the properties as members
         for attr in properties:
             if hasattr(self, attr):
@@ -324,7 +321,9 @@ class Isotherm():
             Extra information printed to console.
 
         """
-        return pygaps.isotherm_to_db(self, db_path, verbose=verbose, **kwargs)
+        return pygaps.isotherm_to_db(
+            self, db_path=db_path, verbose=verbose, **kwargs
+        )
 
     # Figure out the adsorption and desorption branches
     @staticmethod

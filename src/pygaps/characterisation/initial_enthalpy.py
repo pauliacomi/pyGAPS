@@ -374,7 +374,7 @@ def initial_enthalpy_comp(
             (x_axis, baseline + power_term_repulsive(x_axis), 'power rep'),
         )
 
-        title = f'{isotherm.material} {isotherm.material_batch} {isotherm.adsorbate}'
+        title = f'{isotherm.material} {isotherm.adsorbate}'
         initial_enthalpy_plot(
             loading,
             enthalpy,
@@ -430,7 +430,7 @@ def initial_enthalpy_point(
         loading = isotherm.loading(
             branch=branch, loading_unit='mmol', loading_basis='molar'
         )
-        title = f'{isotherm.material} {isotherm.material_batch} {isotherm.adsorbate}'
+        title = f'{isotherm.material} {isotherm.adsorbate}'
         initial_enthalpy_plot(
             loading,
             enthalpy, [initial_enthalpy for i in loading],

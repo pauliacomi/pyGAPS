@@ -441,7 +441,7 @@
     "loading_basis": "molar",
     "loading_unit": "mol",
     "mass": 0.0543,
-    "material_batch": "bel",
+    "apparatus": "bel",
     "material": "Sample_D",
     "pressure_mode": "relative",
     "pressure_unit": null,

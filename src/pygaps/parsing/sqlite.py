@@ -215,41 +215,42 @@ def adsorbate_to_db(
     properties = adsorbate.to_dict()
     del properties['name']  # no need for this
 
-    if overwrite and properties:
-        # Delete existing properties
-        _delete_by_id(
-            cursor,
-            'adsorbate_properties',
-            'ads_id',
-            ads_id,
-            'adsorbate properties',
-            verbose,
-        )
+    if properties:
+        if overwrite:
+            # Delete existing properties
+            _delete_by_id(
+                cursor,
+                'adsorbate_properties',
+                'ads_id',
+                ads_id,
+                'adsorbate properties',
+                verbose,
+            )
 
-    for prop, val in properties.items():
+        for prop, val in properties.items():
 
-        sql_insert = build_insert(
-            table='adsorbate_properties',
-            to_insert=['ads_id', 'type', 'value'],
-        )
+            sql_insert = build_insert(
+                table='adsorbate_properties',
+                to_insert=['ads_id', 'type', 'value'],
+            )
 
-        if not isinstance(val, (list, set, tuple)):
-            val = [val]
+            if not isinstance(val, (list, set, tuple)):
+                val = [val]
 
-        for vl in val:
-            try:
-                cursor.execute(
-                    sql_insert, {
-                        'ads_id': ads_id,
-                        'type': prop,
-                        'value': vl
-                    }
-                )
-            except sqlite3.InterfaceError as e:
-                raise type(e)(
-                    f"Cannot process property {prop}: {vl}"
-                    f"Original error:\n{e}"
-                )
+            for vl in val:
+                try:
+                    cursor.execute(
+                        sql_insert, {
+                            'ads_id': ads_id,
+                            'type': prop,
+                            'value': vl
+                        }
+                    )
+                except sqlite3.InterfaceError as e:
+                    raise type(e)(
+                        f"Cannot process property {prop}: {vl}"
+                        f"Original error:\n{e}"
+                    )
 
     if verbose:
         # Print success
@@ -469,7 +470,7 @@ def material_to_db(
     Upload a material to the database.
 
     If overwrite is set to true, the material is overwritten.
-    Overwrite is done based on material.name + material.batch
+    Overwrite is done based on material.name
 
     Parameters
     ----------
@@ -512,45 +513,46 @@ def material_to_db(
     properties = material.to_dict()
     del properties['name']  # no need for this
 
-    if overwrite and properties:
-        # Delete existing properties
-        _delete_by_id(
-            cursor,
-            'material_properties',
-            'mat_id',
-            mat_id,
-            'material properties',
-            verbose,
-        )
+    if properties:
+        if overwrite:
+            # Delete existing properties
+            _delete_by_id(
+                cursor,
+                'material_properties',
+                'mat_id',
+                mat_id,
+                'material properties',
+                verbose,
+            )
 
-    for prop, val in properties.items():
+        for prop, val in properties.items():
 
-        sql_insert = build_insert(
-            table='material_properties',
-            to_insert=['mat_id', 'type', 'value'],
-        )
+            sql_insert = build_insert(
+                table='material_properties',
+                to_insert=['mat_id', 'type', 'value'],
+            )
 
-        if not isinstance(val, (list, set, tuple)):
-            val = [val]
+            if not isinstance(val, (list, set, tuple)):
+                val = [val]
 
-        for vl in val:
-            try:
-                cursor.execute(
-                    sql_insert, {
-                        'mat_id': mat_id,
-                        'type': prop,
-                        'value': vl
-                    }
-                )
-            except sqlite3.InterfaceError as e:
-                raise type(e)(
-                    f"Cannot process property {prop}: {vl}"
-                    f"Original error:\n{e}"
-                )
+            for vl in val:
+                try:
+                    cursor.execute(
+                        sql_insert, {
+                            'mat_id': mat_id,
+                            'type': prop,
+                            'value': vl
+                        }
+                    )
+                except sqlite3.InterfaceError as e:
+                    raise type(e)(
+                        f"Cannot process property {prop}: {vl}"
+                        f"Original error:\n{e}"
+                    )
 
     if verbose:
         # Print success
-        print("Material uploaded", material.name, material.batch)
+        print(f"Material uploaded: {material.name}")
 
 
 @with_connection
@@ -648,7 +650,7 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        print("Success", material.name, material.batch)
+        print("Success", material.name)
 
     return
 
@@ -858,7 +860,7 @@ def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        print("Success:", isotherm)
+        print("Success:", str(isotherm))
 
 
 @with_connection
