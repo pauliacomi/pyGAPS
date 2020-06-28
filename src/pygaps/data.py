@@ -5,6 +5,7 @@ Here is where objects such as adsorbates or materials are imported to be
 available for pyGAPS. These are populated at import-time. Also defines the
 internal database location.
 """
+# flake8: noqa
 # isort:skip_file
 
 import pkg_resources
