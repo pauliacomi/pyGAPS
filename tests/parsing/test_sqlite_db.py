@@ -1,4 +1,4 @@
-"""""Tests sqlite database utilities."""
+"""Tests sqlite database utilities."""
 
 import pytest
 
@@ -11,11 +11,9 @@ from pygaps.utilities.sqlite_db_creator import db_execute_general
 @pytest.fixture(scope='session')
 def db_file(tmpdir_factory):
     """Generate the database in a temporary folder."""
-
     pth = tmpdir_factory.mktemp('database').join('test.db')
-    db_create(str(pth))
-
-    return str(pth)
+    db_create(pth)
+    return pth
 
 
 @pytest.mark.parsing
