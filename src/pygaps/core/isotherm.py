@@ -312,6 +312,20 @@ class Isotherm():
         """
         return pygaps.isotherm_to_xl(self, path, **kwargs)
 
+    def to_db(self, db_path=None, verbose=False, **kwargs):
+        """
+        Upload the isotherm to an sqlite database.
+
+        Parameters
+        ----------
+        db_path : str, None
+            Path to the database. If none is specified, internal database is used.
+        verbose : bool
+            Extra information printed to console.
+
+        """
+        return pygaps.isotherm_to_db(self, db_path, verbose=verbose, **kwargs)
+
     # Figure out the adsorption and desorption branches
     @staticmethod
     def _splitdata(data, pressure_key):

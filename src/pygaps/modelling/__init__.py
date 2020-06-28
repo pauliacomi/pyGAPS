@@ -6,6 +6,8 @@ Lists all isotherm models which are available.
 If adding a custom model, it should be also added below.
 """
 
+import numpy
+
 from pygaps.utilities.exceptions import ParameterError
 
 from .base_model import IsothermBaseModel
@@ -49,19 +51,21 @@ _IAST_MODELS = [
 ]
 
 
-def get_isotherm_model(model_name):
+def get_isotherm_model(model_name, params=None):
     """
     Check whether specified model name exists and return an instance of that model class.
 
     Parameters
     ----------
     model_name : str
-        The name of the requested model
+        The name of the requested model.
+    params : dict
+        Parameters to instantiate the model with.
 
     Returns
     -------
     ModelIsotherm
-        A specific model
+        A specific model.
 
     Raises
     ------
@@ -70,10 +74,12 @@ def get_isotherm_model(model_name):
     """
     for _model in _MODELS:
         if model_name == _model.name:
-            return _model()
+            return _model(params)
 
-    raise ParameterError(f"Model {model_name} not an option. Viable models "
-                         f"are {[model.name for model in _MODELS]}")
+    raise ParameterError(
+        f"Model {model_name} not an option. Viable models "
+        f"are {[model.name for model in _MODELS]}"
+    )
 
 
 def is_iast_model(model_name):
@@ -110,3 +116,8 @@ def is_base_model(model):
 
     """
     return isinstance(model, IsothermBaseModel)
+
+
+def model_from_dict(model_dict):
+    """Obtain a model from a dictionary."""
+    return get_isotherm_model(model_dict.pop('name'), model_dict)

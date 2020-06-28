@@ -46,11 +46,6 @@ class TemkinApprox(IsothermBaseModel):
         "tht": [0, numpy.inf],
     }
 
-    def __init__(self):
-        """Instantiation function."""
-
-        self.params = {"n_m": numpy.nan, "K": numpy.nan, "tht": numpy.nan}
-
     def loading(self, pressure):
         """
         Calculate loading at specified pressure.

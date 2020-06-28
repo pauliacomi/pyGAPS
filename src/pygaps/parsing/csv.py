@@ -5,11 +5,11 @@ from io import StringIO
 
 import pandas
 
-from ..core.modelisotherm import Isotherm
-from ..core.modelisotherm import ModelIsotherm
-from ..core.pointisotherm import PointIsotherm
-from ..modelling import get_isotherm_model
-from ..utilities.exceptions import ParsingError
+from pygaps.core.modelisotherm import Isotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.modelling import model_from_dict
+from pygaps.utilities.exceptions import ParsingError
 
 
 def _is_float(s):
@@ -229,19 +229,10 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             model['parameters'][values[0]] = float(values[1])
             line = raw_csv.readline().rstrip()
 
-        new_mod = get_isotherm_model(model['name'])
-        new_mod.rmse = model['rmse']
-        new_mod.pressure_range = model['pressure_range']
-        new_mod.loading_range = model['loading_range']
-        for param in new_mod.params:
-            try:
-                new_mod.params[param] = model['parameters'][param]
-            except KeyError as err:
-                raise KeyError(
-                    f"The CSV is missing parameter '{param}'"
-                ) from err
-
-        isotherm = ModelIsotherm(model=new_mod, **raw_dict)
+        isotherm = ModelIsotherm(
+            model=model_from_dict(model),
+            **raw_dict,
+        )
 
     else:
         isotherm = Isotherm(**raw_dict)

@@ -10,6 +10,8 @@ Breaking changes:
  * Included Python 3.8 as latest python and deprecated Python 3.5.
  * For isotherm pressure/loading, a `limits` tuple is now passed instead of
    `min_range` and `max_range`, as for other functions in pyGAPS.
+ * JSON ModelIsotherms now have ``name`` instead of ``model`` as the model name.
+   This is now consistent with both CSV and Excel.
  * The `isotherm_to_jsonf` and `isotherm_from_jsonf` functions have been
    removed. Functionality has been merged with `isotherm_to_json` similarly to
    the `pandas model

@@ -188,7 +188,29 @@ class TestDatabase():
                 test_dict["type"], db_path=db_file
             )
 
-    def test_isotherm(self, db_file, isotherm_parameters, basic_pointisotherm):
+    def test_isotherm(self, db_file, isotherm_parameters, basic_isotherm):
+        """Test functions related to isotherms table, then inserts a test isotherm."""
+
+        # Upload test
+        pygaps.isotherm_to_db(basic_isotherm, db_path=db_file)
+
+        # Unique test
+        with pytest.raises(pygaps.ParsingError):
+            pygaps.isotherm_to_db(basic_isotherm, db_path=db_file)
+
+        # Get test
+        assert basic_isotherm in pygaps.isotherms_from_db(db_path=db_file)
+
+        # Delete test
+        pygaps.isotherm_delete_db(basic_isotherm, db_path=db_file)
+
+        # Delete fail test
+        with pytest.raises(pygaps.ParsingError):
+            pygaps.isotherm_delete_db(basic_isotherm, db_path=db_file)
+
+    def test_pointisotherm(
+        self, db_file, isotherm_parameters, basic_pointisotherm
+    ):
         """Test functions related to isotherms table, then inserts a test isotherm."""
 
         # Upload test
@@ -207,3 +229,25 @@ class TestDatabase():
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
             pygaps.isotherm_delete_db(basic_pointisotherm, db_path=db_file)
+
+    def test_modelisotherm(
+        self, db_file, isotherm_parameters, basic_modelisotherm
+    ):
+        """Test functions related to isotherms table, then inserts a test isotherm."""
+
+        # Upload test
+        pygaps.isotherm_to_db(basic_modelisotherm, db_path=db_file)
+
+        # Unique test
+        with pytest.raises(pygaps.ParsingError):
+            pygaps.isotherm_to_db(basic_modelisotherm, db_path=db_file)
+
+        # Get test
+        assert basic_modelisotherm in pygaps.isotherms_from_db(db_path=db_file)
+
+        # Delete test
+        pygaps.isotherm_delete_db(basic_modelisotherm, db_path=db_file)
+
+        # Delete fail test
+        with pytest.raises(pygaps.ParsingError):
+            pygaps.isotherm_delete_db(basic_modelisotherm, db_path=db_file)

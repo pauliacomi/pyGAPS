@@ -4,6 +4,7 @@ This module contains the sql interface for data manipulation.
 
 import array
 import functools
+import json
 import sqlite3
 
 import pandas
@@ -14,6 +15,7 @@ from pygaps.core.material import Material
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.data import DATABASE
+from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.python_utilities import checktype
 from pygaps.utilities.python_utilities import grouped
@@ -28,7 +30,6 @@ def with_connection(func):
     def wrapper(*args, **kwargs):
 
         db_path = kwargs.get('db_path', DATABASE)
-        print(db_path)
         conn = sqlite3.connect(
             str(db_path)
         )  # TODO remove 'str' call when dropping P3.6
@@ -184,7 +185,7 @@ def adsorbate_to_db(
         Whether to upload the adsorbate or overwrite it.
         WARNING: Overwrite is done on ALL fields.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     """
     cursor = kwargs['cursor']
@@ -268,7 +269,7 @@ def adsorbates_from_db(db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     Returns
     -------
@@ -329,7 +330,7 @@ def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
 
     cursor = kwargs['cursor']
@@ -387,7 +388,7 @@ def adsorbate_property_type_to_db(
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _upload_one_all_columns(
         kwargs['cursor'],
@@ -411,7 +412,7 @@ def adsorbate_property_types_from_db(db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     Returns
     -------
@@ -441,7 +442,7 @@ def adsorbate_property_type_delete_db(
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _delete_by_id(
         kwargs['cursor'],
@@ -480,7 +481,7 @@ def material_to_db(
         Whether to upload the material or overwrite it.
         WARNING: Overwrite is done on ALL fields.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     """
 
@@ -564,7 +565,7 @@ def materials_from_db(db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     Returns
     -------
@@ -617,7 +618,7 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
 
     cursor = kwargs['cursor']
@@ -677,7 +678,7 @@ def material_property_type_to_db(
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _upload_one_all_columns(
         kwargs['cursor'],
@@ -701,7 +702,7 @@ def material_property_types_from_db(db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     Returns
     -------
@@ -731,7 +732,7 @@ def material_property_type_delete_db(
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _delete_by_id(
         kwargs['cursor'],
@@ -757,11 +758,11 @@ def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
     Parameters
     ----------
     isotherm : Isotherm
-        Isotherm class to upload to the database.
+        Isotherm, PointIsotherm or ModelIsotherm to upload to the database.
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
 
     cursor = kwargs['cursor']
@@ -794,40 +795,8 @@ def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
         build_insert(table='isotherms', to_insert=db_columns), upload_dict
     )
 
-    # Then, the isotherm data/model will be uploaded into the isotherm_data table
-
-    # Build sql request
-    sql_insert = build_insert(
-        table='isotherm_data', to_insert=['iso_id', 'type', 'data']
-    )
-
-    # Insert standard data fields:
-    cursor.execute(
-        sql_insert, {
-            'iso_id': iso_id,
-            'type': 'pressure',
-            'data': isotherm.pressure().tobytes()
-        }
-    )
-    cursor.execute(
-        sql_insert, {
-            'iso_id': iso_id,
-            'type': 'loading',
-            'data': isotherm.loading().tobytes()
-        }
-    )
-
-    # Update or insert other fields:
-    for key in isotherm.other_keys:
-        cursor.execute(
-            sql_insert, {
-                'iso_id': iso_id,
-                'type': key,
-                'data': isotherm.other_data(key).tobytes()
-            }
-        )
     # TODO insert multiple
-    # Upload the remaining data from the isotherm
+    # Upload the other isotherm parameters
     for key in iso_dict:
         if key not in isotherm._unit_params:
             # Deal with bools
@@ -845,6 +814,48 @@ def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
                 }
             )
 
+    # Then, the isotherm data/model will be uploaded into the data table
+
+    # Build sql request
+    sql_insert = build_insert(
+        table='isotherm_data', to_insert=['iso_id', 'type', 'data']
+    )
+
+    if isinstance(isotherm, PointIsotherm):
+        # Insert standard data fields:
+        cursor.execute(
+            sql_insert, {
+                'iso_id': iso_id,
+                'type': 'pressure',
+                'data': isotherm.pressure().tobytes()
+            }
+        )
+        cursor.execute(
+            sql_insert, {
+                'iso_id': iso_id,
+                'type': 'loading',
+                'data': isotherm.loading().tobytes()
+            }
+        )
+        # Update or insert other fields:
+        for key in isotherm.other_keys:
+            cursor.execute(
+                sql_insert, {
+                    'iso_id': iso_id,
+                    'type': key,
+                    'data': isotherm.other_data(key).tobytes()
+                }
+            )
+    elif isinstance(isotherm, ModelIsotherm):
+        # Insert model parameters
+        cursor.execute(
+            sql_insert, {
+                'iso_id': iso_id,
+                'type': 'model',
+                'data': json.dumps(isotherm.model.to_dict())
+            }
+        )
+
     if verbose:
         # Print success
         print("Success:", isotherm)
@@ -858,14 +869,15 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
     Parameters
     ----------
     criteria : dict, None
-        Dictionary of isotherm parameters on which to filter database.
-        For example {'name': 'a_name', 'date': 'a_date'}. Parameters
+        Dictionary of isotherm parameters on which to filter database from
+        base parameters ('material', 'adsorbate', 'temperature', 'type').
+        For example {'material': 'm1', 'temperature': '77'}. Parameters
         must exist for the filtering to take place otherwise all
-        results are returned
+        results are returned.
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     Returns
     -------
@@ -907,17 +919,6 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
 
         for row in rows:
 
-            # Generate the isotherm data
-            iso_data = pandas.DataFrame({
-                data[1]: array.array('d', data[2])
-                for data in isotherm_data
-                if data[0] == row['id']
-            })
-            other_keys = [
-                key for key in iso_data.columns
-                if key not in ('pressure', 'loading')
-            ]
-
             # Generate the isotherm parameters dictionary
             iso_params = dict(zip(row.keys(), row))
             iso_params.update({
@@ -925,18 +926,47 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
                 for prop in isotherm_props
                 if prop[0] == row['id']
             })
-            iso_params.update({'other_keys': other_keys})
             iso_params.pop('id')
 
-            # build isotherm object
-            isotherms.append(
-                PointIsotherm(
-                    isotherm_data=iso_data,
-                    pressure_key="pressure",
-                    loading_key="loading",
-                    **iso_params
+            # Generate the isotherm data/model
+            if row['iso_type'] == 'pointisotherm':
+                iso_data = pandas.DataFrame({
+                    data[1]: array.array('d', data[2])
+                    for data in isotherm_data
+                    if data[0] == row['id']
+                })
+                other_keys = [
+                    key for key in iso_data.columns
+                    if key not in ('pressure', 'loading')
+                ]
+                iso_params.update({'other_keys': other_keys})
+
+                # build isotherm object
+                isotherms.append(
+                    PointIsotherm(
+                        isotherm_data=iso_data,
+                        pressure_key="pressure",
+                        loading_key="loading",
+                        **iso_params
+                    )
                 )
-            )
+
+            elif row['iso_type'] == 'modelisotherm':
+
+                iso_model = model_from_dict(
+                    next(
+                        json.loads(data['data'])
+                        for data in isotherm_data
+                        if data[0] == row['id']
+                    )
+                )
+
+                # build isotherm object
+                isotherms.append(ModelIsotherm(model=iso_model, **iso_params))
+
+            else:
+                # build isotherm object
+                isotherms.append(Isotherm(**iso_params))
 
     if verbose:
         # Print success
@@ -957,7 +987,7 @@ def isotherm_delete_db(iso_id, db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
 
     if isinstance(iso_id, Isotherm):
@@ -1024,7 +1054,7 @@ def isotherm_type_to_db(
         Whether to upload the isotherm type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _upload_one_all_columns(
         kwargs['cursor'],
@@ -1048,7 +1078,7 @@ def isotherm_types_from_db(db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     Returns
     -------
@@ -1076,7 +1106,7 @@ def isotherm_type_delete_db(iso_type, db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _delete_by_id(
         kwargs['cursor'],
@@ -1113,7 +1143,7 @@ def isotherm_property_type_to_db(
         Whether to upload the property type or overwrite it.
         WARNING: Overwrite is done on ALL fields.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _upload_one_all_columns(
         kwargs['cursor'],
@@ -1137,7 +1167,7 @@ def isotherm_property_types_from_db(db_path=None, verbose=True, **kwargs):
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
 
     Returns
     -------
@@ -1167,7 +1197,7 @@ def isotherm_property_type_delete_db(
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
-        Print to console on success or error.
+        Extra information printed to console.
     """
     _delete_by_id(
         kwargs['cursor'],

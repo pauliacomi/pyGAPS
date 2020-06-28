@@ -6,11 +6,12 @@ import pandas
 import xlrd
 import xlwt
 
-from ..core.isotherm import Isotherm
-from ..core.modelisotherm import ModelIsotherm
-from ..core.pointisotherm import PointIsotherm
-from ..modelling import get_isotherm_model
-from ..utilities.exceptions import ParsingError
+from pygaps.core.isotherm import Isotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.modelling import model_from_dict
+from pygaps.utilities.exceptions import ParsingError
+
 from .excel_bel import read_bel_report
 from .excel_mic import read_mic_report
 
@@ -340,34 +341,24 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
 
             # Store isotherm type
             isotype = 2
-
-            new_mod = get_isotherm_model(sht.cell(type_row + 1, 1).value)
-            new_mod.rmse = sht.cell(type_row + 2, 1).value
-            new_mod.pressure_range = ast.literal_eval(
-                sht.cell(type_row + 3, 1).value
-            )
-            new_mod.loading_range = ast.literal_eval(
-                sht.cell(type_row + 4, 1).value
-            )
+            model = {
+                "name": sht.cell(type_row + 1, 1).value,
+                "rmse": sht.cell(type_row + 2, 1).value,
+                "pressure_range":
+                ast.literal_eval(sht.cell(type_row + 3, 1).value),
+                "loading_range":
+                ast.literal_eval(sht.cell(type_row + 4, 1).value),
+                "parameters": {},
+            }
 
             final_row = type_row + 6
-
-            model_param = {}
 
             while final_row < sht.nrows:
                 point = sht.cell(final_row, 0).value
                 if point == '':
                     break
-                model_param[point] = sht.cell(final_row, 1).value
+                model["parameters"][point] = sht.cell(final_row, 1).value
                 final_row += 1
-
-            for param in new_mod.params:
-                try:
-                    new_mod.params[param] = model_param[param]
-                except KeyError as err:
-                    raise KeyError(
-                        f"The JSON is missing parameter '{param}'"
-                    ) from err
 
         # read the secondary isotherm parameters
         if 'otherdata' in wb.sheet_names():
@@ -398,6 +389,6 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         return PointIsotherm(isotherm_data=data, **raw_dict)
 
     if isotype == 2:
-        return ModelIsotherm(model=new_mod, **raw_dict)
+        return ModelIsotherm(model=model_from_dict(model), **raw_dict)
 
     return Isotherm(**raw_dict)
