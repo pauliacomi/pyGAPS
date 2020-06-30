@@ -15,7 +15,7 @@ class TestPointIsotherm():
     ##########################
 
     def test_isotherm_create(self):
-        "Checks isotherm can be created from basic data"
+        """Check isotherm can be created from basic data."""
 
         isotherm_param = {
             'material': 'carbon',
@@ -49,7 +49,7 @@ class TestPointIsotherm():
             )
 
     def test_isotherm_id(self, basic_pointisotherm):
-        "Checks isotherm id works as intended"
+        """Check isotherm id works as intended."""
 
         iso_id = basic_pointisotherm.iso_id
         basic_pointisotherm.new_param = 'changed'
@@ -61,7 +61,7 @@ class TestPointIsotherm():
     def test_isotherm_miss_key(
         self, isotherm_parameters, isotherm_data, missing_key
     ):
-        "Tests exception throw for missing data primary key (loading/pressure)"
+        """Tests exception throw for missing data primary key (loading/pressure)."""
 
         keys = dict(
             pressure_key="pressure",
@@ -88,7 +88,7 @@ class TestPointIsotherm():
     def test_isotherm_create_branches(
         self, isotherm_parameters, isotherm_data, branch, expected
     ):
-        "Tests if isotherm branches are well specified"
+        """Tests if isotherm branches are well specified."""
 
         isotherm = pygaps.PointIsotherm(
             isotherm_data=isotherm_data,
@@ -104,7 +104,7 @@ class TestPointIsotherm():
     def test_isotherm_equality(
         self, isotherm_parameters, isotherm_data, basic_pointisotherm
     ):
-        "Checks isotherm id's are unique"
+        """Check isotherm id's are unique"""
 
         isotherm = pygaps.PointIsotherm(
             isotherm_data=isotherm_data,
@@ -120,7 +120,7 @@ class TestPointIsotherm():
         assert isotherm != basic_pointisotherm
 
     def test_isotherm_create_from_isotherm(self, basic_isotherm):
-        "Checks isotherm can be created from isotherm"
+        """Check isotherm can be created from isotherm."""
 
         # regular creation
         pygaps.PointIsotherm.from_isotherm(
@@ -136,7 +136,7 @@ class TestPointIsotherm():
     def test_isotherm_create_from_modelisotherm(
         self, basic_modelisotherm, basic_pointisotherm
     ):
-        "Checks isotherm can be created from isotherm"
+        """Check isotherm can be created from isotherm."""
 
         # regular creation
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
@@ -163,18 +163,17 @@ class TestPointIsotherm():
             basic_modelisotherm.loading_at(3)
         )
 
-
-##########################
+    ##########################
 
     def test_isotherm_ret_has_branch(self, basic_pointisotherm):
-        """Checks that all the functions in pointIsotherm return their specified parameter"""
+        """Check that all the functions in pointIsotherm return their specified parameter."""
 
         # branch
         assert basic_pointisotherm.has_branch(branch='ads')
         assert basic_pointisotherm.has_branch(branch='des')
 
     def test_isotherm_ret_data(self, basic_pointisotherm):
-        """Checks that all the functions in pointIsotherm return their specified parameter"""
+        """Check that all the functions in pointIsotherm return their specified parameter."""
 
         other_key = "enthalpy"
 
@@ -215,7 +214,7 @@ class TestPointIsotherm():
             basic_pointisotherm.data(branch='random')
 
     def test_isotherm_ret_pressure(self, basic_pointisotherm, use_adsorbate):
-        """Checks that all the functions in pointIsotherm return their specified parameter"""
+        """Check that all the functions in pointIsotherm return their specified parameter."""
 
         # Regular return
         assert set(basic_pointisotherm.pressure()
@@ -253,7 +252,7 @@ class TestPointIsotherm():
     def test_isotherm_ret_loading(
         self, basic_pointisotherm, use_material, use_adsorbate
     ):
-        """Checks that all the functions in pointIsotherm return their specified parameter"""
+        """Check that all the functions in pointIsotherm return their specified parameter."""
 
         # Standard return
         assert set(basic_pointisotherm.loading()
@@ -303,7 +302,7 @@ class TestPointIsotherm():
         )
 
     def test_isotherm_ret_other_data(self, basic_pointisotherm):
-        """Checks that all the functions in pointIsotherm return their specified parameter"""
+        """Check that all the functions in pointIsotherm return their specified parameter."""
 
         other_key = "enthalpy"
 
@@ -359,7 +358,7 @@ class TestPointIsotherm():
         self, basic_pointisotherm, use_material, use_adsorbate, inp,
         parameters, expected
     ):
-        """Checks that all the functions in pointIsotherm return their specified parameter"""
+        """Check that all the functions in pointIsotherm return their specified parameter."""
 
         assert numpy.isclose(
             basic_pointisotherm.loading_at(inp, **parameters), expected, 1e-5
@@ -393,7 +392,7 @@ class TestPointIsotherm():
         self, basic_pointisotherm, use_material, use_adsorbate, inp,
         parameters, expected
     ):
-        """Checks that all the functions in ModelIsotherm return their specified parameter"""
+        """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         assert numpy.isclose(
             basic_pointisotherm.pressure_at(inp, **parameters), expected, 1e-5
@@ -410,7 +409,7 @@ class TestPointIsotherm():
     def test_isotherm_spreading_pressure_at(
         self, basic_pointisotherm, use_adsorbate, inp, parameters, expected
     ):
-        """Checks that all the functions in pointIsotherm return their specified parameter"""
+        """Check that all the functions in pointIsotherm return their specified parameter."""
 
         assert numpy.isclose(
             basic_pointisotherm.spreading_pressure_at(inp, **parameters),
@@ -429,7 +428,7 @@ class TestPointIsotherm():
     def test_isotherm_convert_pressure(
         self, basic_pointisotherm, isotherm_data, unit, multiplier
     ):
-        """Checks that the pressure conversion function work as expected"""
+        """Check that the pressure conversion function work as expected."""
 
         # Do the conversion
         basic_pointisotherm.convert_pressure(unit_to=unit)
@@ -453,7 +452,7 @@ class TestPointIsotherm():
         self, basic_pointisotherm, use_adsorbate, isotherm_data, mode,
         multiplier
     ):
-        """Checks that the pressure mode conversion function work as expected"""
+        """Check that the pressure mode conversion function work as expected."""
 
         # Do the conversion
         basic_pointisotherm.convert_pressure(mode_to=mode)
@@ -477,7 +476,7 @@ class TestPointIsotherm():
     def test_isotherm_convert_loading_unit(
         self, basic_pointisotherm, isotherm_data, unit, multiplier
     ):
-        """Checks that the loading conversion function work as expected"""
+        """Check that the loading conversion function work as expected."""
 
         # Do the conversion
         basic_pointisotherm.convert_loading(unit_to=unit)
@@ -500,7 +499,7 @@ class TestPointIsotherm():
         self, basic_pointisotherm, use_material, isotherm_data, basis, unit,
         multiplier
     ):
-        """Checks that the loading basis conversion function work as expected"""
+        """Check that the loading basis conversion function work as expected."""
 
         # Do the conversion
         basic_pointisotherm.convert_loading(basis_to=basis, unit_to=unit)
@@ -522,7 +521,7 @@ class TestPointIsotherm():
     def test_isotherm_convert_adsorbent_unit(
         self, basic_pointisotherm, isotherm_data, unit, multiplier
     ):
-        """Checks that the loading conversion function work as expected"""
+        """Check that the loading conversion function work as expected."""
 
         # Do the conversion
         basic_pointisotherm.convert_adsorbent(unit_to=unit)
@@ -545,7 +544,7 @@ class TestPointIsotherm():
         self, basic_pointisotherm, use_material, isotherm_data, basis, unit,
         multiplier
     ):
-        """Checks that the loading basis conversion function work as expected"""
+        """Check that the loading basis conversion function work as expected."""
 
         # Do the conversion
         basic_pointisotherm.convert_adsorbent(basis_to=basis, unit_to=unit)
@@ -559,6 +558,6 @@ class TestPointIsotherm():
 
     @cleanup
     def test_isotherm_print_parameters(self, basic_pointisotherm):
-        "Checks isotherm can print its own info"
+        """Check isotherm can print its own info."""
 
         basic_pointisotherm.print_info(show=False)
