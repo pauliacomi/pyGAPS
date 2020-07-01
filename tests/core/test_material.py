@@ -22,13 +22,14 @@ class TestMaterial():
 
     def test_material_retrieved_list(self, material_data, basic_material):
         """Check material can be retrieved from master list."""
-        pygaps.data.MATERIAL_LIST.append(basic_material)
+        pygaps.MATERIAL_LIST.append(basic_material)
         uploaded_material = pygaps.Material.find(material_data.get('name'))
 
         assert material_data == uploaded_material.to_dict()
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.Material.find('noname')
+        pygaps.MATERIAL_LIST.remove(basic_material)
 
     def test_material_get_properties(self, material_data, basic_material):
         """Check if properties of a material can be located."""

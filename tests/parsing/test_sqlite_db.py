@@ -229,13 +229,18 @@ class TestDatabase():
         pgsqlite.adsorbate_delete_db(basic_adsorbate, db_path=db_file)
         if basic_adsorbate in pygaps.ADSORBATE_LIST:
             pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
-        print(basic_adsorbate in pgsqlite.adsorbates_from_db(db_path=db_file))
-        print(basic_adsorbate in pygaps.ADSORBATE_LIST)
+        if basic_material in pygaps.MATERIAL_LIST:
+            pygaps.MATERIAL_LIST.remove(basic_material)
         basic_isotherm.to_db(
             db_path=db_file,
             autoinsert_material=True,
             autoinsert_adsorbate=True
         )
+        pygaps.isotherm_delete_db(basic_isotherm, db_path=db_file)
+        pgsqlite.material_delete_db(basic_material, db_path=db_file)
+        pgsqlite.adsorbate_delete_db(basic_adsorbate, db_path=db_file)
+        pgsqlite.material_to_db(basic_material, db_path=db_file)
+        pgsqlite.adsorbate_to_db(basic_adsorbate, db_path=db_file)
 
     def test_pointisotherm(
         self, db_file, isotherm_parameters, basic_pointisotherm
