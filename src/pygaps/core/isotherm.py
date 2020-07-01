@@ -309,7 +309,14 @@ class Isotherm():
         """
         return pygaps.isotherm_to_xl(self, path, **kwargs)
 
-    def to_db(self, db_path=None, verbose=False, **kwargs):
+    def to_db(
+        self,
+        db_path=None,
+        verbose=True,
+        autoinsert_material=True,
+        autoinsert_adsorbate=True,
+        **kwargs
+    ):
         """
         Upload the isotherm to an sqlite database.
 
@@ -317,6 +324,12 @@ class Isotherm():
         ----------
         db_path : str, None
             Path to the database. If none is specified, internal database is used.
+        autoinsert_material: bool, True
+            Whether to automatically insert an isotherm material if it is not found
+            in the database.
+        autoinsert_adsorbate: bool, True
+            Whether to automatically insert an isotherm adsorbate if it is not found
+            in the database.
         verbose : bool
             Extra information printed to console.
 

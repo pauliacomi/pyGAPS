@@ -43,11 +43,11 @@ class Material():
 
     def __repr__(self):
         """Print material name."""
-        return ' '.join([self.name])
+        return self.name
 
     def __str__(self):
         """Print a short summary of all the material parameters."""
-        string = f"Material: {self.name}\n"
+        string = f"pyGAPS Material: {self.name}\n"
 
         if self.properties:
             for prop in self.properties:

@@ -130,11 +130,7 @@ def basic_material(material_data):
 @pytest.fixture()
 def use_material(basic_material):
     """Upload basic material to global list."""
-    material = next(
-        (x for x in pygaps.MATERIAL_LIST if basic_material.name == x.name),
-        None
-    )
-    if not material:
+    if basic_material not in pygaps.MATERIAL_LIST:
         pygaps.MATERIAL_LIST.append(basic_material)
 
 
@@ -176,9 +172,5 @@ def basic_adsorbate(adsorbate_data):
 @pytest.fixture()
 def use_adsorbate(basic_adsorbate):
     """Upload basic adsorbate to global list."""
-    adsorbate = next(
-        (x for x in pygaps.ADSORBATE_LIST if basic_adsorbate.name == x.name),
-        None
-    )
-    if not adsorbate:
+    if basic_adsorbate not in pygaps.ADSORBATE_LIST:
         pygaps.ADSORBATE_LIST.append(basic_adsorbate)

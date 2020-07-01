@@ -62,7 +62,7 @@ class TestDatabase():
         pgsqlite.adsorbate_to_db(basic_adsorbate, db_path=db_file)
 
         # Upload blank test
-        pgsqlite.adsorbate_to_db(pygaps.Adsorbate('name'), db_path=db_file)
+        pgsqlite.adsorbate_to_db(pygaps.Adsorbate('blank'), db_path=db_file)
 
         # Unique test
         with pytest.raises(pygaps.ParsingError):
@@ -72,7 +72,7 @@ class TestDatabase():
         assert basic_adsorbate in pgsqlite.adsorbates_from_db(db_path=db_file)
 
         # Overwrite upload
-        basic_adsorbate.properties['backend_name'] = "newname"
+        basic_adsorbate.properties['formula'] = "newform"
         pgsqlite.adsorbate_to_db(
             basic_adsorbate, db_path=db_file, overwrite=True
         )
@@ -80,10 +80,13 @@ class TestDatabase():
             ads for ads in pgsqlite.adsorbates_from_db(db_path=db_file)
             if ads.name == basic_adsorbate.name
         )
-        assert got_adsorbate.backend_name() == basic_adsorbate.backend_name()
+        assert got_adsorbate.formula == basic_adsorbate.formula
 
         # Delete test
         pgsqlite.adsorbate_delete_db(basic_adsorbate, db_path=db_file)
+
+        # Delete string test
+        pgsqlite.adsorbate_delete_db('blank', db_path=db_file)
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
@@ -138,6 +141,9 @@ class TestDatabase():
         # Upload test
         pgsqlite.material_to_db(basic_material, db_path=db_file)
 
+        # Upload blank test
+        pgsqlite.material_to_db(pygaps.Material('blank'), db_path=db_file)
+
         # Unique test
         with pytest.raises(pygaps.ParsingError):
             pgsqlite.material_to_db(basic_material, db_path=db_file)
@@ -159,6 +165,9 @@ class TestDatabase():
 
         # Delete test
         pgsqlite.material_delete_db(basic_material, db_path=db_file)
+
+        # Delete string test
+        pgsqlite.material_delete_db('blank', db_path=db_file)
 
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
@@ -211,6 +220,23 @@ class TestDatabase():
         with pytest.raises(pygaps.ParsingError):
             pygaps.isotherm_delete_db(basic_isotherm, db_path=db_file)
 
+    def test_isotherm_autoinsert(
+        self, db_file, basic_isotherm, basic_adsorbate, basic_material
+    ):
+        """Test the autoupload functionality."""
+
+        pgsqlite.material_delete_db(basic_material, db_path=db_file)
+        pgsqlite.adsorbate_delete_db(basic_adsorbate, db_path=db_file)
+        if basic_adsorbate in pygaps.ADSORBATE_LIST:
+            pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
+        print(basic_adsorbate in pgsqlite.adsorbates_from_db(db_path=db_file))
+        print(basic_adsorbate in pygaps.ADSORBATE_LIST)
+        basic_isotherm.to_db(
+            db_path=db_file,
+            autoinsert_material=True,
+            autoinsert_adsorbate=True
+        )
+
     def test_pointisotherm(
         self, db_file, isotherm_parameters, basic_pointisotherm
     ):
@@ -232,6 +258,9 @@ class TestDatabase():
         # Delete fail test
         with pytest.raises(pygaps.ParsingError):
             pygaps.isotherm_delete_db(basic_pointisotherm, db_path=db_file)
+
+        # Convenience function test
+        basic_pointisotherm.to_db(db_file)
 
     def test_modelisotherm(
         self, db_file, isotherm_parameters, basic_modelisotherm

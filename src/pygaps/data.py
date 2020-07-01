@@ -11,9 +11,11 @@ internal database location.
 import pkg_resources
 
 DATABASE = pkg_resources.resource_filename('pygaps', 'data/default.db')
+MATERIAL_LIST = []
+ADSORBATE_LIST = []
 
 from .parsing.sqlite import adsorbates_from_db
 from .parsing.sqlite import materials_from_db
 
-MATERIAL_LIST = materials_from_db(verbose=False)
-ADSORBATE_LIST = adsorbates_from_db(verbose=False)
+MATERIAL_LIST.extend(materials_from_db(verbose=False))
+ADSORBATE_LIST.extend(adsorbates_from_db(verbose=False))

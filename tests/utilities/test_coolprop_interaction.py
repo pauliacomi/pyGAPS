@@ -7,7 +7,6 @@ import pygaps
 
 class TestCoolProp():
     """Test CoolProp interaction."""
-
     def test_backend_change(self):
         """Test if backend can change."""
         previous_backend = pygaps.COOLPROP_BACKEND

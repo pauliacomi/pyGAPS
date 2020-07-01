@@ -14,7 +14,9 @@ from pygaps.core.isotherm import Isotherm
 from pygaps.core.material import Material
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.data import ADSORBATE_LIST
 from pygaps.data import DATABASE
+from pygaps.data import MATERIAL_LIST
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.python_utilities import checktype
@@ -29,7 +31,12 @@ def with_connection(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
+        # If cursor exists we just move on
+        if kwargs.get('cursor'):
+            return func(*args, **kwargs)
+
         db_path = kwargs.get('db_path', DATABASE)
+        db_path = db_path if db_path else DATABASE
         conn = sqlite3.connect(
             str(db_path)
         )  # TODO remove 'str' call when dropping P3.6
@@ -43,11 +50,11 @@ def with_connection(func):
 
         except sqlite3.IntegrityError as e:
             conn.rollback()
-            raise ParsingError from e
+            raise ParsingError(e)
 
         except sqlite3.InterfaceError as e:
             conn.rollback()
-            raise ParsingError from e
+            raise ParsingError(e)
 
         else:
             conn.commit()
@@ -252,6 +259,12 @@ def adsorbate_to_db(
                         f"Original error:\n{e}"
                     )
 
+    # Add to existing list
+    if overwrite:
+        if adsorbate in ADSORBATE_LIST:
+            ADSORBATE_LIST.remove(adsorbate.name)
+    ADSORBATE_LIST.append(adsorbate)
+
     if verbose:
         # Print success
         print(f"Adsorbate uploaded: '{adsorbate.name}'")
@@ -326,8 +339,8 @@ def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
 
     Parameters
     ----------
-    adsorbate : Adsorbate
-        The Adsorbate class to delete.
+    adsorbate : Adsorbate or str
+        The Adsorbate class to delete or its name.
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
     verbose : bool
@@ -339,7 +352,8 @@ def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
     # Get id of adsorbate
     ids = cursor.execute(
         build_select(table='adsorbates', to_select=['id'], where=['name']), {
-            'name': adsorbate.name
+            'name':
+            adsorbate.name if isinstance(adsorbate, Adsorbate) else adsorbate
         }
     ).fetchone()
     if ids is None:
@@ -348,20 +362,29 @@ def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
         )
     ads_id = ids[0]
 
-    # Delete data from adsorbate_properties table
-    cursor.execute(
-        build_delete(table='adsorbate_properties', where=['ads_id']),
-        {'ads_id': ads_id}
-    )
+    try:
+        # Delete data from adsorbate_properties table
+        cursor.execute(
+            build_delete(table='adsorbate_properties', where=['ads_id']),
+            {'ads_id': ads_id}
+        )
 
-    # Delete original name in adsorbates table
-    cursor.execute(
-        build_delete(table='adsorbates', where=['id']), {'id': ads_id}
-    )
+        # Delete original name in adsorbates table
+        cursor.execute(
+            build_delete(table='adsorbates', where=['id']), {'id': ads_id}
+        )
+    except sqlite3.Error as e:
+        raise type(e)(
+            "Could not delete adsorbate, are there still isotherms referencing it?"
+        ) from None
+
+    # Remove from existing list
+    if adsorbate in ADSORBATE_LIST:
+        ADSORBATE_LIST.remove(adsorbate)
 
     if verbose:
         # Print success
-        print("Success", adsorbate.name)
+        print(f"Adsorbate deleted: '{adsorbate}'")
 
 
 @with_connection
@@ -548,11 +571,18 @@ def material_to_db(
                     raise type(e)(
                         f"Cannot process property {prop}: {vl}"
                         f"Original error:\n{e}"
-                    )
+                    ) from None
+
+    # Add to existing list
+    if overwrite:
+        if material in MATERIAL_LIST:
+            MATERIAL_LIST.remove(material.name)
+
+    MATERIAL_LIST.append(material)
 
     if verbose:
         # Print success
-        print(f"Material uploaded: {material.name}")
+        print(f"Material uploaded: '{material.name}'")
 
 
 @with_connection
@@ -615,7 +645,7 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
 
     Parameters
     ----------
-    material : Material
+    material : Material or str
         Material class to upload to the database.
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
@@ -628,13 +658,14 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
     # Get id of material
     mat_id = cursor.execute(
         build_select(table='materials', to_select=['id'], where=['name']), {
-            'name': material.name,
+            'name':
+            material.name if isinstance(material, Material) else material,
         }
     ).fetchone()
     if mat_id is None:
         raise sqlite3.IntegrityError(
             "Material to delete does not exist in database."
-        )
+        ) from None
     mat_id = mat_id[0]
 
     # Delete data from material_properties table
@@ -643,16 +674,25 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
         {'mat_id': mat_id}
     )
 
-    # Delete material info in materials table
-    cursor.execute(
-        build_delete(table='materials', where=['id']), {'id': mat_id}
-    )
+    try:
+        # Delete material info in materials table
+        cursor.execute(
+            build_delete(table='materials', where=['id']), {'id': mat_id}
+        )
+    except sqlite3.Error as e:
+        raise type(e)(
+            "Could not delete material, are there still isotherms referencing it?"
+        ) from None
+
+    # Remove from existing list
+    if material in MATERIAL_LIST:
+        MATERIAL_LIST.remove(material)
 
     if verbose:
         # Print success
-        print("Success", material.name)
-
-    return
+        print(
+            f"Material deleted: '{material.name if isinstance(material, Material) else material}'"
+        )
 
 
 @with_connection
@@ -750,7 +790,14 @@ def material_property_type_delete_db(
 
 
 @with_connection
-def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
+def isotherm_to_db(
+    isotherm,
+    db_path=None,
+    autoinsert_material=True,
+    autoinsert_adsorbate=True,
+    verbose=True,
+    **kwargs
+):
     """
     Uploads isotherm to the database.
 
@@ -763,11 +810,35 @@ def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
         Isotherm, PointIsotherm or ModelIsotherm to upload to the database.
     db_path : str, None
         Path to the database. If none is specified, internal database is used.
-    verbose : bool
+    autoinsert_material: bool, True
+        Whether to automatically insert an isotherm material if it is not found
+        in the database.
+    autoinsert_adsorbate: bool, True
+        Whether to automatically insert an isotherm adsorbate if it is not found
+        in the database.
+    verbose : bool, True
         Extra information printed to console.
     """
 
     cursor = kwargs['cursor']
+    # Checks
+    if autoinsert_material:
+        if isotherm.material not in MATERIAL_LIST:
+            material_to_db(
+                isotherm.material if isinstance(isotherm.material, Material)
+                else Material(isotherm.material),
+                db_path=db_path,
+                cursor=cursor
+            )
+    if autoinsert_adsorbate:
+        if isotherm.adsorbate not in ADSORBATE_LIST:
+            adsorbate_to_db(
+                isotherm.adsorbate
+                if isinstance(isotherm.adsorbate, Adsorbate) else
+                Adsorbate(isotherm.adsorbate),
+                db_path=db_path,
+                cursor=cursor
+            )
 
     # The isotherm is going to be inserted into the database
     # Build upload dict
@@ -793,9 +864,16 @@ def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
 
     # Upload isotherm info to database
     db_columns = ["id", "iso_type"] + Isotherm._required_params
-    cursor.execute(
-        build_insert(table='isotherms', to_insert=db_columns), upload_dict
-    )
+    try:
+        cursor.execute(
+            build_insert(table='isotherms', to_insert=db_columns), upload_dict
+        )
+    except sqlite3.Error as e:
+        raise type(e)(
+            f"""Error inserting isotherm "{upload_dict["id"]}" base properties. """
+            f"""Ensure material "{upload_dict["material"]}", and adsorbate "{upload_dict["adsorbate"]}" """
+            f"""exist in the database already. Original error:\n {e}"""
+        ) from None
 
     # TODO insert multiple
     # Upload the other isotherm parameters
@@ -860,7 +938,7 @@ def isotherm_to_db(isotherm, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        print("Success:", str(isotherm))
+        print(f"Isotherm uploaded: '{isotherm.iso_id}'")
 
 
 @with_connection
@@ -1028,7 +1106,7 @@ def isotherm_delete_db(iso_id, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        print("Success:", iso_id)
+        print(f"Isotherm deleted: '{iso_id}'")
 
 
 @with_connection

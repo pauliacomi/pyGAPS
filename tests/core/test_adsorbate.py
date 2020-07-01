@@ -44,7 +44,7 @@ class TestAdsorbate():
 
     def test_adsorbate_retrieved_list(self, adsorbate_data, basic_adsorbate):
         """Check adsorbate can be retrieved from master list."""
-        pygaps.data.ADSORBATE_LIST.append(basic_adsorbate)
+        pygaps.ADSORBATE_LIST.append(basic_adsorbate)
         uploaded_adsorbate = pygaps.Adsorbate.find(adsorbate_data.get('name'))
 
         assert adsorbate_data == uploaded_adsorbate.to_dict()
@@ -54,6 +54,7 @@ class TestAdsorbate():
 
         with pytest.raises(pygaps.ParameterError):
             pygaps.Adsorbate.find(2)
+        pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
 
     def test_adsorbate_find_equals(self):
         """Check standard adsorbates can be found."""

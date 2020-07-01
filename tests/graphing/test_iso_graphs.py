@@ -48,6 +48,7 @@ class TestIsothermGraphs():
         pygaps.plot_iso(basic_pointisotherm, pressure_unit='Pa')
         pygaps.plot_iso(basic_pointisotherm, loading_unit='mol')
         pygaps.plot_iso(basic_pointisotherm, pressure_mode='relative')
+        pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
 
     @cleanup
     def test_range_plot(self, basic_pointisotherm):
