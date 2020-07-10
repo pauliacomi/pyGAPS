@@ -35,4 +35,6 @@ class TestCoolProp():
                     adsorbate.backend.molar_mass()
                 except pygaps.utilities.exceptions.ParameterError:
                     pass
+                except ValueError:
+                    pass
             pygaps.backend_use_coolprop()
