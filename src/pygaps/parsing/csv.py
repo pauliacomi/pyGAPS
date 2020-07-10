@@ -191,11 +191,12 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
         data = pandas.read_csv(raw_csv, sep=separator)
 
         # process isotherm branches if they exist
-        raw_dict['branch'] = 'guess'
         if 'branch' in data.columns:
-            raw_dict['branch'] = data['branch'].replace('ads', False).replace(
-                'des', True
-            ).values
+            data['branch'] = data['branch'].apply(
+                lambda x: False if x == 'ads' else True
+            )
+        else:
+            raw_dict['branch'] = 'guess'
 
         # generate other keys
         other_keys = [

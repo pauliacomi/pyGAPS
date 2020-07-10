@@ -101,6 +101,28 @@ class TestPointIsotherm():
 
         assert isotherm.pressure(branch='des')[0] == expected
 
+    def test_isotherm_existing_branches(
+        self,
+        isotherm_parameters,
+        isotherm_data,
+    ):
+        """Tests if isotherm branches are well specified."""
+
+        isotherm_datab = isotherm_data.copy()
+        isotherm_datab['branch'] = [
+            False, False, True, True, True, True, True, True
+        ]
+
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data=isotherm_datab,
+            loading_key='loading',
+            pressure_key='pressure',
+            other_keys=['enthalpy'],
+            **isotherm_parameters
+        )
+
+        assert isotherm.pressure(branch='des')[0] == 3.0
+
     def test_isotherm_equality(
         self, isotherm_parameters, isotherm_data, basic_pointisotherm
     ):
@@ -178,33 +200,37 @@ class TestPointIsotherm():
         other_key = "enthalpy"
 
         # all data
-        data = basic_pointisotherm.data()
+        data = basic_pointisotherm.data().drop('branch', axis=1)
         data2 = pandas.DataFrame({
-            other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
-            basic_pointisotherm.loading_key:
-            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
             basic_pointisotherm.pressure_key:
             [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            basic_pointisotherm.loading_key:
+            [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
         })
         assert data.equals(data2)
 
         # adsorption branch
-        assert basic_pointisotherm.data(branch='ads').equals(
+        assert basic_pointisotherm.data(
+            branch='ads'
+        ).drop('branch', axis=1).equals(
             pandas.DataFrame({
-                other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
-                basic_pointisotherm.loading_key:
-                [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 basic_pointisotherm.pressure_key:
                 [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                basic_pointisotherm.loading_key:
+                [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                other_key: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
             })
         )
 
         # desorption branch
-        assert basic_pointisotherm.data(branch='des').equals(
+        assert basic_pointisotherm.data(
+            branch='des'
+        ).drop('branch', axis=1).equals(
             pandas.DataFrame({
-                other_key: [4.0, 4.0],
-                basic_pointisotherm.loading_key: [4.5, 2.5],
                 basic_pointisotherm.pressure_key: [4.5, 2.5],
+                basic_pointisotherm.loading_key: [4.5, 2.5],
+                other_key: [4.0, 4.0],
             },
                              index=[6, 7])
         )

@@ -326,10 +326,11 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
 
             # process isotherm branches if they exist
             if 'branch' in data.columns:
-                raw_dict['branch'] = data['branch'].replace('ads',
-                                                            False).replace(
-                                                                'des', True
-                                                            ).values
+                data['branch'] = data['branch'].apply(
+                    lambda x: False if x == 'ads' else True
+                )
+            else:
+                raw_dict['branch'] = 'guess'
 
         if sht.cell(type_row, 1).value.lower().startswith('model'):
 

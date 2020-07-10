@@ -55,6 +55,7 @@ class PointIsotherm(Isotherm):
         Alternatively, an iterable can be passed which contains
         detailed info for each data point if adsorption points ('False')
         or desorption points ('True'). eg: [False, False, True, True...]
+        or as a column of the isotherm_data.
     material : str
         Name of the material on which the isotherm is measured.
     adsorbate : str
@@ -139,12 +140,15 @@ class PointIsotherm(Isotherm):
                 self.other_keys = []
 
             # Pandas DataFrame that stores the data.
-            columns = [self.pressure_key, self.loading_key] + self.other_keys
+            columns = [self.pressure_key, self.loading_key
+                       ] + sorted(self.other_keys)
             if not all([a in isotherm_data.columns for a in columns]):
                 raise ParameterError(
                     "Could not find some specified columns in the adsorption DataFrame."
                 )
-            self.data_raw = isotherm_data[columns].sort_index(axis=1)
+            if 'branch' in isotherm_data.columns:
+                columns.append('branch')
+            self.data_raw = isotherm_data[columns]
 
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
@@ -181,8 +185,10 @@ class PointIsotherm(Isotherm):
         # Run base class constructor
         Isotherm.__init__(self, **isotherm_parameters)
 
-        # Deal with the isotherm branches (ads/des)
-        if isinstance(branch, str):
+        # Deal with the isotherm branches
+        if 'branch' in self.data_raw.columns:
+            pass
+        elif isinstance(branch, str):
             if branch == 'guess':
                 # Split the data in adsorption/desorption
                 self.data_raw['branch'] = self._splitdata(
@@ -195,12 +201,11 @@ class PointIsotherm(Isotherm):
             else:
                 raise ParameterError(
                     "Isotherm branch parameter must be 'guess ,'ads' or 'des'"
+                    " or an array of booleans."
                 )
         else:
             try:
-                self.data_raw.insert(
-                    len(self.data_raw.columns), 'branch', branch
-                )
+                self.data_raw['branch'] = branch
             except Exception as e_info:
                 raise ParameterError(e_info)
 
@@ -244,7 +249,7 @@ class PointIsotherm(Isotherm):
         """
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
-        # insert or update values
+        # add pointisotherm values to dict
         iso_params['pressure'] = pressure
         iso_params['loading'] = loading
         iso_params['isotherm_data'] = isotherm_data
@@ -284,6 +289,8 @@ class PointIsotherm(Isotherm):
         else:
             pressure = pressure_points
 
+        # TODO: in case the model isotherm calculates pressure from loading
+        # this is not ideal
         return PointIsotherm(
             isotherm_data=pandas.DataFrame({
                 'pressure':
@@ -309,10 +316,11 @@ class PointIsotherm(Isotherm):
 
         Parameters
         ----------
-        pressure_mode : {'relative', 'absolute'}
+        mode_to : {'relative', 'absolute'}
             The mode in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal pressure should be converted to.
+            Only makes sense if converting to absolute pressure.
         verbose : bool
             Print out steps taken.
 
@@ -347,7 +355,9 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(f"Changed pressure to mode {mode_to}, unit {unit_to}")
+                print(
+                    f"Changed pressure to mode '{mode_to}', unit '{unit_to}'."
+                )
 
     def convert_loading(self, basis_to=None, unit_to=None, verbose=False):
         """
@@ -357,7 +367,7 @@ class PointIsotherm(Isotherm):
 
         Parameters
         ----------
-        basis : {'volume', 'mass', 'molar'}
+        basis_to : {'volume', 'mass', 'molar'}
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal loading should be converted to.
@@ -367,7 +377,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.loading_basis and unit_to == self.loading_unit:
             if verbose:
-                print("Basis and units are the same, no changes made")
+                print("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -393,7 +403,9 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(f"Changed loading to basis {basis_to}, unit {unit_to}")
+                print(
+                    f"Changed loading to basis '{basis_to}', unit '{unit_to}'."
+                )
 
     def convert_adsorbent(self, basis_to=None, unit_to=None, verbose=False):
         """
@@ -416,7 +428,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.adsorbent_basis and unit_to == self.adsorbent_unit:
             if verbose:
-                print("Basis and units are the same, no changes made")
+                print("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -441,7 +453,9 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(f"Changed adsorbent to basis {basis_to}, unit {unit_to}")
+                print(
+                    f"Changed adsorbent to basis '{basis_to}', unit '{unit_to}'."
+                )
 
     ###########################################################
     #   Info functions
@@ -528,14 +542,11 @@ class PointIsotherm(Isotherm):
 
         """
         if branch is None:
-            return self.data_raw.drop('branch', axis=1)
-        if branch == 'ads':
-            return self.data_raw.loc[~self.data_raw['branch']].drop(
-                'branch', axis=1
-            )
-        if branch == 'des':
-            return self.data_raw.loc[self.data_raw['branch']
-                                     ].drop('branch', axis=1)
+            return self.data_raw
+        elif branch == 'ads':
+            return self.data_raw.loc[~self.data_raw['branch']]
+        elif branch == 'des':
+            return self.data_raw.loc[self.data_raw['branch']]
         raise ParameterError('Bad branch specification.')
 
     def pressure(
@@ -565,7 +576,7 @@ class PointIsotherm(Isotherm):
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
-            pandas.Series with the columns requested instead of an array.
+            pandas.Series instead of an array.
 
         Returns
         -------
@@ -639,7 +650,7 @@ class PointIsotherm(Isotherm):
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
-            pandas.Series with the columns requested instead of an array.
+            pandas.Series instead of an array.
 
         Returns
         -------
@@ -705,7 +716,7 @@ class PointIsotherm(Isotherm):
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
-            pandas.Series with the columns requested instead of an array.
+            pandas.Series instead of an array.
 
         Returns
         -------
@@ -764,7 +775,7 @@ class PointIsotherm(Isotherm):
         adsorbent_basis=None,
     ):
         """
-        Interpolate isotherm to compute pressure at any loading n.
+        Interpolate isotherm to compute pressure at any loading given.
 
         Parameters
         ----------
@@ -896,7 +907,7 @@ class PointIsotherm(Isotherm):
         adsorbent_basis=None,
     ):
         """
-        Interpolate isotherm to compute loading at any pressure P.
+        Interpolate isotherm to compute loading at any pressure given.
 
         Parameters
         ----------

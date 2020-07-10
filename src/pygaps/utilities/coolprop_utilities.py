@@ -1,7 +1,7 @@
 """Utilities for interacting with the CoolProp backend."""
 import pygaps
 
-#: The backend which CoolProp uses, either HEOS or REFPROP.
+#: The backend which CoolProp uses, normally either HEOS or REFPROP.
 COOLPROP_BACKEND = 'HEOS'
 
 
