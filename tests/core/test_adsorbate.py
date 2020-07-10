@@ -17,7 +17,7 @@ class TestAdsorbate():
         ads = pygaps.Adsorbate('Test')
         assert ads == 'Test'
         assert ads == 'test'
-        assert repr(ads) == 'Test'
+        assert repr(ads) == "<pygaps.Adsorbate 'Test'>"
         assert str(ads) == 'Test'
         assert ads + '2' == 'Test2'
         assert 'i' + ads == 'iTest'

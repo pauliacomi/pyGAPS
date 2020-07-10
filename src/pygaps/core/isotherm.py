@@ -181,8 +181,7 @@ class Isotherm():
         for attr in properties:
             if hasattr(self, attr):
                 raise ParameterError(
-                    "Cannot override standard Isotherm class member '{}'"
-                    .format(attr)
+                    f"Cannot override standard Isotherm class member '{attr}'."
                 )
             setattr(self, attr, properties[attr])
 
@@ -206,7 +205,7 @@ class Isotherm():
 
     def __repr__(self):
         """Print key isotherm parameters."""
-        return f"{self.iso_id}: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
+        return f"<{self.iso_id}>: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
