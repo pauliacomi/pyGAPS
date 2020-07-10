@@ -135,11 +135,13 @@ class ModelIsotherm(Isotherm):
             elif branch == 'des':
                 data = data.loc[data['branch']]
             else:
-                raise ParameterError("Isotherm branch must be 'ads' or 'des'")
+                raise ParameterError(
+                    "ModelIsotherm branch must be singular: 'ads' or 'des'."
+                )
 
             if data.empty:
                 raise ParameterError(
-                    "The isotherm branch does not contain enough points"
+                    "The required isotherm branch does not contain any points."
                 )
 
             # Get just the pressure and loading columns
@@ -204,8 +206,8 @@ class ModelIsotherm(Isotherm):
                 for param, guess_val in param_guess.items():
                     if param not in self.param_guess.keys():
                         raise ParameterError(
-                            "%s is not a valid parameter"
-                            " in the %s model." % (param, model)
+                            f"'{param}' is not a valid parameter"
+                            f" in the '{model}' model."
                         )
                     self.param_guess[param] = guess_val
 
@@ -485,7 +487,7 @@ class ModelIsotherm(Isotherm):
                     'ko', **opts
                 )
             ax.legend([m.model.name for m in attempts])
-            print(f"Best model fit is {best_fit.model.name}")
+            print(f"Best model fit is {best_fit.model.name}.")
 
         return best_fit
 
@@ -619,8 +621,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an {self.branch} branch "
-                f"(while parameter supplied was {branch})"
+                f"ModelIsotherm is based on an '{self.branch}' branch "
+                f"(while parameter supplied was '{branch}')."
             )
 
         # Generate pressure points
@@ -712,8 +714,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an {self.branch} branch "
-                f"(while parameter supplied was {branch})"
+                f"ModelIsotherm is based on an '{self.branch}' branch "
+                f"(while parameter supplied was '{branch}')."
             )
 
         if self.model.calculates == 'pressure':
@@ -823,8 +825,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an {self.branch} branch "
-                f"(while parameter supplied was {branch})"
+                f"ModelIsotherm is based on an '{self.branch}' branch "
+                f"(while parameter supplied was '{branch}')."
             )
 
         # Convert to numpy array just in case
@@ -943,8 +945,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an {self.branch} branch "
-                f"(while parameter supplied was {branch})"
+                f"ModelIsotherm is based on an '{self.branch}' branch "
+                f"(while parameter supplied was '{branch}')."
             )
 
         # Convert to numpy array just in case
@@ -1040,8 +1042,8 @@ class ModelIsotherm(Isotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an {self.branch} branch "
-                f"(while parameter supplied was {branch})"
+                f"ModelIsotherm is based on an '{self.branch}' branch "
+                f"(while parameter supplied was '{branch}')."
             )
 
         # Convert to numpy array just in case
