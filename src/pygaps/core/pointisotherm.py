@@ -4,7 +4,6 @@ This module contains the main class that describes an isotherm through discrete 
 
 import textwrap
 
-import matplotlib.pyplot as plt
 import numpy
 import pandas
 
@@ -504,7 +503,7 @@ class PointIsotherm(Isotherm):
         axes = plot_iso(self, **plot_dict)
 
         if show:
-            plt.show()
+            axes.get_figure().show()
             return
 
         return axes

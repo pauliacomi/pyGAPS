@@ -1,6 +1,5 @@
 """Class representing a model of and isotherm."""
 
-import matplotlib.pyplot as plt
 import numpy
 import pandas
 
@@ -553,7 +552,7 @@ class ModelIsotherm(Isotherm):
         axes = plot_iso(self, **plot_dict)
 
         if show:
-            plt.show()
+            axes.get_figure().show()
             return
 
         return axes
