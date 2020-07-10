@@ -1,0 +1,132 @@
+[
+    {
+        "type" : "alias",
+        "unit" : null,
+        "description" : "An alternative name for the adsorbate."
+    },
+    {
+        "type" : "formula",
+        "unit" : null,
+        "description" : "LaTeX-formatted formula string."
+    },
+    {
+        "type" : "inchikey",
+        "unit" : null,
+        "description" : "The standard compound InChiKey."
+    },
+    {
+        "type" : "backend_name",
+        "unit" : null,
+        "description" : "Identifier for CoolProp/Refprop interaction."
+    },
+    {
+        "type" : "family",
+        "unit" : null,
+        "description" : "Adsorbate family (strictly informational)."
+    },
+    {
+        "type" : "molar_mass",
+        "unit" : "g mol^{-1}",
+        "description" : "Standard molar mass."
+    },
+    {
+        "type" : "polarizability",
+        "unit" : "nm^3",
+        "description" : "Molecule polarizability, if available."
+    },
+    {
+        "type" : "dipole_moment",
+        "unit" : "10e18 esu cm",
+        "description" : "Dipole moment, if available."
+    },
+    {
+        "type" : "quadrupole_moment",
+        "unit" : "10e26 esu cm^2",
+        "description" : "Quadrupole moment, if available."
+    },
+    {
+        "type" : "cross_sectional_area",
+        "unit" : "nm^2",
+        "description" : "Molecular cross-sectional area, an approximation used for surface area calculations."
+    },
+    {
+        "type" : "kinetic_diameter",
+        "unit" : "nm",
+        "description" : "Standard molecular kinetic diameter, if available."
+    },
+    {
+        "type" : "molecular_diameter",
+        "unit" : "nm",
+        "description" : "Molecule diameter for some calculations (HK)."
+    },
+    {
+        "type" : "magnetic_susceptibility",
+        "unit" : "nm^3",
+        "description" : "Molecular susceptibility for some calculations (HK)."
+    },
+    {
+        "type" : "surface_density",
+        "unit" : "molecules/m2",
+        "description" : "Surface density of molecules for some calculations (HK)."
+    },
+    {
+        "type" : "acentric_factor",
+        "unit" : null,
+        "description" : "The acentric factor of the molecule."
+    },
+    {
+        "type" : "t_triple",
+        "unit" : "K",
+        "description" : "Triple point temperature."
+    },
+    {
+        "type" : "p_triple",
+        "unit" : "bar",
+        "description" : "Triple point pressure."
+    },
+    {
+        "type" : "t_critical",
+        "unit" : "K",
+        "description" : "Critical point temperature."
+    },
+    {
+        "type" : "p_critical",
+        "unit" : "bar",
+        "description" : "Critical point pressure."
+    },
+    {
+        "type" : "rhomolar_critical",
+        "unit" : "mol m^{-3}",
+        "description" : "Critical point molar density."
+    },
+    {
+        "type" : "rhomass_critical",
+        "unit" : "kg m^{-3}",
+        "description" : "Critical point mass density."
+    },
+    {
+        "type" : "gas_density",
+        "unit" : "g/cm3",
+        "description" : "Gas phase density, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "liquid_density",
+        "unit" : "g/cm3",
+        "description" : "Liquid phase density, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "surface_tension",
+        "unit" : "mN/m",
+        "description" : "Surface tension, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "saturation_pressure",
+        "unit" : "bar",
+        "description" : "Vapour saturation pressure, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    },
+    {
+        "type" : "enthalpy_liquefaction",
+        "unit" : "kJ/mol",
+        "description" : "Liquefaction/vaporization enthalpy, WARNING: temperature dependent and usually calculated from thermodynamic backend."
+    }
+]

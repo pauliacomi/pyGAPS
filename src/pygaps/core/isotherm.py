@@ -35,8 +35,6 @@ class Isotherm():
 
     Other Parameters
     ----------------
-    material_batch : str
-        Batch (or identifier) of the material on which the isotherm is measured.
     adsorbent_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
@@ -66,11 +64,6 @@ class Isotherm():
 
     # strictly required attributes
     _required_params = ['material', 'temperature', 'adsorbate']
-    # specific attributes which are named
-    _named_params = {
-        'iso_type': str,
-        'material_batch': str,
-    }
     # unit-related attributes
     _unit_params = {
         'pressure_unit': 'bar',
@@ -80,13 +73,9 @@ class Isotherm():
         'loading_unit': 'mmol',
         'loading_basis': 'molar',
     }
-    # attributes which will not be in the output
+    # other special reserved parameters
     # subclasses overwrite this
     _reserved_params = []
-    # attributes which are kept in the database
-    _db_columns = ['id'] + _required_params + list(_named_params)
-    # attributes which are used in the ID hash procedure
-    _id_params = _required_params + list(_unit_params)
 
     ##########################################################
     #   Instantiation and classmethods
@@ -188,23 +177,11 @@ class Isotherm():
 
         # Other named properties of the isotherm
 
-        # Isotherm material batch, deprecated.
-        self.material_batch = str(properties.pop('material_batch', None))
-
-        # Others
-        for named_prop in self._named_params:
-            prop_val = properties.pop(named_prop, None)
-            if prop_val:
-                setattr(
-                    self, named_prop, self._named_params[named_prop](prop_val)
-                )
-
         # Save the rest of the properties as members
         for attr in properties:
             if hasattr(self, attr):
                 raise ParameterError(
-                    "Cannot override standard Isotherm class member '{}'"
-                    .format(attr)
+                    f"Cannot override standard Isotherm class member '{attr}'."
                 )
             setattr(self, attr, properties[attr])
 
@@ -228,7 +205,7 @@ class Isotherm():
 
     def __repr__(self):
         """Print key isotherm parameters."""
-        return f"{self.iso_id}: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
+        return f"<{self.iso_id}>: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
@@ -238,12 +215,6 @@ class Isotherm():
         string += ("Material: " + str(self.material) + '\n')
         string += ("Adsorbate: " + str(self.adsorbate) + '\n')
         string += ("Temperature: " + str(self.temperature) + "K" + '\n')
-
-        # Named
-        for param in self._named_params:
-            param_val = getattr(self, param, None)
-            if param_val:
-                string += (param + ': ' + str(param_val) + '\n')
 
         # Units/basis
         string += ("Units: \n")
@@ -258,7 +229,7 @@ class Isotherm():
 
         string += ("Other properties: \n")
         for prop in vars(self):
-            if prop not in self._required_params + list(self._named_params) + \
+            if prop not in self._required_params + \
                     list(self._unit_params) + self._reserved_params:
                 string += (
                     '\t' + prop + ": " + str(getattr(self, prop)) + '\n'
@@ -336,6 +307,35 @@ class Isotherm():
 
         """
         return pygaps.isotherm_to_xl(self, path, **kwargs)
+
+    def to_db(
+        self,
+        db_path=None,
+        verbose=True,
+        autoinsert_material=True,
+        autoinsert_adsorbate=True,
+        **kwargs
+    ):
+        """
+        Upload the isotherm to an sqlite database.
+
+        Parameters
+        ----------
+        db_path : str, None
+            Path to the database. If none is specified, internal database is used.
+        autoinsert_material: bool, True
+            Whether to automatically insert an isotherm material if it is not found
+            in the database.
+        autoinsert_adsorbate: bool, True
+            Whether to automatically insert an isotherm adsorbate if it is not found
+            in the database.
+        verbose : bool
+            Extra information printed to console.
+
+        """
+        return pygaps.isotherm_to_db(
+            self, db_path=db_path, verbose=verbose, **kwargs
+        )
 
     # Figure out the adsorption and desorption branches
     @staticmethod

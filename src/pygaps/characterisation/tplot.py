@@ -3,7 +3,7 @@
 import warnings
 
 import numpy
-import scipy
+import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calcgraph import plot_tp
@@ -262,7 +262,7 @@ def t_plot_parameters(
 ):
     """Calculate the parameters from a linear section of the t-plot."""
 
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         thickness_curve[section], loading[section]
     )
 

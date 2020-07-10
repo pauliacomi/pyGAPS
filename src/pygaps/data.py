@@ -1,21 +1,21 @@
 """
 Loading some data at import-time.
 
-Here is where objects such as adsorbates or materials
-are imported to be available for pyGAPS.
-These are populated at import-time.
-Also defines the internal database location.
+Here is where objects such as adsorbates or materials are imported to be
+available for pyGAPS. These are populated at import-time. Also defines the
+internal database location.
 """
-from pathlib import Path
+# flake8: noqa
+# isort:skip_file
 
-from .parsing.sqliteinterface import db_get_adsorbate_names
-from .parsing.sqliteinterface import db_get_adsorbates
-from .parsing.sqliteinterface import db_get_materials
+import pkg_resources
 
-DATABASE = Path(__file__).parent / 'database' / 'local.db'
+DATABASE = pkg_resources.resource_filename('pygaps', 'data/default.db')
+MATERIAL_LIST = []
+ADSORBATE_LIST = []
 
-MATERIAL_LIST = db_get_materials(DATABASE, verbose=False)
-ADSORBATE_NAME_LIST = [
-    a['name'].lower() for a in db_get_adsorbate_names(DATABASE)
-]
-ADSORBATE_LIST = db_get_adsorbates(DATABASE, verbose=False)
+from .parsing.sqlite import adsorbates_from_db
+from .parsing.sqlite import materials_from_db
+
+MATERIAL_LIST.extend(materials_from_db(verbose=False))
+ADSORBATE_LIST.extend(adsorbates_from_db(verbose=False))

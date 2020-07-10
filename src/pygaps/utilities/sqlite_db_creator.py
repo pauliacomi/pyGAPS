@@ -1,15 +1,16 @@
 """Generate the default sqlite database."""
 
-
+import json
 import sqlite3
 
 import pygaps
+from pygaps.parsing import sqlite as pgsqlite
 
 from .exceptions import ParsingError
 from .sqlite_db_pragmas import PRAGMAS
 
 
-def db_create(pth):
+def db_create(pth, verbose=False):
     """
     Create the entire database.
 
@@ -20,33 +21,57 @@ def db_create(pth):
 
     """
     for pragma in PRAGMAS:
-        db_execute_general(pth, pragma)
+        db_execute_general(pragma, pth, verbose=verbose)
 
-    pygaps.db_upload_isotherm_property_type(pth, {'type': 'pressure_mode'})
-    pygaps.db_upload_isotherm_property_type(pth, {'type': 'pressure_unit'})
-    pygaps.db_upload_isotherm_property_type(pth, {'type': 'adsorbate_mode'})
-    pygaps.db_upload_isotherm_property_type(pth, {'type': 'adsorbate_unit'})
-    pygaps.db_upload_isotherm_property_type(pth, {'type': 'loading_mode'})
-    pygaps.db_upload_isotherm_property_type(pth, {'type': 'loading_unit'})
+    # Load adsorbate paths
+    import pkg_resources
+    ads_props_path = pkg_resources.resource_filename(
+        'pygaps', 'data/adsorbate_props.json'
+    )
+    ads_path = pkg_resources.resource_filename(
+        'pygaps', 'data/adsorbates.json'
+    )
 
-    return
+    # Import adsorbate json
+    with open(ads_props_path) as f:
+        ads_props = json.load(f)
+    for ap_type in ads_props:
+        pgsqlite.adsorbate_property_type_to_db(
+            ap_type, db_path=pth, verbose=verbose
+        )
+
+    # Upload adsorbate property types
+    with open(ads_path) as f:
+        adsorbates = json.load(f)
+
+    # Upload adsorbates
+    for ads in adsorbates:
+        pgsqlite.adsorbate_to_db(
+            pygaps.Adsorbate(**ads), db_path=pth, verbose=verbose
+        )
+
+    # Upload standard isotherm types
+    pgsqlite.isotherm_type_to_db({'type': 'isotherm'}, db_path=pth)
+    pgsqlite.isotherm_type_to_db({'type': 'pointisotherm'}, db_path=pth)
+    pgsqlite.isotherm_type_to_db({'type': 'modelisotherm'}, db_path=pth)
 
 
-def db_execute_general(pth, statement):
+def db_execute_general(statement, pth, verbose=False):
     """
     Execute general SQL statements.
 
     Parameters
     ----------
-    pth : str
-        Path where the database is located.
     statement : str
         SQL statement to execute.
+    pth : str
+        Path where the database is located.
 
     """
     # Attempt to connect
     try:
-        with sqlite3.connect(pth) as db:
+        # TODO remove str call on python 3.7
+        with sqlite3.connect(str(pth)) as db:
 
             # Get a cursor object
             cursor = db.cursor()
@@ -56,12 +81,6 @@ def db_execute_general(pth, statement):
             cursor.executescript(statement)
 
     # Catch the exception
-    except sqlite3.OperationalError as e_info:
+    except sqlite3.Error as e_info:
         print("Unable to execute statement", statement)
         raise ParsingError from e_info
-
-    # Close the db connection
-    if db:
-        db.close()
-
-    return

@@ -61,7 +61,7 @@ There are a few types of database functions:
     - :class:`~pygaps.core.pointisotherm.PointIsotherm` management functions
 
 A complete list of methods can be found in the
-:mod:`~pygaps.parsing.sqliteinterface` reference.
+:mod:`~pygaps.parsing.sqlite` reference.
 
 .. note::
 

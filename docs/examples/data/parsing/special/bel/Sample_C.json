@@ -93,7 +93,7 @@
     "loading_basis": "molar",
     "loading_unit": "cm3(STP)",
     "mass": 0.074,
-    "material_batch": "bel",
+    "apparatus": "bel",
     "material": "Sample_C",
     "pressure_mode": "relative",
     "pressure_unit": null,

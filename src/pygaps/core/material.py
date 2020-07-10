@@ -33,26 +33,35 @@ class Material():
     which can be set as seen above.
 
     """
-    def __init__(self, name, batch=None, **properties):
+    def __init__(self, name, **properties):
         """Instantiate by passing all the parameters."""
         #: Material name
         self.name = name
-
-        #: Material batch
-        self.batch = batch
 
         #: Rest of material properties
         self.properties = properties
 
     def __repr__(self):
-        """Print material name."""
-        return ' '.join([self.name])
+        """Print material id."""
+        return f"<pygaps.Material '{self.name}'>"
 
     def __str__(self):
+        """Print material standard name."""
+        return self.name
+
+    def __hash__(self):
+        """Override hashing as a hash of name."""
+        return hash(self.name)
+
+    def __eq__(self, other):
+        """Overload equality operator to use name."""
+        if isinstance(other, Material):
+            return self.name == other.name
+        return self.name == other
+
+    def print_info(self):
         """Print a short summary of all the material parameters."""
-        string = ""
-        string += ("Material:" + self.name + '\n')
-        string += ("Batch:" + self.batch + '\n')
+        string = f"pyGAPS Material: {self.name}\n"
 
         if self.properties:
             for prop in self.properties:
@@ -60,27 +69,14 @@ class Material():
 
         return string
 
-    def __hash__(self):
-        """Override hashing as a hash of name."""
-        return hash(self.__repr__())
-
-    def __eq__(self, other):
-        """Overload equality operator to use name."""
-        if isinstance(other, Material):
-            return self.name == other.name
-        return self.__repr__() == other
-
     @classmethod
-    def find(cls, material_name, material_batch=None):
-        """
-        Get the material from the master list using its name.
+    def find(cls, name):
+        """Get the specified material from the master list.
 
         Parameters
         ----------
-        material_name : str
+        name : str
             The name of the material to search.
-        material_batch : str
-            The batch of the material to search.
 
         Returns
         -------
@@ -90,20 +86,18 @@ class Material():
         Raises
         ------
         ``ParameterError``
-            If it does not exist or cannot be calculated.
+            If it does not exist in list.
         """
         # Checks to see if material exists in master list
-        material = next((material for material in pygaps.MATERIAL_LIST
-                         if material_name == material.name
-                         and material_batch == material.batch), None)
-
-        if material is None:
+        try:
+            return next(
+                mat for mat in pygaps.MATERIAL_LIST if name == mat.name
+            )
+        except StopIteration:
             raise ParameterError(
-                f"Material {material_name} {material_batch} does not exist in list of materials. "
+                f"Material {name} does not exist in list of materials. "
                 "First populate pygaps.MATERIAL_LIST with required material class"
             )
-
-        return material
 
     def to_dict(self):
         """
@@ -117,10 +111,8 @@ class Material():
             Dictionary of all parameters.
 
         """
-        parameters_dict = {'name': self.name, 'batch': self.batch}
-
+        parameters_dict = {'name': self.name}
         parameters_dict.update(self.properties)
-
         return parameters_dict
 
     def get_prop(self, prop):
@@ -149,7 +141,7 @@ class Material():
                 req_prop = getattr(self, prop)
             except AttributeError:
                 raise ParameterError(
-                    f"The {prop} entry was not found in the "
-                    f"material properties for material {self.name}.")
+                    f"Material '{self.name}' does not have a property named '{prop}'."
+                )
 
         return req_prop

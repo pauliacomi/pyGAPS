@@ -4,15 +4,15 @@ import json
 
 import pandas
 
-from ..core.isotherm import Isotherm
-from ..core.modelisotherm import ModelIsotherm
-from ..core.pointisotherm import PointIsotherm
-from ..modelling import get_isotherm_model
-from ..utilities.exceptions import ParsingError
-from ..utilities.unit_converter import _MASS_UNITS
-from ..utilities.unit_converter import _MOLAR_UNITS
-from ..utilities.unit_converter import _PRESSURE_UNITS
-from ..utilities.unit_converter import _VOLUME_UNITS
+from pygaps.core.isotherm import Isotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.modelling import model_from_dict
+from pygaps.utilities.exceptions import ParsingError
+from pygaps.utilities.unit_converter import _MASS_UNITS
+from pygaps.utilities.unit_converter import _MOLAR_UNITS
+from pygaps.utilities.unit_converter import _PRESSURE_UNITS
+from pygaps.utilities.unit_converter import _VOLUME_UNITS
 
 
 def isotherm_to_json(isotherm, path=None, **args_to_json):
@@ -50,15 +50,13 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
 
         def process_data(value):
             """
-            Specifically mark only the desorption branch
-            then turn numbers into strings to avoid floating
-            point conversion issues
+            Specifically mark only the desorption branch.
             """
             if value.get('branch', False) is False:
                 del value['branch']
             else:
                 value['branch'] = 'des'
-            return {p: str(t) for p, t in value.items()}
+            return value
 
         raw_dict["isotherm_data"] = [
             process_data(v) for k, v in isotherm_data_dict.items()
@@ -145,9 +143,7 @@ def isotherm_from_json(
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
-            raw_dict['branch'] = data['branch'].fillna(False).replace(
-                'des', True
-            ).values
+            data['branch'] = data['branch'].fillna(False).replace('des', True)
         else:
             raw_dict['branch'] = 'guess'
 
@@ -166,31 +162,11 @@ def isotherm_from_json(
             **raw_dict
         )
     elif model:
-
-        new_mod = get_isotherm_model(model['model'])
-
-        rmse = model.pop('rmse', None)
-        if rmse:
-            new_mod.rmse = rmse
-
-        prange = model.pop('pressure_range', None)
-        if prange:
-            new_mod.pressure_range = prange
-
-        lrange = model.pop('loading_range', None)
-        if lrange:
-            new_mod.loading_range = lrange
-
-        for param in new_mod.params:
-            try:
-                new_mod.params[param] = model['parameters'][param]
-            except KeyError as err:
-                raise KeyError(
-                    f"The JSON is missing parameter '{param}'"
-                ) from err
-
         # generate the isotherm
-        isotherm = ModelIsotherm(model=new_mod, **raw_dict)
+        isotherm = ModelIsotherm(
+            model=model_from_dict(model),
+            **raw_dict,
+        )
 
     else:
         # generate the isotherm
@@ -206,7 +182,7 @@ def _from_json_nist(raw_dict):
 
     # Get regular isotherm parameters
     nist_dict['material'] = raw_dict['adsorbent']['name']
-    nist_dict['material_batch'] = raw_dict.pop('adsorbent')['hashkey']
+    nist_dict['nist_hash'] = raw_dict.pop('adsorbent')['hashkey']
     nist_dict['temperature'] = raw_dict.pop('temperature')
 
     # Get adsorbate

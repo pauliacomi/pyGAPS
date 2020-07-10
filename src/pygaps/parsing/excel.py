@@ -6,13 +6,14 @@ import pandas
 import xlrd
 import xlwt
 
-from ..core.isotherm import Isotherm
-from ..core.modelisotherm import ModelIsotherm
-from ..core.pointisotherm import PointIsotherm
-from ..modelling import get_isotherm_model
-from ..utilities.exceptions import ParsingError
-from .excel_bel_parser import read_bel_report
-from .excel_mic_parser import read_mic_report
+from pygaps.core.isotherm import Isotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.modelling import model_from_dict
+from pygaps.utilities.exceptions import ParsingError
+
+from .excel_bel import read_bel_report
+from .excel_mic import read_mic_report
 
 _FIELDS = {
     'material': {
@@ -21,64 +22,58 @@ _FIELDS = {
         'row': 0,
         'column': 0,
     },
-    'material_batch': {
-        'text': ['Material batch'],
-        'name': 'material_batch',
-        'row': 1,
-        'column': 0,
-    },
     'temperature': {
         'text': ['Experiment temperature (K)'],
         'name': 'temperature',
-        'row': 2,
+        'row': 1,
         'column': 0,
     },
     'adsorbate': {
         'text': ['Adsorbate used'],
         'name': 'adsorbate',
-        'row': 3,
+        'row': 2,
         'column': 0,
     },
     'pressure_mode': {
         'text': ['Pressure mode'],
         'name': 'pressure_mode',
-        'row': 4,
+        'row': 3,
         'column': 0,
     },
     'pressure_unit': {
         'text': ['Pressure unit'],
         'name': 'pressure_unit',
-        'row': 5,
+        'row': 4,
         'column': 0,
     },
     'loading_basis': {
         'text': ['Loading basis'],
         'name': 'loading_basis',
-        'row': 6,
+        'row': 5,
         'column': 0,
     },
     'loading_unit': {
         'text': ['Loading unit'],
         'name': 'loading_unit',
-        'row': 7,
+        'row': 6,
         'column': 0,
     },
     'adsorbent_basis': {
         'text': ['Adsorbent basis'],
         'name': 'adsorbent_basis',
-        'row': 8,
+        'row': 7,
         'column': 0,
     },
     'adsorbent_unit': {
         'text': ['Adsorbent unit'],
         'name': 'adsorbent_unit',
-        'row': 9,
+        'row': 8,
         'column': 0,
     },
     'isotherm_data': {
         'text': ['Isotherm type'],
         'name': 'isotherm_data',
-        'row': 10,
+        'row': 9,
         'column': 0,
     },
 }
@@ -239,7 +234,7 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict.update(read_mic_report(path))
 
         # Add required props
-        raw_dict['material_batch'] = 'mic'
+        raw_dict['apparatus'] = 'mic'
         raw_dict['pressure_mode'] = 'relative'
         raw_dict['pressure_unit'] = None
         raw_dict['loading_basis'] = 'molar'
@@ -257,7 +252,7 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict.update(read_bel_report(path))
 
         # Add required props
-        raw_dict['material_batch'] = 'bel'
+        raw_dict['apparatus'] = 'bel'
         raw_dict['pressure_mode'] = 'relative'
         raw_dict['pressure_unit'] = None
         raw_dict['loading_basis'] = 'molar'
@@ -331,43 +326,34 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
 
             # process isotherm branches if they exist
             if 'branch' in data.columns:
-                raw_dict['branch'] = data['branch'].replace('ads',
-                                                            False).replace(
-                                                                'des', True
-                                                            ).values
+                data['branch'] = data['branch'].apply(
+                    lambda x: False if x == 'ads' else True
+                )
+            else:
+                raw_dict['branch'] = 'guess'
 
         if sht.cell(type_row, 1).value.lower().startswith('model'):
 
             # Store isotherm type
             isotype = 2
-
-            new_mod = get_isotherm_model(sht.cell(type_row + 1, 1).value)
-            new_mod.rmse = sht.cell(type_row + 2, 1).value
-            new_mod.pressure_range = ast.literal_eval(
-                sht.cell(type_row + 3, 1).value
-            )
-            new_mod.loading_range = ast.literal_eval(
-                sht.cell(type_row + 4, 1).value
-            )
+            model = {
+                "name": sht.cell(type_row + 1, 1).value,
+                "rmse": sht.cell(type_row + 2, 1).value,
+                "pressure_range":
+                ast.literal_eval(sht.cell(type_row + 3, 1).value),
+                "loading_range":
+                ast.literal_eval(sht.cell(type_row + 4, 1).value),
+                "parameters": {},
+            }
 
             final_row = type_row + 6
-
-            model_param = {}
 
             while final_row < sht.nrows:
                 point = sht.cell(final_row, 0).value
                 if point == '':
                     break
-                model_param[point] = sht.cell(final_row, 1).value
+                model["parameters"][point] = sht.cell(final_row, 1).value
                 final_row += 1
-
-            for param in new_mod.params:
-                try:
-                    new_mod.params[param] = model_param[param]
-                except KeyError as err:
-                    raise KeyError(
-                        f"The JSON is missing parameter '{param}'"
-                    ) from err
 
         # read the secondary isotherm parameters
         if 'otherdata' in wb.sheet_names():
@@ -398,6 +384,6 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         return PointIsotherm(isotherm_data=data, **raw_dict)
 
     if isotype == 2:
-        return ModelIsotherm(model=new_mod, **raw_dict)
+        return ModelIsotherm(model=model_from_dict(model), **raw_dict)
 
     return Isotherm(**raw_dict)

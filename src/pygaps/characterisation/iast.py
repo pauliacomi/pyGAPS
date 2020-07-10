@@ -4,7 +4,7 @@ import textwrap
 import warnings
 
 import numpy
-import scipy.optimize
+import scipy.optimize as opt
 
 from ..graphing.iastgraphs import plot_iast_svp
 from ..graphing.iastgraphs import plot_iast_vle
@@ -322,7 +322,7 @@ def iast(
             adsorbed_mole_fraction_guess
         )
 
-    res = scipy.optimize.root(
+    res = opt.root(
         spreading_pressure_differences,
         adsorbed_mole_fraction_guess[:-1],
         method='lm'
@@ -536,7 +536,7 @@ def reverse_iast(
         # if list, convert to numpy array
         gas_mole_fraction_guess = numpy.asarray(gas_mole_fraction_guess)
 
-    res = scipy.optimize.root(
+    res = opt.root(
         spreading_pressure_differences,
         gas_mole_fraction_guess[:-1],
         method='lm'

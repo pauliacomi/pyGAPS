@@ -4,7 +4,6 @@ This module contains the main class that describes an isotherm through discrete 
 
 import textwrap
 
-import matplotlib.pyplot as plt
 import numpy
 import pandas
 
@@ -56,10 +55,9 @@ class PointIsotherm(Isotherm):
         Alternatively, an iterable can be passed which contains
         detailed info for each data point if adsorption points ('False')
         or desorption points ('True'). eg: [False, False, True, True...]
+        or as a column of the isotherm_data.
     material : str
         Name of the material on which the isotherm is measured.
-    material_batch : str
-        Batch (or identifier) of the material on which the isotherm is measured.
     adsorbate : str
         Isotherm adsorbate.
     temperature : float
@@ -104,15 +102,17 @@ class PointIsotherm(Isotherm):
     ##########################################################
     #   Instantiation and classmethods
 
-    def __init__(self,
-                 pressure=None,
-                 loading=None,
-                 isotherm_data=None,
-                 pressure_key=None,
-                 loading_key=None,
-                 other_keys=None,
-                 branch='guess',
-                 **isotherm_parameters):
+    def __init__(
+        self,
+        pressure=None,
+        loading=None,
+        isotherm_data=None,
+        pressure_key=None,
+        loading_key=None,
+        other_keys=None,
+        branch='guess',
+        **isotherm_parameters
+    ):
         """
         Instantiation is done by passing the discrete data as a pandas
         DataFrame, the column keys as string as well as the parameters
@@ -123,7 +123,8 @@ class PointIsotherm(Isotherm):
             if None in [pressure_key, loading_key]:
                 raise ParameterError(
                     "Pass loading_key and pressure_key, the names of the loading and"
-                    " pressure columns in the DataFrame, to the constructor.")
+                    " pressure columns in the DataFrame, to the constructor."
+                )
 
             # Save column names
             # Name of column in the dataframe that contains adsorbed amount.
@@ -139,25 +140,31 @@ class PointIsotherm(Isotherm):
                 self.other_keys = []
 
             # Pandas DataFrame that stores the data.
-            columns = [self.pressure_key, self.loading_key] + self.other_keys
+            columns = [self.pressure_key, self.loading_key
+                       ] + sorted(self.other_keys)
             if not all([a in isotherm_data.columns for a in columns]):
                 raise ParameterError(
                     "Could not find some specified columns in the adsorption DataFrame."
                 )
-            self.data_raw = isotherm_data[columns].sort_index(axis=1)
+            if 'branch' in isotherm_data.columns:
+                columns.append('branch')
+            self.data_raw = isotherm_data[columns]
 
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
                 raise ParameterError(
                     "If you've chosen to pass loading and pressure directly as"
-                    " arrays, make sure both are specified!")
+                    " arrays, make sure both are specified!"
+                )
             if len(pressure) != len(loading):
                 raise ParameterError(
-                    "Pressure and loading arrays are not equal!")
+                    "Pressure and loading arrays are not equal!"
+                )
             if other_keys:
                 raise ParameterError(
                     "Cannot specify other isotherm components in this mode."
-                    " Use the ``isotherm_data`` method.")
+                    " Use the ``isotherm_data`` method."
+                )
 
             # Standard column names
             self.pressure_key = 'pressure'
@@ -172,28 +179,33 @@ class PointIsotherm(Isotherm):
         else:
             raise ParameterError(
                 "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
-                " or directly ``pressure`` and ``loading`` as arrays.")
+                " or directly ``pressure`` and ``loading`` as arrays."
+            )
 
         # Run base class constructor
         Isotherm.__init__(self, **isotherm_parameters)
 
-        # Deal with the isotherm branches (ads/des)
-        if isinstance(branch, str):
+        # Deal with the isotherm branches
+        if 'branch' in self.data_raw.columns:
+            pass
+        elif isinstance(branch, str):
             if branch == 'guess':
                 # Split the data in adsorption/desorption
                 self.data_raw['branch'] = self._splitdata(
-                    self.data_raw, self.pressure_key)
+                    self.data_raw, self.pressure_key
+                )
             elif branch == 'ads':
                 self.data_raw['branch'] = False
             elif branch == 'des':
                 self.data_raw['branch'] = True
             else:
                 raise ParameterError(
-                    "Isotherm branch parameter must be 'guess ,'ads' or 'des'")
+                    "Isotherm branch parameter must be 'guess ,'ads' or 'des'"
+                    " or an array of booleans."
+                )
         else:
             try:
-                self.data_raw.insert(len(self.data_raw.columns), 'branch',
-                                     branch)
+                self.data_raw['branch'] = branch
             except Exception as e_info:
                 raise ParameterError(e_info)
 
@@ -204,14 +216,16 @@ class PointIsotherm(Isotherm):
         self.p_interpolator = None
 
     @classmethod
-    def from_isotherm(cls,
-                      isotherm,
-                      pressure=None,
-                      loading=None,
-                      isotherm_data=None,
-                      pressure_key=None,
-                      loading_key=None,
-                      other_keys=None):
+    def from_isotherm(
+        cls,
+        isotherm,
+        pressure=None,
+        loading=None,
+        isotherm_data=None,
+        pressure_key=None,
+        loading_key=None,
+        other_keys=None
+    ):
         """
         Construct a point isotherm using a parent isotherm as the template for
         all the parameters.
@@ -235,7 +249,7 @@ class PointIsotherm(Isotherm):
         """
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
-        # insert or update values
+        # add pointisotherm values to dict
         iso_params['pressure'] = pressure
         iso_params['loading'] = loading
         iso_params['isotherm_data'] = isotherm_data
@@ -275,15 +289,19 @@ class PointIsotherm(Isotherm):
         else:
             pressure = pressure_points
 
-        return PointIsotherm(isotherm_data=pandas.DataFrame({
-            'pressure':
-            pressure,
-            'loading':
-            modelisotherm.loading_at(pressure)
-        }),
-                             loading_key='loading',
-                             pressure_key='pressure',
-                             **modelisotherm.to_dict())
+        # TODO: in case the model isotherm calculates pressure from loading
+        # this is not ideal
+        return PointIsotherm(
+            isotherm_data=pandas.DataFrame({
+                'pressure':
+                pressure,
+                'loading':
+                modelisotherm.loading_at(pressure)
+            }),
+            loading_key='loading',
+            pressure_key='pressure',
+            **modelisotherm.to_dict()
+        )
 
     ##########################################################
     #   Conversion functions
@@ -298,10 +316,11 @@ class PointIsotherm(Isotherm):
 
         Parameters
         ----------
-        pressure_mode : {'relative', 'absolute'}
+        mode_to : {'relative', 'absolute'}
             The mode in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal pressure should be converted to.
+            Only makes sense if converting to absolute pressure.
         verbose : bool
             Print out steps taken.
 
@@ -321,7 +340,8 @@ class PointIsotherm(Isotherm):
                 unit_from=self.pressure_unit,
                 unit_to=unit_to,
                 adsorbate_name=self.adsorbate,
-                temp=self.temperature)
+                temp=self.temperature
+            )
 
             if unit_to != self.pressure_unit and mode_to == 'absolute':
                 self.pressure_unit = unit_to
@@ -335,7 +355,9 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(f"Changed pressure to mode {mode_to}, unit {unit_to}")
+                print(
+                    f"Changed pressure to mode '{mode_to}', unit '{unit_to}'."
+                )
 
     def convert_loading(self, basis_to=None, unit_to=None, verbose=False):
         """
@@ -345,7 +367,7 @@ class PointIsotherm(Isotherm):
 
         Parameters
         ----------
-        basis : {'volume', 'mass', 'molar'}
+        basis_to : {'volume', 'mass', 'molar'}
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal loading should be converted to.
@@ -355,7 +377,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.loading_basis and unit_to == self.loading_unit:
             if verbose:
-                print("Basis and units are the same, no changes made")
+                print("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -368,7 +390,8 @@ class PointIsotherm(Isotherm):
                 unit_from=self.loading_unit,
                 unit_to=unit_to,
                 adsorbate_name=self.adsorbate,
-                temp=self.temperature)
+                temp=self.temperature
+            )
 
             if basis_to != self.loading_basis:
                 self.loading_basis = basis_to
@@ -380,7 +403,9 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(f"Changed loading to basis {basis_to}, unit {unit_to}")
+                print(
+                    f"Changed loading to basis '{basis_to}', unit '{unit_to}'."
+                )
 
     def convert_adsorbent(self, basis_to=None, unit_to=None, verbose=False):
         """
@@ -403,7 +428,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.adsorbent_basis and unit_to == self.adsorbent_unit:
             if verbose:
-                print("Basis and units are the same, no changes made")
+                print("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -415,8 +440,8 @@ class PointIsotherm(Isotherm):
                 basis_to=basis_to,
                 unit_from=self.adsorbent_unit,
                 unit_to=unit_to,
-                material=self.material,
-                material_batch=self.material_batch)
+                material=self.material
+            )
 
             if unit_to != self.adsorbent_unit:
                 self.adsorbent_unit = unit_to
@@ -428,7 +453,9 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(f"Changed adsorbent to basis {basis_to}, unit {unit_to}")
+                print(
+                    f"Changed adsorbent to basis '{basis_to}', unit '{unit_to}'."
+                )
 
     ###########################################################
     #   Info functions
@@ -490,7 +517,7 @@ class PointIsotherm(Isotherm):
         axes = plot_iso(self, **plot_dict)
 
         if show:
-            plt.show()
+            axes.get_figure().show()
             return
 
         return axes
@@ -515,21 +542,21 @@ class PointIsotherm(Isotherm):
 
         """
         if branch is None:
-            return self.data_raw.drop('branch', axis=1)
-        if branch == 'ads':
-            return self.data_raw.loc[~self.data_raw['branch']].drop('branch',
-                                                                    axis=1)
-        if branch == 'des':
-            return self.data_raw.loc[self.data_raw['branch']].drop('branch',
-                                                                   axis=1)
+            return self.data_raw
+        elif branch == 'ads':
+            return self.data_raw.loc[~self.data_raw['branch']]
+        elif branch == 'des':
+            return self.data_raw.loc[self.data_raw['branch']]
         raise ParameterError('Bad branch specification.')
 
-    def pressure(self,
-                 branch=None,
-                 pressure_unit=None,
-                 pressure_mode=None,
-                 limits=None,
-                 indexed=False):
+    def pressure(
+        self,
+        branch=None,
+        pressure_unit=None,
+        pressure_mode=None,
+        limits=None,
+        indexed=False
+    ):
         """
         Return pressure points as an array.
 
@@ -549,7 +576,7 @@ class PointIsotherm(Isotherm):
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
-            pandas.Series with the columns requested instead of an array.
+            pandas.Series instead of an array.
 
         Returns
         -------
@@ -567,32 +594,37 @@ class PointIsotherm(Isotherm):
                 if not pressure_unit:
                     pressure_unit = self.pressure_unit
 
-                ret = c_pressure(ret,
-                                 mode_from=self.pressure_mode,
-                                 mode_to=pressure_mode,
-                                 unit_from=self.pressure_unit,
-                                 unit_to=pressure_unit,
-                                 adsorbate_name=self.adsorbate,
-                                 temp=self.temperature)
+                ret = c_pressure(
+                    ret,
+                    mode_from=self.pressure_mode,
+                    mode_to=pressure_mode,
+                    unit_from=self.pressure_unit,
+                    unit_to=pressure_unit,
+                    adsorbate_name=self.adsorbate,
+                    temp=self.temperature
+                )
 
             # Select required points
             if limits:
                 ret = ret.loc[ret.between(
                     -numpy.inf if limits[0] is None else limits[0],
-                    numpy.inf if limits[1] is None else limits[1])]
+                    numpy.inf if limits[1] is None else limits[1]
+                )]
 
         if indexed:
             return ret
         return ret.values
 
-    def loading(self,
-                branch=None,
-                loading_unit=None,
-                loading_basis=None,
-                adsorbent_unit=None,
-                adsorbent_basis=None,
-                limits=None,
-                indexed=False):
+    def loading(
+        self,
+        branch=None,
+        loading_unit=None,
+        loading_basis=None,
+        adsorbent_unit=None,
+        adsorbent_basis=None,
+        limits=None,
+        indexed=False
+    ):
         """
         Return loading points as an array.
 
@@ -618,7 +650,7 @@ class PointIsotherm(Isotherm):
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
-            pandas.Series with the columns requested instead of an array.
+            pandas.Series instead of an array.
 
         Returns
         -------
@@ -634,31 +666,35 @@ class PointIsotherm(Isotherm):
                 if not adsorbent_basis:
                     adsorbent_basis = self.adsorbent_basis
 
-                ret = c_adsorbent(ret,
-                                  basis_from=self.adsorbent_basis,
-                                  basis_to=adsorbent_basis,
-                                  unit_from=self.adsorbent_unit,
-                                  unit_to=adsorbent_unit,
-                                  material=self.material,
-                                  material_batch=self.material_batch)
+                ret = c_adsorbent(
+                    ret,
+                    basis_from=self.adsorbent_basis,
+                    basis_to=adsorbent_basis,
+                    unit_from=self.adsorbent_unit,
+                    unit_to=adsorbent_unit,
+                    material=self.material
+                )
 
             if loading_basis or loading_unit:
                 if not loading_basis:
                     loading_basis = self.loading_basis
 
-                ret = c_loading(ret,
-                                basis_from=self.loading_basis,
-                                basis_to=loading_basis,
-                                unit_from=self.loading_unit,
-                                unit_to=loading_unit,
-                                adsorbate_name=self.adsorbate,
-                                temp=self.temperature)
+                ret = c_loading(
+                    ret,
+                    basis_from=self.loading_basis,
+                    basis_to=loading_basis,
+                    unit_from=self.loading_unit,
+                    unit_to=loading_unit,
+                    adsorbate_name=self.adsorbate,
+                    temp=self.temperature
+                )
 
             # Select required points
             if limits:
                 ret = ret.loc[ret.between(
                     -numpy.inf if limits[0] is None else limits[0],
-                    numpy.inf if limits[1] is None else limits[1])]
+                    numpy.inf if limits[1] is None else limits[1]
+                )]
 
         if indexed:
             return ret
@@ -680,7 +716,7 @@ class PointIsotherm(Isotherm):
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
-            pandas.Series with the columns requested instead of an array.
+            pandas.Series instead of an array.
 
         Returns
         -------
@@ -696,7 +732,8 @@ class PointIsotherm(Isotherm):
                 if limits:
                     ret = ret.loc[ret.between(
                         -numpy.inf if limits[0] is None else limits[0],
-                        numpy.inf if limits[1] is None else limits[1])]
+                        numpy.inf if limits[1] is None else limits[1]
+                    )]
 
             if indexed:
                 return ret
@@ -725,20 +762,20 @@ class PointIsotherm(Isotherm):
     #   Functions that interpolate values of the isotherm data
 
     def pressure_at(
-            self,
-            loading,
-            branch='ads',
-            interpolation_type='linear',
-            interp_fill=None,
-            pressure_unit=None,
-            pressure_mode=None,
-            loading_unit=None,
-            loading_basis=None,
-            adsorbent_unit=None,
-            adsorbent_basis=None,
+        self,
+        loading,
+        branch='ads',
+        interpolation_type='linear',
+        interp_fill=None,
+        pressure_unit=None,
+        pressure_mode=None,
+        loading_unit=None,
+        loading_basis=None,
+        adsorbent_unit=None,
+        adsorbent_basis=None,
     ):
         """
-        Interpolate isotherm to compute pressure at any loading n.
+        Interpolate isotherm to compute pressure at any loading given.
 
         Parameters
         ----------
@@ -794,7 +831,8 @@ class PointIsotherm(Isotherm):
                 self.pressure(branch=branch),
                 interp_branch=branch,
                 interp_kind=interpolation_type,
-                interp_fill=interp_fill)
+                interp_fill=interp_fill
+            )
 
         # Ensure loading is in correct units and basis for the internal model
         if adsorbent_basis or adsorbent_unit:
@@ -803,30 +841,35 @@ class PointIsotherm(Isotherm):
             if not adsorbent_unit:
                 raise ParameterError(
                     "Must specify an adsorbent unit if the input"
-                    " is in another basis")
+                    " is in another basis"
+                )
 
-            loading = c_adsorbent(loading,
-                                  basis_from=adsorbent_basis,
-                                  basis_to=self.adsorbent_basis,
-                                  unit_from=adsorbent_unit,
-                                  unit_to=self.adsorbent_unit,
-                                  material=self.material,
-                                  material_batch=self.material_batch)
+            loading = c_adsorbent(
+                loading,
+                basis_from=adsorbent_basis,
+                basis_to=self.adsorbent_basis,
+                unit_from=adsorbent_unit,
+                unit_to=self.adsorbent_unit,
+                material=self.material
+            )
 
         if loading_basis or loading_unit:
             if not loading_basis:
                 loading_basis = self.loading_basis
             if not loading_unit:
-                raise ParameterError("Must specify a loading unit if the input"
-                                     " is in another basis")
+                raise ParameterError(
+                    "Must specify a loading unit if the input is in another basis"
+                )
 
-            loading = c_loading(loading,
-                                basis_from=loading_basis,
-                                basis_to=self.loading_basis,
-                                unit_from=loading_unit,
-                                unit_to=self.loading_unit,
-                                adsorbate_name=self.adsorbate,
-                                temp=self.temperature)
+            loading = c_loading(
+                loading,
+                basis_from=loading_basis,
+                basis_to=self.loading_basis,
+                unit_from=loading_unit,
+                unit_to=self.loading_unit,
+                adsorbate_name=self.adsorbate,
+                temp=self.temperature
+            )
 
         # Interpolate using the internal interpolator
         pressure = self.p_interpolator(loading)
@@ -838,31 +881,33 @@ class PointIsotherm(Isotherm):
             if not pressure_unit:
                 pressure_unit = self.pressure_unit
 
-            pressure = c_pressure(pressure,
-                                  mode_from=self.pressure_mode,
-                                  mode_to=pressure_mode,
-                                  unit_from=self.pressure_unit,
-                                  unit_to=pressure_unit,
-                                  adsorbate_name=self.adsorbate,
-                                  temp=self.temperature)
+            pressure = c_pressure(
+                pressure,
+                mode_from=self.pressure_mode,
+                mode_to=pressure_mode,
+                unit_from=self.pressure_unit,
+                unit_to=pressure_unit,
+                adsorbate_name=self.adsorbate,
+                temp=self.temperature
+            )
 
         return pressure
 
     def loading_at(
-            self,
-            pressure,
-            branch='ads',
-            interpolation_type='linear',
-            interp_fill=None,
-            pressure_unit=None,
-            pressure_mode=None,
-            loading_unit=None,
-            loading_basis=None,
-            adsorbent_unit=None,
-            adsorbent_basis=None,
+        self,
+        pressure,
+        branch='ads',
+        interpolation_type='linear',
+        interp_fill=None,
+        pressure_unit=None,
+        pressure_mode=None,
+        loading_unit=None,
+        loading_basis=None,
+        adsorbent_unit=None,
+        adsorbent_basis=None,
     ):
         """
-        Interpolate isotherm to compute loading at any pressure P.
+        Interpolate isotherm to compute loading at any pressure given.
 
         Parameters
         ----------
@@ -918,7 +963,8 @@ class PointIsotherm(Isotherm):
                 self.loading(branch=branch),
                 interp_branch=branch,
                 interp_kind=interpolation_type,
-                interp_fill=interp_fill)
+                interp_fill=interp_fill
+            )
 
         # Ensure pressure is in correct units and mode for the internal model
         if pressure_mode or pressure_unit:
@@ -927,15 +973,18 @@ class PointIsotherm(Isotherm):
             if pressure_mode == 'absolute' and not pressure_unit:
                 raise ParameterError(
                     "Must specify a pressure unit if the input"
-                    " is in an absolute mode")
+                    " is in an absolute mode"
+                )
 
-            pressure = c_pressure(pressure,
-                                  mode_from=pressure_mode,
-                                  mode_to=self.pressure_mode,
-                                  unit_from=pressure_unit,
-                                  unit_to=self.pressure_unit,
-                                  adsorbate_name=self.adsorbate,
-                                  temp=self.temperature)
+            pressure = c_pressure(
+                pressure,
+                mode_from=pressure_mode,
+                mode_to=self.pressure_mode,
+                unit_from=pressure_unit,
+                unit_to=self.pressure_unit,
+                adsorbate_name=self.adsorbate,
+                temp=self.temperature
+            )
 
         # Interpolate using the internal interpolator
         loading = self.l_interpolator(pressure)
@@ -945,38 +994,43 @@ class PointIsotherm(Isotherm):
             if not adsorbent_basis:
                 adsorbent_basis = self.adsorbent_basis
 
-            loading = c_adsorbent(loading,
-                                  basis_from=self.adsorbent_basis,
-                                  basis_to=adsorbent_basis,
-                                  unit_from=self.adsorbent_unit,
-                                  unit_to=adsorbent_unit,
-                                  material=self.material,
-                                  material_batch=self.material_batch)
+            loading = c_adsorbent(
+                loading,
+                basis_from=self.adsorbent_basis,
+                basis_to=adsorbent_basis,
+                unit_from=self.adsorbent_unit,
+                unit_to=adsorbent_unit,
+                material=self.material
+            )
 
         if loading_basis or loading_unit:
             if not loading_basis:
                 loading_basis = self.loading_basis
 
-            loading = c_loading(loading,
-                                basis_from=self.loading_basis,
-                                basis_to=loading_basis,
-                                unit_from=self.loading_unit,
-                                unit_to=loading_unit,
-                                adsorbate_name=self.adsorbate,
-                                temp=self.temperature)
+            loading = c_loading(
+                loading,
+                basis_from=self.loading_basis,
+                basis_to=loading_basis,
+                unit_from=self.loading_unit,
+                unit_to=loading_unit,
+                adsorbate_name=self.adsorbate,
+                temp=self.temperature
+            )
 
         return loading
 
-    def spreading_pressure_at(self,
-                              pressure,
-                              branch='ads',
-                              pressure_unit=None,
-                              pressure_mode=None,
-                              loading_unit=None,
-                              loading_basis=None,
-                              adsorbent_unit=None,
-                              adsorbent_basis=None,
-                              interp_fill=None):
+    def spreading_pressure_at(
+        self,
+        pressure,
+        branch='ads',
+        pressure_unit=None,
+        pressure_mode=None,
+        loading_unit=None,
+        loading_basis=None,
+        adsorbent_unit=None,
+        adsorbent_basis=None,
+        interp_fill=None
+    ):
         r"""
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.
 
@@ -1027,20 +1081,25 @@ class PointIsotherm(Isotherm):
 
         """
         # Get all data points
-        pressures = self.pressure(branch=branch,
-                                  pressure_unit=pressure_unit,
-                                  pressure_mode=pressure_mode)
-        loadings = self.loading(branch=branch,
-                                loading_unit=loading_unit,
-                                loading_basis=loading_basis,
-                                adsorbent_unit=adsorbent_unit,
-                                adsorbent_basis=adsorbent_basis)
+        pressures = self.pressure(
+            branch=branch,
+            pressure_unit=pressure_unit,
+            pressure_mode=pressure_mode
+        )
+        loadings = self.loading(
+            branch=branch,
+            loading_unit=loading_unit,
+            loading_basis=loading_basis,
+            adsorbent_unit=adsorbent_unit,
+            adsorbent_basis=adsorbent_basis
+        )
 
         # throw exception if interpolating outside the range.
         if (self.l_interpolator is not None and self.l_interpolator.interp_fill is None) & \
                 (pressure > pressures.max() or pressure < pressures.min()):
             raise CalculationError(
-                textwrap.dedent(f"""
+                textwrap.dedent(
+                    f"""
             To compute the spreading pressure at this bulk
             adsorbate pressure, we would need to extrapolate the isotherm since this
             pressure is outside the range of the highest pressure in your
@@ -1058,7 +1117,9 @@ class PointIsotherm(Isotherm):
                 a plateau at the highest pressures.
             Option 3: Go back to the lab or computer to collect isotherm data
                 at higher pressures. (Extrapolation can be dangerous!)
-            """))
+            """
+                )
+            )
 
         # approximate loading up to first pressure point with Henry's law
         # loading = henry_const * P
@@ -1079,24 +1140,27 @@ class PointIsotherm(Isotherm):
         # get area between P_1 and P_k, where P_k < P < P_{k+1}
         for i in range(n_points - 1):
             # linear interpolation of isotherm data
-            slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] -
-                                                       pressures[i])
+            slope = (loadings[i + 1] -
+                     loadings[i]) / (pressures[i + 1] - pressures[i])
             intercept = loadings[i] - slope * pressures[i]
             # add area of this segment
             area += slope * (pressures[i + 1] - pressures[i]) + intercept * \
                 numpy.log(pressures[i + 1] / pressures[i])
 
         # finally, area of last segment
-        slope = (self.loading_at(pressure,
-                                 branch=branch,
-                                 pressure_unit=pressure_unit,
-                                 pressure_mode=pressure_mode,
-                                 loading_unit=loading_unit,
-                                 loading_basis=loading_basis,
-                                 adsorbent_unit=adsorbent_unit,
-                                 adsorbent_basis=adsorbent_basis,
-                                 interp_fill=interp_fill) -
-                 loadings[n_points - 1]) / (pressure - pressures[n_points - 1])
+        slope = (
+            self.loading_at(
+                pressure,
+                branch=branch,
+                pressure_unit=pressure_unit,
+                pressure_mode=pressure_mode,
+                loading_unit=loading_unit,
+                loading_basis=loading_basis,
+                adsorbent_unit=adsorbent_unit,
+                adsorbent_basis=adsorbent_basis,
+                interp_fill=interp_fill
+            ) - loadings[n_points - 1]
+        ) / (pressure - pressures[n_points - 1])
         intercept = loadings[n_points - 1] - \
             slope * pressures[n_points - 1]
         area += slope * (pressure - pressures[n_points - 1]) + intercept * \

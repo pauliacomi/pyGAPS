@@ -1,11 +1,10 @@
 # pylint: disable=W0614,W0611,W0622
 # flake8: noqa
+# isort:skip_file
 
 __author__ = 'Paul A. Iacomi'
 __docformat__ = 'restructuredtext'
 __version__ = '2.0.2'
-
-# isort:skip_file
 
 # This code is written for Python 3.
 import importlib
@@ -31,6 +30,5 @@ del hard_dependencies, dependency, missing_dependencies
 
 from .data import DATABASE
 from .data import ADSORBATE_LIST
-from .data import ADSORBATE_NAME_LIST
 from .data import MATERIAL_LIST
 from .api import *

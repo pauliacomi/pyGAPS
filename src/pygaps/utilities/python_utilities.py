@@ -23,4 +23,13 @@ def zip_varlen(*iterables):
 
 
 def grouped(iterable, n):
-    return zip_varlen(*[iter(iterable)]*n)
+    return zip_varlen(*[iter(iterable)] * n)
+
+
+def checktype(val):
+    """Check if a value is a bool. Useful for sqlite storage."""
+    if val in ['TRUE', 'FALSE']:
+        if val == 'TRUE':
+            return True
+        return False
+    return val

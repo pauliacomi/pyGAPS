@@ -99,8 +99,11 @@ class Adsorbate():
         if alias is None:
             self.alias = [_name]
         else:
-            self.alias = [a.lower() for a in alias]
-            if _name not in self.alias:
+            if isinstance(alias, str):
+                self.alias = [alias.lower()]
+            else:
+                self.alias = [a.lower() for a in alias]
+            if _name.lower() not in self.alias:
                 self.alias.append(_name)
 
         #: Adsorbate properties
@@ -111,8 +114,8 @@ class Adsorbate():
         self._backend_mode = None
 
     def __repr__(self):
-        """Print adsorbate standard name."""
-        return self.name
+        """Print adsorbate id."""
+        return f"<pygaps.Adsorbate '{self.name}'>"
 
     def __str__(self):
         """Print adsorbate standard name."""
@@ -120,22 +123,20 @@ class Adsorbate():
 
     def __hash__(self):
         """Override hashing as a name hash."""
-        return hash(self.__repr__())
+        return hash(self.name)
 
     def __eq__(self, other):
         """Overload equality operator to include aliases."""
         if isinstance(other, Adsorbate):
-            other = other.name
-        else:
-            other = str(other).lower()
-        return self.name == other or other in self.alias
+            return self.name == other.name
+        return other.lower() in self.alias
 
     def __add__(self, other):
         """Overload addition operator to use name."""
         return self.name + other
 
     def __radd__(self, other):
-        """Overload addition operator to use name."""
+        """Overload rev addition operator to use name."""
         return other + self.name
 
     def print_info(self):
@@ -151,18 +152,18 @@ class Adsorbate():
         return string
 
     @classmethod
-    def find(cls, adsorbate_name):
+    def find(cls, name):
         """Get the specified adsorbate from the master list.
 
         Parameters
         ----------
-        adsorbate_name : str
-            the name of the adsorbate to search
+        name : str
+            The name of the adsorbate to search
 
         Returns
         -------
         Adsorbate
-            instance of class
+            Instance of class
 
         Raises
         ------
@@ -170,19 +171,19 @@ class Adsorbate():
             If it does not exist in list.
         """
         # Skip search if already adsorbate
-        if isinstance(adsorbate_name, Adsorbate):
-            return adsorbate_name
+        if isinstance(name, Adsorbate):
+            return name
+        elif not isinstance(name, str):
+            raise ParameterError("Pass a string as a name.")
 
         # See if adsorbate exists in master list
-        for ads in pygaps.ADSORBATE_LIST:
-            if ads == adsorbate_name:
-                return ads
-
-        # Otherwise raise error
-        raise ParameterError(
-            f"Adsorbate {adsorbate_name} does not exist in list of adsorbates. "
-            "First populate pygaps.ADSORBATE_LIST with required adsorbate class"
-        )
+        try:
+            return next(ads for ads in pygaps.ADSORBATE_LIST if ads == name)
+        except StopIteration:
+            raise ParameterError(
+                f"Adsorbate '{name}' does not exist in list of adsorbates. "
+                "First populate pygaps.ADSORBATE_LIST with required adsorbate class."
+            ) from None
 
     @property
     def backend(self):
@@ -200,8 +201,7 @@ class Adsorbate():
         """Return the adsorbent formula."""
         formula = self.properties.get('formula')
         if formula is None:
-            formula = self.name
-
+            return self.name
         return formula
 
     def to_dict(self):
@@ -246,9 +246,8 @@ class Adsorbate():
         req_prop = self.properties.get(prop)
         if req_prop is None:
             raise ParameterError(
-                f"Adsorbate {self.name} does not have a property named {prop}"
+                f"Adsorbate '{self.name}' does not have a property named '{prop}'."
             )
-
         return req_prop
 
     def backend_name(self):
@@ -269,8 +268,8 @@ class Adsorbate():
         c_name = self.properties.get("backend_name")
         if c_name is None:
             raise ParameterError(
-                f"Adsorbate {self.name} does not have a property named "
-                "backend_name. This must be available for CoolProp interaction"
+                f"Adsorbate '{self.name}' does not have a property named "
+                "backend_name. This must be available for CoolProp interaction."
             )
         return c_name
 
@@ -299,7 +298,7 @@ class Adsorbate():
         """
         if calculate:
             try:
-                mol_m = self.backend.molar_mass() * 1000
+                return self.backend.molar_mass() * 1000
 
             except Exception as e_info:
                 warnings.warn(str(e_info))
@@ -310,13 +309,7 @@ class Adsorbate():
                     raise CalculationError
 
         else:
-            mol_m = self.properties.get("molar_mass")
-            if mol_m is None:
-                raise ParameterError(
-                    f"Adsorbate {self.name} does not have a property named molar_mass."
-                )
-
-        return mol_m
+            return self.get_prop("molar_mass")
 
     def saturation_pressure(self, temp, unit=None, calculate=True):
         """
@@ -365,14 +358,9 @@ class Adsorbate():
 
             if unit is not None:
                 sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
+            return sat_p
         else:
-            sat_p = self.properties.get("saturation_pressure")
-            if sat_p is None:
-                raise ParameterError(
-                    f"Adsorbate {self.name} does not have a property named saturation_pressure"
-                )
-
-        return sat_p
+            return self.get_prop("saturation_pressure")
 
     def surface_tension(self, temp, calculate=True):
         """
@@ -404,7 +392,7 @@ class Adsorbate():
             try:
                 state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
-                surf_t = state.surface_tension() * 1000
+                return state.surface_tension() * 1000
 
             except Exception as e_info:
                 warnings.warn(str(e_info))
@@ -415,13 +403,7 @@ class Adsorbate():
                     raise CalculationError
 
         else:
-            surf_t = self.properties.get("surface_tension")
-            if surf_t is None:
-                raise ParameterError(
-                    f"Adsorbate {self.name} does not have a property named surface_tension"
-                )
-
-        return surf_t
+            return self.get_prop("surface_tension")
 
     def liquid_density(self, temp, calculate=True):
         """
@@ -453,7 +435,7 @@ class Adsorbate():
             try:
                 state = self.backend
                 state.update(CoolProp.QT_INPUTS, 0.0, temp)
-                liq_d = state.rhomass() / 1000
+                return state.rhomass() / 1000
 
             except Exception as e_info:
                 warnings.warn(str(e_info))
@@ -464,13 +446,7 @@ class Adsorbate():
                     raise CalculationError
 
         else:
-            liq_d = self.properties.get("liquid_density")
-            if liq_d is None:
-                raise ParameterError(
-                    f"Adsorbate {self.name} does not have a property named liquid_density"
-                )
-
-        return liq_d
+            return self.get_prop("liquid_density")
 
     def gas_density(self, temp, calculate=True):
         """
@@ -502,7 +478,7 @@ class Adsorbate():
             try:
                 state = self.backend
                 state.update(CoolProp.QT_INPUTS, 1.0, temp)
-                gas_d = state.rhomass() / 1000
+                return state.rhomass() / 1000
 
             except Exception as e_info:
                 warnings.warn(str(e_info))
@@ -513,13 +489,7 @@ class Adsorbate():
                     raise CalculationError
 
         else:
-            gas_d = self.properties.get("gas_density")
-            if gas_d is None:
-                raise ParameterError(
-                    f"Adsorbate {self.name} does not have a property named gas_density"
-                )
-
-        return gas_d
+            return self.get_prop("gas_density")
 
     def enthalpy_liquefaction(self, temp, calculate=True):
         """
@@ -557,7 +527,7 @@ class Adsorbate():
                 state.update(CoolProp.QT_INPUTS, 1.0, temp)
                 h_vap = state.hmolar()
 
-                enth_liq = (h_vap - h_liq) / 1000
+                return (h_vap - h_liq) / 1000
 
             except Exception as e_info:
                 warnings.warn(str(e_info))
@@ -568,10 +538,4 @@ class Adsorbate():
                     raise CalculationError
 
         else:
-            enth_liq = self.properties.get("enthalpy_liquefaction")
-            if enth_liq is None:
-                raise ParameterError(
-                    f"Adsorbate {self.name} does not have a property named enthalpy_liquefaction"
-                )
-
-        return enth_liq
+            return self.get_prop("enthalpy_liquefaction")

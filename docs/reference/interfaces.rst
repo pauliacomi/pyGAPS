@@ -5,26 +5,26 @@ Parsing and interfaces
 
 JSON
 ----
-.. automodule:: pygaps.parsing.jsoninterface
+.. automodule:: pygaps.parsing.json
     :members:
 
 Excel
 -----
-.. automodule:: pygaps.parsing.excelinterface
+.. automodule:: pygaps.parsing.excel
     :members:
 
 
 Sqlite
 ------
-.. automodule:: pygaps.parsing.sqliteinterface
+.. automodule:: pygaps.parsing.sqlite
     :members:
 
 CSV
 ---
-.. automodule:: pygaps.parsing.csvinterface
+.. automodule:: pygaps.parsing.csv
     :members:
 
 Apparatus
 ---------
-.. automodule:: pygaps.parsing.csv_bel_parser
+.. automodule:: pygaps.parsing.csv_bel
     :members:

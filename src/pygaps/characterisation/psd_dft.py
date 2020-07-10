@@ -8,7 +8,8 @@ from pathlib import Path
 
 import numpy
 import pandas
-import scipy
+import scipy.interpolate as interp
+import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calcgraph import psd_plot
@@ -287,7 +288,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     # # run the optimisation algorithm
     guess = numpy.array([0 for pore in pore_widths])
     bounds = [(0, None) for pore in pore_widths]
-    result = scipy.optimize.minimize(
+    result = opt.minimize(
         sum_squares,
         guess,
         method='SLSQP',
@@ -344,7 +345,7 @@ def _load_kernel(path):
 
     kernel = {}
     for pore_size in raw_kernel:
-        interpolator = scipy.interpolate.interp1d(
+        interpolator = interp.interp1d(
             raw_kernel[pore_size].index,
             raw_kernel[pore_size].values,
             kind='cubic'

@@ -41,6 +41,7 @@ setup(
     },
     packages=find_packages('src'),
     package_dir={'': 'src'},
+    package_data={'pygaps': ['data/*']},
     py_modules=[path.name.suffix for path in Path('./src').glob('*.py')],
     include_package_data=True,
     zip_safe=False,

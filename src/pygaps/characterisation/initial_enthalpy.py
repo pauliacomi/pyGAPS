@@ -3,7 +3,7 @@
 import warnings
 
 import numpy
-import scipy
+import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calcgraph import initial_enthalpy_plot
@@ -11,11 +11,9 @@ from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
 
-def initial_enthalpy_comp(isotherm,
-                          enthalpy_key,
-                          branch='ads',
-                          verbose=False,
-                          **param_guess):
+def initial_enthalpy_comp(
+    isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess
+):
     r"""
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading with a fitting
@@ -90,9 +88,9 @@ def initial_enthalpy_comp(isotherm,
 
     """
     # Read data in
-    loading = isotherm.loading(branch=branch,
-                               loading_unit='mmol',
-                               loading_basis='molar')
+    loading = isotherm.loading(
+        branch=branch, loading_unit='mmol', loading_basis='molar'
+    )
     loading = loading / max(loading)
     enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
 
@@ -123,9 +121,9 @@ def initial_enthalpy_comp(isotherm,
         return params['const']
 
     def exponential_term(loading):
-        return params['preexp'] * 1 / (1 +
-                                       numpy.exp(params['exp'] *
-                                                 (loading - params['exploc'])))
+        return params['preexp'] * 1 / (
+            1 + numpy.exp(params['exp'] * (loading - params['exploc']))
+        )
 
     def power_term_repulsive(loading):
         return params['prepowr'] * loading**params['powr']
@@ -135,8 +133,8 @@ def initial_enthalpy_comp(isotherm,
 
     def enthalpy_approx(loading):
         return constant_term(loading) + exponential_term(
-            loading) + power_term_repulsive(loading) + power_term_attractive(
-                loading)
+            loading
+        ) + power_term_repulsive(loading) + power_term_attractive(loading)
 
     def residual_sum_of_squares(params_):
         for i, _ in enumerate(param_names):
@@ -239,8 +237,10 @@ def initial_enthalpy_comp(isotherm,
 
     if verbose:
         print('Bounds: \n\tconst =', (bounds_arr[0]))
-        print('\tpreexp =', bounds_arr[1], ', exp =', bounds_arr[2],
-              ', exploc =', bounds_arr[3])
+        print(
+            '\tpreexp =', bounds_arr[1], ', exp =', bounds_arr[2],
+            ', exploc =', bounds_arr[3]
+        )
         print('\tprepowa =', bounds_arr[4], ', powa =', bounds_arr[5])
         print('\tprepowr =', bounds_arr[6], ', powr =', bounds_arr[7])
 
@@ -260,7 +260,8 @@ def initial_enthalpy_comp(isotherm,
         {
             'type': 'ineq',
             'fun': repulsion_dominates
-        }, )
+        },
+    )
 
     ##################################
     ##################################
@@ -300,17 +301,21 @@ def initial_enthalpy_comp(isotherm,
             print('\n')
             print('Minimizing routine number', i + 1)
             print('Initial guess: \n\tconst =', guess[0])
-            print('\tpreexp =', guess[1], ', exp =', guess[2], ', exploc =',
-                  guess[3])
+            print(
+                '\tpreexp =', guess[1], ', exp =', guess[2], ', exploc =',
+                guess[3]
+            )
             print('\tprepowa =', guess[4], ', powa =', guess[5])
             print('\tprepowr =', guess[6], ', powr =', guess[7])
 
-        opt_res = scipy.optimize.minimize(residual_sum_of_squares,
-                                          guess,
-                                          bounds=bounds_arr,
-                                          constraints=constr,
-                                          method='SLSQP',
-                                          options=options)
+        opt_res = opt.minimize(
+            residual_sum_of_squares,
+            guess,
+            bounds=bounds_arr,
+            constraints=constr,
+            method='SLSQP',
+            options=options
+        )
 
         if opt_res.fun < min_fun:
             final_guess = opt_res.x
@@ -318,7 +323,8 @@ def initial_enthalpy_comp(isotherm,
 
     if final_guess is None:
         raise CalculationError(
-            "\n\tMinimization of RSS fitting failed with all guesses")
+            "\n\tMinimization of RSS fitting failed with all guesses"
+        )
     if verbose:
         print('\n')
         print('Final best fit', best_fit)
@@ -329,10 +335,11 @@ def initial_enthalpy_comp(isotherm,
     initial_enthalpy = enthalpy_approx(0)
     if abs(initial_enthalpy - enthalpy[0]) > 50:
         warnings.warn(
-            "Probable offshoot for exponent, reverting to point method")
+            "Probable offshoot for exponent, reverting to point method"
+        )
         initial_enthalpy = initial_enthalpy_point(
-            isotherm, enthalpy_key, branch=branch,
-            verbose=verbose).get('initial_enthalpy')
+            isotherm, enthalpy_key, branch=branch, verbose=verbose
+        ).get('initial_enthalpy')
 
     if verbose:
         print('\n')
@@ -344,13 +351,19 @@ def initial_enthalpy_comp(isotherm,
             warnings.warn(
                 'CARE: Base enthalpy of adsorption is lower than enthalpy of liquefaction.'
             )
-        print("The exponential contribution is \n\t"
-              f"{params['preexp']:.2f} * exp({params['exp']:.2E} * n)"
-              f"with the limit at {params['exploc']:.2f}")
-        print("The guest-guest attractive contribution is \n\t"
-              f"{params['prepowa']:.2g} * n^{params['powa']:.2}")
-        print("The guest-guest repulsive contribution is \n\t"
-              f"{params['prepowr']:.2g} * n^{params['powr']:.2}")
+        print(
+            "The exponential contribution is \n\t"
+            f"{params['preexp']:.2f} * exp({params['exp']:.2E} * n)"
+            f"with the limit at {params['exploc']:.2f}"
+        )
+        print(
+            "The guest-guest attractive contribution is \n\t"
+            f"{params['prepowa']:.2g} * n^{params['powa']:.2}"
+        )
+        print(
+            "The guest-guest repulsive contribution is \n\t"
+            f"{params['prepowr']:.2g} * n^{params['powr']:.2}"
+        )
 
         x_axis = numpy.linspace(0, 1)
         baseline = constant_term(x_axis)
@@ -361,20 +374,23 @@ def initial_enthalpy_comp(isotherm,
             (x_axis, baseline + power_term_repulsive(x_axis), 'power rep'),
         )
 
-        title = f'{isotherm.material} {isotherm.material_batch} {isotherm.adsorbate}'
-        initial_enthalpy_plot(loading,
-                              enthalpy,
-                              enthalpy_approx(loading),
-                              title=title,
-                              extras=extras)
+        title = f'{isotherm.material} {isotherm.adsorbate}'
+        initial_enthalpy_plot(
+            loading,
+            enthalpy,
+            enthalpy_approx(loading),
+            title=title,
+            extras=extras
+        )
 
     params.update({'initial_enthalpy': initial_enthalpy})
 
     return params
 
 
-def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads',
-                           verbose=False):
+def initial_enthalpy_point(
+    isotherm, enthalpy_key, branch='ads', verbose=False
+):
     """
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading by taking the
@@ -406,15 +422,19 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads',
     initial_enthalpy = enthalpy[0]
 
     if verbose:
-        print("The initial enthalpy of adsorption is: \n\tE =",
-              round(initial_enthalpy, 2))
+        print(
+            "The initial enthalpy of adsorption is: \n\tE =",
+            round(initial_enthalpy, 2)
+        )
 
-        loading = isotherm.loading(branch=branch,
-                                   loading_unit='mmol',
-                                   loading_basis='molar')
-        title = f'{isotherm.material} {isotherm.material_batch} {isotherm.adsorbate}'
-        initial_enthalpy_plot(loading,
-                              enthalpy, [initial_enthalpy for i in loading],
-                              title=title)
+        loading = isotherm.loading(
+            branch=branch, loading_unit='mmol', loading_basis='molar'
+        )
+        title = f'{isotherm.material} {isotherm.adsorbate}'
+        initial_enthalpy_plot(
+            loading,
+            enthalpy, [initial_enthalpy for i in loading],
+            title=title
+        )
 
     return {'initial_enthalpy': initial_enthalpy}

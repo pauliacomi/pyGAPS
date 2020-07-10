@@ -104,7 +104,7 @@ def initial_henry_slope(
             'plot_type': 'isotherm',
             'branch': 'ads',
             'fig_title': (' '.join([isotherm.material])),
-            'lgd_keys': ['material_batch', 'adsorbate', 'temperature'],
+            'lgd_keys': ['adsorbate', 'temperature'],
             'lgd_pos': 'bottom'
         }
         params.update(plot_parameters)
@@ -112,7 +112,6 @@ def initial_henry_slope(
         henry.loading_range = [pressure[0], loading[:rows_taken][-1]]
 
         iso_params = isotherm.to_dict()
-        iso_params['material_batch'] = 'Henry model'
         model_isotherm = ModelIsotherm(
             model=henry,
             **iso_params,
