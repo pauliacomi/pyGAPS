@@ -7,7 +7,7 @@ def convert_chemformula(string):
 
     Parameters
     ----------
-    string or Isotherm: str
+    string or Adsorbate: str
         String to process.
 
     Returns
