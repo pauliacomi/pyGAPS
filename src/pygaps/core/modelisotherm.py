@@ -3,8 +3,8 @@
 import numpy
 import pandas
 
-from ..graphing.isothermgraphs import plot_iso
-from ..graphing.isothermgraphs import plot_iso_raw
+from ..graphing.isotherm_graphs import plot_iso
+from ..graphing.isotherm_graphs import plot_iso_raw
 from ..modelling import _GUESS_MODELS
 from ..modelling import _MODELS
 from ..modelling import get_isotherm_model

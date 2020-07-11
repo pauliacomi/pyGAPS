@@ -8,7 +8,7 @@ import scipy.constants as const
 import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calcgraph import langmuir_plot
+from ..graphing.calc_graphs import langmuir_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 

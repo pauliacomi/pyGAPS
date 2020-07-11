@@ -6,14 +6,13 @@ import math
 import warnings
 from itertools import cycle
 
-import matplotlib.pyplot as plt
 import numpy
 from cycler import cycler
-from matplotlib import cm
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
 from ..utilities.string_utilities import convert_chemformula
+from . import plt
 from .mpl_styles import ISO_STYLES
 
 # list of branch types
@@ -250,8 +249,8 @@ def plot_iso(
         fig = ax.get_figure()
         ax1 = ax
     else:
-        fig = plt.figure(**styles['fig_style'])
-        ax1 = plt.subplot(111)
+        fig = plt.pyplot.figure(**styles['fig_style'])
+        ax1 = plt.pyplot.subplot(111)
 
     # Create second axes object, populate it if required
     ax2 = ax1.twinx() if y2_data else None
@@ -280,9 +279,9 @@ def plot_iso(
     # Color styling
     if color:
         if isinstance(color, bool):
-            colors = (cm.jet(x) for x in numpy.linspace(0, 1, 7))
+            colors = (plt.cm.jet(x) for x in numpy.linspace(0, 1, 7))
         elif isinstance(color, int):
-            colors = (cm.jet(x) for x in numpy.linspace(0, 1, color))
+            colors = (plt.cm.jet(x) for x in numpy.linspace(0, 1, color))
         elif isinstance(color, abc.Iterable):
             colors = color
         else:
@@ -350,7 +349,7 @@ def plot_iso(
             return ''
 
         if lbl_components is None:
-            return isotherm.material + ' ' + convert_chemformula(isotherm)
+            return f"{isotherm.material} {convert_chemformula(isotherm.adsorbate)}"
 
         text = []
         for selected in lbl_components:
@@ -363,7 +362,7 @@ def plot_iso(
             val = getattr(isotherm, selected)
             if val:
                 if selected == 'adsorbate':
-                    text.append(convert_chemformula(isotherm))
+                    text.append(convert_chemformula(isotherm.adsorbate))
                 else:
                     text.append(str(val))
 
@@ -473,7 +472,7 @@ def plot_iso_raw(
     logx=False,
     logy1=False,
     logy2=False,
-    color=cm.jet(0.8),
+    color=None,
     marker='o',
     x_range=(None, None),
     y1_range=(None, None),
@@ -498,14 +497,17 @@ def plot_iso_raw(
         if new_style:
             styles[style].update(new_style)
 
+    if color is None:
+        color = plt.cm.jet(0.8)
+
     #
     # Generate the graph itself
     if ax:
         ax1 = ax
         fig = ax1.get_figure()
     else:
-        fig = plt.figure(**styles['fig_style'])
-        ax1 = plt.subplot(111)
+        fig = plt.pyplot.figure(**styles['fig_style'])
+        ax1 = plt.pyplot.subplot(111)
 
     # Create second axes object, populate it if required
     ax2 = ax1.twinx() if y2_data else None

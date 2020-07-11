@@ -6,7 +6,7 @@ import numpy
 import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calcgraph import plot_tp
+from ..graphing.calc_graphs import tp_plot
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
 from .models_thickness import get_thickness_model
@@ -154,7 +154,7 @@ def t_plot(
                     f"and the area is {result.get('area'):.2f} m2/{isotherm.adsorbent_unit}"
                 )
 
-            plot_tp(t_curve, loading, results)
+            tp_plot(t_curve, loading, results)
 
     return {
         't_curve': t_curve,

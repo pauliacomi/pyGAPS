@@ -4,14 +4,13 @@ import numpy
 import scipy.constants as const
 import scipy.stats as stats
 
-from ..graphing.calcgraph import isosteric_enthalpy_plot
+from ..graphing.calc_graphs import isosteric_enthalpy_plot
 from ..utilities.exceptions import ParameterError
 
 
-def isosteric_enthalpy(isotherms,
-                       loading_points=None,
-                       branch='ads',
-                       verbose=False):
+def isosteric_enthalpy(
+    isotherms, loading_points=None, branch='ads', verbose=False
+):
     r"""
     Calculate the isosteric enthalpy of adsorption using several isotherms
     recorded at different temperatures on the same material.
@@ -85,26 +84,29 @@ def isosteric_enthalpy(isotherms,
     # Check same material
     if not all(x.material == isotherms[0].material for x in isotherms):
         raise ParameterError(
-            'Isotherms passed are not measured on the same material.')
+            'Isotherms passed are not measured on the same material.'
+        )
 
     # Check same basis
-    if not all(x.adsorbent_basis == isotherms[0].adsorbent_basis
-               for x in isotherms):
+    if not all(
+        x.adsorbent_basis == isotherms[0].adsorbent_basis for x in isotherms
+    ):
         raise ParameterError(
-            'Isotherm passed are in a different adsorbent basis.')
+            'Isotherm passed are in a different adsorbent basis.'
+        )
 
     # Get minimum and maximum loading for each isotherm
     min_loading = 1.01 * max([
         min(
-            x.loading(
-                loading_basis='molar', loading_unit='mmol', branch=branch))
-        for x in isotherms
+            x.
+            loading(loading_basis='molar', loading_unit='mmol', branch=branch)
+        ) for x in isotherms
     ])
     max_loading = 0.99 * min([
         max(
-            x.loading(
-                loading_basis='molar', loading_unit='mmol', branch=branch))
-        for x in isotherms
+            x.
+            loading(loading_basis='molar', loading_unit='mmol', branch=branch)
+        ) for x in isotherms
     ])
 
     # Get temperatures
@@ -118,15 +120,18 @@ def isosteric_enthalpy(isotherms,
 
     # Get pressure point for each isotherm at loading
     pressures = numpy.array([[
-        i.pressure_at(load,
-                      pressure_unit='bar',
-                      pressure_mode='absolute',
-                      loading_unit='mmol',
-                      branch=branch).item() for i in isotherms
+        i.pressure_at(
+            load,
+            pressure_unit='bar',
+            pressure_mode='absolute',
+            loading_unit='mmol',
+            branch=branch
+        ).item() for i in isotherms
     ] for load in loading])
 
     iso_enthalpy, slopes, correlation = isosteric_enthalpy_raw(
-        pressures, temperatures)
+        pressures, temperatures
+    )
 
     if verbose:
         isosteric_enthalpy_plot(loading, iso_enthalpy)
@@ -193,7 +198,8 @@ def isosteric_enthalpy_raw(pressures, temperatures):
     for pressure in pressures:
 
         slope, intercept, corr_coef, p, stderr = stats.linregress(
-            inv_t, numpy.log(pressure))
+            inv_t, numpy.log(pressure)
+        )
 
         iso_enth.append(-const.gas_constant * slope / 1000)
         slopes.append(slope)

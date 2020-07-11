@@ -6,8 +6,8 @@ import warnings
 import numpy
 import scipy.optimize as opt
 
-from ..graphing.iastgraphs import plot_iast_svp
-from ..graphing.iastgraphs import plot_iast_vle
+from ..graphing.iast_graphs import plot_iast_svp
+from ..graphing.iast_graphs import plot_iast_vle
 from ..modelling import is_iast_model
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -16,8 +16,9 @@ from ..utilities.exceptions import ParameterError
 def iast_binary_vle(
     isotherms,
     total_pressure,
-    warningoff=False,
+    npoints=30,
     adsorbed_mole_fraction_guess=None,
+    warningoff=False,
     verbose=False,
     ax=None
 ):
@@ -37,13 +38,16 @@ def iast_binary_vle(
     total_pressure : float
         Pressure at which the vapour-liquid equilibrium is to be
         calculated.
+    npoints: int
+        Number of points in the resulting curve. More points
+        will be more computationally intensive.
+    adsorbed_mole_fraction_guess : array or list, optional
+        Starting guesses for adsorbed phase mole fractions that
+        `iast` solves for.
     warningoff: bool, optional
         When False, warnings will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data.
-    adsorbed_mole_fraction_guess : array or list, optional
-        Starting guesses for adsorbed phase mole fractions that
-        `iast` solves for.
     verbose : bool, optional
         Print off a extra information, as well as a graph.
     ax : matplotlib axes object, optional
@@ -59,18 +63,17 @@ def iast_binary_vle(
 
     """
     # Parameter checks
-    if len(isotherms) > 2 or len(isotherms) < 2:
+    if len(isotherms) != 2:
         raise ParameterError(
-            "The binary vle graph can only take two components as parameters"
+            "The binary equilibrium calculation can only take two components as parameters."
         )
 
     # Generate fractions array
-    y_data = numpy.linspace(0.01, 0.99, 30)
-    y2_data = 1 - y_data
-    binary_fractions = numpy.array((y_data, y2_data)).transpose()
+    y_data = numpy.linspace(0.01, 0.99, npoints)
+    binary_fractions = numpy.array((y_data, 1 - y_data)).transpose()
 
     # Generate the array of loadings
-    component_loadings = numpy.zeros((len(binary_fractions), 2))
+    component_loadings = numpy.zeros((npoints, 2))
 
     # Run IAST
     for index, fraction in enumerate(binary_fractions):
@@ -93,8 +96,8 @@ def iast_binary_vle(
         plot_iast_vle(
             x_data,
             y_data,
-            isotherms[0],
-            isotherms[1],
+            isotherms[0].adsorbate,
+            isotherms[1].adsorbate,
             total_pressure,
             isotherms[0].pressure_unit,
             ax=ax
@@ -152,9 +155,9 @@ def iast_binary_svp(
     """
 
     # Parameter checks
-    if len(isotherms) > 2 or len(mole_fractions) > 2:
+    if len(isotherms) != 2 or len(mole_fractions) != 2:
         raise ParameterError(
-            "The selectivity graph can only take two components as parameters"
+            "The selectivity calculation can only take two components as parameters."
         )
     if sum(mole_fractions) != 1:
         raise ParameterError("Mole fractions do not add up to unity")
@@ -182,8 +185,8 @@ def iast_binary_svp(
         plot_iast_svp(
             pressures,
             selectivities,
-            isotherms[0],
-            isotherms[1],
+            isotherms[0].adsorbate,
+            isotherms[1].adsorbate,
             mole_fractions[0],
             isotherms[0].pressure_unit,
             ax=ax
@@ -214,7 +217,7 @@ def iast(
     ----------
     isotherms : list of ModelIsotherms or PointIsotherms
         Model adsorption isotherms.
-        e.g. [methane_isotherm, ethane_isotherm]
+        e.g. [methane_isotherm, ethane_isotherm, ...]
     gas_mole_fraction : array or list
         Partial pressures of gas components,
         e.g. [0.5, 0.5].
@@ -245,24 +248,20 @@ def iast(
 
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:
-        raise ParameterError("Pass list of pure component isotherms...")
+        raise ParameterError("Pass at least two isotherms.")
 
     partial_pressures = numpy.asarray(gas_mole_fraction) * total_pressure
     if numpy.size(partial_pressures) != n_components:
-        print(
-            """Example use:\n
-              pygaps.iast([xe_isotherm, kr_isotherm], [0.5,0.5], 1, verbose=true)"""
-        )
         raise ParameterError(
-            "Length of partial pressures != length of array of"
-            " isotherms..."
+            "Number of partial pressures != number of isotherms. Example use:\n"
+            "pygaps.iast([iso1, iso2, iso3], [p1,p2,p3], total_p)"
         )
 
     if verbose:
         print(f"{n_components:d} components.")
         for i in range(n_components):
             print(
-                f"\tPartial pressure component {i:d} = {partial_pressures[i]:f}"
+                f"\tPartial pressure component {i:d} = {partial_pressures[i]:.4f}"
             )
 
     # Assert that the spreading pressures of each component are equal
@@ -274,9 +273,9 @@ def iast(
         Parameters
         ----------
         adsorbed_mole_fractions : array
-            Mole fractions in the adsorbed
-            phase; numpy.size(adsorbed_mole_fractions) = n_components - 1 because
-            sum z_i = 1 asserted here automatically.
+            Mole fractions in the adsorbed phase;
+            numpy.size(adsorbed_mole_fractions) = n_components - 1
+            because sum z_i = 1 asserted here automatically.
 
         Returns
         -------
@@ -307,11 +306,10 @@ def iast(
     ####
     if adsorbed_mole_fraction_guess is None:
         # Default guess: pure-component loadings at these partial pressures.
-        loading_guess = [
+        loading_guess = numpy.asarray([
             isotherms[i].loading_at(partial_pressures[i])
             for i in range(n_components)
-        ]
-        loading_guess = numpy.asarray(loading_guess)
+        ])
         adsorbed_mole_fraction_guess = loading_guess / numpy.sum(loading_guess)
     else:
         numpy.testing.assert_almost_equal(
@@ -331,12 +329,13 @@ def iast(
     if not res.success:
         raise CalculationError(
             textwrap.dedent(
-                f"""\
-                Root finding for adsorbed phase mole fractions failed.
-                This is likely because the default guess is not good enough.
-                Try a different starting guess for the adsorbed phase mole fractions by
-                passing an array adsorbed_mole_fraction_guess to this function.
-                Scipy error message: \n\t{res.message}"""
+                f"""
+                Root finding for adsorbed phase mole fractions failed. This is
+                likely because the default guess is not good enough. Try a
+                different starting guess for the adsorbed phase mole fractions
+                by passing an array adsorbed_mole_fraction_guess to this
+                function. Scipy error message: \n\t{res.message}
+                """
             )
         )
 
@@ -348,12 +347,12 @@ def iast(
         numpy.asarray([1.0 - numpy.sum(adsorbed_mole_fractions)])
     ))
 
-    if numpy.sum(adsorbed_mole_fractions < 0.0
-                 ) != 0 or numpy.sum(adsorbed_mole_fractions > 1.0) != 0:
+    if numpy.any((adsorbed_mole_fractions < 0.0)
+                 | (adsorbed_mole_fractions > 1.0)):
         raise CalculationError(
             textwrap.dedent(
-                """\
-                Adsorbed mole fraction not in [0,1]. Try a different
+                """
+                Some adsorbed mole fractions are below 0 or over 1. Try a different
                 starting guess for the adsorbed mole fractions by passing an array or
                 list 'adsorbed_mole_fraction_guess' into this function.
                 e.g. adsorbed_mole_fraction_guess=[0.2, 0.8]"""
@@ -374,14 +373,13 @@ def iast(
     if verbose:
         # print IAST loadings and corresponding pure-component loadings
         for i in range(n_components):
-            print("Component ", i)
-            print("\tp = ", partial_pressures[i])
-            print("\tp^0 = ", pressure0[i])
-            print("\tLoading: ", loadings[i])
-            print("\tx = ", adsorbed_mole_fractions[i])
+            print(f"Component {i}")
+            print(f"\tp = {partial_pressures[i]:.4f}")
+            print(f"\tp^0 = {pressure0[i]:.4f}")
+            print(f"\tLoading = {loadings[i]:.4f}")
+            print(f"\tx = {adsorbed_mole_fractions[i]:.4f}")
             print(
-                "\tSpreading pressure = ",
-                isotherms[i].spreading_pressure_at(pressure0[i])
+                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i]):.4f}"
             )
 
     # print warning if had to extrapolate isotherm in spreading pressure
@@ -390,7 +388,7 @@ def iast(
             if pressure0[i] > isotherms[i].pressure(branch='ads').max():
                 warnings.warn(
                     textwrap.dedent(
-                        f"""\
+                        f"""
                         WARNING:
                         Component {i:d}: p0 = {pressure0[i]:.2f} > \
                             {isotherms[i].pressure(branch='ads').max():.2f}
@@ -457,32 +455,26 @@ def reverse_iast(
                 )
 
     n_components = len(isotherms)  # number of components in the mixture
-    adsorbed_mole_fractions = numpy.asarray(adsorbed_mole_fractions)
     if n_components == 1:
-        raise ParameterError("Pass list of pure component isotherms...")
+        raise ParameterError("Pass at least two isotherms.")
 
+    adsorbed_mole_fractions = numpy.asarray(adsorbed_mole_fractions)
     if numpy.size(adsorbed_mole_fractions) != n_components:
-        print(
-            """Example use:\n
-              pygaps.reverse_iast([xe_isotherm, kr_isotherm], [0.5,0.5], 1.0,
-              verbose=true)"""
-        )
         raise ParameterError(
-            "Length of desired adsorbed mole fractions != length of"
-            " array of isotherms..."
+            "Number of adsorbed mole fractions is different from number of isotherms. Example use:\n"
+            "pygaps.reverse_iast([iso1, iso2], [p1,p2], total_p)"
         )
 
     if numpy.sum(adsorbed_mole_fractions) != 1.0:
         raise ParameterError(
-            "Desired adsorbed mole fractions should sum to 1.0..."
+            "Desired adsorbed mole fractions should sum to 1.0."
         )
 
     if verbose:
         print(f"{n_components:d} components.")
         for i in range(n_components):
             print(
-                f"\tDesired adsorbed phase mole fraction of component"
-                f"{i:d} = {adsorbed_mole_fractions[i]:f}"
+                f"\tDesired adsorbed phase mole fraction of component {i:d} = {adsorbed_mole_fractions[i]:.4f}"
             )
 
     # assert that the spreading pressures of each component are equal
@@ -545,7 +537,7 @@ def reverse_iast(
     if not res.success:
         raise CalculationError(
             textwrap.dedent(
-                f"""\
+                f"""
                 Root finding for gas phase mole fractions failed.
                 This is likely because the default guess is not good enough.
                 Try a different starting guess for the gas phase mole fractions by
@@ -564,10 +556,12 @@ def reverse_iast(
     if numpy.sum(gas_mole_fractions < 0.0
                  ) != 0 or numpy.sum(gas_mole_fractions > 1.0) != 0:
         raise CalculationError(
-            """Gas phase mole fraction not in [0,1]. Try a different
-        starting guess for the gas phase mole fractions by passing an array or
-        list 'gas_mole_fraction_guess' into this function.
-        e.g. gas_mole_fraction_guess=[0.2, 0.8]"""
+            textwrap.dedent(
+                """Gas phase mole fraction not in [0,1]. Try a different
+                starting guess for the gas phase mole fractions by passing an
+                array or list 'gas_mole_fraction_guess' into this function. e.g.
+                gas_mole_fraction_guess=[0.2, 0.8]"""
+            )
         )
 
     pressure0 = total_pressure * gas_mole_fractions / adsorbed_mole_fractions
@@ -585,34 +579,32 @@ def reverse_iast(
     if verbose:
         # print off IAST loadings and corresponding pure component loadings
         for i in range(n_components):
-            print("Component ", i)
+            print(f"Component {i}")
             print(
-                "\tDesired mole fraction in adsorbed phase, x = ",
-                adsorbed_mole_fractions[i]
+                f"\tDesired mole fraction in adsorbed phase, x = {adsorbed_mole_fractions[i]:.4f}"
             )
             print(
-                "\tBulk gas mole fraction that gives this, y = ",
-                gas_mole_fractions[i]
+                f"\tBulk gas mole fraction that gives this, y = {gas_mole_fractions[i]:.4f}"
             )
+            print(f"\tp^0 = {pressure0[i]:.4f}")
+            print(f"\tLoading = {loadings[i]:.4f}")
             print(
-                "\tSpreading pressure = ",
-                isotherms[i].spreading_pressure_at(pressure0[i])
+                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i]):.4f}"
             )
-            print("\tp^0 = ", pressure0[i])
-            print("\tLoading: ", loadings[i])
 
     # print warning if had to extrapolate isotherm in spreading pressure
     if not warningoff:
         for i in range(n_components):
             if pressure0[i] > isotherms[i].pressure(branch='ads').max():
                 warnings.warn(
-                    """WARNING:
-                    Component %d: p0 = %f > %f, the highest pressure
-                    exhibited in the pure-component isotherm data. Thus,
-                    code had to extrapolate the isotherm data to achieve
-                    this IAST result.""" % (
-                        i, pressure0[i], isotherms[i].pressure(branch='ads'
-                                                               ).max()
+                    textwrap.dedent(
+                        f"""
+                        WARNING:
+                        Component {i}: p0 = {pressure0[i]} > {isotherms[i].pressure(branch='ads').max()}, the highest pressure
+                        exhibited in the pure-component isotherm data. Thus,
+                        code had to extrapolate the isotherm data to achieve
+                        this IAST result.
+                        """
                     )
                 )
 

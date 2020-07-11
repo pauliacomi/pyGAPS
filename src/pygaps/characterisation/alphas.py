@@ -7,7 +7,7 @@ import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
 from ..core.isotherm import Isotherm
-from ..graphing.calcgraph import plot_tp
+from ..graphing.calc_graphs import tp_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
@@ -206,7 +206,7 @@ def alpha_s(
                     f"The adsorbed volume is {result.get('adsorbed_volume'):.4f} and the area is {result.get('area'):.4f}"
                 )
 
-            plot_tp(
+            tp_plot(
                 alpha_curve,
                 loading,
                 results,

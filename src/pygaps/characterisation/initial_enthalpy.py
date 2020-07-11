@@ -6,7 +6,7 @@ import numpy
 import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calcgraph import initial_enthalpy_plot
+from ..graphing.calc_graphs import initial_enthalpy_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 

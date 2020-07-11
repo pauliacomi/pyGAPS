@@ -2,10 +2,10 @@
 
 import warnings
 
-import matplotlib.pyplot as plt
 import numpy
 import scipy.optimize as opt
 
+from ..graphing.calc_graphs import virial_plot
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
@@ -77,7 +77,8 @@ class Virial(IsothermBaseModel):
 
         if not opt_res.success:
             raise CalculationError(
-                f"Root finding failed. Error: \n\t{opt_res.message}")
+                f"Root finding failed. Error: \n\t{opt_res.message}"
+            )
 
         return opt_res.x
 
@@ -97,10 +98,10 @@ class Virial(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        return loading * numpy.exp(-numpy.log(self.params['K']) +
-                                   self.params['A'] * loading +
-                                   self.params['B'] * loading**2 +
-                                   self.params['C'] * loading**3)
+        return loading * numpy.exp(
+            -numpy.log(self.params['K']) + self.params['A'] * loading +
+            self.params['B'] * loading**2 + self.params['C'] * loading**3
+        )
 
     def spreading_pressure(self, pressure):
         r"""
@@ -145,7 +146,8 @@ class Virial(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading)
+            pressure, loading
+        )
 
         guess = {"K": saturation_loading * langmuir_k, "A": 0, "B": 0, "C": 0}
 
@@ -157,12 +159,14 @@ class Virial(IsothermBaseModel):
 
         return guess
 
-    def fit(self,
-            pressure,
-            loading,
-            param_guess,
-            optimization_params=None,
-            verbose=False):
+    def fit(
+        self,
+        pressure,
+        loading,
+        param_guess,
+        optimization_params=None,
+        verbose=False
+    ):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -206,7 +210,8 @@ class Virial(IsothermBaseModel):
         fractional_loading = loading / max(loading)
         if len(fractional_loading[fractional_loading < 0.5]) < 3:
             if not add_point:
-                raise CalculationError("""
+                raise CalculationError(
+                    """
                     The isotherm recorded has very few points below 0.5
                     fractional loading. If a virial model fit is attempted
                     the resulting polynomial will likely be unstable in the
@@ -215,7 +220,8 @@ class Virial(IsothermBaseModel):
                     You can pass ``add_point=True`` in ``optimization_params``
                     to attempt to add a point in the low pressure region or
                     record better isotherms.
-                    """)
+                    """
+                )
             added_point = True
             ln_p_over_n = numpy.hstack([ln_p_over_n[0], ln_p_over_n])
             loading = numpy.hstack([1e-1, loading])
@@ -238,10 +244,10 @@ class Virial(IsothermBaseModel):
         opt_res = opt.least_squares(
             fit_func,
             guess,  # provide the fit function and initial guess
-            args=(
-                loading,
-                ln_p_over_n),  # supply the extra arguments to the fit function
-            **kwargs)
+            args=(loading, ln_p_over_n
+                  ),  # supply the extra arguments to the fit function
+            **kwargs
+        )
         if not opt_res.success:
             raise CalculationError(
                 f"\nFitting routine with model {self.name} failed with error:"
@@ -249,7 +255,8 @@ class Virial(IsothermBaseModel):
                 f"\nTry a different starting point in the nonlinear optimization"
                 f"\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
                 f"\nDefault starting guess for parameters:"
-                f"\n{param_guess}\n")
+                f"\n{param_guess}\n"
+            )
 
         # assign params
         for index, _ in enumerate(param_names):
@@ -260,13 +267,8 @@ class Virial(IsothermBaseModel):
         if verbose:
             print(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
-            fig, ax = plt.subplots()
-            ax.plot(loading, ln_p_over_n, '.')
-            ax.plot(n_load,
-                    numpy.log(numpy.divide(self.pressure(n_load), n_load)),
-                    '-')
-            if added_point:
-                ax.plot(1e-1, ln_p_over_n[0], '.r')
-            ax.set_title("Virial fit")
-            ax.set_xlabel("Loading")
-            ax.set_ylabel("ln(p/n)")
+            virial_plot(
+                loading, ln_p_over_n, n_load,
+                numpy.log(numpy.divide(self.pressure(n_load), n_load)),
+                added_point
+            )

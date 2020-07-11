@@ -1,8 +1,6 @@
 """Functions for plotting calculation-specific graphs."""
 
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-
+from . import plt
 from .mpl_styles import LABEL_STYLE
 from .mpl_styles import TICK_STYLE
 from .mpl_styles import TITLE_STYLE
@@ -46,7 +44,7 @@ def roq_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots(figsize=(6, 4))
+        _, ax = plt.pyplot.subplots(figsize=(6, 4))
 
     ax.plot(
         pressure,
@@ -128,7 +126,7 @@ def bet_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots(figsize=(6, 4))
+        _, ax = plt.pyplot.subplots(figsize=(6, 4))
 
     ax.plot(
         pressure,
@@ -204,7 +202,7 @@ def langmuir_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots(figsize=(6, 4))
+        _, ax = plt.pyplot.subplots(figsize=(6, 4))
 
     ax.plot(
         pressure,
@@ -239,7 +237,7 @@ def langmuir_plot(
     return ax
 
 
-def plot_tp(
+def tp_plot(
     thickness_curve,
     loading,
     results,
@@ -285,7 +283,7 @@ def plot_tp(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.pyplot.subplots()
 
     if alpha_s:
         label1 = '$\\alpha_s$ method'
@@ -385,7 +383,7 @@ def psd_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        fig = plt.figure(figsize=(15, 5))
+        fig = plt.pyplot.figure(figsize=(15, 5))
         ax = fig.add_subplot(111)
 
     lst = {'marker': '', 'color': 'k'}
@@ -411,10 +409,10 @@ def psd_plot(
 
     if log:
         ax.set_xscale('log')
-        ax.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
-        ax.xaxis.set_major_formatter(ticker.FuncFormatter(formatter))
+        ax.xaxis.set_minor_formatter(plt.ticker.FuncFormatter(formatter))
+        ax.xaxis.set_major_formatter(plt.ticker.FuncFormatter(formatter))
         ax.xaxis.set_major_locator(
-            ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
+            plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
         )
         ax.tick_params(
             axis='x', which='minor', width=0.75, length=2.5, **TICK_STYLE
@@ -472,7 +470,7 @@ def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.pyplot.subplots()
 
     ax.plot(
         loading, isosteric_enthalpy, marker='o', color='g', label='enthalpy'
@@ -480,7 +478,7 @@ def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(
-            ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
+            plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
         )
     ax.set_title("Isosteric enthalpy plot")
     ax.set_xlabel('Loading')
@@ -530,7 +528,7 @@ def initial_enthalpy_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.pyplot.subplots()
 
     ax.plot(
         loading,
@@ -548,7 +546,7 @@ def initial_enthalpy_plot(
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(
-            ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
+            plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
         )
 
     ax.set_title(title + " initial enthalpy fit")
@@ -604,7 +602,7 @@ def dra_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.pyplot.subplots()
 
     ax.plot(
         log_n_p0p,
@@ -638,3 +636,23 @@ def dra_plot(
     ax.legend()
 
     return ax
+
+
+def virial_plot(
+    loading,
+    ln_p_over_n,
+    n_load,
+    p_load,
+    added_point,
+):
+    """
+    Draw a Virial plot.
+    """
+    _, ax = plt.pyplot.subplots()
+    ax.plot(loading, ln_p_over_n, '.')
+    ax.plot(n_load, p_load, '-')
+    if added_point:
+        ax.plot(1e-1, ln_p_over_n[0], '.r')
+    ax.set_title("Virial fit")
+    ax.set_xlabel("Loading")
+    ax.set_ylabel("ln(p/n)")

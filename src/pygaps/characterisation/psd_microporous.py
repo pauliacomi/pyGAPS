@@ -9,7 +9,7 @@ import scipy.constants as const
 import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calcgraph import psd_plot
+from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import ParameterError
 from .models_hk import get_hk_model
 
@@ -17,13 +17,15 @@ _MICRO_PSD_MODELS = ['HK']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
-def psd_microporous(isotherm,
-                    psd_model='HK',
-                    pore_geometry='slit',
-                    branch='ads',
-                    adsorbent_model='Carbon(HK)',
-                    adsorbate_model=None,
-                    verbose=False):
+def psd_microporous(
+    isotherm,
+    psd_model='HK',
+    pore_geometry='slit',
+    branch='ads',
+    adsorbent_model='Carbon(HK)',
+    adsorbate_model=None,
+    verbose=False
+):
     """
     Calculate the microporous size distribution using a 'classical' model.
 
@@ -75,18 +77,24 @@ def psd_microporous(isotherm,
     """
     # Function parameter checks
     if psd_model is None:
-        raise ParameterError("Specify a model to generate the pore size"
-                             " distribution e.g. psd_model=\"HK\"")
+        raise ParameterError(
+            "Specify a model to generate the pore size"
+            " distribution e.g. psd_model=\"HK\""
+        )
     if psd_model not in _MICRO_PSD_MODELS:
-        raise ParameterError(f"Model {psd_model} not an option for psd. "
-                             f"Available models are {_MICRO_PSD_MODELS}")
+        raise ParameterError(
+            f"Model {psd_model} not an option for psd. "
+            f"Available models are {_MICRO_PSD_MODELS}"
+        )
     if pore_geometry not in _PORE_GEOMETRIES:
         raise ParameterError(
             f"Geometry {pore_geometry} not an option for pore size distribution. "
-            f"Available geometries are {_PORE_GEOMETRIES}")
+            f"Available geometries are {_PORE_GEOMETRIES}"
+        )
     if not isinstance(isotherm.adsorbate, Adsorbate):
         raise ParameterError(
-            "Isotherm adsorbate is not known, cannot calculate PSD.")
+            "Isotherm adsorbate is not known, cannot calculate PSD."
+        )
 
     # Get adsorbate properties
     if adsorbate_model is None:
@@ -109,24 +117,27 @@ def psd_microporous(isotherm,
     adsorbent_properties = get_hk_model(adsorbent_model)
 
     # Read data in
-    loading = isotherm.loading(branch=branch,
-                               loading_basis='molar',
-                               loading_unit='mmol')
+    loading = isotherm.loading(
+        branch=branch, loading_basis='molar', loading_unit='mmol'
+    )
     pressure = isotherm.pressure(branch=branch, pressure_mode='relative')
 
     # Call specified pore size distribution function
     if psd_model == 'HK':
         pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
             loading, pressure, isotherm.temperature, pore_geometry,
-            adsorbate_model, adsorbent_properties)
+            adsorbate_model, adsorbent_properties
+        )
 
     if verbose:
-        psd_plot(pore_widths,
-                 pore_dist,
-                 pore_vol_cum=pore_vol_cum,
-                 log=False,
-                 right=2.5,
-                 method=psd_model)
+        psd_plot(
+            pore_widths,
+            pore_dist,
+            pore_vol_cum=pore_vol_cum,
+            log=False,
+            right=2.5,
+            method=psd_model
+        )
 
     return {
         'pore_widths': pore_widths,
@@ -135,12 +146,14 @@ def psd_microporous(isotherm,
     }
 
 
-def psd_horvath_kawazoe(loading,
-                        pressure,
-                        temperature,
-                        pore_geometry,
-                        adsorbate_properties,
-                        adsorbent_properties=None):
+def psd_horvath_kawazoe(
+    loading,
+    pressure,
+    temperature,
+    pore_geometry,
+    adsorbate_properties,
+    adsorbent_properties=None
+):
     r"""
     Calculate the pore size distribution using the Horvath-Kawazoe method.
 
@@ -280,7 +293,8 @@ def psd_horvath_kawazoe(loading,
             "molecular_diameter, polarizability,"
             "magnetic_susceptibility and surface_density"
             "Some standard models can be found in "
-            " .characterisation.models_hk")
+            " .characterisation.models_hk"
+        )
     missing = [
         x for x in adsorbent_properties if x not in [
             'molecular_diameter', 'polarizability', 'magnetic_susceptibility',
@@ -297,7 +311,8 @@ def psd_horvath_kawazoe(loading,
             "A dictionary of adsorbate properties must be provided"
             " for the HK method. The properties required are:"
             " molecular_diameter, liquid_density, polarizability,"
-            " magnetic_susceptibility, surface_density, adsorbate_molar_mass")
+            " magnetic_susceptibility, surface_density, adsorbate_molar_mass"
+        )
     missing = [
         x for x in [
             'molecular_diameter', 'liquid_density', 'polarizability',
@@ -316,9 +331,11 @@ def psd_horvath_kawazoe(loading,
     p_gas = adsorbate_properties.get('polarizability') * 1e-27  # to m3
     p_mat = adsorbent_properties.get('polarizability') * 1e-27  # to m3
     m_gas = adsorbate_properties.get(
-        'magnetic_susceptibility') * 1e-27  # to m3
+        'magnetic_susceptibility'
+    ) * 1e-27  # to m3
     m_mat = adsorbent_properties.get(
-        'magnetic_susceptibility') * 1e-27  # to m3
+        'magnetic_susceptibility'
+    ) * 1e-27  # to m3
     n_gas = adsorbate_properties.get('surface_density')
     n_mat = adsorbent_properties.get('surface_density')
     liquid_density = adsorbate_properties.get('liquid_density')
@@ -337,17 +354,18 @@ def psd_horvath_kawazoe(loading,
     constant_coefficient = const.Avogadro / (const.gas_constant * temperature) * \
         (n_gas * a_gas + n_mat * a_mat) / (sigma_si**4)
 
-    constant_interaction_term = -((sigma**4) / (3 *
-                                                (effective_diameter / 2)**3) -
-                                  (sigma**10) / (9 *
-                                                 (effective_diameter / 2)**9))
+    constant_interaction_term = -((sigma**4) /
+                                  (3 *
+                                   (effective_diameter / 2)**3) - (sigma**10) /
+                                  (9 * (effective_diameter / 2)**9))
 
     def h_k_pressure(l_pore):
         pressure = numpy.exp(
             constant_coefficient / (l_pore - effective_diameter) *
             ((sigma**4) / (3 * (l_pore - effective_diameter / 2)**3) -
              (sigma**10) / (9 * (l_pore - effective_diameter / 2)**9) +
-             constant_interaction_term))
+             constant_interaction_term)
+        )
 
         return pressure
 

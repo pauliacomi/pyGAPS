@@ -13,7 +13,7 @@ their own customised plots, pyGAPS includes a few plotting functions
 which make it easier for standard plots to be generated.
 
 The main plotting tool is in the
-:func:`~pygaps.graphing.isothermgraphs.plot_iso` function which handles
+:func:`~pygaps.graphing.isotherm_graphs.plot_iso` function which handles
 the plotting of isotherms. Some common use-case scenarios for the
 functionality are:
 

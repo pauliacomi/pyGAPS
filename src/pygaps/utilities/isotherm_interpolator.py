@@ -30,12 +30,14 @@ class IsothermInterpolator():
         to determine what to do outside data bounds.
 
     """
-
-    def __init__(self, known_data, interp_data,
-                 interp_branch='ads',
-                 interp_kind='linear',
-                 interp_fill=None,
-                 ):
+    def __init__(
+        self,
+        known_data,
+        interp_data,
+        interp_branch='ads',
+        interp_kind='linear',
+        interp_fill=None,
+    ):
         """Instantiate."""
         # The branch the internal interpolator is on.
         self.interp_branch = interp_branch
@@ -50,13 +52,17 @@ class IsothermInterpolator():
             return
 
         if interp_fill is None:
-            self.interp_fun = interp1d(known_data, interp_data,
-                                       kind=interp_kind)
+            self.interp_fun = interp1d(
+                known_data, interp_data, kind=interp_kind
+            )
         else:
-            self.interp_fun = interp1d(known_data, interp_data,
-                                       kind=interp_kind,
-                                       fill_value=interp_fill,
-                                       bounds_error=False)
+            self.interp_fun = interp1d(
+                known_data,
+                interp_data,
+                kind=interp_kind,
+                fill_value=interp_fill,
+                bounds_error=False
+            )
 
     def __call__(self, data):
         """Override direct call."""

@@ -8,8 +8,8 @@ import scipy.constants as const
 import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calcgraph import bet_plot
-from ..graphing.calcgraph import roq_plot
+from ..graphing.calc_graphs import bet_plot
+from ..graphing.calc_graphs import roq_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 

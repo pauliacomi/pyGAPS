@@ -17,16 +17,20 @@ LABEL_STYLE = {
 TICK_STYLE = {
     'labelsize': 17,
 }
-LEGEND_STYLE = {
-    'handlelength': 3, 'fontsize': 15
-}
+LEGEND_STYLE = {'handlelength': 3, 'fontsize': 15}
 
 ISO_STYLES = {
     'fig_style': FIG_STYLE,
     'title_style': TITLE_STYLE,
     'label_style': LABEL_STYLE,
-    'y1_line_style': {'linewidth': 2, 'markersize': 8},
-    'y2_line_style': {'linewidth': 0, 'markersize': 8},
+    'y1_line_style': {
+        'linewidth': 2,
+        'markersize': 8
+    },
+    'y2_line_style': {
+        'linewidth': 0,
+        'markersize': 8
+    },
     'tick_style': TICK_STYLE,
     'legend_style': LEGEND_STYLE,
     'save_style': {},

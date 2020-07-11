@@ -3,7 +3,7 @@
 import numpy
 
 from ..core.modelisotherm import ModelIsotherm
-from ..graphing.isothermgraphs import plot_iso
+from ..graphing.isotherm_graphs import plot_iso
 from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParameterError
 

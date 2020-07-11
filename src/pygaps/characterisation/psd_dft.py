@@ -12,8 +12,8 @@ import scipy.interpolate as interp
 import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calcgraph import psd_plot
-from ..graphing.isothermgraphs import plot_iso
+from ..graphing.calc_graphs import psd_plot
+from ..graphing.isotherm_graphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import bspline

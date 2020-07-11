@@ -7,7 +7,7 @@ import textwrap
 import numpy
 import pandas
 
-from ..graphing.isothermgraphs import plot_iso
+from ..graphing.isotherm_graphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.isotherm_interpolator import IsothermInterpolator
@@ -1100,24 +1100,24 @@ class PointIsotherm(Isotherm):
             raise CalculationError(
                 textwrap.dedent(
                     f"""
-            To compute the spreading pressure at this bulk
-            adsorbate pressure, we would need to extrapolate the isotherm since this
-            pressure is outside the range of the highest pressure in your
-            pure-component isotherm data, {pressures.max()}.
+                To compute the spreading pressure at this bulk adsorbate pressure,
+                we would need to extrapolate the isotherm since this pressure ({pressure:.3f} {self.pressure_unit})
+                is outside the range of the highest pressure in your pure-component
+                isotherm data ({pressures.max()} {self.pressure_unit}).
 
-            At present, the PointIsotherm object is set to throw an
-            exception when this occurs, as we do not have data outside this
-            pressure range to characterize the isotherm at higher pressures.
+                At present, the PointIsotherm class is set to throw an exception
+                when this occurs, as we do not have data outside this pressure range
+                to characterize the isotherm at higher pressures.
 
-            Option 1: fit an analytical model to extrapolate the isotherm
-            Option 2: pass a `interp_fill` to the spreading pressure function of the
-                PointIsotherm object. Then, that PointIsotherm will
-                assume that the uptake beyond pressure {pressures.max()} is given by
-                `interp_fill`. This is reasonable if your isotherm data exhibits
-                a plateau at the highest pressures.
-            Option 3: Go back to the lab or computer to collect isotherm data
-                at higher pressures. (Extrapolation can be dangerous!)
-            """
+                Option 1: fit an analytical model to extrapolate the isotherm
+                Option 2: pass a `interp_fill` to the spreading pressure function of the
+                    PointIsotherm object. Then, that PointIsotherm will
+                    assume that the uptake beyond {pressures.max()} {self.pressure_unit} is given by
+                    `interp_fill`. This is reasonable if your isotherm data exhibits
+                    a plateau at the highest pressures.
+                Option 3: Go back to the lab or computer to collect isotherm data
+                    at higher pressures. (Extrapolation can be dangerous!)
+                """
                 )
             )
 

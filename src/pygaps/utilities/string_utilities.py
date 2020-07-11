@@ -1,10 +1,4 @@
 """General functions for string transformations."""
-import pygaps
-
-
-def _to_latex(string):
-    """Latex-decorate a string."""
-    return ('$' + string + '$')
 
 
 def convert_chemformula(string):
@@ -21,31 +15,23 @@ def convert_chemformula(string):
     str
         Processed string.
     """
-    result = result = getattr(string, 'adsorbate', False)
-    if not result:
-        inner = []
-        # Iterate through the string, adding non-numbers to the no_digits list
+    result = getattr(string, 'formula', None)
+    if result is None:
+        latexd = []
         number_processing = False
         for i in string:
-            if i.isdigit() and number_processing:
-                number_processing = True
-            elif i.isdigit() and not number_processing:
-                inner.append('_{')
-                number_processing = True
+            if i.isdigit():
+                if not number_processing:
+                    latexd.append('_{')
+                    number_processing = True
             else:
                 if number_processing:
-                    inner.append('}')
+                    latexd.append('}')
                     number_processing = False
-            inner.append(i)
+            latexd.append(i)
 
-        if inner[-1].isdigit():
-            inner.append('}')
+        if number_processing:
+            latexd.append('}')
 
-        # which put all characters together.
-        result = ''.join(inner)
-    else:
-        try:
-            result = pygaps.Adsorbate.find(result).formula
-        except pygaps.ParameterError:
-            pass
-    return _to_latex(result)
+        result = ''.join(latexd)
+    return f'${result}$'

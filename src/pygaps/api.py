@@ -2,12 +2,6 @@
 # flake8: noqa
 # isort:skip_file
 
-# Core
-from .core.adsorbate import Adsorbate
-from .core.material import Material
-from .core.modelisotherm import ModelIsotherm
-from .core.pointisotherm import PointIsotherm
-
 # Parsing
 from .parsing.csv import isotherm_from_csv
 from .parsing.csv import isotherm_to_csv
@@ -47,8 +41,7 @@ from .characterisation.tplot import t_plot
 from .characterisation.tplot import t_plot_raw
 
 # Others
-from .graphing.iastgraphs import plot_iast_vle
-from .graphing.isothermgraphs import plot_iso
+from .graphing.isotherm_graphs import plot_iso
 
 from .utilities.coolprop_utilities import COOLPROP_BACKEND
 from .utilities.coolprop_utilities import backend_use_coolprop

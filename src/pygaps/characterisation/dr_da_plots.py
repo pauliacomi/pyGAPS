@@ -6,7 +6,7 @@ import scipy.optimize as opt
 import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calcgraph import dra_plot
+from ..graphing.calc_graphs import dra_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
