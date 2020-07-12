@@ -480,7 +480,7 @@ class PointIsotherm(Isotherm):
 
         """
         print(self)
-        return self.plot(show, **plot_iso_args)
+        return self.plot(**plot_iso_args)
 
     def plot(self, **plot_iso_args):
         """
