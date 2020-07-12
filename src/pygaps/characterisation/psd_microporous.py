@@ -4,6 +4,8 @@ a pore size distribution for pores in
 the micropore range (<2 nm).
 """
 
+from typing import List, Mapping
+
 import numpy
 import scipy.constants as const
 import scipy.optimize as opt
@@ -11,9 +13,9 @@ import scipy.optimize as opt
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import ParameterError
-from .models_hk import get_hk_model
+from .models_hk import get_hk_model, HK_KEYS
 
-_MICRO_PSD_MODELS = ['HK']
+_MICRO_PSD_MODELS = ['HK', 'CY']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
@@ -66,6 +68,7 @@ def psd_microporous(
     Currently, the methods provided are:
 
         - the HK, or Horvath-Kawazoe method
+        - the CY, or Cheng-Yang nonlinear corrected HK method
 
     A common mantra of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
@@ -128,6 +131,8 @@ def psd_microporous(
             loading, pressure, isotherm.temperature, pore_geometry,
             adsorbate_model, adsorbent_properties
         )
+    elif psd_model == 'CY':
+        pass
 
     if verbose:
         psd_plot(
@@ -147,12 +152,12 @@ def psd_microporous(
 
 
 def psd_horvath_kawazoe(
-    loading,
-    pressure,
-    temperature,
-    pore_geometry,
-    adsorbate_properties,
-    adsorbent_properties=None
+    loading: List[float],
+    pressure: List[float],
+    temperature: float,
+    pore_geometry: str,
+    adsorbate_properties: Mapping[str, float],
+    adsorbent_properties: Mapping[str, float],
 ):
     r"""
     Calculate the pore size distribution using the Horvath-Kawazoe method.
@@ -279,110 +284,223 @@ def psd_horvath_kawazoe(
 
     """
     # Parameter checks
+    missing = [x for x in adsorbent_properties if x not in HK_KEYS]
+    if missing:
+        raise ParameterError(
+            f"Adsorbent properties dictionary is missing parameters: {missing}."
+        )
+
+    missing = [
+        x for x in adsorbate_properties
+        if x not in HK_KEYS + ['liquid_density', 'adsorbate_molar_mass']
+    ]
+    if missing:
+        raise ParameterError(
+            f"Adsorbate properties dictionary is missing parameters: {missing}."
+        )
+
+    # ensure numpy arrays
+    pressure = numpy.asarray(pressure)
+    loading = numpy.asarray(loading)
+
     if pore_geometry == 'slit':
-        pass
+        pore_widths = _hk_slit_raw(
+            pressure, temperature, adsorbate_properties, adsorbent_properties
+        )
     elif pore_geometry == 'cylinder':
-        raise NotImplementedError('Currently only slit pores supported.')
+        pore_widths = _hk_cylinder_raw(
+            pressure, temperature, adsorbate_properties, adsorbent_properties
+        )
     elif pore_geometry == 'sphere':
-        raise NotImplementedError('Currently only slit pores supported.')
-
-    if adsorbent_properties is None:
-        raise ParameterError(
-            "A dictionary of adsorbent properties must be provided"
-            " for the HK method. The properties required are:"
-            "molecular_diameter, polarizability,"
-            "magnetic_susceptibility and surface_density"
-            "Some standard models can be found in "
-            " .characterisation.models_hk"
+        pore_widths = _hk_sphere_raw(
+            pressure, temperature, adsorbate_properties, adsorbent_properties
         )
-    missing = [
-        x for x in adsorbent_properties if x not in [
-            'molecular_diameter', 'polarizability', 'magnetic_susceptibility',
-            'surface_density'
-        ]
-    ]
-    if len(missing) != 0:
-        raise ParameterError(
-            f"Adsorbent properties dictionary is missing parameters: {missing}"
-        )
-
-    if adsorbate_properties is None:
-        raise ParameterError(
-            "A dictionary of adsorbate properties must be provided"
-            " for the HK method. The properties required are:"
-            " molecular_diameter, liquid_density, polarizability,"
-            " magnetic_susceptibility, surface_density, adsorbate_molar_mass"
-        )
-    missing = [
-        x for x in [
-            'molecular_diameter', 'liquid_density', 'polarizability',
-            'magnetic_susceptibility', 'surface_density',
-            'adsorbate_molar_mass'
-        ] if x not in adsorbate_properties
-    ]
-    if len(missing) != 0:
-        raise ParameterError(
-            f"Adsorbate properties dictionary is missing parameters: {missing}"
-        )
-
-    # dictionary unpacking
-    d_gas = adsorbate_properties.get('molecular_diameter')
-    d_mat = adsorbent_properties.get('molecular_diameter')
-    p_gas = adsorbate_properties.get('polarizability') * 1e-27  # to m3
-    p_mat = adsorbent_properties.get('polarizability') * 1e-27  # to m3
-    m_gas = adsorbate_properties.get(
-        'magnetic_susceptibility'
-    ) * 1e-27  # to m3
-    m_mat = adsorbent_properties.get(
-        'magnetic_susceptibility'
-    ) * 1e-27  # to m3
-    n_gas = adsorbate_properties.get('surface_density')
-    n_mat = adsorbent_properties.get('surface_density')
-    liquid_density = adsorbate_properties.get('liquid_density')
-    adsorbate_molar_mass = adsorbate_properties.get('adsorbate_molar_mass')
-
-    # calculation of constants and terms
-    e_m = const.electron_mass
-    c_l = const.speed_of_light
-    effective_diameter = d_gas + d_mat
-    sigma = (2 / 5)**(1 / 6) * effective_diameter / 2
-    sigma_si = sigma * 1e-9
-
-    a_mat = 6 * e_m * c_l**2 * p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
-    a_gas = 3 * e_m * c_l**2 * p_gas * m_gas / 2
-
-    constant_coefficient = const.Avogadro / (const.gas_constant * temperature) * \
-        (n_gas * a_gas + n_mat * a_mat) / (sigma_si**4)
-
-    constant_interaction_term = -((sigma**4) /
-                                  (3 *
-                                   (effective_diameter / 2)**3) - (sigma**10) /
-                                  (9 * (effective_diameter / 2)**9))
-
-    def h_k_pressure(l_pore):
-        pressure = numpy.exp(
-            constant_coefficient / (l_pore - effective_diameter) *
-            ((sigma**4) / (3 * (l_pore - effective_diameter / 2)**3) -
-             (sigma**10) / (9 * (l_pore - effective_diameter / 2)**9) +
-             constant_interaction_term)
-        )
-
-        return pressure
-
-    p_w = []
-
-    for p_point in pressure:
-        # minimise to find pore length
-        def h_k_minimization(l_pore):
-            return numpy.abs(h_k_pressure(l_pore) - p_point)
-
-        res = opt.minimize_scalar(h_k_minimization)
-        p_w.append(res.x - d_mat)
 
     # finally calculate pore distribution
-    pore_widths = numpy.array(p_w)
+    liquid_density = adsorbate_properties['liquid_density']
+    adsorbate_molar_mass = adsorbate_properties['adsorbate_molar_mass']
+
     avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2  # nm
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000  # cm3/g
     pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
 
     return avg_pore_widths, pore_dist, volume_adsorbed[1:]
+
+
+def _hk_slit_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
+
+    # dictionary unpacking
+    d_gas = adsorbate_properties['molecular_diameter']
+    d_mat = adsorbent_properties['molecular_diameter']
+    p_gas = adsorbate_properties['polarizability'] * 1e-27  # to m3
+    p_mat = adsorbent_properties['polarizability'] * 1e-27  # to m3
+    m_gas = adsorbate_properties['magnetic_susceptibility'] * 1e-27  # to m3
+    m_mat = adsorbent_properties['magnetic_susceptibility'] * 1e-27  # to m3
+    n_gas = adsorbate_properties['surface_density']
+    n_mat = adsorbent_properties['surface_density']
+
+    # HK starts
+    # NOTE: ~30 ms
+    # constants and constant term calculation
+    d_eff = (d_gas + d_mat) / 2  # effective diameter
+    sigma = (2 / 5)**(1 / 6) * d_eff  # distance from atom at 0 potential
+    sigma_p4_o3 = sigma**4 / 3  # sigma^4 / 3
+    sigma_p10_o9 = sigma**10 / 9  # sigma^10 / 9
+
+    a_mat = 6 * const.electron_mass * const.speed_of_light**2 * \
+        p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
+    a_gas = 1.5 * const.electron_mass * const.speed_of_light**2 * p_gas * m_gas
+
+    const_coeff = const.Avogadro / (const.gas_constant * temp) * \
+        (n_gas * a_gas + n_mat * a_mat) / (sigma * 1e-9)**4  # sigma must be in SI
+
+    const_term = (sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3))  # nm
+
+    def h_k_pressure(l_pore):
+        return numpy.exp(
+            const_coeff / (l_pore - 2 * d_eff) * (
+                sigma_p4_o3 / (l_pore - d_eff)**3 - \
+                sigma_p10_o9 / (l_pore - d_eff)**9 + const_term
+            )
+        )
+
+    p_w = []
+
+    # I personally found that simple Brent minimization
+    # gives good results. There may be other, more efficient
+    # algorithms, like conjugate gradient, but speed is a moot point
+    # as long as average total runtime is <50 ms.
+    # The minimisation runs with bounds of effective diameter < x < 100.
+    # Maximum determinable pore size is limited at 2.5 nm anyway.
+    for p_point in pressure:
+
+        def fun(l_pore):
+            return (h_k_pressure(l_pore) - p_point)**2
+
+        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 100))
+        p_w.append(res.x - d_mat)  # Effective pore size
+
+    return numpy.asarray(p_w)
+
+
+def _hk_cylinder_raw(
+    pressure, temp, adsorbate_properties, adsorbent_properties
+):
+    # dictionary unpacking
+    d_gas = adsorbate_properties['molecular_diameter']  # nm
+    d_mat = adsorbent_properties['molecular_diameter']  # nm
+    p_gas = adsorbate_properties['polarizability'] * 1e-27  # to m3
+    p_mat = adsorbent_properties['polarizability'] * 1e-27  # to m3
+    m_gas = adsorbate_properties['magnetic_susceptibility'] * 1e-27  # to m3
+    m_mat = adsorbent_properties['magnetic_susceptibility'] * 1e-27  # to m3
+    n_gas = adsorbate_properties['surface_density']
+    n_mat = adsorbent_properties['surface_density']
+
+    # SF starts
+    # constants and constant term calculation
+    d_eff = (d_gas + d_mat) / 2  # effective diameter
+    a_mat = 6 * const.electron_mass * const.speed_of_light**2 * \
+        p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
+    a_gas = 1.5 * const.electron_mass * const.speed_of_light**2 * p_gas * m_gas
+
+    const_coeff = (3 / 4) * const.pi * const.Avogadro / (const.gas_constant * temp) * \
+        (n_gas * a_gas + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
+
+    def s_f_pressure(r_pore):
+
+        a_k = 1
+        b_k = 1
+        n = 21 / 32
+        d_over_r = d_eff / r_pore  # dimensionless
+        k_sum = n * d_over_r**10 - d_over_r**4  # first value at K=0
+
+        # TODO, k=100 ensures that convergence is achieved
+        # however, it would be better if it can be checked
+        for k in range(1, 100):
+            a_k = ((-4.5 - k) / k)**2 * a_k
+            b_k = ((-1.5 - k) / k)**2 * b_k
+            k_sum = k_sum + ((1 / (2 * k + 1) * (1 - d_over_r)**(2 * k)) *
+                             (n * a_k * (d_over_r)**10 - b_k * (d_over_r)**4))
+
+        return numpy.exp(const_coeff * k_sum)
+
+    p_w = []
+
+    # I personally found that simple Brent minimization
+    # gives good results. There may be other, more efficient
+    # algorithms, like conjugate gradient, but speed is a moot point
+    # as long as average total runtime is <50 ms.
+    # The minimisation runs with bounds of effective diameter < x < 100.
+    # Maximum determinable pore size is limited at 2.5 nm anyway.
+    for p_point in pressure:
+
+        def fun(r_pore):
+            return (s_f_pressure(r_pore) - p_point)**2
+
+        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 100))
+        p_w.append(2 * res.x - d_mat)  # Effective pore size
+
+    return numpy.asarray(p_w)
+
+
+def _hk_sphere_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
+
+    # dictionary unpacking
+    d_gas = adsorbate_properties['molecular_diameter']
+    d_mat = adsorbent_properties['molecular_diameter']
+    p_gas = adsorbate_properties['polarizability'] * 1e-27  # to m3
+    p_mat = adsorbent_properties['polarizability'] * 1e-27  # to m3
+    m_gas = adsorbate_properties['magnetic_susceptibility'] * 1e-27  # to m3
+    m_mat = adsorbent_properties['magnetic_susceptibility'] * 1e-27  # to m3
+    n_gas = adsorbate_properties['surface_density']
+    n_mat = adsorbent_properties['surface_density']
+
+    # CY starts
+    # constants and constant term calculation
+    d_eff = (d_gas + d_mat) / 2  # effective diameter
+
+    a_mat = 6 * const.electron_mass * const.speed_of_light**2 * \
+        p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
+    a_gas = 1.5 * const.electron_mass * const.speed_of_light**2 * p_gas * m_gas
+
+    p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # 1-2 potential
+    p_22 = a_gas / (4 * (d_gas * 1e-9)**6)  # 2-2 potential
+    c1 = const.Avogadro / (const.gas_constant * temp)
+
+    def c_y_pressure(l_pore):
+
+        l_minus_d = l_pore - d_eff
+        d_over_l = d_eff / l_pore
+
+        n_1 = 4 * const.pi * (l_pore * 1e-9)**2 * n_mat
+        n_2 = 4 * const.pi * (l_minus_d * 1e-9)**2 * n_gas
+
+        def t_term(x):
+            return (1 / (1 + (-1)**x * l_minus_d / l_pore)**x) -\
+                   (1 / (1 - (-1)**x * l_minus_d / l_pore)**x)
+
+        c2 = 6 * (n_1 * p_12 + n_2 * p_22) * l_pore**3 / l_minus_d**3
+        coef = (
+            -(d_over_l**6) * (1 / 12 * t_term(3) - 1 / 8 * t_term(2)) +
+            (d_over_l**12) * (1 / 90 * t_term(9) - 1 / 80 * t_term(8))
+        )
+
+        return numpy.exp(c1 * c2 * coef)
+
+    p_w = []
+
+    # I personally found that simple Brent minimization
+    # gives good results. There may be other, more efficient
+    # algorithms, like conjugate gradient, but speed is a moot point
+    # as long as average total runtime is <50 ms.
+    # The minimisation runs with bounds of effective diameter < x < 50.
+    # Maximum determinable pore size is limited at 2.5 nm anyway.
+    for p_point in pressure:
+
+        def fun(l_pore):
+            return (c_y_pressure(l_pore) - p_point)**2
+
+        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 50))
+        p_w.append(res.x - d_mat)  # Effective pore size
+
+    return numpy.asarray(p_w)

@@ -5,6 +5,13 @@ for use in the Horvath-Kawazoe method.
 
 from ..utilities.exceptions import ParameterError
 
+HK_KEYS = [
+    'molecular_diameter',  # nm
+    'polarizability',  # nm3
+    'magnetic_susceptibility',  # nm3
+    'surface_density',  # molecules/m2
+]
+
 PROPERTIES_CARBON = {
     'molecular_diameter': 0.34,  # nm
     'polarizability': 1.02E-3,  # nm3
