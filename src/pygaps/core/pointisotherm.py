@@ -148,7 +148,7 @@ class PointIsotherm(Isotherm):
                 )
             if 'branch' in isotherm_data.columns:
                 columns.append('branch')
-            self.data_raw = isotherm_data[columns]
+            self.data_raw = isotherm_data.reindex(columns=columns)
 
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
@@ -191,13 +191,13 @@ class PointIsotherm(Isotherm):
         elif isinstance(branch, str):
             if branch == 'guess':
                 # Split the data in adsorption/desorption
-                self.data_raw['branch'] = self._splitdata(
+                self.data_raw.loc[:, 'branch'] = self._splitdata(
                     self.data_raw, self.pressure_key
                 )
             elif branch == 'ads':
-                self.data_raw['branch'] = False
+                self.data_raw.loc[:, 'branch'] = False
             elif branch == 'des':
-                self.data_raw['branch'] = True
+                self.data_raw.loc[:, 'branch'] = True
             else:
                 raise ParameterError(
                     "Isotherm branch parameter must be 'guess ,'ads' or 'des'"
@@ -460,7 +460,7 @@ class PointIsotherm(Isotherm):
     ###########################################################
     #   Info functions
 
-    def print_info(self, show=True, **plot_iso_args):
+    def print_info(self, **plot_iso_args):
         """
         Print a short summary of all the isotherm parameters and a graph.
 
@@ -482,7 +482,7 @@ class PointIsotherm(Isotherm):
         print(self)
         return self.plot(show, **plot_iso_args)
 
-    def plot(self, show=True, **plot_iso_args):
+    def plot(self, **plot_iso_args):
         """
         Plot the isotherm using pygaps.plot_iso().
 
@@ -514,13 +514,7 @@ class PointIsotherm(Isotherm):
         )
         plot_dict.update(plot_iso_args)
 
-        axes = plot_iso(self, **plot_dict)
-
-        if show:
-            axes.get_figure().show()
-            return
-
-        return axes
+        return plot_iso(self, **plot_dict)
 
     ##########################################################
     #   Functions that return part of the isotherm data

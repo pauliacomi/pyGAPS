@@ -345,4 +345,4 @@ class TestModelIsotherm():
     def test_isotherm_print_parameters(self, basic_modelisotherm):
         """Checks isotherm can print its own info."""
 
-        basic_modelisotherm.print_info(show=False)
+        basic_modelisotherm.print_info()

@@ -498,7 +498,7 @@ class ModelIsotherm(Isotherm):
         """Print a short summary of all the isotherm parameters."""
         return super().__str__() + self.model.__str__()
 
-    def print_info(self, show=True, **plot_iso_args):
+    def print_info(self, **plot_iso_args):
         """
         Print a short summary of the isotherm parameters and a graph.
 
@@ -518,9 +518,9 @@ class ModelIsotherm(Isotherm):
 
         """
         print(self)
-        return self.plot(show, **plot_iso_args)
+        return self.plot(**plot_iso_args)
 
-    def plot(self, show=True, **plot_iso_args):
+    def plot(self, **plot_iso_args):
         """
         Plot the isotherm using pygaps.plot_iso().
 
@@ -551,13 +551,7 @@ class ModelIsotherm(Isotherm):
         )
         plot_dict.update(plot_iso_args)
 
-        axes = plot_iso(self, **plot_dict)
-
-        if show:
-            axes.get_figure().show()
-            return
-
-        return axes
+        return plot_iso(self, **plot_dict)
 
     ##########################################################
     #   Methods

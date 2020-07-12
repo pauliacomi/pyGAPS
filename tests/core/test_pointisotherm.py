@@ -586,4 +586,4 @@ class TestPointIsotherm():
     def test_isotherm_print_parameters(self, basic_pointisotherm):
         """Check isotherm can print its own info."""
 
-        basic_pointisotherm.print_info(show=False)
+        basic_pointisotherm.print_info()
