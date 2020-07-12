@@ -116,7 +116,8 @@ def read_mic_report(path):
         try:
             field = next(
                 v for k, v in _FIELDS.items()
-                if any([cell_value.startswith(n) for n in v.get('text')]))
+                if any([cell_value.startswith(n) for n in v.get('text')])
+            )
         except StopIteration:
             continue
         if field['type'] == 'number':
@@ -179,8 +180,9 @@ def _get_data_labels(sheet, row, col):
     # Abstract this sort of thing
     header = sheet.cell(row + header_row, final_column).value
     while any(
-            header.startswith(label)
-            for label in _FIELDS['isotherm tabular']['labels']):
+        header.startswith(label)
+        for label in _FIELDS['isotherm tabular']['labels']
+    ):
         final_column += 1
         header = sheet.cell(row + header_row, final_column).value
     return [
@@ -218,8 +220,8 @@ def _assign_data(item, field, data, points):
         data['time'] = _convert_time(points)
     elif field['labels'][name] == 'loading':
         data['loading'] = points
-        for (u, c) in (('(mmol/', 'mmol'), ('(mol/', 'mol'), ('(cm³/',
-                                                              'cm3(STP)')):
+        for (u, c) in (('(mmol/', 'mmol'), ('(mol/', 'mol'),
+                       ('(cm³/', 'cm3(STP)')):
             if u in item:
                 data['loading_unit'] = c
         for (u, c) in (('/g', 'g'), ('/kg', 'kg')):
@@ -229,7 +231,8 @@ def _assign_data(item, field, data, points):
         data['pressure'][field['labels'][name]] = points
     else:
         raise ValueError(
-            f"Label name '{field['labels'][name]}' not recognized.")
+            f"Label name '{field['labels'][name]}' not recognized."
+        )
 
 
 def _get_errors(sheet, row, col):
@@ -264,4 +267,5 @@ def _check(data, path):
         for empty in empties:
             logging.info('No data collected for %s in file %s.', empty, path)
     if 'errors' in data:
+        logging.warning('Report file contains warnings:')
         logging.warning('\n'.join(data['errors']))
