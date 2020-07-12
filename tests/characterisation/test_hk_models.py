@@ -17,7 +17,6 @@ import pygaps.characterisation.models_hk as hk
 @pytest.mark.characterisation
 class TestHKModels():
     """Tests the HK models."""
-
     def test_get_hk_model_string(self):
         """Just gets stored models."""
         for model in hk._ADSORBENT_MODELS:
@@ -31,10 +30,10 @@ class TestHKModels():
     def test_get_hk_model_dict(self):
         """When passing a dict, we check for consistency and return the same dict."""
         model_dict = dict(
-            molecular_diameter=0.276,            # nm
-            polarizability=2.5E-3,              # nm3
-            magnetic_susceptibility=1.3E-7,     # nm3
-            surface_density=1.315E19,           # molecules/m2
+            molecular_diameter=0.276,  # nm
+            polarizability=2.5E-3,  # nm3
+            magnetic_susceptibility=1.3E-7,  # nm3
+            surface_density=1.315E19,  # molecules/m2
         )
 
         assert hk.get_hk_model(model_dict) == model_dict

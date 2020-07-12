@@ -21,13 +21,18 @@ import pygaps.characterisation.models_thickness as mt
 @pytest.mark.characterisation
 class TestThicknessModels():
     """Test the thickness models."""
-
-    @pytest.mark.parametrize('model, pressure, thickness', [
-        (mt._THICKNESS_MODELS['Halsey'],
-         [0.1, 0.4, 0.9], [0.46, 0.62, 1.28]),
-        (mt._THICKNESS_MODELS['Harkins/Jura'],
-         [0.1, 0.4, 0.9], [0.37, 0.57, 1.32]),
-    ])
+    @pytest.mark.parametrize(
+        'model, pressure, thickness', [
+            (
+                mt._THICKNESS_MODELS['Halsey'], [0.1, 0.4, 0.9
+                                                 ], [0.46, 0.62, 1.28]
+            ),
+            (
+                mt._THICKNESS_MODELS['Harkins/Jura'], [0.1, 0.4, 0.9
+                                                       ], [0.37, 0.57, 1.32]
+            ),
+        ]
+    )
     def test_static_models(self, model, pressure, thickness):
         """Test each model against pre-calculated values."""
         for index, value in enumerate(pressure):
@@ -35,7 +40,8 @@ class TestThicknessModels():
 
     def test_get_thickness(self):
         """Get a regular model."""
-        assert mt.get_thickness_model('Halsey') == mt._THICKNESS_MODELS['Halsey']
+        assert mt.get_thickness_model('Halsey'
+                                      ) == mt._THICKNESS_MODELS['Halsey']
 
     def test_get_thickness_error(self):
         """When the model requested is not found we raise."""
@@ -46,5 +52,6 @@ class TestThicknessModels():
         """When we pass a function, we receive it back."""
         def call_this():
             return 'called'
+
         ret = mt.get_thickness_model(call_this)
         assert ret() == 'called'
