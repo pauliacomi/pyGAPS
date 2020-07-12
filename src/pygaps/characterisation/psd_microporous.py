@@ -4,7 +4,8 @@ a pore size distribution for pores in
 the micropore range (<2 nm).
 """
 
-from typing import List, Mapping
+from typing import List
+from typing import Mapping
 
 import numpy
 import scipy.constants as const
@@ -14,7 +15,8 @@ from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from .models_hk import get_hk_model, HK_KEYS
+from .models_hk import HK_KEYS
+from .models_hk import get_hk_model
 
 _MICRO_PSD_MODELS = ['HK', 'CY']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
