@@ -7,6 +7,7 @@ import numpy
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
+from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from .models_kelvin import get_kelvin_model
 from .models_kelvin import get_meniscus_geometry
@@ -23,6 +24,7 @@ def psd_mesoporous(
     branch='des',
     thickness_model='Harkins/Jura',
     kelvin_model='Kelvin',
+    p_limits=None,
     verbose=False
 ):
     r"""
@@ -45,6 +47,8 @@ def psd_mesoporous(
         relative pressure as an argument.
     thickness_model : str or callable, optional
         The thickness model to use for PSD, It defaults to Harkins and Jura.
+    p_limits : [float, float]
+        Pressure range in which to calculate PSD, defaults to entire isotherm.
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
 
@@ -125,7 +129,7 @@ def psd_mesoporous(
         )
     if branch not in ['ads', 'des']:
         raise ParameterError(
-            f"Branch {branch} not an option for psd.",
+            f"Branch '{branch}' not an option for PSD.",
             "Select either 'ads' or 'des'"
         )
     if not isinstance(isotherm.adsorbate, Adsorbate):
@@ -151,6 +155,23 @@ def psd_mesoporous(
     if branch == 'ads':
         loading = loading[::-1]
         pressure = pressure[::-1]
+
+    # Determine the limits
+    if not p_limits:
+        p_limits = (None, None)
+    minimum = 0
+    maximum = len(pressure)
+    if p_limits[0]:
+        minimum = numpy.searchsorted(pressure, p_limits[0])
+    if p_limits[1]:
+        maximum = numpy.searchsorted(pressure, p_limits[1])
+    if maximum - minimum < 3:  # (for 3 point minimum)
+        raise CalculationError(
+            "The isotherm does not have enough points (at least 3) "
+            "in the selected region."
+        )
+    pressure = pressure[minimum:maximum]
+    loading = loading[minimum:maximum]
 
     # calculated volume adsorbed
     volume_adsorbed = loading * molar_mass / liquid_density / 1000
@@ -204,7 +225,7 @@ def psd_pygapsdh(
     condensation_model
 ):
     r"""
-    Calculate a pore size distribution using the an expanded Dollimore-Heal method.
+    Calculate a pore size distribution using an expanded Dollimore-Heal method.
 
     Parameters
     ----------
@@ -301,8 +322,7 @@ def psd_pygapsdh(
     # Checks
     if len(volume_adsorbed) != len(relative_pressure):
         raise ParameterError(
-            "The length of the pressure and loading arrays"
-            " do not match"
+            "The length of the pressure and loading arrays do not match"
         )
 
     # Pore geometry specifics

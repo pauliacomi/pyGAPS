@@ -5,12 +5,12 @@ for use in the Horvath-Kawazoe method.
 
 from ..utilities.exceptions import ParameterError
 
-HK_KEYS = [
-    'molecular_diameter',  # nm
-    'polarizability',  # nm3
-    'magnetic_susceptibility',  # nm3
-    'surface_density',  # molecules/m2
-]
+HK_KEYS = {
+    'molecular_diameter': 'nm',
+    'polarizability': 'nm3',
+    'magnetic_susceptibility': 'nm3',
+    'surface_density': 'molecules/m2',
+}
 
 PROPERTIES_CARBON = {
     'molecular_diameter': 0.34,  # nm
@@ -73,9 +73,7 @@ def get_hk_model(model):
 
     # If the model is an dictionary, use it as is
     if isinstance(model, dict):
-        for key in [('molecular_diameter', 'nm'), ('polarizability', 'nm3'),
-                    ('magnetic_susceptibility', 'nm3'),
-                    ('surface_density', 'molecules/m2')]:
+        for key in HK_KEYS.items():
             if key[0] not in model.keys():
                 raise ParameterError(
                     f"The passed dictionary must contain the parameter {key[0]} "

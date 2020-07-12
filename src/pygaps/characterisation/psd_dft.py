@@ -30,6 +30,7 @@ def psd_dft(
     isotherm,
     kernel='DFT-N2-77K-carbon-slit',
     branch='ads',
+    p_limits=None,
     bspline_order=2,
     kernel_units=None,
     verbose=False,
@@ -45,6 +46,8 @@ def psd_dft(
         The name of the kernel, or the path where it can be found.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
+    p_limits : [float, float]
+        Pressure range in which to calculate PSD, defaults to entire isotherm.
     bspline_order : int
         The smoothing order of the b-splines fit to the data.
         If set to 0, data will be returned as-is.
@@ -167,6 +170,32 @@ def psd_dft(
         pressure_mode=pressure_mode,
         pressure_unit=pressure_unit
     )
+    if loading is None:
+        raise ParameterError(
+            "The isotherm does not have the required branch "
+            "for this calculation"
+        )
+    # If on an desorption branch, data will be reversed
+    if branch == 'des':
+        loading = loading[::-1]
+        pressure = pressure[::-1]
+
+    # Determine the limits
+    if not p_limits:
+        p_limits = (None, None)
+    minimum = 0
+    maximum = len(pressure)
+    if p_limits[0]:
+        minimum = numpy.searchsorted(pressure, p_limits[0])
+    if p_limits[1]:
+        maximum = numpy.searchsorted(pressure, p_limits[1])
+    if maximum - minimum < 3:  # (for 3 point minimum)
+        raise CalculationError(
+            "The isotherm does not have enough points (at least 3) "
+            "in the selected region."
+        )
+    pressure = pressure[minimum:maximum]
+    loading = loading[minimum:maximum]
 
     # Call the DFT function
     pore_widths, pore_dist, pore_load_cum = psd_dft_kernel_fit(

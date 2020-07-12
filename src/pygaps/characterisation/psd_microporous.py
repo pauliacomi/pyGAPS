@@ -12,6 +12,7 @@ import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
+from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from .models_hk import get_hk_model, HK_KEYS
 
@@ -26,6 +27,7 @@ def psd_microporous(
     branch='ads',
     adsorbent_model='Carbon(HK)',
     adsorbate_model=None,
+    p_limits=None,
     verbose=False
 ):
     """
@@ -46,6 +48,8 @@ def psd_microporous(
     adsorbate_model : dict or `None`
         The adsorbate properties to use for PSD, If null, properties are
         automatically searched from the Adsorbent.
+    p_limits : [float, float]
+        Pressure range in which to calculate PSD, defaults to [0, 0.2].
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
 
@@ -94,13 +98,20 @@ def psd_microporous(
             f"Geometry {pore_geometry} not an option for pore size distribution. "
             f"Available geometries are {_PORE_GEOMETRIES}"
         )
-    if not isinstance(isotherm.adsorbate, Adsorbate):
+    if branch not in ['ads', 'des']:
         raise ParameterError(
-            "Isotherm adsorbate is not known, cannot calculate PSD."
+            f"Branch '{branch}' not an option for PSD.",
+            "Select either 'ads' or 'des'"
         )
 
     # Get adsorbate properties
     if adsorbate_model is None:
+        if not isinstance(isotherm.adsorbate, Adsorbate):
+            raise ParameterError(
+                "Isotherm adsorbate is not known, cannot calculate PSD."
+                "Either use a recognised adsorbate (i.e. nitrogen) or "
+                "pass a dictionary with your adsorbate parameters."
+            )
         adsorbate_model = {
             'molecular_diameter':
             isotherm.adsorbate.get_prop('molecular_diameter'),
@@ -124,12 +135,42 @@ def psd_microporous(
         branch=branch, loading_basis='molar', loading_unit='mmol'
     )
     pressure = isotherm.pressure(branch=branch, pressure_mode='relative')
+    if loading is None:
+        raise ParameterError(
+            "The isotherm does not have the required branch "
+            "for this calculation"
+        )
+    # If on an desorption branch, data will be reversed
+    if branch == 'des':
+        loading = loading[::-1]
+        pressure = pressure[::-1]
+
+    # Determine the limits
+    if not p_limits:
+        p_limits = (None, 0.2)
+    minimum = 0
+    maximum = len(pressure)
+    if p_limits[0]:
+        minimum = numpy.searchsorted(pressure, p_limits[0])
+    if p_limits[1]:
+        maximum = numpy.searchsorted(pressure, p_limits[1])
+    if maximum - minimum < 3:  # (for 3 point minimum)
+        raise CalculationError(
+            "The isotherm does not have enough points (at least 3) "
+            "in the selected region."
+        )
+    pressure = pressure[minimum:maximum]
+    loading = loading[minimum:maximum]
 
     # Call specified pore size distribution function
     if psd_model == 'HK':
         pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
-            loading, pressure, isotherm.temperature, pore_geometry,
-            adsorbate_model, adsorbent_properties
+            pressure,
+            loading,
+            isotherm.temperature,
+            pore_geometry,
+            adsorbate_model,
+            adsorbent_properties,
         )
     elif psd_model == 'CY':
         pass
@@ -152,8 +193,8 @@ def psd_microporous(
 
 
 def psd_horvath_kawazoe(
-    loading: List[float],
     pressure: List[float],
+    loading: List[float],
     temperature: float,
     pore_geometry: str,
     adsorbate_properties: Mapping[str, float],
@@ -291,8 +332,8 @@ def psd_horvath_kawazoe(
         )
 
     missing = [
-        x for x in adsorbate_properties
-        if x not in HK_KEYS + ['liquid_density', 'adsorbate_molar_mass']
+        x for x in adsorbate_properties if x not in list(HK_KEYS.keys()) +
+        ['liquid_density', 'adsorbate_molar_mass']
     ]
     if missing:
         raise ParameterError(
@@ -358,10 +399,9 @@ def _hk_slit_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
 
     def h_k_pressure(l_pore):
         return numpy.exp(
-            const_coeff / (l_pore - 2 * d_eff) * (
-                sigma_p4_o3 / (l_pore - d_eff)**3 - \
-                sigma_p10_o9 / (l_pore - d_eff)**9 + const_term
-            )
+            const_coeff / (l_pore - 2 * d_eff) *
+            ((sigma_p4_o3 / (l_pore - d_eff)**3) -
+             (sigma_p10_o9 / (l_pore - d_eff)**9) + const_term)
         )
 
     p_w = []
@@ -370,14 +410,14 @@ def _hk_slit_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
     # gives good results. There may be other, more efficient
     # algorithms, like conjugate gradient, but speed is a moot point
     # as long as average total runtime is <50 ms.
-    # The minimisation runs with bounds of effective diameter < x < 100.
+    # The minimisation runs with bounds of effective diameter < x < 50.
     # Maximum determinable pore size is limited at 2.5 nm anyway.
     for p_point in pressure:
 
         def fun(l_pore):
             return (h_k_pressure(l_pore) - p_point)**2
 
-        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 100))
+        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 50))
         p_w.append(res.x - d_mat)  # Effective pore size
 
     return numpy.asarray(p_w)
@@ -414,9 +454,8 @@ def _hk_cylinder_raw(
         d_over_r = d_eff / r_pore  # dimensionless
         k_sum = n * d_over_r**10 - d_over_r**4  # first value at K=0
 
-        # TODO, k=100 ensures that convergence is achieved
-        # however, it would be better if it can be checked
-        for k in range(1, 100):
+        # 30 * pore radius ensures that layer convergence is achieved
+        for k in range(1, int(r_pore * 30)):
             a_k = ((-4.5 - k) / k)**2 * a_k
             b_k = ((-1.5 - k) / k)**2 * b_k
             k_sum = k_sum + ((1 / (2 * k + 1) * (1 - d_over_r)**(2 * k)) *
