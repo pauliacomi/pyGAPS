@@ -27,7 +27,7 @@ def psd_microporous(
     psd_model='HK',
     pore_geometry='slit',
     branch='ads',
-    adsorbent_model='Carbon(HK)',
+    material_model='Carbon(HK)',
     adsorbate_model=None,
     p_limits=None,
     verbose=False
@@ -45,8 +45,9 @@ def psd_microporous(
         The geometry of the adsorbent pores.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
-    adsorbent_model : str or dict
-        The adsorbent model to use for PSD, It defaults to Carbon(HK).
+    material_model : str or dict
+        The material model to use for PSD, It defaults to 'Carbon(HK)', the original
+        Horvath-Kawazoe carbon parameters.
     adsorbate_model : dict or `None`
         The adsorbate properties to use for PSD, If null, properties are
         automatically searched from the Adsorbent.
@@ -74,7 +75,8 @@ def psd_microporous(
     Currently, the methods provided are:
 
         - the HK, or Horvath-Kawazoe method
-        - the CY, or Cheng-Yang nonlinear corrected HK method
+        - the CY, or Cheng-Yang nonlinear (Langmuir) corrected HK method
+        - the RY, or Rege-Yang corrected HK method
 
     A common mantra of data processing is: "garbage in = garbage out". Only use methods
     when you are aware of their limitations and shortcomings.
@@ -82,6 +84,8 @@ def psd_microporous(
     See Also
     --------
     pygaps.characterisation.psd_microporous.psd_horvath_kawazoe : low level HK (Horvath-Kawazoe) method
+    pygaps.characterisation.psd_microporous.psd_hk_cheng_yang : low level HK-CY (Cheng-Yang) method
+    pygaps.characterisation.psd_microporous.psd_hk_rege_yang : low level HK-RY (Rege-Yang) method
 
     """
     # Function parameter checks
@@ -130,7 +134,7 @@ def psd_microporous(
         }
 
     # Get adsorbent properties
-    adsorbent_properties = get_hk_model(adsorbent_model)
+    material_properties = get_hk_model(material_model)
 
     # Read data in
     loading = isotherm.loading(
@@ -172,7 +176,7 @@ def psd_microporous(
             isotherm.temperature,
             pore_geometry,
             adsorbate_model,
-            adsorbent_properties,
+            material_properties,
         )
     elif psd_model == 'CY':
         pass
@@ -200,7 +204,7 @@ def psd_horvath_kawazoe(
     temperature: float,
     pore_geometry: str,
     adsorbate_properties: Mapping[str, float],
-    adsorbent_properties: Mapping[str, float],
+    material_properties: Mapping[str, float],
 ):
     r"""
     Calculate the pore size distribution using the Horvath-Kawazoe method.
@@ -219,15 +223,15 @@ def psd_horvath_kawazoe(
         Properties for the adsorbate in the form of::
 
             adsorbate_properties = dict(
-                'molecular_diameter'=0,           # nm
-                'polarizability'=0,               # nm3
-                'magnetic_susceptibility'=0,      # nm3
-                'surface_density'=0,              # molecules/m2
-                'liquid_density'=0,               # g/cm3
-                'adsorbate_molar_mass'=0,         # g/mol
+                'molecular_diameter': 0,           # nm
+                'polarizability': 0,               # nm3
+                'magnetic_susceptibility': 0,      # nm3
+                'surface_density': 0,              # molecules/m2
+                'liquid_density': 0,               # g/cm3
+                'adsorbate_molar_mass': 0,         # g/mol
             )
 
-    adsorbent_properties : dict
+    material_properties : dict
         Properties for the adsorbate in the same form
         as 'adsorbate_properties'. A list of common models
         can be found in .characterisation.models_hk.
@@ -246,23 +250,43 @@ def psd_horvath_kawazoe(
 
     *Description*
 
-    The H-K method [#]_ attempts to describe the adsorption within pores by calculation
-    of the average potential energy for a pore. The method starts by assuming the
-    relationship between the gas phase as being:
+    The H-K method [#]_ attempts to describe the adsorption within pores by
+    calculation of the average potential energy for a pore. The method starts by
+    assuming the following relationship between the two phases:
 
     .. math::
 
         R_g T \ln(\frac{p}{p_0}) = U_0 + P_a
 
-    Here :math:`U_0` is the potential function describing the surface to adsorbent
-    interactions and :math:`P_a` is the potential function describing the adsorbate-
-    adsorbate interactions. This equation is derived from the equation of the free energy
-    of adsorption at constant temperature where term :math:`T \Delta S^{tr}(w/w_{\infty})`
-    is assumed to be negligible.
+    Here :math:`U_0` is the potential function describing the surface to
+    adsorbent interactions and :math:`P_a` is the potential function describing
+    the adsorbate- adsorbate interactions. This equation is derived from the
+    equation of the free energy of adsorption at constant temperature where
+    adsorption entropy term :math:`T \Delta S^{tr}(w/w_{\infty})` is assumed to
+    be negligible.
 
-    If a Lennard-Jones-type potential function describes the interactions between the
-    adsorbate molecules and the adsorbent molecules then the two contributions to the
-    total potential can be replaced by the extended function. The resulting equation becomes:
+------------------------------------------------------------------------------------------------
+    A cylindrical model
+
+    ..[#] A. Saito and H. C. Foley, Curvature and Parametric Sensitivity in
+    Models for Adsorption in Micropores, AIChE J., 37, 429, 1991.
+
+------------------------------------------------------------------------------------------------
+    The equation assumes that adsorption follows Henry's law. A correction was
+    proposed by Cheng and Yang [#]_ which incorporate a Langmuir type behaviour
+    of adsorbed molecules.
+
+    ..[#] L. S. Cheng and R. T. Yang, ‘‘Improved Horvath-Kawazoe Equations
+    Including Spherical Pore Models for Calculating Micropore Size
+    Distribution,’’ Chem. Eng. Sci., 49, 2599, 1994.
+
+------------------------------------------------------------------------------
+
+
+    If a Lennard-Jones-type potential function describes the interactions
+    between the adsorbate molecules and the adsorbent molecules then the two
+    contributions to the total potential can be replaced by the extended
+    function. The resulting equation becomes:
 
     .. math::
 
@@ -306,28 +330,36 @@ def psd_horvath_kawazoe(
 
     The assumptions made by using the H-K method are:
 
-        - It does not have a description of capillary condensation. This means that the
-          pore size distribution can only be considered accurate up to a maximum of 5 nm.
+        - It does not have a description of capillary condensation. This means
+          that the pore size distribution can only be considered accurate up to
+          a maximum of 5 nm.
 
-        - Each pore is uniform and of infinite length. Materials with varying pore
-          shapes or highly interconnected networks may not give realistic results.
+        - Each pore is uniform and of infinite length. Materials with varying
+          pore shapes or highly interconnected networks may not give realistic
+          results.
 
-        - The wall is made up of single layer atoms. Furthermore, since the HK method
-          is reliant on knowing the properties of the surface atoms as well as the
-          adsorbent molecules the material should ideally be homogenous.
+        - The surface is made up of a single layer of atoms. Furthermore, since
+          the HK method is reliant on knowing the properties of the surface
+          atoms as well as the adsorbent molecules the material should ideally
+          be homogenous.
 
-        - Only dispersive forces are accounted for. If the adsorbate-adsorbent interactions
-          have other contributions, the Lennard-Jones potential function will not be
-          an accurate description of pore environment.
+        - Only dispersive forces are accounted for. If the adsorbate-adsorbent
+          interactions have other contributions, the Lennard-Jones potential
+          function will not be an accurate description of pore environment.
 
     References
     ----------
-    .. [#] K. Kutics, G. Horvath, Determination of Pore size distribution in MSC from
-       Carbon-dioxide Adsorption Isotherms, 86
+    .. [#] G. Horvath and K. Kawazoe, Method for Calculation of Effective Pore
+    Size Distribution in Molecular Sieve Carbon, J. Chem. Eng. Japan, 16, 470 1983.
+
+    .. [#] S. U. Rege and R. T. Yang, Corrected Horváth-Kawazoe equations for
+    pore-size distribution, AIChE Journal, vol. 46, no. 4, pp. 734–750, Apr.
+    2000.
+
 
     """
     # Parameter checks
-    missing = [x for x in adsorbent_properties if x not in HK_KEYS]
+    missing = [x for x in material_properties if x not in HK_KEYS]
     if missing:
         raise ParameterError(
             f"Adsorbent properties dictionary is missing parameters: {missing}."
@@ -348,15 +380,15 @@ def psd_horvath_kawazoe(
 
     if pore_geometry == 'slit':
         pore_widths = _hk_slit_raw(
-            pressure, temperature, adsorbate_properties, adsorbent_properties
+            pressure, temperature, adsorbate_properties, material_properties
         )
     elif pore_geometry == 'cylinder':
         pore_widths = _hk_cylinder_raw(
-            pressure, temperature, adsorbate_properties, adsorbent_properties
+            pressure, temperature, adsorbate_properties, material_properties
         )
     elif pore_geometry == 'sphere':
         pore_widths = _hk_sphere_raw(
-            pressure, temperature, adsorbate_properties, adsorbent_properties
+            pressure, temperature, adsorbate_properties, material_properties
         )
 
     # finally calculate pore distribution
@@ -370,32 +402,27 @@ def psd_horvath_kawazoe(
     return avg_pore_widths, pore_dist, volume_adsorbed[1:]
 
 
-def _hk_slit_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
+def _hk_slit_raw(pressure, temp, adsorbate_properties, material_properties):
 
-    # dictionary unpacking
-    d_gas = adsorbate_properties['molecular_diameter']
-    d_mat = adsorbent_properties['molecular_diameter']
-    p_gas = adsorbate_properties['polarizability'] * 1e-27  # to m3
-    p_mat = adsorbent_properties['polarizability'] * 1e-27  # to m3
-    m_gas = adsorbate_properties['magnetic_susceptibility'] * 1e-27  # to m3
-    m_mat = adsorbent_properties['magnetic_susceptibility'] * 1e-27  # to m3
-    n_gas = adsorbate_properties['surface_density']
-    n_mat = adsorbent_properties['surface_density']
+    # Constants unpacking and calculation
+    d_ads = adsorbate_properties['molecular_diameter']
+    d_mat = material_properties['molecular_diameter']
+    n_ads = adsorbate_properties['surface_density']
+    n_mat = material_properties['surface_density']
 
-    # HK starts
-    # NOTE: ~30 ms
-    # constants and constant term calculation
-    d_eff = (d_gas + d_mat) / 2  # effective diameter
-    sigma = (2 / 5)**(1 / 6) * d_eff  # distance from atom at 0 potential
+    a_ads, a_mat = _dispersion_from_dict(
+        adsorbate_properties, material_properties
+    )  # dispersion constants
+
+    d_eff = (d_ads + d_mat) / 2  # effective diameter
+
+    sigma = 0.066666667 * d_eff  # (2 / 5)**(1 / 6) * d_eff, internuclear distance at 0 energy
     sigma_p4_o3 = sigma**4 / 3  # sigma^4 / 3
     sigma_p10_o9 = sigma**10 / 9  # sigma^10 / 9
 
-    a_mat = 6 * const.electron_mass * const.speed_of_light**2 * \
-        p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
-    a_gas = 1.5 * const.electron_mass * const.speed_of_light**2 * p_gas * m_gas
-
-    const_coeff = const.Avogadro / (const.gas_constant * temp) * \
-        (n_gas * a_gas + n_mat * a_mat) / (sigma * 1e-9)**4  # sigma must be in SI
+    const_coeff = (
+        _N_over_RT(temp) * (n_ads * a_ads + n_mat * a_mat) / (sigma * 1e-9)**4
+    )  # sigma must be in SI
 
     const_term = (sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3))  # nm
 
@@ -426,27 +453,22 @@ def _hk_slit_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
 
 
 def _hk_cylinder_raw(
-    pressure, temp, adsorbate_properties, adsorbent_properties
+    pressure, temp, adsorbate_properties, material_properties
 ):
-    # dictionary unpacking
-    d_gas = adsorbate_properties['molecular_diameter']  # nm
-    d_mat = adsorbent_properties['molecular_diameter']  # nm
-    p_gas = adsorbate_properties['polarizability'] * 1e-27  # to m3
-    p_mat = adsorbent_properties['polarizability'] * 1e-27  # to m3
-    m_gas = adsorbate_properties['magnetic_susceptibility'] * 1e-27  # to m3
-    m_mat = adsorbent_properties['magnetic_susceptibility'] * 1e-27  # to m3
-    n_gas = adsorbate_properties['surface_density']
-    n_mat = adsorbent_properties['surface_density']
+    # Constants unpacking and calculation
+    d_ads = adsorbate_properties['molecular_diameter']
+    d_mat = material_properties['molecular_diameter']
+    n_ads = adsorbate_properties['surface_density']
+    n_mat = material_properties['surface_density']
 
-    # SF starts
-    # constants and constant term calculation
-    d_eff = (d_gas + d_mat) / 2  # effective diameter
-    a_mat = 6 * const.electron_mass * const.speed_of_light**2 * \
-        p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
-    a_gas = 1.5 * const.electron_mass * const.speed_of_light**2 * p_gas * m_gas
+    a_ads, a_mat = _dispersion_from_dict(
+        adsorbate_properties, material_properties
+    )  # dispersion constants
 
-    const_coeff = (3 / 4) * const.pi * const.Avogadro / (const.gas_constant * temp) * \
-        (n_gas * a_gas + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
+    d_eff = (d_ads + d_mat) / 2  # effective diameter
+
+    const_coeff = 0.75 * const.pi * _N_over_RT(temp) * \
+        (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
 
     def s_f_pressure(r_pore):
 
@@ -484,29 +506,23 @@ def _hk_cylinder_raw(
     return numpy.asarray(p_w)
 
 
-def _hk_sphere_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
+def _hk_sphere_raw(pressure, temp, adsorbate_properties, material_properties):
 
-    # dictionary unpacking
-    d_gas = adsorbate_properties['molecular_diameter']
-    d_mat = adsorbent_properties['molecular_diameter']
-    p_gas = adsorbate_properties['polarizability'] * 1e-27  # to m3
-    p_mat = adsorbent_properties['polarizability'] * 1e-27  # to m3
-    m_gas = adsorbate_properties['magnetic_susceptibility'] * 1e-27  # to m3
-    m_mat = adsorbent_properties['magnetic_susceptibility'] * 1e-27  # to m3
-    n_gas = adsorbate_properties['surface_density']
-    n_mat = adsorbent_properties['surface_density']
+    # Constants unpacking and calculation
+    d_ads = adsorbate_properties['molecular_diameter']
+    d_mat = material_properties['molecular_diameter']
+    n_ads = adsorbate_properties['surface_density']
+    n_mat = material_properties['surface_density']
 
-    # CY starts
-    # constants and constant term calculation
-    d_eff = (d_gas + d_mat) / 2  # effective diameter
+    a_ads, a_mat = _dispersion_from_dict(
+        adsorbate_properties, material_properties
+    )  # dispersion constants
 
-    a_mat = 6 * const.electron_mass * const.speed_of_light**2 * \
-        p_gas * p_mat / (p_gas / m_gas + p_mat / m_mat)
-    a_gas = 1.5 * const.electron_mass * const.speed_of_light**2 * p_gas * m_gas
+    d_eff = (d_ads + d_mat) / 2  # effective diameter
 
     p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # 1-2 potential
-    p_22 = a_gas / (4 * (d_gas * 1e-9)**6)  # 2-2 potential
-    c1 = const.Avogadro / (const.gas_constant * temp)
+    p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # 2-2 potential
+    N_over_RT = _N_over_RT(temp)
 
     def c_y_pressure(l_pore):
 
@@ -514,7 +530,7 @@ def _hk_sphere_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
         d_over_l = d_eff / l_pore
 
         n_1 = 4 * const.pi * (l_pore * 1e-9)**2 * n_mat
-        n_2 = 4 * const.pi * (l_minus_d * 1e-9)**2 * n_gas
+        n_2 = 4 * const.pi * (l_minus_d * 1e-9)**2 * n_ads
 
         def t_term(x):
             return (1 / (1 + (-1)**x * l_minus_d / l_pore)**x) -\
@@ -526,7 +542,7 @@ def _hk_sphere_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
             (d_over_l**12) * (1 / 90 * t_term(9) - 1 / 80 * t_term(8))
         )
 
-        return numpy.exp(c1 * c2 * coef)
+        return numpy.exp(N_over_RT * c2 * coef)
 
     p_w = []
 
@@ -545,3 +561,42 @@ def _hk_sphere_raw(pressure, temp, adsorbate_properties, adsorbent_properties):
         p_w.append(res.x - d_mat)  # Effective pore size
 
     return numpy.asarray(p_w)
+
+
+def _dispersion_from_dict(ads_dict, mat_dict):
+
+    p_ads = ads_dict['polarizability'] * 1e-27  # to m3
+    p_mat = mat_dict['polarizability'] * 1e-27  # to m3
+    m_ads = ads_dict['magnetic_susceptibility'] * 1e-27  # to m3
+    m_mat = mat_dict['magnetic_susceptibility'] * 1e-27  # to m3
+
+    return (
+        _kirkwood_muller_dispersion_ads(p_ads, m_ads),
+        _kirkwood_muller_dispersion_mat(p_mat, m_mat, p_ads, m_ads),
+    )
+
+
+def _kirkwood_muller_dispersion_ads(p_ads, m_ads):
+    """Calculate the dispersion constant for the adsorbate.
+
+    p and m stand for polarizability and magnetic susceptibility
+    """
+    return (
+        1.5 * const.electron_mass * const.speed_of_light**2 * p_ads * m_ads
+    )
+
+
+def _kirkwood_muller_dispersion_mat(p_mat, m_mat, p_ads, m_ads):
+    """Calculate the dispersion constant for the material.
+
+    p and m stand for polarizability and magnetic susceptibility
+    """
+    return (
+        6 * const.electron_mass * const.speed_of_light**2 * p_ads * p_mat /
+        (p_ads / m_ads + p_mat / m_mat)
+    )
+
+
+def _N_over_RT(temp):
+    """Calculate (N_a / RT)."""
+    return (const.Avogadro / const.gas_constant / temp)
