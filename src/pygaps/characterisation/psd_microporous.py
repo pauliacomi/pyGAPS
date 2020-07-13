@@ -179,7 +179,15 @@ def psd_microporous(
             material_properties,
         )
     elif psd_model == 'CY':
-        pass
+        pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
+            pressure,
+            loading,
+            isotherm.temperature,
+            pore_geometry,
+            adsorbate_model,
+            material_properties,
+            use_cy=True,
+        )
 
     if verbose:
         psd_plot(
@@ -205,6 +213,7 @@ def psd_horvath_kawazoe(
     pore_geometry: str,
     adsorbate_properties: Mapping[str, float],
     material_properties: Mapping[str, float],
+    use_cy: bool = False,
 ):
     r"""
     Calculate the pore size distribution using the Horvath-Kawazoe method.
@@ -392,6 +401,7 @@ def psd_horvath_kawazoe(
 
     ###################################################################
     if pore_geometry == 'slit':
+
         sigma = 0.066666667 * d_eff  # (2 / 5)**(1 / 6) * d_eff, internuclear distance at 0 energy
         sigma_p4_o3 = sigma**4 / 3  # sigma^4 / 3
         sigma_p10_o9 = sigma**10 / 9  # sigma^10 / 9
@@ -405,26 +415,29 @@ def psd_horvath_kawazoe(
             sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3)
         )  # nm
 
-        def h_k_pressure(l_pore):
-            return numpy.exp(
+        def potential(l_pore):
+            return (
                 const_coeff / (l_pore - 2 * d_eff) *
                 ((sigma_p4_o3 / (l_pore - d_eff)**3) -
                  (sigma_p10_o9 / (l_pore - d_eff)**9) + const_term)
             )
 
-        pore_widths = numpy.asarray(
-            _solve_hk(pressure, h_k_pressure, d_eff)
-        ) - d_mat  # Effective pore size
+        if use_cy:
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+        else:
+            pore_widths = _solve_hk(pressure, potential, d_eff)
+
+        pore_widths = numpy.asarray(pore_widths) - d_mat  # Effective pore size
 
     ###################################################################
     elif pore_geometry == 'cylinder':
+
         const_coeff = 0.75 * const.pi * _N_over_RT(temperature) * \
             (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
 
-        def s_f_pressure(l_pore):
+        def potential(l_pore):
 
-            a_k = 1
-            b_k = 1
+            a_k, b_k = 1, 1
             n = 21 / 32
             d_over_r = d_eff / l_pore  # dimensionless
             k_sum = n * d_over_r**10 - d_over_r**4  # first value at K=0
@@ -438,19 +451,25 @@ def psd_horvath_kawazoe(
                     (n * a_k * (d_over_r)**10 - b_k * (d_over_r)**4)
                 )
 
-            return numpy.exp(const_coeff * k_sum)
+            return const_coeff * k_sum
+
+        if use_cy:
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+        else:
+            pore_widths = _solve_hk(pressure, potential, d_eff)
 
         pore_widths = 2 * numpy.asarray(
-            _solve_hk(pressure, s_f_pressure, d_eff)
+            pore_widths
         ) - d_mat  # Effective pore size
 
     ###################################################################
     elif pore_geometry == 'sphere':
+
         p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # 1-2 potential
         p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # 2-2 potential
         N_over_RT = _N_over_RT(temperature)
 
-        def c_y_pressure(l_pore):
+        def potential(l_pore):
 
             l_minus_d = l_pore - d_eff
             d_over_l = d_eff / l_pore
@@ -462,17 +481,19 @@ def psd_horvath_kawazoe(
                 return (1 / (1 + (-1)**x * l_minus_d / l_pore)**x) -\
                     (1 / (1 - (-1)**x * l_minus_d / l_pore)**x)
 
-            c2 = 6 * (n_1 * p_12 + n_2 * p_22) * l_pore**3 / l_minus_d**3
-            coef = (
+            return N_over_RT * (
+                6 * (n_1 * p_12 + n_2 * p_22) * l_pore**3 / l_minus_d**3
+            ) * (
                 -(d_over_l**6) * (1 / 12 * t_term(3) - 1 / 8 * t_term(2)) +
                 (d_over_l**12) * (1 / 90 * t_term(9) - 1 / 80 * t_term(8))
             )
 
-            return numpy.exp(N_over_RT * c2 * coef)
+        if use_cy:
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+        else:
+            pore_widths = _solve_hk(pressure, potential, d_eff)
 
-        pore_widths = numpy.asarray(
-            _solve_hk(pressure, c_y_pressure, d_eff)
-        ) - d_mat  # Effective pore size
+        pore_widths = numpy.asarray(pore_widths) - d_mat  # Effective pore size
 
     # finally calculate pore distribution
     liquid_density = adsorbate_properties['liquid_density']
@@ -500,7 +521,28 @@ def _solve_hk(pressure, hk_fun, bound):
     for p_point in pressure:
 
         def fun(l_pore):
-            return (hk_fun(l_pore) - p_point)**2
+            return (numpy.exp(hk_fun(l_pore)) - p_point)**2
+
+        res = opt.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
+        p_w.append(res.x)
+
+    return p_w
+
+
+def _solve_hk_cy(pressure, loading, hk_fun, bound):
+    """
+    In this case, the SF correction factor is subtracted
+    from the original function.
+    """
+
+    p_w = []
+    coverage = loading / loading[-1]
+
+    for p_point, c_point in zip(pressure, coverage):
+
+        def fun(l_pore):
+            sf_corr = 1 + 1 / c_point * numpy.log(1 - c_point)
+            return (numpy.exp(hk_fun(l_pore) - sf_corr) - p_point)**2
 
         res = opt.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
         p_w.append(res.x)
