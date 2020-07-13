@@ -380,15 +380,30 @@ def psd_horvath_kawazoe(
 
     if pore_geometry == 'slit':
         pore_widths = _hk_slit_raw(
-            pressure, temperature, adsorbate_properties, material_properties
+            pressure,
+            loading,
+            temperature,
+            adsorbate_properties,
+            material_properties,
+            sf=apply_sf,
         )
     elif pore_geometry == 'cylinder':
         pore_widths = _hk_cylinder_raw(
-            pressure, temperature, adsorbate_properties, material_properties
+            pressure,
+            loading,
+            temperature,
+            adsorbate_properties,
+            material_properties,
+            sf=apply_sf,
         )
     elif pore_geometry == 'sphere':
         pore_widths = _hk_sphere_raw(
-            pressure, temperature, adsorbate_properties, material_properties
+            pressure,
+            loading,
+            temperature,
+            adsorbate_properties,
+            material_properties,
+            sf=apply_sf,
         )
 
     # finally calculate pore distribution
@@ -402,7 +417,14 @@ def psd_horvath_kawazoe(
     return avg_pore_widths, pore_dist, volume_adsorbed[1:]
 
 
-def _hk_slit_raw(pressure, temp, adsorbate_properties, material_properties):
+def _hk_slit_raw(
+    pressure,
+    loading,
+    temp,
+    adsorbate_properties,
+    material_properties,
+    sf=False,
+):
 
     # Constants unpacking and calculation
     d_ads = adsorbate_properties['molecular_diameter']
@@ -433,27 +455,18 @@ def _hk_slit_raw(pressure, temp, adsorbate_properties, material_properties):
              (sigma_p10_o9 / (l_pore - d_eff)**9) + const_term)
         )
 
-    p_w = []
+    p_w = solve_hk(pressure, h_k_pressure, d_eff)
 
-    # I personally found that simple Brent minimization
-    # gives good results. There may be other, more efficient
-    # algorithms, like conjugate gradient, but speed is a moot point
-    # as long as average total runtime is <50 ms.
-    # The minimisation runs with bounds of effective diameter < x < 50.
-    # Maximum determinable pore size is limited at 2.5 nm anyway.
-    for p_point in pressure:
-
-        def fun(l_pore):
-            return (h_k_pressure(l_pore) - p_point)**2
-
-        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 50))
-        p_w.append(res.x - d_mat)  # Effective pore size
-
-    return numpy.asarray(p_w)
+    return numpy.asarray(p_w) - d_mat  # Effective pore size
 
 
 def _hk_cylinder_raw(
-    pressure, temp, adsorbate_properties, material_properties
+    pressure,
+    loading,
+    temp,
+    adsorbate_properties,
+    material_properties,
+    sf=False,
 ):
     # Constants unpacking and calculation
     d_ads = adsorbate_properties['molecular_diameter']
@@ -487,26 +500,19 @@ def _hk_cylinder_raw(
 
         return numpy.exp(const_coeff * k_sum)
 
-    p_w = []
+    p_w = solve_hk(pressure, s_f_pressure, d_eff)
 
-    # I personally found that simple Brent minimization
-    # gives good results. There may be other, more efficient
-    # algorithms, like conjugate gradient, but speed is a moot point
-    # as long as average total runtime is <50 ms.
-    # The minimisation runs with bounds of effective diameter < x < 100.
-    # Maximum determinable pore size is limited at 2.5 nm anyway.
-    for p_point in pressure:
-
-        def fun(r_pore):
-            return (s_f_pressure(r_pore) - p_point)**2
-
-        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 100))
-        p_w.append(2 * res.x - d_mat)  # Effective pore size
-
-    return numpy.asarray(p_w)
+    return 2 * numpy.asarray(p_w) - d_mat  # Effective pore size
 
 
-def _hk_sphere_raw(pressure, temp, adsorbate_properties, material_properties):
+def _hk_sphere_raw(
+    pressure,
+    loading,
+    temp,
+    adsorbate_properties,
+    material_properties,
+    sf=False,
+):
 
     # Constants unpacking and calculation
     d_ads = adsorbate_properties['molecular_diameter']
@@ -544,23 +550,32 @@ def _hk_sphere_raw(pressure, temp, adsorbate_properties, material_properties):
 
         return numpy.exp(N_over_RT * c2 * coef)
 
+    p_w = solve_hk(pressure, c_y_pressure, d_eff)
+
+    return numpy.asarray(p_w) - d_mat  # Effective pore size
+
+
+def solve_hk(pressure, hk_fun, bound):
+    """
+    I personally found that simple Brent minimization
+    gives good results. There may be other, more efficient
+    algorithms, like conjugate gradient, but speed is a moot point
+    as long as average total runtime is <50 ms.
+    The minimisation runs with bounds of effective diameter < x < 100.
+    Maximum determinable pore size is limited at 2.5 nm anyway.
+    """
+
     p_w = []
 
-    # I personally found that simple Brent minimization
-    # gives good results. There may be other, more efficient
-    # algorithms, like conjugate gradient, but speed is a moot point
-    # as long as average total runtime is <50 ms.
-    # The minimisation runs with bounds of effective diameter < x < 50.
-    # Maximum determinable pore size is limited at 2.5 nm anyway.
     for p_point in pressure:
 
         def fun(l_pore):
-            return (c_y_pressure(l_pore) - p_point)**2
+            return (hk_fun(l_pore) - p_point)**2
 
-        res = opt.minimize_scalar(fun, method='bounded', bounds=(d_eff, 50))
-        p_w.append(res.x - d_mat)  # Effective pore size
+        res = opt.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
+        p_w.append(res.x)
 
-    return numpy.asarray(p_w)
+    return p_w
 
 
 def _dispersion_from_dict(ads_dict, mat_dict):
