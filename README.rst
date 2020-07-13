@@ -97,30 +97,40 @@ Features
 Documentation
 =============
 
-The framework is well documented, with in-depth explanations, examples and
-theory. An `online documentation <https://pygaps.readthedocs.io/>`__ is available
-for this purpose.
-If you are familiar with Python and adsorption theory and want to jump right
-in, look at the `quickstart section
-<https://pygaps.readthedocs.io/en/latest/examples/quickstart.html>`__.
-Examples on each of the capabilities specified above can be found
-in the `examples <https://pygaps.readthedocs.io/en/latest/examples/index.html>`__.
-Most of the examples in the documentation are actually Jupyter Notebooks.
-You can download them and run them yourself from the
+pyGAPS is built with three key mantras in mind:
+
+    - **opinionated**: There are many places where the code will suggest or
+      default to what the it considers a good practice. As examples: the
+      standard units, pore size distribution methods and BET calculation limits.
+    - **flexible**: While the defaults are there for a reason, you can override
+      pretty much any parameter. Want to pass a custom adsorbate thickness
+      function or use volumetric bases? Can do!
+    - **transparency**: All code is well documented and open source. There are
+      no black boxes.
+
+In-depth explanations, examples and theory can be found in the
+`online documentation <https://pygaps.readthedocs.io/>`__. If you are familiar
+with Python and adsorption theory and want to jump right in, look at the
+`quickstart section
+<https://pygaps.readthedocs.io/en/latest/examples/quickstart.html>`__. Examples
+on each of the capabilities specified above can be found in the
+`examples <https://pygaps.readthedocs.io/en/latest/examples/index.html>`__. Most
+of the pages in the documentation are actually Jupyter Notebooks. You can
+download them and run them yourself from the
 `/docs/examples <https://github.com/pauliacomi/pyGAPS/tree/master/docs/examples>`__
 folder.
 
-To become well familiarised with the concepts introduced by pyGAPS,
-such as what is an Isotherm, how units work, what data is required
-and can be stored etc., a deep dive is available in the
+To become well familiarised with the concepts introduced by pyGAPS, such as what
+is an Isotherm, how units work, what data is required and can be stored etc., a
+deep dive is available in the
 `manual <https://pygaps.readthedocs.io/en/latest/manual/index.html>`__.
 
-Finally, having a strong grasp of the science of adsorption is recommended,
-to understand the strengths and shortcomings of various methods. We have
-done our best to explain the theory and application range of each
-capability and model. To learn more, look at the
-`reference <https://pygaps.readthedocs.io/en/latest/reference/index.html>`__
-or simply call ``help()`` from a python interpreter (for example
+Finally, having a strong grasp of the science of adsorption is recommended, to
+understand the strengths and shortcomings of various methods. We have done our
+best to explain the theory and application range of each capability and model.
+To learn more, look at the
+`reference <https://pygaps.readthedocs.io/en/latest/reference/index.html>`__ or
+simply call ``help()`` from a python interpreter (for example
 ``help(pygaps.area_BET)``.
 
 Citing
@@ -172,18 +182,16 @@ Then install the package with pip either in regular or developer mode.
 Development
 ===========
 
-If you want to contribute to pyGAPS or develop your own code
-from the package, check out the detailed information
-`here <CONTRIBUTING.rst>`__.
+If you want to contribute to pyGAPS or develop your own code from the package,
+check out the detailed information `here <CONTRIBUTING.rst>`__.
 
 Bugs or questions?
 ==================
 
 For any bugs found, please open an
-`issue <https://github.com/pauliacomi/pyGAPS/issues/>`__ or, even better,
-submit a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__.
-It'll make my life easier.
-This also applies to any features which you think might benefit the project.
-I'm also more than happy to answer any questions. Shoot an email to
-mail( at )pauliacomi.com or find me on
-at https://pauliacomi.com or on `Twitter <https://twitter.com/iacomip>`__.
+`issue <https://github.com/pauliacomi/pyGAPS/issues/>`__ or, even better, submit
+a `pull request <https://github.com/pauliacomi/pyGAPS/pulls/>`__. It'll make my
+life easier. This also applies to any features which you think might benefit the
+project. I'm also more than happy to answer any questions. Shoot an email to
+mail( at )pauliacomi.com or find me at https://pauliacomi.com or on
+`Twitter <https://twitter.com/iacomip>`__.
