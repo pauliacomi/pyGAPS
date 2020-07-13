@@ -378,33 +378,101 @@ def psd_horvath_kawazoe(
     pressure = numpy.asarray(pressure)
     loading = numpy.asarray(loading)
 
+    # Constants unpacking and calculation
+    d_ads = adsorbate_properties['molecular_diameter']
+    d_mat = material_properties['molecular_diameter']
+    n_ads = adsorbate_properties['surface_density']
+    n_mat = material_properties['surface_density']
+
+    a_ads, a_mat = _dispersion_from_dict(
+        adsorbate_properties, material_properties
+    )  # dispersion constants
+
+    d_eff = (d_ads + d_mat) / 2  # effective diameter
+
+    ###################################################################
     if pore_geometry == 'slit':
-        pore_widths = _hk_slit_raw(
-            pressure,
-            loading,
-            temperature,
-            adsorbate_properties,
-            material_properties,
-            sf=apply_sf,
-        )
+        sigma = 0.066666667 * d_eff  # (2 / 5)**(1 / 6) * d_eff, internuclear distance at 0 energy
+        sigma_p4_o3 = sigma**4 / 3  # sigma^4 / 3
+        sigma_p10_o9 = sigma**10 / 9  # sigma^10 / 9
+
+        const_coeff = (
+            _N_over_RT(temperature) * (n_ads * a_ads + n_mat * a_mat) /
+            (sigma * 1e-9)**4
+        )  # sigma must be in SI
+
+        const_term = (
+            sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3)
+        )  # nm
+
+        def h_k_pressure(l_pore):
+            return numpy.exp(
+                const_coeff / (l_pore - 2 * d_eff) *
+                ((sigma_p4_o3 / (l_pore - d_eff)**3) -
+                 (sigma_p10_o9 / (l_pore - d_eff)**9) + const_term)
+            )
+
+        pore_widths = numpy.asarray(
+            _solve_hk(pressure, h_k_pressure, d_eff)
+        ) - d_mat  # Effective pore size
+
+    ###################################################################
     elif pore_geometry == 'cylinder':
-        pore_widths = _hk_cylinder_raw(
-            pressure,
-            loading,
-            temperature,
-            adsorbate_properties,
-            material_properties,
-            sf=apply_sf,
-        )
+        const_coeff = 0.75 * const.pi * _N_over_RT(temperature) * \
+            (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
+
+        def s_f_pressure(l_pore):
+
+            a_k = 1
+            b_k = 1
+            n = 21 / 32
+            d_over_r = d_eff / l_pore  # dimensionless
+            k_sum = n * d_over_r**10 - d_over_r**4  # first value at K=0
+
+            # 30 * pore radius ensures that layer convergence is achieved
+            for k in range(1, int(l_pore * 30)):
+                a_k = ((-4.5 - k) / k)**2 * a_k
+                b_k = ((-1.5 - k) / k)**2 * b_k
+                k_sum = k_sum + (
+                    (1 / (2 * k + 1) * (1 - d_over_r)**(2 * k)) *
+                    (n * a_k * (d_over_r)**10 - b_k * (d_over_r)**4)
+                )
+
+            return numpy.exp(const_coeff * k_sum)
+
+        pore_widths = 2 * numpy.asarray(
+            _solve_hk(pressure, s_f_pressure, d_eff)
+        ) - d_mat  # Effective pore size
+
+    ###################################################################
     elif pore_geometry == 'sphere':
-        pore_widths = _hk_sphere_raw(
-            pressure,
-            loading,
-            temperature,
-            adsorbate_properties,
-            material_properties,
-            sf=apply_sf,
-        )
+        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # 1-2 potential
+        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # 2-2 potential
+        N_over_RT = _N_over_RT(temperature)
+
+        def c_y_pressure(l_pore):
+
+            l_minus_d = l_pore - d_eff
+            d_over_l = d_eff / l_pore
+
+            n_1 = 4 * const.pi * (l_pore * 1e-9)**2 * n_mat
+            n_2 = 4 * const.pi * (l_minus_d * 1e-9)**2 * n_ads
+
+            def t_term(x):
+                return (1 / (1 + (-1)**x * l_minus_d / l_pore)**x) -\
+                    (1 / (1 - (-1)**x * l_minus_d / l_pore)**x)
+
+            c2 = 6 * (n_1 * p_12 + n_2 * p_22) * l_pore**3 / l_minus_d**3
+            coef = (
+                -(d_over_l**6) * (1 / 12 * t_term(3) - 1 / 8 * t_term(2)) +
+                (d_over_l**12) * (1 / 90 * t_term(9) - 1 / 80 * t_term(8))
+            )
+
+            return numpy.exp(N_over_RT * c2 * coef)
+
+        pore_widths = numpy.asarray(
+            _solve_hk(pressure, c_y_pressure, d_eff)
+        ) - d_mat  # Effective pore size
 
     # finally calculate pore distribution
     liquid_density = adsorbate_properties['liquid_density']
@@ -417,145 +485,7 @@ def psd_horvath_kawazoe(
     return avg_pore_widths, pore_dist, volume_adsorbed[1:]
 
 
-def _hk_slit_raw(
-    pressure,
-    loading,
-    temp,
-    adsorbate_properties,
-    material_properties,
-    sf=False,
-):
-
-    # Constants unpacking and calculation
-    d_ads = adsorbate_properties['molecular_diameter']
-    d_mat = material_properties['molecular_diameter']
-    n_ads = adsorbate_properties['surface_density']
-    n_mat = material_properties['surface_density']
-
-    a_ads, a_mat = _dispersion_from_dict(
-        adsorbate_properties, material_properties
-    )  # dispersion constants
-
-    d_eff = (d_ads + d_mat) / 2  # effective diameter
-
-    sigma = 0.066666667 * d_eff  # (2 / 5)**(1 / 6) * d_eff, internuclear distance at 0 energy
-    sigma_p4_o3 = sigma**4 / 3  # sigma^4 / 3
-    sigma_p10_o9 = sigma**10 / 9  # sigma^10 / 9
-
-    const_coeff = (
-        _N_over_RT(temp) * (n_ads * a_ads + n_mat * a_mat) / (sigma * 1e-9)**4
-    )  # sigma must be in SI
-
-    const_term = (sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3))  # nm
-
-    def h_k_pressure(l_pore):
-        return numpy.exp(
-            const_coeff / (l_pore - 2 * d_eff) *
-            ((sigma_p4_o3 / (l_pore - d_eff)**3) -
-             (sigma_p10_o9 / (l_pore - d_eff)**9) + const_term)
-        )
-
-    p_w = solve_hk(pressure, h_k_pressure, d_eff)
-
-    return numpy.asarray(p_w) - d_mat  # Effective pore size
-
-
-def _hk_cylinder_raw(
-    pressure,
-    loading,
-    temp,
-    adsorbate_properties,
-    material_properties,
-    sf=False,
-):
-    # Constants unpacking and calculation
-    d_ads = adsorbate_properties['molecular_diameter']
-    d_mat = material_properties['molecular_diameter']
-    n_ads = adsorbate_properties['surface_density']
-    n_mat = material_properties['surface_density']
-
-    a_ads, a_mat = _dispersion_from_dict(
-        adsorbate_properties, material_properties
-    )  # dispersion constants
-
-    d_eff = (d_ads + d_mat) / 2  # effective diameter
-
-    const_coeff = 0.75 * const.pi * _N_over_RT(temp) * \
-        (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
-
-    def s_f_pressure(r_pore):
-
-        a_k = 1
-        b_k = 1
-        n = 21 / 32
-        d_over_r = d_eff / r_pore  # dimensionless
-        k_sum = n * d_over_r**10 - d_over_r**4  # first value at K=0
-
-        # 30 * pore radius ensures that layer convergence is achieved
-        for k in range(1, int(r_pore * 30)):
-            a_k = ((-4.5 - k) / k)**2 * a_k
-            b_k = ((-1.5 - k) / k)**2 * b_k
-            k_sum = k_sum + ((1 / (2 * k + 1) * (1 - d_over_r)**(2 * k)) *
-                             (n * a_k * (d_over_r)**10 - b_k * (d_over_r)**4))
-
-        return numpy.exp(const_coeff * k_sum)
-
-    p_w = solve_hk(pressure, s_f_pressure, d_eff)
-
-    return 2 * numpy.asarray(p_w) - d_mat  # Effective pore size
-
-
-def _hk_sphere_raw(
-    pressure,
-    loading,
-    temp,
-    adsorbate_properties,
-    material_properties,
-    sf=False,
-):
-
-    # Constants unpacking and calculation
-    d_ads = adsorbate_properties['molecular_diameter']
-    d_mat = material_properties['molecular_diameter']
-    n_ads = adsorbate_properties['surface_density']
-    n_mat = material_properties['surface_density']
-
-    a_ads, a_mat = _dispersion_from_dict(
-        adsorbate_properties, material_properties
-    )  # dispersion constants
-
-    d_eff = (d_ads + d_mat) / 2  # effective diameter
-
-    p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # 1-2 potential
-    p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # 2-2 potential
-    N_over_RT = _N_over_RT(temp)
-
-    def c_y_pressure(l_pore):
-
-        l_minus_d = l_pore - d_eff
-        d_over_l = d_eff / l_pore
-
-        n_1 = 4 * const.pi * (l_pore * 1e-9)**2 * n_mat
-        n_2 = 4 * const.pi * (l_minus_d * 1e-9)**2 * n_ads
-
-        def t_term(x):
-            return (1 / (1 + (-1)**x * l_minus_d / l_pore)**x) -\
-                   (1 / (1 - (-1)**x * l_minus_d / l_pore)**x)
-
-        c2 = 6 * (n_1 * p_12 + n_2 * p_22) * l_pore**3 / l_minus_d**3
-        coef = (
-            -(d_over_l**6) * (1 / 12 * t_term(3) - 1 / 8 * t_term(2)) +
-            (d_over_l**12) * (1 / 90 * t_term(9) - 1 / 80 * t_term(8))
-        )
-
-        return numpy.exp(N_over_RT * c2 * coef)
-
-    p_w = solve_hk(pressure, c_y_pressure, d_eff)
-
-    return numpy.asarray(p_w) - d_mat  # Effective pore size
-
-
-def solve_hk(pressure, hk_fun, bound):
+def _solve_hk(pressure, hk_fun, bound):
     """
     I personally found that simple Brent minimization
     gives good results. There may be other, more efficient
