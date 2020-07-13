@@ -1,7 +1,6 @@
 """
-Module contains 'classical' methods of calculating
-a pore size distribution for pores in
-the micropore range (<2 nm).
+Module contains 'classical' methods of calculating a pore size distribution for
+pores in the micropore range (<2 nm). These are derived from the HK models.
 """
 
 from typing import List
@@ -18,7 +17,7 @@ from ..utilities.exceptions import ParameterError
 from .models_hk import HK_KEYS
 from .models_hk import get_hk_model
 
-_MICRO_PSD_MODELS = ['HK', 'CY']
+_MICRO_PSD_MODELS = ['HK', 'HK-CY', 'RY', 'RY-CY']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
@@ -33,7 +32,7 @@ def psd_microporous(
     verbose=False
 ):
     """
-    Calculate the microporous size distribution using a 'classical' model.
+    Calculate the microporous size distribution using a Horvath-Kawazoe type model.
 
     Parameters
     ----------
@@ -67,19 +66,21 @@ def psd_microporous(
 
     Notes
     -----
-    Calculates the pore size distribution using a 'classical' model which attempts to
-    describe the adsorption in a pore of specific width w at a relative pressure p/p0
-    as a single function :math:`p/p0 = f(w)`. This function uses properties of the
-    adsorbent and adsorbate as a way of determining the pore size distribution.
+    Calculates the pore size distribution using a 'classical' model which
+    attempts to describe the adsorption in a pore of specific width w at a
+    relative pressure p/p0 as a single function :math:`p/p0 = f(w)`. This
+    function uses properties of the adsorbent and adsorbate as a way of
+    determining the pore size distribution.
 
     Currently, the methods provided are:
 
         - the HK, or Horvath-Kawazoe method
-        - the CY, or Cheng-Yang nonlinear (Langmuir) corrected HK method
-        - the RY, or Rege-Yang corrected HK method
+        - the HK-CY, or Cheng-Yang nonlinear (Langmuir) corrected HK method
+        - the RY, or Rege-Yang HK-derived method
+        - the RY-CY, or Cheng-Yang nonlinear (Langmuir) corrected RY method
 
-    A common mantra of data processing is: "garbage in = garbage out". Only use methods
-    when you are aware of their limitations and shortcomings.
+    A common mantra of data processing is: "garbage in = garbage out". Only use
+    methods when you are aware of their limitations and shortcomings.
 
     See Also
     --------
@@ -178,8 +179,28 @@ def psd_microporous(
             adsorbate_model,
             material_properties,
         )
-    elif psd_model == 'CY':
+    elif psd_model == 'HK-CY':
         pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
+            pressure,
+            loading,
+            isotherm.temperature,
+            pore_geometry,
+            adsorbate_model,
+            material_properties,
+            use_cy=True,
+        )
+    elif psd_model == 'RY':
+        pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe_ry(
+            pressure,
+            loading,
+            isotherm.temperature,
+            pore_geometry,
+            adsorbate_model,
+            material_properties,
+            use_cy=True,
+        )
+    elif psd_model == 'RY-CY':
+        pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe_ry(
             pressure,
             loading,
             isotherm.temperature,
@@ -244,6 +265,8 @@ def psd_horvath_kawazoe(
         Properties for the adsorbate in the same form
         as 'adsorbate_properties'. A list of common models
         can be found in .characterisation.models_hk.
+    use_cy : bool:
+        Whether to use the Cheng-Yang nonlinear term.
 
     Returns
     -------
@@ -409,7 +432,7 @@ def psd_horvath_kawazoe(
         const_coeff = (
             _N_over_RT(temperature) * (n_ads * a_ads + n_mat * a_mat) /
             (sigma * 1e-9)**4
-        )  # sigma must be in SI
+        )  # sigma must be in SI here
 
         const_term = (
             sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3)
@@ -423,9 +446,9 @@ def psd_horvath_kawazoe(
             )
 
         if use_cy:
-            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+            pore_widths = _solve_hk_cy(pressure, loading, potential, 2 * d_eff)
         else:
-            pore_widths = _solve_hk(pressure, potential, d_eff)
+            pore_widths = _solve_hk(pressure, potential, 2 * d_eff)
 
         pore_widths = numpy.asarray(pore_widths) - d_mat  # Effective pore size
 
@@ -465,8 +488,8 @@ def psd_horvath_kawazoe(
     ###################################################################
     elif pore_geometry == 'sphere':
 
-        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # 1-2 potential
-        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # 2-2 potential
+        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # surface potential
+        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # adsorbate potential
         N_over_RT = _N_over_RT(temperature)
 
         def potential(l_pore):
@@ -478,8 +501,8 @@ def psd_horvath_kawazoe(
             n_2 = 4 * const.pi * (l_minus_d * 1e-9)**2 * n_ads
 
             def t_term(x):
-                return (1 / (1 + (-1)**x * l_minus_d / l_pore)**x) -\
-                    (1 / (1 - (-1)**x * l_minus_d / l_pore)**x)
+                return (1 + (-1)**x * l_minus_d / l_pore)**(-x) -\
+                    (1 - (-1)**x * l_minus_d / l_pore)**(-x)
 
             return N_over_RT * (
                 6 * (n_1 * p_12 + n_2 * p_22) * l_pore**3 / l_minus_d**3
@@ -493,7 +516,168 @@ def psd_horvath_kawazoe(
         else:
             pore_widths = _solve_hk(pressure, potential, d_eff)
 
+        pore_widths = 2 * numpy.asarray(
+            pore_widths
+        ) - d_mat  # Effective pore size
+
+    # finally calculate pore distribution
+    liquid_density = adsorbate_properties['liquid_density']
+    adsorbate_molar_mass = adsorbate_properties['adsorbate_molar_mass']
+
+    avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2  # nm
+    volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000  # cm3/g
+    pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
+
+    return avg_pore_widths, pore_dist, volume_adsorbed[1:]
+
+
+def psd_horvath_kawazoe_ry(
+    pressure: List[float],
+    loading: List[float],
+    temperature: float,
+    pore_geometry: str,
+    adsorbate_properties: Mapping[str, float],
+    material_properties: Mapping[str, float],
+    use_cy: bool = False,
+):
+    # Parameter checks
+    missing = [x for x in material_properties if x not in HK_KEYS]
+    if missing:
+        raise ParameterError(
+            f"Adsorbent properties dictionary is missing parameters: {missing}."
+        )
+
+    missing = [
+        x for x in adsorbate_properties if x not in list(HK_KEYS.keys()) +
+        ['liquid_density', 'adsorbate_molar_mass']
+    ]
+    if missing:
+        raise ParameterError(
+            f"Adsorbate properties dictionary is missing parameters: {missing}."
+        )
+
+    # ensure numpy arrays
+    pressure = numpy.asarray(pressure)
+    loading = numpy.asarray(loading)
+
+    # Constants unpacking and calculation
+    d_ads = adsorbate_properties['molecular_diameter']
+    d_mat = material_properties['molecular_diameter']
+    n_ads = adsorbate_properties['surface_density']
+    n_mat = material_properties['surface_density']
+
+    a_ads, a_mat = _dispersion_from_dict(
+        adsorbate_properties, material_properties
+    )  # dispersion constants
+
+    d_eff = (d_ads + d_mat) / 2  # effective diameter
+
+    ###################################################################
+    if pore_geometry == 'slit':
+
+        sigma_mat = 0.066666667 * d_eff
+        sigma_ads = 0.066666667 * d_ads
+        s_over_da = sigma_ads / d_ads
+        s_over_d0 = sigma_mat / d_eff
+        const_coeff = _N_over_RT(temperature)
+
+        # potential with adsorbate bulk
+        def potential_adsorbate():
+            return (
+                n_ads * a_ads / (2 * (sigma_ads * 1e-9)**4) *
+                (-s_over_da**4 + s_over_da**10)
+            )
+
+        # potential with surface
+        def potential_surface():
+            return (
+                n_mat * a_mat / (2 * (sigma_mat * 1e-9)**4) *
+                (-s_over_d0**4 + s_over_d0**10)
+            ) + potential_adsorbate()
+
+        # potential with two interacting surfaces
+        def potential_twosurface(l_pore):
+            return n_mat * a_mat / (2 * (sigma_mat * 1e-9)**4) * (
+                -s_over_d0**4 + s_over_d0**10 - (sigma_mat /
+                                                 (l_pore - d_eff))**4 +
+                (sigma_mat / (l_pore - d_eff))**10
+            )
+
+        def average_potential(n_layer):
+            return ((
+                2 * potential_surface() +
+                (n_layer - 2) * 2 * potential_adsorbate()
+            ) / n_layer)
+
+        def potential(l_pore):
+            n_layer = (l_pore - d_mat) / d_ads
+            if n_layer < 2:
+                return const_coeff * potential_twosurface(l_pore)
+            else:
+                return const_coeff * average_potential(n_layer)
+
+        if use_cy:
+            pore_widths = _solve_hk_cy(pressure, loading, potential, 2 * d_eff)
+        else:
+            pore_widths = _solve_hk(pressure, potential, 2 * d_eff)
+
         pore_widths = numpy.asarray(pore_widths) - d_mat  # Effective pore size
+
+    ###################################################################
+    elif pore_geometry == 'cylinder':
+
+        n = 21 / 32
+        const_coeff = _N_over_RT(temperature)
+
+        def k_sum(l_pore, ratio, n):
+            x_k = 1
+            k_sum = 1
+
+            for k in range(1, int(l_pore * 30)):
+                k_sum = k_sum + (x_k * ratio**(2 * k))
+                x_k = ((-n - k) / k)**2 * x_k
+
+            return k_sum
+
+        # potential with surface (first layer)
+        def potential_surface(l_pore):
+            ratio_1 = d_eff / l_pore
+            ratio_2 = (l_pore - d_eff) / l_pore
+
+            return (
+                0.75 * const.pi * n_mat * a_mat / ((d_eff * 1e-9)**4) * (
+                    n * ratio_1**10 * k_sum(l_pore, ratio_2, 4.5) -
+                    ratio_1**4 * k_sum(l_pore, ratio_2, 1.5)
+                )
+            )
+
+        # potential with adsorbate surrounded layers
+        def potential_adsorbate(l_pore, n_layer):
+            ratio_1 = d_ads / (l_pore - d_eff - (n_layer - 2) * d_ads)
+            ratio_2 = ((l_pore - d_eff - (n_layer - 1) * d_ads) /
+                       (l_pore - d_eff - (n_layer - 2) * d_ads))
+
+            return (
+                0.75 * const.pi * n_ads * a_ads / ((d_ads * 1e-9)**4) * (
+                    n * ratio_1**10 * k_sum(l_pore, ratio_2, 4.5) -
+                    ratio_1**4 * k_sum(l_pore, ratio_2, 1.5)
+                )
+            )
+
+        def potential(l_pore):
+            n_layer = int((l_pore - d_mat) / d_ads - 0.5) + 1
+            if n_layer < 2:
+                return const_coeff * potential_twosurface(l_pore)
+            else:
+                return const_coeff * average_potential(n_layer)
+
+        pore_widths = 2 * numpy.asarray(
+            pore_widths
+        ) - d_mat  # Effective pore size
+
+    ###################################################################
+    elif pore_geometry == 'sphere':
+        raise NotImplementedError
 
     # finally calculate pore distribution
     liquid_density = adsorbate_properties['liquid_density']
