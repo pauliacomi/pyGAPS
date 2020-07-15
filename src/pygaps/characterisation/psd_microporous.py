@@ -170,7 +170,7 @@ def psd_microporous(
     loading = loading[minimum:maximum]
 
     # Call specified pore size distribution function
-    if psd_model == 'HK':
+    if psd_model in ['HK', 'HK-CY']:
         pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
             pressure,
             loading,
@@ -178,18 +178,9 @@ def psd_microporous(
             pore_geometry,
             adsorbate_model,
             material_properties,
+            use_cy=False if psd_model == 'HK' else True,
         )
-    elif psd_model == 'HK-CY':
-        pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe(
-            pressure,
-            loading,
-            isotherm.temperature,
-            pore_geometry,
-            adsorbate_model,
-            material_properties,
-            use_cy=True,
-        )
-    elif psd_model == 'RY':
+    elif psd_model in ['RY', 'RY-CY']:
         pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe_ry(
             pressure,
             loading,
@@ -197,17 +188,7 @@ def psd_microporous(
             pore_geometry,
             adsorbate_model,
             material_properties,
-            use_cy=True,
-        )
-    elif psd_model == 'RY-CY':
-        pore_widths, pore_dist, pore_vol_cum = psd_horvath_kawazoe_ry(
-            pressure,
-            loading,
-            isotherm.temperature,
-            pore_geometry,
-            adsorbate_model,
-            material_properties,
-            use_cy=True,
+            use_cy=False if psd_model == 'RY' else True,
         )
 
     if verbose:
@@ -216,7 +197,7 @@ def psd_microporous(
             pore_dist,
             pore_vol_cum=pore_vol_cum,
             log=False,
-            right=2.5,
+            right=5,
             method=psd_model
         )
 
@@ -470,7 +451,7 @@ def psd_horvath_kawazoe(
                 a_k = ((-4.5 - k) / k)**2 * a_k
                 b_k = ((-1.5 - k) / k)**2 * b_k
                 k_sum = k_sum + (
-                    (1 / (2 * k + 1) * (1 - d_over_r)**(2 * k)) *
+                    (1 / (k + 1) * (1 - d_over_r)**(2 * k)) *
                     (n * a_k * (d_over_r)**10 - b_k * (d_over_r)**4)
                 )
 
@@ -505,10 +486,10 @@ def psd_horvath_kawazoe(
                     (1 - (-1)**x * l_minus_d / l_pore)**(-x)
 
             return N_over_RT * (
-                6 * (n_1 * p_12 + n_2 * p_22) * l_pore**3 / l_minus_d**3
+                6 * (n_1 * p_12 + n_2 * p_22) * (l_pore / l_minus_d)**3
             ) * (
-                -(d_over_l**6) * (1 / 12 * t_term(3) - 1 / 8 * t_term(2)) +
-                (d_over_l**12) * (1 / 90 * t_term(9) - 1 / 80 * t_term(8))
+                -(d_over_l**6) * (1 / 12 * t_term(3) + 1 / 8 * t_term(2)) +
+                (d_over_l**12) * (1 / 90 * t_term(9) + 1 / 80 * t_term(8))
             )
 
         if use_cy:
