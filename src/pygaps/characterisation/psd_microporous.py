@@ -402,17 +402,17 @@ def psd_horvath_kawazoe(
     )  # dispersion constants
 
     d_eff = (d_ads + d_mat) / 2  # effective diameter
+    N_over_RT = _N_over_RT(temperature)
 
     ###################################################################
     if pore_geometry == 'slit':
 
-        sigma = 0.066666667 * d_eff  # (2 / 5)**(1 / 6) * d_eff, internuclear distance at 0 energy
+        sigma = 0.8583742 * d_eff  # (2 / 5)**(1 / 6) * d_eff, internuclear distance at 0 energy
         sigma_p4_o3 = sigma**4 / 3  # sigma^4 / 3
         sigma_p10_o9 = sigma**10 / 9  # sigma^10 / 9
 
         const_coeff = (
-            _N_over_RT(temperature) * (n_ads * a_ads + n_mat * a_mat) /
-            (sigma * 1e-9)**4
+            N_over_RT * (n_ads * a_ads + n_mat * a_mat) / (sigma * 1e-9)**4
         )  # sigma must be in SI here
 
         const_term = (
@@ -436,7 +436,7 @@ def psd_horvath_kawazoe(
     ###################################################################
     elif pore_geometry == 'cylinder':
 
-        const_coeff = 0.75 * const.pi * _N_over_RT(temperature) * \
+        const_coeff = 0.75 * const.pi * N_over_RT * \
             (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
 
         def potential(l_pore):
@@ -471,7 +471,6 @@ def psd_horvath_kawazoe(
 
         p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # surface potential
         p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # adsorbate potential
-        N_over_RT = _N_over_RT(temperature)
 
         def potential(l_pore):
 
@@ -509,7 +508,9 @@ def psd_horvath_kawazoe(
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000  # cm3/g
     pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
 
-    return avg_pore_widths, pore_dist, volume_adsorbed[1:]
+    out = (1e-3 < pore_dist) & (pore_dist < 1e3)
+
+    return avg_pore_widths[out], pore_dist[out], volume_adsorbed[1:][out]
 
 
 def psd_horvath_kawazoe_ry(
@@ -552,15 +553,15 @@ def psd_horvath_kawazoe_ry(
     )  # dispersion constants
 
     d_eff = (d_ads + d_mat) / 2  # effective diameter
+    N_over_RT = _N_over_RT(temperature)
 
     ###################################################################
     if pore_geometry == 'slit':
 
-        sigma_mat = 0.066666667 * d_eff
-        sigma_ads = 0.066666667 * d_ads
+        sigma_mat = 0.858374219 * d_eff  # (2 / 5)**(1 / 6) * d_eff,
+        sigma_ads = 0.858374219 * d_ads  # (2 / 5)**(1 / 6) * d_ads,
         s_over_da = sigma_ads / d_ads
         s_over_d0 = sigma_mat / d_eff
-        const_coeff = _N_over_RT(temperature)
 
         # potential with adsorbate bulk
         def potential_adsorbate():
@@ -593,9 +594,9 @@ def psd_horvath_kawazoe_ry(
         def potential(l_pore):
             n_layer = (l_pore - d_mat) / d_ads
             if n_layer < 2:
-                return const_coeff * potential_twosurface(l_pore)
+                return N_over_RT * potential_twosurface(l_pore)
             else:
-                return const_coeff * average_potential(n_layer)
+                return N_over_RT * average_potential(n_layer)
 
         if use_cy:
             pore_widths = _solve_hk_cy(pressure, loading, potential, 2 * d_eff)
