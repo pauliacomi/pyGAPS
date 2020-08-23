@@ -22,20 +22,21 @@ PROPERTIES_CARBON = {
 PROPERTIES_AlSi_OXIDE_ION = {
     'molecular_diameter': 0.276,  # nm
     'polarizability': 2.5E-3,  # nm3
-    'magnetic_susceptibility': 1.3E-7,  # nm3
+    'magnetic_susceptibility': 1.3E-8,  # nm3
     'surface_density': 1.315E19,  # molecules/m2
 }
+
 PROPERTIES_AlPh_OXIDE_ION = {
     'molecular_diameter': 0.260,  # nm
     'polarizability': 2.5E-3,  # nm3
-    'magnetic_susceptibility': 1.3E-7,  # nm3
+    'magnetic_susceptibility': 1.3E-8,  # nm3
     'surface_density': 1.000E19,  # molecules/m2
 }
 
 _ADSORBENT_MODELS = {
     'Carbon(HK)': PROPERTIES_CARBON,
     'AlSiOxideIon': PROPERTIES_AlSi_OXIDE_ION,
-    'AlPhOxideIon': PROPERTIES_AlPh_OXIDE_ION
+    'AlPhOxideIon': PROPERTIES_AlPh_OXIDE_ION,
 }
 
 
