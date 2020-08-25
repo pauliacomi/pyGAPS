@@ -407,9 +407,9 @@ def psd_horvath_kawazoe(
     ###################################################################
     if pore_geometry == 'slit':
 
-        sigma = 0.8583742 * d_eff  # (2 / 5)**(1 / 6) * d_eff, internuclear distance at 0 energy
-        sigma_p4_o3 = sigma**4 / 3  # sigma^4 / 3
-        sigma_p10_o9 = sigma**10 / 9  # sigma^10 / 9
+        sigma = 0.8583742 * d_eff  # (2/5)**(1/6)*d_eff, internuclear distance at 0 energy
+        sigma_p4_o3 = sigma**4 / 3  # pre-calculated constant
+        sigma_p10_o9 = sigma**10 / 9  # pre-calculated constant
 
         const_coeff = (
             N_over_RT * (n_ads * a_ads + n_mat * a_mat) / (sigma * 1e-9)**4
@@ -431,7 +431,8 @@ def psd_horvath_kawazoe(
         else:
             pore_widths = _solve_hk(pressure, potential, 2 * d_eff)
 
-        pore_widths = numpy.asarray(pore_widths) - d_mat  # Effective pore size
+        # width = distance between infinite slabs - 2 * surface molecule radius (=d_mat)
+        pore_widths = numpy.asarray(pore_widths) - d_mat
 
     ###################################################################
     elif pore_geometry == 'cylinder':
@@ -440,11 +441,11 @@ def psd_horvath_kawazoe(
             (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
 
         def potential(l_pore):
+            # 0.65625 is (21 / 32), constant
 
             a_k, b_k = 1, 1
-            n = 21 / 32
             d_over_r = d_eff / l_pore  # dimensionless
-            k_sum = n * d_over_r**10 - d_over_r**4  # first value at K=0
+            k_sum = 0.65625 * d_over_r**10 - d_over_r**4  # first value at K=0
 
             # 30 * pore radius ensures that layer convergence is achieved
             for k in range(1, int(l_pore * 30)):
@@ -452,7 +453,7 @@ def psd_horvath_kawazoe(
                 b_k = ((-1.5 - k) / k)**2 * b_k
                 k_sum = k_sum + (
                     (1 / (k + 1) * (1 - d_over_r)**(2 * k)) *
-                    (n * a_k * (d_over_r)**10 - b_k * (d_over_r)**4)
+                    (0.65625 * a_k * (d_over_r)**10 - b_k * (d_over_r)**4)
                 )
 
             return const_coeff * k_sum
@@ -462,15 +463,14 @@ def psd_horvath_kawazoe(
         else:
             pore_widths = _solve_hk(pressure, potential, d_eff)
 
-        pore_widths = 2 * numpy.asarray(
-            pore_widths
-        ) - d_mat  # Effective pore size
+        # width = 2 * cylinder radius - 2 * surface molecule radius (=d_mat)
+        pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
 
     ###################################################################
     elif pore_geometry == 'sphere':
 
-        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # surface potential
-        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # adsorbate potential
+        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # ads-surface potential depth
+        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # ads-ads potential depth
 
         def potential(l_pore):
 
@@ -496,9 +496,8 @@ def psd_horvath_kawazoe(
         else:
             pore_widths = _solve_hk(pressure, potential, d_eff)
 
-        pore_widths = 2 * numpy.asarray(
-            pore_widths
-        ) - d_mat  # Effective pore size
+        # width = 2 * sphere radius - 2 * surface molecule radius (=d_mat)
+        pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
 
     # finally calculate pore distribution
     liquid_density = adsorbate_properties['liquid_density']
@@ -508,7 +507,8 @@ def psd_horvath_kawazoe(
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000  # cm3/g
     pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
 
-    out = (1e-3 < pore_dist) & (pore_dist < 1e3)
+    # TODO do not cut, look into values close to pore width
+    out = (1e-3 < pore_dist) & (pore_dist < 1e3)  # cut infinite values
 
     return avg_pore_widths[out], pore_dist[out], volume_adsorbed[1:][out]
 
@@ -558,10 +558,10 @@ def psd_horvath_kawazoe_ry(
     ###################################################################
     if pore_geometry == 'slit':
 
-        sigma_mat = 0.858374219 * d_eff  # (2 / 5)**(1 / 6) * d_eff,
-        sigma_ads = 0.858374219 * d_ads  # (2 / 5)**(1 / 6) * d_ads,
-        s_over_da = sigma_ads / d_ads
-        s_over_d0 = sigma_mat / d_eff
+        sigma_mat = 0.858374219 * d_eff  # (2/5)**(1/6) * d_eff,
+        sigma_ads = 0.858374219 * d_ads  # (2/5)**(1/6) * d_ads,
+        s_over_da = sigma_ads / d_ads  # pre-calculated constant
+        s_over_d0 = sigma_mat / d_eff  # pre-calculated constant
 
         # potential with adsorbate bulk
         def potential_adsorbate():
@@ -588,7 +588,7 @@ def psd_horvath_kawazoe_ry(
         def average_potential(n_layer):
             return ((
                 2 * potential_surface() +
-                (n_layer - 2) * 2 * potential_adsorbate()
+                (n_layer - 2) * 2 * potential_adsorbate()  # 2 * is correct
             ) / n_layer)
 
         def potential(l_pore):
@@ -603,13 +603,12 @@ def psd_horvath_kawazoe_ry(
         else:
             pore_widths = _solve_hk(pressure, potential, 2 * d_eff)
 
-        pore_widths = numpy.asarray(pore_widths) - d_mat  # Effective pore size
+        # width = distance between infinite slabs - 2 * surface molecule radius (=d_mat)
+        pore_widths = numpy.asarray(pore_widths) - d_mat
 
     ###################################################################
     elif pore_geometry == 'cylinder':
-
-        n = 21 / 32
-        const_coeff = _N_over_RT(temperature)
+        # 0.65625 is (21 / 32), constant
 
         def k_sum(l_pore, ratio, n):
             x_k = 1
@@ -622,44 +621,122 @@ def psd_horvath_kawazoe_ry(
             return k_sum
 
         # potential with surface (first layer)
-        def potential_surface(l_pore):
-            ratio_1 = d_eff / l_pore
-            ratio_2 = (l_pore - d_eff) / l_pore
-
+        def potential_general(l_pore, d_x, n_x, a_x, r1, r2):
             return (
-                0.75 * const.pi * n_mat * a_mat / ((d_eff * 1e-9)**4) * (
-                    n * ratio_1**10 * k_sum(l_pore, ratio_2, 4.5) -
-                    ratio_1**4 * k_sum(l_pore, ratio_2, 1.5)
-                )
-            )
-
-        # potential with adsorbate surrounded layers
-        def potential_adsorbate(l_pore, n_layer):
-            ratio_1 = d_ads / (l_pore - d_eff - (n_layer - 2) * d_ads)
-            ratio_2 = ((l_pore - d_eff - (n_layer - 1) * d_ads) /
-                       (l_pore - d_eff - (n_layer - 2) * d_ads))
-
-            return (
-                0.75 * const.pi * n_ads * a_ads / ((d_ads * 1e-9)**4) * (
-                    n * ratio_1**10 * k_sum(l_pore, ratio_2, 4.5) -
-                    ratio_1**4 * k_sum(l_pore, ratio_2, 1.5)
+                0.75 * const.pi * n_x * a_x / ((d_x * 1e-9)**4) * (
+                    0.65625 * r1**10 * k_sum(l_pore, r2, 4.5) -
+                    r1**4 * k_sum(l_pore, r2, 1.5)
                 )
             )
 
         def potential(l_pore):
-            n_layer = int((l_pore - d_mat) / d_ads - 0.5) + 1
-            if n_layer < 2:
-                return const_coeff * potential_twosurface(l_pore)
-            else:
-                return const_coeff * average_potential(n_layer)
+            n_layers = int((l_pore - d_mat) / d_ads - 0.5) + 1
+            layer_populations = []
+            layer_potentials = []
 
-        pore_widths = 2 * numpy.asarray(
-            pore_widths
-        ) - d_mat  # Effective pore size
+            for layer in range(1, n_layers):
+                width = 2 * (l_pore - d_eff - (layer - 1) * d_ads)
+                if d_ads < width:
+                    layer_population = const.pi / numpy.sin(d_mat / width
+                                                            )**(-1)
+                else:
+                    layer_population = 1
+
+                if layer == 1:
+                    r1 = d_eff / l_pore
+                    r2 = (l_pore - d_eff) / l_pore
+                    layer_potential = potential_general(
+                        l_pore, d_eff, n_mat, a_mat, r1, r2
+                    )
+                else:
+                    r1 = d_ads / (l_pore - d_eff - (layer - 2) * d_ads)
+                    r2 = ((l_pore - d_eff - (layer - 1) * d_ads) /
+                          (l_pore - d_eff - (layer - 2) * d_ads))
+                    layer_potential = potential_general(
+                        l_pore, d_ads, n_ads, a_ads, r1, r2
+                    )
+
+                layer_populations.append(layer_population)
+                layer_potentials.append(layer_potential)
+
+            layer_molecules = numpy.asarray(layer_population)
+            layer_potentials = numpy.asarray(
+                layer_potentials
+            )  # should be one smaller
+
+            return (
+                N_over_RT * numpy.sum(layer_molecules * layer_potentials) /
+                numpy.sum(layer_molecules)
+            )
+
+        if use_cy:
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+        else:
+            pore_widths = _solve_hk(pressure, potential, d_eff)
+
+        # width = 2 * cylinder radius - 2 * surface molecule radius (=d_mat)
+        pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
 
     ###################################################################
     elif pore_geometry == 'sphere':
-        raise NotImplementedError
+
+        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # ads-surface potential depth
+        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # ads-ads potential depth
+
+        def potential_general(n_m, p_xx, r1, r2):
+            """General layer potential in a spherical regime."""
+            return (
+                2 * n_m * p_xx *
+                ((-r1**6 / (4 * r2) * ((1 - r2)**(-4) - (1 + r2)**(-4))) +
+                 (r1**12 / (10 * r2) * ((1 - r2)**(-10) - (1 + r2)**(-10))))
+            )
+
+        def potential(l_pore):
+            n_layers = int((l_pore - d_mat) / d_ads - 0.5) + 1
+            layer_populations = []
+            layer_potentials = []
+
+            for layer in range(1, n_layers):
+
+                if layer == 1:  # potential with surface (first layer)
+                    layer_population = 4 * const.pi * l_pore**2 * n_mat
+                    r1 = d_eff / l_pore
+                    r2 = (l_pore - d_eff) / l_pore
+                    layer_potential = potential_general(
+                        layer_population, p_12, r1, r2
+                    )
+
+                else:  # inter-adsorbate potential (subsequent layers).
+                    layer_population = 4 * const.pi * (
+                        l_pore - d_eff - (layer - 1) * d_ads
+                    )**2 * n_ads
+                    r1 = d_ads / (l_pore - d_eff - (layer - 2) * d_ads)
+                    r2 = ((l_pore - d_ads - (layer - 1) * d_ads) /
+                          (l_pore - d_ads - (layer - 2) * d_ads))
+                    layer_potential = potential_general(
+                        layer_populations[-1], p_22, r1, r2
+                    )
+
+                layer_populations.append(layer_population)
+                layer_potentials.append(layer_potential)
+
+            layer_molecules = numpy.asarray(layer_population)
+            layer_potentials = numpy.asarray(
+                layer_potentials
+            )  # should be one smaller
+
+            return (
+                N_over_RT * numpy.sum(layer_molecules * layer_potentials) /
+                numpy.sum(layer_molecules)
+            )
+
+        if use_cy:
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+        else:
+            pore_widths = _solve_hk(pressure, potential, d_eff)
+
+        # width = 2 * sphere radius - 2 * surface molecule radius (=d_mat)
+        pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
 
     # finally calculate pore distribution
     liquid_density = adsorbate_properties['liquid_density']
