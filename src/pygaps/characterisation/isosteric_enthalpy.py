@@ -37,6 +37,9 @@ def isosteric_enthalpy(
 
             - ``isosteric_enthalpy`` (array) : the isosteric enthalpy of adsorption in kj/mmol
             - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol
+            - ``slopes`` (array) : the exact log(p) vs 1/T slope for each point
+            - ``correlation`` (array) : correlation coefficient for each point
+            - ``std_errors`` (array) : estimated standard errors for each point
 
     Notes
     -----
@@ -129,18 +132,19 @@ def isosteric_enthalpy(
         ).item() for i in isotherms
     ] for load in loading])
 
-    iso_enthalpy, slopes, correlation = isosteric_enthalpy_raw(
+    iso_enthalpy, slopes, correlation, std_errs = isosteric_enthalpy_raw(
         pressures, temperatures
     )
 
     if verbose:
-        isosteric_enthalpy_plot(loading, iso_enthalpy)
+        isosteric_enthalpy_plot(loading, iso_enthalpy, std_errs)
 
     return {
         'loading': loading,
         'isosteric_enthalpy': iso_enthalpy,
         'slopes': slopes,
         'correlation': correlation,
+        'std_errs': std_errs,
     }
 
 
@@ -156,12 +160,12 @@ def isosteric_enthalpy_raw(pressures, temperatures):
     Parameters
     ----------
     pressure : array of arrays
-        A two dimensional array of pressures for each isotherm, in bar.
-        For example, if using two isotherms to calculate the isosteric enthalpy::
+        A two dimensional array of pressures for each isotherm at same loading point,
+        in bar. For example, if using two isotherms to calculate the isosteric enthalpy::
 
-            [[l1_iso1, l1_iso2],
-            [l2_iso1, l2_iso2],
-            [l3_iso1, l3_iso2],
+            [[p1_iso1, p1_iso2],
+            [p2_iso1, p2_iso2],
+            [p3_iso1, p3_iso2],
             ...]
 
     temperatures : array
@@ -193,16 +197,18 @@ def isosteric_enthalpy_raw(pressures, temperatures):
     iso_enth = []
     slopes = []
     correlations = []
+    stderrs = []
 
     # Calculate enthalpy for each point
     for pressure in pressures:
 
-        slope, intercept, corr_coef, p, stderr = stats.linregress(
+        slope, intercept, corr_coef, p, std_err = stats.linregress(
             inv_t, numpy.log(pressure)
         )
 
         iso_enth.append(-const.gas_constant * slope / 1000)
         slopes.append(slope)
         correlations.append(corr_coef)
+        stderrs.append(-const.gas_constant * std_err / 1000)
 
-    return iso_enth, slopes, correlations
+    return iso_enth, slopes, correlations, stderrs

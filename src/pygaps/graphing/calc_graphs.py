@@ -445,7 +445,9 @@ def psd_plot(
     return ax
 
 
-def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
+def isosteric_enthalpy_plot(
+    loading, isosteric_enthalpy, std_err, log=False, ax=None
+):
     """
     Draws the isosteric enthalpy plot.
 
@@ -455,6 +457,8 @@ def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
         Loadings for which the isosteric enthalpy was calculated.
     isosteric_enthalpy : array
         The isosteric enthalpy corresponding to each loading.
+    std_err : array
+        Standard error for each point.
     log : int
         Whether to display a logarithmic graph.
     ax : matplotlib axes object, default None
@@ -472,8 +476,14 @@ def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
     if ax is None:
         _, ax = plt.pyplot.subplots()
 
-    ax.plot(
-        loading, isosteric_enthalpy, marker='o', color='g', label='enthalpy'
+    ax.errorbar(
+        loading,
+        isosteric_enthalpy,
+        yerr=std_err,
+        marker='o',
+        markersize=3,
+        color='g',
+        label='enthalpy',
     )
     if log:
         ax.set_xscale('log')
@@ -481,8 +491,8 @@ def isosteric_enthalpy_plot(loading, isosteric_enthalpy, log=False, ax=None):
             plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
         )
     ax.set_title("Isosteric enthalpy plot")
-    ax.set_xlabel('Loading')
-    ax.set_ylabel('Isosteric enthalpy')
+    ax.set_xlabel('Loading (mmol/g)')
+    ax.set_ylabel('Isosteric enthalpy (kJ/mol)')
     ax.legend(loc='best')
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
