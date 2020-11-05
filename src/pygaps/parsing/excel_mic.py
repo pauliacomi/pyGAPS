@@ -185,6 +185,16 @@ def _get_data_labels(sheet, row, col):
     ):
         final_column += 1
         header = sheet.cell(row + header_row, final_column).value
+
+    if col == final_column:
+        # this means no header exists, can happen in some older files
+        # the units might not be standard! TODO should check
+        return [
+            "Relative Pressure (P/Po)", "Absolute Pressure (kPa)",
+            "Quantity Adsorbed (cm³/g STP)", "Elapsed Time (h:min)",
+            "Saturation Pressure (kPa)"
+        ]
+
     return [
         sheet.cell(row + header_row, i).value
         for i in range(col, final_column)
@@ -205,15 +215,23 @@ def _get_datapoints(sheet, row, col):
     while point:
         final_row += 1
         point = sheet.cell(final_row, col).value
-    return [sheet.cell(i, col).value for i in range(start_row, final_row)]
+        # sometimes 1-row gaps are left for P0 measurement
+        if not point:
+            final_row += 1
+            point = sheet.cell(final_row, col).value
+    return [
+        sheet.cell(i, col).value
+        for i in range(start_row, final_row)
+        if sheet.cell(i, col).value
+    ]
 
 
 def _assign_data(item, field, data, points):
     """
-    Add data to the data dictionary.
+    Add numeric data to the data dictionary.
 
-    For each column of data collected
-    in a form depending on the label of the column.
+    For each column of the Excel file, read to the bottom,
+    then assign it depending on the label of the column (first point).
     """
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'time':

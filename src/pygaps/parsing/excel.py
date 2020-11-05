@@ -240,12 +240,22 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict['loading_basis'] = 'molar'
         raw_dict['adsorbent_basis'] = 'mass'
 
-        data = pandas.DataFrame({
-            raw_dict['pressure_key']:
-            raw_dict.pop(raw_dict['pressure_key'])['relative'],
-            raw_dict['loading_key']:
-            raw_dict.pop(raw_dict['loading_key']),
-        })
+        pressure_key = raw_dict['pressure_key']
+        try:
+            pressure = raw_dict.pop(pressure_key).get('relative')
+        except KeyError as e:
+            raise ParsingError(
+                "Could not read pressure from Micromeritics file."
+            ) from e
+        loading_key = raw_dict['loading_key']
+        try:
+            loading = raw_dict.pop(loading_key)
+        except KeyError as e:
+            raise ParsingError(
+                "Could not read loading from Micromeritics file."
+            ) from e
+
+        data = pandas.DataFrame({pressure_key: pressure, loading_key: loading})
 
     elif fmt == 'bel':
         isotype = 1
@@ -259,12 +269,18 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         raw_dict['adsorbent_basis'] = 'mass'
         raw_dict['branch'] = raw_dict.pop('measurement')
 
-        data = pandas.DataFrame({
-            raw_dict['pressure_key']:
-            raw_dict.pop(raw_dict['pressure_key'])['relative'],
-            raw_dict['loading_key']:
-            raw_dict.pop(raw_dict['loading_key']),
-        })
+        pressure_key = raw_dict['pressure_key']
+        try:
+            pressure = raw_dict.pop(pressure_key).get('relative')
+        except KeyError as e:
+            raise ParsingError("Could not read pressure from Bel file.") from e
+        loading_key = raw_dict['loading_key']
+        try:
+            loading = raw_dict.pop(loading_key)
+        except KeyError as e:
+            raise ParsingError("Could not read loading from Bel file.") from e
+
+        data = pandas.DataFrame({pressure_key: pressure, loading_key: loading})
 
     else:
         # Get excel workbook and sheet
