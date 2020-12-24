@@ -7,12 +7,10 @@ TITLE_STYLE = {
     'horizontalalignment': 'center',
     'fontsize': 25,
     'y': 1.01,
-    # 'fontdict': {'family': 'monospace'}
 }
 LABEL_STYLE = {
     'horizontalalignment': 'center',
     'fontsize': 20,
-    # 'fontdict': {'family': 'monospace'},
 }
 TICK_STYLE = {
     'labelsize': 17,
