@@ -28,18 +28,22 @@ _PRESSURE_UNITS = {
     "Pa": 1,
     "kPa": 1000,
     "atm": 101325,
-    "mmHg": 133.322
+    "mmHg": 133.322,
+    "torr": 133.322,
 }
 
 _PRESSURE_MODE = {
     "absolute": _PRESSURE_UNITS,
     "relative": None,
+    "relative%": None,
 }
 
 _MATERIAL_MODE = {
     "mass": _MASS_UNITS,
     "volume": _VOLUME_UNITS,
     "molar": _MOLAR_UNITS,
+    "percent": None,
+    "fractional": None,
 }
 
 
@@ -75,7 +79,7 @@ def c_pressure(
         converted. Required for mode change.
     temp : float, optional
         Temperature at which the pressure is measured, in K.
-        Required for mode change.
+        Required for mode changes to relative pressure.
 
     Returns
     -------
@@ -95,26 +99,56 @@ def c_pressure(
                 f"Viable modes are {list(_PRESSURE_MODE)}"
             )
 
-        if mode_to == "absolute":
-            if not unit_to:
-                raise ParameterError("Specify unit to convert to.")
-            if unit_to not in _PRESSURE_UNITS:
+        unit = None
+        sign = 1
+        factor = 1
+
+        # Now go through various global options
+        if "absolute" in [mode_to, mode_from]:
+            if mode_to == "absolute":
+                if not unit_to:
+                    raise ParameterError("Specify unit to convert to.")
+                if unit_to not in _PRESSURE_UNITS:
+                    raise ParameterError(
+                        f"Unit selected for pressure ({unit_to}) is not an option. "
+                        f"Viable units are {list(_PRESSURE_UNITS)}"
+                    )
+                unit = unit_to
+                sign = 1
+
+            if mode_from == "absolute":
+                if not unit_from:
+                    raise ParameterError("Specify unit to convert from.")
+                if unit_from not in _PRESSURE_UNITS:
+                    raise ParameterError(
+                        f"Unit selected for pressure ({unit_from}) is not an option. "
+                        f"Viable units are {list(_PRESSURE_UNITS)}"
+                    )
+                unit = unit_from
+                sign = -1
+
+            if not temp:
                 raise ParameterError(
-                    f"Unit selected for pressure ({unit_to}) is not an option. "
-                    f"Viable units are {list(_PRESSURE_UNITS)}"
+                    "A temperature is required for this conversion."
                 )
 
-            unit = unit_to
-            sign = 1
+            factor = pygaps.Adsorbate.find(adsorbate_name).saturation_pressure(
+                temp, unit=unit
+            )
 
-        if mode_to == "relative":
-            unit = unit_from
-            sign = -1
+            if "relative%" in [mode_to, mode_from]:
+                factor = factor / 100
 
-        return value * \
-            pygaps.Adsorbate.find(adsorbate_name).saturation_pressure(
-                temp, unit=unit) ** sign
+        elif mode_to in ["relative", "relative%"]:
+            factor = 100
+            if mode_to == "relative%":
+                sign = 1
+            elif mode_to == "relative":
+                sign = -1
 
+        return value * factor**sign
+
+    # convert just units in absolute mode
     elif unit_to and mode_from == 'absolute':
         return c_unit(_PRESSURE_MODE[mode_from], value, unit_from, unit_to)
 
@@ -170,11 +204,17 @@ def c_loading(
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
                 f"Basis selected for loading ({basis_to}) is not an option. "
-                f"Viable bases are {list(_MATERIAL_MODE)}"
+                f"Viable basis for uptake are {list(_MATERIAL_MODE)}"
             )
 
-        if not unit_to or not unit_from:
-            raise ParameterError("Specify both from and to units")
+        if _MATERIAL_MODE[basis_to] is not None and not unit_to:
+            raise ParameterError(
+                f"To convert to {basis_to} basis, units must be specified."
+            )
+        if _MATERIAL_MODE[basis_from] is not None and not unit_from:
+            raise ParameterError(
+                f"To convert from {basis_from} basis, units must be specified."
+            )
 
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
@@ -235,7 +275,7 @@ def c_adsorbent(
     """
     Convert adsorbent units and basis.
 
-    The name and batch of the material have to be
+    The name of the material has to be
     specified when converting between basis.
 
     Parameters

@@ -130,7 +130,7 @@ class Isotherm():
 
         self.pressure_mode = properties.pop('pressure_mode', None)
         self.pressure_unit = properties.pop('pressure_unit', None)
-        if self.pressure_mode == 'relative':
+        if self.pressure_mode.startswith('relative'):
             self.pressure_unit = None
         self.adsorbent_basis = properties.pop('adsorbent_basis', None)
         self.adsorbent_unit = properties.pop('adsorbent_unit', None)
@@ -222,7 +222,7 @@ class Isotherm():
             "\tUptake in: " + str(self.loading_unit) + "/" +
             str(self.adsorbent_unit) + '\n'
         )
-        if self.pressure_mode == 'relative':
+        if self.pressure_mode.startswith('relative'):
             string += ("\tRelative pressure \n")
         else:
             string += ("\tPressure in: " + str(self.pressure_unit) + '\n')

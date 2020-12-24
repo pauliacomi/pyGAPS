@@ -316,7 +316,7 @@ class PointIsotherm(Isotherm):
 
         Parameters
         ----------
-        mode_to : {'relative', 'absolute'}
+        mode_to : {'absolute', 'relative', 'relative%'}
             The mode in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal pressure should be converted to.
@@ -562,7 +562,7 @@ class PointIsotherm(Isotherm):
         pressure_unit : str, optional
             Unit in which the pressure should be returned. If ``None``
             it defaults to which pressure unit the isotherm is currently in.
-        pressure_mode : {None, 'absolute', 'relative'}
+        pressure_mode : {None, 'absolute', 'relative', 'relative%'}
             The mode in which to return the pressure, if possible. If ``None``,
             returns mode the isotherm is currently in.
         limits : [float, float], optional

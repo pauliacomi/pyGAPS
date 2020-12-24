@@ -71,7 +71,7 @@ class ModelIsotherm(Isotherm):
     loading_unit : str, optional
         Unit in which the loading basis is expressed.
     pressure_mode : str, optional
-        The pressure mode, either 'absolute' pressures or 'relative' in
+        The pressure mode, either 'absolute' pressures or 'relative'/'relative%' in
         the form of p/p0.
     pressure_unit : str, optional
         Unit of pressure.
@@ -597,7 +597,7 @@ class ModelIsotherm(Isotherm):
         pressure_unit : str, optional
             Unit in which the pressure should be returned. If None
             it defaults to which pressure unit the isotherm is currently in.
-        pressure_mode : {None, 'absolute', 'relative'}
+        pressure_mode : {None, 'absolute', 'relative', 'relative%'}
             The mode in which to return the pressure, if possible. If ``None``,
             returns mode the isotherm is currently in.
         limits : [float, float], optional
@@ -1049,7 +1049,7 @@ class ModelIsotherm(Isotherm):
                 pressure_mode = self.pressure_mode
             if not pressure_unit:
                 pressure_unit = self.pressure_unit
-            if not pressure_unit and self.pressure_mode == 'relative':
+            if not pressure_unit and self.pressure_mode.startswith('relative'):
                 raise ParameterError(
                     "Must specify a pressure unit if the input"
                     " is in an absolute mode"
