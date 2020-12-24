@@ -167,21 +167,27 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
     line = raw_csv.readline().rstrip()
     raw_dict = {}
 
-    while not (
-        line.startswith('data') or line.startswith('model') or line == ""
-    ):
-        values = line.split(sep=separator)
+    try:
+        while not (
+            line.startswith('data') or line.startswith('model') or line == ""
+        ):
+            values = line.split(sep=separator)
 
-        if _is_bool(values[1]):
-            val = _to_bool(values[1])
-        elif _is_float(values[1]):
-            val = float(values[1])
-        elif _is_list(values[1]):
-            val = _from_list(values[1])
-        else:
-            val = values[1]
-        raw_dict.update({values[0]: val})
-        line = raw_csv.readline().rstrip()
+            if _is_bool(values[1]):
+                val = _to_bool(values[1])
+            elif _is_float(values[1]):
+                val = float(values[1])
+            elif _is_list(values[1]):
+                val = _from_list(values[1])
+            else:
+                val = values[1]
+            raw_dict.update({values[0]: val})
+            line = raw_csv.readline().rstrip()
+    except:
+        raise ParsingError(
+            "Could not parse JSON isotherm. "
+            "The `str_or_path` is invalid or does not exist. "
+        )
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)
