@@ -262,6 +262,8 @@ def plot_iso(
                 text = 'Pressure ($' + pressure_unit + '$)'
             elif pressure_mode == "relative":
                 text = "$p/p^0$"
+            elif pressure_mode == "relative%":
+                text = "%$ p/p^0$"
         elif key == 'loading':
             text = 'Loading ($' + loading_unit + r'\/' + adsorbent_unit + '^{-1}$)'
         elif key == 'enthalpy':
