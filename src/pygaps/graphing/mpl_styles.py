@@ -30,7 +30,7 @@ ISO_STYLES = {
         'markersize': 8
     },
     'tick_style': TICK_STYLE,
-    'legend_style': LEGEND_STYLE,
+    'lgd_style': LEGEND_STYLE,
     'save_style': {},
 }
 
@@ -39,5 +39,5 @@ IAST_STYLES = {
     'title_style': TITLE_STYLE,
     'label_style': LABEL_STYLE,
     'tick_style': TICK_STYLE,
-    'legend_style': LEGEND_STYLE,
+    'lgd_style': LEGEND_STYLE,
 }

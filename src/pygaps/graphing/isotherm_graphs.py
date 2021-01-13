@@ -156,7 +156,7 @@ def plot_iso(
     tick_style : dict
         A dictionary that will be passed into the matplotlib tick_params() function.
 
-    legend_style : dict
+    lgd_style : dict
         A dictionary that will be passed into the matplotlib legend() function.
 
     save_style : dict
@@ -626,31 +626,31 @@ def _final_styling(
     if lgd_pos is None:
         pass
     elif lgd_pos == 'inner':
-        lgd = ax1.legend(lines, labels, **styles['legend_style'])
+        lgd = ax1.legend(lines, labels, **styles['lgd_style'])
     elif lgd_pos == 'bottom':
-        legend_style = {}
-        legend_style['bbox_to_anchor'] = (0.5, 0)
-        legend_style['loc'] = 'upper center'
-        legend_style['bbox_transform'] = fig.transFigure
-        legend_style['ncol'] = 2
-        legend_style.update(styles['legend_style'])
-        lgd = fig.legend(lines, labels, **legend_style)
+        lgd_style = {}
+        lgd_style['bbox_to_anchor'] = (0.5, 0)
+        lgd_style['loc'] = 'upper center'
+        lgd_style['bbox_transform'] = fig.transFigure
+        lgd_style['ncol'] = 2
+        lgd_style.update(styles['lgd_style'])
+        lgd = fig.legend(lines, labels, **lgd_style)
     elif lgd_pos == 'right':
-        legend_style = {}
-        legend_style['bbox_to_anchor'] = (1, 0.5)
-        legend_style['loc'] = 'center left'
-        legend_style['bbox_transform'] = fig.transFigure
-        legend_style.update(styles['legend_style'])
-        lgd = fig.legend(lines, labels, **legend_style)
+        lgd_style = {}
+        lgd_style['bbox_to_anchor'] = (1, 0.5)
+        lgd_style['loc'] = 'center left'
+        lgd_style['bbox_transform'] = fig.transFigure
+        lgd_style.update(styles['lgd_style'])
+        lgd = fig.legend(lines, labels, **lgd_style)
     elif lgd_pos == 'left':
-        legend_style = {}
-        legend_style['bbox_to_anchor'] = (0, 0.5)
-        legend_style['loc'] = 'center right'
-        legend_style['bbox_transform'] = fig.transFigure
-        legend_style.update(styles['legend_style'])
-        lgd = fig.legend(lines, labels, **legend_style)
+        lgd_style = {}
+        lgd_style['bbox_to_anchor'] = (0, 0.5)
+        lgd_style['loc'] = 'center right'
+        lgd_style['bbox_transform'] = fig.transFigure
+        lgd_style.update(styles['lgd_style'])
+        lgd = fig.legend(lines, labels, **lgd_style)
     else:
-        lgd = ax1.legend(lines, labels, **styles['legend_style'])
+        lgd = ax1.legend(lines, labels, **styles['lgd_style'])
 
     bbox_extra_artists = []
     if lgd:

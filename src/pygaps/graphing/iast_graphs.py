@@ -60,7 +60,7 @@ def plot_iast_vle(x_data, y_data, ads1, ads2, pressure, p_unit, ax=None):
     line = [0, 1]
     ax.plot(line, line, color='black')
 
-    ax.legend(loc='best', **IAST_STYLES['legend_style'])
+    ax.legend(loc='best', **IAST_STYLES['lgd_style'])
 
     ax.grid(True, zorder=5)
     ax.set_xlim(left=0, right=1)
@@ -121,7 +121,7 @@ def plot_iast_svp(p_data, s_data, ads1, ads2, fraction, p_unit, ax=None):
     # Regular data
     ax.plot(p_data, s_data, label=label)
 
-    ax.legend(loc='best', **IAST_STYLES['legend_style'])
+    ax.legend(loc='best', **IAST_STYLES['lgd_style'])
 
     ax.grid(True, zorder=5)
     ax.set_ylim(bottom=0)
