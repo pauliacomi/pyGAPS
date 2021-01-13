@@ -160,7 +160,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             raw_csv = StringIO(str_or_path)
         except Exception:
             raise ParsingError(
-                "Could not parse JSON isotherm. "
+                "Could not parse CSV isotherm. "
                 "The `str_or_path` is invalid or does not exist. "
             )
 
