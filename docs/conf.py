@@ -12,7 +12,7 @@ if not on_rtd:  # only set the theme if we're building docs locally
     html_theme = 'sphinx_rtd_theme'
 
 
-# Need to mock modules using MagicMock, or else they won't be able to
+# Need to mock modules using MagicMock, as they won't be able to
 # be installed on readthedocs
 class Mock(MagicMock):
     @classmethod
@@ -21,9 +21,19 @@ class Mock(MagicMock):
 
 
 MOCK_MODULES = [
-    'matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker', 'numpy', 'pandas',
-    'pandas.util', 'scipy', 'scipy.constants', 'scipy.stats', 'scipy.optimize',
-    'scipy.interpolate'
+    'matplotlib',
+    'matplotlib.pyplot',
+    'matplotlib.ticker',
+    'matplotlib.cm',
+    'numpy',
+    'pandas',
+    'pandas.util',
+    'scipy',
+    'scipy.constants',
+    'scipy.stats',
+    'scipy.optimize',
+    'scipy.interpolate',
+    'scipy.integrate',
 ]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
