@@ -83,9 +83,6 @@ def psd_mesoporous(
         - the original BJH or Barrett, Joyner and Halenda method
         - the original DH or Dollimore-Heal method, an extension of the BJH method
 
-    A common mantra of data processing is: "garbage in = garbage out". Only use methods
-    when you are aware of their limitations and shortcomings.
-
     According to Rouquerol [#]_, in adopting this approach, it is assumed that:
 
         - The Kelvin equation is applicable over the pore range (mesopores). Therefore
@@ -98,6 +95,11 @@ def psd_mesoporous(
           open-ended and non-intersecting
         - The filling/emptying of each pore does not depend on its location.
         - The adsorption on the pore walls is not different from surface adsorption.
+
+    .. caution::
+
+        A common mantra of data processing is: **garbage in = garbage out**. Only use
+        methods when you are aware of their limitations and shortcomings.
 
     References
     ----------

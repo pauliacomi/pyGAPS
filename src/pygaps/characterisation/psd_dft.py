@@ -115,7 +115,7 @@ def psd_dft(
 
     The isotherm used to calculate the pore size distribution should have enough
     datapoints and pressure range in order to cover adsorption in the entire range
-    of pores the material has.
+    of pores.
 
     See Also
     --------
