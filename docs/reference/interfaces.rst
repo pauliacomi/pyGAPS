@@ -13,7 +13,6 @@ Excel
 .. automodule:: pygaps.parsing.excel
     :members:
 
-
 Sqlite
 ------
 .. automodule:: pygaps.parsing.sqlite

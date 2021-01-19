@@ -1,7 +1,7 @@
 .. _classes-ref:
 
-Classes
-=======
+Core classes
+============
 
 Adsorbate
 ---------

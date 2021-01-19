@@ -1,7 +1,7 @@
 .. _models-ref:
 
-Isotherm models
-===============
+Isotherm fitting and models
+===========================
 
 Henry
 -----
