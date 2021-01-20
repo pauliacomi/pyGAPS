@@ -58,9 +58,7 @@ There are several ways to create a PointIsotherm object:
       PointIsotherm, as other data can be manually specified.
     - A json string or file. This can be done either using the
       :meth:`~pygaps.parsing.json.isotherm_from_json`
-      function (string input), or with the
-      :meth:`~pygaps.parsing.json.isotherm_from_jsonf`
-      function (file input).
+      function which takes either string or file descriptor input.
       See :ref:`parsing from excel <parsing-manual-json>`.
     - Parsing an excel file of a standard format.
       See :ref:`parsing from excel <parsing-manual-excel>`.
@@ -70,20 +68,18 @@ There are several ways to create a PointIsotherm object:
       store and retrieve constructed isotherms in an sqlite database.
       See :ref:`database <parsing-manual-sqlite>`.
 
-This section will explain how to create an isotherm from raw data.
-For the fastest way to create an isotherm object, pressure and loading arrays
-can be passed to the constructor as the ``pressure`` and ``loading``
-parameters.
+This section will explain how to create an isotherm from raw data. For the
+fastest way to create an isotherm object, pressure and loading arrays can be
+passed to the constructor as the ``pressure`` and ``loading`` parameters.
 
-The code does its best to attempt to guess whether the data passed is part of
-an adsorption branch, desorption branch or has both. It does this by looking
-at whether pressure is increasing or decreasing between two consecutive points.
-It then marks the particular branch internally.
-If the data isn't well conditioned, this functionality will likely not produce
-good results. In this case, the user can specify whether the data is
-an adsorption or desorption branch by using the ``branch`` argument.
-What's more, the user can specify where the branches are located by passing
-an iterable as the ``branch`` parameter. See more in the
+The code does its best to attempt to guess whether the data passed is part of an
+adsorption branch, desorption branch or has both. It does this by looking at
+whether pressure is increasing or decreasing between two consecutive points. It
+then marks the particular branch internally. If the data isn't well conditioned,
+this functionality will likely not produce good results. In this case, the user
+can specify whether the data is an adsorption or desorption branch by using the
+``branch`` argument. What's more, the user can specify where the branches are
+located by passing an iterable as the ``branch`` parameter. See more in the
 :ref:`reference <isotherms-pointisotherm>`.
 
 .. caution::
@@ -93,11 +89,10 @@ an iterable as the ``branch`` parameter. See more in the
     behaviour.
 
 
-The other information that needs to be passed to the constructor is
-related to the parameters of the isotherm. This is information about
-the material the isotherm was measured on, the adsorbate which was used,
-as well as data about the temperature, units
-used and so on.
+The other information that needs to be passed to the constructor is related to
+the parameters of the isotherm. This is information about the material the
+isotherm was measured on, the adsorbate which was used, as well as data about
+the temperature, units used and so on.
 
 Besides data, the isotherm parameters must include:
 
@@ -105,10 +100,10 @@ Besides data, the isotherm parameters must include:
     - The adsorbate used (``adsorbate``)
     - The temperature, in K at which the data was recorded (``temperature``)
 
-The isotherm units can also be specified here. If not specified, the
-framework will assume default values: absolute pressure in *bar* and
-the amount adsorbed in terms of *mmol* per *g* (molar basis loading
-per adsorbent mass basis). Options are:
+The isotherm units can also be specified here. If not specified, the framework
+will assume default values: absolute pressure in *bar* and the amount adsorbed
+in terms of *mmol* per *g* (molar basis loading per adsorbent mass basis).
+Options are:
 
     - The ``pressure_mode`` parameter specifies if the pressure is
       relative or absolute. If not passed, the pressure is assumed
@@ -135,10 +130,9 @@ per adsorbent mass basis). Options are:
       it can be a mass, volume or molar unit.
       By default, the adsorbent is is read in *g*.
 
-Other user parameters can be passed as well, and will be stored
-in the isotherm object as properties. Will these components, an
-isotherm can now be created. An example
-instantiation is given below, with explanations.
+Other user parameters can be passed as well, and will be stored in the isotherm
+object as properties. Will these components, an isotherm can now be created. An
+example instantiation is given below, with explanations.
 
 ::
 
@@ -170,19 +164,17 @@ instantiation is given below, with explanations.
         something='something',          # User specific
     )
 
-Alternatively, a pandas.DataFrame can be passed in.
-This allows for more data than just pressure and loading to be
-stored in a single isotherm. The DataFrame should have at
-least two columns: the pressures at which each point was recorded,
-and the loadings for each point. Other data columns, such
-as calorimetry data, magnetic field strengths, or other
-simultaneous measurements are also supported.
+Alternatively, a `pandas.DataFrame` can be passed in. This allows for more data
+than just pressure and loading to be stored in a single isotherm. The DataFrame
+should have at least two columns: the pressures at which each point was
+recorded, and the loadings for each point. Other data columns, such as
+calorimetry data, magnetic field strengths, or other simultaneous measurements
+are also supported.
 
-If a DataFrame is used, ``loading_key`` and ``pressure_key``
-are required parameters specifying which column in the DataFrame
-contains what data of the isotherm. If other columns are to be
-stored in the isotherm object, their names should be passed in
-a list as the ``other_keys`` parameter. As an example:
+If a DataFrame is used, ``loading_key`` and ``pressure_key`` are required
+parameters specifying which column in the DataFrame contains what data of the
+isotherm. If other columns are to be stored in the isotherm object, their names
+should be passed in a list as the ``other_keys`` parameter. As an example:
 
 ::
 
@@ -214,13 +206,13 @@ a list as the ``other_keys`` parameter. As an example:
 Creating a ModelIsotherm
 ::::::::::::::::::::::::
 
-To create a ModelIsotherm, one can use either raw data, in a process similar
-to the PointIsotherm creation above or, if a PointIsotherm is already created,
-it can be used to generate a model.
+To create a ModelIsotherm, one can use either raw data, in a process similar to
+the PointIsotherm creation above or, if a PointIsotherm is already created, it
+can be used to generate a model.
 
 ModelIsotherm creation from raw data is almost identical to the PointIsotherm
-creation. The same data and parameters can be used, but with a
-few other parameters:
+creation. The same data and parameters can be used, but with a few other
+parameters:
 
     - The ``model`` parameter specifies which model
       to use to attempt to fit the data.
