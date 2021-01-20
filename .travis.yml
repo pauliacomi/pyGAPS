@@ -84,6 +84,11 @@ jobs:
       dist: bionic
       env:
         - TOXENV=py38-cover,report,codecov
+    - stage: test
+      python: '3.9'
+      dist: bionic
+      env:
+        - TOXENV=py39-cover,report,codecov
     # If all goes well, we want to deploy to PyPi
     - stage: deploy
       python: '3.8'     # specify python 3.8
