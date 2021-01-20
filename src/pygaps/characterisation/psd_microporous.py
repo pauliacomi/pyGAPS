@@ -1,15 +1,16 @@
 """
-Module contains 'classical' methods of calculating a pore size distribution for
-pores in the micropore range (<2 nm). These are derived from the HK models.
+This module contains 'classical' methods of calculating a pore size distribution for
+pores in the micropore range (<2 nm). These are derived from the Horvath-Kawazoe models.
 """
 
-from typing import List
-from typing import Mapping
+from typing import List, Mapping
 
 import numpy
+import math
 import scipy.constants as const
 import scipy.optimize as opt
 
+from ..core.isotherm import Isotherm
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
@@ -22,16 +23,16 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
 def psd_microporous(
-    isotherm,
-    psd_model='HK',
-    pore_geometry='slit',
-    branch='ads',
-    material_model='Carbon(HK)',
-    adsorbate_model=None,
-    p_limits=None,
-    verbose=False
-):
-    """
+    isotherm: Isotherm,
+    psd_model: str = 'HK',
+    pore_geometry: str = 'slit',
+    branch: str = 'ads',
+    material_model: str = 'Carbon(HK)',
+    adsorbate_model: str = None,
+    p_limits: List[float] = None,
+    verbose: bool = False
+) -> dict:
+    r"""
     Calculate the microporous size distribution using a Horvath-Kawazoe type model.
 
     Parameters
@@ -39,21 +40,22 @@ def psd_microporous(
     isotherm : Isotherm
         Isotherm for which the pore size distribution will be calculated.
     psd_model : str
-        The pore size distribution model to use.
+        Pore size distribution model to use. Available are 'HK' (original Horvath-Kawazoe),
+        'RY' (Rege-Yang correction) or the Cheng-Yang modification to the two models ('HK-CY', 'RY-CY').
     pore_geometry : str
         The geometry of the adsorbent pores.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
     material_model : str or dict
         The material model to use for PSD, It defaults to 'Carbon(HK)', the original
-        Horvath-Kawazoe carbon parameters.
+        Horvath-Kawazoe activated carbon parameters.
     adsorbate_model : dict or `None`
-        The adsorbate properties to use for PSD, If null, properties are
-        automatically searched from the Adsorbent.
+        The adsorbate properties to use for PSD, If empty, properties are
+        automatically searched from internal database for the Adsorbate.
     p_limits : [float, float]
         Pressure range in which to calculate PSD, defaults to [0, 0.2].
     verbose : bool
-        Prints out extra information on the calculation and graphs the results.
+        Print out extra information on the calculation and graphs the results.
 
     Returns
     -------
@@ -66,27 +68,66 @@ def psd_microporous(
 
     Notes
     -----
-    Calculates the pore size distribution using a 'classical' model which
-    attempts to describe the adsorption in a pore of specific width w at a
-    relative pressure p/p0 as a single function :math:`p/p0 = f(w)`. This
-    function uses properties of the adsorbent and adsorbate as a way of
-    determining the pore size distribution.
 
-    Currently, the methods provided are:
+    Calculates the pore size distribution using a "classical" model, which
+    attempts to relate the global adsorption potential, :math:`RT \ln(p/p_0)`,
+    with the energetic potential of individual adsorbate molecules in a pore of
+    a particular geometry :math:`\Phi`. Calculation of the latter is based on
+    the Lennard-Jones 6-12 intermolecular potential, incorporating both
+    guest-host and guest-guest dispersion contributions through the
+    Kirkwood-Muller formalism. The function is then solved numerically. These
+    methods are necessarily approximations, as besides using a semi-empirical
+    mathematical model, they are also heavily dependent on the material and
+    adsorbate properties (polarizability and susceptibility) used to derive
+    dispersion coefficients.
 
-        - the HK, or Horvath-Kawazoe method
-        - the HK-CY, or Cheng-Yang nonlinear (Langmuir) corrected HK method
-        - the RY, or Rege-Yang HK-derived method
-        - the RY-CY, or Cheng-Yang nonlinear (Langmuir) corrected RY method
+    There are two main approaches which pyGAPS implements, chosen by passing
+    the ``psd_model`` parameter:
 
-    A common mantra of data processing is: "garbage in = garbage out". Only use
-    methods when you are aware of their limitations and shortcomings.
+        - The "HK", or the original Horvath-Kawazoe method [#hk1]_.
+        - The "RY", or the modified Rege-Yang method [#ry1]_.
+
+    Detailed explanations for both methods can be found in
+    :py:func:`~pygaps.characterisation.psd_microporous.psd_horvath_kawazoe` and
+    :py:func:`~pygaps.characterisation.psd_microporous.psd_horvath_kawazoe_ry`,
+    respectively. Additionally for both models, the Cheng-Yang correction
+    [#cy1]_ can be applied by appending *"-CY"*, such as ``psd_model="HK-CY"``
+    or ``"RY-CY"``. This correction attempts to change the expression for the
+    thermodynamic potential from a Henry-type to a Langmuir-type isotherm. While
+    this new expression does not remain consistent at high pressures, it may
+    better represent the isotherm curvature at low pressure [#ry1]_.
+
+    .. math::
+
+        \Phi = RT\ln(p/p_0) + RT (1 + \frac{\ln(1-\theta)}{\theta})
+
+    Currently, three geometries are supported for each model: slit-like pores,
+    cylindrical pores and spherical pores, as described in the related papers
+    [#hk1]_ [#sf1]_ [#cy1]_ [#ry1]_.
+
+    .. caution::
+
+        A common mantra of data processing is: **garbage in = garbage out**. Only use
+        methods when you are aware of their limitations and shortcomings.
+
+    References
+    ----------
+    .. [#hk1] G. Horvath and K. Kawazoe, "Method for Calculation of Effective Pore
+       Size Distribution in Molecular Sieve Carbon", J. Chem. Eng. Japan, 16, 470
+       1983.
+    .. [#sf1] A. Saito and H. C. Foley, "Curvature and Parametric Sensitivity in
+       Models for Adsorption in Micropores", AIChE J., 37, 429, 1991.
+    .. [#cy1] L. S. Cheng and R. T. Yang, "Improved Horvath-Kawazoe Equations
+       Including Spherical Pore Models for Calculating Micropore Size
+       Distribution", Chem. Eng. Sci., 49, 2599, 1994.
+    .. [#ry1] S. U. Rege and R. T. Yang, "Corrected Horváth-Kawazoe equations for
+       pore-size distribution", AIChE Journal, vol. 46, no. 4, pp. 734–750, Apr.
+       2000.
 
     See Also
     --------
     pygaps.characterisation.psd_microporous.psd_horvath_kawazoe : low level HK (Horvath-Kawazoe) method
-    pygaps.characterisation.psd_microporous.psd_hk_cheng_yang : low level HK-CY (Cheng-Yang) method
-    pygaps.characterisation.psd_microporous.psd_hk_rege_yang : low level HK-RY (Rege-Yang) method
+    pygaps.characterisation.psd_microporous.psd_horvath_kawazoe_ry : low level RY (Rege-Yang) method
 
     """
     # Function parameter checks
@@ -222,10 +263,10 @@ def psd_horvath_kawazoe(
 
     Parameters
     ----------
-    loading : array
-        Adsorbed amount in mmol/g.
     pressure : array
         Relative pressure.
+    loading : array
+        Adsorbed amount in mmol/g.
     temperature : float
         Temperature of the experiment, in K.
     pore_geometry : str
@@ -247,7 +288,7 @@ def psd_horvath_kawazoe(
         as 'adsorbate_properties'. A list of common models
         can be found in .characterisation.models_hk.
     use_cy : bool:
-        Whether to use the Cheng-Yang nonlinear term.
+        Whether to use the Cheng-Yang nonlinear Langmuir term.
 
     Returns
     -------
@@ -263,93 +304,140 @@ def psd_horvath_kawazoe(
 
     *Description*
 
-    The H-K method [#]_ attempts to describe the adsorption within pores by
-    calculation of the average potential energy for a pore. The method starts by
-    assuming the following relationship between the two phases:
+    The H-K method [#hk2]_ attempts to describe adsorption within pores by
+    calculation of the average potential energy for a pore and equating it to
+    the change in free energy upon adsorption. The method starts by assuming the
+    following relationship between the two:
 
     .. math::
 
-        R_g T \ln(\frac{p}{p_0}) = U_0 + P_a
+        \Phi = RT \ln(p/p_0) = U_0 + P_a
 
-    Here :math:`U_0` is the potential function describing the surface to
-    adsorbent interactions and :math:`P_a` is the potential function describing
-    the adsorbate- adsorbate interactions. This equation is derived from the
-    equation of the free energy of adsorption at constant temperature where
-    adsorption entropy term :math:`T \Delta S^{tr}(w/w_{\infty})` is assumed to
-    be negligible.
-
-------------------------------------------------------------------------------------------------
-    A cylindrical model
-
-    ..[#] A. Saito and H. C. Foley, Curvature and Parametric Sensitivity in
-    Models for Adsorption in Micropores, AIChE J., 37, 429, 1991.
-
-------------------------------------------------------------------------------------------------
-    The equation assumes that adsorption follows Henry's law. A correction was
-    proposed by Cheng and Yang [#]_ which incorporate a Langmuir type behaviour
-    of adsorbed molecules.
-
-    ..[#] L. S. Cheng and R. T. Yang, ‘‘Improved Horvath-Kawazoe Equations
-    Including Spherical Pore Models for Calculating Micropore Size
-    Distribution,’’ Chem. Eng. Sci., 49, 2599, 1994.
-
-------------------------------------------------------------------------------
-
-
-    If a Lennard-Jones-type potential function describes the interactions
-    between the adsorbate molecules and the adsorbent molecules then the two
-    contributions to the total potential can be replaced by the extended
-    function. The resulting equation becomes:
+    Here :math:`U_0` is the potential describing the surface to adsorbent
+    interactions and :math:`P_a` is the potential describing the
+    adsorbate-adsorbate interactions. This relationship is derived from the
+    equation of the free energy of adsorption at constant temperature where the
+    adsorption entropy term :math:`T \Delta S^{tr}(\theta)` is assumed to be
+    negligible. :math:`R`, :math:`T`, and :math:`p` are the gas constant,
+    temperature and pressure, respectively. The expression for the guest-host
+    and host-host interaction in the pore is then modelled on the basis of the
+    Lennard-Jones 12-6 potential. For two molecules 1 and 2:
 
     .. math::
 
-        RT\ln(p/p_0) =   & N_A\frac{n_a A_a + n_A A_A}{2 \sigma^{4}(l-d)} \\
-                        & \times \int_{d/_2}^{1-d/_2}
+        \epsilon_{12}(z) = 4 \epsilon^{*}_{12} \Big[(\frac{\sigma}{z})^{12} - (\frac{\sigma}{z})^{6}\Big]
+
+    Where :math:`z` is intermolecular distance, :math:`\epsilon^{*}` is the
+    depth of the potential well and :math:`\sigma` is the zero-interaction
+    energy distance. The two molecules can be identical, or different species.
+
+    The distance at zero-interaction energy, commonly defined as the "rest
+    internuclear distance", is a function of the diameter of the molecules
+    involved, and is calculated as :math:`\sigma = (2/5)^{1/6} d_0`. If the two
+    molecules are different, :math:`d_0` is the average of the diameter of the
+    two, :math:`d_0=(d_g + d_h)/2` such as between the guest and host molecules.
+    In the case of multiple surface atom types (as for zeolites), representative
+    averages are used.
+
+    The depth of the potential well is obtained using the Kirkwood-Muller
+    formalism, which relates molecular polarizability :math:`\alpha` and
+    magnetic susceptibility :math:`\varkappa` to the specific dispersion
+    constant. For guest-host (:math:`A_{gh}`) and guest-guest (:math:`A_{gg}`)
+    interactions they are calculated through:
+
+    .. math::
+
+        A_{gh} = \frac{6mc^2\alpha_g\alpha_h}{\alpha_g/\varkappa_g + \alpha_h/\varkappa_h} \\
+        A_{gg} = \frac{3}{2} m_e c ^2 \alpha_g\varkappa_g
+
+    In the above formulas, :math:`m_e` is the mass of an electron and :math:`c`
+    is the speed of light in a vacuum. This potential equation
+    (:math:`\epsilon`) is then applied to the specific geometry of the pore
+    (e.g. potential of an adsorbate molecule between two infinite surface
+    slits). Individual molecular contributions as obtained through these
+    expressions are multiplied by average surface densities for the guest
+    (:math:`n_g`) and the host (:math:`n_h`) and then scaled to moles by using
+    Avogadro's number :math:`N_A`. By integrating over the specific pore
+    dimension (width, radius) an average potential for a specific pore size is
+    obtained.
+
+    *Slit pore*
+
+    The original model was derived for a slit-like pore, with each pore modelled
+    as two parallel infinite planes between which adsorption took place.
+    [#hk2]_ The effective width of the pore is related to the characterisic
+    length by, :math:`W = L - d_h` and the following relationship is derived:
+
+    .. math::
+
+        RT\ln(p/p_0) =  & N_A\frac{n_h A_{gh} + n_g A_{gh} }{\sigma^{4}(L-2d_0)} \\
+                        & \times
                             \Big[
-                            - \Big(\frac{\sigma}{r}\Big)^{4}
-                            + \Big(\frac{\sigma}{r}\Big)^{10}
-                            - \Big(\frac{\sigma}{l-r}\Big)^{4}
-                            + \Big(\frac{\sigma}{l-r}\Big)^{4}
-                            \Big] \mathrm{d}x
+                              \Big(\frac{\sigma^{10}}{9 d_0^9}\Big)
+                            - \Big(\frac{\sigma^{4}}{3 d_0^3}\Big)
+                            - \Big(\frac{\sigma^{10}}{9(L-d_0)^{9}}\Big)
+                            + \Big(\frac{\sigma^{4}}{3(L - d_0)^{3}}\Big)
+                            \Big]
 
-    Where:
+    *Cylindrical pore*
 
-    * :math:`R` -- gas constant
-    * :math:`T` -- temperature
-    * :math:`l` -- width of pore
-    * :math:`d` -- defined as :math:`d=d_a+d_A` the sum of the diameters of the adsorbate and
-      adsorbent molecules
-    * :math:`N_A` -- Avogadro's number
-    * :math:`n_a` -- number of molecules of adsorbent
-    * :math:`A_a` -- the Lennard-Jones potential constant of the adsorbent molecule defined as
+    Using the same procedure, a cylindrical model was proposed by Saito and
+    Foley [#sf2]_ using pore radius :math:`L` as the representative length
+    (therefore pore width :math:`W = 2L - d_h`), and involves a summation of
+    probe-wall interactions for sequential axial rings of the cylinder up to
+    infinity.
 
-        .. math::
-            A_a = \frac{6mc^2\alpha_a\alpha_A}{\alpha_a/\varkappa_a + \alpha_A/\varkappa_A}
+    .. math::
 
-    * :math:`A_A` -- the Lennard-Jones potential constant of the adsorbate molecule defined as
+        RT\ln(p/p_0) =  & \frac{3}{4}\pi N_A \frac{n_h A_{gh} + n_g A_{gg} }{d_0^{4}} \\
+                        & \times
+                            \sum^{\infty}_{k = 0} \frac{1}{k+1} \Big( 1 - \frac{d_0}{L} \Big)^{2k}
+                            \Big[
+                             \frac{21}{32} \alpha_k \Big(\frac{d_0}{L}\Big)^{10}
+                             - \beta_k \Big(\frac{d_0}{L}\Big)^{4}
+                            \Big]
 
-        .. math::
-            A_a = \frac{3 m_e c_l ^2\alpha_A\varkappa_A}{2}
+    Where the constants :math:`\alpha_k` and :math:`\beta` are recursively
+    calculated from :math:`\alpha_0 = \beta_0 = 1`:
 
-    * :math:`m_e` -- mass of an electron
-    * :math:`c_l` -- speed of light in vacuum
-    * :math:`\alpha_a` -- polarizability of the adsorbate molecule
-    * :math:`\alpha_A` -- polarizability of the adsorbent molecule
-    * :math:`\varkappa_a` -- magnetic susceptibility of the adsorbate molecule
-    * :math:`\varkappa_A` -- magnetic susceptibility of the adsorbent molecule
+    .. math::
 
+        \alpha_k = \Big( \frac{-4.5-k}{k} \Big)^2 \alpha_{k-1} \ \text{and}
+        \ \beta_k = \Big( \frac{-1.5-k}{k} \Big)^2 \beta_{k-1}
+
+    *Spherical pore*
+
+    Similarly, Cheng and Yang [#cy2]_ introduced an extension for spherical
+    pores by considering the interactions with a spherical cavity. This model
+    similarly uses the sphere radius :math:`L` as the representative length
+    (therefore effective pore width :math:`W = 2L - d_h`) It should be noted
+    that realistic spherical pores would not have any communication with the
+    adsorbent exterior.
+
+    .. math::
+
+        RT\ln(p/p_0) =  & N_A 6 \Big( n_a \frac{A_{gh}}{4 d_0^6} + n_A \frac{A_{gg}}{4 d_g^6} \Big)
+                          \frac{L^3}{(L-d_0)^{3}} \\
+                        & \times
+                            \Big[
+                              \Big( \frac{d_0}{L} \Big)^{12} \Big( \frac{T_9}{90} - \frac{T_8}{80} \Big)
+                            - \Big( \frac{d_0}{L} \Big)^{6} \Big( \frac{T_3}{12} - \frac{T_2}{8} \Big)
+                            \Big]
+
+    Here, :math:`T_x` stands for a function of the type:
+
+    .. math::
+
+        T_x = \Big[1 + (-1)^{x} \frac{L-d_0}{L} \Big]^{-x} -
+              \Big[1 - (-1)^{x} \frac{L-d_0}{L} \Big]^{-x}
 
     *Limitations*
 
-    The assumptions made by using the H-K method are:
+    The main assumptions made by using the H-K method are:
 
         - It does not have a description of capillary condensation. This means
           that the pore size distribution can only be considered accurate up to
           a maximum of 5 nm.
-
-        - Each pore is uniform and of infinite length. Materials with varying
-          pore shapes or highly interconnected networks may not give realistic
-          results.
 
         - The surface is made up of a single layer of atoms. Furthermore, since
           the HK method is reliant on knowing the properties of the surface
@@ -357,30 +445,37 @@ def psd_horvath_kawazoe(
           be homogenous.
 
         - Only dispersive forces are accounted for. If the adsorbate-adsorbent
-          interactions have other contributions, the Lennard-Jones potential
-          function will not be an accurate description of pore environment.
+          interactions have other contributions, such as charged interactions,
+          the Lennard-Jones potential function will not be an accurate
+          description of pore environment.
+
+        - Each pore is uniform and of infinite length. Materials with varying
+          pore shapes or highly interconnected networks may not give realistic
+          results.
 
     References
     ----------
-    .. [#] G. Horvath and K. Kawazoe, Method for Calculation of Effective Pore
-    Size Distribution in Molecular Sieve Carbon, J. Chem. Eng. Japan, 16, 470 1983.
-
-    .. [#] S. U. Rege and R. T. Yang, Corrected Horváth-Kawazoe equations for
-    pore-size distribution, AIChE Journal, vol. 46, no. 4, pp. 734–750, Apr.
-    2000.
+    .. [#hk2] G. Horvath and K. Kawazoe, Method for Calculation of Effective Pore
+       Size Distribution in Molecular Sieve Carbon, J. Chem. Eng. Japan, 16, 470 1983.
+    .. [#sf2] A. Saito and H. C. Foley, Curvature and Parametric Sensitivity in
+       Models for Adsorption in Micropores, AIChE J., 37, 429, 1991.
+    .. [#cy2] L. S. Cheng and R. T. Yang, ‘‘Improved Horvath-Kawazoe Equations
+       Including Spherical Pore Models for Calculating Micropore Size
+       Distribution,’’ Chem. Eng. Sci., 49, 2599, 1994.
 
 
     """
     # Parameter checks
-    missing = [x for x in material_properties if x not in HK_KEYS]
+    missing = [x for x in HK_KEYS if x not in material_properties]
     if missing:
         raise ParameterError(
             f"Adsorbent properties dictionary is missing parameters: {missing}."
         )
 
     missing = [
-        x for x in adsorbate_properties if x not in list(HK_KEYS.keys()) +
+        x for x in list(HK_KEYS.keys()) +
         ['liquid_density', 'adsorbate_molar_mass']
+        if x not in adsorbate_properties
     ]
     if missing:
         raise ParameterError(
@@ -390,6 +485,7 @@ def psd_horvath_kawazoe(
     # ensure numpy arrays
     pressure = numpy.asarray(pressure)
     loading = numpy.asarray(loading)
+    pore_widths = []
 
     # Constants unpacking and calculation
     d_ads = adsorbate_properties['molecular_diameter']
@@ -402,7 +498,7 @@ def psd_horvath_kawazoe(
     )  # dispersion constants
 
     d_eff = (d_ads + d_mat) / 2  # effective diameter
-    N_over_RT = _N_over_RT(temperature)
+    N_over_RT = _N_over_RT(temperature)  # N_av / RT
 
     ###################################################################
     if pore_geometry == 'slit':
@@ -427,9 +523,11 @@ def psd_horvath_kawazoe(
             )
 
         if use_cy:
-            pore_widths = _solve_hk_cy(pressure, loading, potential, 2 * d_eff)
+            pore_widths = _solve_hk_cy(
+                pressure, loading, potential, 2 * d_eff, 1
+            )
         else:
-            pore_widths = _solve_hk(pressure, potential, 2 * d_eff)
+            pore_widths = _solve_hk(pressure, potential, 2 * d_eff, 1)
 
         # width = distance between infinite slabs - 2 * surface molecule radius (=d_mat)
         pore_widths = numpy.asarray(pore_widths) - d_mat
@@ -440,28 +538,33 @@ def psd_horvath_kawazoe(
         const_coeff = 0.75 * const.pi * N_over_RT * \
             (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
 
+        # to avoid unnecessary recalculations, we cache a_k and b_k values
+        a_ks, b_ks = [1], [1]
+        for k in range(1, 2000):
+            a_ks.append(((-4.5 - k) / k)**2 * a_ks[k - 1])
+            b_ks.append(((-1.5 - k) / k)**2 * b_ks[k - 1])
+
         def potential(l_pore):
-            # 0.65625 is (21 / 32), constant
 
-            a_k, b_k = 1, 1
             d_over_r = d_eff / l_pore  # dimensionless
-            k_sum = 0.65625 * d_over_r**10 - d_over_r**4  # first value at K=0
+            d_over_r_p4 = d_over_r**4  # d/L ^ 4
+            d_over_r_p10_k = 0.65625 * d_over_r**10  # 21/32 * d/L ^ 4
 
-            # 30 * pore radius ensures that layer convergence is achieved
-            for k in range(1, int(l_pore * 30)):
-                a_k = ((-4.5 - k) / k)**2 * a_k
-                b_k = ((-1.5 - k) / k)**2 * b_k
+            k_sum = d_over_r_p10_k - d_over_r_p4  # first value at K=0
+
+            # 25 * pore radius ensures that layer convergence is achieved
+            for k in range(1, int(l_pore * 25)):
                 k_sum = k_sum + (
                     (1 / (k + 1) * (1 - d_over_r)**(2 * k)) *
-                    (0.65625 * a_k * (d_over_r)**10 - b_k * (d_over_r)**4)
+                    (a_ks[k] * d_over_r_p10_k - b_ks[k] * d_over_r_p4)
                 )
 
             return const_coeff * k_sum
 
         if use_cy:
-            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff, 2)
         else:
-            pore_widths = _solve_hk(pressure, potential, d_eff)
+            pore_widths = _solve_hk(pressure, potential, d_eff, 2)
 
         # width = 2 * cylinder radius - 2 * surface molecule radius (=d_mat)
         pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
@@ -469,8 +572,8 @@ def psd_horvath_kawazoe(
     ###################################################################
     elif pore_geometry == 'sphere':
 
-        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # ads-surface potential depth
-        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # ads-ads potential depth
+        p_12 = 0.25 * a_mat / (d_eff * 1e-9)**6  # ads-surface potential depth
+        p_22 = 0.25 * a_ads / (d_ads * 1e-9)**6  # ads-ads potential depth
 
         def potential(l_pore):
 
@@ -487,14 +590,14 @@ def psd_horvath_kawazoe(
             return N_over_RT * (
                 6 * (n_1 * p_12 + n_2 * p_22) * (l_pore / l_minus_d)**3
             ) * (
-                -(d_over_l**6) * (1 / 12 * t_term(3) + 1 / 8 * t_term(2)) +
-                (d_over_l**12) * (1 / 90 * t_term(9) + 1 / 80 * t_term(8))
+                -(d_over_l**6) * (t_term(3) / 12 + t_term(2) / 8) +
+                (d_over_l**12) * (t_term(9) / 90 + t_term(8) / 80)
             )
 
         if use_cy:
-            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff, 2)
         else:
-            pore_widths = _solve_hk(pressure, potential, d_eff)
+            pore_widths = _solve_hk(pressure, potential, d_eff, 2)
 
         # width = 2 * sphere radius - 2 * surface molecule radius (=d_mat)
         pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
@@ -503,14 +606,17 @@ def psd_horvath_kawazoe(
     liquid_density = adsorbate_properties['liquid_density']
     adsorbate_molar_mass = adsorbate_properties['adsorbate_molar_mass']
 
+    # Cut unneeded values
+    selected = slice(0, len(pore_widths))
+    pore_widths = pore_widths[selected]
+    pressure = pressure[selected]
+    loading = loading[selected]
+
     avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2  # nm
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000  # cm3/g
     pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
 
-    # TODO do not cut, look into values close to pore width
-    out = (1e-3 < pore_dist) & (pore_dist < 1e3)  # cut infinite values
-
-    return avg_pore_widths[out], pore_dist[out], volume_adsorbed[1:][out]
+    return avg_pore_widths, pore_dist, volume_adsorbed[1:]
 
 
 def psd_horvath_kawazoe_ry(
@@ -522,16 +628,233 @@ def psd_horvath_kawazoe_ry(
     material_properties: Mapping[str, float],
     use_cy: bool = False,
 ):
+    r"""
+    Calculate the microporous size distribution using a Rege-Yang (R-Y) type model.
+
+    Parameters
+    ----------
+    pressure : array
+        Relative pressure.
+    loading : array
+        Adsorbed amount in mmol/g.
+    temperature : float
+        Temperature of the experiment, in K.
+    pore_geometry : str
+        The geometry of the pore, eg. 'sphere', 'cylinder' or 'slit'.
+    adsorbate_properties : dict
+        Properties for the adsorbate in the form of::
+
+            adsorbate_properties = dict(
+                'molecular_diameter': 0,           # nm
+                'polarizability': 0,               # nm3
+                'magnetic_susceptibility': 0,      # nm3
+                'surface_density': 0,              # molecules/m2
+                'liquid_density': 0,               # g/cm3
+                'adsorbate_molar_mass': 0,         # g/mol
+            )
+
+    material_properties : dict
+        Properties for the adsorbate in the same form
+        as 'adsorbate_properties'. A list of common models
+        can be found in .characterisation.models_hk.
+    use_cy : bool:
+        Whether to use the Cheng-Yang nonlinear Langmuir term.
+
+    Returns
+    -------
+    pore widths : array
+        The widths of the pores.
+    pore_dist : array
+        The distributions for each width.
+    pore_vol_cum : array
+        Cumulative pore volume.
+
+    Notes
+    -----
+    This approach attempts to address two main shortcomings of the H-K method,
+    (see details here
+    :py:func:`~pygaps.characterisation.psd_microporous.psd_horvath_kawazoe_ry`)
+    namely its odd summation of contributions from the adsorbate-surface and
+    adsorbate-adsorbate contributions and the assumption of a continuous
+    distributions of guest molecules inside a pore.
+
+    Rege and Yang [#ry2]_ propose a more granular model, where molecules occupy
+    fixed positions according to a minimum energy potential. Depending on the
+    size of the pore in relation to the guest, pores are categorised based on
+    the number of adsorbed layers :math:`M`, with molecules adsorbed inside
+    described on a layer-by-layer basis. In a similar assumption to the BET
+    theory, a molecule would experience a surface-guest potential only if
+    adjacent to the pore wall, with subsequent layers interacting through pure
+    guest-guest interactions. While they do not assign a weighted distribution
+    to the guest position (i.e. according to Boltzmann's law) and thus disregard
+    thermal motion, this model is theoretically a more accurate representation
+    of how spherical molecules would pack in the pore. The potential equations
+    were derived for slit, cylindrical and spherical pores.
+
+    *Slit pore*
+
+    For a slit geometry, the number of layers in a pore of width :math:`L` is
+    calculated as a function of guest molecule and host surface atom diameter as
+    :math:`M = (L - d_h)/d_g`. If the number of adsorbed layers is between 1 and
+    2, the guest molecule will see only the two pore walls, and its potential
+    will be:
+
+    .. math::
+
+        \epsilon_{hgh} = \frac{n_h A_{gh}}{2\sigma^{4}}
+                            \Big[
+                                  \Big(\frac{\sigma}{d_0}\Big)^{10}
+                                - \Big(\frac{\sigma}{d_0}\Big)^{4}
+                                - \Big(\frac{\sigma}{L - d_0}\Big)^{10}
+                                + \Big(\frac{\sigma}{L - d_0}\Big)^{4}
+                            \Big]
+
+    If the number of layers is larger than two, there will be two types of guest
+    molecular potentials, namely (i) the first layer which interacts on one side
+    with the host surface and a layer of guests on the other and (ii) a
+    middle-type layer which interacts with two other guest layers. Internuclear
+    distance at zero energy for two guest molecules is introduced as
+    :math:`\sigma_g = (2/5)^{1/6} d_g`. The functions describing the potentials
+    of the two types of potential :math:`\epsilon_{hgg}` and
+    :math:`\epsilon_{ggg}` are then:
+
+    .. math::
+
+        \epsilon_{hgg} = \frac{n_h A_{gh}}{2\sigma^{4}}
+                            \Big[
+                                  \Big(\frac{\sigma}{d_0}\Big)^{10}
+                                - \Big(\frac{\sigma}{d_0}\Big)^{4}
+                            \Big] +
+                            \frac{n_g A_{gg}}{2\sigma_g^{4}}
+                            \Big[
+                                  \Big(\frac{\sigma_g}{d_g}\Big)^{10}
+                                - \Big(\frac{\sigma_g}{d_g}\Big)^{4}
+                            \Big]
+
+    .. math::
+
+        \epsilon_{ggg} = 2 \times \frac{n_g A_{gg}}{2\sigma_g^{4}}
+                            \Big[
+                                  \Big(\frac{\sigma_g}{d_g}\Big)^{10}
+                                - \Big(\frac{\sigma_g}{d_g}\Big)^{4}
+                            \Big]
+
+    The average potential for a pore with more than two layers is a weighted
+    combination of the two types of layers
+    :math:`\bar{\epsilon} = [2 \epsilon_{hgg} + (M-2)\epsilon_{ggg}] / M`, while
+    while for a single layer it is equal to
+    :math:`\bar{\epsilon} = \epsilon_{hgh}`. With a potential formula for both
+    types of pores, the change in free energy can be calculated similarly to the
+    original H-K method: :math:`RT\ln(p/p_0) = N_A \bar{\epsilon}`.
+
+    *Cylindrical pore*
+
+    In a cylindrical pore, the number of concentric layers of guest molecules
+    which can be arranged in a cross-section of radius :math:`L` is
+    mathematically represented as:
+
+    .. math::
+
+        M = \text{int}\Big[ \frac{(2L - d_h)/d_g - 1}{2} \Big] + 1
+
+    Here, :math:`int` truncates to an integer number rounded down. Molecules can
+    then either be part of the first layer, interacting with the surface, or in
+    subsequent layers, interacting with adsorbate layers, with their number for
+    each layer estimated using its diameter. In this particular geometry, an
+    assumption is made that *only outer-facing layers contribute to the
+    interaction energy*. The potentials corresponding to the two situations are
+    then determined as:
+
+    .. math::
+
+        \epsilon_{hg} =   \frac{3}{4}\pi \frac{n_h A_{gh}}{d_0^{4}}
+                           \times
+                             \Big[
+                              \frac{21}{32} a_1^{10} \sum^{\infty}_{k = 0} \alpha_k b_1^{2k}
+                              - a_1^{4} \sum^{\infty}_{k = 0} \beta_k b_1^{2k}
+                             \Big] \\
+
+    .. math::
+
+        \epsilon_{gg} =   \frac{3}{4}\pi \frac{n_g A_{gg}}{d_g^{4}}
+                           \times
+                             \Big[
+                              \frac{21}{32} a_i^{10} \sum^{\infty}_{k = 0} \alpha_k b_i^{2k}
+                              - a_i^{4} \sum^{\infty}_{k = 0} \beta_k b_i^{2k}
+                             \Big]
+
+    Where:
+
+    .. math::
+
+            a_1 = d_0 / L \ \text{and} \ b_1 = (L - d_0) / L
+
+    .. math::
+
+            a_i = \frac{d_g}{L - d_0 - (i - 2) d_g} \ \text{and} \ b_i = \frac{L - d_0 - (i - 1) d_g}{L - d_0 - (i - 2) d_g}
+
+    With the symbols having the same connotation as those in the original H-K
+    cylindrical model. The number of molecules accommodated in each concentric
+    layer is calculated as:
+
+    .. math::
+
+            n_i = \frac{\pi}{\sin^{-1} \Big[\frac{d_g}{2(L - d_0 - (i - 1) d_g)}\Big]}
+
+    The average potential for a pore is then a weighted average defined as
+    :math:`\bar{\epsilon} = \sum^{M}_{i = 1} n_i \epsilon_i / \sum^{M}_{i = 1} n_i`
+    and then equated to change in free energy by multiplication with Avogadro's
+    number.
+
+    *Spherical pore*
+
+    In a spherical pore of radius :math:`L`, the number of layers that can be
+    accommodated :math:`M` is assumed identical to that in a cylindrical pore of
+    similar radius. The equations describing the potential for the initial and
+    subsequent layers are then given as:
+
+    .. math::
+
+        \epsilon_1 = 2 \frac{n_0 A_{gh}}{4 d_0^6}
+                        \Big[
+                          \frac{a_1^{12}}{10 b_1} \Big( \frac{1}{(1-b_1)^{10}} - \frac{1}{(1+b_1)^{10}} \Big)
+                        - \frac{a_1^{6}}{4 b_1} \Big( \frac{1}{(1-b_1)^{4}} - \frac{1}{(1+b_1)^{4}} \Big)
+                        \Big]
+
+    .. math::
+
+        \epsilon_i = 2 \frac{n_{i-1} A_{gg}}{4 d_g^6}
+                        \Big[
+                          \frac{a_i^{12}}{10 b_i} \Big( \frac{1}{(1-b_i)^{10}} - \frac{1}{(1+b_i)^{10}} \Big)
+                        - \frac{a_i^{6}}{4 b_i} \Big( \frac{1}{(1-b_i)^{4}} - \frac{1}{(1+b_i)^{4}} \Big)
+                        \Big]
+
+    The number of molecules each layer interacts with (:math:`n`) is calculated
+    based on known surface density and a spherical geometry correction. For the
+    first layer :math:`n_0 = 4\pi L^2 n_h` and for subsequent layers
+    :math:`n_i = 4\pi (L - d_0 - (i-1) d_g)^2 n_g`. The constants :math:`a` and
+    :math:`b` are calculated as for a cylindrical geometry, as in the case with
+    the average potential :math:`\bar{\epsilon}`.
+
+
+    References
+    ----------
+    .. [#ry2] S. U. Rege and R. T. Yang, "Corrected Horváth-Kawazoe equations for
+       pore-size distribution", AIChE Journal, vol. 46, no. 4, pp. 734–750, Apr.
+       2000.
+
+    """
     # Parameter checks
-    missing = [x for x in material_properties if x not in HK_KEYS]
+    missing = [x for x in HK_KEYS if x not in material_properties]
     if missing:
         raise ParameterError(
             f"Adsorbent properties dictionary is missing parameters: {missing}."
         )
 
     missing = [
-        x for x in adsorbate_properties if x not in list(HK_KEYS.keys()) +
+        x for x in list(HK_KEYS.keys()) +
         ['liquid_density', 'adsorbate_molar_mass']
+        if x not in adsorbate_properties
     ]
     if missing:
         raise ParameterError(
@@ -541,6 +864,7 @@ def psd_horvath_kawazoe_ry(
     # ensure numpy arrays
     pressure = numpy.asarray(pressure)
     loading = numpy.asarray(loading)
+    pore_widths = []
 
     # Constants unpacking and calculation
     d_ads = adsorbate_properties['molecular_diameter']
@@ -553,42 +877,41 @@ def psd_horvath_kawazoe_ry(
     )  # dispersion constants
 
     d_eff = (d_ads + d_mat) / 2  # effective diameter
-    N_over_RT = _N_over_RT(temperature)
+    N_over_RT = _N_over_RT(temperature)  # N_av / RT
 
     ###################################################################
     if pore_geometry == 'slit':
 
-        sigma_mat = 0.858374219 * d_eff  # (2/5)**(1/6) * d_eff,
-        sigma_ads = 0.858374219 * d_ads  # (2/5)**(1/6) * d_ads,
-        s_over_da = sigma_ads / d_ads  # pre-calculated constant
-        s_over_d0 = sigma_mat / d_eff  # pre-calculated constant
+        sigma = 0.8583742 * d_eff  # (2/5)**(1/6) * d_eff,
+        sigma_ads = 0.8583742 * d_ads  # (2/5)**(1/6) * d_ads,
+        s_over_d0 = sigma / d_eff  # pre-calculated constant
+        sa_over_da = sigma_ads / d_ads  # pre-calculated constant
 
-        # potential with adsorbate bulk
-        def potential_adsorbate():
-            return (
-                n_ads * a_ads / (2 * (sigma_ads * 1e-9)**4) *
-                (-s_over_da**4 + s_over_da**10)
-            )
+        # Potential with one sorbate layer.
+        potential_adsorbate = (
+            n_ads * a_ads / 2 / (sigma_ads * 1e-9)**4 *
+            (-sa_over_da**4 + sa_over_da**10)
+        )
 
-        # potential with surface
-        def potential_surface():
-            return (
-                n_mat * a_mat / (2 * (sigma_mat * 1e-9)**4) *
-                (-s_over_d0**4 + s_over_d0**10)
-            ) + potential_adsorbate()
+        # Potential with one surface layer and one sorbate layer.
+        potential_onesurface = (
+            n_mat * a_mat / 2 / (sigma * 1e-9)**4 *
+            (-s_over_d0**4 + s_over_d0**10)
+        ) + potential_adsorbate
 
-        # potential with two interacting surfaces
         def potential_twosurface(l_pore):
-            return n_mat * a_mat / (2 * (sigma_mat * 1e-9)**4) * (
-                -s_over_d0**4 + s_over_d0**10 - (sigma_mat /
-                                                 (l_pore - d_eff))**4 +
-                (sigma_mat / (l_pore - d_eff))**10
+            """Potential with two surface layers."""
+            return (
+                n_mat * a_mat / 2 / (sigma * 1e-9)**4 * \
+                    (s_over_d0**10 - s_over_d0**4 + \
+                    (sigma / (l_pore - d_eff))**10 - (sigma / (l_pore - d_eff))**4
+                )
             )
 
-        def average_potential(n_layer):
+        def potential_average(n_layer):
             return ((
-                2 * potential_surface() +
-                (n_layer - 2) * 2 * potential_adsorbate()  # 2 * is correct
+                2 * potential_onesurface + (n_layer - 2) * \
+                2 * potential_adsorbate  # NOTE 2 * is correct
             ) / n_layer)
 
         def potential(l_pore):
@@ -596,83 +919,93 @@ def psd_horvath_kawazoe_ry(
             if n_layer < 2:
                 return N_over_RT * potential_twosurface(l_pore)
             else:
-                return N_over_RT * average_potential(n_layer)
+                return N_over_RT * potential_average(n_layer)
 
         if use_cy:
-            pore_widths = _solve_hk_cy(pressure, loading, potential, 2 * d_eff)
+            pore_widths = _solve_hk_cy(
+                pressure, loading, potential, 2 * d_eff, 1
+            )
         else:
-            pore_widths = _solve_hk(pressure, potential, 2 * d_eff)
+            pore_widths = _solve_hk(pressure, potential, 2 * d_eff, 1)
 
         # width = distance between infinite slabs - 2 * surface molecule radius (=d_mat)
         pore_widths = numpy.asarray(pore_widths) - d_mat
 
     ###################################################################
     elif pore_geometry == 'cylinder':
-        # 0.65625 is (21 / 32), constant
 
-        def k_sum(l_pore, ratio, n):
-            x_k = 1
-            k_sum = 1
+        max_k = 25  # Maximum K summed
+        cached_k = 2000  # Maximum K's cached
+        # to avoid unnecessary recalculations, we cache a_k and b_k values
+        a_ks, b_ks = [1], [1]
+        for k in range(1, cached_k):
+            a_ks.append(((-4.5 - k) / k)**2 * a_ks[k - 1])
+            b_ks.append(((-1.5 - k) / k)**2 * b_ks[k - 1])
 
-            for k in range(1, int(l_pore * 30)):
-                k_sum = k_sum + (x_k * ratio**(2 * k))
-                x_k = ((-n - k) / k)**2 * x_k
+        def a_k_sum(r2, max_k_pore):
+            k_sum_t = 1
+            for k in range(1, max_k_pore):
+                k_sum_t = k_sum_t + (a_ks[k] * r2**(2 * k))
+            return k_sum_t
 
-            return k_sum
+        def b_k_sum(r2, max_k_pore):
+            k_sum_t = 1
+            for k in range(1, max_k_pore):
+                k_sum_t = k_sum_t + (b_ks[k] * r2**(2 * k))
+            return k_sum_t
 
-        # potential with surface (first layer)
-        def potential_general(l_pore, d_x, n_x, a_x, r1, r2):
+        def potential_general(l_pore, d_x, n_x, a_x, r1):
+            # determine maximum summation as a function of pore length
+            max_k_pore = int(l_pore * max_k)
+            max_k_pore = max_k_pore if max_k_pore < 2000 else 2000
+            # the b constant is 1-a
+            r2 = 1 - r1
+            # 0.65625 is (21 / 32), constant
             return (
                 0.75 * const.pi * n_x * a_x / ((d_x * 1e-9)**4) * (
-                    0.65625 * r1**10 * k_sum(l_pore, r2, 4.5) -
-                    r1**4 * k_sum(l_pore, r2, 1.5)
+                    0.65625 * r1**10 * a_k_sum(r2, max_k_pore) -
+                    r1**4 * b_k_sum(r2, max_k_pore)
                 )
             )
 
         def potential(l_pore):
-            n_layers = int((l_pore - d_mat) / d_ads - 0.5) + 1
+            n_layers = int(((2 * l_pore - d_mat) / d_ads - 1) / 2) + 1
             layer_populations = []
             layer_potentials = []
 
-            for layer in range(1, n_layers):
+            for layer in range(1, n_layers + 1):
                 width = 2 * (l_pore - d_eff - (layer - 1) * d_ads)
-                if d_ads < width:
-                    layer_population = const.pi / numpy.sin(d_mat / width
-                                                            )**(-1)
+                if d_ads <= width:
+                    layer_population = const.pi / math.asin(d_ads / width)
                 else:
                     layer_population = 1
 
-                if layer == 1:
+                if layer == 1:  # potential with surface (first layer)
                     r1 = d_eff / l_pore
-                    r2 = (l_pore - d_eff) / l_pore
                     layer_potential = potential_general(
-                        l_pore, d_eff, n_mat, a_mat, r1, r2
+                        l_pore, d_eff, n_mat, a_mat, r1
                     )
-                else:
+                else:  # inter-adsorbate potential (subsequent layers)
                     r1 = d_ads / (l_pore - d_eff - (layer - 2) * d_ads)
-                    r2 = ((l_pore - d_eff - (layer - 1) * d_ads) /
-                          (l_pore - d_eff - (layer - 2) * d_ads))
                     layer_potential = potential_general(
-                        l_pore, d_ads, n_ads, a_ads, r1, r2
+                        l_pore, d_ads, n_ads, a_ads, r1
                     )
 
                 layer_populations.append(layer_population)
                 layer_potentials.append(layer_potential)
 
-            layer_molecules = numpy.asarray(layer_population)
-            layer_potentials = numpy.asarray(
-                layer_potentials
-            )  # should be one smaller
+            layer_populations = numpy.asarray(layer_populations)
+            layer_potentials = numpy.asarray(layer_potentials)
 
             return (
-                N_over_RT * numpy.sum(layer_molecules * layer_potentials) /
-                numpy.sum(layer_molecules)
+                N_over_RT * numpy.sum(layer_populations * layer_potentials) /
+                numpy.sum(layer_populations)
             )
 
         if use_cy:
-            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff, 1)
         else:
-            pore_widths = _solve_hk(pressure, potential, d_eff)
+            pore_widths = _solve_hk(pressure, potential, d_eff, 1)
 
         # width = 2 * cylinder radius - 2 * surface molecule radius (=d_mat)
         pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
@@ -683,8 +1016,9 @@ def psd_horvath_kawazoe_ry(
         p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # ads-surface potential depth
         p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # ads-ads potential depth
 
-        def potential_general(n_m, p_xx, r1, r2):
-            """General layer potential in a spherical regime."""
+        def potential_general(n_m, p_xx, r1):
+            """General RY layer potential in a spherical regime."""
+            r2 = 1 - r1  # the b constant is 1-a
             return (
                 2 * n_m * p_xx *
                 ((-r1**6 / (4 * r2) * ((1 - r2)**(-4) - (1 + r2)**(-4))) +
@@ -692,48 +1026,41 @@ def psd_horvath_kawazoe_ry(
             )
 
         def potential(l_pore):
-            n_layers = int((l_pore - d_mat) / d_ads - 0.5) + 1
+            n_layers = int(((2 * l_pore - d_mat) / d_ads - 1) / 2) + 1
             layer_populations = []
             layer_potentials = []
 
-            for layer in range(1, n_layers):
+            # potential with surface (first layer)
+            layer_population = 4 * const.pi * (l_pore * 1e-9)**2 * n_mat
+            r1 = d_eff / l_pore
+            layer_potential = potential_general(layer_population, p_12, r1)
+            layer_potentials.append(layer_potential)  # add E1
 
-                if layer == 1:  # potential with surface (first layer)
-                    layer_population = 4 * const.pi * l_pore**2 * n_mat
-                    r1 = d_eff / l_pore
-                    r2 = (l_pore - d_eff) / l_pore
-                    layer_potential = potential_general(
-                        layer_population, p_12, r1, r2
-                    )
+            # inter-adsorbate potential (subsequent layers)
+            layer_populations = [(
+                4 * const.pi * ((l_pore - d_eff -
+                                 (layer - 1) * d_ads) * 1e-9)**2 * n_ads
+            ) for layer in range(1, n_layers + 1)]  # [N1...Nm]
 
-                else:  # inter-adsorbate potential (subsequent layers).
-                    layer_population = 4 * const.pi * (
-                        l_pore - d_eff - (layer - 1) * d_ads
-                    )**2 * n_ads
-                    r1 = d_ads / (l_pore - d_eff - (layer - 2) * d_ads)
-                    r2 = ((l_pore - d_ads - (layer - 1) * d_ads) /
-                          (l_pore - d_ads - (layer - 2) * d_ads))
-                    layer_potential = potential_general(
-                        layer_populations[-1], p_22, r1, r2
-                    )
+            for layer, layer_population in zip(
+                range(2, n_layers + 1), layer_populations
+            ):
+                r1 = d_ads / (l_pore - d_eff - (layer - 2) * d_ads)
+                layer_potential = potential_general(layer_population, p_22, r1)
+                layer_potentials.append(layer_potential)  # add [E2...Em]
 
-                layer_populations.append(layer_population)
-                layer_potentials.append(layer_potential)
-
-            layer_molecules = numpy.asarray(layer_population)
-            layer_potentials = numpy.asarray(
-                layer_potentials
-            )  # should be one smaller
+            layer_populations = numpy.asarray(layer_populations)
+            layer_potentials = numpy.asarray(layer_potentials)
 
             return (
-                N_over_RT * numpy.sum(layer_molecules * layer_potentials) /
-                numpy.sum(layer_molecules)
+                N_over_RT * numpy.sum(layer_populations * layer_potentials) /
+                numpy.sum(layer_populations)
             )
 
         if use_cy:
-            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff)
+            pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff, 1)
         else:
-            pore_widths = _solve_hk(pressure, potential, d_eff)
+            pore_widths = _solve_hk(pressure, potential, d_eff, 1)
 
         # width = 2 * sphere radius - 2 * surface molecule radius (=d_mat)
         pore_widths = 2 * numpy.asarray(pore_widths) - d_mat
@@ -742,6 +1069,12 @@ def psd_horvath_kawazoe_ry(
     liquid_density = adsorbate_properties['liquid_density']
     adsorbate_molar_mass = adsorbate_properties['adsorbate_molar_mass']
 
+    # Cut unneeded values
+    selected = slice(0, len(pore_widths))
+    pore_widths = pore_widths[selected]
+    pressure = pressure[selected]
+    loading = loading[selected]
+
     avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2  # nm
     volume_adsorbed = loading * adsorbate_molar_mass / liquid_density / 1000  # cm3/g
     pore_dist = numpy.diff(volume_adsorbed) / numpy.diff(pore_widths)
@@ -749,17 +1082,18 @@ def psd_horvath_kawazoe_ry(
     return avg_pore_widths, pore_dist, volume_adsorbed[1:]
 
 
-def _solve_hk(pressure, hk_fun, bound):
+def _solve_hk(pressure, hk_fun, bound, geo):
     """
     I personally found that simple Brent minimization
     gives good results. There may be other, more efficient
-    algorithms, like conjugate gradient, but speed is a moot point
-    as long as average total runtime is <50 ms.
-    The minimisation runs with bounds of effective diameter < x < 100.
-    Maximum determinable pore size is limited at 2.5 nm anyway.
+    algorithms, like conjugate gradient, but optimization is a moot point
+    as long as average total runtime is short.
+    The minimisation runs with bounds of [d_eff < x < 50].
+    Maximum determinable pore size is limited at ~2.5 nm anyway.
     """
 
     p_w = []
+    p_w_max = 10 / geo
 
     for p_point in pressure:
 
@@ -769,26 +1103,36 @@ def _solve_hk(pressure, hk_fun, bound):
         res = opt.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
         p_w.append(res.x)
 
+        # we will stop if reaching unrealistic pore sizes
+        if res.x > p_w_max:
+            break
+
     return p_w
 
 
-def _solve_hk_cy(pressure, loading, hk_fun, bound):
+def _solve_hk_cy(pressure, loading, hk_fun, bound, geo):
     """
     In this case, the SF correction factor is subtracted
     from the original function.
     """
 
     p_w = []
-    coverage = loading / loading[-1]
+    p_w_max = 10 / geo
+    coverage = loading / (max(loading) * 1.01)
 
     for p_point, c_point in zip(pressure, coverage):
 
+        sf_corr = 1 + 1 / c_point * numpy.log(1 - c_point)
+
         def fun(l_pore):
-            sf_corr = 1 + 1 / c_point * numpy.log(1 - c_point)
             return (numpy.exp(hk_fun(l_pore) - sf_corr) - p_point)**2
 
         res = opt.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
         p_w.append(res.x)
+
+        # we will stop if reaching unrealistic pore sizes
+        if res.x > p_w_max:
+            break
 
     return p_w
 
