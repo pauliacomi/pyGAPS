@@ -416,7 +416,7 @@ def psd_horvath_kawazoe(
 
     .. math::
 
-        RT\ln(p/p_0) =  & N_A 6 \Big( n_a \frac{A_{gh}}{4 d_0^6} + n_A \frac{A_{gg}}{4 d_g^6} \Big)
+        RT\ln(p/p_0) =  & N_A 6 \Big( n_1 \frac{A_{gh}}{4 d_0^6} + n_2 \frac{A_{gg}}{4 d_g^6} \Big)
                           \frac{L^3}{(L-d_0)^{3}} \\
                         & \times
                             \Big[
@@ -430,6 +430,10 @@ def psd_horvath_kawazoe(
 
         T_x = \Big[1 + (-1)^{x} \frac{L-d_0}{L} \Big]^{-x} -
               \Big[1 - (-1)^{x} \frac{L-d_0}{L} \Big]^{-x}
+
+    While the population densities for guest and host :math:`n_1` and
+    :math:`n_2` are calculated from the plane values as
+    :math:`n_0 = 4\pi L^2 n_h` and :math:`n_i = 4\pi (L - d_0)^2 n_g`.\
 
     *Limitations*
 
@@ -902,16 +906,17 @@ def psd_horvath_kawazoe_ry(
         def potential_twosurface(l_pore):
             """Potential with two surface layers."""
             return (
-                n_mat * a_mat / 2 / (sigma * 1e-9)**4 * \
-                    (s_over_d0**10 - s_over_d0**4 + \
-                    (sigma / (l_pore - d_eff))**10 - (sigma / (l_pore - d_eff))**4
+                n_mat * a_mat / 2 / (sigma * 1e-9)**4 * (
+                    s_over_d0**10 - s_over_d0**4 + (sigma /
+                                                    (l_pore - d_eff))**10 -
+                    (sigma / (l_pore - d_eff))**4
                 )
             )
 
         def potential_average(n_layer):
             return ((
-                2 * potential_onesurface + (n_layer - 2) * \
-                2 * potential_adsorbate  # NOTE 2 * is correct
+                2 * potential_onesurface +
+                (n_layer - 2) * 2 * potential_adsorbate  # NOTE 2 * is correct
             ) / n_layer)
 
         def potential(l_pore):
