@@ -1,5 +1,5 @@
+dist: bionic
 language: python
-dist: xenial
 cache: pip
 git:                    # no need to clone everything
   depth: 5
@@ -15,7 +15,7 @@ before_install:
   - python --version    # print python version
 
 install:
-  - pip install tox     # install tox
+  - python -mpip install --progress-bar=off twine tox-wheel # install tox/twine
   # display versions of installed components
   - virtualenv --version
   - easy_install --version
@@ -48,12 +48,12 @@ script:
   - tox -v
 
 after_failure:
-  - more .tox/log/* | cat
-  - more .tox/*/log/* | cat
+  - cat .tox/log/*
+  - cat .tox/*/log/*
 
 jobs:
   include:
-    # Checks and docks
+    # Checks and docs
     - stage: test
       python: '3.8'     # specify python 3.8
       dist: bionic
@@ -65,17 +65,16 @@ jobs:
       env:
         - TOXENV=docs
       addons:
+        # We need to install pandoc separately to deal with translation of docs to jupyter
         apt_packages:
-        # We need to install pandoc separately to deal
-        # with translation of docs to jupyter
         - pandoc
     # Create an test job on the test stage for each python version
-{%- for env, config in tox_environments|dictsort %}{{ '' }}
+{%- for env in tox_environments %}{{ '' }}
     - stage: test
       python: '{{ env.split("-")[0] if env.startswith("pypy") else "{0[2]}.{0[3]}".format(env) }}'
       dist: bionic
       env:
-        - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
+        - TOXENV={{ env }}{% if 'cover' in env %},report,codecov{% endif -%}
 {% endfor %}
 
     # If all goes well, we want to deploy to PyPi

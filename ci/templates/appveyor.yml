@@ -23,18 +23,27 @@ environment:
   CONDA_ROOT: 'C:\Miniconda3-x64'
 
   matrix:
-{% for env, config in tox_environments|dictsort %}{{ '' }}{% if env.startswith(('py2', 'py3')) %}
+{% for env in tox_environments %}{{ '' }}
+{% if env.startswith(('py2', 'py3')) %}
+
     - PYTHON_VERSION: '{{ env[2] }}.{{ env[3] }}'
       platform: x86
+{% if 'nocov' in env %}
+      WHEEL_PATH: .tox/dist
+{% endif %}
 
     - PYTHON_VERSION: '{{ env[2] }}.{{ env[3] }}'
       platform: x64
+{% if 'nocov' in env %}
+      WHEEL_PATH: .tox/dist
+{% endif %}
 
-{% endif %}{% endfor %}
+{% endif %}
+{% endfor %}
 
 # initial commands
 init:
-  - echo %PYTHON_VERSION%
+  - ps: echo $env:PYTHON_VERSION
 
 # setup stage
 install:
@@ -61,6 +70,9 @@ test_script:
 
 # cleanup the environment
 after_test:
+
+on_success:
+  - IF DEFINED WHEEL_PATH twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing %WHEEL_PATH%/*.whl
 
 # stuff to do on fail
 on_failure:
