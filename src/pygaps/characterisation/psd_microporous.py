@@ -70,16 +70,18 @@ def psd_microporous(
     -----
 
     Calculates the pore size distribution using a "classical" model, which
-    attempts to relate the global adsorption potential, :math:`RT \ln(p/p_0)`,
-    with the energetic potential of individual adsorbate molecules in a pore of
-    a particular geometry :math:`\Phi`. Calculation of the latter is based on
-    the Lennard-Jones 6-12 intermolecular potential, incorporating both
-    guest-host and guest-guest dispersion contributions through the
-    Kirkwood-Muller formalism. The function is then solved numerically. These
-    methods are necessarily approximations, as besides using a semi-empirical
-    mathematical model, they are also heavily dependent on the material and
-    adsorbate properties (polarizability and susceptibility) used to derive
-    dispersion coefficients.
+    describes adsorption in micropores as a sequential instant filling of
+    increasingly wider pores. The pressure of filling for each pore is
+    determined by relating the global adsorption potential,
+    :math:`RT \ln(p/p_0)`, with the energetic potential of individual adsorbate
+    molecules in a pore of a particular geometry :math:`\Phi`. Calculation of
+    the latter is based on the Lennard-Jones 6-12 intermolecular potential,
+    incorporating both guest-host and guest-guest dispersion contributions
+    through the Kirkwood-Muller formalism. The function is then solved
+    numerically. These methods are necessarily approximations, as besides using
+    a semi-empirical mathematical model, they are also heavily dependent on the
+    material and adsorbate properties (polarizability and susceptibility) used
+    to derive dispersion coefficients.
 
     There are two main approaches which pyGAPS implements, chosen by passing
     the ``psd_model`` parameter:
