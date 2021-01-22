@@ -10,7 +10,8 @@ from setuptools import setup
 def read(name, **kwargs):
     """Read and return file contents."""
     with open(
-        Path(__file__).parent / name, encoding=kwargs.get('encoding', 'utf8')
+        Path(__file__).parent / name,
+        encoding=kwargs.get('encoding', 'utf8'),
     ) as fh:
         return fh.read()
 
@@ -30,7 +31,7 @@ setup(
     },
     license='MIT license',
     description=  # noqa: E251
-    """A framework for processing adsorption data for porous materials""",
+    """A framework for processing adsorption data for porous materials.""",
     long_description=remove_badges(read('README.rst')),
     author='Paul Iacomi',
     author_email='mail@pauliacomi.com',
