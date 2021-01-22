@@ -9,6 +9,10 @@ jobs:
     strategy:
       matrix:
         include:
+          - python-version: 3.8
+            toxenv: "check"
+          - python-version: 3.8
+            toxenv: "docs"
           - python-version: 3.6
             toxenv: "py36-cover"
           - python-version: 3.7
