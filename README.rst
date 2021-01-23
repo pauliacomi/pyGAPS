@@ -183,7 +183,9 @@ Development
 ===========
 
 If you want to contribute to pyGAPS or develop your own code from the package,
-check out the detailed information `here <CONTRIBUTING.rst>`__.
+check out the detailed information `in here`_.
+
+.. _in here: contributing.rst
 
 Bugs or questions?
 ==================
