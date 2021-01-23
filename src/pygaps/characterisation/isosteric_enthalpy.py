@@ -13,7 +13,8 @@ def isosteric_enthalpy(
 ):
     r"""
     Calculate the isosteric enthalpy of adsorption using several isotherms
-    recorded at different temperatures on the same material.
+    recorded at different temperatures on the same material and the
+    Clausius-Clapeyron equation.
 
     Parameters
     ----------
@@ -67,17 +68,19 @@ def isosteric_enthalpy(
 
     *Limitations*
 
-    The isosteric enthalpy is sensitive to the differences in pressure between the two isotherms. If
-    the isotherms measured are too close together, the error margin will increase.
+    The isosteric enthalpy is sensitive to the differences in pressure between
+    the two isotherms. If the isotherms measured are too close together, the
+    error margin will increase.
 
-    The method also assumes that enthalpy of adsorption does not vary with temperature. If the
-    variation is large for the system in question, the isosteric enthalpy calculation will give
-    unrealistic values.
+    The method also assumes that enthalpy of adsorption does not vary with
+    temperature. If the variation is large for the system in question, the
+    isosteric enthalpy calculation will give unrealistic values.
 
-    Even with carefully measured experimental data, there are two assumptions used in deriving
-    the Clausius-Clapeyron equation: an ideal bulk gas phase and a negligible adsorbed phase
-    molar volume. These have a significant effect on the calculated isosteric enthalpies of adsorption,
-    especially at high relative pressures and for heavy adsorbates.
+    Even with carefully measured experimental data, there are two assumptions
+    used in deriving the Clausius-Clapeyron equation: an ideal bulk gas phase
+    and a negligible adsorbed phase molar volume. These have a significant
+    effect on the calculated isosteric enthalpies of adsorption, especially at
+    high relative pressures and for heavy adsorbates.
 
     """
     # Check more than one isotherm
@@ -91,46 +94,42 @@ def isosteric_enthalpy(
         )
 
     # Check same basis
-    if not all(
-        x.adsorbent_basis == isotherms[0].adsorbent_basis for x in isotherms
-    ):
+    if len(set(x.adsorbent_basis for x in isotherms)) > 1:
         raise ParameterError(
             'Isotherm passed are in a different adsorbent basis.'
         )
-
-    # Get minimum and maximum loading for each isotherm
-    min_loading = 1.01 * max([
-        min(
-            x.
-            loading(loading_basis='molar', loading_unit='mmol', branch=branch)
-        ) for x in isotherms
-    ])
-    max_loading = 0.99 * min([
-        max(
-            x.
-            loading(loading_basis='molar', loading_unit='mmol', branch=branch)
-        ) for x in isotherms
-    ])
 
     # Get temperatures
     temperatures = [x.temperature for x in isotherms]
 
     # Loading
-    if loading_points is None:
+    loading = loading_points
+    if loading is None:
+        load_args = dict(
+            loading_basis='molar',
+            loading_unit='mmol',
+            branch=branch,
+        )
+        # Get a minimum and maximum loading common for all isotherms
+        min_loading = 1.01 * max([
+            min(x.loading(**load_args)) for x in isotherms
+        ])
+        max_loading = 0.99 * min([
+            max(x.loading(**load_args)) for x in isotherms
+        ])
         loading = numpy.linspace(min_loading, max_loading, 50)
-    else:
-        loading = loading_points
 
     # Get pressure point for each isotherm at loading
-    pressures = numpy.array([[
-        i.pressure_at(
-            load,
-            pressure_unit='bar',
+    pressures = numpy.array([
+        iso.pressure_at(
+            loading,
             pressure_mode='absolute',
+            pressure_unit='bar',
+            loading_basis='molar',
             loading_unit='mmol',
             branch=branch
-        ).item() for i in isotherms
-    ] for load in loading])
+        ) for iso in isotherms
+    ]).T
 
     iso_enthalpy, slopes, correlation, std_errs = isosteric_enthalpy_raw(
         pressures, temperatures
@@ -198,12 +197,13 @@ def isosteric_enthalpy_raw(pressures, temperatures):
     slopes = []
     correlations = []
     stderrs = []
+    log_pressures = numpy.log(pressures)
 
-    # Calculate enthalpy for each point
-    for pressure in pressures:
+    # Calculate enthalpy for each point by a linear fit
+    for log_p in log_pressures:
 
         slope, intercept, corr_coef, p, std_err = stats.linregress(
-            inv_t, numpy.log(pressure)
+            inv_t, log_p
         )
 
         iso_enth.append(-const.gas_constant * slope / 1000)
