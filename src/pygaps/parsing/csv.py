@@ -127,7 +127,7 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
 
     if path:
         with open(path, mode='w', newline='\n') as file:
-            file.write(output.getvalue())
+            print(output.getvalue(), file=file)
     else:
         return output.getvalue()
 

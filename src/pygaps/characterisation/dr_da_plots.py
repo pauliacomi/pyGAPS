@@ -1,7 +1,5 @@
 """Dubinin-Radushkevich equation and related plots."""
 
-import logging
-
 import numpy
 import scipy.constants as const
 import scipy.optimize as opt
@@ -201,11 +199,9 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
 
     if verbose:
         if find_exp:
-            logging.info(f"Exponent is: {exp:.2f}")
-        logging.info(f"Micropore volume is: {microp_volume:.3f} cm3")
-        logging.info(
-            f"Effective adsorption potential is : {potential:.3f} kj/mol"
-        )
+            print(f"Exponent is: {exp:.2f}")
+        print(f"Micropore volume is: {microp_volume:.3f} cm3")
+        print(f"Effective adsorption potential is : {potential:.3f} kj/mol")
         # Plot
         dra_plot(
             log_v_adj(loading, molar_mass, liquid_density),

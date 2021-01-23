@@ -1,7 +1,5 @@
 """Module calculating the initial henry constant."""
 
-import logging
-
 import numpy
 
 from ..core.modelisotherm import ModelIsotherm
@@ -98,10 +96,10 @@ def initial_henry_slope(
 
     # logging for debugging
     if verbose:
-        logging.info(f"Calculated K = {henry.params['K']:.2e}")
-        logging.info("Starting points:", initial_rows)
-        logging.info("Selected points:", rows_taken)
-        logging.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
+        print(f"Calculated K = {henry.params['K']:.2e}")
+        print("Starting points:", initial_rows)
+        print("Selected points:", rows_taken)
+        print(f"Final adjusted RMSE: {adjrmsd:.2e}")
         params = {
             'plot_type': 'isotherm',
             'branch': 'ads',

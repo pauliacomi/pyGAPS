@@ -1,7 +1,5 @@
 """Class representing a model of and isotherm."""
 
-import logging
-
 import numpy
 import pandas
 
@@ -459,7 +457,7 @@ class ModelIsotherm(Isotherm):
 
             except CalculationError as e:
                 if verbose:
-                    logging.info(
+                    print(
                         f"Modelling using {model} failed. "
                         f"Fitting routine outputs: \n{e}"
                     )
@@ -489,7 +487,7 @@ class ModelIsotherm(Isotherm):
                     'ko', **opts
                 )
             ax.legend([m.model.name for m in attempts])
-            logging.info(f"Best model fit is {best_fit.model.name}.")
+            print(f"Best model fit is {best_fit.model.name}.")
 
         return best_fit
 

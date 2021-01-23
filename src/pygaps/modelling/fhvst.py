@@ -1,7 +1,5 @@
 """Flory-Huggins-VST isotherm model."""
 
-import logging
-
 import numpy
 import scipy.optimize as opt
 
@@ -110,8 +108,7 @@ class FHVST(IsothermBaseModel):
 
         if not opt_res.success:
             raise CalculationError(
-                f"Root finding for value {pressure} failed."
-            )
+                f"Root finding for value {pressure} failed.")
 
         return opt_res.x
 
@@ -182,8 +179,7 @@ class FHVST(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+            pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k, "a1v": 0}
 
@@ -195,14 +191,12 @@ class FHVST(IsothermBaseModel):
 
         return guess
 
-    def fit(
-        self,
-        pressure,
-        loading,
-        param_guess,
-        optimization_params=None,
-        verbose=False
-    ):
+    def fit(self,
+            pressure,
+            loading,
+            param_guess,
+            optimization_params=None,
+            verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -220,7 +214,7 @@ class FHVST(IsothermBaseModel):
             Prints out extra information about steps taken.
         """
         if verbose:
-            logging.info(f"Attempting to model using {self.name}")
+            print(f"Attempting to model using {self.name}")
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
@@ -245,8 +239,7 @@ class FHVST(IsothermBaseModel):
             guess,  # provide the fit function and initial guess
             args=(pressure,
                   loading),  # supply the extra arguments to the fit function
-            **kwargs
-        )
+            **kwargs)
         if not opt_res.success:
             raise CalculationError(
                 f"\nFitting routine with model {self.name} failed with error:"
@@ -254,8 +247,7 @@ class FHVST(IsothermBaseModel):
                 f"\nTry a different starting point in the nonlinear optimization"
                 f"\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
                 f"\nDefault starting guess for parameters:"
-                f"\n{param_guess}\n"
-            )
+                f"\n{param_guess}\n")
 
         # assign params
         for index, _ in enumerate(param_names):
@@ -264,4 +256,4 @@ class FHVST(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            logging.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            print(f"Model {self.name} success, RMSE is {self.rmse:.3f}")

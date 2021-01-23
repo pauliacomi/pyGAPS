@@ -1,7 +1,5 @@
 """Wilson-VST isotherm model."""
 
-import logging
-
 import numpy
 import scipy.optimize as opt
 
@@ -228,7 +226,7 @@ class WVST(IsothermBaseModel):
             Prints out extra information about steps taken.
         """
         if verbose:
-            logging.info(f"Attempting to model using {self.name}")
+            print(f"Attempting to model using {self.name}")
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
@@ -272,4 +270,4 @@ class WVST(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            logging.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            print(f"Model {self.name} success, RMSE is {self.rmse:.3f}")

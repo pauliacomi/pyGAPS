@@ -1,7 +1,6 @@
 """Generate the default sqlite database."""
 
 import json
-import logging
 import sqlite3
 
 import pygaps
@@ -83,5 +82,5 @@ def db_execute_general(statement, pth, verbose=False):
 
     # Catch the exception
     except sqlite3.Error as e_info:
-        logging.info("Unable to execute statement", statement)
+        print("Unable to execute statement", statement)
         raise ParsingError from e_info
