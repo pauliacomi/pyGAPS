@@ -1,6 +1,7 @@
 """Base class for all isotherm models."""
 
 import abc
+import logging
 
 import numpy
 import scipy.optimize as opt
@@ -49,6 +50,7 @@ class IsothermBaseModel():
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
+
     def __repr__(self):
         """Print model name."""
         return f"pyGAPS Isotherm Model, '{self.name}' type"
@@ -196,7 +198,7 @@ class IsothermBaseModel():
             Prints out extra information about steps taken.
         """
         if verbose:
-            print(f"Attempting to model using {self.name}.")
+            logging.info(f"Attempting to model using {self.name}.")
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
@@ -241,4 +243,4 @@ class IsothermBaseModel():
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            print(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            logging.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")

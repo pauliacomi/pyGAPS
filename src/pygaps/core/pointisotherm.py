@@ -2,6 +2,7 @@
 This module contains the main class that describes an isotherm through discrete points.
 """
 
+import logging
 import textwrap
 
 import numpy
@@ -327,7 +328,7 @@ class PointIsotherm(Isotherm):
         """
         if mode_to == self.pressure_mode and unit_to == self.pressure_unit:
             if verbose:
-                print("Mode and units are the same, no changes made")
+                logging.info("Mode and units are the same, no changes made")
 
         else:
             if not mode_to:
@@ -355,7 +356,7 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(
+                logging.info(
                     f"Changed pressure to mode '{mode_to}', unit '{unit_to}'."
                 )
 
@@ -377,7 +378,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.loading_basis and unit_to == self.loading_unit:
             if verbose:
-                print("Basis and units are the same, no changes made.")
+                logging.info("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -403,7 +404,7 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(
+                logging.info(
                     f"Changed loading to basis '{basis_to}', unit '{unit_to}'."
                 )
 
@@ -428,7 +429,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.adsorbent_basis and unit_to == self.adsorbent_unit:
             if verbose:
-                print("Basis and units are the same, no changes made.")
+                logging.info("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -453,7 +454,7 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                print(
+                logging.info(
                     f"Changed adsorbent to basis '{basis_to}', unit '{unit_to}'."
                 )
 

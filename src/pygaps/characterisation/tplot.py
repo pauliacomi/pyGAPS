@@ -1,5 +1,6 @@
 """This module contains the t-plot calculation."""
 
+import logging
 import warnings
 
 import numpy
@@ -140,16 +141,18 @@ def t_plot(
 
     if verbose:
         if not results:
-            print("Could not find linear regions, attempt a manual limit.")
+            logging.info(
+                "Could not find linear regions, attempt a manual limit."
+            )
         else:
             for index, result in enumerate(results):
-                print(f"For linear region {index + 1}")
-                print(
+                logging.info(f"For linear region {index + 1}")
+                logging.info(
                     f"The slope is {result.get('slope'):.2e} "
                     f"and the intercept is {result.get('intercept'):.2e}, "
                     f"with a correlation coefficient of {result.get('corr_coef'):.2e}"
                 )
-                print(
+                logging.info(
                     f"The adsorbed volume is {result.get('adsorbed_volume'):.2f} cm3/{isotherm.adsorbent_unit} "
                     f"and the area is {result.get('area'):.2f} m2/{isotherm.adsorbent_unit}"
                 )
