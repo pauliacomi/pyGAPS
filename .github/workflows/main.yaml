@@ -1,10 +1,11 @@
 name: CI
 
 on:
-
   push:
 
   pull_request:
+    branches:
+      - develop
 
   # Allows running manually
   workflow_dispatch:
@@ -42,6 +43,11 @@ jobs:
         pip --version
         virtualenv --version
         tox --version
+
+    - name: Install pandoc
+      if: ${{ matrix.toxenv == 'docs' }}
+      run: |
+        sudo apt-get install pandoc
 
     - name: Test with tox
       run: |
