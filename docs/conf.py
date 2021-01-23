@@ -97,6 +97,7 @@ linkcheck_retries = 2
 linkcheck_ignore = [
     r'https://github.com/pauliacomi/pygaps/compare/.+',
     r'https://requires.io/.+',
+    r'https://twitter.com/.+',
 ]
 
 # Checking for internal links
