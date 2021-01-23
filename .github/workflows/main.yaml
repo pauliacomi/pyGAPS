@@ -1,6 +1,13 @@
-name: pygaps
+name: CI
 
-on: [push]
+on:
+
+  push:
+
+  pull_request:
+
+  # Allows running manually
+  workflow_dispatch:
 
 jobs:
   build:
