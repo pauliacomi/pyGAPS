@@ -139,7 +139,7 @@ def isotherm_from_json(
             data = _from_data_nist(data)
 
         # build pandas dataframe of data
-        data = pandas.DataFrame.from_dict(data, dtype='float64')
+        data = pandas.DataFrame(data, dtype='float64')
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:

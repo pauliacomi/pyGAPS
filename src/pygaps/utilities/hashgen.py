@@ -27,9 +27,7 @@ def isotherm_to_hash(isotherm):
 
     # Isotherm data or model
     if isinstance(isotherm, pygaps.PointIsotherm):
-        raw_dict["data_hash"] = str(
-            hash_pandas_object(isotherm.data_raw.round(8)).sum()
-        )
+        raw_dict["data_hash"] = str(hash_pandas_object(isotherm.data()).sum())
     elif isinstance(isotherm, pygaps.ModelIsotherm):
         raw_dict["data_hash"] = isotherm.model.to_dict()
 

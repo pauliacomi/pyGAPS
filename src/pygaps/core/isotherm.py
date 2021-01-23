@@ -186,7 +186,7 @@ class Isotherm():
             setattr(self, attr, properties[attr])
 
     ##########################################################
-    #   Overloaded and own functions
+    #   Overloaded and private functions
 
     @property
     def iso_id(self):
