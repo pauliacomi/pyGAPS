@@ -2,6 +2,8 @@
 
 import logging
 
+logger = logging.getLogger('pygaps')
+
 import numpy
 import scipy.constants as const
 import scipy.optimize as opt
@@ -201,10 +203,10 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
 
     if verbose:
         if find_exp:
-            logging.info(f"Exponent is: {exp:.2f}")
-        logging.info(f"Micropore volume is: {microp_volume:.3f} cm3")
-        logging.info(
-            f"Effective adsorption potential is : {potential:.3f} kj/mol"
+            logger.info(f"Exponent is: {exp:.2f}")
+        logger.info(f"Micropore volume is: {microp_volume:.3f} cm3")
+        logger.info(
+            f"Effective adsorption potential is : {potential:.3f} kJ/mol"
         )
         # Plot
         dra_plot(

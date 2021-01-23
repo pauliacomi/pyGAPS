@@ -6,6 +6,8 @@ import array
 import functools
 import json
 import logging
+
+logger = logging.getLogger('pygaps')
 import sqlite3
 
 import pandas
@@ -103,7 +105,7 @@ def _upload_one_all_columns(
 
     if verbose:
         # Print success
-        logging.info(print_string, "uploaded", insert_dict.get(table_id))
+        logger.info(f"{print_string} uploaded {insert_dict.get(table_id)}")
 
 
 def _get_all_no_id(
@@ -167,7 +169,7 @@ def _delete_by_id(
 
     if verbose:
         # Print success
-        logging.info(f"Success, deleted {print_string}: {element_id}")
+        logger.info(f"Success, deleted {print_string}: {element_id}")
 
 
 # ---------------------- Adsorbates
@@ -268,7 +270,7 @@ def adsorbate_to_db(
 
     if verbose:
         # Print success
-        logging.info(f"Adsorbate uploaded: '{adsorbate.name}'")
+        logger.info(f"Adsorbate uploaded: '{adsorbate.name}'")
 
 
 @with_connection
@@ -328,7 +330,7 @@ def adsorbates_from_db(db_path=None, verbose=True, **kwargs):
 
     # Print success
     if verbose:
-        logging.info(f"Selected {len(adsorbates)} adsorbates")
+        logger.info(f"Selected {len(adsorbates)} adsorbates")
 
     return adsorbates
 
@@ -385,7 +387,7 @@ def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        logging.info(f"Adsorbate deleted: '{adsorbate}'")
+        logger.info(f"Adsorbate deleted: '{adsorbate}'")
 
 
 @with_connection
@@ -583,7 +585,7 @@ def material_to_db(
 
     if verbose:
         # Print success
-        logging.info(f"Material uploaded: '{material.name}'")
+        logger.info(f"Material uploaded: '{material.name}'")
 
 
 @with_connection
@@ -634,7 +636,7 @@ def materials_from_db(db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        logging.info("Selected", len(materials), "materials")
+        logger.info(f"Selected {len(materials)} materials")
 
     return materials
 
@@ -691,7 +693,7 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        logging.info(
+        logger.info(
             f"Material deleted: '{material.name if isinstance(material, Material) else material}'"
         )
 
@@ -939,7 +941,7 @@ def isotherm_to_db(
 
     if verbose:
         # Print success
-        logging.info(f"Isotherm uploaded: '{isotherm.iso_id}'")
+        logger.info(f"Isotherm uploaded: '{isotherm.iso_id}'")
 
 
 @with_connection
@@ -1051,7 +1053,7 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        logging.info("Selected", len(isotherms), "isotherms")
+        logger.info(f"Selected {len(isotherms)} isotherms")
 
     return isotherms
 
@@ -1107,7 +1109,7 @@ def isotherm_delete_db(iso_id, db_path=None, verbose=True, **kwargs):
 
     if verbose:
         # Print success
-        logging.info(f"Isotherm deleted: '{iso_id}'")
+        logger.info(f"Isotherm deleted: '{iso_id}'")
 
 
 @with_connection

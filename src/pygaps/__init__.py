@@ -6,12 +6,25 @@ __author__ = 'Paul A. Iacomi'
 __docformat__ = 'restructuredtext'
 __version__ = '2.0.2'
 
+import sys
 import logging
+logger = logging.getLogger('pygaps')
+logger.setLevel(logging.DEBUG)
+
+# create console handler
+ch = logging.StreamHandler(stream=sys.stdout)
+ch.setLevel(logging.INFO)
+
+# # create formatter
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# ch.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(ch)
 
 # This code is written for Python 3.
-import sys
 if sys.version_info[0] != 3:
-    logging.error("pyGAPS requires Python 3.")
+    logger.error("pyGAPS requires Python 3.")
     sys.exit(1)
 
 # Let users know if they're missing any hard dependencies

@@ -1,6 +1,8 @@
 """This module contains Langmuir area calculations."""
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import textwrap
 import warnings
 
@@ -117,7 +119,7 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
     if verbose:
 
-        logging.info(
+        logger.info(
             textwrap.dedent(
                 f"""\
             Langmuir surface area: a = {langmuir_area:.2e} m2/{isotherm.adsorbent_unit}

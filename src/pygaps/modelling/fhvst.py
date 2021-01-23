@@ -2,6 +2,8 @@
 
 import logging
 
+logger = logging.getLogger('pygaps')
+
 import numpy
 import scipy.optimize as opt
 
@@ -220,7 +222,7 @@ class FHVST(IsothermBaseModel):
             Prints out extra information about steps taken.
         """
         if verbose:
-            logging.info(f"Attempting to model using {self.name}")
+            logger.info(f"Attempting to model using {self.name}")
 
         # parameter names (cannot rely on order in Dict)
         param_names = [param for param in self.params]
@@ -264,4 +266,4 @@ class FHVST(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            logging.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")

@@ -1,6 +1,8 @@
 """This module contains the alpha-s calculation."""
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import warnings
 
 import numpy
@@ -195,17 +197,17 @@ def alpha_s(
 
     if verbose:
         if not results:
-            logging.info(
+            logger.info(
                 "Could not find linear regions, attempt a manual limit."
             )
         else:
             for index, result in enumerate(results):
-                logging.info(f"For linear region {index}")
-                logging.info(
+                logger.info(f"For linear region {index}")
+                logger.info(
                     f"The slope is {result.get('slope'):.4f} and the intercept is {result.get('intercept'):.4f}, "
                     f"with a correlation coefficient of {result.get('corr_coef'):.4f}"
                 )
-                logging.info(
+                logger.info(
                     f"The adsorbed volume is {result.get('adsorbed_volume'):.4f} and the area is {result.get('area'):.4f}"
                 )
 

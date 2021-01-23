@@ -1,6 +1,8 @@
 """Module calculating the initial enthalpy of adsorption."""
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import warnings
 
 import numpy
@@ -237,13 +239,12 @@ def initial_enthalpy_comp(
     )
 
     if verbose:
-        logging.info('Bounds: \n\tconst =', (bounds_arr[0]))
-        logging.info(
-            '\tpreexp =', bounds_arr[1], ', exp =', bounds_arr[2],
-            ', exploc =', bounds_arr[3]
+        logger.info(f"Bounds: \n\tconst = {bounds_arr[0]}")
+        logger.info(
+            f"\tpreexp = {bounds_arr[1]}, exp = {bounds_arr[2]}, exploc = {bounds_arr[3]}"
         )
-        logging.info('\tprepowa =', bounds_arr[4], ', powa =', bounds_arr[5])
-        logging.info('\tprepowr =', bounds_arr[6], ', powr =', bounds_arr[7])
+        logger.info(f"\tprepowa = {bounds_arr[4]}, powa = {bounds_arr[5]}")
+        logger.info(f"\tprepowr = {bounds_arr[6]}, powr = {bounds_arr[7]}")
 
     ##################################
     ##################################
@@ -299,15 +300,14 @@ def initial_enthalpy_comp(
 
     for i, guess in enumerate(guesses):
         if verbose:
-            logging.info('\n')
-            logging.info('Minimizing routine number', i + 1)
-            logging.info('Initial guess: \n\tconst =', guess[0])
-            logging.info(
-                '\tpreexp =', guess[1], ', exp =', guess[2], ', exploc =',
-                guess[3]
+            logger.info('\n')
+            logger.info(f"Minimizing routine number {i +1}")
+            logger.info(f"Initial guess: \n\tconst = {guess[0]}")
+            logger.info(
+                f"\tpreexp = {guess[1]}, exp = {guess[2]}, exploc = {guess[3]}"
             )
-            logging.info('\tprepowa =', guess[4], ', powa =', guess[5])
-            logging.info('\tprepowr =', guess[6], ', powr =', guess[7])
+            logger.info(f"\tprepowa = {guess[4]}, powa = {guess[5]}")
+            logger.info(f"\tprepowr = {guess[6]}, powr = {guess[7]}")
 
         opt_res = opt.minimize(
             residual_sum_of_squares,
@@ -327,8 +327,8 @@ def initial_enthalpy_comp(
             "\n\tMinimization of RSS fitting failed with all guesses"
         )
     if verbose:
-        logging.info('\n')
-        logging.info('Final best fit', best_fit)
+        logger.info('\n')
+        logger.info(f'Final best fit {best_fit}.')
 
     for i, _ in enumerate(param_names):
         params[param_names[i]] = final_guess[i]
@@ -343,25 +343,25 @@ def initial_enthalpy_comp(
         ).get('initial_enthalpy')
 
     if verbose:
-        logging.info('\n')
-        logging.info(
+        logger.info('\n')
+        logger.info(
             f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}"
         )
-        logging.info(f"The constant contribution is \n\t{params['const']:.2f}")
+        logger.info(f"The constant contribution is \n\t{params['const']:.2f}")
         if params['const'] < enth_liq:
             warnings.warn(
                 'CARE: Base enthalpy of adsorption is lower than enthalpy of liquefaction.'
             )
-        logging.info(
+        logger.info(
             "The exponential contribution is \n\t"
             f"{params['preexp']:.2f} * exp({params['exp']:.2E} * n)"
             f"with the limit at {params['exploc']:.2f}"
         )
-        logging.info(
+        logger.info(
             "The guest-guest attractive contribution is \n\t"
             f"{params['prepowa']:.2g} * n^{params['powa']:.2}"
         )
-        logging.info(
+        logger.info(
             "The guest-guest repulsive contribution is \n\t"
             f"{params['prepowr']:.2g} * n^{params['powr']:.2}"
         )
@@ -423,7 +423,7 @@ def initial_enthalpy_point(
     initial_enthalpy = enthalpy[0]
 
     if verbose:
-        logging.info(
+        logger.info(
             f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}",
         )
 

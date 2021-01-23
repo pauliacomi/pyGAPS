@@ -3,6 +3,8 @@ This module contains the main class that describes an isotherm through discrete 
 """
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import textwrap
 
 import numpy
@@ -328,7 +330,7 @@ class PointIsotherm(Isotherm):
         """
         if mode_to == self.pressure_mode and unit_to == self.pressure_unit:
             if verbose:
-                logging.info("Mode and units are the same, no changes made")
+                logger.info("Mode and units are the same, no changes made.")
 
         else:
             if not mode_to:
@@ -356,7 +358,7 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                logging.info(
+                logger.info(
                     f"Changed pressure to mode '{mode_to}', unit '{unit_to}'."
                 )
 
@@ -378,7 +380,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.loading_basis and unit_to == self.loading_unit:
             if verbose:
-                logging.info("Basis and units are the same, no changes made.")
+                logger.info("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -404,7 +406,7 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                logging.info(
+                logger.info(
                     f"Changed loading to basis '{basis_to}', unit '{unit_to}'."
                 )
 
@@ -429,7 +431,7 @@ class PointIsotherm(Isotherm):
         """
         if basis_to == self.adsorbent_basis and unit_to == self.adsorbent_unit:
             if verbose:
-                logging.info("Basis and units are the same, no changes made.")
+                logger.info("Basis and units are the same, no changes made.")
 
         else:
             if not basis_to:
@@ -454,7 +456,7 @@ class PointIsotherm(Isotherm):
             self.p_interpolator = None
 
             if verbose:
-                logging.info(
+                logger.info(
                     f"Changed adsorbent to basis '{basis_to}', unit '{unit_to}'."
                 )
 

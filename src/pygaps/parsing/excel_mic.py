@@ -5,6 +5,8 @@
 """
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import re
 from itertools import product
 
@@ -283,7 +285,7 @@ def _check(data, path):
     if 'loading' in data:
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
-            logging.info('No data collected for %s in file %s.', empty, path)
+            logger.info(f'No data collected for {empty} in file {path}.')
     if 'errors' in data:
-        logging.warning('Report file contains warnings:')
-        logging.warning('\n'.join(data['errors']))
+        logger.warning('Report file contains warnings:')
+        logger.warning('\n'.join(data['errors']))

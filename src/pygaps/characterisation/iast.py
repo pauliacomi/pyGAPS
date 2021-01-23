@@ -1,6 +1,8 @@
 """Module calculating IAST, given the pure-component adsorption isotherm model."""
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import textwrap
 import warnings
 
@@ -259,9 +261,9 @@ def iast(
         )
 
     if verbose:
-        logging.info(f"{n_components:d} components.")
+        logger.info(f"{n_components:d} components.")
         for i in range(n_components):
-            logging.info(
+            logger.info(
                 f"\tPartial pressure component {i:d} = {partial_pressures[i]:.4f}"
             )
 
@@ -374,12 +376,12 @@ def iast(
     if verbose:
         # print IAST loadings and corresponding pure-component loadings
         for i in range(n_components):
-            logging.info(f"Component {i}")
-            logging.info(f"\tp = {partial_pressures[i]:.4f}")
-            logging.info(f"\tp^0 = {pressure0[i]:.4f}")
-            logging.info(f"\tLoading = {loadings[i]:.4f}")
-            logging.info(f"\tx = {adsorbed_mole_fractions[i]:.4f}")
-            logging.info(
+            logger.info(f"Component {i}")
+            logger.info(f"\tp = {partial_pressures[i]:.4f}")
+            logger.info(f"\tp^0 = {pressure0[i]:.4f}")
+            logger.info(f"\tLoading = {loadings[i]:.4f}")
+            logger.info(f"\tx = {adsorbed_mole_fractions[i]:.4f}")
+            logger.info(
                 f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i]):.4f}"
             )
 
@@ -472,9 +474,9 @@ def reverse_iast(
         )
 
     if verbose:
-        logging.info(f"{n_components:d} components.")
+        logger.info(f"{n_components:d} components.")
         for i in range(n_components):
-            logging.info(
+            logger.info(
                 f"\tDesired adsorbed phase mole fraction of component {i:d} = {adsorbed_mole_fractions[i]:.4f}"
             )
 
@@ -580,16 +582,16 @@ def reverse_iast(
     if verbose:
         # print off IAST loadings and corresponding pure component loadings
         for i in range(n_components):
-            logging.info(f"Component {i}")
-            logging.info(
+            logger.info(f"Component {i}")
+            logger.info(
                 f"\tDesired mole fraction in adsorbed phase, x = {adsorbed_mole_fractions[i]:.4f}"
             )
-            logging.info(
+            logger.info(
                 f"\tBulk gas mole fraction that gives this, y = {gas_mole_fractions[i]:.4f}"
             )
-            logging.info(f"\tp^0 = {pressure0[i]:.4f}")
-            logging.info(f"\tLoading = {loadings[i]:.4f}")
-            logging.info(
+            logger.info(f"\tp^0 = {pressure0[i]:.4f}")
+            logger.info(f"\tLoading = {loadings[i]:.4f}")
+            logger.info(
                 f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i]):.4f}"
             )
 

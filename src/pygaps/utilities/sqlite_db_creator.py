@@ -2,6 +2,8 @@
 
 import json
 import logging
+
+logger = logging.getLogger('pygaps')
 import sqlite3
 
 import pygaps
@@ -83,5 +85,5 @@ def db_execute_general(statement, pth, verbose=False):
 
     # Catch the exception
     except sqlite3.Error as e_info:
-        logging.info("Unable to execute statement", statement)
+        logger.info(f"Unable to execute statement: \n{statement}")
         raise ParsingError from e_info

@@ -1,6 +1,8 @@
 """Parse bel xls output files"""
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import re
 from itertools import product
 
@@ -114,7 +116,8 @@ def read_bel_report(path):
         try:
             field = next(
                 v for k, v in _FIELDS.items()
-                if any([cell_value.startswith(n) for n in v.get('text')]))
+                if any([cell_value.startswith(n) for n in v.get('text')])
+            )
         except StopIteration:
             continue
         if field['type'] == 'number':
@@ -122,8 +125,9 @@ def read_bel_report(path):
             data[field['name']] = val
         if field['type'] == 'date':
             day = sheet.cell(row + field['row'], col + field['column']).value
-            time = sheet.cell(row + 1 + field['row'],
-                              col + field['column']).value
+            time = sheet.cell(
+                row + 1 + field['row'], col + field['column']
+            ).value
             data[field['name']] = _handle_date(sheet, day + time)
         elif field['type'] == 'string':
             val = sheet.cell(row + field['row'], col + field['column']).value
@@ -156,8 +160,8 @@ def _handle_date(sheet, val):
     Input is a cell of type 'date'.
     """
     if val:
-        return xlrd.xldate.xldate_as_datetime(
-            val, sheet.book.datemode).strftime("%Y-%m-%d %H:%M:%S")
+        return xlrd.xldate.xldate_as_datetime(val, sheet.book.datemode
+                                              ).strftime("%Y-%m-%d %H:%M:%S")
     else:
         return None
 
@@ -176,14 +180,19 @@ def _get_data_labels(sheet, row, col):
     final_column = col
     header_row = _FIELDS['cell_value']['header']['row']
     # Abstract this sort of thing
-    header = re.sub(_RSPACE_REGEX, '',
-                    sheet.cell(row + header_row, final_column).value)
+    header = re.sub(
+        _RSPACE_REGEX, '',
+        sheet.cell(row + header_row, final_column).value
+    )
     while any(
-            header.startswith(label)
-            for label in _FIELDS['isotherm data']['labels']):
+        header.startswith(label)
+        for label in _FIELDS['isotherm data']['labels']
+    ):
         final_column += 1
-        header = re.sub(_RSPACE_REGEX, '',
-                        sheet.cell(row + header_row, final_column).value)
+        header = re.sub(
+            _RSPACE_REGEX, '',
+            sheet.cell(row + header_row, final_column).value
+        )
     return [
         re.sub(_RSPACE_REGEX, '',
                sheet.cell(row + header_row, i).value)
@@ -234,8 +243,8 @@ def _assign_data(item, field, data, ads_points, des_points):
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'loading':
         data['loading'] = ads_points + des_points
-        for (u, c) in (('/mmol', 'mmol'), ('/mol', 'mol'), ('/cm3(STP)',
-                                                            'cm3(STP)')):
+        for (u, c) in (('/mmol', 'mmol'), ('/mol', 'mol'),
+                       ('/cm3(STP)', 'cm3(STP)')):
             if u in item:
                 data['loading_unit'] = c
         for (u, c) in (('g-1', 'g'), ('kg-1', 'kg')):
@@ -245,12 +254,13 @@ def _assign_data(item, field, data, ads_points, des_points):
         data['measurement'] = [False] * \
             len(ads_points) + [True] * len(des_points)
     elif field['labels'][name] in [
-            'relative', 'absolute', 'saturation', 'absolute2', 'internal'
+        'relative', 'absolute', 'saturation', 'absolute2', 'internal'
     ]:
         data['pressure'][field['labels'][name]] = ads_points + des_points
     else:
         raise ValueError(
-            f"Label name '{field['labels'][name]}' not recognized.")
+            f"Label name '{field['labels'][name]}' not recognized."
+        )
 
 
 def _get_errors(sheet, row, col):
@@ -283,6 +293,6 @@ def _check(data, path):
     if 'loading' in data:
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
-            logging.info(f"No data collected for {empty} in file {path}.")
+            logger.info(f"No data collected for {empty} in file {path}.")
     if 'errors' in data:
-        logging.warning('\n'.join(data['errors']))
+        logger.warning('\n'.join(data['errors']))

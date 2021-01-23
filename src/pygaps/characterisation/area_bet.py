@@ -1,6 +1,8 @@
 """This module contains BET area calculations."""
 
 import logging
+
+logger = logging.getLogger('pygaps')
 import textwrap
 import warnings
 
@@ -141,8 +143,7 @@ def area_BET(isotherm, limits=None, verbose=False):
     ) = area_BET_raw(pressure, loading, cross_section, limits=limits)
 
     if verbose:
-
-        logging.info(
+        logger.info(
             textwrap.dedent(
                 f"""\
             BET surface area: a = {bet_area:.2e} m2/{isotherm.adsorbent_unit}

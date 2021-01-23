@@ -2,6 +2,8 @@
 
 import logging
 
+logger = logging.getLogger('pygaps')
+
 import numpy
 
 from ..core.modelisotherm import ModelIsotherm
@@ -96,12 +98,11 @@ def initial_henry_slope(
         else:
             break
 
-    # logging for debugging
     if verbose:
-        logging.info(f"Calculated K = {henry.params['K']:.2e}")
-        logging.info("Starting points:", initial_rows)
-        logging.info("Selected points:", rows_taken)
-        logging.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
+        logger.info(f"Calculated K = {henry.params['K']:.2e}")
+        logger.info(f"Starting points: {initial_rows}")
+        logger.info(f"Selected points: {rows_taken}")
+        logger.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
         params = {
             'plot_type': 'isotherm',
             'branch': 'ads',
