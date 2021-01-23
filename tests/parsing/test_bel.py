@@ -18,5 +18,4 @@ class TestBEL():
 
             json_path = str(path).replace('.DAT', '.json')
 
-            with open(json_path, 'r') as file:
-                assert isotherm == pygaps.isotherm_from_json(file.read())
+            assert isotherm == pygaps.isotherm_from_json(json_path)
