@@ -45,7 +45,6 @@ jobs:
 
     - name: Test with tox
       run: |
-        echo "Starting testing with tox in environment $TOXENV"
         tox -v
       env:
         TOXENV: ${{ matrix.toxenv }}
