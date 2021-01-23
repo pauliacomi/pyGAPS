@@ -6,10 +6,12 @@ __author__ = 'Paul A. Iacomi'
 __docformat__ = 'restructuredtext'
 __version__ = '2.0.2'
 
+import logging
+
 # This code is written for Python 3.
 import sys
 if sys.version_info[0] != 3:
-    print("pyGAPS requires Python 3.")
+    logging.error("pyGAPS requires Python 3.")
     sys.exit(1)
 
 # Let users know if they're missing any hard dependencies

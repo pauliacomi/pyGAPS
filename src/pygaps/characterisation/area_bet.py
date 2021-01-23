@@ -1,5 +1,6 @@
 """This module contains BET area calculations."""
 
+import logging
 import textwrap
 import warnings
 
@@ -141,7 +142,7 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     if verbose:
 
-        print(
+        logging.info(
             textwrap.dedent(
                 f"""\
             BET surface area: a = {bet_area:.2e} m2/{isotherm.adsorbent_unit}
