@@ -75,8 +75,8 @@ class Toth(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        return (loading / (self.params["n_m"]*self.params["K"])) / \
-            (1 - (loading/self.params["n_m"])**self.params["t"])**(1/self.params["t"])
+        return (loading / (self.params["n_m"] * self.params["K"])) / \
+            (1 - (loading / self.params["n_m"])**self.params["t"])**(1 / self.params["t"])
 
     def spreading_pressure(self, pressure):
         r"""

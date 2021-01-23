@@ -130,8 +130,8 @@ class BET(IsothermBaseModel):
         """
         return self.params["n_m"] * self.params["C"] * pressure / (
             (1.0 - self.params["N"] * pressure) *
-            (1.0 - self.params["N"] * pressure +
-             self.params["C"] * pressure))
+            (1.0 - self.params["N"] * pressure + self.params["C"] * pressure)
+        )
 
     def pressure(self, loading):
         """
@@ -157,7 +157,7 @@ class BET(IsothermBaseModel):
         x = loading * b * (b - c)
         y = loading * c - 2 * loading * b - a * c
 
-        res = (-y - numpy.sqrt(y**2 - 4*x*loading)) / (2*x)
+        res = (-y - numpy.sqrt(y**2 - 4 * x * loading)) / (2 * x)
 
         if numpy.isnan(res).any():
             res = numpy.nan_to_num(res, copy=False)
@@ -193,7 +193,8 @@ class BET(IsothermBaseModel):
         """
         return self.params["n_m"] * numpy.log(
             (1.0 - self.params["N"] * pressure + self.params["C"] * pressure) /
-            (1.0 - self.params["N"] * pressure))
+            (1.0 - self.params["N"] * pressure)
+        )
 
     def initial_guess(self, pressure, loading):
         """
@@ -211,7 +212,9 @@ class BET(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
         guess = {"n_m": saturation_loading, "C": langmuir_k, "N": 0.01}
 
