@@ -2,10 +2,25 @@
 Changelog
 =========
 
-3.0.0 (2020-xx-xx)
+3.0.0 (2021-0-xx)
 ------------------
 
 New features:
+
+improve import speed
+loading%
+tplot psd
+error from isosteric_enthalpy
+issue with isosteric enthalpy in non-converted isotherms
+
+todo testing & documentation
+    - relative%
+    - csv path or str
+
+get a cli
+
+
+error in isosteric if not in mol/g
 
  * Significant improvements to the Horvath-Kawazoe methods of pore size
    distribution, including more pore geometries (cylindrical and spherical
@@ -15,6 +30,8 @@ New features:
    ``json.dump`` function.
  * New convenience functions for isotherm parsing: `isotherm.to_json()`,
    `isotherm.to_csv()` and `isotherm.to_xl()`.
+ * Added new mode for loading as "fractional", or "percent". This ties the uptake to the same basis
+   as the adsorbate (i.e. weight%, volume%, mol% or fractions thereof)
  * The NIST isotherms based on "wt%" can also be converted.
  * Perform isotherm branch separation based on maximum pressure,
    rather than first derivative. In such way, slight uncertainty
@@ -29,7 +46,7 @@ New features:
 
 Breaking changes:
 
- * Included Python 3.8 as latest python and deprecated Python 3.5.
+ * Included Python 3.9/3.8 as versions and deprecated Python 3.5.
  * For isotherm pressure/loading, a `limits` tuple is now passed instead of
    `min_range` and `max_range`, as for other functions in pyGAPS.
  * JSON ModelIsotherms now have ``name`` instead of ``model`` as the model name.
