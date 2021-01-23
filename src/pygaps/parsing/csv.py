@@ -183,7 +183,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
                 val = values[1]
             raw_dict.update({values[0]: val})
             line = raw_csv.readline().rstrip()
-    except:
+    except Exception:
         raise ParsingError(
             "Could not parse JSON isotherm. "
             "The `str_or_path` is invalid or does not exist. "
