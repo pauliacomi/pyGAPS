@@ -15,7 +15,8 @@ before_install:
   - python --version    # print python version
 
 install:
-  - python -mpip install --progress-bar=off twine tox-wheel # install tox/twine
+  - python -m pip install --upgrade pip       # latest setuptools
+  - pip install twine tox-wheel               # install tox/twine
   # display versions of installed components
   - virtualenv --version
   - easy_install --version
