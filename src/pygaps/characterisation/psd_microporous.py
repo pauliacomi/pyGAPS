@@ -3,15 +3,16 @@ This module contains 'classical' methods of calculating a pore size distribution
 pores in the micropore range (<2 nm). These are derived from the Horvath-Kawazoe models.
 """
 
-from typing import List, Mapping
+import math
+from typing import List
+from typing import Mapping
 
 import numpy
-import math
 import scipy.constants as const
 import scipy.optimize as opt
 
-from ..core.isotherm import Isotherm
 from ..core.adsorbate import Adsorbate
+from ..core.isotherm import Isotherm
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
