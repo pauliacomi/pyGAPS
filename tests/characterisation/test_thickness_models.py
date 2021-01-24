@@ -14,7 +14,6 @@ at several points.
 import numpy
 import pytest
 
-import pygaps
 import pygaps.characterisation.models_thickness as mt
 import pygaps.utilities.exceptions as pgEx
 

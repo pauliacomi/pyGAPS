@@ -2,6 +2,11 @@
 
 import CoolProp
 
+import logging
+logger = logging.getLogger('pygaps')
+
+logger.debug(f"CoolProp version is '{CoolProp.__version__}'")
+
 #: The backend which CoolProp uses, normally either HEOS or REFPROP.
 COOLPROP_BACKEND = 'HEOS'
 

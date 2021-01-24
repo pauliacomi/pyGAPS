@@ -10,7 +10,6 @@ The purposes are:
 
 import pytest
 
-import pygaps
 import pygaps.characterisation.models_hk as hk
 import pygaps.utilities.exceptions as pgEx
 

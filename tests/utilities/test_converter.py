@@ -4,7 +4,6 @@ import pytest
 
 import pygaps
 from pygaps.utilities import converter_mode
-from pygaps.utilities import converter_unit
 
 
 @pytest.mark.core
