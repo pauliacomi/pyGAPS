@@ -12,6 +12,7 @@ import pytest
 
 import pygaps
 import pygaps.characterisation.models_hk as hk
+import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.characterisation
@@ -24,7 +25,7 @@ class TestHKModels():
 
     def test_get_hk_model_error(self):
         """Check if errors are raised."""
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             hk.get_hk_model('bad_model')
 
     def test_get_hk_model_dict(self):
@@ -41,5 +42,5 @@ class TestHKModels():
         # dictionary parameters should be checked
         model_dict.pop('molecular_diameter')
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             hk.get_hk_model(model_dict)

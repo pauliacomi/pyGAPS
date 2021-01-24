@@ -4,12 +4,12 @@ import warnings
 
 import CoolProp
 
-import pygaps
-
+from ..data import ADSORBATE_LIST
+from ..utilities.converter_unit import _PRESSURE_UNITS
+from ..utilities.converter_unit import c_unit
+from ..utilities.coolprop_utilities import COOLPROP_BACKEND
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import _PRESSURE_UNITS
-from ..utilities.unit_converter import c_unit
 
 
 class Adsorbate():
@@ -143,11 +143,11 @@ class Adsorbate():
         """Print a short summary of all the adsorbate parameters."""
         string = ""
 
-        string += ("Adsorbate: " + self.name + '\n')
-        string += ("Aliases: " + ", ".join(self.alias) + '\n')
+        string += f"Adsorbate: {self.name}\n"
+        string += f"Aliases: { *self.alias,}\n"
 
         for prop in self.properties:
-            string += (prop + ':' + str(self.properties.get(prop)) + '\n')
+            string += f"{prop}:{str(self.properties.get(prop))}\n"
 
         return string
 
@@ -174,11 +174,11 @@ class Adsorbate():
         if isinstance(name, Adsorbate):
             return name
         elif not isinstance(name, str):
-            raise ParameterError("Pass a string as a name.")
+            raise ParameterError("Pass a string as an adsorbate name.")
 
         # See if adsorbate exists in master list
         try:
-            return next(ads for ads in pygaps.ADSORBATE_LIST if ads == name)
+            return next(ads for ads in ADSORBATE_LIST if ads == name)
         except StopIteration:
             raise ParameterError(
                 f"Adsorbate '{name}' does not exist in list of adsorbates. "
@@ -188,10 +188,10 @@ class Adsorbate():
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
-        if not self._backend_mode or self._backend_mode != pygaps.COOLPROP_BACKEND:
-            self._backend_mode = pygaps.COOLPROP_BACKEND
+        if not self._backend_mode or self._backend_mode != COOLPROP_BACKEND:
+            self._backend_mode = COOLPROP_BACKEND
             self._state = CoolProp.AbstractState(
-                pygaps.COOLPROP_BACKEND, self.backend_name()
+                COOLPROP_BACKEND, self.backend_name()
             )
 
         return self._state

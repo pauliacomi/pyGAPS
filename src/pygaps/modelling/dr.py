@@ -2,8 +2,8 @@
 
 import numpy
 import scipy.constants as const
-import scipy.integrate as integrate
 
+from ..characterisation import scipy
 from .base_model import IsothermBaseModel
 
 
@@ -127,7 +127,7 @@ class DR(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
+        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """

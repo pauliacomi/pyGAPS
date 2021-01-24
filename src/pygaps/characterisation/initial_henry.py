@@ -104,9 +104,8 @@ def initial_henry_slope(
         logger.info(f"Selected points: {rows_taken}")
         logger.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
         params = {
-            'plot_type': 'isotherm',
             'branch': 'ads',
-            'fig_title': (' '.join([isotherm.material])),
+            'fig_title': str(isotherm.material),
             'lgd_keys': ['adsorbate', 'temperature'],
             'lgd_pos': 'bottom'
         }

@@ -17,6 +17,7 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_CALO
 from .conftest import DATA_CALO_PATH
@@ -29,7 +30,7 @@ class TestInitialEnthalpyPoint():
         """Checks for built-in safeguards."""
 
         # Will raise a "can't find enthalpy column error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.initial_enthalpy_point(basic_pointisotherm, 'wrong')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])
@@ -63,7 +64,7 @@ class TestInitialEnthalpyFit():
         """Checks for built-in safeguards."""
 
         # Will raise a "can't find enthalpy column error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.initial_enthalpy_comp(basic_pointisotherm, 'wrong')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])

@@ -257,17 +257,22 @@ def plot_iso(
 
     # Build the name of the axes
     def get_name(key):
-        if key == 'pressure':
+        if key == "pressure":
             if pressure_mode == "absolute":
-                text = 'Pressure ($' + pressure_unit + '$)'
+                text = f"Pressure [${pressure_unit}$]"
             elif pressure_mode == "relative":
-                text = "$p/p^0$"
+                text = "Pressure [$p/p^0$]"
             elif pressure_mode == "relative%":
-                text = "%$ p/p^0$"
+                text = "Pressure [%$p/p^0$]"
         elif key == 'loading':
-            text = 'Loading ($' + loading_unit + r'\/' + adsorbent_unit + '^{-1}$)'
-        elif key == 'enthalpy':
-            text = r'$\Delta_{ads}h$ $(-kJ\/mol^{-1})$'
+            if loading_basis == "percent":
+                text = f"Loading [${adsorbent_basis}$%]"
+            elif loading_basis == "fractional":
+                text = f"Loading [${adsorbent_basis}\/fraction$]"
+            else:
+                text = fr"Loading [${loading_unit}\/{adsorbent_unit}^{{-1}}$]"
+        elif key == "enthalpy":
+            text = r"$\Delta_{ads}h$ $(-kJ\/mol^{-1})$"
         else:
             text = key
         return text

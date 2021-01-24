@@ -17,6 +17,7 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -29,7 +30,7 @@ class TestTPlot():
         """Checks for built-in safeguards."""
 
         # Will raise a "no suitable model exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.t_plot(basic_pointisotherm, thickness_model='random')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])

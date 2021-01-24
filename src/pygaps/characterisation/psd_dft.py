@@ -9,7 +9,6 @@ from pathlib import Path
 import numpy
 import pandas
 import scipy.interpolate as interp
-import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
@@ -17,6 +16,7 @@ from ..graphing.isotherm_graphs import plot_iso
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import bspline
+from . import scipy
 
 _KERNELS = {
     'DFT-N2-77K-carbon-slit':
@@ -317,7 +317,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     # # run the optimisation algorithm
     guess = numpy.array([0 for pore in pore_widths])
     bounds = [(0, None) for pore in pore_widths]
-    result = opt.minimize(
+    result = scipy.optimize.minimize(
         sum_squares,
         guess,
         method='SLSQP',

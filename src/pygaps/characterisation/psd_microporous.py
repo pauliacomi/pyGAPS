@@ -9,13 +9,13 @@ from typing import Mapping
 
 import numpy
 import scipy.constants as const
-import scipy.optimize as opt
 
 from ..core.adsorbate import Adsorbate
 from ..core.isotherm import Isotherm
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from . import scipy
 from .models_hk import HK_KEYS
 from .models_hk import get_hk_model
 
@@ -1108,7 +1108,7 @@ def _solve_hk(pressure, hk_fun, bound, geo):
         def fun(l_pore):
             return (numpy.exp(hk_fun(l_pore)) - p_point)**2
 
-        res = opt.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
+        res = scipy.optimize.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
         p_w.append(res.x)
 
         # we will stop if reaching unrealistic pore sizes
@@ -1135,7 +1135,7 @@ def _solve_hk_cy(pressure, loading, hk_fun, bound, geo):
         def fun(l_pore):
             return (numpy.exp(hk_fun(l_pore) - sf_corr) - p_point)**2
 
-        res = opt.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
+        res = scipy.optimize.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
         p_w.append(res.x)
 
         # we will stop if reaching unrealistic pore sizes

@@ -8,11 +8,11 @@ from pygaps.core.isotherm import Isotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
+from pygaps.utilities.converter_mode import _MASS_UNITS
+from pygaps.utilities.converter_mode import _MOLAR_UNITS
+from pygaps.utilities.converter_mode import _PRESSURE_UNITS
+from pygaps.utilities.converter_mode import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
-from pygaps.utilities.unit_converter import _MASS_UNITS
-from pygaps.utilities.unit_converter import _MOLAR_UNITS
-from pygaps.utilities.unit_converter import _PRESSURE_UNITS
-from pygaps.utilities.unit_converter import _VOLUME_UNITS
 
 
 def isotherm_to_json(isotherm, path=None, **args_to_json):

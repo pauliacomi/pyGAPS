@@ -1,8 +1,8 @@
 """Triple Site Langmuir isotherm model."""
 
 import numpy
-import scipy.optimize as opt
 
+from ..characterisation import scipy
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
@@ -95,7 +95,7 @@ class TSLangmuir(IsothermBaseModel):
         def fun(x):
             return self.loading(x) - loading
 
-        opt_res = opt.root(fun, 0, method='hybr')
+        opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {loading} failed.")

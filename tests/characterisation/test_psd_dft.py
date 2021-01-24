@@ -21,6 +21,7 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 import pygaps.characterisation.psd_dft as pdft
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -32,11 +33,11 @@ class TestPSDDFT():
     def test_psd_dft_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
         # Will raise a "no kernel exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pdft.psd_dft(basic_pointisotherm, kernel=None)
 
         # Will raise a "no applicable branch exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pdft.psd_dft(basic_pointisotherm, branch='test')
 
     @pytest.mark.parametrize('kernel', [

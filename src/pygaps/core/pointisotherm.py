@@ -11,12 +11,12 @@ import numpy
 import pandas
 
 from ..graphing.isotherm_graphs import plot_iso
+from ..utilities.converter_mode import c_adsorbent
+from ..utilities.converter_mode import c_loading
+from ..utilities.converter_mode import c_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.isotherm_interpolator import IsothermInterpolator
-from ..utilities.unit_converter import c_adsorbent
-from ..utilities.unit_converter import c_loading
-from ..utilities.unit_converter import c_pressure
 from .isotherm import Isotherm
 
 
@@ -342,9 +342,7 @@ class PointIsotherm(Isotherm):
                 mode_to=mode_to,
                 unit_from=self.pressure_unit,
                 unit_to=unit_to,
-                adsorbate_name=self.adsorbate,
-                temp=self.temperature
-            )
+            adsorbate=self.adsorbate,
 
             if unit_to != self.pressure_unit and mode_to == 'absolute':
                 self.pressure_unit = unit_to
@@ -388,12 +386,7 @@ class PointIsotherm(Isotherm):
 
             self.data_raw[self.loading_key] = c_loading(
                 self.data_raw[self.loading_key],
-                basis_from=self.loading_basis,
-                basis_to=basis_to,
-                unit_from=self.loading_unit,
-                unit_to=unit_to,
-                adsorbate_name=self.adsorbate,
-                temp=self.temperature
+            adsorbate=self.adsorbate,
             )
 
             if basis_to != self.loading_basis:
@@ -597,7 +590,7 @@ class PointIsotherm(Isotherm):
                     mode_to=pressure_mode,
                     unit_from=self.pressure_unit,
                     unit_to=pressure_unit,
-                    adsorbate_name=self.adsorbate,
+                    adsorbate=self.adsorbate,
                     temp=self.temperature
                 )
 
@@ -682,7 +675,7 @@ class PointIsotherm(Isotherm):
                     basis_to=loading_basis,
                     unit_from=self.loading_unit,
                     unit_to=loading_unit,
-                    adsorbate_name=self.adsorbate,
+                    adsorbate=self.adsorbate,
                     temp=self.temperature
                 )
 
@@ -864,7 +857,7 @@ class PointIsotherm(Isotherm):
                 basis_to=self.loading_basis,
                 unit_from=loading_unit,
                 unit_to=self.loading_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 
@@ -884,7 +877,7 @@ class PointIsotherm(Isotherm):
                 mode_to=pressure_mode,
                 unit_from=self.pressure_unit,
                 unit_to=pressure_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 
@@ -979,7 +972,7 @@ class PointIsotherm(Isotherm):
                 mode_to=self.pressure_mode,
                 unit_from=pressure_unit,
                 unit_to=self.pressure_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 
@@ -1010,7 +1003,7 @@ class PointIsotherm(Isotherm):
                 basis_to=loading_basis,
                 unit_from=self.loading_unit,
                 unit_to=loading_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 

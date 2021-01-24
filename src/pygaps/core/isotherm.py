@@ -4,13 +4,14 @@ import warnings
 
 import numpy
 
-import pygaps
+from pygaps.core.material import Material
 
+from ..core.adsorbate import Adsorbate
+from ..utilities.converter_mode import _MATERIAL_MODE
+from ..utilities.converter_mode import _PRESSURE_MODE
+from ..utilities.converter_unit import _PRESSURE_UNITS
 from ..utilities.exceptions import ParameterError
 from ..utilities.hashgen import isotherm_to_hash
-from ..utilities.unit_converter import _MATERIAL_MODE
-from ..utilities.unit_converter import _PRESSURE_MODE
-from ..utilities.unit_converter import _PRESSURE_UNITS
 
 
 class Isotherm():
@@ -94,19 +95,26 @@ class Isotherm():
                 f"Isotherm MUST have the following properties:{self._required_params}"
             )
 
-        #: Isotherm material name.
-        self.material = str(properties.pop('material'))
-        #: Isotherm experimental temperature.
+        # Isotherm temperature.
         self.temperature = float(properties.pop('temperature'))
-        #: Isotherm adsorbate.
+
+        # Isotherm material
+        self.material = properties.pop('material')
+        try:
+            self.material = Material.find(self.material)
+        except ParameterError:
+            self.material = Material(self.material)
+
+        # Isotherm adsorbate
         self.adsorbate = properties.pop('adsorbate')
         try:
-            self.adsorbate = pygaps.Adsorbate.find(self.adsorbate)
-        except pygaps.ParameterError:
+            self.adsorbate = Adsorbate.find(self.adsorbate)
+        except ParameterError:
+            self.adsorbate = Adsorbate(self.adsorbate)
             warnings.warn((
-                "Specified adsorbent is not in internal list "
+                "Specified adsorbate is not in internal list "
                 "(or name cannot be resolved to an existing one). "
-                "CoolProp backend disabled for this adsorbent."
+                "CoolProp backend disabled for this gas/vapour."
             ))
 
         # Isotherm units
@@ -212,28 +220,23 @@ class Isotherm():
         string = ""
 
         # Required
-        string += ("Material: " + str(self.material) + '\n')
-        string += ("Adsorbate: " + str(self.adsorbate) + '\n')
-        string += ("Temperature: " + str(self.temperature) + "K" + '\n')
+        string += f"Material: { str(self.material) }\n"
+        string += f"Adsorbate: { str(self.adsorbate) }\n"
+        string += f"Temperature: { str(self.temperature) }K\n"
 
         # Units/basis
-        string += ("Units: \n")
-        string += (
-            "\tUptake in: " + str(self.loading_unit) + "/" +
-            str(self.adsorbent_unit) + '\n'
-        )
+        string += "Units: \n"
+        string += f"\tUptake in: {self.loading_unit}/{self.adsorbent_unit}\n"
         if self.pressure_mode.startswith('relative'):
-            string += ("\tRelative pressure \n")
+            string += "\tRelative pressure\n"
         else:
-            string += ("\tPressure in: " + str(self.pressure_unit) + '\n')
+            string += f"\tPressure in: {self.pressure_unit}\n"
 
-        string += ("Other properties: \n")
+        string += "Other properties: \n"
         for prop in vars(self):
             if prop not in self._required_params + \
                     list(self._unit_params) + self._reserved_params:
-                string += (
-                    '\t' + prop + ": " + str(getattr(self, prop)) + '\n'
-                )
+                string += (f"\t{prop}: {str(getattr(self, prop))}\n")
 
         return string
 
@@ -249,8 +252,9 @@ class Isotherm():
         """
         parameter_dict = vars(self).copy()
 
-        # This line is here to ensure that adsorbate is copied as a string
+        # These line are here to ensure that material/adsorbate are copied as a string
         parameter_dict['adsorbate'] = str(parameter_dict['adsorbate'])
+        parameter_dict['material'] = str(parameter_dict['material'])
 
         # Remove reserved parameters
         for param in self._reserved_params:
@@ -275,7 +279,8 @@ class Isotherm():
             If path is None, returns the resulting json format as a string.
             Otherwise returns None.
         """
-        return pygaps.isotherm_to_json(self, path, **kwargs)
+        from ..parsing.json import isotherm_to_json
+        return isotherm_to_json(self, path, **kwargs)
 
     def to_csv(self, path=None, separator=',', **kwargs):
         """
@@ -294,7 +299,8 @@ class Isotherm():
             If path is None, returns the resulting json format as a string.
             Otherwise returns None.
         """
-        return pygaps.isotherm_to_csv(self, path, separator, **kwargs)
+        from ..parsing.csv import isotherm_to_csv
+        return isotherm_to_csv(self, path, separator, **kwargs)
 
     def to_xl(self, path, **kwargs):
         """
@@ -306,7 +312,8 @@ class Isotherm():
             Path where to save Excel file.
 
         """
-        return pygaps.isotherm_to_xl(self, path, **kwargs)
+        from ..parsing.excel import isotherm_to_xl
+        return isotherm_to_xl(self, path, **kwargs)
 
     def to_db(
         self,
@@ -333,8 +340,14 @@ class Isotherm():
             Extra information printed to console.
 
         """
-        return pygaps.isotherm_to_db(
-            self, db_path=db_path, verbose=verbose, **kwargs
+        from ..parsing.sqlite import isotherm_to_db
+        return isotherm_to_db(
+            self,
+            db_path=db_path,
+            autoinsert_material=autoinsert_material,
+            autoinsert_adsorbate=autoinsert_adsorbate,
+            verbose=verbose,
+            **kwargs
         )
 
     # Figure out the adsorption and desorption branches

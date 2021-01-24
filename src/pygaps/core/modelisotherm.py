@@ -13,11 +13,11 @@ from ..modelling import _GUESS_MODELS
 from ..modelling import _MODELS
 from ..modelling import get_isotherm_model
 from ..modelling import is_base_model
+from ..utilities.converter_mode import c_adsorbent
+from ..utilities.converter_mode import c_loading
+from ..utilities.converter_mode import c_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from ..utilities.unit_converter import c_adsorbent
-from ..utilities.unit_converter import c_loading
-from ..utilities.unit_converter import c_pressure
 from .isotherm import Isotherm
 
 
@@ -430,11 +430,9 @@ class ModelIsotherm(Isotherm):
         """
         attempts = []
         if models == 'all':
-            guess_models = [md.name for md in _GUESS_MODELS]
+            guess_models = _GUESS_MODELS
         else:
-            guess_models = [
-                m for m in models if m in [md.name for md in _MODELS]
-            ]
+            guess_models = [m for m in models if m in _MODELS]
             if len(guess_models) != len(models):
                 raise ParameterError(
                     'Not all models provided correspond to internal models.'
@@ -544,7 +542,6 @@ class ModelIsotherm(Isotherm):
 
         """
         plot_dict = dict(
-            plot_type='isotherm',
             adsorbent_basis=self.adsorbent_basis,
             adsorbent_unit=self.adsorbent_unit,
             loading_basis=self.loading_basis,
@@ -643,7 +640,7 @@ class ModelIsotherm(Isotherm):
                     mode_to=pressure_mode,
                     unit_from=self.pressure_unit,
                     unit_to=pressure_unit,
-                    adsorbate_name=self.adsorbate,
+                    adsorbate=self.adsorbate,
                     temp=self.temperature
                 )
         else:
@@ -745,7 +742,7 @@ class ModelIsotherm(Isotherm):
                     basis_to=loading_basis,
                     unit_from=self.loading_unit,
                     unit_to=loading_unit,
-                    adsorbate_name=self.adsorbate,
+                    adsorbate=self.adsorbate,
                     temp=self.temperature
                 )
         else:
@@ -864,7 +861,7 @@ class ModelIsotherm(Isotherm):
                 basis_to=self.loading_basis,
                 unit_from=loading_unit,
                 unit_to=self.loading_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 
@@ -884,7 +881,7 @@ class ModelIsotherm(Isotherm):
                 mode_to=pressure_mode,
                 unit_from=self.pressure_unit,
                 unit_to=pressure_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 
@@ -966,7 +963,7 @@ class ModelIsotherm(Isotherm):
                 mode_to=self.pressure_mode,
                 unit_from=pressure_unit,
                 unit_to=self.pressure_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 
@@ -997,7 +994,7 @@ class ModelIsotherm(Isotherm):
                 basis_to=loading_basis,
                 unit_from=self.loading_unit,
                 unit_to=loading_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 
@@ -1065,7 +1062,7 @@ class ModelIsotherm(Isotherm):
                 mode_to=self.pressure_mode,
                 unit_from=pressure_unit,
                 unit_to=self.pressure_unit,
-                adsorbate_name=self.adsorbate,
+                adsorbate=self.adsorbate,
                 temp=self.temperature
             )
 

@@ -21,6 +21,7 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 import pygaps.characterisation.psd_mesoporous as pmes
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -33,19 +34,19 @@ class TestPSDMeso():
         """Checks for built-in safeguards."""
 
         # Will raise a "no model exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmes.psd_mesoporous(basic_pointisotherm, psd_model=None)
 
         # Will raise a "no suitable model exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmes.psd_mesoporous(basic_pointisotherm, psd_model='test')
 
         # Will raise a "no applicable geometry exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmes.psd_mesoporous(basic_pointisotherm, pore_geometry='test')
 
         # Will raise a "no applicable branch exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmes.psd_mesoporous(basic_pointisotherm, branch='test')
 
     @pytest.mark.parametrize('method', [

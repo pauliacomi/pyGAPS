@@ -17,6 +17,7 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -29,14 +30,14 @@ class TestDAPlot():
         """Checks for built-in safeguards."""
 
         # Will raise a "negative exponent" error.
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.da_plot(basic_pointisotherm, exp=-2)
 
         filepath = DATA_N77_PATH / DATA['Takeda 5A']['file']
         isotherm = pygaps.isotherm_from_json(filepath)
 
         # Will raise "bad limits" error.
-        with pytest.raises(pygaps.CalculationError):
+        with pytest.raises(pgEx.CalculationError):
             pygaps.dr_plot(isotherm, limits=[0.2, 0.1])
 
         # These limits work

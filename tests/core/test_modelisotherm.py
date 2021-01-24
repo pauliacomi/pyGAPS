@@ -6,6 +6,7 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from ..characterisation.conftest import DATA
 from ..characterisation.conftest import DATA_N77_PATH
@@ -62,23 +63,23 @@ class TestModelIsotherm():
         )
 
         # Missing pressure/loading
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm(
                 pressure=pressure, loading=None, **isotherm_param
             )
 
         # Missing model
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm(isotherm_data=isotherm_data, **isotherm_param)
 
         # Wrong model
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data=isotherm_data, model='Wrong', **isotherm_param
             )
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data=isotherm_data,
                 model='Henry',
@@ -86,7 +87,7 @@ class TestModelIsotherm():
             )
 
         # Wrong parameters
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm(
                 isotherm_data=isotherm_data,
                 model='Henry',
@@ -142,7 +143,7 @@ class TestModelIsotherm():
             isotherm, guess_model=['Henry', 'Langmuir'], verbose=True
         )
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm.from_pointisotherm(
                 isotherm, guess_model=['Henry', 'DummyModel'], verbose=True
             )
@@ -151,7 +152,7 @@ class TestModelIsotherm():
         """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_modelisotherm.pressure(branch='des')
 
         # Regular return
@@ -186,7 +187,7 @@ class TestModelIsotherm():
         """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_modelisotherm.loading(branch='des')
 
         # Standard return
@@ -227,7 +228,7 @@ class TestModelIsotherm():
         """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_modelisotherm.loading_at(1, branch='des')
 
         # Standard return
@@ -273,7 +274,7 @@ class TestModelIsotherm():
         """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_modelisotherm.pressure_at(1, branch='des')
 
         # Standard return
@@ -322,7 +323,7 @@ class TestModelIsotherm():
         """Check that all the functions in ModelIsotherm return their specified parameter."""
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_modelisotherm.spreading_pressure_at(1, branch='des')
 
         # Standard return

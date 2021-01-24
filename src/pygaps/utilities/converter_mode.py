@@ -1,36 +1,11 @@
-"""Perform conversions between different units used."""
+"""Perform conversions between different variables used."""
 
-import pygaps
-
+from .converter_unit import _MASS_UNITS
+from .converter_unit import _MOLAR_UNITS
+from .converter_unit import _PRESSURE_UNITS
+from .converter_unit import _VOLUME_UNITS
+from .converter_unit import c_unit
 from .exceptions import ParameterError
-
-_MOLAR_UNITS = {
-    "mol": 1,
-    "mmol": 0.001,
-    "kmol": 1000,
-    "cm3(STP)": 4.461e-5,
-    "ml": 4.461e-5,
-}
-_MASS_UNITS = {
-    'mg': 0.001,
-    'g': 1,
-    'kg': 1000,
-}
-_VOLUME_UNITS = {
-    'cm3': 1,
-    'ml': 1,
-    'dm3': 1e3,
-    'l': 1e3,
-    'm3': 1e6,
-}
-_PRESSURE_UNITS = {
-    "bar": 100000,
-    "Pa": 1,
-    "kPa": 1000,
-    "atm": 101325,
-    "mmHg": 133.322,
-    "torr": 133.322,
-}
 
 _PRESSURE_MODE = {
     "absolute": _PRESSURE_UNITS,
@@ -48,13 +23,7 @@ _MATERIAL_MODE = {
 
 
 def c_pressure(
-    value,
-    mode_from,
-    mode_to,
-    unit_from,
-    unit_to,
-    adsorbate_name=None,
-    temp=None
+    value, mode_from, mode_to, unit_from, unit_to, adsorbate=None, temp=None
 ):
     """
     Convert pressure units and modes.
@@ -74,8 +43,8 @@ def c_pressure(
         Unit from which to convert.
     unit_from : str
         Unit to which to convert.
-    adsorbate_name : str, optional
-        Name of the adsorbate on which the pressure is to be
+    adsorbate : Adsorbate, optional
+        Adsorbate on which the pressure is to be
         converted. Required for mode change.
     temp : float, optional
         Temperature at which the pressure is measured, in K.
@@ -132,9 +101,7 @@ def c_pressure(
                     "A temperature is required for this conversion."
                 )
 
-            factor = pygaps.Adsorbate.find(adsorbate_name).saturation_pressure(
-                temp, unit=unit
-            )
+            factor = adsorbate.saturation_pressure(temp, unit=unit)
 
             if "relative%" in [mode_to, mode_from]:
                 factor = factor / 100
@@ -162,7 +129,7 @@ def c_loading(
     basis_to,
     unit_from,
     unit_to,
-    adsorbate_name=None,
+    adsorbate=None,
     temp=None
 ):
     """
@@ -183,9 +150,8 @@ def c_loading(
         Unit from which to convert.
     unit_from : str
         Unit to which to convert.
-    adsorbate_name : str
-        Name of the adsorbate on which the pressure is to be
-        converted.
+    adsorbate : str
+        Adsorbate for which the pressure is to be converted.
     temp : float
         Temperature at which the pressure is measured, in K.
 
@@ -230,31 +196,24 @@ def c_loading(
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(
-                    temp=temp
-                )
+                constant = adsorbate.gas_density(temp=temp)
                 sign = -1
             elif basis_to == 'molar':
-                constant = pygaps.Adsorbate.find(adsorbate_name).molar_mass()
+                constant = adsorbate.molar_mass()
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(
-                    temp=temp
-                )
+                constant = adsorbate.gas_density(temp=temp)
                 sign = 1
             elif basis_to == 'molar':
-                adsorbate = pygaps.Adsorbate.find(adsorbate_name)
-                constant = pygaps.Adsorbate.find(adsorbate_name).gas_density(
-                    temp=temp
-                ) / adsorbate.molar_mass()
+                constant = adsorbate.gas_density(temp=temp
+                                                 ) / adsorbate.molar_mass()
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = pygaps.Adsorbate.find(adsorbate_name).molar_mass()
+                constant = adsorbate.molar_mass()
                 sign = 1
             elif basis_to == 'volume':
-                adsorbate = pygaps.Adsorbate.find(adsorbate_name)
                 constant = adsorbate.gas_density(temp=temp
                                                  ) / adsorbate.molar_mass()
                 sign = -1
@@ -329,35 +288,25 @@ def c_adsorbent(
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = pygaps.core.material.Material.find(
-                    material
-                ).get_prop('density')
+                constant = material.get_prop('density')
                 sign = -1
             elif basis_to == 'molar':
-                constant = pygaps.core.material.Material.find(
-                    material
-                ).get_prop('molar_mass')
+                constant = material.get_prop('molar_mass')
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = pygaps.core.material.Material.find(
-                    material
-                ).get_prop('density')
+                constant = material.get_prop('density')
                 sign = 1
             elif basis_to == 'molar':
-                material = pygaps.core.material.Material.find(material)
                 constant = material.get_prop('density') / material.get_prop(
                     'molar_mass'
                 )
                 sign = -1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = pygaps.core.material.Material.find(
-                    material
-                ).get_prop('molar_mass')
+                constant = material.get_prop('molar_mass')
                 sign = 1
             elif basis_to == 'volume':
-                material = pygaps.core.material.Material.find(material)
                 constant = material.get_prop('density') / material.get_prop(
                     'molar_mass'
                 )
@@ -373,40 +322,3 @@ def c_adsorbent(
         )
 
     return value
-
-
-def c_unit(unit_list, value, unit_from, unit_to, sign=1):
-    """
-    Convert units based on their proportions in a dictionary.
-
-    Parameters
-    ----------
-    unit_list : dict
-        The dictionary with the units and their relationship.
-    value : dict
-        The value to convert.
-    unit_from : str
-        Unit from which to convert.
-    unit_from : str
-        Unit to which to convert.
-    sign : int
-        If the conversion is inverted or not.
-
-    Returns
-    -------
-    float
-        Value converted as requested.
-
-    Raises
-    ------
-    ``ParameterError``
-        If the unit selected is not an option.
-    """
-    if unit_to not in unit_list or unit_from not in unit_list:
-        raise ParameterError(
-            f"Units selected for conversion (from {unit_from} to {unit_to}) are not an option. "
-            f"Viable units are {unit_list.keys()}"
-        )
-
-    return value * \
-        (unit_list[unit_from] / unit_list[unit_to]) ** sign

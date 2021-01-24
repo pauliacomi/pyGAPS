@@ -34,8 +34,12 @@ import pytest
 
 MODEL_DATA = {
     'Henry': {
-        'initial_guess': {'K': 11},
-        'test_parameters': {'K': 2},
+        'initial_guess': {
+            'K': 11
+        },
+        'test_parameters': {
+            'K': 2
+        },
         'test_values': {
             'pressure': [0.0, 1.0, 3.0],
             'loading': [0.0, 2.0, 6.0],
@@ -44,8 +48,14 @@ MODEL_DATA = {
         }
     },
     'Langmuir': {
-        'initial_guess': {'K': 10, 'n_m': 1.1},
-        'test_parameters': {'K': 3, 'n_m': 5},
+        'initial_guess': {
+            'K': 10,
+            'n_m': 1.1
+        },
+        'test_parameters': {
+            'K': 3,
+            'n_m': 5
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.153846154, 3.75, 4.838709677],
@@ -54,8 +64,18 @@ MODEL_DATA = {
         }
     },
     'DSLangmuir': {
-        'initial_guess': {'K1': 4, 'n_m1': 0.55, 'K2': 6, 'n_m2': 0.55},
-        'test_parameters': {'K1': 3, 'n_m1': 5, 'K2': 10, 'n_m2': 1},
+        'initial_guess': {
+            'K1': 4,
+            'n_m1': 0.55,
+            'K2': 6,
+            'n_m2': 0.55
+        },
+        'test_parameters': {
+            'K1': 3,
+            'n_m1': 5,
+            'K2': 10,
+            'n_m2': 1
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.653846154, 4.659090909, 5.828808687],
@@ -64,8 +84,22 @@ MODEL_DATA = {
         }
     },
     'TSLangmuir': {
-        'initial_guess': {'K1': 2, 'n_m1': 0.44, 'K2': 4, 'n_m2': 0.44, 'K3': 4, 'n_m3': 0.22},
-        'test_parameters': {'K1': 3, 'n_m1': 5, 'K2': 10, 'n_m2': 1, 'K3': 0.1, 'n_m3': 10},
+        'initial_guess': {
+            'K1': 2,
+            'n_m1': 0.44,
+            'K2': 4,
+            'n_m2': 0.44,
+            'K3': 4,
+            'n_m3': 0.22
+        },
+        'test_parameters': {
+            'K1': 3,
+            'n_m1': 5,
+            'K2': 10,
+            'n_m2': 1,
+            'K3': 0.1,
+            'n_m3': 10
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.752856055, 5.568181818, 10.82880869],
@@ -74,8 +108,16 @@ MODEL_DATA = {
         }
     },
     'BET': {
-        'initial_guess': {'C': 10, 'N': 0.01, 'n_m': 1.1},
-        'test_parameters': {'C': 5, 'N': 0.05, 'n_m': 10},
+        'initial_guess': {
+            'C': 10,
+            'N': 0.01,
+            'n_m': 1.1
+        },
+        'test_parameters': {
+            'C': 5,
+            'N': 0.05,
+            'n_m': 10
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 3.361288046, 8.845643521, 19.8019802],
@@ -84,8 +126,16 @@ MODEL_DATA = {
         }
     },
     'GAB': {
-        'initial_guess': {'C': 100, 'K': 0.01, 'n_m': 1.1},
-        'test_parameters': {'C': 50, 'K': 0.01, 'n_m': 10},
+        'initial_guess': {
+            'C': 100,
+            'K': 0.01,
+            'n_m': 1.1
+        },
+        'test_parameters': {
+            'C': 50,
+            'K': 0.01,
+            'n_m': 10
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 0.477121545, 3.389600705, 9.416195857],
@@ -94,8 +144,14 @@ MODEL_DATA = {
         }
     },
     'Freundlich': {
-        'initial_guess': {'K': 11, 'm': 1},
-        'test_parameters': {'K': 5, 'm': 5},
+        'initial_guess': {
+            'K': 11,
+            'm': 1
+        },
+        'test_parameters': {
+            'K': 5,
+            'm': 5
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 3.154786722, 5.0, 7.924465962],
@@ -104,8 +160,16 @@ MODEL_DATA = {
         }
     },
     'DA': {
-        'initial_guess': {'e': 1000, 'n_m': 1.1, 'm': 1},
-        'test_parameters': {'e': 3000, 'n_m': 10, 'm': 3},
+        'initial_guess': {
+            'e': 1000,
+            'n_m': 1.1,
+            'm': 1
+        },
+        'test_parameters': {
+            'e': 3000,
+            'n_m': 10,
+            'm': 3
+        },
         'test_values': {
             'pressure': [0.1, 0.5, 1.0],
             'loading': [6.362582158, 9.877415087, 10.0],
@@ -114,8 +178,14 @@ MODEL_DATA = {
         }
     },
     'DR': {
-        'initial_guess': {'e': 1000, 'n_m': 1.1},
-        'test_parameters': {'e': 2000, 'n_m': 10},
+        'initial_guess': {
+            'e': 1000,
+            'n_m': 1.1
+        },
+        'test_parameters': {
+            'e': 2000,
+            'n_m': 10
+        },
         'test_values': {
             'pressure': [0.1, 0.5, 1.0],
             'loading': [2.656768582, 8.868199956, 10.0],
@@ -124,8 +194,16 @@ MODEL_DATA = {
         }
     },
     'Quadratic': {
-        'initial_guess': {'n_m': 0.55, 'Ka': 10, 'Kb': 100},
-        'test_parameters': {'n_m': 10, 'Ka': 0.1, 'Kb': 1},
+        'initial_guess': {
+            'n_m': 0.55,
+            'Ka': 10,
+            'Kb': 100
+        },
+        'test_parameters': {
+            'n_m': 10,
+            'Ka': 0.1,
+            'Kb': 1
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 0.294117647, 10.0, 19.70588235],
@@ -134,8 +212,16 @@ MODEL_DATA = {
         }
     },
     'TemkinApprox': {
-        'initial_guess': {'n_m': 1.1, 'K': 10, 'tht': 0},
-        'test_parameters': {'n_m': 5, 'K': 5, 'tht': 1},
+        'initial_guess': {
+            'n_m': 1.1,
+            'K': 10,
+            'tht': 0
+        },
+        'test_parameters': {
+            'n_m': 5,
+            'K': 5,
+            'tht': 1
+        },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.296296296, 3.587962963, 4.807728551],
@@ -144,8 +230,16 @@ MODEL_DATA = {
         }
     },
     'Toth': {
-        'initial_guess': {'n_m': 1.1, 'K': 10, 't': 1},
-        'test_parameters': {'n_m': 5, 'K': 3, 't': 2},
+        'initial_guess': {
+            'n_m': 1.1,
+            'K': 10,
+            't': 1
+        },
+        'test_parameters': {
+            'n_m': 5,
+            'K': 3,
+            't': 2
+        },
         'test_values': {
             'pressure': [0.1, 1.0, 10.0],
             'loading': [1.436739428, 4.74341649, 4.997224535],
@@ -153,9 +247,19 @@ MODEL_DATA = {
             'spreading_pressure_mark': pytest.mark.okay,
         }
     },
-    'Jensen-Seaton': {
-        'initial_guess': {'K': 11, 'a': 1, 'b': 1, 'c': 1},
-        'test_parameters': {'K': 10, 'a': 3, 'b': 0.1, 'c': 1},
+    'JensenSeaton': {
+        'initial_guess': {
+            'K': 11,
+            'a': 1,
+            'b': 1,
+            'c': 1
+        },
+        'test_parameters': {
+            'K': 10,
+            'a': 3,
+            'b': 0.1,
+            'c': 1
+        },
         'test_values': {
             'pressure': [0.1, 1.0, 10.0],
             'loading': [0.7518610421836228, 2.481203007518797, 5.660377358],
@@ -164,18 +268,41 @@ MODEL_DATA = {
         }
     },
     'Virial': {
-        'initial_guess': {'K': 11, 'A': 0.0, 'B': 0.0, 'C': 0.0},
-        'test_parameters': {'K': 5, 'A': 0.001, 'B': 0.0001, 'C': 0.0001},
+        'initial_guess': {
+            'K': 11,
+            'A': 0.0,
+            'B': 0.0,
+            'C': 0.0
+        },
+        'test_parameters': {
+            'K': 5,
+            'A': 0.001,
+            'B': 0.0001,
+            'C': 0.0001
+        },
         'test_values': {
-            'pressure': [0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144, 0.40128205],
+            'pressure': [
+                0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144,
+                0.40128205
+            ],
             'loading': [0.0, 0.2, 0.4, 0.6, 1.0, 2.0],
-            'spreading_pressure': [0.0, 15.77393361, 18.77393361, 20.77393361, 25.0, 30.62232981],
-            'spreading_pressure_mark': pytest.mark.xfail,
+            'spreading_pressure':
+            [0.0, 15.77393361, 18.77393361, 20.77393361, 25.0, 30.62232981],
+            'spreading_pressure_mark':
+            pytest.mark.xfail,
         }
     },
-    'FH-VST': {
-        'initial_guess': {'n_m': 1.1, 'K': 10, 'a1v': 0},
-        'test_parameters': {'n_m': 30, 'K': 2, 'a1v': 1},
+    'FHVST': {
+        'initial_guess': {
+            'n_m': 1.1,
+            'K': 10,
+            'a1v': 0
+        },
+        'test_parameters': {
+            'n_m': 30,
+            'K': 2,
+            'a1v': 1
+        },
         'test_values': {
             'pressure': [0.0, 0.10134005, 0.534198619, 44.75474093],
             'loading': [0.0, 0.2, 1.0, 20.0],
@@ -183,9 +310,19 @@ MODEL_DATA = {
             'spreading_pressure_mark': pytest.mark.xfail,
         }
     },
-    'W-VST': {
-        'initial_guess': {'n_m': 1.1, 'K': 10, 'L1v': 1, 'Lv1': 1},
-        'test_parameters': {'n_m': 30, 'K': 2, 'L1v': 2, 'Lv1': 1},
+    'WVST': {
+        'initial_guess': {
+            'n_m': 1.1,
+            'K': 10,
+            'L1v': 1,
+            'Lv1': 1
+        },
+        'test_parameters': {
+            'n_m': 30,
+            'K': 2,
+            'L1v': 2,
+            'Lv1': 1
+        },
         'test_values': {
             'pressure': [0.0, 0.101346218, 0.534999558],
             'loading': [0.0, 0.2, 1.0],

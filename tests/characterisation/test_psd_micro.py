@@ -21,6 +21,7 @@ from matplotlib.testing.decorators import cleanup
 
 import pygaps
 import pygaps.characterisation.psd_microporous as pmic
+import pygaps.utilities.exceptions as pgEx
 from pygaps.characterisation.models_hk import PROPERTIES_CARBON
 
 from .conftest import DATA
@@ -42,19 +43,19 @@ class TestPSDMicro():
     def test_psd_micro_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
         # Will raise a "no model exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmic.psd_microporous(basic_pointisotherm, psd_model=None)
 
         # Will raise a "no suitable model exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmic.psd_microporous(basic_pointisotherm, psd_model='Test')
 
         # Will raise a "no applicable geometry exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmic.psd_microporous(basic_pointisotherm, pore_geometry='test')
 
         # Will raise a "no applicable branch exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pmic.psd_microporous(basic_pointisotherm, branch='test')
 
     def test_psd_micro_funcs(self):

@@ -3,55 +3,67 @@
 """
 Lists all isotherm models which are available.
 
-If adding a custom model, it should be also added below.
+If adding a custom model, it should be also added below as a string.
 """
 
-import numpy
+import importlib
 
-from pygaps.utilities.exceptions import ParameterError
-
+from ..utilities.exceptions import ParameterError
 from .base_model import IsothermBaseModel
-from .bet import BET
-from .da import DA
-from .dr import DR
-from .dslangmuir import DSLangmuir
-from .fhvst import FHVST
-from .freundlich import Freundlich
-from .gab import GAB
-from .henry import Henry
-from .jensenseaton import JensenSeaton
-from .langmuir import Langmuir
-from .quadratic import Quadratic
-from .temkinapprox import TemkinApprox
-from .toth import Toth
-from .tslangmuir import TSLangmuir
-from .virial import Virial
-from .wvst import WVST
 
 # This list has all the available models
 _MODELS = [
-    Henry, Langmuir, DSLangmuir, TSLangmuir, BET, GAB, Freundlich, DA, DR,
-    Quadratic, TemkinApprox, Virial, Toth, JensenSeaton, FHVST, WVST
+    "Henry",
+    "Langmuir",
+    "DSLangmuir",
+    "TSLangmuir",
+    "BET",
+    "GAB",
+    "Freundlich",
+    "DA",
+    "DR",
+    "Quadratic",
+    "TemkinApprox",
+    "Virial",
+    "Toth",
+    "JensenSeaton",
+    "FHVST",
+    "WVST",
 ]
 
 # This list has all the models which will be used when attempting to
 # guess an isotherm model. They are the ones where the fitting
 # is fast enough to be acceptable
 _GUESS_MODELS = [
-    Henry, Langmuir, DSLangmuir, DR, Freundlich, Quadratic, BET, TemkinApprox,
-    Toth, JensenSeaton
+    "Henry",
+    "Langmuir",
+    "DSLangmuir",
+    "DR",
+    "Freundlich",
+    "Quadratic",
+    "BET",
+    "TemkinApprox",
+    "Toth",
+    "JensenSeaton",
 ]
 
 # This list has all the models which work with IAST.
 # This is required as some models (such as Freundlich)
 # are not physically consistent.
 _IAST_MODELS = [
-    Henry, Langmuir, DSLangmuir, TSLangmuir, Quadratic, BET, TemkinApprox,
-    Toth, JensenSeaton
+    "Henry",
+    "Langmuir",
+    "DSLangmuir",
+    "TSLangmuir",
+    "Quadratic",
+    "BET",
+    "TemkinApprox",
+    "Toth",
+    "JensenSeaton",
 ]
 
 
-def get_isotherm_model(model_name, params=None):
+def get_isotherm_model(model_name: str, params: dict = None):
     """
     Check whether specified model name exists and return an instance of that model class.
 
@@ -73,16 +85,20 @@ def get_isotherm_model(model_name, params=None):
         When the model does not exist
     """
     for _model in _MODELS:
-        if model_name == _model.name:
-            return _model(params)
+        if model_name.lower() == _model.lower():
+            module = importlib.import_module(
+                f"pygaps.modelling.{_model.lower()}"
+            )
+            model = getattr(module, _model)
+            return model(params)
 
     raise ParameterError(
         f"Model {model_name} not an option. Viable models "
-        f"are {[model.name for model in _MODELS]}"
+        f"are {[model for model in _MODELS]}"
     )
 
 
-def is_iast_model(model_name):
+def is_iast_model(model_name: dict):
     """
     Check whether specified model can be used with IAST.
 
@@ -97,7 +113,7 @@ def is_iast_model(model_name):
         Whether it is applicable or not.
 
     """
-    return model_name in [model.name for model in _IAST_MODELS]
+    return model_name.lower() in [model.lower() for model in _IAST_MODELS]
 
 
 def is_base_model(model):

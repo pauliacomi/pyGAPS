@@ -6,13 +6,12 @@ logger = logging.getLogger('pygaps')
 
 import numpy
 import scipy.constants as const
-import scipy.optimize as opt
-import scipy.stats as stats
 
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import dra_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from . import scipy
 
 
 def dr_plot(isotherm, limits=None, verbose=False):
@@ -312,7 +311,7 @@ def da_plot_raw(
 
     def fit(exp, ret=False):
         """Linear fit."""
-        slope, intercept, corr_coef, p_val, stderr = stats.linregress(
+        slope, intercept, corr_coef, p_val, stderr = scipy.stats.linregress(
             log_p_exp(pressure, exp), logv
         )
 
@@ -322,7 +321,9 @@ def da_plot_raw(
 
     if exp is None:
 
-        res = opt.minimize_scalar(fit, bounds=[1, 3], method='bounded')
+        res = scipy.optimize.minimize_scalar(
+            fit, bounds=[1, 3], method='bounded'
+        )
 
         if not res.success:
             raise CalculationError(

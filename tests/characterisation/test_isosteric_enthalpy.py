@@ -18,6 +18,7 @@ from numpy import isclose
 
 import pygaps
 import pygaps.characterisation.isosteric_enthalpy as ie
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_ISOSTERIC
 from .conftest import DATA_ISOSTERIC_PATH
@@ -37,18 +38,18 @@ class TestIsostericEnthalpy():
             isotherms.append(isotherm)
 
         # Will raise a "requires more than one isotherm error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             ie.isosteric_enthalpy([isotherms[0]])
 
         # Will raise a "requires isotherms on the same material error"
         isotherms[0].material = 'Test'
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             ie.isosteric_enthalpy(isotherms)
         isotherms[0].material = isotherms[1].material
 
         # Will raise a "requires isotherm on the same basis error"
         isotherms[0].convert_adsorbent(basis_to='volume', unit_to='cm3')
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             ie.isosteric_enthalpy(isotherms)
 
     def test_iso_enthalpy(self):

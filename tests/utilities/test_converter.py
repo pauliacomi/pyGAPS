@@ -3,6 +3,8 @@ import numpy
 import pytest
 
 import pygaps
+from pygaps.utilities import converter_mode
+from pygaps.utilities import converter_unit
 
 
 @pytest.mark.core
@@ -26,13 +28,13 @@ class TestConversions():
         self, value, basis_from, basis_to, unit_from, unit_to, use_adsorbate
     ):
 
-        result = pygaps.utilities.unit_converter.c_loading(
+        result = converter_mode.c_loading(
             1,
             basis_from=basis_from,
             basis_to=basis_to,
             unit_from=unit_from,
             unit_to=unit_to,
-            adsorbate_name='TA',
+            adsorbate=pygaps.Adsorbate.find('TA'),
             temp=77.344,
         )
 
@@ -57,13 +59,13 @@ class TestConversions():
         self, value, basis_from, basis_to, unit_from, unit_to, use_material
     ):
 
-        result = pygaps.utilities.unit_converter.c_adsorbent(
+        result = converter_mode.c_adsorbent(
             1,
             basis_from=basis_from,
             basis_to=basis_to,
             unit_from=unit_from,
             unit_to=unit_to,
-            material='TEST'
+            material=pygaps.Material.find('TEST')
         )
 
         assert numpy.isclose(result, value, 0.01, 0.01)
@@ -83,13 +85,13 @@ class TestConversions():
         self, value, mode_from, mode_to, unit_from, unit_to
     ):
 
-        result = pygaps.utilities.unit_converter.c_pressure(
+        result = converter_mode.c_pressure(
             1,
             mode_from=mode_from,
             mode_to=mode_to,
             unit_from=unit_from,
             unit_to=unit_to,
-            adsorbate_name='N2',
+            adsorbate=pygaps.Adsorbate.find('N2'),
             temp=77.344
         )
 

@@ -26,28 +26,26 @@ def db_create(pth, verbose=False):
     for pragma in PRAGMAS:
         db_execute_general(pragma, pth, verbose=verbose)
 
-    # Load adsorbate paths
-    import pkg_resources
-    ads_props_path = pkg_resources.resource_filename(
-        'pygaps', 'data/adsorbate_props.json'
-    )
-    ads_path = pkg_resources.resource_filename(
-        'pygaps', 'data/adsorbates.json'
-    )
+    # Get json files
+    try:
+        import importlib.resources as pkg_resources
+    except ImportError:
+        # Try backported to PY<37 `importlib_resources`.
+        import importlib_resources as pkg_resources
 
-    # Import adsorbate json
-    with open(ads_props_path) as f:
-        ads_props = json.load(f)
+    # Get and upload adsorbate property types
+    ads_props_json = pkg_resources.read_text(
+        'pygaps.data', 'adsorbate_props.json'
+    )
+    ads_props = json.loads(ads_props_json)
     for ap_type in ads_props:
         pgsqlite.adsorbate_property_type_to_db(
             ap_type, db_path=pth, verbose=verbose
         )
 
-    # Upload adsorbate property types
-    with open(ads_path) as f:
-        adsorbates = json.load(f)
-
-    # Upload adsorbates
+    # Get and upload adsorbates
+    ads_json = pkg_resources.read_text('pygaps.data', 'adsorbates.json')
+    adsorbates = json.loads(ads_json)
     for ads in adsorbates:
         pgsqlite.adsorbate_to_db(
             pygaps.Adsorbate(**ads), db_path=pth, verbose=verbose

@@ -33,23 +33,51 @@ missing_dependencies = []
 
 import importlib
 for dependency in hard_dependencies:
-    try:
-        importlib.import_module(dependency)
-    except ImportError as e_info:
-        missing_dependencies.append(f"{dependency}: {e_info}")
+    spec = importlib.util.find_spec(dependency)
+    if not spec:
+        missing_dependencies.append(dependency)
 
 if missing_dependencies:
     raise ImportError(f"Missing required dependencies {missing_dependencies}")
 del hard_dependencies, dependency, missing_dependencies
 
-# Core
-from .core.adsorbate import Adsorbate
-from .core.material import Material
-from .core.modelisotherm import ModelIsotherm
-from .core.pointisotherm import PointIsotherm
+
+# This lazy load function will be used for non-critical modules to speed import time
+# Examples: matplotlib, scipy.optimize
+def _load_lazy(fullname):
+    try:
+        return sys.modules[fullname]
+    except KeyError:
+        spec = importlib.util.find_spec(fullname)
+        if not spec:
+            raise ModuleNotFoundError(f"Could not import {fullname}.")
+        loader = importlib.util.LazyLoader(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        # Make module with proper locking and get it inserted into sys.modules.
+        loader.exec_module(module)
+        sys.modules[fullname] = module
+        return module
+
 
 # Data
 from .data import DATABASE
 from .data import ADSORBATE_LIST
 from .data import MATERIAL_LIST
+from .data import load_data
+
+# Thermodynamic backend
+from .utilities.coolprop_utilities import thermodynamic_backend
+from .utilities.coolprop_utilities import backend_use_coolprop
+from .utilities.coolprop_utilities import backend_use_refprop
+
+# Core classes
+from .core.adsorbate import Adsorbate
+from .core.material import Material
+from .core.pointisotherm import PointIsotherm
+from .core.modelisotherm import ModelIsotherm
+
+# Data load
+load_data()
+
+# Other user-facing functions
 from .api import *

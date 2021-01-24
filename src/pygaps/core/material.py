@@ -1,7 +1,6 @@
 """Contains the material class."""
 
-import pygaps
-
+from ..data import MATERIAL_LIST
 from ..utilities.exceptions import ParameterError
 
 
@@ -59,13 +58,21 @@ class Material():
             return self.name == other.name
         return self.name == other
 
+    def __add__(self, other):
+        """Overload addition operator to use name."""
+        return self.name + other
+
+    def __radd__(self, other):
+        """Overload rev addition operator to use name."""
+        return other + self.name
+
     def print_info(self):
         """Print a short summary of all the material parameters."""
         string = f"pyGAPS Material: {self.name}\n"
 
         if self.properties:
             for prop in self.properties:
-                string += (prop + ':' + str(self.properties.get(prop)) + '\n')
+                string += f"{prop}:{str(self.properties.get(prop))}\n"
 
         return string
 
@@ -88,11 +95,15 @@ class Material():
         ``ParameterError``
             If it does not exist in list.
         """
+        # Skip search if already material
+        if isinstance(name, Material):
+            return name
+        elif not isinstance(name, str):
+            raise ParameterError("Pass a string as an material name.")
+
         # Checks to see if material exists in master list
         try:
-            return next(
-                mat for mat in pygaps.MATERIAL_LIST if name == mat.name
-            )
+            return next(mat for mat in MATERIAL_LIST if name == mat.name)
         except StopIteration:
             raise ParameterError(
                 f"Material {name} does not exist in list of materials. "

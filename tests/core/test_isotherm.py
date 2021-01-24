@@ -3,6 +3,7 @@
 import pytest
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.core
@@ -36,7 +37,7 @@ class TestIsotherm():
         data = isotherm_parameters
         del data[missing_param]
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.core.isotherm.Isotherm(**isotherm_parameters)
 
     @pytest.mark.parametrize(
@@ -91,7 +92,7 @@ class TestIsotherm():
 
         isotherm_parameters[prop] = set_to
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.core.isotherm.Isotherm(**isotherm_parameters)
 
     def test_isotherm_get_parameters(

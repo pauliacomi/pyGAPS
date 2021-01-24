@@ -6,8 +6,8 @@ logger = logging.getLogger('pygaps')
 import warnings
 
 import numpy
-import scipy.stats as stats
 
+from ..characterisation import scipy
 from ..core.adsorbate import Adsorbate
 from ..core.isotherm import Isotherm
 from ..graphing.calc_graphs import tp_plot
@@ -328,7 +328,7 @@ def alpha_s_plot_parameters(
 ):
     """Get the parameters for the linear region of the alpha-s plot."""
 
-    slope, intercept, corr_coef, p, stderr = stats.linregress(
+    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
         alpha_curve[section], loading[section]
     )
 

@@ -8,8 +8,8 @@ import warnings
 
 import numpy
 import scipy.constants as const
-import scipy.stats as stats
 
+from ..characterisation import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import langmuir_plot
 from ..utilities.exceptions import CalculationError
@@ -246,7 +246,7 @@ def langmuir_transform(pressure, loading):
 
 def langmuir_optimisation(pressure, langmuir_points):
     """Finds the slope and intercept of the Langmuir region."""
-    slope, intercept, corr_coef, p, stderr = stats.linregress(
+    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
         pressure, langmuir_points
     )
     return slope, intercept, corr_coef

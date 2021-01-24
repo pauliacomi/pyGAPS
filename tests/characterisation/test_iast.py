@@ -19,6 +19,7 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_IAST
 from .conftest import DATA_IAST_PATH
@@ -52,16 +53,16 @@ class TestIAST():
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast([ch4], [0.1], 1)
 
         # Raises "different dimensions of arrays"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast([ch4, c2h6], [0.1], 1)
 
         # Raises "model cannot be used with IAST"
         ch4_m = pygaps.ModelIsotherm.from_pointisotherm(ch4, model='Virial')
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast([ch4_m, c2h6], [0.6, 0.4], 1)
 
         # Warning "extrapolate outside range"
@@ -103,20 +104,20 @@ class TestReverseIAST():
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4], [0.1], 1)
 
         # Raises "different dimensions of arrays"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4, c2h6], [0.1], 1)
 
         # Raises "fractions do not add up to 1"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4, c2h6], [0.1, 0.4], 1)
 
         # Raises "model cannot be used with IAST"
         ch4_m = pygaps.ModelIsotherm.from_pointisotherm(ch4, model='Virial')
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4_m, c2h6], [0.6, 0.4], 1)
 
         # Warning "extrapolate outside range"
@@ -172,7 +173,7 @@ class TestIASTVLE():
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast_binary_vle([ch4], 1)
 
     def test_iast_vle(self, load_iast):
@@ -216,11 +217,11 @@ class TestIASTSVP():
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast_binary_svp([ch4], [0.1], [1, 2])
 
         # Raises error not adds to one
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast_binary_svp([ch4, c2h6], [0.1, 0.4], [1, 2])
 
     def test_iast_svp(self, load_iast):

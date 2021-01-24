@@ -16,6 +16,7 @@ import pytest
 
 import pygaps
 import pygaps.characterisation.models_thickness as mt
+import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.characterisation
@@ -45,7 +46,7 @@ class TestThicknessModels():
 
     def test_get_thickness_error(self):
         """When the model requested is not found we raise."""
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             mt.get_thickness_model('bad_model')
 
     def test_get_thickness_callable(self):

@@ -19,6 +19,7 @@ from numpy import linspace
 
 import pygaps
 import pygaps.characterisation.area_bet as ab
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -33,11 +34,11 @@ class TestAreaBET():
         L = linspace(0.3, 10)
 
         # arrays should be equal
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             ab.area_BET_raw(P[1:], L, 1)
 
         # should not take less than 3 points
-        with pytest.raises(pygaps.CalculationError):
+        with pytest.raises(pgEx.CalculationError):
             ab.area_BET_raw(P[:2], L[:2], 1, limits=[-1, 10])
 
         # 3 will work
@@ -57,7 +58,7 @@ class TestAreaBET():
 
         # This will automatically extend to select points
         # but find that there aren't enough, so error
-        with pytest.raises(pygaps.CalculationError):
+        with pytest.raises(pgEx.CalculationError):
             ab.area_BET_raw(P[3:], L[3:], 1)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])

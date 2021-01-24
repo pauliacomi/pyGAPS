@@ -5,6 +5,7 @@ import warnings
 import pytest
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.core
@@ -12,7 +13,7 @@ class TestAdsorbate():
     """Test the adsorbate class."""
     def test_adsorbate_basic(self):
         """Basic creation tests."""
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             ads = pygaps.Adsorbate()
         ads = pygaps.Adsorbate('Test')
         assert ads == 'Test'
@@ -49,10 +50,10 @@ class TestAdsorbate():
 
         assert adsorbate_data == uploaded_adsorbate.to_dict()
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.Adsorbate.find('noname')
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.Adsorbate.find(2)
         pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
 
@@ -73,7 +74,7 @@ class TestAdsorbate():
         ) == adsorbate_data.get('backend_name')
 
         name = basic_adsorbate.properties.pop('backend_name')
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_adsorbate.backend_name()
         basic_adsorbate.properties['backend_name'] = name
 
@@ -102,8 +103,8 @@ class TestAdsorbate():
         ) == pytest.approx(adsorbate_data.get('enthalpy_liquefaction'), 0.001)
 
     @pytest.mark.parametrize(
-        'calculated, error', [(True, pygaps.CalculationError),
-                              (False, pygaps.ParameterError)]
+        'calculated, error', [(True, pgEx.CalculationError),
+                              (False, pgEx.ParameterError)]
     )
     def test_adsorbate_miss_named_props(self, calculated, error):
         temp = 77.355

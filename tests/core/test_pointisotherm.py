@@ -6,6 +6,7 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.core
@@ -40,7 +41,7 @@ class TestPointIsotherm():
         )
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.PointIsotherm(
                 pressure=pressure,
                 loading=loading,
@@ -70,7 +71,7 @@ class TestPointIsotherm():
 
         del keys[missing_key]
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.PointIsotherm(
                 isotherm_data=isotherm_data,
                 loading_key=keys.get('loading_key'),
@@ -236,7 +237,7 @@ class TestPointIsotherm():
         )
 
         # Wrong branch
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_pointisotherm.data(branch='random')
 
     def test_isotherm_ret_pressure(self, basic_pointisotherm, use_adsorbate):
@@ -350,7 +351,7 @@ class TestPointIsotherm():
         )
 
         # Error
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_pointisotherm.other_data('random')
 
     ##########################

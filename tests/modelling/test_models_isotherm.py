@@ -17,7 +17,7 @@ import numpy
 import pytest
 
 import pygaps.modelling as models
-from pygaps.utilities.exceptions import ParameterError
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import MODEL_DATA
 
@@ -39,7 +39,7 @@ class TestIsothermModels():
             model = models.get_isotherm_model(model_name)
             assert model.name == model_name
 
-        with pytest.raises(ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             models.get_isotherm_model('bad_model')
 
     @pytest.mark.parametrize("m_name", MODEL_DATA.keys())

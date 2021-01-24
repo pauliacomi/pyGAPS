@@ -2,8 +2,6 @@
 
 import warnings
 
-import requests
-
 from .json import isotherm_from_json
 
 _ISODB_API = "https://adsorption.nist.gov/isodb/api"
@@ -24,6 +22,8 @@ def isotherm_from_isodb(filename):
         The isotherm from ISODB.
 
     """
+    import requests
+
     url = fr"{_ISODB_API}/isotherm/{filename}.json"
 
     try:

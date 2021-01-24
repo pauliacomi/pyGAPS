@@ -4,6 +4,7 @@ import pytest
 
 import pygaps
 from pygaps.parsing import sqlite as pgsqlite
+from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.sqlite_db_creator import db_create
 from pygaps.utilities.sqlite_db_creator import db_execute_general
 
@@ -20,7 +21,7 @@ def db_file(tmpdir_factory):
 class TestDatabase():
     def test_db_create(self, db_file):
         """Test the database creation."""
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             db_execute_general("SELECT", "/")
         return db_file
 
@@ -36,7 +37,7 @@ class TestDatabase():
         pgsqlite.adsorbate_property_type_to_db(test_dict, db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.adsorbate_property_type_to_db(test_dict, db_path=db_file)
 
         # Get test
@@ -50,7 +51,7 @@ class TestDatabase():
         )
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.adsorbate_property_type_delete_db(
                 test_dict["type"], db_path=db_file
             )
@@ -65,7 +66,7 @@ class TestDatabase():
         pgsqlite.adsorbate_to_db(pygaps.Adsorbate('blank'), db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.adsorbate_to_db(basic_adsorbate, db_path=db_file)
 
         # Get test
@@ -89,7 +90,7 @@ class TestDatabase():
         pgsqlite.adsorbate_delete_db('blank', db_path=db_file)
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.adsorbate_delete_db(basic_adsorbate, db_path=db_file)
 
         # Final upload
@@ -108,7 +109,7 @@ class TestDatabase():
         pgsqlite.material_property_type_to_db(test_dict, db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.material_property_type_to_db(test_dict, db_path=db_file)
 
         # Get test
@@ -122,7 +123,7 @@ class TestDatabase():
         )
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.material_property_type_delete_db(
                 test_dict["type"], db_path=db_file
             )
@@ -145,7 +146,7 @@ class TestDatabase():
         pgsqlite.material_to_db(pygaps.Material('blank'), db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.material_to_db(basic_material, db_path=db_file)
 
         # Get test
@@ -170,7 +171,7 @@ class TestDatabase():
         pgsqlite.material_delete_db('blank', db_path=db_file)
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.material_delete_db(basic_material, db_path=db_file)
 
         # Final upload
@@ -185,7 +186,7 @@ class TestDatabase():
         pgsqlite.isotherm_type_to_db(test_dict, db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.isotherm_type_to_db(test_dict, db_path=db_file)
 
         # Get test
@@ -195,7 +196,7 @@ class TestDatabase():
         pgsqlite.isotherm_type_delete_db(test_dict["type"], db_path=db_file)
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pgsqlite.isotherm_type_delete_db(
                 test_dict["type"], db_path=db_file
             )
@@ -207,7 +208,7 @@ class TestDatabase():
         pygaps.isotherm_to_db(basic_isotherm, db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pygaps.isotherm_to_db(basic_isotherm, db_path=db_file)
 
         # Get test
@@ -217,7 +218,7 @@ class TestDatabase():
         pygaps.isotherm_delete_db(basic_isotherm, db_path=db_file)
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pygaps.isotherm_delete_db(basic_isotherm, db_path=db_file)
 
     def test_isotherm_autoinsert(
@@ -251,7 +252,7 @@ class TestDatabase():
         pygaps.isotherm_to_db(basic_pointisotherm, db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pygaps.isotherm_to_db(basic_pointisotherm, db_path=db_file)
 
         # Get test
@@ -261,7 +262,7 @@ class TestDatabase():
         pygaps.isotherm_delete_db(basic_pointisotherm, db_path=db_file)
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pygaps.isotherm_delete_db(basic_pointisotherm, db_path=db_file)
 
         # Convenience function test
@@ -276,7 +277,7 @@ class TestDatabase():
         pygaps.isotherm_to_db(basic_modelisotherm, db_path=db_file)
 
         # Unique test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pygaps.isotherm_to_db(basic_modelisotherm, db_path=db_file)
 
         # Get test
@@ -286,7 +287,7 @@ class TestDatabase():
         pygaps.isotherm_delete_db(basic_modelisotherm, db_path=db_file)
 
         # Delete fail test
-        with pytest.raises(pygaps.ParsingError):
+        with pytest.raises(ParsingError):
             pygaps.isotherm_delete_db(basic_modelisotherm, db_path=db_file)
 
         # Convenience function test

@@ -5,8 +5,8 @@ import logging
 logger = logging.getLogger('pygaps')
 
 import numpy
-import scipy.optimize as opt
 
+from ..characterisation import scipy
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
@@ -78,7 +78,7 @@ class FHVST(IsothermBaseModel):
     """
 
     # Model parameters
-    name = 'FH-VST'
+    name = 'FHVST'
     calculates = 'pressure'
     param_names = ["n_m", "K", "a1v"]
     param_bounds = {
@@ -108,7 +108,7 @@ class FHVST(IsothermBaseModel):
         def fun(x):
             return self.pressure(x) - pressure
 
-        opt_res = opt.root(fun, 0, method='hybr')
+        opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError(
@@ -242,7 +242,7 @@ class FHVST(IsothermBaseModel):
             kwargs.update(optimization_params)
 
         # minimize RSS
-        opt_res = opt.least_squares(
+        opt_res = scipy.optimize.least_squares(
             fit_func,
             guess,  # provide the fit function and initial guess
             args=(pressure,

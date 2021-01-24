@@ -17,6 +17,7 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -25,15 +26,15 @@ from .conftest import DATA_N77_PATH
 @pytest.mark.characterisation
 class TestAlphaSPlot():
     """Test alpha-s calculation."""
-    def test_alphas_checks(self, basic_pointisotherm):
+    def test_alphas_checks(self, use_adsorbate, basic_pointisotherm):
         """Checks for built-in safeguards."""
 
         # Will raise a "no reference isotherm" error
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.alpha_s(basic_pointisotherm, None)
 
         # Will raise a "no reference isotherm" error
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.alpha_s(basic_pointisotherm, 'isotherm')
 
         # Will raise a "adsorbate not the same" error
@@ -44,11 +45,11 @@ class TestAlphaSPlot():
             adsorbate='argon',
             temperature=87
         )
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.alpha_s(basic_pointisotherm, ref_iso)
 
         # Will raise a "bad reducing pressure" error
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.alpha_s(
                 basic_pointisotherm,
                 basic_pointisotherm,
@@ -56,7 +57,7 @@ class TestAlphaSPlot():
             )
 
         # Will raise a "bad reference_area value" error
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.alpha_s(
                 basic_pointisotherm,
                 basic_pointisotherm,

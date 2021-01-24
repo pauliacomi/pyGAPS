@@ -3,6 +3,7 @@
 import pytest
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.core
@@ -27,7 +28,7 @@ class TestMaterial():
 
         assert material_data == uploaded_material.to_dict()
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.Material.find('noname')
         pygaps.MATERIAL_LIST.remove(basic_material)
 
@@ -38,7 +39,7 @@ class TestMaterial():
                                        ) == material_data.get('density')
 
         density = basic_material.properties.pop('density')
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             basic_material.get_prop('density')
         basic_material.properties['density'] = density
 

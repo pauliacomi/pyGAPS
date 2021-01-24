@@ -16,6 +16,7 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -60,7 +61,7 @@ class TestInitialHenry():
             isotherm, max_adjrms=0.01, l_limits=[5, None]
         )
 
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.initial_henry_slope(
                 isotherm, max_adjrms=0.01, l_limits=[25, None]
             )
