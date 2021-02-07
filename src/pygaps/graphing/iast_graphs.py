@@ -105,7 +105,7 @@ def plot_iast_svp(p_data, s_data, ads1, ads2, fraction, p_unit, ax=None):
     ads1 = convert_chemformula(ads1)
     ads2 = convert_chemformula(ads2)
 
-    text_x = f"Pressure ({p_unit})"
+    text_x = f"Pressure [{p_unit}]"
     text_y = f"Selectivity, {ads1}"
     title_graph = f"{ads1} in {ads2}"
     label = f"{fraction:.2%} {ads1}"

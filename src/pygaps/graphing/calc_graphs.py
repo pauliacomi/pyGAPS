@@ -291,7 +291,7 @@ def tp_plot(
         label3 = '$\\alpha_s$ method'
     else:
         label1 = 't transform'
-        label2 = 'Layer thickness (nm)'
+        label2 = 'Layer thickness [nm]'
         label3 = 't-plot method'
     ax.plot(thickness_curve, loading, marker='', color='g', label=label1)
 
@@ -428,10 +428,10 @@ def psd_plot(
         ax.tick_params(axis='both', which='major', **TICK_STYLE)
 
     ax.set_title("PSD plot " + str(method), **TITLE_STYLE)
-    ax.set_xlabel('Pore width (nm)', **LABEL_STYLE)
+    ax.set_xlabel('Pore width [nm]', **LABEL_STYLE)
     ax.set_ylabel('Distribution (dV/dw)', **LABEL_STYLE)
     if labelcum:
-        ax2.set_ylabel('Cumulative Vol ($cm^3 g^{-1}$)', **LABEL_STYLE)
+        ax2.set_ylabel('Cumulative Vol [$cm^3 g^{-1}$]', **LABEL_STYLE)
 
     lns = l1
     if labelcum:
@@ -491,8 +491,8 @@ def isosteric_enthalpy_plot(
             plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
         )
     ax.set_title("Isosteric enthalpy plot")
-    ax.set_xlabel('Loading (mmol/g)')
-    ax.set_ylabel('Isosteric enthalpy (kJ/mol)')
+    ax.set_xlabel('Loading [$mmol\/g^{-1}$]')
+    ax.set_ylabel('Isosteric enthalpy [$kJ\/mol^{-1}$]')
     ax.legend(loc='best')
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)

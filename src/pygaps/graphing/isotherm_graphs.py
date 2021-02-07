@@ -267,7 +267,7 @@ def plot_iso(
         elif key == 'loading':
             if loading_basis == "percent":
                 text = f"Loading [${adsorbent_basis}$%]"
-            elif loading_basis == "fractional":
+            elif loading_basis == "fraction":
                 text = fr"Loading [${adsorbent_basis}\/fraction$]"
             else:
                 text = fr"Loading [${loading_unit}\/{adsorbent_unit}^{{-1}}$]"
