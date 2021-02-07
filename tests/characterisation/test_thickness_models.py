@@ -11,7 +11,6 @@ The thickness functions are tested against pre-calculated values
 at several points.
 """
 
-import numpy
 import pytest
 
 import pygaps.characterisation.models_thickness as mt
@@ -22,21 +21,15 @@ import pygaps.utilities.exceptions as pgEx
 class TestThicknessModels():
     """Test the thickness models."""
     @pytest.mark.parametrize(
-        'model, pressure, thickness', [
-            (
-                mt._THICKNESS_MODELS['Halsey'], [0.1, 0.4, 0.9
-                                                 ], [0.46, 0.62, 1.28]
-            ),
-            (
-                mt._THICKNESS_MODELS['Harkins/Jura'], [0.1, 0.4, 0.9
-                                                       ], [0.37, 0.57, 1.32]
-            ),
+        'model, thickness', [
+            (mt._THICKNESS_MODELS['Halsey'], [0.46, 0.62, 1.28]),
+            (mt._THICKNESS_MODELS['Harkins/Jura'], [0.37, 0.57, 1.32]),
         ]
     )
-    def test_static_models(self, model, pressure, thickness):
+    def test_static_models(self, model, thickness):
         """Test each model against pre-calculated values."""
-        for index, value in enumerate(pressure):
-            assert numpy.isclose(model(value), thickness[index], 0.01, 0.01)
+        for index, value in enumerate([0.1, 0.4, 0.9]):
+            assert model(value) == pytest.approx(thickness[index], 0.01)
 
     def test_get_thickness(self):
         """Get a regular model."""
