@@ -5,7 +5,7 @@
 # Parsing
 from .parsing.csv import isotherm_from_csv
 from .parsing.csv import isotherm_to_csv
-from .parsing.csv_bel import isotherm_from_bel
+from .parsing.bel_dat import isotherm_from_bel
 from .parsing.excel import isotherm_from_xl
 from .parsing.excel import isotherm_to_xl
 from .parsing.isodb import isotherm_from_isodb

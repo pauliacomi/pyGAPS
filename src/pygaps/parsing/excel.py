@@ -12,8 +12,8 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
 
-from .excel_bel import read_bel_report
-from .excel_mic import read_mic_report
+from .bel_excel import read_bel_report
+from .mic_excel import read_mic_report
 
 _FIELDS = {
     'material': {
@@ -81,18 +81,9 @@ _FIELDS = {
 _FORMATS = ['bel', 'mic']
 
 
-def _update_recurs(dict1, dict2):
-    """Update a dictionary with one level down."""
-    for f in dict2:
-        if f in dict1:
-            dict1[f].update(dict2[f])
-        else:
-            dict1[f] = dict2[f]
-
-
 def isotherm_to_xl(isotherm, path):
     """
-    Convert an isotherm into an excel file.
+    Save an isotherm to an excel file.
 
     Parameters
     ----------
@@ -100,7 +91,6 @@ def isotherm_to_xl(isotherm, path):
         Isotherm to be written to excel.
     path : str
         Path to the file to be written.
-
     """
     # create a new workbook and select first sheet
     wb = xlwt.Workbook()
@@ -194,8 +184,6 @@ def isotherm_to_xl(isotherm, path):
 
     wb.save(path)
 
-    return
-
 
 def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
     """
@@ -220,67 +208,47 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         if fmt not in _FORMATS:
             raise ParsingError('Format not supported')
 
-    # isotherm type
+    # isotherm type (point/model)
     isotype = 0
 
     raw_dict = {
         'pressure_key': 'pressure',
         'loading_key': 'loading',
-        'branch': 'guess',
     }
 
     if fmt == 'mic':
+        meta, data = read_mic_report(path)
+
         isotype = 1
-        raw_dict.update(read_mic_report(path))
+        raw_dict.update(meta)
+        data = pandas.DataFrame(data)
 
-        # Add required props
-        raw_dict['apparatus'] = 'mic'
-        raw_dict['pressure_mode'] = 'relative'
-        raw_dict['pressure_unit'] = None
-        raw_dict['loading_basis'] = 'molar'
-        raw_dict['adsorbent_basis'] = 'mass'
-
-        pressure_key = raw_dict['pressure_key']
-        try:
-            pressure = raw_dict.pop(pressure_key).get('relative')
-        except KeyError as e:
-            raise ParsingError(
-                "Could not read pressure from Micromeritics file."
-            ) from e
-        loading_key = raw_dict['loading_key']
-        try:
-            loading = raw_dict.pop(loading_key)
-        except KeyError as e:
-            raise ParsingError(
-                "Could not read loading from Micromeritics file."
-            ) from e
-
-        data = pandas.DataFrame({pressure_key: pressure, loading_key: loading})
+        # TODO pyGAPS does not yet handle saturation pressure recorded at each point
+        # Therefore, we use the relative pressure column as our true pressure,
+        # ignoring the absolute pressure column
+        if 'pressure_relative' in data.columns:
+            data['pressure'] = data['pressure_relative']
+            data = data.drop('pressure_relative', axis=1)
+            raw_dict['other_keys'].remove('pressure_relative')
+            raw_dict['pressure_mode'] = 'relative'
+            raw_dict['pressure_unit'] = None
 
     elif fmt == 'bel':
+        meta, data = read_bel_report(path)
+
         isotype = 1
-        raw_dict.update(read_bel_report(path))
+        raw_dict.update(meta)
+        data = pandas.DataFrame(data)
 
-        # Add required props
-        raw_dict['apparatus'] = 'bel'
-        raw_dict['pressure_mode'] = 'relative'
-        raw_dict['pressure_unit'] = None
-        raw_dict['loading_basis'] = 'molar'
-        raw_dict['adsorbent_basis'] = 'mass'
-        raw_dict['branch'] = raw_dict.pop('measurement')
-
-        pressure_key = raw_dict['pressure_key']
-        try:
-            pressure = raw_dict.pop(pressure_key).get('relative')
-        except KeyError as e:
-            raise ParsingError("Could not read pressure from Bel file.") from e
-        loading_key = raw_dict['loading_key']
-        try:
-            loading = raw_dict.pop(loading_key)
-        except KeyError as e:
-            raise ParsingError("Could not read loading from Bel file.") from e
-
-        data = pandas.DataFrame({pressure_key: pressure, loading_key: loading})
+        # TODO pyGAPS does not yet handle saturation pressure recorded at each point
+        # Therefore, we use the relative pressure column as our true pressure,
+        # ignoring the absolute pressure column
+        if 'pressure_relative' in data.columns:
+            data['pressure'] = data['pressure_relative']
+            data = data.drop('pressure_relative', axis=1)
+            raw_dict['other_keys'].remove('pressure_relative')
+            raw_dict['pressure_mode'] = 'relative'
+            raw_dict['pressure_unit'] = None
 
     else:
         # Get excel workbook and sheet

@@ -25,5 +25,5 @@ CSV
 
 Apparatus
 ---------
-.. automodule:: pygaps.parsing.csv_bel
+.. automodule:: pygaps.parsing.bel_dat
     :members:

@@ -9,13 +9,14 @@ import logging
 logger = logging.getLogger('pygaps')
 import re
 from itertools import product
+import dateutil.parser
 
 import xlrd
 
 _NUMBER_REGEX = re.compile(r'^(-)?\d+(.|,)?\d+')
 
 _FIELDS = {
-    'sample:': {
+    'material': {
         'text': ['sample:', 'echantillon:'],
         'name': 'material',
         'row': 0,
@@ -50,12 +51,19 @@ _FIELDS = {
         'column': 1,
         'type': 'string'
     },
-    'sample mass': {
+    'sample_mass': {
         'text': ['sample mass'],
         'name': 'mass',
         'row': 0,
         'column': 1,
         'type': 'number'
+    },
+    'apparatus': {
+        'text': ['micromeritics instrument'],
+        'name': 'apparatus',
+        'row': 1,
+        'column': 0,
+        'type': 'string'
     },
     'comment': {
         'text': ['comments'],
@@ -64,18 +72,18 @@ _FIELDS = {
         'column': 0,
         'type': 'string'
     },
-    'isotherm tabular': {
+    'isotherm_data': {
         'text': ['isotherm tabular'],
-        'type': 'isotherm report',
+        'type': 'isotherm_data',
         'labels': {
-            'Relative': 'relative',
-            'Absolute': 'absolute',
+            'Absolute': 'pressure',
+            'Relative': 'pressure_relative',
+            'Saturation': 'pressure_saturation',
             'Quantity': 'loading',
             'Elapsed': 'time',
-            'Saturation': 'saturation'
         }
     },
-    'primary data': {
+    'primary_data': {
         'text': ['primary data'],
         'type': 'error',
         'row': 1,
@@ -83,7 +91,6 @@ _FIELDS = {
         'name': 'errors'
     },
     'cell_value': {
-        'text': [],
         'header': {
             'row': 2
         },
@@ -111,6 +118,7 @@ def read_mic_report(path):
     """
     workbook = xlrd.open_workbook(path, encoding_override='latin-1')
     sheet = workbook.sheet_by_index(0)
+    meta = {}
     data = {}
     errors = []
     for row, col in product(range(sheet.nrows), range(sheet.ncols)):
@@ -118,27 +126,39 @@ def read_mic_report(path):
         try:
             field = next(
                 v for k, v in _FIELDS.items()
-                if any([cell_value.startswith(n) for n in v.get('text')])
+                if any([cell_value.startswith(n) for n in v.get('text', [])])
             )
         except StopIteration:
             continue
         if field['type'] == 'number':
             val = sheet.cell(row + field['row'], col + field['column']).value
-            data[field['name']] = _handle_numbers(field, val)
+            meta[field['name']] = _handle_numbers(field, val)
         elif field['type'] == 'string':
             val = sheet.cell(row + field['row'], col + field['column']).value
-            data[field['name']] = _handle_string(val)
-        elif field['type'] == 'isotherm report':
-            data['pressure'] = {}
+            meta[field['name']] = _handle_string(val)
+        elif field['type'] == 'isotherm_data':
             for i, item in enumerate(_get_data_labels(sheet, row, col)):
                 points = _get_datapoints(sheet, row, col + i)
-                _assign_data(item, field, data, points)
+                _assign_data(item, field, meta, data, points)
         elif field['type'] == 'error':
             errors += _get_errors(sheet, row, col)
     if errors:
-        data['errors'] = errors
-    _check(data, path)
-    return data
+        meta['errors'] = errors
+
+    _check(meta, data, path)
+
+    # Set extra metadata
+    meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
+    meta['loading_key'] = 'loading'
+    meta['pressure_key'] = 'pressure'
+    meta['other_keys'] = sorted([
+        a for a in data if a not in ['loading', 'pressure', 'branch']
+    ])
+    meta['pressure_mode'] = 'absolute'
+    meta['loading_basis'] = 'molar'
+    meta['adsorbent_basis'] = 'mass'
+
+    return meta, data
 
 
 def _handle_numbers(field, val):
@@ -183,7 +203,7 @@ def _get_data_labels(sheet, row, col):
     header = sheet.cell(row + header_row, final_column).value
     while any(
         header.startswith(label)
-        for label in _FIELDS['isotherm tabular']['labels']
+        for label in _FIELDS['isotherm_data']['labels']
     ):
         final_column += 1
         header = sheet.cell(row + header_row, final_column).value
@@ -228,27 +248,44 @@ def _get_datapoints(sheet, row, col):
     ]
 
 
-def _assign_data(item, field, data, points):
+def _assign_data(item, field, meta, data, points):
     """
     Add numeric data to the data dictionary.
-
     For each column of the Excel file, read to the bottom,
     then assign it depending on the label of the column (first point).
     """
     name = next(f for f in field['labels'] if item.startswith(f))
     if field['labels'][name] == 'time':
-        data['time'] = _convert_time(points)
+        data['time'] = _convert_time(points)[1:]
     elif field['labels'][name] == 'loading':
         data['loading'] = points
-        for (u, c) in (('(mmol/', 'mmol'), ('(mol/', 'mol'),
-                       ('(cm³/', 'cm3(STP)')):
+        for (u, c) in (
+            ('(mmol/', 'mmol'),
+            ('(mol/', 'mol'),
+            ('(cm³/', 'cm3(STP)'),
+        ):
             if u in item:
-                data['loading_unit'] = c
-        for (u, c) in (('/g', 'g'), ('/kg', 'kg')):
+                meta['loading_unit'] = c
+        for (u, c) in (
+            ('/g', 'g'),
+            ('/kg', 'kg'),
+        ):
             if u in item:
-                data['adsorbent_unit'] = c
-    elif field['labels'][name] in ['relative', 'absolute', 'saturation']:
-        data['pressure'][field['labels'][name]] = points
+                meta['adsorbent_unit'] = c
+    elif field['labels'][name] == 'pressure':
+        data['pressure'] = points
+        for (u, c) in (
+            ('(mmHg', 'torr'),
+            ('(torr', 'torr'),
+            ('(kPa', 'kPa'),
+            ('(bar', 'bar'),
+        ):
+            if u in item:
+                meta['pressure_unit'] = c
+    elif field['labels'][name] == 'pressure_relative':
+        data['pressure_relative'] = points
+    elif field['labels'][name] == 'pressure_saturation':
+        data['pressure_saturation'] = points[1:]
     else:
         raise ValueError(
             f"Label name '{field['labels'][name]}' not recognized."
@@ -258,10 +295,9 @@ def _assign_data(item, field, data, points):
 def _get_errors(sheet, row, col):
     """
     Look for all cells that contain errors.
-
     (are below a cell labelled primary data).
     """
-    field = _FIELDS['primary data']
+    field = _FIELDS['primary_data']
     val = sheet.cell(row + field['row'], col + field['column']).value
     if not val:
         return []
@@ -276,16 +312,15 @@ def _get_errors(sheet, row, col):
     ]
 
 
-def _check(data, path):
+def _check(meta, data, path):
     """
     Check keys in data and logs a warning if a key is empty.
-
     Also logs a warning for errors found in file.
     """
     if 'loading' in data:
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
             logger.info(f'No data collected for {empty} in file {path}.')
-    if 'errors' in data:
+    if 'errors' in meta:
         logger.warning('Report file contains warnings:')
-        logger.warning('\n'.join(data['errors']))
+        logger.warning('\n'.join(meta['errors']))

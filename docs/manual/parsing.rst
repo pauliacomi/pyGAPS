@@ -173,7 +173,7 @@ and therefore imported.
 Currently pyGAPS includes functionality to import:
 
     - Microtrac BEL .dat files using
-      :meth:`~pygaps.parsing.csv_bel.isotherm_from_bel`
+      :meth:`~pygaps.parsing.bel_dat.isotherm_from_bel`
     - Microtrac BEL .xls files using
       :meth:`~pygaps.parsing.excel.isotherm_from_xl`
       and ``fmt="bel"``

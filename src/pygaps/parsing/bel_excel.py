@@ -5,6 +5,7 @@ import logging
 logger = logging.getLogger('pygaps')
 import re
 from itertools import product
+import dateutil.parser
 
 import xlrd
 
@@ -65,11 +66,11 @@ _FIELDS = {
         'type': 'isotherm data',
         'labels': {
             'No': 'measurement',
-            'pi/': 'internal',
-            'pe/': 'absolute',
-            'pe2/': 'absolute2',
-            'p0/': 'saturation',
-            'p/p0': 'relative',
+            'pi/': 'pressure_internal',
+            'pe/': 'pressure',
+            'pe2/': 'pressure2',
+            'p0/': 'pressure_saturation',
+            'p/p0': 'pressure_relative',
             'Va/': 'loading',
             'na/': 'loading',
         }
@@ -109,6 +110,7 @@ def read_bel_report(path):
     """
     workbook = xlrd.open_workbook(path, encoding_override='latin-1')
     sheet = workbook.sheet_by_name('AdsDes')
+    meta = {}
     data = {}
     errors = []
     for row, col in product(range(sheet.nrows), range(sheet.ncols)):
@@ -122,18 +124,17 @@ def read_bel_report(path):
             continue
         if field['type'] == 'number':
             val = sheet.cell(row + field['row'], col + field['column']).value
-            data[field['name']] = val
+            meta[field['name']] = val
         if field['type'] == 'date':
             day = sheet.cell(row + field['row'], col + field['column']).value
             time = sheet.cell(
                 row + 1 + field['row'], col + field['column']
             ).value
-            data[field['name']] = _handle_date(sheet, day + time)
+            meta[field['name']] = _handle_date(sheet, day + time)
         elif field['type'] == 'string':
             val = sheet.cell(row + field['row'], col + field['column']).value
-            data[field['name']] = _handle_string(val)
+            meta[field['name']] = _handle_string(val)
         elif field['type'] == 'isotherm data':
-            data['pressure'] = {}
             (ads_start, ads_end, des_start,
              des_end) = _find_datapoints(sheet, row, col)
 
@@ -144,13 +145,27 @@ def read_bel_report(path):
                 des_points = [
                     sheet.cell(r, i).value for r in range(des_start, des_end)
                 ]
-                _assign_data(item, field, data, ads_points, des_points)
+                _assign_data(item, field, meta, data, ads_points, des_points)
         elif field['type'] == 'error':
             errors += _get_errors(sheet, row, col)
     if errors:
-        data['errors'] = errors
-    _check(data, path)
-    return data
+        meta['errors'] = errors
+
+    _check(meta, data, path)
+
+    # Set extra metadata
+    meta['apparatus'] = 'BEL'
+    meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
+    meta['loading_key'] = 'loading'
+    meta['pressure_key'] = 'pressure'
+    meta['other_keys'] = sorted([
+        a for a in data if a not in ['loading', 'pressure', 'branch']
+    ])
+    meta['pressure_mode'] = 'absolute'
+    meta['loading_basis'] = 'molar'
+    meta['adsorbent_basis'] = 'mass'
+
+    return meta, data
 
 
 def _handle_date(sheet, val):
@@ -233,7 +248,7 @@ def _find_datapoints(sheet, row, col):
     return (ads_start_row, ads_final_row, des_start_row, des_final_row)
 
 
-def _assign_data(item, field, data, ads_points, des_points):
+def _assign_data(item, field, meta, data, ads_points, des_points):
     """
     Add data to the data dictionary.
 
@@ -241,22 +256,46 @@ def _assign_data(item, field, data, ads_points, des_points):
     in a form depending on the label of the column.
     """
     name = next(f for f in field['labels'] if item.startswith(f))
-    if field['labels'][name] == 'loading':
-        data['loading'] = ads_points + des_points
-        for (u, c) in (('/mmol', 'mmol'), ('/mol', 'mol'),
-                       ('/cm3(STP)', 'cm3(STP)')):
-            if u in item:
-                data['loading_unit'] = c
-        for (u, c) in (('g-1', 'g'), ('kg-1', 'kg')):
-            if u in item:
-                data['adsorbent_unit'] = c
-    elif field['labels'][name] == 'measurement':
-        data['measurement'] = [False] * \
+
+    if field['labels'][name] == 'measurement':
+        data['branch'] = [False] * \
             len(ads_points) + [True] * len(des_points)
+
+    elif field['labels'][name] == 'loading':
+        data['loading'] = ads_points + des_points
+        for (u, c) in (
+            ('/mmol', 'mmol'),
+            ('/mol', 'mol'),
+            ('/cm3(STP)', 'cm3(STP)'),
+        ):
+            if u in item:
+                meta['loading_unit'] = c
+        for (u, c) in (
+            ('g-1', 'g'),
+            ('kg-1', 'kg'),
+        ):
+            if u in item:
+                meta['adsorbent_unit'] = c
+
+    elif field['labels'][name] == 'pressure':
+        data['pressure'] = ads_points + des_points
+        for (u, c) in (
+            ('/mmHg', 'torr'),
+            ('/torr', 'torr'),
+            ('/kPa', 'kPa'),
+            ('/bar', 'bar'),
+        ):
+            if u in item:
+                meta['pressure_unit'] = c
+
     elif field['labels'][name] in [
-        'relative', 'absolute', 'saturation', 'absolute2', 'internal'
+        'pressure2',
+        'pressure_saturation',
+        'pressure_relative',
+        'pressure_internal',
     ]:
-        data['pressure'][field['labels'][name]] = ads_points + des_points
+        data[field['labels'][name]] = ads_points + des_points
+
     else:
         raise ValueError(
             f"Label name '{field['labels'][name]}' not recognized."
@@ -284,7 +323,7 @@ def _get_errors(sheet, row, col):
     ]
 
 
-def _check(data, path):
+def _check(meta, data, path):
     """
     Check keys in data and logs a warning if a key is empty.
 
@@ -294,5 +333,5 @@ def _check(data, path):
         empties = (k for k, v in data.items() if not v)
         for empty in empties:
             logger.info(f"No data collected for {empty} in file {path}.")
-    if 'errors' in data:
-        logger.warning('\n'.join(data['errors']))
+    if 'errors' in meta:
+        logger.warning('\n'.join(meta['errors']))
