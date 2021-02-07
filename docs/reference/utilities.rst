@@ -1,10 +1,14 @@
 .. _utilities-ref:
 
 
-Unit Converter
-==============
+Unit Converters
+===============
 
-.. automodule:: pygaps.utilities.unit_converter
+.. automodule:: pygaps.utilities.converter_mode
+    :members:
+
+
+.. automodule:: pygaps.utilities.converter_unit
     :members:
 
 Interpolator

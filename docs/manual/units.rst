@@ -39,7 +39,7 @@ info of the specific adsorbate is required. This info is obtained
 internally using an equation of state from either CoolProp or REFPROP.
 
 Pressure conversions are handled by the
-:func:`~pygaps.utilities.unit_converter.c_pressure` function.
+:func:`~pygaps.utilities.converter_mode.c_pressure` function.
 
 
 Adsorbate loading
@@ -62,7 +62,7 @@ density of the adsorbate are required. This info is obtained
 internally using an equation of state from either CoolProp or REFPROP.
 
 Loading conversions are handled by the
-:func:`~pygaps.utilities.unit_converter.c_loading` function.
+:func:`~pygaps.utilities.converter_mode.c_loading` function.
 
 Adsorbent quantity
 :::::::::::::::::::
@@ -78,7 +78,7 @@ material is needed and should be provided by the user. To specify this in a
 material, check out the :ref:`Material <material-manual-manage>` manual.
 
 Adsorbent conversions are handled by the
-:func:`~pygaps.utilities.unit_converter.c_adsorbent` function.
+:func:`~pygaps.utilities.converter_mode.c_adsorbent` function.
 
 
 .. _units-manual-low-level:
@@ -86,17 +86,16 @@ Adsorbent conversions are handled by the
 Low-level convert
 -----------------
 
-The way units are converted under the hood is through
-the use of dictionaries to store conversion factors
-between the different unit types. The user can use the
-functions directly by importing the
-:mod:`pygaps.utilities.unit_converter` module.
+The way units are converted under the hood is through the use of dictionaries to
+store conversion factors between the different unit types. The user can use the
+functions directly by importing the :mod:`pygaps.utilities.converter_mode` and
+:mod:`pygaps.utilities.converter_unit` module.
 
 An example pressure conversion:
 
 ::
 
-    from pygaps.utilities.unit_converter import c_pressure
+    from pygaps.utilities.converter_mode import c_pressure
 
     c_pressure(1,
                mode_from='absolute', unit_from='bar',
@@ -107,7 +106,7 @@ An example loading conversion:
 
 ::
 
-    from pygaps.utilities.unit_converter import c_loading
+    from pygaps.utilities.converter_mode import c_loading
 
     c_loading(1,
               mode_from='molar', unit_from='mol',
@@ -118,7 +117,7 @@ An example pressure conversion:
 
 ::
 
-    from pygaps.utilities.unit_converter import c_adsorbent
+    from pygaps.utilities.converter_mode import c_adsorbent
 
     c_adsorbent(1,
                 mode_from='mass', unit_from='g',
