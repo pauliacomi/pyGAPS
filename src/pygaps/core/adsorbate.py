@@ -52,19 +52,23 @@ class Adsorbate():
         Custom value for liquid density (otherwise obtained through CoolProp).
     gas_density : float
         Custom value for gas density (otherwise obtained through CoolProp).
+    liquid_molar_density : float
+        Custom value for liquid molar density (otherwise obtained through CoolProp).
+    gas_molar_density : float
+        Custom value for gas molar density (otherwise obtained through CoolProp).
     enthalpy_liquefaction : float
         Custom value for enthalpy of liquefaction (otherwise obtained through CoolProp).
 
     Notes
     -----
-    The members of the properties dictionary are left at the discretion
-    of the user, to keep the class extensible. There are, however, some
-    unique properties which are used by calculations in other modules
-    listed in the other parameters section above.
+    The members of the properties dictionary are left at the discretion of the
+    user, to keep the class extensible. There are, however, some unique
+    properties which are used by calculations in other modules listed in the
+    other parameters section above.
 
     These properties can be either calculated by CoolProp (if the adsorbate
-    exists in CoolProp/REFPROP) or taken from the parameters
-    dictionary. They are best accessed using the associated function.
+    exists in CoolProp/REFPROP) or taken from the parameters dictionary. They
+    are best accessed using the associated function.
 
     Calculated::
 
@@ -75,9 +79,9 @@ class Adsorbate():
         my_adsorbate.surface_tension(77, calculate=False)
 
     If available, the underlying CoolProp state object
-    (http://www.coolprop.org/coolprop/LowLevelAPI.html) can be
-    accessed directly through the backend variable. For example,
-    to get the CoolProp-calculated critical pressure::
+    (http://www.coolprop.org/coolprop/LowLevelAPI.html) can be accessed directly
+    through the backend variable. For example, to get the CoolProp-calculated
+    critical pressure::
 
         adsorbate.backend.p_critical()
 
@@ -308,8 +312,7 @@ class Adsorbate():
                 except ParameterError:
                     raise CalculationError
 
-        else:
-            return self.get_prop("molar_mass")
+        return self.get_prop("molar_mass")
 
     def saturation_pressure(self, temp, unit=None, calculate=True):
         """
@@ -359,8 +362,8 @@ class Adsorbate():
             if unit is not None:
                 sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
             return sat_p
-        else:
-            return self.get_prop("saturation_pressure")
+
+        return self.get_prop("saturation_pressure")
 
     def surface_tension(self, temp, calculate=True):
         """
@@ -402,8 +405,7 @@ class Adsorbate():
                 except ParameterError:
                     raise CalculationError
 
-        else:
-            return self.get_prop("surface_tension")
+        return self.get_prop("surface_tension")
 
     def liquid_density(self, temp, calculate=True):
         """
@@ -445,12 +447,53 @@ class Adsorbate():
                 except ParameterError:
                     raise CalculationError
 
-        else:
-            return self.get_prop("liquid_density")
+        return self.get_prop("liquid_density")
+
+    def liquid_molar_density(self, temp, calculate=True):
+        """
+        Get the liquid molar density at a particular temperature.
+
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the liquid density is desired in K.
+        calculate : bool, optional.
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Molar liquid density in mol/cm3.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+
+        """
+        if calculate:
+            try:
+                state = self.backend
+                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                return state.rhomolar() / 1e6
+
+            except Exception as e_info:
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                try:
+                    return self.liquid_molar_density(temp, calculate=False)
+                except ParameterError:
+                    raise CalculationError
+
+        return self.get_prop("liquid_molar_density")
 
     def gas_density(self, temp, calculate=True):
         """
-        Get the gas density at a particular temperature.
+        Get the gas molar density at a particular temperature.
 
         Parameters
         ----------
@@ -488,8 +531,49 @@ class Adsorbate():
                 except ParameterError:
                     raise CalculationError
 
-        else:
-            return self.get_prop("gas_density")
+        return self.get_prop("gas_density")
+
+    def gas_molar_density(self, temp, calculate=True):
+        """
+        Get the gas density at a particular temperature.
+
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the gas density is desired in K.
+        calculate : bool, optional.
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Molar gas density in mol/cm3.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+
+        """
+        if calculate:
+            try:
+                state = self.backend
+                state.update(CoolProp.QT_INPUTS, 1.0, temp)
+                return state.rhomolar() / 1e6
+
+            except Exception as e_info:
+                warnings.warn(str(e_info))
+                warnings.warn('Attempting to read dictionary')
+                try:
+                    return self.gas_molar_density(temp, calculate=False)
+                except ParameterError:
+                    raise CalculationError
+
+        return self.get_prop("gas_molar_density")
 
     def enthalpy_liquefaction(self, temp, calculate=True):
         """
