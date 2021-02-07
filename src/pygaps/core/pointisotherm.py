@@ -147,7 +147,9 @@ class PointIsotherm(Isotherm):
                        ] + sorted(self.other_keys)
             if not all([a in isotherm_data.columns for a in columns]):
                 raise ParameterError(
-                    "Could not find some specified columns in the adsorption DataFrame."
+                    "Could not find specified columns "
+                    f"({[a for a in columns if a not in isotherm_data.columns]})"
+                    " in the adsorption DataFrame."
                 )
             if 'branch' in isotherm_data.columns:
                 columns.append('branch')
