@@ -1,19 +1,19 @@
 """Tests relating to the ModelIsotherm class."""
 
 import pandas
-from pandas.testing import assert_series_equal
 import pytest
 from matplotlib.testing.decorators import cleanup
+from pandas.testing import assert_series_equal
 
 import pygaps
 import pygaps.utilities.exceptions as pgEx
 
 from ..characterisation.conftest import DATA
 from ..characterisation.conftest import DATA_N77_PATH
-from .conftest import PRESSURE_PARAM
+from .conftest import LOADING_AT_PARAM
 from .conftest import LOADING_PARAM
 from .conftest import PRESSURE_AT_PARAM
-from .conftest import LOADING_AT_PARAM
+from .conftest import PRESSURE_PARAM
 
 
 @pytest.mark.core

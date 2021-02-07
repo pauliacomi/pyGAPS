@@ -1,8 +1,8 @@
 """Interface with BEL-generated DAT files."""
 
+from datetime import datetime
 from io import StringIO
 
-from datetime import datetime
 import pandas
 
 from ..core.pointisotherm import PointIsotherm

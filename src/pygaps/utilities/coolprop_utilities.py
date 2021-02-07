@@ -1,8 +1,9 @@
 """Utilities for interacting with the CoolProp backend."""
 
+import logging
+
 import CoolProp
 
-import logging
 logger = logging.getLogger('pygaps')
 
 logger.debug(f"CoolProp version is '{CoolProp.__version__}'")

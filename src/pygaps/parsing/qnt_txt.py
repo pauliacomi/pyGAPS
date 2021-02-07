@@ -1,8 +1,9 @@
 """Parse Quantachrome txt output files."""
 
-import numpy as np
 import re
+
 import dateutil.parser
+import numpy as np
 
 _FIELDS = {
     'material': {
@@ -124,6 +125,7 @@ def parse(path):
         elif index == ads_start - 2:
             units = re.split(r"\s{2,}", line)
             # TODO handle units
+            print(f"Units are {units}")
 
         elif index >= ads_start:
             raw_data.append(list(map(float, line.split())))

@@ -5,8 +5,8 @@ import logging
 logger = logging.getLogger('pygaps')
 import re
 from itertools import product
-import dateutil.parser
 
+import dateutil.parser
 import xlrd
 
 _RSPACE_REGEX = re.compile(r'\s+')
