@@ -336,13 +336,7 @@ class PointIsotherm(Isotherm):
             if not mode_to:
                 mode_to = self.pressure_mode
 
-            self.data_raw[self.pressure_key] = c_pressure(
-                self.data_raw[self.pressure_key],
-                mode_from=self.pressure_mode,
-                mode_to=mode_to,
-                unit_from=self.pressure_unit,
-                unit_to=unit_to,
-            adsorbate=self.adsorbate,
+                adsorbate=self.adsorbate,
 
             if unit_to != self.pressure_unit and mode_to == 'absolute':
                 self.pressure_unit = unit_to

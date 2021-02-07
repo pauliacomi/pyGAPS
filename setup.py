@@ -76,6 +76,7 @@ setup(
         'xlwt >= 1.3',
         'coolprop >= 6.0',
         'requests',
+        'importlib_resources; python_version<"3.9"',  # TODO remove after 3.8 is unsupported
     ],
     tests_require=[
         'pytest',
