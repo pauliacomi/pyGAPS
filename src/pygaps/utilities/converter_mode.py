@@ -18,7 +18,7 @@ _MATERIAL_MODE = {
     "volume": _VOLUME_UNITS,
     "molar": _MOLAR_UNITS,
     "percent": None,
-    "fractional": None,
+    "fraction": None,
 }
 
 
@@ -124,13 +124,15 @@ def c_pressure(
 
 
 def c_loading(
-    value,
-    basis_from,
-    basis_to,
-    unit_from,
-    unit_to,
+    value: float,
+    basis_from: str,
+    basis_to: str,
+    unit_from: str,
+    unit_to: str,
     adsorbate=None,
-    temp=None
+    temp: float = None,
+    basis_adsorbent: str = None,
+    unit_adsorbent: str = None,
 ):
     """
     Convert loading units and basis.
@@ -150,10 +152,18 @@ def c_loading(
         Unit from which to convert.
     unit_from : str
         Unit to which to convert.
-    adsorbate : str
+    adsorbate : str, optional
         Adsorbate for which the pressure is to be converted.
-    temp : float
-        Temperature at which the pressure is measured, in K.
+        Only required for some conversions.
+    temp : float, optional
+        Temperature at which the loading is measured, in K.
+        Only required for some conversions.
+    basis_adsorbent : str, optional
+        The basis of the adsorbent.
+        Only required for conversions involving percentage/fraction.
+    unit_adsorbent : str, optional
+        The unit of the adsorbent.
+        Only required for conversions involving percentage/fraction.
 
     Returns
     -------
@@ -173,54 +183,86 @@ def c_loading(
                 f"Viable basis for uptake are {list(_MATERIAL_MODE)}"
             )
 
-        if _MATERIAL_MODE[basis_to] is not None and not unit_to:
-            raise ParameterError(
-                f"To convert to {basis_to} basis, units must be specified."
-            )
-        if _MATERIAL_MODE[basis_from] is not None and not unit_from:
-            raise ParameterError(
-                f"To convert from {basis_from} basis, units must be specified."
-            )
+        if _MATERIAL_MODE[basis_to]:
+            if not unit_to:
+                raise ParameterError(
+                    f"To convert to {basis_to} basis, units must be specified."
+                )
+            if unit_to not in _MATERIAL_MODE[basis_to]:
+                raise ParameterError(
+                    f"Unit selected for loading unit_to ({unit_to}) is not an option. "
+                    f"Viable units are {list(_MATERIAL_MODE[basis_to])}"
+                )
 
-        if unit_to not in _MATERIAL_MODE[basis_to]:
-            raise ParameterError(
-                f"Unit selected for loading unit_to ({unit_to}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[basis_to])}"
-            )
+        if _MATERIAL_MODE[basis_from]:
+            if not unit_from:
+                raise ParameterError(
+                    f"To convert from {basis_from} basis, units must be specified."
+                )
+            if unit_from not in _MATERIAL_MODE[basis_from]:
+                raise ParameterError(
+                    f"Unit selected for loading unit_from ({unit_from}) is not an option. "
+                    f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
+                )
 
-        if unit_from not in _MATERIAL_MODE[basis_from]:
-            raise ParameterError(
-                f"Unit selected for loading unit_from ({unit_from}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
-            )
+        _basis_from = basis_from
+        _unit_from = unit_from
+        _basis_to = basis_to
+        _unit_to = unit_to
 
-        if basis_from == 'mass':
-            if basis_to == 'volume':
+        constant = 1
+        sign = 1
+        factor = 1
+
+        bf_b = basis_from in ['percent', 'fraction']
+        bt_b = basis_to in ['percent', 'fraction']
+        if bf_b or bt_b:
+            # if both are percent/fraction we do not need conversion
+            if bf_b and bt_b:
+                # we know they are different, so one must be percent and one fraction
+                if basis_from == 'percent':
+                    return value / 100
+                else:
+                    return value * 100
+            else:
+                # convert from physical -> percent/fraction
+                if bf_b:
+                    _basis_from = basis_adsorbent
+                    _unit_from = unit_adsorbent
+                    if basis_from == 'percent':
+                        factor = 0.01
+                elif bt_b:
+                    _basis_to = basis_adsorbent
+                    _unit_to = unit_adsorbent
+                    if basis_to == 'percent':
+                        factor = 100
+
+        if _basis_from == 'mass':
+            if _basis_to == 'volume':
                 constant = adsorbate.gas_density(temp=temp)
                 sign = -1
-            elif basis_to == 'molar':
+            elif _basis_to == 'molar':
                 constant = adsorbate.molar_mass()
                 sign = -1
-        elif basis_from == 'volume':
-            if basis_to == 'mass':
+        elif _basis_from == 'volume':
+            if _basis_to == 'mass':
                 constant = adsorbate.gas_density(temp=temp)
                 sign = 1
-            elif basis_to == 'molar':
-                constant = adsorbate.gas_density(temp=temp
-                                                 ) / adsorbate.molar_mass()
-                sign = -1
-        elif basis_from == 'molar':
-            if basis_to == 'mass':
+            elif _basis_to == 'molar':
+                constant = adsorbate.gas_molar_density(temp=temp)
+                sign = 1
+        elif _basis_from == 'molar':
+            if _basis_to == 'mass':
                 constant = adsorbate.molar_mass()
                 sign = 1
-            elif basis_to == 'volume':
-                constant = adsorbate.gas_density(temp=temp
-                                                 ) / adsorbate.molar_mass()
+            elif _basis_to == 'volume':
+                constant = adsorbate.gas_molar_density(temp=temp)
                 sign = -1
 
-        value = value * _MATERIAL_MODE[basis_from][unit_from] \
-            * constant ** sign \
-            / _MATERIAL_MODE[basis_to][unit_to]
+        return (
+            value * _MATERIAL_MODE[_basis_from][_unit_from] * factor *
+            constant**sign / _MATERIAL_MODE[_basis_to][_unit_to]
+        )
 
     elif unit_to and unit_from != unit_to:
         return c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to)
@@ -268,11 +310,19 @@ def c_adsorbent(
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
                 f"Basis selected for adsorbent ({basis_to}) is not an option. "
-                f"Viable bases are {list(_MATERIAL_MODE)}"
+                f"Viable bases are {[base for base in list(_MATERIAL_MODE) if base not in ['percent', 'fraction']]}"
+            )
+
+        if (
+            basis_from in ['percent', 'fraction']
+            or basis_to in ['percent', 'fraction']
+        ):
+            ParameterError(
+                "If you want to convert to/from fraction/percent, convert using loading, not adsorbate."
             )
 
         if not unit_to or not unit_from:
-            raise ParameterError("Specify both from and to units")
+            raise ParameterError("Specify both 'from' and 'to' units.")
 
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
@@ -285,6 +335,9 @@ def c_adsorbent(
                 f"Unit selected for adsorbent unit_from ({unit_from}) is not an option. "
                 f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
             )
+
+        constant = 1
+        sign = 1
 
         if basis_from == 'mass':
             if basis_to == 'volume':
@@ -301,7 +354,7 @@ def c_adsorbent(
                 constant = material.get_prop('density') / material.get_prop(
                     'molar_mass'
                 )
-                sign = -1
+                sign = 1
         elif basis_from == 'molar':
             if basis_to == 'mass':
                 constant = material.get_prop('molar_mass')
@@ -312,9 +365,10 @@ def c_adsorbent(
                 )
                 sign = -1
 
-        return value / _MATERIAL_MODE[basis_from][unit_from] \
-            / constant ** sign \
-            * _MATERIAL_MODE[basis_to][unit_to]
+        return (
+            value / _MATERIAL_MODE[basis_from][unit_from] / constant**sign *
+            _MATERIAL_MODE[basis_to][unit_to]
+        )
 
     elif unit_to and unit_from != unit_to:
         return c_unit(

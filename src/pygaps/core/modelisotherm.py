@@ -719,6 +719,8 @@ class ModelIsotherm(Isotherm):
                 points
             )
 
+            # Convert if needed
+            # First adsorbent is converted
             if adsorbent_basis or adsorbent_unit:
                 if not adsorbent_basis:
                     adsorbent_basis = self.adsorbent_basis
@@ -736,6 +738,13 @@ class ModelIsotherm(Isotherm):
                 if not loading_basis:
                     loading_basis = self.loading_basis
 
+                # These must be specified
+                # in the case of fractional conversions
+                if not adsorbent_basis:
+                    adsorbent_basis = self.adsorbent_basis
+                if not adsorbent_unit:
+                    adsorbent_unit = self.adsorbent_unit
+
                 ret = c_loading(
                     ret,
                     basis_from=self.loading_basis,
@@ -743,7 +752,9 @@ class ModelIsotherm(Isotherm):
                     unit_from=self.loading_unit,
                     unit_to=loading_unit,
                     adsorbate=self.adsorbate,
-                    temp=self.temperature
+                    temp=self.temperature,
+                    basis_adsorbent=adsorbent_basis,
+                    unit_adsorbent=adsorbent_unit,
                 )
         else:
             ret = self.loading_at(
@@ -862,7 +873,9 @@ class ModelIsotherm(Isotherm):
                 unit_from=loading_unit,
                 unit_to=self.loading_unit,
                 adsorbate=self.adsorbate,
-                temp=self.temperature
+                temp=self.temperature,
+                basis_adsorbent=adsorbent_basis,
+                unit_adsorbent=adsorbent_unit,
             )
 
         # Calculate pressure using internal model
@@ -971,6 +984,7 @@ class ModelIsotherm(Isotherm):
         loading = self.model.loading(pressure)
 
         # Ensure loading is in correct units and basis requested
+        # First adsorbent is converted
         if adsorbent_basis or adsorbent_unit:
             if not adsorbent_basis:
                 adsorbent_basis = self.adsorbent_basis
@@ -984,9 +998,17 @@ class ModelIsotherm(Isotherm):
                 material=self.material
             )
 
+        # Then loading
         if loading_basis or loading_unit:
             if not loading_basis:
                 loading_basis = self.loading_basis
+
+            # These must be specified
+            # in the case of fractional conversions
+            if not adsorbent_basis:
+                adsorbent_basis = self.adsorbent_basis
+            if not adsorbent_unit:
+                adsorbent_unit = self.adsorbent_unit
 
             loading = c_loading(
                 loading,
@@ -995,7 +1017,9 @@ class ModelIsotherm(Isotherm):
                 unit_from=self.loading_unit,
                 unit_to=loading_unit,
                 adsorbate=self.adsorbate,
-                temp=self.temperature
+                temp=self.temperature,
+                basis_adsorbent=adsorbent_basis,
+                unit_adsorbent=adsorbent_unit,
             )
 
         return loading

@@ -115,7 +115,7 @@ def material_data():
         'type': 'MOF',
         'form': 'powder',
         'comment': 'test comment',
-        'density': 10,  # g/cm3
+        'density': 2,  # g/cm3
         'poresize': 14,
         'molar_mass': 10,  # g/mol
     }
