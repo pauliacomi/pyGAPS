@@ -23,7 +23,7 @@ def _is_float(s):
 
 def _is_bool(s):
     """Check a value is a CSV bool."""
-    if s == 'True' or s == 'False':
+    if s.lower() in ['true', 'false']:
         return True
     else:
         return False
@@ -31,9 +31,9 @@ def _is_bool(s):
 
 def _to_bool(s):
     """Convert a value into a CSV bool."""
-    if s == 'True':
+    if s.lower() == 'true':
         return True
-    elif s == 'False':
+    elif s.lower() == 'false':
         return False
     else:
         raise ValueError('String cannot be converted to bool')
@@ -41,7 +41,7 @@ def _to_bool(s):
 
 def _is_list(s):
     """Check a value is a CSV list."""
-    if s[0] == '[' and s[-1] == ']':
+    if s.startswith('[') and s.endswith(']'):
         return True
     else:
         return False
@@ -171,9 +171,15 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
         while not (
             line.startswith('data') or line.startswith('model') or line == ""
         ):
-            values = line.split(sep=separator)
+            values = line.strip().split(sep=separator)
 
-            if _is_bool(values[1]):
+            if len(values) > 2:
+                raise ParsingError(
+                    f"The isotherm metadata {values} contains more than two values."
+                )
+            elif not values[1]:
+                val = None
+            elif _is_bool(values[1]):
                 val = _to_bool(values[1])
             elif _is_float(values[1]):
                 val = float(values[1])
@@ -185,8 +191,8 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             line = raw_csv.readline().rstrip()
     except Exception:
         raise ParsingError(
-            "Could not parse JSON isotherm. "
-            "The `str_or_path` is invalid or does not exist. "
+            "Could not parse CSV isotherm. "
+            "The text cannot be parsed wrong, check for errors."
         )
 
     # Update dictionary with any user parameters
