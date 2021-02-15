@@ -11,8 +11,9 @@ from cycler import cycler
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
-from ..utilities.string_utilities import convert_chemformula
 from . import plt
+from .axis_labels import label_axis_text_pl
+from .axis_labels import label_lgd
 from .mpl_styles import ISO_STYLES
 
 # list of branch types
@@ -171,6 +172,7 @@ def plot_iso(
     #######################################
     #
     # Initial checks
+
     # Make iterable if not already
     if not isinstance(isotherms, abc.Iterable):
         isotherms = (isotherms, )
@@ -196,7 +198,7 @@ def plot_iso(
             f"One of the isotherms supplied does not have {y1_data} data."
         )
 
-    if y2_data is not None:
+    if y2_data:
         if all(y2_data not in keys(isotherm) for isotherm in isotherms):
             raise GraphingError(
                 f"None of the isotherms supplied have {y2_data} data"
@@ -205,7 +207,7 @@ def plot_iso(
             warnings.warn(f"Some isotherms do not have {y2_data} data")
 
     # Store which branches will be displayed
-    if branch is None:
+    if not branch:
         raise ParameterError(
             "Specify a branch to display"
             " e.g. branch=\'ads\'"
@@ -238,6 +240,7 @@ def plot_iso(
     styles = copy.deepcopy(ISO_STYLES)
 
     # Overwrite with any user provided styles
+    # TODO not really a good deep dict merge
     for style in styles:
         new_style = other_parameters.get(style)
         if new_style:
@@ -246,43 +249,22 @@ def plot_iso(
     #
     # Generate or assign the figure and the axes
     if ax:
-        fig = ax.get_figure()
         ax1 = ax
+        fig = ax1.get_figure()
     else:
         fig = plt.pyplot.figure(**styles['fig_style'])
-        ax1 = plt.pyplot.subplot(111)
+        ax1 = fig.add_subplot(111)
 
     # Create second axes object, populate it if required
     ax2 = ax1.twinx() if y2_data else None
 
-    # Build the name of the axes
-    def get_name(key):
-        if key == "pressure":
-            if pressure_mode == "absolute":
-                text = f"Pressure [${pressure_unit}$]"
-            elif pressure_mode == "relative":
-                text = "Pressure [$p/p^0$]"
-            elif pressure_mode == "relative%":
-                text = "Pressure [%$p/p^0$]"
-        elif key == 'loading':
-            if loading_basis == "percent":
-                text = f"Loading [${adsorbent_basis}$%]"
-            elif loading_basis == "fraction":
-                text = fr"Loading [${adsorbent_basis}\/fraction$]"
-            else:
-                text = fr"Loading [${loading_unit}\/{adsorbent_unit}^{{-1}}$]"
-        elif key == "enthalpy":
-            text = r"$\Delta_{ads}h$ $(-kJ\/mol^{-1})$"
-        else:
-            text = key
-        return text
-
-    x_label = get_name(x_data)
-    y1_label = get_name(y1_data)
+    x_label = label_axis_text_pl(iso_params, x_data)
+    y1_label = label_axis_text_pl(iso_params, y1_data)
     if y2_data:
-        y2_label = get_name(y2_data)
+        y2_label = label_axis_text_pl(iso_params, y2_data)
 
     # Get a cycling style for the graph
+    #
     # Color styling
     if color:
         if isinstance(color, bool):
@@ -298,7 +280,7 @@ def plot_iso(
 
     else:
         color_cy = cycler('color', ['black', 'grey', 'silver'])
-
+    #
     # Marker styling
     all_markers = ('o', 's', 'D', 'P', '*', '<', '>', 'X', 'v', '^')
     if marker is None:
@@ -342,38 +324,12 @@ def plot_iso(
         pc_secondary = cycle(y2_marker_cy * color_cy)
 
     # Put grid on plot
-    ax1.grid(True, zorder=5)
+    # TODO deprecated
+    # ax1.grid(True, zorder=5)
 
     # Graph title
-    if fig_title is None:
-        fig_title = ''
-    ax1.set_title(fig_title, **styles['title_style'])
-
-    # Graph legend builder
-    def build_label(isotherm, lbl_components, current_branch, key):
-        """Build a label for the legend depending on requested parameters."""
-        if branch == 'all-nol' and current_branch == 'des':
-            return ''
-
-        if lbl_components is None:
-            return f"{isotherm.material} {convert_chemformula(isotherm.adsorbate)}"
-
-        text = []
-        for selected in lbl_components:
-            if selected == 'branch':
-                text.append(current_branch)
-                continue
-            if selected == 'key':
-                text.append(key)
-                continue
-            val = getattr(isotherm, selected)
-            if val:
-                if selected == 'adsorbate':
-                    text.append(convert_chemformula(isotherm.adsorbate))
-                else:
-                    text.append(str(val))
-
-        return " ".join(text)
+    if fig_title:
+        ax1.set_title(fig_title, **styles['title_style'])
 
     ###########################################
     #
@@ -395,7 +351,7 @@ def plot_iso(
         ax1.tick_params(axis='both', which='major', **styles['tick_style'])
 
         # Plot line 1
-        label = build_label(isotherm, lgd_keys, current_branch, y1_data)
+        label = label_lgd(isotherm, lgd_keys, current_branch, branch, y1_data)
 
         x_p, y_p = _get_data(
             isotherm, x_data, current_branch, x_range, **iso_params
@@ -420,7 +376,9 @@ def plot_iso(
                 join='inner'
             )
 
-            label = build_label(isotherm, lgd_keys, current_branch, y2_data)
+            label = label_lgd(
+                isotherm, lgd_keys, current_branch, branch, y2_data
+            )
             ax2.set_ylabel(y2_label, **styles['label_style'])
             ax2.tick_params(axis='both', which='major', **styles['tick_style'])
             ax2.plot(x_p, y2_p, label=label, **y2_style)
@@ -487,7 +445,15 @@ def plot_iso_raw(
     fig_title=None,
     **other_parameters
 ):
+    """
+    A simpler plot function given data/labels directly.
 
+    TODO this is code duplication, should refactor.
+    """
+    if color is None:
+        color = plt.cm.jet(0.8)
+
+    # Pack parameters
     log_params = dict(logx=logx, logy1=logy1, logy2=logy2)
     range_params = dict(x_range=x_range, y1_range=y1_range, y2_range=y2_range)
 
@@ -504,9 +470,6 @@ def plot_iso_raw(
         if new_style:
             styles[style].update(new_style)
 
-    if color is None:
-        color = plt.cm.jet(0.8)
-
     #
     # Generate the graph itself
     if ax:
@@ -514,18 +477,18 @@ def plot_iso_raw(
         fig = ax1.get_figure()
     else:
         fig = plt.pyplot.figure(**styles['fig_style'])
-        ax1 = plt.pyplot.subplot(111)
+        ax1 = fig.add_subplot(111)
 
     # Create second axes object, populate it if required
     ax2 = ax1.twinx() if y2_data else None
 
     # Put grid on plot
-    ax1.grid(True, zorder=5)
+    # TODO deprecated
+    # ax1.grid(True, zorder=5)
 
     # Graph title
-    if fig_title is None:
-        fig_title = ''
-    ax1.set_title(fig_title, **styles['title_style'])
+    if fig_title:
+        ax1.set_title(fig_title, **styles['title_style'])
 
     #####################################
     #

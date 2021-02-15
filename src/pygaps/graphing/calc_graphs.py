@@ -4,6 +4,8 @@ from . import plt
 from .mpl_styles import LABEL_STYLE
 from .mpl_styles import TICK_STYLE
 from .mpl_styles import TITLE_STYLE
+from .mpl_styles import POINTS_ALL_STYLE
+from .mpl_styles import POINTS_SEL_STYLE
 
 
 def roq_plot(
@@ -50,20 +52,13 @@ def roq_plot(
         pressure,
         roq_points,
         label='all points',
-        color='grey',
-        marker='o',
-        mfc='none',
-        markersize=6,
-        markeredgewidth=1.5,
-        linewidth=0,
+        **POINTS_ALL_STYLE,
     )
     ax.plot(
         pressure[minimum:maximum],
         roq_points[minimum:maximum],
-        marker='o',
-        linestyle='',
-        color='r',
-        label='chosen points'
+        label='chosen points',
+        **POINTS_SEL_STYLE,
     )
     ax.plot(
         p_monolayer,
@@ -132,24 +127,23 @@ def bet_plot(
         pressure,
         bet_points,
         label='all points',
-        color='grey',
-        marker='o',
-        mfc='none',
-        markersize=6,
-        markeredgewidth=1.5,
-        linewidth=0,
+        **POINTS_ALL_STYLE,
     )
     ax.plot(
         pressure[minimum:maximum],
         bet_points[minimum:maximum],
-        marker='o',
-        linestyle='',
-        color='r',
-        label='chosen points'
+        label='chosen points',
+        **POINTS_SEL_STYLE,
     )
     x_lim = [0, pressure[maximum]]
     y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
-    ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
+    ax.plot(
+        x_lim,
+        y_lim,
+        linestyle='--',
+        color='black',
+        label='model fit',
+    )
     ax.plot(
         p_monolayer,
         bet_monolayer,
@@ -208,24 +202,23 @@ def langmuir_plot(
         pressure,
         langmuir_points,
         label='all points',
-        color='grey',
-        marker='o',
-        mfc='none',
-        markersize=6,
-        markeredgewidth=1.5,
-        linewidth=0,
+        **POINTS_ALL_STYLE,
     )
     ax.plot(
         pressure[minimum:maximum],
         langmuir_points[minimum:maximum],
-        marker='o',
-        linestyle='',
-        color='r',
-        label='chosen points'
+        label='chosen points',
+        **POINTS_SEL_STYLE,
     )
     x_lim = [0, pressure[maximum]]
     y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
-    ax.plot(x_lim, y_lim, linestyle='--', color='black', label='trendline')
+    ax.plot(
+        x_lim,
+        y_lim,
+        linestyle='--',
+        color='black',
+        label='model fit',
+    )
 
     ax.set_ylim(bottom=0, top=langmuir_points[maximum] * 1.2)
     ax.set_xlim(left=0, right=pressure[maximum] * 1.2)
@@ -286,22 +279,27 @@ def tp_plot(
         _, ax = plt.pyplot.subplots()
 
     if alpha_s:
-        label1 = '$\\alpha_s$ method'
-        label2 = '$\\alpha_s (V/V_{' + str(alpha_reducing_p) + '})$'
-        label3 = '$\\alpha_s$ method'
+        label_points = '$\\alpha_s$ transform'
+        label_x = '$\\alpha_s (V/V_{' + str(alpha_reducing_p) + '})$'
+        label_title = '$\\alpha_s$ method'
     else:
-        label1 = 't transform'
-        label2 = 'Layer thickness [nm]'
-        label3 = 't-plot method'
-    ax.plot(thickness_curve, loading, marker='', color='g', label=label1)
-
+        label_points = 't transform'
+        label_x = 'Layer thickness [nm]'
+        label_title = 't-plot method'
+    ax.plot(
+        thickness_curve,
+        loading,
+        label=label_points,
+        **POINTS_ALL_STYLE,
+    )
+    style = POINTS_SEL_STYLE.copy()
     for index, result in enumerate(results):
+        style['color'] = f"C{index}"
         # plot chosen points
         ax.plot(
             thickness_curve[result.get('section')],
             loading[result.get('section')],
-            marker='.',
-            linestyle=''
+            **style,
         )
 
         # plot line
@@ -317,14 +315,14 @@ def tp_plot(
             x_lim,
             y_lim,
             linestyle='--',
-            color='black',
-            label='linear' + str(index + 1)
+            color=f"C{index}",
+            label=f'linear {index+1}'
         )
 
-    ax.set_title(label3)
+    ax.set_title(label_title)
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
-    ax.set_xlabel(label2)
+    ax.set_xlabel(label_x)
     ax.set_ylabel('Loading')
     ax.legend(loc='best')
 
@@ -614,17 +612,7 @@ def dra_plot(
     if ax is None:
         _, ax = plt.pyplot.subplots()
 
-    ax.plot(
-        log_n_p0p,
-        logv,
-        label='all points',
-        color='grey',
-        marker='o',
-        mfc='none',
-        markersize=6,
-        markeredgewidth=1.5,
-        linewidth=0,
-    )
+    ax.plot(log_n_p0p, logv, label='all points', **POINTS_ALL_STYLE)
     ax.plot(
         log_n_p0p[minimum:maximum],
         logv[minimum:maximum],
@@ -638,7 +626,7 @@ def dra_plot(
         slope * log_n_p0p + intercept,
         linestyle='--',
         color='black',
-        label='trendline'
+        label='model fit'
     )
 
     ax.set_xlabel('log $p^0/p$')

@@ -41,3 +41,16 @@ IAST_STYLES = {
     'tick_style': TICK_STYLE,
     'lgd_style': LEGEND_STYLE,
 }
+POINTS_ALL_STYLE = {
+    'color': 'grey',
+    'marker': 'o',
+    'mfc': 'none',
+    'markersize': 6,
+    'markeredgewidth': 1.5,
+    'linewidth': 0,
+}
+POINTS_SEL_STYLE = {
+    'marker': 'o',
+    'linestyle': '',
+    'color': 'r',
+}
