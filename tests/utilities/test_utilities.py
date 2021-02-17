@@ -27,3 +27,36 @@ def test_file_paths():
     paths = util.folder_utilities.util_get_file_paths(path, extension='tst')
 
     assert all([path in known_paths for path in paths])
+
+
+@pytest.mark.core
+def test_deep_merge():
+    source = {'hello1': 1}
+    overrides = {'hello2': 2}
+    util.python_utilities.deep_merge(source, overrides)
+    assert source == {'hello1': 1, 'hello2': 2}
+
+    source = {'hello1': 0}
+    overrides = {'hello1': {'bar': 1}}
+    util.python_utilities.deep_merge(source, overrides)
+    assert source == {'hello1': {'bar': 1}}
+
+    source = {'hello': 'to_override'}
+    overrides = {'hello': 'over'}
+    util.python_utilities.deep_merge(source, overrides)
+    assert source == {'hello': 'over'}
+
+    source = {'hello': {'value': 'to_override', 'no_change': 1}}
+    overrides = {'hello': {'value': 'over'}}
+    util.python_utilities.deep_merge(source, overrides)
+    assert source == {'hello': {'value': 'over', 'no_change': 1}}
+
+    source = {'hello': {'value': 'to_override', 'no_change': 1}}
+    overrides = {'hello': {'value': {}}}
+    util.python_utilities.deep_merge(source, overrides)
+    assert source == {'hello': {'value': {}, 'no_change': 1}}
+
+    source = {'hello': {'value': {}, 'no_change': 1}}
+    overrides = {'hello': {'value': 2}}
+    util.python_utilities.deep_merge(source, overrides)
+    assert source == {'hello': {'value': 2, 'no_change': 1}}

@@ -11,6 +11,7 @@ from cycler import cycler
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
+from ..utilities.python_utilities import deep_merge
 from . import plt
 from .axis_labels import label_axis_text_pl
 from .axis_labels import label_lgd
@@ -240,11 +241,10 @@ def plot_iso(
     styles = copy.deepcopy(ISO_STYLES)
 
     # Overwrite with any user provided styles
-    # TODO not really a good deep dict merge
     for style in styles:
-        new_style = other_parameters.get(style)
+        new_style = other_parameters.get(style, None)
         if new_style:
-            styles[style].update(new_style)
+            styles[style] = deep_merge(styles[style], new_style)
 
     #
     # Generate or assign the figure and the axes
@@ -466,9 +466,9 @@ def plot_iso_raw(
 
     # Overwrite with any user provided styles
     for style in styles:
-        new_style = other_parameters.get(style)
+        new_style = other_parameters.get(style, None)
         if new_style:
-            styles[style].update(new_style)
+            styles[style] = deep_merge(styles[style], new_style)
 
     #
     # Generate the graph itself

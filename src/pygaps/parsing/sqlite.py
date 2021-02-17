@@ -22,7 +22,7 @@ from pygaps.data import DATABASE
 from pygaps.data import MATERIAL_LIST
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
-from pygaps.utilities.python_utilities import checktype
+from pygaps.utilities.python_utilities import checkSQLbool
 from pygaps.utilities.python_utilities import grouped
 from pygaps.utilities.sqlite_utilities import build_delete
 from pygaps.utilities.sqlite_utilities import build_insert
@@ -1005,7 +1005,7 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
             # Generate the isotherm parameters dictionary
             iso_params = dict(zip(row.keys(), row))
             iso_params.update({
-                prop[1]: checktype(prop[2])
+                prop[1]: checkSQLbool(prop[2])
                 for prop in isotherm_props
                 if prop[0] == row['id']
             })
