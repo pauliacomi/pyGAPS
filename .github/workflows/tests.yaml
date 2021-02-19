@@ -58,7 +58,7 @@ jobs:
             toxenv: "py37-cover"
           - python-version: 3.8
             toxenv: "py38-cover"
-          - python-version: 3.8
+          - python-version: 3.9
             toxenv: "py39-cover"
 
     steps:
