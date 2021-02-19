@@ -1,4 +1,4 @@
-name: CI
+name: Test package and docs
 
 on:
   [push, pull_request, workflow_dispatch]
@@ -45,7 +45,7 @@ jobs:
         TOXENV: docs
 
   unittests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -53,10 +53,13 @@ jobs:
         include:
           - python-version: 3.6
             toxenv: "py36-cover"
+            os: ${{ matrix.os }}
           - python-version: 3.7
             toxenv: "py37-cover"
+          - os: ${{ matrix.os }}
           - python-version: 3.8
             toxenv: "py38-cover"
+            os: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
