@@ -2,10 +2,10 @@
 
 from . import plt
 from .mpl_styles import LABEL_STYLE
-from .mpl_styles import TICK_STYLE
-from .mpl_styles import TITLE_STYLE
 from .mpl_styles import POINTS_ALL_STYLE
 from .mpl_styles import POINTS_SEL_STYLE
+from .mpl_styles import TICK_STYLE
+from .mpl_styles import TITLE_STYLE
 
 
 def roq_plot(
