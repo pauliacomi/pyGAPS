@@ -33,6 +33,7 @@ setup(
     description=  # noqa: E251
     """A framework for processing adsorption data for porous materials.""",
     long_description=remove_badges(read('README.rst')),
+    long_description_content_type="text/x-rst",
     author='Paul Iacomi',
     author_email='mail@pauliacomi.com',
     url='https://github.com/pauliacomi/pygaps',
