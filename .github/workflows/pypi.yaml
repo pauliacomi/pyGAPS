@@ -3,10 +3,10 @@ name: Publish to PyPI
 on:
   # On a new version, in the master branch
   push:
-    # branches:
-    #   - master
-    # tags:
-    #   - v*
+    branches:
+      - master
+    tags:
+      - v*
 
   # Allows running manually
   workflow_dispatch:
@@ -39,8 +39,8 @@ jobs:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
 
-    # - name: Publish 📦 to PyPI
-    #   uses: pypa/gh-action-pypi-publish@release/v1
-    #   with:
-    #     user: __token__
-    #     password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Publish 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
