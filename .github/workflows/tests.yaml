@@ -50,16 +50,16 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        python-version : [3.6, 3.7, 3.8, 3.9]
         include:
           - python-version: 3.6
             toxenv: "py36-cover"
-            os: ${{ matrix.os }}
           - python-version: 3.7
             toxenv: "py37-cover"
-          - os: ${{ matrix.os }}
           - python-version: 3.8
             toxenv: "py38-cover"
-            os: ${{ matrix.os }}
+          - python-version: 3.8
+            toxenv: "py39-cover"
 
     steps:
     - uses: actions/checkout@v2
