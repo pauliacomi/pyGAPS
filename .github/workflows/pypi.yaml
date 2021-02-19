@@ -3,10 +3,10 @@ name: Publish to PyPI
 on:
   # On a new version, in the master branch
   push:
-    branches:
-      - master
-    tags:
-      - v*
+    # branches:
+    #   - master
+    # tags:
+    #   - v*
 
   # Allows running manually
   workflow_dispatch:
