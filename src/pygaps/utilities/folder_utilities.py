@@ -5,7 +5,7 @@ from pathlib import Path
 from .exceptions import pgError
 
 
-def util_get_file_paths(folder, extension=None):
+def get_file_paths(folder, extension=None):
     """
     Get the paths of the files with the requested extension as a list.
 
