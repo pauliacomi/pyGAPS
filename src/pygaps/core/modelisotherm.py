@@ -252,10 +252,10 @@ class ModelIsotherm(BaseIsotherm):
         isotherm_data=None,
         pressure_key=None,
         loading_key=None,
+        branch='ads',
         model=None,
         param_guess=None,
         optimization_params=None,
-        branch='ads',
         verbose=False,
     ):
         """
@@ -279,6 +279,9 @@ class ModelIsotherm(BaseIsotherm):
             Column of the pandas DataFrame where the pressure is stored.
         loading_key : str
             Column of the pandas DataFrame where the loading is stored.
+        branch : ['ads', 'des'], optional
+            The branch on which the model isotherm is based on. It is assumed to be the
+            adsorption branch, as it is the most commonly modelled.
         model : str
             The model to be used to describe the isotherm.
         param_guess : dict
@@ -288,10 +291,6 @@ class ModelIsotherm(BaseIsotherm):
             See `here
             <https://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize>`__.
             Defaults to "Nelder-Mead".
-        branch : ['ads', 'des'], optional
-            The branch on which the model isotherm is based on. It is assumed to be the
-            adsorption branch, as it is the most commonly modelled part, although may
-            set to desorption as well.
         verbose : bool
             Prints out extra information about steps taken.
         """
@@ -315,30 +314,27 @@ class ModelIsotherm(BaseIsotherm):
     def from_pointisotherm(
         cls,
         isotherm,
-        model=None,
-        guess_model=None,
         branch='ads',
+        model=None,
         param_guess=None,
         optimization_params=None,
         verbose=False
     ):
         """
-        Constructs a ModelIsotherm using a the data from a PointIsotherm
-        and all its parameters.
+        Constructs a ModelIsotherm using data from a PointIsotherm and all its
+        parameters.
 
         Parameters
         ----------
         isotherm : PointIsotherm
             An instance of the PointIsotherm parent class to model.
-        model : str
-            The model to be used to describe the isotherm.
-        guess_model : 'all', list of model names
-            Attempt to guess which model best fits the isotherm data
-            from the model name list supplied. If set to 'all'
-            A calculation of all models available will be performed,
-            therefore it will take a longer time.
         branch : [None, 'ads', 'des'], optional
             Branch of isotherm to model. Defaults to adsorption branch.
+        model : str, list, 'guessall'
+            The model to be used to describe the isotherm. Give a single model
+            name (`"Langmuir"`) to fit it. Give a list of many model names to
+            try them all and return the best fit (`[`Henry`, `Langmuir`]`).
+            Specify `"guessall"` to try all available models.
         param_guess : dict, optional
             Starting guess for model parameters in the data fitting routine.
         optimization_params : dict, optional
@@ -350,27 +346,25 @@ class ModelIsotherm(BaseIsotherm):
         """
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
+        iso_params['isotherm_data'] = isotherm.data(branch=branch)
+        iso_params['pressure_key'] = isotherm.pressure_key
+        iso_params['loading_key'] = isotherm.loading_key
 
-        if guess_model:
-            return ModelIsotherm.guess(
-                isotherm_data=isotherm.data(branch=branch),
-                pressure_key=isotherm.pressure_key,
-                loading_key=isotherm.loading_key,
-                models=guess_model,
-                optimization_params=optimization_params,
-                branch=branch,
-                verbose=verbose,
-                **iso_params
-            )
+        if isinstance(model, str):
+            if model != 'guessall':
+                return cls(
+                    branch=branch,
+                    model=model,
+                    param_guess=param_guess,
+                    optimization_params=optimization_params,
+                    verbose=verbose,
+                    **iso_params
+                )
 
-        return cls(
-            isotherm_data=isotherm.data(branch=branch),
-            pressure_key=isotherm.pressure_key,
-            loading_key=isotherm.loading_key,
-            model=model,
-            param_guess=param_guess,
-            optimization_params=optimization_params,
+        return ModelIsotherm.guess(
             branch=branch,
+            models=model,
+            optimization_params=optimization_params,
             verbose=verbose,
             **iso_params
         )
@@ -383,15 +377,15 @@ class ModelIsotherm(BaseIsotherm):
         isotherm_data=None,
         pressure_key=None,
         loading_key=None,
-        models='all',
-        optimization_params=None,
         branch='ads',
+        models='guessall',
+        optimization_params=None,
         verbose=False,
         **isotherm_parameters
     ):
         """
         Attempt to model the data using supplied list of model names,
-        then return the one with the best rms fit.
+        then return the one with the best RMS fit.
 
         May take a long time depending on the number of datapoints.
 
@@ -409,9 +403,9 @@ class ModelIsotherm(BaseIsotherm):
             Column of the pandas DataFrame where the pressure is stored.
         loading_key : str
             Column of the pandas DataFrame where the loading is stored.
-        models : 'all', list of model names
+        models : 'guessall', list of model names
             Attempt to guess which model best fits the isotherm data
-            from the model name list supplied. If set to 'all'
+            from the model name list supplied. If set to 'guessall'
             A calculation of all models available will be performed,
             therefore it will take a longer time.
 
@@ -429,7 +423,7 @@ class ModelIsotherm(BaseIsotherm):
             Any other parameters of the isotherm which should be stored internally.
         """
         attempts = []
-        if models == 'all':
+        if models == 'guessall':
             guess_models = _GUESS_MODELS
         else:
             guess_models = [m for m in models if m in _MODELS]
@@ -440,7 +434,7 @@ class ModelIsotherm(BaseIsotherm):
 
         for model in guess_models:
             try:
-                isotherm = ModelIsotherm(
+                isotherm = cls(
                     pressure=pressure,
                     loading=loading,
                     isotherm_data=isotherm_data,
