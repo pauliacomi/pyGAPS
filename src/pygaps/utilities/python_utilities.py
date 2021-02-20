@@ -1,6 +1,10 @@
 """Collections of various python utilities."""
 
+
 import collections.abc as abc
+import pathlib
+
+from .exceptions import pgError
 
 
 def _one_pass(iters):
@@ -59,3 +63,27 @@ def checkSQLbool(val):
             return True
         return False
     return val
+
+
+
+def get_file_paths(folder, extension=None):
+    """
+    Get the paths of the files with the requested extension as a list.
+
+    Parameters
+    ----------
+    folder : str
+        Folder where the function will look in, recursively.
+    extension : str
+        The extension of the files to look for.
+
+    Returns
+    -------
+    list
+        Paths of each file.
+
+    """
+    if extension is None:
+        raise pgError("Must provide a file extension to look for")
+
+    return pathlib.Path(folder).rglob(f"*.{extension}")
