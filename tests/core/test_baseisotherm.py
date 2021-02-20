@@ -7,12 +7,12 @@ import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.core
-class TestIsotherm():
+class TestBaseIsotherm():
     """Test the basic isotherm object."""
     def test_isotherm_create(self):
         """Check isotherm can be created from test data."""
 
-        pygaps.core.isotherm.Isotherm(
+        pygaps.core.baseisotherm.BaseIsotherm(
             material='carbon',
             adsorbate='nitrogen',
             temperature=77,
@@ -29,7 +29,7 @@ class TestIsotherm():
         assert iso_id != basic_isotherm.iso_id
 
     @pytest.mark.parametrize(
-        'missing_param', pygaps.core.isotherm.Isotherm._required_params
+        'missing_param', pygaps.core.baseisotherm.BaseIsotherm._required_params
     )
     def test_isotherm_miss_param(self, isotherm_parameters, missing_param):
         """Test exception throw for missing required attributes."""
@@ -38,7 +38,7 @@ class TestIsotherm():
         del data[missing_param]
 
         with pytest.raises(pgEx.ParameterError):
-            pygaps.core.isotherm.Isotherm(**isotherm_parameters)
+            pygaps.core.baseisotherm.BaseIsotherm(**isotherm_parameters)
 
     @pytest.mark.parametrize(
         'update', [
@@ -75,7 +75,7 @@ class TestIsotherm():
         """Test exception throw for missing or wrong unit."""
 
         isotherm_parameters.update(update)
-        pygaps.core.isotherm.Isotherm(**isotherm_parameters)
+        pygaps.core.baseisotherm.BaseIsotherm(**isotherm_parameters)
 
     @pytest.mark.parametrize(
         'prop, set_to', [('pressure_unit', 'something'),
@@ -93,7 +93,7 @@ class TestIsotherm():
         isotherm_parameters[prop] = set_to
 
         with pytest.raises(pgEx.ParameterError):
-            pygaps.core.isotherm.Isotherm(**isotherm_parameters)
+            pygaps.core.baseisotherm.BaseIsotherm(**isotherm_parameters)
 
     def test_isotherm_get_parameters(
         self, isotherm_parameters, basic_isotherm

@@ -75,7 +75,7 @@ def isotherm_data():
 @pytest.fixture(scope='function')
 def basic_isotherm(isotherm_parameters):
     """Create a basic isotherm from basic data."""
-    return pygaps.core.isotherm.Isotherm(**isotherm_parameters)
+    return pygaps.core.baseisotherm.BaseIsotherm(**isotherm_parameters)
 
 
 @pytest.fixture(scope='function')

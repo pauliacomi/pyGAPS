@@ -6,7 +6,7 @@ import pandas
 import xlrd
 import xlwt
 
-from pygaps.core.isotherm import Isotherm
+from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
@@ -370,4 +370,4 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
     if isotype == 2:
         return ModelIsotherm(model=model_from_dict(model), **raw_dict)
 
-    return Isotherm(**raw_dict)
+    return BaseIsotherm(**raw_dict)

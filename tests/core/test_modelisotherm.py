@@ -140,16 +140,16 @@ class TestModelIsotherm():
         isotherm = pygaps.isotherm_from_json(filepath)
 
         pygaps.ModelIsotherm.from_pointisotherm(
-            isotherm, guess_model='all', verbose=True
+            isotherm, model='guessall', verbose=True
         )
 
         pygaps.ModelIsotherm.from_pointisotherm(
-            isotherm, guess_model=['Henry', 'Langmuir'], verbose=True
+            isotherm, model=['Henry', 'Langmuir'], verbose=True
         )
 
         with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm.from_pointisotherm(
-                isotherm, guess_model=['Henry', 'DummyModel'], verbose=True
+                isotherm, model=['Henry', 'DummyModel'], verbose=True
             )
 
     ##########################

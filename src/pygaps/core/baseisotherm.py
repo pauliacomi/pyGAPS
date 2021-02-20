@@ -14,7 +14,7 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.hashgen import isotherm_to_hash
 
 
-class Isotherm():
+class BaseIsotherm():
     """
     Class which contains the general data for an isotherm, real or model.
 
@@ -67,12 +67,12 @@ class Isotherm():
     _required_params = ['material', 'temperature', 'adsorbate']
     # unit-related attributes
     _unit_params = {
-        'pressure_unit': 'bar',
         'pressure_mode': 'absolute',
-        'adsorbent_unit': 'g',
+        'pressure_unit': 'bar',
         'adsorbent_basis': 'mass',
-        'loading_unit': 'mmol',
+        'adsorbent_unit': 'g',
         'loading_basis': 'molar',
+        'loading_unit': 'mmol',
     }
     # other special reserved parameters
     # subclasses overwrite this

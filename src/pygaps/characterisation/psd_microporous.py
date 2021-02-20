@@ -11,7 +11,7 @@ import numpy
 import scipy.constants as const
 
 from ..core.adsorbate import Adsorbate
-from ..core.isotherm import Isotherm
+from ..core.baseisotherm import BaseIsotherm
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -24,7 +24,7 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
 def psd_microporous(
-    isotherm: Isotherm,
+    isotherm: BaseIsotherm,
     psd_model: str = 'HK',
     pore_geometry: str = 'slit',
     branch: str = 'ads',

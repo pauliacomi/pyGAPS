@@ -5,7 +5,7 @@ from io import StringIO
 
 import pandas
 
-from pygaps.core.modelisotherm import Isotherm
+from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
@@ -248,6 +248,6 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
         )
 
     else:
-        isotherm = Isotherm(**raw_dict)
+        isotherm = BaseIsotherm(**raw_dict)
 
     return isotherm

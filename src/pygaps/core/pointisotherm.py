@@ -17,10 +17,10 @@ from ..utilities.converter_mode import c_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.isotherm_interpolator import IsothermInterpolator
-from .isotherm import Isotherm
+from .baseisotherm import BaseIsotherm
 
 
-class PointIsotherm(Isotherm):
+class PointIsotherm(BaseIsotherm):
     """
     Class which contains the points from an adsorption isotherm.
 
@@ -188,7 +188,7 @@ class PointIsotherm(Isotherm):
             )
 
         # Run base class constructor
-        Isotherm.__init__(self, **isotherm_parameters)
+        BaseIsotherm.__init__(self, **isotherm_parameters)
 
         # Deal with the isotherm branches
         if 'branch' in self.data_raw.columns:

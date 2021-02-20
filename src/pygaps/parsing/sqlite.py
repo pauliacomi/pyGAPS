@@ -13,7 +13,7 @@ import sqlite3
 import pandas
 
 from pygaps.core.adsorbate import Adsorbate
-from pygaps.core.isotherm import Isotherm
+from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.material import Material
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
@@ -852,7 +852,7 @@ def isotherm_to_db(
         upload_dict['iso_type'] = 'pointisotherm'
     elif isinstance(isotherm, ModelIsotherm):
         upload_dict['iso_type'] = 'modelisotherm'
-    elif isinstance(isotherm, Isotherm):
+    elif isinstance(isotherm, BaseIsotherm):
         upload_dict['iso_type'] = 'isotherm'
     else:
         raise ParsingError("Unknown isotherm type.")
@@ -862,11 +862,11 @@ def isotherm_to_db(
     # attributes which are kept in the database
     upload_dict.update({
         param: iso_dict.pop(param, None)
-        for param in Isotherm._required_params
+        for param in BaseIsotherm._required_params
     })
 
     # Upload isotherm info to database
-    db_columns = ["id", "iso_type"] + Isotherm._required_params
+    db_columns = ["id", "iso_type"] + BaseIsotherm._required_params
     try:
         cursor.execute(
             build_insert(table='isotherms', to_insert=db_columns), upload_dict
@@ -1049,7 +1049,7 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
 
             else:
                 # build isotherm object
-                isotherms.append(Isotherm(**iso_params))
+                isotherms.append(BaseIsotherm(**iso_params))
 
     if verbose:
         # Print success
@@ -1073,7 +1073,7 @@ def isotherm_delete_db(iso_id, db_path=None, verbose=True, **kwargs):
         Extra information printed to console.
     """
 
-    if isinstance(iso_id, Isotherm):
+    if isinstance(iso_id, BaseIsotherm):
         iso_id = iso_id.iso_id
 
     cursor = kwargs['cursor']

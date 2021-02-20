@@ -18,10 +18,10 @@ from ..utilities.converter_mode import c_loading
 from ..utilities.converter_mode import c_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from .isotherm import Isotherm
+from .baseisotherm import BaseIsotherm
 
 
-class ModelIsotherm(Isotherm):
+class ModelIsotherm(BaseIsotherm):
     """
     Class to characterize pure-component isotherm data with an analytical model.
     Data fitting is done during instantiation.
@@ -222,7 +222,7 @@ class ModelIsotherm(Isotherm):
             )
 
         # Run base class constructor
-        Isotherm.__init__(self, **isotherm_parameters)
+        BaseIsotherm.__init__(self, **isotherm_parameters)
 
         # Plot fit if verbose
         if verbose and isotherm_parameters.get('plot_fit', True):

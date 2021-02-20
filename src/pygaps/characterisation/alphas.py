@@ -9,7 +9,7 @@ import numpy
 
 from ..characterisation import scipy
 from ..core.adsorbate import Adsorbate
-from ..core.isotherm import Isotherm
+from ..core.baseisotherm import BaseIsotherm
 from ..graphing.calc_graphs import tp_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -124,7 +124,7 @@ def alpha_s(
     """
     # Check to see if reference isotherm is given
     if reference_isotherm is None or not isinstance(
-        reference_isotherm, Isotherm
+        reference_isotherm, BaseIsotherm
     ):
         raise ParameterError(
             "No reference isotherm for alpha s calculation "
