@@ -3,6 +3,7 @@
 
 from .. import _load_lazy
 
+
 class mpl_backend():
     """A backend for matplotlib, which will be lazy loaded eventually."""
     def __init__(self):
