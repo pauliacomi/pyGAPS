@@ -78,7 +78,8 @@ def get_thickness_model(model):
         if model not in _THICKNESS_MODELS:
             raise ParameterError(
                 f"Model {model} not an implemented thickness function. ",
-                f"Available models are {_THICKNESS_MODELS.keys()}")
+                f"Available models are {_THICKNESS_MODELS.keys()}"
+            )
 
         return _THICKNESS_MODELS[model]
 

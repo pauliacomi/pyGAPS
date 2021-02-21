@@ -25,7 +25,6 @@ from .conftest import MODEL_DATA
 @pytest.mark.modelling
 class TestIsothermModels():
     """Test the isotherm models."""
-
     def test_base_class(self):
         """Test base class for model."""
         model = models.base_model.IsothermBaseModel()
@@ -62,7 +61,8 @@ class TestIsothermModels():
 
         for i, p in enumerate(test_values['pressure']):
             assert numpy.isclose(
-                model.loading(p), test_values['loading'][i], 0.001)
+                model.loading(p), test_values['loading'][i], 0.001
+            )
 
     @pytest.mark.parametrize("m_name", [key for key in MODEL_DATA])
     def test_models_pressure(self, m_name):
@@ -74,12 +74,17 @@ class TestIsothermModels():
 
         for i, l in enumerate(test_values['loading']):
             assert numpy.isclose(
-                model.pressure(l), test_values['pressure'][i], 0.001)
+                model.pressure(l), test_values['pressure'][i], 0.001
+            )
 
-    @pytest.mark.parametrize("m_name", [
-        pytest.param(
-            key, marks=MODEL_DATA[key]['test_values']['spreading_pressure_mark'])
-        for key in MODEL_DATA])
+    @pytest.mark.parametrize(
+        "m_name", [
+            pytest.param(
+                key,
+                marks=MODEL_DATA[key]['test_values']['spreading_pressure_mark']
+            ) for key in MODEL_DATA
+        ]
+    )
     def test_models_s_pressure(self, m_name):
         """Test each model's spreading pressure function."""
 
@@ -89,7 +94,9 @@ class TestIsothermModels():
 
         for i, p in enumerate(test_values['pressure']):
             assert numpy.isclose(
-                model.spreading_pressure(p), test_values['spreading_pressure'][i], 0.001)
+                model.spreading_pressure(p),
+                test_values['spreading_pressure'][i], 0.001
+            )
 
     @pytest.mark.parametrize("m_name", [key for key in MODEL_DATA])
     def test_models_fit_function(self, m_name):

@@ -1,6 +1,5 @@
 """Collections of various python utilities."""
 
-
 import collections.abc as abc
 import pathlib
 
@@ -63,7 +62,6 @@ def checkSQLbool(val):
             return True
         return False
     return val
-
 
 
 def get_file_paths(folder, extension=None):

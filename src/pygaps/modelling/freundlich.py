@@ -68,7 +68,7 @@ class Freundlich(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["K"] * pressure ** (1 / self.params["m"])
+        return self.params["K"] * pressure**(1 / self.params["m"])
 
     def pressure(self, loading):
         r"""
@@ -91,7 +91,7 @@ class Freundlich(IsothermBaseModel):
             Pressure at specified loading.
 
         """
-        return (loading / self.params['K']) ** self.params['m']
+        return (loading / self.params['K'])**self.params['m']
 
     def spreading_pressure(self, pressure):
         r"""
@@ -120,7 +120,9 @@ class Freundlich(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["m"] * self.params["K"] * pressure ** (1 / self.params["m"])
+        return self.params["m"] * self.params["K"] * pressure**(
+            1 / self.params["m"]
+        )
 
     def initial_guess(self, pressure, loading):
         """
@@ -138,7 +140,9 @@ class Freundlich(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
         guess = {"K": saturation_loading * langmuir_k, "m": 1}
 
