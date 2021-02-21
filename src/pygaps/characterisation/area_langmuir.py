@@ -14,6 +14,7 @@ from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import langmuir_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import pgError
 
 
 def area_langmuir(isotherm, limits=None, verbose=False):
@@ -109,12 +110,27 @@ def area_langmuir(isotherm, limits=None, verbose=False):
     loading = isotherm.loading(
         branch='ads', loading_unit='mol', loading_basis='molar'
     )
-    pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
+    try:
+        pressure = isotherm.pressure(
+            branch='ads',
+            pressure_mode='relative',
+        )
+    except pgError:
+        raise CalculationError(
+            "The isotherm cannot be converted to a relative basis. "
+            "Is your isotherm supercritical?"
+        )
 
     # use the langmuir function
     (
-        langmuir_area, langmuir_const, n_monolayer, slope, intercept, minimum,
-        maximum, corr_coef
+        langmuir_area,
+        langmuir_const,
+        n_monolayer,
+        slope,
+        intercept,
+        minimum,
+        maximum,
+        corr_coef,
     ) = area_langmuir_raw(pressure, loading, cross_section, limits=limits)
 
     if verbose:

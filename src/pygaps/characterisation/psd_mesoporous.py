@@ -9,6 +9,7 @@ from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import pgError
 from .models_kelvin import get_kelvin_model
 from .models_kelvin import get_meniscus_geometry
 from .models_thickness import get_thickness_model
@@ -148,10 +149,19 @@ def psd_mesoporous(
     loading = isotherm.loading(
         branch=branch, loading_basis='molar', loading_unit='mmol'
     )
-    pressure = isotherm.pressure(branch=branch, pressure_mode='relative')
     if loading is None:
         raise ParameterError(
             "The isotherm does not have the required branch for this calculation"
+        )
+    try:
+        pressure = isotherm.pressure(
+            branch='ads',
+            pressure_mode='relative',
+        )
+    except pgError:
+        raise CalculationError(
+            "The isotherm cannot be converted to a relative basis. "
+            "Is your isotherm supercritical?"
         )
     # If on an adsorption branch, data will be reversed
     if branch == 'ads':

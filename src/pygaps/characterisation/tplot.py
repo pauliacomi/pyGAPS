@@ -10,7 +10,9 @@ import numpy
 from ..characterisation import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import tp_plot
+from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import pgError
 from ..utilities.math_utilities import find_linear_sections
 from .models_thickness import get_thickness_model
 
@@ -131,7 +133,16 @@ def t_plot(
     loading = isotherm.loading(
         branch='ads', loading_unit='mol', loading_basis='molar'
     )
-    pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
+    try:
+        pressure = isotherm.pressure(
+            branch='ads',
+            pressure_mode='relative',
+        )
+    except pgError:
+        raise CalculationError(
+            "The isotherm cannot be converted to a relative basis. "
+            "Is your isotherm supercritical?"
+        )
 
     # Get thickness model
     t_model = get_thickness_model(thickness_model)

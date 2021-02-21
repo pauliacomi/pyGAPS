@@ -15,6 +15,7 @@ from ..graphing.calc_graphs import bet_plot
 from ..graphing.calc_graphs import roq_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import pgError
 
 
 def area_BET(isotherm, limits=None, verbose=False):
@@ -131,10 +132,16 @@ def area_BET(isotherm, limits=None, verbose=False):
         loading_unit='mol',
         loading_basis='molar',
     )
-    pressure = isotherm.pressure(
-        branch='ads',
-        pressure_mode='relative',
-    )  # TODO: Should throw a specific error if relative is impossible
+    try:
+        pressure = isotherm.pressure(
+            branch='ads',
+            pressure_mode='relative',
+        )
+    except pgError:
+        raise CalculationError(
+            "The isotherm cannot be converted to a relative basis. "
+            "Is your isotherm supercritical?"
+        )
 
     # use the bet function
     (

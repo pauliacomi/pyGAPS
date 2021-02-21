@@ -11,6 +11,7 @@ from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import dra_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import pgError
 from . import scipy
 
 
@@ -184,7 +185,16 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
     loading = isotherm.loading(
         branch='ads', loading_unit='mol', loading_basis='molar'
     )
-    pressure = isotherm.pressure(branch='ads', pressure_mode='relative')
+    try:
+        pressure = isotherm.pressure(
+            branch='ads',
+            pressure_mode='relative',
+        )
+    except pgError:
+        raise CalculationError(
+            "The isotherm cannot be converted to a relative basis. "
+            "Is your isotherm supercritical?"
+        )
 
     # Call the raw function
     (

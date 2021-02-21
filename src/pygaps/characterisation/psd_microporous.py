@@ -4,8 +4,7 @@ pores in the micropore range (<2 nm). These are derived from the Horvath-Kawazoe
 """
 
 import math
-from typing import List
-from typing import Mapping
+import typing as t
 
 import numpy
 import scipy.constants as const
@@ -15,6 +14,7 @@ from ..core.baseisotherm import BaseIsotherm
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import pgError
 from . import scipy
 from .models_hk import HK_KEYS
 from .models_hk import get_hk_model
@@ -30,9 +30,9 @@ def psd_microporous(
     branch: str = 'ads',
     material_model: str = 'Carbon(HK)',
     adsorbate_model: str = None,
-    p_limits: List[float] = None,
+    p_limits: t.List[float] = None,
     verbose: bool = False
-) -> dict:
+) -> t.Mapping:
     r"""
     Calculate the microporous size distribution using a Horvath-Kawazoe type model.
 
@@ -185,12 +185,22 @@ def psd_microporous(
     loading = isotherm.loading(
         branch=branch, loading_basis='molar', loading_unit='mmol'
     )
-    pressure = isotherm.pressure(branch=branch, pressure_mode='relative')
     if loading is None:
         raise ParameterError(
             "The isotherm does not have the required branch "
             "for this calculation"
         )
+    try:
+        pressure = isotherm.pressure(
+            branch='ads',
+            pressure_mode='relative',
+        )
+    except pgError:
+        raise CalculationError(
+            "The isotherm cannot be converted to a relative basis. "
+            "Is your isotherm supercritical?"
+        )
+
     # If on an desorption branch, data will be reversed
     if branch == 'des':
         loading = loading[::-1]
@@ -253,12 +263,12 @@ def psd_microporous(
 
 
 def psd_horvath_kawazoe(
-    pressure: List[float],
-    loading: List[float],
+    pressure: t.List[float],
+    loading: t.List[float],
     temperature: float,
     pore_geometry: str,
-    adsorbate_properties: Mapping[str, float],
-    material_properties: Mapping[str, float],
+    adsorbate_properties: t.Mapping[str, float],
+    material_properties: t.Mapping[str, float],
     use_cy: bool = False,
 ):
     r"""
@@ -627,12 +637,12 @@ def psd_horvath_kawazoe(
 
 
 def psd_horvath_kawazoe_ry(
-    pressure: List[float],
-    loading: List[float],
+    pressure: t.List[float],
+    loading: t.List[float],
     temperature: float,
     pore_geometry: str,
-    adsorbate_properties: Mapping[str, float],
-    material_properties: Mapping[str, float],
+    adsorbate_properties: t.Mapping[str, float],
+    material_properties: t.Mapping[str, float],
     use_cy: bool = False,
 ):
     r"""
