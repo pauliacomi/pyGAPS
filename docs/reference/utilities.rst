@@ -28,7 +28,7 @@ Other utilities
 .. automodule:: pygaps.utilities.coolprop_utilities
     :members:
 
-.. automodule:: pygaps.utilities.folder_utilities
+.. automodule:: pygaps.utilities.python_utilities
     :members:
 
 .. automodule:: pygaps.utilities.math_utilities

@@ -105,9 +105,8 @@ def initial_henry_slope(
         logger.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
         params = {
             'branch': 'ads',
-            'fig_title': str(isotherm.material),
-            'lgd_keys': ['adsorbate', 'temperature'],
-            'lgd_pos': 'bottom'
+            'lgd_keys': ['material'],
+            'lgd_pos': 'inner'
         }
         params.update(plot_parameters)
         henry.pressure_range = [pressure[0], pressure[:rows_taken][-1]]
@@ -118,6 +117,7 @@ def initial_henry_slope(
             model=henry,
             **iso_params,
         )
+        model_isotherm.material = "model"
         plot_iso([isotherm, model_isotherm], **params)
 
     # return the henry constant

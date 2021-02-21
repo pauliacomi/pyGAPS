@@ -13,6 +13,7 @@ import scipy.interpolate as interp
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
 from ..graphing.isotherm_graphs import plot_iso
+from ..graphing.mpl_styles import POINTS_ALL_STYLE
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import bspline
@@ -211,7 +212,7 @@ def psd_dft(
             'logx': True,
             'fig_title': 'DFT Fit',
             'lgd_keys': ['material'],
-            'y1_line_style': dict(markersize=5, linewidth=0),
+            'y1_line_style': POINTS_ALL_STYLE,
             'loading_basis': loading_basis,
             'loading_unit': loading_unit,
             'adsorbent_basis': adsorbent_basis,

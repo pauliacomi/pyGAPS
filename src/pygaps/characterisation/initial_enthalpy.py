@@ -114,8 +114,14 @@ def initial_enthalpy_comp(
     # First define the parameters
 
     param_names = [
-        'const', 'preexp', 'exp', 'exploc', 'prepowa', 'powa', 'prepowr',
-        'powr'
+        'const',
+        'preexp',
+        'exp',
+        'exploc',
+        'prepowa',
+        'powa',
+        'prepowr',
+        'powr',
     ]
     params = {name: numpy.nan for name in param_names}
 

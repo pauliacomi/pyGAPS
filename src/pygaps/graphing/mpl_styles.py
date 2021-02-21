@@ -1,36 +1,40 @@
 """Contains global style dictionaries for matplotlib to be applied."""
 
 FIG_STYLE = {
-    'figsize': (8, 8),
+    'figsize': (6, 6),
 }
 TITLE_STYLE = {
     'horizontalalignment': 'center',
-    'fontsize': 25,
+    'fontsize': 20,
     'y': 1.01,
 }
 LABEL_STYLE = {
     'horizontalalignment': 'center',
-    'fontsize': 20,
+    'fontsize': 15,
 }
 TICK_STYLE = {
-    'labelsize': 17,
+    'labelsize': 13,
 }
-LEGEND_STYLE = {'handlelength': 3, 'fontsize': 15}
+LEGEND_STYLE = {
+    'handlelength': 2,
+    'fontsize': 12,
+    'frameon': False,
+}
 
 ISO_STYLES = {
     'fig_style': FIG_STYLE,
     'title_style': TITLE_STYLE,
     'label_style': LABEL_STYLE,
+    'lgd_style': LEGEND_STYLE,
     'y1_line_style': {
-        'linewidth': 2,
-        'markersize': 8
+        'linewidth': 1.5,
+        'markersize': 6
     },
     'y2_line_style': {
         'linewidth': 0,
-        'markersize': 8
+        'markersize': 6
     },
     'tick_style': TICK_STYLE,
-    'lgd_style': LEGEND_STYLE,
     'save_style': {},
 }
 

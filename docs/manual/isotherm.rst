@@ -22,7 +22,7 @@ differ in the way they represent the relationship between pressure and loading:
       to describe a model of adsorption behaviour. It can only model a single
       branch of the data, either adsorption or desorption.
 
-Both classes are derived from the :meth:`~pygaps.core.isotherm.Isotherm` class.
+Both classes are derived from the :meth:`~pygaps.core.baseisotherm.BaseIsotherm` class.
 This class holds parameters of the isotherm besides data, such as the
 adsorbate used, the material's name and the temperature at which the
 isotherm was measured. These parameters are inherited

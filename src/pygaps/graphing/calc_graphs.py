@@ -1,7 +1,9 @@
 """Functions for plotting calculation-specific graphs."""
 
 from . import plt
+from .mpl_styles import FIG_STYLE
 from .mpl_styles import LABEL_STYLE
+from .mpl_styles import LEGEND_STYLE
 from .mpl_styles import POINTS_ALL_STYLE
 from .mpl_styles import POINTS_SEL_STYLE
 from .mpl_styles import TICK_STYLE
@@ -324,7 +326,7 @@ def tp_plot(
     ax.set_ylim(bottom=0)
     ax.set_xlabel(label_x)
     ax.set_ylabel('Loading')
-    ax.legend(loc='best')
+    ax.legend(loc='best', frameon=False)
 
     return ax
 
@@ -400,9 +402,8 @@ def psd_plot(
             label=labelcum
         )
 
-    # Func formatter
-
     def formatter(x, pos):
+        """Forces matplotlib to display whole numbers"""
         return f"{x:g}"
 
     if log:
@@ -427,14 +428,16 @@ def psd_plot(
 
     ax.set_title("PSD plot " + str(method), **TITLE_STYLE)
     ax.set_xlabel('Pore width [nm]', **LABEL_STYLE)
-    ax.set_ylabel('Distribution (dV/dw)', **LABEL_STYLE)
+    ax.set_ylabel('Distribution [dV/dw]', **LABEL_STYLE)
     if labelcum:
         ax2.set_ylabel('Cumulative Vol [$cm^3 g^{-1}$]', **LABEL_STYLE)
 
     lns = l1
     if labelcum:
         lns = l1 + l2
-    ax.legend(lns, [lbl.get_label() for lbl in lns], loc='lower right')
+    ax.legend(
+        lns, [lbl.get_label() for lbl in lns], loc='lower right', fontsize=13
+    )
     ax.set_ylim(bottom=0)
     if labelcum:
         ax2.set_ylim(bottom=0)
@@ -472,7 +475,7 @@ def isosteric_enthalpy_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.pyplot.subplots()
+        _, ax = plt.pyplot.subplots(**FIG_STYLE)
 
     ax.errorbar(
         loading,
@@ -480,21 +483,20 @@ def isosteric_enthalpy_plot(
         yerr=std_err,
         marker='o',
         markersize=3,
-        color='g',
-        label='enthalpy',
+        label=r'$\Delta h_{st}$',
     )
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(
             plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
         )
-    ax.set_title("Isosteric enthalpy plot")
-    ax.set_xlabel(r'Loading [$mmol\/g^{-1}$]')
-    ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]')
-    ax.legend(loc='best')
+    ax.set_title("Isosteric enthalpy", **TITLE_STYLE)
+    ax.set_xlabel(r'Loading [$mmol\/g^{-1}$]', **LABEL_STYLE)
+    ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]', **LABEL_STYLE)
+    ax.legend(loc='best', **LEGEND_STYLE)
+    ax.tick_params(axis='both', which='major', **TICK_STYLE)
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
-    ax.grid(True)
 
     return ax
 
@@ -536,7 +538,7 @@ def initial_enthalpy_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.pyplot.subplots()
+        _, ax = plt.pyplot.subplots(**FIG_STYLE)
 
     ax.plot(
         loading,
@@ -558,12 +560,12 @@ def initial_enthalpy_plot(
         )
 
     ax.set_title(title + " initial enthalpy fit")
-    ax.set_xlabel('Loading')
-    ax.set_ylabel('Enthalpy')
-    ax.legend(loc='best')
+    ax.set_xlabel('Loading', **LABEL_STYLE)
+    ax.set_ylabel('Enthalpy', **LABEL_STYLE)
+    ax.legend(loc='best', **LEGEND_STYLE)
     ax.set_ylim(bottom=0, top=(max(enthalpy) * 1.2))
     ax.set_xlim(left=0)
-    ax.grid(True)
+    ax.tick_params(axis='both', which='major', **TICK_STYLE)
 
     return ax
 
@@ -642,15 +644,21 @@ def virial_plot(
     n_load,
     p_load,
     added_point,
+    ax=None,
 ):
     """
     Draw a Virial plot.
     """
-    _, ax = plt.pyplot.subplots()
-    ax.plot(loading, ln_p_over_n, '.')
+    # Generate the figure if needed
+    if ax is None:
+        _, ax = plt.pyplot.subplots(**FIG_STYLE)
+    ax.plot(loading, ln_p_over_n, **POINTS_ALL_STYLE)
     ax.plot(n_load, p_load, '-')
     if added_point:
-        ax.plot(1e-1, ln_p_over_n[0], '.r')
-    ax.set_title("Virial fit")
-    ax.set_xlabel("Loading")
-    ax.set_ylabel("ln(p/n)")
+        ax.plot(1e-1, ln_p_over_n[0], 'or')
+    ax.set_title("Virial fit", **TITLE_STYLE)
+    ax.set_xlabel("Loading", **LABEL_STYLE)
+    ax.set_ylabel("ln(p/n)", **LABEL_STYLE)
+    ax.tick_params(axis='both', which='major', **TICK_STYLE)
+
+    return ax

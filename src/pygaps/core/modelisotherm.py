@@ -8,7 +8,7 @@ import numpy
 import pandas
 
 from ..graphing.isotherm_graphs import plot_iso
-from ..graphing.isotherm_graphs import plot_iso_raw
+from ..graphing.mpl_styles import POINTS_ALL_STYLE
 from ..modelling import _GUESS_MODELS
 from ..modelling import _MODELS
 from ..modelling import get_isotherm_model
@@ -232,16 +232,9 @@ class ModelIsotherm(BaseIsotherm):
             else:
                 p_c = pressure
                 l_c = self.loading_at(p_c)
-            ax = plot_iso_raw(
-                p_c,
-                pressure_key,
-                l_c,
-                loading_key,
-                y1_line_style=dict(markersize=0)
-            )
-            opts = {'mfc': 'none', 'markersize': 8, 'markeredgewidth': 1.5}
-            ax.plot(pressure, loading, 'ko', **opts)
-            ax.legend([self.model.name])
+            ax = self.plot(y1_line_style=dict(markersize=0))
+            ax.plot(pressure, loading, 'ko', zorder=-1, **POINTS_ALL_STYLE)
+            ax.legend([self.model.name], frameon=False)
 
     @classmethod
     def from_isotherm(
@@ -474,13 +467,15 @@ class ModelIsotherm(BaseIsotherm):
                 lgd_pos=None,
                 y1_line_style=dict(markersize=0)
             )
-            opts = {'mfc': 'none', 'markersize': 8, 'markeredgewidth': 1.5}
             if loading is not None:
-                ax.plot(pressure, loading, 'ko', **opts)
+                ax.plot(pressure, loading, 'ko', zorder=-1, **POINTS_ALL_STYLE)
             else:
                 ax.plot(
-                    isotherm_data[pressure_key], isotherm_data[loading_key],
-                    'ko', **opts
+                    isotherm_data[pressure_key],
+                    isotherm_data[loading_key],
+                    'ko',
+                    zorder=-1,
+                    **POINTS_ALL_STYLE,
                 )
             ax.legend([m.model.name for m in attempts])
             logger.info(f"Best model fit is {best_fit.model.name}.")

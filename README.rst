@@ -3,7 +3,7 @@ Overview
 ========
 
 pyGAPS (Python General Adsorption Processing Suite) is a framework for
-adsorption data analysis and fitting written in Python 3.
+adsorption data analysis and fitting, written in Python 3.
 
 .. start-badges
 
