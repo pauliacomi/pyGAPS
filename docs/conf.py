@@ -68,7 +68,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pygaps'
-year = '2019'
+year = '2021'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
 version = release = '2.0.2'
