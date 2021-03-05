@@ -192,7 +192,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
     except Exception:
         raise ParsingError(
             "Could not parse CSV isotherm. "
-            "The text cannot be parsed wrong, check for errors."
+            "The format may be wrong, check for errors."
         )
 
     # Update dictionary with any user parameters
