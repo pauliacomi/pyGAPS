@@ -323,10 +323,6 @@ def plot_iso(
         pc_primary = cycle(y1_marker_cy * color_cy)
         pc_secondary = cycle(y2_marker_cy * color_cy)
 
-    # Put grid on plot
-    # TODO deprecated
-    # ax1.grid(True, zorder=5)
-
     # Graph title
     if fig_title:
         ax1.set_title(fig_title, **styles['title_style'])
