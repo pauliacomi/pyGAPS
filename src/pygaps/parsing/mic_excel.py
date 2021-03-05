@@ -212,9 +212,11 @@ def _get_data_labels(sheet, row, col):
         # this means no header exists, can happen in some older files
         # the units might not be standard! TODO should check
         return [
-            "Relative Pressure (P/Po)", "Absolute Pressure (kPa)",
-            "Quantity Adsorbed (cm³/g STP)", "Elapsed Time (h:min)",
-            "Saturation Pressure (kPa)"
+            "Relative Pressure (P/Po)",
+            "Absolute Pressure (kPa)",
+            "Quantity Adsorbed (cm³/g STP)",
+            "Elapsed Time (h:min)",
+            "Saturation Pressure (kPa)",
         ]
 
     return [
@@ -318,9 +320,20 @@ def _check(meta, data, path):
     Also logs a warning for errors found in file.
     """
     if 'loading' in data:
-        empties = (k for k, v in data.items() if not v)
-        for empty in empties:
-            logger.info(f'No data collected for {empty} in file {path}.')
+
+        # Some files use an odd format
+        # We instead remove unreadable values
+        dels = []
+        for k, v in data.items():
+            if not v:
+                logger.info(f'No data collected for {k} in file {path}.')
+
+            if len(v) != len(data['pressure']):
+                dels.append(k)
+
+        for d in dels:
+            del data[d]
+
     if 'errors' in meta:
         logger.warning('Report file contains warnings:')
         logger.warning('\n'.join(meta['errors']))
