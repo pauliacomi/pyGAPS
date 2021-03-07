@@ -40,5 +40,8 @@ from .characterisation.psd_microporous import psd_microporous
 from .characterisation.tplot import t_plot
 from .characterisation.tplot import t_plot_raw
 
+# Modelling/fitting
+from .modelling import model_iso
+
 # Plotting
 from .graphing.isotherm_graphs import plot_iso

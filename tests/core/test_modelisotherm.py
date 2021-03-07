@@ -16,6 +16,12 @@ from .conftest import PRESSURE_AT_PARAM
 from .conftest import PRESSURE_PARAM
 
 
+class TestModelConvenience():
+    """Test the convenience model function."""
+    def test_model_isotherm(self, basic_pointisotherm):
+        pygaps.model_iso(basic_pointisotherm, model="Henry")
+
+
 @pytest.mark.core
 class TestModelIsotherm():
     """Test the ModelIsotherm class."""
@@ -124,6 +130,8 @@ class TestModelIsotherm():
 
     def test_isotherm_create_from_pointisotherm(self, basic_pointisotherm):
         """Check isotherm can be created from PointIsotherm."""
+        with pytest.raises(pgEx.ParameterError):
+            pygaps.ModelIsotherm.from_pointisotherm(basic_pointisotherm)
         pygaps.ModelIsotherm.from_pointisotherm(
             basic_pointisotherm,
             model='Henry',
