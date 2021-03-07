@@ -47,6 +47,8 @@ def plot_iso(
     x_range=(None, None),
     y1_range=(None, None),
     y2_range=(None, None),
+    x_points=None,
+    y1_points=None,
     fig_title: str = None,
     lgd_keys=None,
     lgd_pos: str = 'best',
@@ -118,6 +120,10 @@ def plot_iso(
     y2_range : tuple
         Range for data on the secondary y axis. eg: (0, 1). Is applied to each
         isotherm, in the unit/mode/basis requested.
+    x_points : tuple
+        Specific points of pressure where to evaluate an isotherm. Assumes x=pressure.
+    y1_points : tuple
+        Specific points of loading where to evaluate an isotherm. Assumes y1=loading.
 
     fig_title : str
         Title of the graph. Defaults to none.
@@ -264,11 +270,6 @@ def plot_iso(
     # Create second axes object, populate it if required
     ax2 = ax1.twinx() if y2_data else None
 
-    x_label = label_axis_text_pl(iso_params, x_data)
-    y1_label = label_axis_text_pl(iso_params, y1_data)
-    if y2_data:
-        y2_label = label_axis_text_pl(iso_params, y2_data)
-
     # Get a cycling style for the graph
     #
     # Color styling
@@ -329,6 +330,17 @@ def plot_iso(
         pc_primary = cycle(y1_marker_cy * color_cy)
         pc_secondary = cycle(y2_marker_cy * color_cy)
 
+    # Labels and ticks
+    x_label = label_axis_text_pl(iso_params, x_data)
+    y1_label = label_axis_text_pl(iso_params, y1_data)
+    ax1.set_xlabel(x_label, **styles['label_style'])
+    ax1.set_ylabel(y1_label, **styles['label_style'])
+    ax1.tick_params(axis='both', which='major', **styles['tick_style'])
+    if y2_data:
+        y2_label = label_axis_text_pl(iso_params, y2_data)
+        ax2.set_ylabel(y2_label, **styles['label_style'])
+        ax2.tick_params(axis='both', which='major', **styles['tick_style'])
+
     # Graph title
     if fig_title:
         ax1.set_title(fig_title, **styles['title_style'])
@@ -338,52 +350,47 @@ def plot_iso(
     # Generic axes graphing function
     #
 
-    def graph_caller(
-        isotherm, current_branch, y1_style, y2_style, **iso_params
-    ):
-        """Convenience function to call other graphing functions."""
-
-        # Check for branch existence
-        if not isotherm.has_branch(branch=current_branch):
-            return
-
-        # Labels and ticks
-        ax1.set_xlabel(x_label, **styles['label_style'])
-        ax1.set_ylabel(y1_label, **styles['label_style'])
-        ax1.tick_params(axis='both', which='major', **styles['tick_style'])
+    def _data_plot(isotherm, current_branch, y1_style, y2_style, **iso_params):
+        """Plot the y1 data and y2 data of each branch."""
 
         # Plot line 1
-        label = label_lgd(isotherm, lgd_keys, current_branch, branch, y1_data)
+        y1_lbl = label_lgd(isotherm, lgd_keys, current_branch, branch, y1_data)
 
-        x_p, y_p = _get_data(
-            isotherm, x_data, current_branch, x_range, **iso_params
-        ).align(
-            _get_data(
+        if x_points is not None:
+            x_p = x_points
+            y1_p = _get_data(
+                isotherm, y1_data, current_branch, y1_range, x_points,
+                **iso_params
+            )
+        elif y1_points is not None:
+            x_p = _get_data(
+                isotherm, x_data, current_branch, x_range, y1_points,
+                **iso_params
+            )
+            y1_p = y1_points
+        else:
+            x_p = _get_data(
+                isotherm, x_data, current_branch, x_range, **iso_params
+            )
+            y1_p = _get_data(
                 isotherm, y1_data, current_branch, y1_range, **iso_params
-            ),
-            join='inner'
-        )
+            )
+            x_p, y1_p = x_p.align(y1_p, join='inner')
 
-        ax1.plot(x_p, y_p, label=label, **y1_style)
+        ax1.plot(x_p, y1_p, label=y1_lbl, **y1_style)
 
         # Plot line 2 (if applicable)
         if y2_data and y2_data in keys(isotherm):
 
-            x_p, y2_p = _get_data(
-                isotherm, x_data, current_branch, x_range, **iso_params
-            ).align(
-                _get_data(
-                    isotherm, y2_data, current_branch, y2_range, **iso_params
-                ),
-                join='inner'
+            y2_p = _get_data(
+                isotherm, y2_data, current_branch, y2_range, **iso_params
             )
+            aligned = x_p.align(y2_p, join='inner')
 
-            label = label_lgd(
+            y2_lbl = label_lgd(
                 isotherm, lgd_keys, current_branch, branch, y2_data
             )
-            ax2.set_ylabel(y2_label, **styles['label_style'])
-            ax2.tick_params(axis='both', which='major', **styles['tick_style'])
-            ax2.plot(x_p, y2_p, label=label, **y2_style)
+            ax2.plot(aligned[0], aligned[1], label=y2_lbl, **y2_style)
 
     #####################################
     #
@@ -399,8 +406,8 @@ def plot_iso(
         y2_line_style.update(styles['y2_line_style'])
 
         # If there's an adsorption branch, plot it
-        if ads:
-            graph_caller(
+        if ads and isotherm.has_branch('ads'):
+            _data_plot(
                 isotherm, 'ads', y1_line_style, y2_line_style, **iso_params
             )
 
@@ -410,8 +417,8 @@ def plot_iso(
         y2_line_style['markerfacecolor'] = 'none'
 
         # If there's a desorption branch, plot it
-        if des:
-            graph_caller(
+        if des and isotherm.has_branch('des'):
+            _data_plot(
                 isotherm, 'des', y1_line_style, y2_line_style, **iso_params
             )
 
@@ -428,9 +435,23 @@ def plot_iso(
     return ax1
 
 
-def _get_data(isotherm, data_name, current_branch, drange, **kwargs):
+def _get_data(
+    isotherm,
+    data_name,
+    current_branch,
+    drange=None,
+    points=None,
+    **kwargs,
+):
     """Get different data from an isotherm."""
     if data_name == 'pressure':
+        if points is not None:
+            return isotherm.pressure_at(
+                points,
+                branch=current_branch,
+                pressure_mode=kwargs['pressure_mode'],
+                pressure_unit=kwargs['pressure_unit'],
+            )
         return isotherm.pressure(
             branch=current_branch,
             pressure_mode=kwargs['pressure_mode'],
@@ -438,7 +459,16 @@ def _get_data(isotherm, data_name, current_branch, drange, **kwargs):
             limits=drange,
             indexed=True,
         )
-    if data_name == 'loading':
+    elif data_name == 'loading':
+        if points is not None:
+            return isotherm.loading_at(
+                points,
+                branch=current_branch,
+                loading_basis=kwargs['loading_basis'],
+                loading_unit=kwargs['loading_unit'],
+                adsorbent_basis=kwargs['adsorbent_basis'],
+                adsorbent_unit=kwargs['adsorbent_unit'],
+            )
         return isotherm.loading(
             branch=current_branch,
             loading_basis=kwargs['loading_basis'],

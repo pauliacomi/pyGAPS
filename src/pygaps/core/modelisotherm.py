@@ -8,7 +8,7 @@ import numpy
 import pandas
 
 from ..graphing.isotherm_graphs import plot_iso
-from ..graphing.mpl_styles import POINTS_ALL_STYLE
+from ..graphing.mpl_styles import LEGEND_STYLE, POINTS_ALL_STYLE
 from ..modelling import _GUESS_MODELS
 from ..modelling import _MODELS
 from ..modelling import get_isotherm_model
@@ -217,8 +217,11 @@ class ModelIsotherm(BaseIsotherm):
 
             # fit model to isotherm data
             self.model.fit(
-                pressure, loading, self.param_guess, optimization_params,
-                verbose
+                pressure,
+                loading,
+                self.param_guess,
+                optimization_params,
+                verbose,
             )
 
         # Run base class constructor
@@ -227,13 +230,14 @@ class ModelIsotherm(BaseIsotherm):
         # Plot fit if verbose
         if verbose and isotherm_parameters.get('plot_fit', True):
             if self.model.calculates == 'pressure':
-                l_c = loading
-                p_c = self.pressure_at(l_c)
+                ax = self.plot(
+                    y1_line_style=dict(markersize=0), y1_points=loading
+                )
             else:
-                p_c = pressure
-                l_c = self.loading_at(p_c)
-            ax = self.plot(y1_line_style=dict(markersize=0))
-            ax.plot(pressure, loading, 'ko', zorder=-1, **POINTS_ALL_STYLE)
+                ax = self.plot(
+                    y1_line_style=dict(markersize=0), x_points=pressure
+                )
+            ax.plot(pressure, loading, zorder=-1, **POINTS_ALL_STYLE)
             ax.legend([self.model.name], frameon=False)
 
     @classmethod
@@ -447,7 +451,7 @@ class ModelIsotherm(BaseIsotherm):
                     optimization_params=optimization_params,
                     branch=branch,
                     verbose=verbose,
-                    plot_fit=False,  # we only want one plot
+                    plot_fit=False,  # we don't want to plot at this stage
                     **isotherm_parameters
                 )
 
@@ -462,31 +466,31 @@ class ModelIsotherm(BaseIsotherm):
 
         if not attempts:
             raise CalculationError(
-                "No model could be reliably fit on the isotherm"
+                "No model could be reliably fit on the isotherm."
             )
 
         errors = [x.model.rmse for x in attempts]
         best_fit = attempts[errors.index(min(errors))]
 
         if verbose:
+            if loading is None:
+                pressure = isotherm_data[pressure_key]
+                loading = isotherm_data[loading_key]
             ax = plot_iso(
                 attempts,
                 color=len(attempts),
                 branch=branch,
+                x_points=pressure,
                 lgd_pos=None,
-                y1_line_style=dict(markersize=0)
+                y1_line_style=dict(markersize=0),
             )
-            if loading is not None:
-                ax.plot(pressure, loading, 'ko', zorder=-1, **POINTS_ALL_STYLE)
-            else:
-                ax.plot(
-                    isotherm_data[pressure_key],
-                    isotherm_data[loading_key],
-                    'ko',
-                    zorder=-1,
-                    **POINTS_ALL_STYLE,
-                )
-            ax.legend([m.model.name for m in attempts])
+            ax.plot(
+                pressure,
+                loading,
+                zorder=-1,
+                **POINTS_ALL_STYLE,
+            )
+            ax.legend([m.model.name for m in attempts], **LEGEND_STYLE)
             logger.info(f"Best model fit is {best_fit.model.name}.")
 
         return best_fit
@@ -574,7 +578,7 @@ class ModelIsotherm(BaseIsotherm):
 
     def pressure(
         self,
-        points=40,
+        points=60,
         branch=None,
         pressure_unit=None,
         pressure_mode=None,
@@ -660,7 +664,7 @@ class ModelIsotherm(BaseIsotherm):
 
     def loading(
         self,
-        points=40,
+        points=60,
         branch=None,
         loading_unit=None,
         loading_basis=None,
