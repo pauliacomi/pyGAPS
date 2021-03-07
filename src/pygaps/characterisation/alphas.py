@@ -60,7 +60,7 @@ def alpha_s(
         A dictionary containing the t-plot curve, as well as a list of dictionaries
         with calculated parameters for each straight section. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
-        volume of adsorbent):
+        volume of adsorbent material):
 
             - ``alpha curve`` (list) : Calculated alpha-s curve
             - ``results`` (list of dicts):
@@ -244,7 +244,7 @@ def alpha_s_raw(
     Parameters
     ----------
     loading : array
-        Amount adsorbed at the surface, in mol/adsorbent.
+        Amount adsorbed at the surface, in mol/material.
     reference_loading : array
         Loading of the reference curve corresponding to the same pressures.
     alpha_s_point : float

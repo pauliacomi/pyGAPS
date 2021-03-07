@@ -155,12 +155,12 @@ def area_BET(isotherm, branch='ads', limits=None, verbose=False):
         logger.info(
             textwrap.dedent(
                 f"""\
-            BET surface area: a = {bet_area:.2e} m2/{isotherm.adsorbent_unit}
+            BET surface area: a = {bet_area:.2e} m2/{isotherm.material_unit}
             Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum -1]:.3f}
             The slope of the BET fit: s = {slope:.2e}
             The intercept of the BET fit: i = {intercept:.2e}
             The BET constant is: C = {c_const:.1f}
-            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.adsorbent_unit}"""
+            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.material_unit}"""
             )
         )
 

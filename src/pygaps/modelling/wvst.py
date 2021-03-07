@@ -27,7 +27,7 @@ class WVST(IsothermBaseModel):
           which acts as the solvent in both the gas and adsorbed phases.
         * The properties of the adsorbed phase are defined as excess properties
           in relation to a dividing surface.
-        * The entire system including the adsorbent are in thermal equilibrium
+        * The entire system including the material are in thermal equilibrium
           however only the gas and adsorbed phases are in thermodynamic equilibrium.
         * The equilibrium of the system is maintained by the spreading pressure
           which arises from a potential field at the surface

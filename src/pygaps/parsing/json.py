@@ -1,6 +1,7 @@
 """Parse to and from a JSON file format for isotherms."""
 
 import json
+import warnings
 
 import pandas
 
@@ -130,6 +131,20 @@ def isotherm_from_json(
     data = raw_dict.pop("isotherm_data", None)
     model = raw_dict.pop("isotherm_model", None)
 
+    # TODO deprecation
+    if "adsorbent_basis" in raw_dict:
+        raw_dict['material_basis'] = raw_dict.pop("adsorbent_basis")
+        warnings.warn(
+            "adsorbent_basis was replaced with material_basis",
+            DeprecationWarning
+        )
+    if "adsorbent_unit" in raw_dict:
+        raw_dict['material_unit'] = raw_dict.pop("adsorbent_unit")
+        warnings.warn(
+            "adsorbent_unit was replaced with material_unit",
+            DeprecationWarning
+        )
+
     if data:
         # rename keys and get units if needed depending on format
         if fmt == 'NIST':
@@ -211,15 +226,15 @@ def _from_json_nist(raw_dict):
     else:
         raise ParsingError("Isotherm cannot be parsed due to loading unit.")
 
-    adsorbent_unit = comp[1]
-    if adsorbent_unit in _MASS_UNITS:
-        adsorbent_basis = "mass"
-    elif adsorbent_unit in _VOLUME_UNITS:
-        adsorbent_basis = "volume"
-    elif adsorbent_unit in _MOLAR_UNITS:
-        adsorbent_basis = "molar"
+    material_unit = comp[1]
+    if material_unit in _MASS_UNITS:
+        material_basis = "mass"
+    elif material_unit in _VOLUME_UNITS:
+        material_basis = "volume"
+    elif material_unit in _MOLAR_UNITS:
+        material_basis = "molar"
     else:
-        raise ParsingError("Isotherm cannot be parsed due to adsorbent basis.")
+        raise ParsingError("Isotherm cannot be parsed due to material basis.")
 
     # Get pressure mode and unit
     pressure_mode = "absolute"
@@ -236,8 +251,8 @@ def _from_json_nist(raw_dict):
     nist_dict.update(raw_dict)
 
     nist_dict.update({
-        'adsorbent_basis': adsorbent_basis,
-        'adsorbent_unit': adsorbent_unit,
+        'material_basis': material_basis,
+        'material_unit': material_unit,
         'loading_basis': loading_basis,
         'loading_unit': loading_unit,
         'pressure_mode': pressure_mode,

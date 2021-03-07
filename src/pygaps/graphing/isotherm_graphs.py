@@ -38,8 +38,8 @@ def plot_iso(
     logy2: bool = False,
     color=True,
     marker=None,
-    adsorbent_basis: str = None,
-    adsorbent_unit: str = None,
+    material_basis: str = None,
+    material_unit: str = None,
     loading_basis: str = None,
     loading_unit: str = None,
     pressure_mode: str = None,
@@ -96,10 +96,10 @@ def plot_iso(
         If a list of matplotlib markers,
         it will be passed directly to the plot function.
 
-    adsorbent_basis : str, optional
+    material_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         or 'per mass'.
-    adsorbent_unit : str, optional
+    material_unit : str, optional
         Unit of loading, otherwise first isotherm value is used.
     loading_basis : str, optional
         Loading basis, otherwise first isotherm value is used.
@@ -239,10 +239,10 @@ def plot_iso(
         if loading_basis else isotherms[0].loading_basis,
         loading_unit=loading_unit
         if loading_unit else isotherms[0].loading_unit,
-        adsorbent_basis=adsorbent_basis
-        if adsorbent_basis else isotherms[0].adsorbent_basis,
-        adsorbent_unit=adsorbent_unit
-        if adsorbent_unit else isotherms[0].adsorbent_unit,
+        material_basis=material_basis
+        if material_basis else isotherms[0].material_basis,
+        material_unit=material_unit
+        if material_unit else isotherms[0].material_unit,
     )
 
     #######################################
@@ -466,15 +466,15 @@ def _get_data(
                 branch=current_branch,
                 loading_basis=kwargs['loading_basis'],
                 loading_unit=kwargs['loading_unit'],
-                adsorbent_basis=kwargs['adsorbent_basis'],
-                adsorbent_unit=kwargs['adsorbent_unit'],
+                material_basis=kwargs['material_basis'],
+                material_unit=kwargs['material_unit'],
             )
         return isotherm.loading(
             branch=current_branch,
             loading_basis=kwargs['loading_basis'],
             loading_unit=kwargs['loading_unit'],
-            adsorbent_basis=kwargs['adsorbent_basis'],
-            adsorbent_unit=kwargs['adsorbent_unit'],
+            material_basis=kwargs['material_basis'],
+            material_unit=kwargs['material_unit'],
             limits=drange,
             indexed=True,
         )

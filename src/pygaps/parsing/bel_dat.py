@@ -109,13 +109,13 @@ def isotherm_from_bel(path):
                             ):
                                 if u in h:
                                     meta['loading_unit'] = c
-                            meta['adsorbent_basis'] = 'mass'
+                            meta['material_basis'] = 'mass'
                             for (u, c) in (
                                 ('g-1', 'g'),
                                 ('kg-1', 'kg'),
                             ):
                                 if u in h:
-                                    meta['adsorbent_unit'] = c
+                                    meta['material_unit'] = c
 
                         if txt == 'pressure':
                             meta['pressure_mode'] = 'absolute'

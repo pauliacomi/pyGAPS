@@ -37,11 +37,11 @@ class BaseIsotherm():
 
     Other Parameters
     ----------------
-    adsorbent_basis : str, optional
+    material_basis : str, optional
         Whether the adsorption is read in terms of either 'per volume'
         'per molar amount' or 'per mass' of material.
-    adsorbent_unit : str, optional
-        Unit in which the adsorbent basis is expressed.
+    material_unit : str, optional
+        Unit in which the material basis is expressed.
     loading_basis : str, optional
         Whether the adsorbed material is read in terms of either 'volume'
         'molar' or 'mass'.
@@ -70,8 +70,8 @@ class BaseIsotherm():
     _unit_params = {
         'pressure_mode': 'absolute',
         'pressure_unit': 'bar',
-        'adsorbent_basis': 'mass',
-        'adsorbent_unit': 'g',
+        'material_basis': 'mass',
+        'material_unit': 'g',
         'loading_basis': 'molar',
         'loading_unit': 'mmol',
     }
@@ -132,15 +132,15 @@ class BaseIsotherm():
         self.pressure_unit = properties.pop('pressure_unit', None)
         if self.pressure_mode.startswith('relative'):
             self.pressure_unit = None
-        self.adsorbent_basis = properties.pop('adsorbent_basis', None)
-        self.adsorbent_unit = properties.pop('adsorbent_unit', None)
+        self.material_basis = properties.pop('material_basis', None)
+        self.material_unit = properties.pop('material_unit', None)
         self.loading_basis = properties.pop('loading_basis', None)
         self.loading_unit = properties.pop('loading_unit', None)
 
         # Check basis
-        if self.adsorbent_basis not in _MATERIAL_MODE:
+        if self.material_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                f"Basis selected for adsorbent ({self.adsorbent_basis}) is not an option. "
+                f"Basis selected for material ({self.material_basis}) is not an option. "
                 f"See viable values: {_MATERIAL_MODE.keys()}"
             )
 
@@ -169,9 +169,9 @@ class BaseIsotherm():
                 f"See viable values: {_PRESSURE_UNITS.keys()}"
             )
 
-        if self.adsorbent_unit not in _MATERIAL_MODE[self.adsorbent_basis]:
+        if self.material_unit not in _MATERIAL_MODE[self.material_basis]:
             raise ParameterError(
-                f"Unit selected for adsorbent ({self.adsorbent_unit}) is not an option. "
+                f"Unit selected for material ({self.material_unit}) is not an option. "
                 f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
             )
 
@@ -218,7 +218,7 @@ class BaseIsotherm():
 
         # Units/basis
         string += "Units: \n"
-        string += f"\tUptake in: {self.loading_unit}/{self.adsorbent_unit}\n"
+        string += f"\tUptake in: {self.loading_unit}/{self.material_unit}\n"
         if self.pressure_mode.startswith('relative'):
             string += "\tRelative pressure\n"
         else:

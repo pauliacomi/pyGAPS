@@ -8,9 +8,6 @@ class Material():
     """
     An unified descriptor for an adsorbent material.
 
-    Its purpose is to store properties such as adsorbent name,
-    and batch.
-
     Parameters
     ----------
     name : str

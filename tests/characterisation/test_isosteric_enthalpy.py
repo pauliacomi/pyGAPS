@@ -48,7 +48,7 @@ class TestIsostericEnthalpy():
         isotherms[0].material = isotherms[1].material
 
         # Will raise a "requires isotherm on the same basis error"
-        isotherms[0].convert_adsorbent(basis_to='volume', unit_to='cm3')
+        isotherms[0].convert_material(basis_to='volume', unit_to='cm3')
         with pytest.raises(pgEx.ParameterError):
             ie.isosteric_enthalpy(isotherms)
 

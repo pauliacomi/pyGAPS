@@ -10,8 +10,8 @@
     "lab": "local",
     "pressure_mode" : "absolute",
     "pressure_unit" : "bar",
-    "adsorbent_basis" : "mass",
-    "adsorbent_unit" : "g",
+    "material_basis" : "mass",
+    "material_unit" : "g",
     "loading_basis" : "molar",
     "loading_unit" : "mmol",
     "isotherm_data": [

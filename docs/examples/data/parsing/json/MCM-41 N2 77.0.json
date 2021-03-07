@@ -1,7 +1,7 @@
 {
     "adsorbate": "nitrogen",
-    "adsorbent_basis": "mass",
-    "adsorbent_unit": "g",
+    "material_basis": "mass",
+    "material_unit": "g",
     "comment": null,
     "date": null,
     "iso_type": "Isotherme",

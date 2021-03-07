@@ -9,7 +9,7 @@ project,ACRONYM
 machine,device1
 type,calorimetry
 loading_unit,mmol
-adsorbent_unit,g
+material_unit,g
 pressure_unit,bar
 data
 pressure,loading,Enthalpy(kJ/mol)

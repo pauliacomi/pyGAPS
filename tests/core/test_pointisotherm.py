@@ -520,7 +520,7 @@ class TestPointIsotherm():
             ),
         ]
     )
-    def test_isotherm_convert_adsorbent(
+    def test_isotherm_convert_material(
         self,
         use_adsorbate,
         use_material,
@@ -531,7 +531,7 @@ class TestPointIsotherm():
         """Check that the loading conversion function work as expected."""
 
         # Do the conversion
-        basic_pointisotherm.convert_adsorbent(**parameters)
+        basic_pointisotherm.convert_material(**parameters)
         converted = basic_pointisotherm.loading()[0]
 
         # Check if one datapoint is now as expected
@@ -551,23 +551,23 @@ class TestPointIsotherm():
             basic_pointisotherm.loading()[0] == pytest.approx(0.028, 0.001)
         )
         # Convert from wt% (g/g) to vol% (cm3/cm3)
-        basic_pointisotherm.convert_adsorbent(basis_to='volume', unit_to='cm3')
+        basic_pointisotherm.convert_material(basis_to='volume', unit_to='cm3')
         assert (
             basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001)
         )
         # Convert from vol% (cm3/cm3) to vol% (m3/m3)
-        basic_pointisotherm.convert_adsorbent(basis_to='volume', unit_to='m3')
+        basic_pointisotherm.convert_material(basis_to='volume', unit_to='m3')
         assert (
             basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001)
         )
         # Convert from vol% (m3/m3) to mol% (mol/mol)
-        basic_pointisotherm.convert_adsorbent(basis_to='molar', unit_to='mol')
+        basic_pointisotherm.convert_material(basis_to='molar', unit_to='mol')
         assert (basic_pointisotherm.loading()[0] == pytest.approx(0.01, 0.001))
         # Convert from mol% (mol/mol) to mmol/mol
         basic_pointisotherm.convert_loading(basis_to='molar', unit_to='mmol')
         assert (basic_pointisotherm.loading()[0] == pytest.approx(10, 0.001))
         # Convert from mmol/mol to mmol/g
-        basic_pointisotherm.convert_adsorbent(basis_to='mass', unit_to='g')
+        basic_pointisotherm.convert_material(basis_to='mass', unit_to='g')
         assert (basic_pointisotherm.loading()[0] == pytest.approx(1, 0.001))
 
     ##########################

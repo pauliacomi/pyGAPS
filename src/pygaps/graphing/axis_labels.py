@@ -19,11 +19,11 @@ def label_axis_text_pl(iso_params, key):
             text = "Pressure [%$p/p^0$]"
     elif key == 'loading':
         if iso_params['loading_basis'] == "percent":
-            text = f"Loading [${iso_params['adsorbent_basis']}$%]"
+            text = f"Loading [${iso_params['material_basis']}$%]"
         elif iso_params['loading_basis'] == "fraction":
-            text = fr"Loading [${iso_params['adsorbent_basis']}\/fraction$]"
+            text = fr"Loading [${iso_params['material_basis']}\/fraction$]"
         else:
-            text = fr"Loading [${convert_unitstr(iso_params['loading_unit'])}\/{convert_unitstr(iso_params['adsorbent_unit'], True)}$]"
+            text = fr"Loading [${convert_unitstr(iso_params['loading_unit'])}\/{convert_unitstr(iso_params['material_unit'], True)}$]"
     elif key == "enthalpy":
         text = r"$\Delta_{ads}h$ $(-kJ\/mol^{-1})$"
     else:

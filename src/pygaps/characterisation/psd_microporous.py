@@ -178,7 +178,7 @@ def psd_microporous(
             isotherm.adsorbate.molar_mass(),
         }
 
-    # Get adsorbent properties
+    # Get material properties
     material_properties = get_hk_model(material_model)
 
     # Read data in
@@ -458,7 +458,7 @@ def psd_horvath_kawazoe(
 
         - The surface is made up of a single layer of atoms. Furthermore, since
           the HK method is reliant on knowing the properties of the surface
-          atoms as well as the adsorbent molecules the material should ideally
+          atoms as well as the adsorbate molecules the material should ideally
           be homogenous.
 
         - Only dispersive forces are accounted for. If the adsorbate-adsorbent

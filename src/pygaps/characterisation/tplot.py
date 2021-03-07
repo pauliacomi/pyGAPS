@@ -166,8 +166,8 @@ def t_plot(
                     f"with a correlation coefficient of {result.get('corr_coef'):.2e}"
                 )
                 logger.info(
-                    f"The adsorbed volume is {result.get('adsorbed_volume'):.2f} cm3/{isotherm.adsorbent_unit} "
-                    f"and the area is {result.get('area'):.2f} m2/{isotherm.adsorbent_unit}"
+                    f"The adsorbed volume is {result.get('adsorbed_volume'):.2f} cm3/{isotherm.material_unit} "
+                    f"and the area is {result.get('area'):.2f} m2/{isotherm.material_unit}"
                 )
 
             tp_plot(t_curve, loading, results)
@@ -196,7 +196,7 @@ def t_plot_raw(
     Parameters
     ----------
     loading : array
-        Amount adsorbed at the surface, mol/adsorbent.
+        Amount adsorbed at the surface, mol/material.
     pressure : array
         Relative pressure corresponding to the loading.
     thickness_model : callable

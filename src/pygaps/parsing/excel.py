@@ -58,15 +58,15 @@ _FIELDS = {
         'row': 6,
         'column': 0,
     },
-    'adsorbent_basis': {
-        'text': ['Adsorbent basis'],
-        'name': 'adsorbent_basis',
+    'material_basis': {
+        'text': ['Material basis'],
+        'name': 'material_basis',
         'row': 7,
         'column': 0,
     },
-    'adsorbent_unit': {
-        'text': ['Adsorbent unit'],
-        'name': 'adsorbent_unit',
+    'material_unit': {
+        'text': ['Material unit'],
+        'name': 'material_unit',
         'row': 8,
         'column': 0,
     },

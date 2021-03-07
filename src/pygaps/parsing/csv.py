@@ -1,6 +1,7 @@
 """The csv parsing interface."""
 
 import ast
+import warnings
 from io import StringIO
 
 import pandas
@@ -197,6 +198,20 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)
+
+    # TODO deprecation
+    if "adsorbent_basis" in raw_dict:
+        raw_dict['material_basis'] = raw_dict.pop("adsorbent_basis")
+        warnings.warn(
+            "adsorbent_basis was replaced with material_basis",
+            DeprecationWarning
+        )
+    if "adsorbent_unit" in raw_dict:
+        raw_dict['material_unit'] = raw_dict.pop("adsorbent_unit")
+        warnings.warn(
+            "adsorbent_unit was replaced with material_unit",
+            DeprecationWarning
+        )
 
     # Now read specific type of isotherm (Point, Model, Base)
     if line.startswith('data'):

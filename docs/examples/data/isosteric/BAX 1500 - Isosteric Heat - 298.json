@@ -1,7 +1,7 @@
 {
     "adsorbate": "n-butane",
-    "adsorbent_basis": "mass",
-    "adsorbent_unit": "g",
+    "material_basis": "mass",
+    "material_unit": "g",
     "iso_type": "isotherm",
     "isotherm_data": [
         {

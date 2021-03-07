@@ -1,7 +1,7 @@
 {
     "adsorbate": "methane",
-    "adsorbent_basis": "mass",
-    "adsorbent_unit": "g",
+    "material_basis": "mass",
+    "material_unit": "g",
     "iso_type": "Isotherm",
     "isotherm_data": [
         {

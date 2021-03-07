@@ -207,7 +207,7 @@ class Adsorbate():
 
     @property
     def formula(self) -> str:
-        """Return the adsorbent formula."""
+        """Return the adsorbate formula."""
         formula = self.properties.get('formula')
         if formula is None:
             return self.name

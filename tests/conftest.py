@@ -48,8 +48,8 @@ def isotherm_parameters():
         'iso_type': 'calorimetry',
 
         # Units/bases
-        'adsorbent_basis': 'mass',
-        'adsorbent_unit': 'g',
+        'material_basis': 'mass',
+        'material_unit': 'g',
         'loading_basis': 'molar',
         'loading_unit': 'mmol',
         'pressure_mode': 'absolute',

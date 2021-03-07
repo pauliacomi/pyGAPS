@@ -1,7 +1,7 @@
 {
     "adsorbate": "nitrogen",
-    "adsorbent_basis": "mass",
-    "adsorbent_unit": "g",
+    "material_basis": "mass",
+    "material_unit": "g",
     "apparatus": "TriStar II 3020 3.02",
     "comment": "Sample that was stopped during collection.",
     "date": "2017-06-13T07:56:30",

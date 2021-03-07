@@ -37,7 +37,7 @@ def dr_plot(isotherm, limits=None, verbose=False):
     dict
         Dictionary of results with the following parameters:
 
-        - ``pore_volume`` (float) : calculated total micropore volume, cm3/adsorbent unit
+        - ``pore_volume`` (float) : calculated total micropore volume, cm3/material unit
         - ``adsorption_potential`` (float) : calculated adsorption potential, in kJ/mol
 
     Notes
@@ -115,7 +115,7 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
     dict
         Dictionary of results with the following parameters:
 
-        - ``pore_volume`` (float) : calculated total micropore volume, cm3/adsorbent unit
+        - ``pore_volume`` (float) : calculated total micropore volume, cm3/material unit
         - ``adsorption_potential`` (float) : calculated adsorption potential, in kJ/mol
         - ``exponent`` (float) : the exponent, only if not specified, unitless
 

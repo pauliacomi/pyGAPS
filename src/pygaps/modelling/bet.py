@@ -30,12 +30,10 @@ class BET(IsothermBaseModel):
           layers equals the condensation energy of the adsorbent :math:`E_L`.
 
     A particular surface percentage :math:`\theta_x` is occupied with x layers.
-    For each layer at equilibrium, the adsorption and desorption rates must be equal. We can
-    then apply the Langmuir theory for each layer.
-    It is assumed
-    that the adsorption energy of a molecule on the second
-    and higher layers is just the condensation energy of the
-    adsorbent :math:`E_{i>1} = E_L`.
+    For each layer at equilibrium, the adsorption and desorption rates must be
+    equal. We can then apply the Langmuir theory for each layer. It is assumed
+    that the adsorption energy of a molecule on the second and higher layers is
+    just the condensation energy of the adsorbent :math:`E_{i>1} = E_L`.
 
     .. math::
 

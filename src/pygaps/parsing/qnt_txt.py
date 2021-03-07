@@ -138,7 +138,7 @@ def parse(path):
     meta['temperature_unit'] = "K"
     meta['pressure_unit'] = "torr"
     meta['loading_unit'] = "mmol"
-    meta['adsorbent_unit'] = "g"
+    meta['material_unit'] = "g"
     meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
 
     # amount adsorbed from cc to mmol/g

@@ -1,7 +1,7 @@
 {
     "adsorbate": "carbon dioxide",
-    "adsorbent_basis": "mass",
-    "adsorbent_unit": "g",
+    "material_basis": "mass",
+    "material_unit": "g",
     "comment": null,
     "date": "2010-05-21 00:00:00",
     "iso_type": "Calorimetrie",

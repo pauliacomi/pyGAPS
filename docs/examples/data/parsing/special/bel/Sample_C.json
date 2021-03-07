@@ -1,7 +1,7 @@
 {
     "adsorbate": "propane",
-    "adsorbent_basis": "mass",
-    "adsorbent_unit": "g",
+    "material_basis": "mass",
+    "material_unit": "g",
     "apparatus": "BEL",
     "comment": "Comment number 1",
     "date": "2018-06-11T19:42:27",

@@ -54,7 +54,7 @@ def psd_dft(
         If set to 0, data will be returned as-is.
     kernel_units : dict
         A dictionary of kernel basis and units, contains ``loading_basis``,
-        ``loading_unit``, ``adsorbent_basis``, ``adsorbent_unit``, ``pressure_mode``
+        ``loading_unit``, ``material_basis``, ``material_unit``, ``pressure_mode``
         and "pressure_unit". Defaults to mmol/g in relative pressure.
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
@@ -153,8 +153,8 @@ def psd_dft(
 
     loading_basis = kernel_units.get('loading_basis', 'molar')
     loading_unit = kernel_units.get('loading_unit', 'mmol')
-    adsorbent_basis = kernel_units.get('adsorbate_basis', 'mass')
-    adsorbent_unit = kernel_units.get('adsorbate_unit', 'g')
+    material_basis = kernel_units.get('material_basis', 'mass')
+    material_unit = kernel_units.get('material_unit', 'g')
     pressure_mode = kernel_units.get('pressure_mode', 'relative')
     pressure_unit = kernel_units.get('pressure_unit', None)
 
@@ -163,8 +163,8 @@ def psd_dft(
         branch=branch,
         loading_basis=loading_basis,
         loading_unit=loading_unit,
-        adsorbent_basis=adsorbent_basis,
-        adsorbent_unit=adsorbent_unit
+        material_basis=material_basis,
+        material_unit=material_unit
     )
     pressure = isotherm.pressure(
         branch=branch,
@@ -215,8 +215,8 @@ def psd_dft(
             'y1_line_style': POINTS_ALL_STYLE,
             'loading_basis': loading_basis,
             'loading_unit': loading_unit,
-            'adsorbent_basis': adsorbent_basis,
-            'adsorbent_unit': adsorbent_unit,
+            'material_basis': material_basis,
+            'material_unit': material_unit,
             'pressure_mode': pressure_mode,
             'pressure_unit': pressure_unit,
         }

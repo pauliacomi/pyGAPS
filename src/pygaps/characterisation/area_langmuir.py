@@ -37,9 +37,9 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
     dict
         A dictionary of results with the following components. The basis of these
         results will be derived from the basis of the isotherm (per mass or per
-        volume of adsorbent):
+        volume of material):
 
-        - ``area`` (float) : calculated Langmuir surface area, in m2/unit of adsorbent
+        - ``area`` (float) : calculated Langmuir surface area, in m2/unit of material
         - ``langmuir_const`` (float) : the constant in the Langmuir fit
         - ``n_monolayer`` (float) : the amount adsorbed at the monolayer
         - ``langmuir_slope`` (float) : slope of the Langmuir plot
@@ -140,12 +140,12 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
         logger.info(
             textwrap.dedent(
                 f"""\
-            Langmuir surface area: a = {langmuir_area:.2e} m2/{isotherm.adsorbent_unit}
+            Langmuir surface area: a = {langmuir_area:.2e} m2/{isotherm.material_unit}
             Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum -1]:.3f}
             The slope of the Langmuir line: s = {slope:.2e}
             The intercept of the Langmuir line: i = {intercept:.2e}
             The Langmuir constant is: K = {langmuir_const:.1f}
-            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.adsorbent_unit}"""
+            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.material_unit}"""
             )
         )
 

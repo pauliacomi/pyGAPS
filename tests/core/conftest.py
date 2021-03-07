@@ -32,11 +32,11 @@ LOADING_PARAM = [
         'loading_unit': 'cm3'
     }),  # Loading basis specified
     (1000, {
-        'adsorbent_unit': 'kg'
+        'material_unit': 'kg'
     }),  # Adsorbent unit specified
     (2, {
-        'adsorbent_basis': 'volume',
-        'adsorbent_unit': 'cm3',
+        'material_basis': 'volume',
+        'material_unit': 'cm3',
     }),  # Adsorbent basis specified
     (0.0280135, {
         'loading_basis': 'fraction',
@@ -47,23 +47,23 @@ LOADING_PARAM = [
     (
         0.01, {
             'loading_basis': 'fraction',
-            'adsorbent_basis': 'molar',
-            'adsorbent_unit': 'mmol',
+            'material_basis': 'molar',
+            'material_unit': 'mmol',
         }
     ),  # Fractional molar (will be 1/1000 mol * 10 g/mol)
     (
         1.7529697, {
             'loading_basis': 'fraction',
-            'adsorbent_basis': 'volume',
-            'adsorbent_unit': 'cm3',
+            'material_basis': 'volume',
+            'material_unit': 'cm3',
         }
     ),  # Fractional volume
     (
         56.02696, {
             'loading_basis': 'mass',
             'loading_unit': 'kg',
-            'adsorbent_basis': 'volume',
-            'adsorbent_unit': 'm3',
+            'material_basis': 'volume',
+            'material_unit': 'm3',
         }
     ),  # All specified
     (3.0, {
@@ -90,11 +90,11 @@ PRESSURE_AT_PARAM = [
         'loading_unit': 'g'
     }),  # Loading mode specified
     (1000, 1, {
-        'adsorbent_unit': 'kg'
+        'material_unit': 'kg'
     }),  # Loading basis specified
     (2, 1, {
-        'adsorbent_basis': 'volume',
-        'adsorbent_unit': 'cm3'
+        'material_basis': 'volume',
+        'material_unit': 'cm3'
     }),  # Adsorbent basis specified
     (
         0.1, 0.229334, {
@@ -102,8 +102,8 @@ PRESSURE_AT_PARAM = [
             'pressure_unit': 'Pa',
             'loading_basis': 'mass',
             'loading_unit': 'g',
-            'adsorbent_basis': 'volume',
-            'adsorbent_unit': 'cm3',
+            'material_basis': 'volume',
+            'material_unit': 'cm3',
         }
     ),  # All specified
 ]
@@ -127,11 +127,11 @@ LOADING_AT_PARAM = [
         'loading_unit': 'g'
     }),  # Loading mode specified
     (1, 1000, {
-        'adsorbent_unit': 'kg'
+        'material_unit': 'kg'
     }),  # Loading basis specified
     (1, 2, {
-        'adsorbent_basis': 'volume',
-        'adsorbent_unit': 'cm3'
+        'material_basis': 'volume',
+        'material_unit': 'cm3'
     }),  # Adsorbent basis specified
     (
         0.229334, 0.1, {
@@ -139,8 +139,8 @@ LOADING_AT_PARAM = [
             'pressure_mode': 'relative',
             'loading_basis': 'mass',
             'loading_unit': 'g',
-            'adsorbent_basis': 'volume',
-            'adsorbent_unit': 'cm3',
+            'material_basis': 'volume',
+            'material_unit': 'cm3',
         }
     ),  # All specified
 ]

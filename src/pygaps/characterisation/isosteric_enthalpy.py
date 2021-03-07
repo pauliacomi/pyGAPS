@@ -94,9 +94,9 @@ def isosteric_enthalpy(
         )
 
     # Check same basis
-    if len(set(x.adsorbent_basis for x in isotherms)) > 1:
+    if len(set(x.material_basis for x in isotherms)) > 1:
         raise ParameterError(
-            'Isotherm passed are in a different adsorbent basis.'
+            'Isotherm passed are in a different material basis.'
         )
 
     # Get temperatures

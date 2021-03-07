@@ -131,8 +131,8 @@ def c_loading(
     unit_to: str,
     adsorbate=None,
     temp: float = None,
-    basis_adsorbent: str = None,
-    unit_adsorbent: str = None,
+    basis_material: str = None,
+    unit_material: str = None,
 ):
     """
     Convert loading units and basis.
@@ -158,11 +158,11 @@ def c_loading(
     temp : float, optional
         Temperature at which the loading is measured, in K.
         Only required for some conversions.
-    basis_adsorbent : str, optional
-        The basis of the adsorbent.
+    basis_material : str, optional
+        The basis of the material.
         Only required for conversions involving percentage/fraction.
-    unit_adsorbent : str, optional
-        The unit of the adsorbent.
+    unit_material : str, optional
+        The unit of the material.
         Only required for conversions involving percentage/fraction.
 
     Returns
@@ -227,13 +227,13 @@ def c_loading(
             else:
                 # convert from physical -> percent/fraction
                 if bf_b:
-                    _basis_from = basis_adsorbent
-                    _unit_from = unit_adsorbent
+                    _basis_from = basis_material
+                    _unit_from = unit_material
                     if basis_from == 'percent':
                         factor = 0.01
                 elif bt_b:
-                    _basis_to = basis_adsorbent
-                    _unit_to = unit_adsorbent
+                    _basis_to = basis_material
+                    _unit_to = unit_material
                     if basis_to == 'percent':
                         factor = 100
 
@@ -270,11 +270,9 @@ def c_loading(
     return value
 
 
-def c_adsorbent(
-    value, basis_from, basis_to, unit_from, unit_to, material=None
-):
+def c_material(value, basis_from, basis_to, unit_from, unit_to, material=None):
     """
-    Convert adsorbent units and basis.
+    Convert material units and basis.
 
     The name of the material has to be
     specified when converting between basis.
@@ -309,7 +307,7 @@ def c_adsorbent(
 
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
-                f"Basis selected for adsorbent ({basis_to}) is not an option. "
+                f"Basis selected for material ({basis_to}) is not an option. "
                 f"Viable bases are {[base for base in list(_MATERIAL_MODE) if base not in ['percent', 'fraction']]}"
             )
 
@@ -326,13 +324,13 @@ def c_adsorbent(
 
         if unit_to not in _MATERIAL_MODE[basis_to]:
             raise ParameterError(
-                f"Unit selected for adsorbent unit_to ({unit_to}) is not an option. "
+                f"Unit selected for material unit_to ({unit_to}) is not an option. "
                 f"Viable units are {list(_MATERIAL_MODE[unit_to])}"
             )
 
         if unit_from not in _MATERIAL_MODE[basis_from]:
             raise ParameterError(
-                f"Unit selected for adsorbent unit_from ({unit_from}) is not an option. "
+                f"Unit selected for material unit_from ({unit_from}) is not an option. "
                 f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
             )
 

@@ -163,7 +163,7 @@ def read_bel_report(path):
     ])
     meta['pressure_mode'] = 'absolute'
     meta['loading_basis'] = 'molar'
-    meta['adsorbent_basis'] = 'mass'
+    meta['material_basis'] = 'mass'
 
     return meta, data
 
@@ -275,7 +275,7 @@ def _assign_data(item, field, meta, data, ads_points, des_points):
             ('kg-1', 'kg'),
         ):
             if u in item:
-                meta['adsorbent_unit'] = c
+                meta['material_unit'] = c
 
     elif field['labels'][name] == 'pressure':
         data['pressure'] = ads_points + des_points

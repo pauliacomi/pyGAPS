@@ -62,12 +62,12 @@ class TestBaseIsotherm():
                 'loading_unit': 'g'
             }),
             ({
-                'adsorbent_basis': 'mass',
-                'adsorbent_unit': 'kg'
+                'material_basis': 'mass',
+                'material_unit': 'kg'
             }),
             ({
-                'adsorbent_basis': 'volume',
-                'adsorbent_unit': 'cm3'
+                'material_basis': 'volume',
+                'material_unit': 'cm3'
             }),
         ]
     )
@@ -82,8 +82,8 @@ class TestBaseIsotherm():
                          ('pressure_mode', 'something'),
                          ('loading_unit', 'something'),
                          ('loading_basis', 'something'),
-                         ('adsorbent_unit', 'something'),
-                         ('adsorbent_basis', 'something')]
+                         ('material_unit', 'something'),
+                         ('material_basis', 'something')]
     )
     def test_isotherm_mode_and_units_bad(
         self, isotherm_parameters, prop, set_to

@@ -1,7 +1,7 @@
 {
     "adsorbate": "water",
-    "adsorbent_basis": "mass",
-    "adsorbent_unit": "g",
+    "material_basis": "mass",
+    "material_unit": "g",
     "apparatus": "BEL",
     "comment": "",
     "date": "2017-09-12T07:47:47",
