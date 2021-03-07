@@ -29,28 +29,28 @@ _BRANCH_TYPES = {
 def plot_iso(
     isotherms,
     ax=None,
-    x_data='pressure',
-    y1_data='loading',
-    y2_data=None,
-    branch="all",
-    logx=False,
-    logy1=False,
-    logy2=False,
+    x_data: str = 'pressure',
+    y1_data: str = 'loading',
+    y2_data: str = None,
+    branch: str = "all",
+    logx: bool = False,
+    logy1: bool = False,
+    logy2: bool = False,
     color=True,
     marker=None,
-    adsorbent_basis="mass",
-    adsorbent_unit="g",
-    loading_basis="molar",
-    loading_unit="mmol",
-    pressure_mode="absolute",
-    pressure_unit="bar",
+    adsorbent_basis: str = None,
+    adsorbent_unit: str = None,
+    loading_basis: str = None,
+    loading_unit: str = None,
+    pressure_mode: str = None,
+    pressure_unit: str = None,
     x_range=(None, None),
     y1_range=(None, None),
     y2_range=(None, None),
-    fig_title=None,
+    fig_title: str = None,
     lgd_keys=None,
-    lgd_pos='best',
-    save_path=None,
+    lgd_pos: str = 'best',
+    save_path: str = None,
     **other_parameters
 ):
     """
@@ -98,16 +98,16 @@ def plot_iso(
         Whether the adsorption is read in terms of either 'per volume'
         or 'per mass'.
     adsorbent_unit : str, optional
-        Unit of loading.
+        Unit of loading, otherwise first isotherm value is used.
     loading_basis : str, optional
-        Loading basis.
+        Loading basis, otherwise first isotherm value is used.
     loading_unit : str, optional
-        Unit of loading.
+        Unit of loading, otherwise first isotherm value is used.
     pressure_mode : str, optional
         The pressure mode, either absolute pressures or relative in
-        the form of p/p0.
+        the form of p/p0, otherwise first isotherm value is used.
     pressure_unit : str, optional
-        Unit of pressure.
+        Unit of pressure, otherwise first isotherm value is used.
 
     x_range : tuple
         Range for data on the x axis. eg: (0, 1). Is applied to each
@@ -225,12 +225,18 @@ def plot_iso(
     log_params = dict(logx=logx, logy1=logy1, logy2=logy2)
     range_params = dict(x_range=x_range, y1_range=y1_range, y2_range=y2_range)
     iso_params = dict(
-        pressure_mode=pressure_mode,
-        pressure_unit=pressure_unit,
-        loading_basis=loading_basis,
-        loading_unit=loading_unit,
-        adsorbent_basis=adsorbent_basis,
-        adsorbent_unit=adsorbent_unit,
+        pressure_mode=pressure_mode
+        if pressure_mode else isotherms[0].pressure_mode,
+        pressure_unit=pressure_unit
+        if pressure_unit else isotherms[0].pressure_unit,
+        loading_basis=loading_basis
+        if loading_basis else isotherms[0].loading_basis,
+        loading_unit=loading_unit
+        if loading_unit else isotherms[0].loading_unit,
+        adsorbent_basis=adsorbent_basis
+        if adsorbent_basis else isotherms[0].adsorbent_basis,
+        adsorbent_unit=adsorbent_unit
+        if adsorbent_unit else isotherms[0].adsorbent_unit,
     )
 
     #######################################
@@ -530,4 +536,5 @@ def _final_styling(
             bbox_extra_artists=bbox_extra_artists,
             bbox_inches='tight',
             **styles['save_style'],
+            dpi=300,
         )
