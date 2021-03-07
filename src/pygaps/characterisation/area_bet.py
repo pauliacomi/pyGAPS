@@ -18,7 +18,7 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
 
 
-def area_BET(isotherm, limits=None, verbose=False):
+def area_BET(isotherm, branch='ads', limits=None, verbose=False):
     r"""
     Calculate BET-determined surface area from an isotherm.
 
@@ -31,6 +31,8 @@ def area_BET(isotherm, limits=None, verbose=False):
     ----------
     isotherm : PointIsotherm
         The isotherm of which to calculate the BET surface area.
+    branch : {'ads', 'des'}, optional
+        Branch of the isotherm to use. It defaults to adsorption.
     limits : [float, float], optional
         Manual limits for region selection.
     verbose : bool, optional
@@ -128,13 +130,13 @@ def area_BET(isotherm, limits=None, verbose=False):
 
     # Read data in
     loading = isotherm.loading(
-        branch='ads',
+        branch=branch,
         loading_unit='mol',
         loading_basis='molar',
     )
     try:
         pressure = isotherm.pressure(
-            branch='ads',
+            branch=branch,
             pressure_mode='relative',
         )
     except pgError:

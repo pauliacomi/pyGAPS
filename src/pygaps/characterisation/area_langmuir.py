@@ -17,7 +17,7 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
 
 
-def area_langmuir(isotherm, limits=None, verbose=False):
+def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
     r"""
     Calculate the Langmuir-determined surface area of an isotherm.
 
@@ -25,6 +25,8 @@ def area_langmuir(isotherm, limits=None, verbose=False):
     ----------
     isotherm : PointIsotherm
         The isotherm of which to calculate the Langmuir surface area.
+    branch : {'ads', 'des'}, optional
+        Branch of the isotherm to use. It defaults to adsorption.
     limits : [float, float], optional
         Manual limits for region selection.
     verbose : bool, optional
@@ -108,11 +110,11 @@ def area_langmuir(isotherm, limits=None, verbose=False):
 
     # Read data in
     loading = isotherm.loading(
-        branch='ads', loading_unit='mol', loading_basis='molar'
+        branch=branch, loading_unit='mol', loading_basis='molar'
     )
     try:
         pressure = isotherm.pressure(
-            branch='ads',
+            branch=branch,
             pressure_mode='relative',
         )
     except pgError:
