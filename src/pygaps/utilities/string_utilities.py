@@ -17,21 +17,67 @@ def convert_chemformula(string):
     """
     result = getattr(string, 'formula', None)
     if result is None:
-        latexd = []
+        result = ""
         number_processing = False
         for i in string:
             if i.isdigit():
                 if not number_processing:
-                    latexd.append('_{')
+                    result += '_{'
                     number_processing = True
             else:
                 if number_processing:
-                    latexd.append('}')
+                    result += '}'
                     number_processing = False
-            latexd.append(i)
+            result += i
 
         if number_processing:
-            latexd.append('}')
+            result += '}'
 
-        result = ''.join(latexd)
     return f'${result}$'
+
+
+def convert_unitstr(string: str, negative: bool = False):
+    """
+    Convert a unit string to a nice matplotlib parsable format (latex).
+
+    Parameters
+    ----------
+    string: str
+        String to process.
+    negative: bool
+        Whether the power is negative instead.
+
+    Returns
+    -------
+    str
+        Processed string.
+    """
+    result = ""
+    number_processing = False
+    for i in string:
+        if i.isdigit():
+            if not number_processing:
+                result += '^{'
+                if negative:
+                    result += '-'
+                    negative = False
+                number_processing = True
+        else:
+            if number_processing:
+                result += '}'
+                number_processing = False
+            if i == "(":
+                result += '_{'
+                continue
+            elif i == ")":
+                result += '}'
+                continue
+        result += (i)
+
+    if number_processing:
+        result += '}'
+
+    if negative:
+        result += '^{-1}'
+
+    return result
