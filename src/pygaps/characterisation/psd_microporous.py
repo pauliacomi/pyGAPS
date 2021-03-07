@@ -192,8 +192,8 @@ def psd_microporous(
         )
     try:
         pressure = isotherm.pressure(
-            branch='ads',
-            pressure_mode='relative',
+            branch=branch,
+            pressure_mode='relative'
         )
     except pgError:
         raise CalculationError(

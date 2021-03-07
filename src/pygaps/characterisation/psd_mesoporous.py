@@ -154,10 +154,7 @@ def psd_mesoporous(
             "The isotherm does not have the required branch for this calculation"
         )
     try:
-        pressure = isotherm.pressure(
-            branch='ads',
-            pressure_mode='relative',
-        )
+        pressure = isotherm.pressure(branch=branch, pressure_mode='relative')
     except pgError:
         raise CalculationError(
             "The isotherm cannot be converted to a relative basis. "
