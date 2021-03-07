@@ -2,6 +2,7 @@
 
 import collections.abc as abc
 import pathlib
+import warnings
 
 from .exceptions import pgError
 
@@ -85,3 +86,21 @@ def get_file_paths(folder, extension=None):
         raise pgError("Must provide a file extension to look for")
 
     return pathlib.Path(folder).rglob(f"*.{extension}")
+
+
+class simplewarning():
+    """
+    Context manager overrides warning formatter to remove unneeded info.
+    """
+    def __enter__(self):
+        # ignore everything except the message
+        def custom_formatwarning(msg, *args, **kwargs):
+            return str(msg) + '\n'
+
+        self.old_formatter = warnings.formatwarning
+        warnings.formatwarning = custom_formatwarning
+        return True
+
+    def __exit__(self, type, value, traceback):
+        warnings.formatwarning = self.old_formatter
+        return True

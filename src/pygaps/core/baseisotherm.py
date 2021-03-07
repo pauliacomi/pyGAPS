@@ -12,6 +12,7 @@ from ..utilities.converter_mode import _PRESSURE_MODE
 from ..utilities.converter_unit import _PRESSURE_UNITS
 from ..utilities.exceptions import ParameterError
 from ..utilities.hashgen import isotherm_to_hash
+from ..utilities.python_utilities import simplewarning
 
 
 class BaseIsotherm():
@@ -119,22 +120,13 @@ class BaseIsotherm():
 
         # Isotherm units
         #
-        # We create a custom warning format that only displays the message.
-        def custom_formatwarning(msg, *args, **kwargs):
-            # ignore everything except the message
-            return str(msg) + '\n'
-
-        old_formatter = warnings.formatwarning
-        warnings.formatwarning = custom_formatwarning
-
-        for k in self._unit_params:
-            if k not in properties:
-                warnings.warn(
-                    f"WARNING: '{k}' was not specified , assumed as '{self._unit_params[k]}'"
-                )
-                properties[k] = self._unit_params[k]
-
-        warnings.formatwarning = old_formatter
+        with simplewarning():
+            for k in self._unit_params:
+                if k not in properties:
+                    warnings.warn(
+                        f"WARNING: '{k}' was not specified , assumed as '{self._unit_params[k]}'"
+                    )
+                    properties[k] = self._unit_params[k]
 
         self.pressure_mode = properties.pop('pressure_mode', None)
         self.pressure_unit = properties.pop('pressure_unit', None)
