@@ -205,7 +205,7 @@ class BaseIsotherm():
 
     def __repr__(self):
         """Print key isotherm parameters."""
-        return f"<{self.iso_id}>: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
+        return f"<{type(self).__name__} {self.iso_id}>: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
 
     def __str__(self):
         """Print a short summary of all the isotherm parameters."""
