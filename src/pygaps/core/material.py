@@ -15,8 +15,6 @@ class Material():
     ----------
     name : str
         The name of the material.
-    batch : str, None
-        A batch number or secondary identifier for the material.
 
     Other Parameters
     ----------------
@@ -29,16 +27,19 @@ class Material():
     -----
     The members of the properties are left at the discretion
     of the user. There are, however, some unique properties
-    which can be set as seen above.
+    which can be set.
 
     """
-    def __init__(self, name, **properties):
+    def __init__(self, name: str, **properties):
         """Instantiate by passing all the parameters."""
-        #: Material name
+        # Material name
         self.name = name
 
-        #: Rest of material properties
+        # Rest of material properties
         self.properties = properties
+
+        # TODO
+        # auto-upload materials to global list?
 
     def __repr__(self):
         """Print material id."""
@@ -77,7 +78,7 @@ class Material():
         return string
 
     @classmethod
-    def find(cls, name):
+    def find(cls, name: str):
         """Get the specified material from the master list.
 
         Parameters
@@ -103,14 +104,14 @@ class Material():
 
         # Checks to see if material exists in master list
         try:
-            return next(mat for mat in MATERIAL_LIST if name == mat.name)
+            return next(mat for mat in MATERIAL_LIST if name == mat)
         except StopIteration:
             raise ParameterError(
                 f"Material {name} does not exist in list of materials. "
                 "First populate pygaps.MATERIAL_LIST with required material class"
             )
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Return a dictionary of the material class.
 

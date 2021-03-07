@@ -49,10 +49,10 @@ class Adsorbate():
         Custom value for surface tension (otherwise obtained through CoolProp).
     liquid_density : float
         Custom value for liquid density (otherwise obtained through CoolProp).
-    gas_density : float
-        Custom value for gas density (otherwise obtained through CoolProp).
     liquid_molar_density : float
         Custom value for liquid molar density (otherwise obtained through CoolProp).
+    gas_density : float
+        Custom value for gas density (otherwise obtained through CoolProp).
     gas_molar_density : float
         Custom value for gas molar density (otherwise obtained through CoolProp).
     enthalpy_liquefaction : float
@@ -85,7 +85,7 @@ class Adsorbate():
         adsorbate.backend.p_critical()
 
     """
-    def __init__(self, name=None, **properties):
+    def __init__(self, name: str = None, **properties):
         """Instantiate by passing a dictionary with the parameters."""
         # Adsorbate name
         if name is None:
@@ -106,7 +106,7 @@ class Adsorbate():
                 self.alias = [alias.lower()]
             else:
                 self.alias = [a.lower() for a in alias]
-            if _name.lower() not in self.alias:
+            if _name not in self.alias:
                 self.alias.append(_name)
 
         #: Adsorbate properties
@@ -115,6 +115,9 @@ class Adsorbate():
         # CoolProp interaction variables, only generate when called
         self._state = None
         self._backend_mode = None
+
+        # TODO
+        # auto-upload adsorbates to global list?
 
     def __repr__(self):
         """Print adsorbate id."""
@@ -155,7 +158,7 @@ class Adsorbate():
         return string
 
     @classmethod
-    def find(cls, name):
+    def find(cls, name: str):
         """Get the specified adsorbate from the master list.
 
         Parameters
@@ -189,7 +192,7 @@ class Adsorbate():
             ) from None
 
     @property
-    def backend(self):
+    def backend(self) -> str:
         """Return the CoolProp state associated with the fluid."""
         if (
             not self._backend_mode
@@ -203,14 +206,14 @@ class Adsorbate():
         return self._state
 
     @property
-    def formula(self):
+    def formula(self) -> str:
         """Return the adsorbent formula."""
         formula = self.properties.get('formula')
         if formula is None:
             return self.name
         return formula
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Return a dictionary of the adsorbate class.
 
@@ -226,7 +229,6 @@ class Adsorbate():
             'alias': self.alias,
         }
         parameters_dict.update(self.properties)
-
         return parameters_dict
 
     def get_prop(self, prop):
