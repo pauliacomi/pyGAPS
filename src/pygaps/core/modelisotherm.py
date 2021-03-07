@@ -337,6 +337,10 @@ class ModelIsotherm(BaseIsotherm):
         verbose : bool
             Prints out extra information about steps taken.
         """
+        if not model:
+            raise ParameterError(
+                "Provide a model name (or a list of them) to fit."
+            )
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
         iso_params['isotherm_data'] = isotherm.data(branch=branch)
@@ -419,7 +423,12 @@ class ModelIsotherm(BaseIsotherm):
         if models == 'guessall':
             guess_models = _GUESS_MODELS
         else:
-            guess_models = [m for m in models if m in _MODELS]
+            try:
+                guess_models = [m for m in models if m in _MODELS]
+            except TypeError:
+                raise ParameterError(
+                    "Could not figure out the list of models. Is it a list?"
+                )
             if len(guess_models) != len(models):
                 raise ParameterError(
                     'Not all models provided correspond to internal models.'
