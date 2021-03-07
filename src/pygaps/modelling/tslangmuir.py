@@ -17,14 +17,15 @@ class TSLangmuir(IsothermBaseModel):
 
     Notes
     -----
-    An extension to the Langmuir model is to consider the experimental isotherm to be
-    the sum of several Langmuir-type isotherms with different monolayer capacities and
-    affinities [#]_. The assumption is that the adsorbent presents several distinct
-    types of homogeneous adsorption sites, and that separate Langmuir equations
-    should be applied to each. This is particularly applicable in cases where the
-    structure of the adsorbent suggests that different types of sites are present,
-    such as in crystalline materials of variable chemistry like zeolites and MOFs.
-    The resulting isotherm equation is:
+    An extension to the Langmuir model is to consider the experimental isotherm
+    to be the sum of several Langmuir-type isotherms with different monolayer
+    capacities and affinities [#]_. The assumption is that the adsorbent
+    material presents several distinct types of homogeneous adsorption sites,
+    and that separate Langmuir equations should be applied to each. This is
+    particularly applicable in cases where the structure of the adsorbent
+    suggests that different types of sites are present, such as in crystalline
+    materials of variable chemistry like zeolites and MOFs. The resulting
+    isotherm equation is:
 
     .. math::
 
