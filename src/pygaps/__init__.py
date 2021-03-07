@@ -15,10 +15,6 @@ logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler(stream=sys.stdout)
 ch.setLevel(logging.INFO)
 
-# # create formatter
-# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# ch.setFormatter(formatter)
-
 # add the handlers to the logger
 logger.addHandler(ch)
 
@@ -28,18 +24,27 @@ if sys.version_info[0] != 3:
     sys.exit(1)
 
 # Let users know if they're missing any hard dependencies
-hard_dependencies = ("numpy", "pandas", "scipy", "CoolProp")
+hard_dependencies = ("numpy", "pandas", "scipy")
+soft_dependencies = {
+    "CoolProp": "Used for many thermodynamic backend calculations."
+}
 missing_dependencies = []
 
 import importlib
 for dependency in hard_dependencies:
-    spec = importlib.util.find_spec(dependency)
-    if not spec:
+    if not importlib.util.find_spec(dependency):
         missing_dependencies.append(dependency)
 
 if missing_dependencies:
     raise ImportError(f"Missing required dependencies {missing_dependencies}")
-del hard_dependencies, dependency, missing_dependencies
+
+for dependency in soft_dependencies:
+    if not importlib.util.find_spec(dependency):
+        logger.warn(
+            f"Missing important package {dependency}. {soft_dependencies[dependency]}"
+        )
+
+del hard_dependencies, soft_dependencies, dependency, missing_dependencies
 
 
 # This lazy load function will be used for non-critical modules to speed import time

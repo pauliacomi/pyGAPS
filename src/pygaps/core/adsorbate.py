@@ -2,12 +2,11 @@
 
 import warnings
 
-import CoolProp
-
 from ..data import ADSORBATE_LIST
 from ..utilities.converter_unit import _PRESSURE_UNITS
 from ..utilities.converter_unit import c_unit
-from ..utilities.coolprop_utilities import COOLPROP_BACKEND
+from ..utilities.coolprop_utilities import CP
+from ..utilities.coolprop_utilities import thermodynamic_backend
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
@@ -192,10 +191,13 @@ class Adsorbate():
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
-        if not self._backend_mode or self._backend_mode != COOLPROP_BACKEND:
-            self._backend_mode = COOLPROP_BACKEND
-            self._state = CoolProp.AbstractState(
-                COOLPROP_BACKEND, self.backend_name()
+        if (
+            not self._backend_mode
+            or self._backend_mode != thermodynamic_backend()
+        ):
+            self._backend_mode = thermodynamic_backend()
+            self._state = CP.AbstractState(
+                self._backend_mode, self.backend_name
             )
 
         return self._state
@@ -254,6 +256,7 @@ class Adsorbate():
             )
         return req_prop
 
+    @property
     def backend_name(self):
         """
         Get the CoolProp interaction name of the adsorbate.
@@ -346,7 +349,7 @@ class Adsorbate():
         if calculate:
             try:
                 state = self.backend
-                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                state.update(CP.QT_INPUTS, 0.0, temp)
                 sat_p = state.p()
 
             except Exception as e_info:
@@ -394,7 +397,7 @@ class Adsorbate():
         if calculate:
             try:
                 state = self.backend
-                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                state.update(CP.QT_INPUTS, 0.0, temp)
                 return state.surface_tension() * 1000
 
             except Exception as e_info:
@@ -436,7 +439,7 @@ class Adsorbate():
         if calculate:
             try:
                 state = self.backend
-                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                state.update(CP.QT_INPUTS, 0.0, temp)
                 return state.rhomass() / 1000
 
             except Exception as e_info:
@@ -478,7 +481,7 @@ class Adsorbate():
         if calculate:
             try:
                 state = self.backend
-                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                state.update(CP.QT_INPUTS, 0.0, temp)
                 return state.rhomolar() / 1e6
 
             except Exception as e_info:
@@ -520,7 +523,7 @@ class Adsorbate():
         if calculate:
             try:
                 state = self.backend
-                state.update(CoolProp.QT_INPUTS, 1.0, temp)
+                state.update(CP.QT_INPUTS, 1.0, temp)
                 return state.rhomass() / 1000
 
             except Exception as e_info:
@@ -562,7 +565,7 @@ class Adsorbate():
         if calculate:
             try:
                 state = self.backend
-                state.update(CoolProp.QT_INPUTS, 1.0, temp)
+                state.update(CP.QT_INPUTS, 1.0, temp)
                 return state.rhomolar() / 1e6
 
             except Exception as e_info:
@@ -605,10 +608,10 @@ class Adsorbate():
             try:
                 state = self.backend
 
-                state.update(CoolProp.QT_INPUTS, 0.0, temp)
+                state.update(CP.QT_INPUTS, 0.0, temp)
                 h_liq = state.hmolar()
 
-                state.update(CoolProp.QT_INPUTS, 1.0, temp)
+                state.update(CP.QT_INPUTS, 1.0, temp)
                 h_vap = state.hmolar()
 
                 return (h_vap - h_liq) / 1000

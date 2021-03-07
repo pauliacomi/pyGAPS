@@ -70,12 +70,13 @@ class TestAdsorbate():
         assert basic_adsorbate.get_prop('backend_name') == adsorbate_data.get(
             'backend_name'
         )
-        assert basic_adsorbate.backend_name(
-        ) == adsorbate_data.get('backend_name')
+        assert basic_adsorbate.backend_name == adsorbate_data.get(
+            'backend_name'
+        )
 
         name = basic_adsorbate.properties.pop('backend_name')
         with pytest.raises(pgEx.ParameterError):
-            basic_adsorbate.backend_name()
+            name = basic_adsorbate.backend_name
         basic_adsorbate.properties['backend_name'] = name
 
     @pytest.mark.parametrize('calculated', [True, False])

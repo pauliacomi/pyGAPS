@@ -1,7 +1,5 @@
 """Test CoolProp interaction."""
 
-import CoolProp
-
 import pygaps
 import pygaps.utilities.exceptions as pgEx
 
@@ -26,6 +24,7 @@ class TestCoolProp():
 
     def test_backend_names_refprop(self):
         """Test if RERFPROP can be called for database adsorbents."""
+        import CoolProp
         version = CoolProp.CoolProp.get_global_param_string("REFPROP_version")
         if version == 'n/a':
             pass
