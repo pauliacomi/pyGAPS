@@ -8,7 +8,8 @@ import numpy
 import pandas
 
 from ..graphing.isotherm_graphs import plot_iso
-from ..graphing.mpl_styles import LEGEND_STYLE, POINTS_ALL_STYLE
+from ..graphing.mpl_styles import LEGEND_STYLE
+from ..graphing.mpl_styles import POINTS_ALL_STYLE
 from ..modelling import _GUESS_MODELS
 from ..modelling import _MODELS
 from ..modelling import get_isotherm_model

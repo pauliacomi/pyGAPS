@@ -9,7 +9,6 @@ If adding a custom model, it should be also added below as a string.
 import importlib
 
 from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import ParameterError
 from .base_model import IsothermBaseModel
 
 # This list has all the available models
