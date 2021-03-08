@@ -1,9 +1,8 @@
 """Dubinin-Astakov isotherm model."""
 
 import numpy
-import scipy.constants as const
 
-from ..characterisation import scipy
+from .. import scipy
 from .base_model import IsothermBaseModel
 
 
@@ -61,7 +60,7 @@ class DA(IsothermBaseModel):
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -const.gas_constant * parameters['temperature']
+        self.minus_rt = -scipy.const.gas_constant * parameters['temperature']
 
     def loading(self, pressure):
         """

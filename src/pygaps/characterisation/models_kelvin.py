@@ -6,8 +6,8 @@ as a function of pressure.
 from functools import partial
 
 import numpy
-import scipy.constants as const
 
+from .. import scipy
 from ..utilities.exceptions import ParameterError
 
 
@@ -122,7 +122,7 @@ def kelvin_radius(
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
     return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
-        (geometry_factor * const.gas_constant * temperature * numpy.log(pressure))
+        (geometry_factor * scipy.const.gas_constant * temperature * numpy.log(pressure))
 
 
 def kelvin_radius_kjs(
@@ -190,7 +190,7 @@ def kelvin_radius_kjs(
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
     return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
-        (const.gas_constant * temperature * numpy.log(pressure)) + 0.3
+        (scipy.const.gas_constant * temperature * numpy.log(pressure)) + 0.3
 
 
 _KELVIN_MODELS = {

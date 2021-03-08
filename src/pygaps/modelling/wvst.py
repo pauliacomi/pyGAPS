@@ -6,7 +6,7 @@ logger = logging.getLogger('pygaps')
 
 import numpy
 
-from ..characterisation import scipy
+from .. import scipy
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 

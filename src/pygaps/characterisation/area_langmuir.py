@@ -7,9 +7,8 @@ import textwrap
 import warnings
 
 import numpy
-import scipy.constants as const
 
-from ..characterisation import scipy
+from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import langmuir_plot
 from ..utilities.exceptions import CalculationError
@@ -275,5 +274,5 @@ def langmuir_parameters(slope, intercept, cross_section):
     n_monolayer = 1 / slope
     langmuir_const = 1 / (intercept * n_monolayer)
     langmuir_area = n_monolayer * cross_section * \
-        (10**(-18)) * const.Avogadro
+        (10**(-18)) * scipy.const.Avogadro
     return n_monolayer, langmuir_const, langmuir_area

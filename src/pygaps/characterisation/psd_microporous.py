@@ -7,15 +7,14 @@ import math
 import typing as t
 
 import numpy
-import scipy.constants as const
 
+from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..core.baseisotherm import BaseIsotherm
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
-from . import scipy
 from .models_hk import HK_KEYS
 from .models_hk import get_hk_model
 
@@ -191,10 +190,7 @@ def psd_microporous(
             "for this calculation"
         )
     try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative'
-        )
+        pressure = isotherm.pressure(branch=branch, pressure_mode='relative')
     except pgError:
         raise CalculationError(
             "The isotherm cannot be converted to a relative basis. "
@@ -552,7 +548,7 @@ def psd_horvath_kawazoe(
     ###################################################################
     elif pore_geometry == 'cylinder':
 
-        const_coeff = 0.75 * const.pi * N_over_RT * \
+        const_coeff = 0.75 * scipy.const.pi * N_over_RT * \
             (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
 
         # to avoid unnecessary recalculations, we cache a_k and b_k values
@@ -597,8 +593,8 @@ def psd_horvath_kawazoe(
             l_minus_d = l_pore - d_eff
             d_over_l = d_eff / l_pore
 
-            n_1 = 4 * const.pi * (l_pore * 1e-9)**2 * n_mat
-            n_2 = 4 * const.pi * (l_minus_d * 1e-9)**2 * n_ads
+            n_1 = 4 * scipy.const.pi * (l_pore * 1e-9)**2 * n_mat
+            n_2 = 4 * scipy.const.pi * (l_minus_d * 1e-9)**2 * n_ads
 
             def t_term(x):
                 return (1 + (-1)**x * l_minus_d / l_pore)**(-x) -\
@@ -980,7 +976,7 @@ def psd_horvath_kawazoe_ry(
             r2 = 1 - r1
             # 0.65625 is (21 / 32), constant
             return (
-                0.75 * const.pi * n_x * a_x / ((d_x * 1e-9)**4) * (
+                0.75 * scipy.const.pi * n_x * a_x / ((d_x * 1e-9)**4) * (
                     0.65625 * r1**10 * a_k_sum(r2, max_k_pore) -
                     r1**4 * b_k_sum(r2, max_k_pore)
                 )
@@ -994,7 +990,7 @@ def psd_horvath_kawazoe_ry(
             for layer in range(1, n_layers + 1):
                 width = 2 * (l_pore - d_eff - (layer - 1) * d_ads)
                 if d_ads <= width:
-                    layer_population = const.pi / math.asin(d_ads / width)
+                    layer_population = scipy.const.pi / math.asin(d_ads / width)
                 else:
                     layer_population = 1
 
@@ -1049,14 +1045,14 @@ def psd_horvath_kawazoe_ry(
             layer_potentials = []
 
             # potential with surface (first layer)
-            layer_population = 4 * const.pi * (l_pore * 1e-9)**2 * n_mat
+            layer_population = 4 * scipy.const.pi * (l_pore * 1e-9)**2 * n_mat
             r1 = d_eff / l_pore
             layer_potential = potential_general(layer_population, p_12, r1)
             layer_potentials.append(layer_potential)  # add E1
 
             # inter-adsorbate potential (subsequent layers)
             layer_populations = [(
-                4 * const.pi * ((l_pore - d_eff -
+                4 * scipy.const.pi * ((l_pore - d_eff -
                                  (layer - 1) * d_ads) * 1e-9)**2 * n_ads
             ) for layer in range(1, n_layers + 1)]  # [N1...Nm]
 
@@ -1178,7 +1174,7 @@ def _kirkwood_muller_dispersion_ads(p_ads, m_ads):
     p and m stand for polarizability and magnetic susceptibility
     """
     return (
-        1.5 * const.electron_mass * const.speed_of_light**2 * p_ads * m_ads
+        1.5 * scipy.const.electron_mass * scipy.const.speed_of_light**2 * p_ads * m_ads
     )
 
 
@@ -1188,11 +1184,11 @@ def _kirkwood_muller_dispersion_mat(p_mat, m_mat, p_ads, m_ads):
     p and m stand for polarizability and magnetic susceptibility
     """
     return (
-        6 * const.electron_mass * const.speed_of_light**2 * p_ads * p_mat /
+        6 * scipy.const.electron_mass * scipy.const.speed_of_light**2 * p_ads * p_mat /
         (p_ads / m_ads + p_mat / m_mat)
     )
 
 
 def _N_over_RT(temp):
     """Calculate (N_a / RT)."""
-    return (const.Avogadro / const.gas_constant / temp)
+    return (scipy.const.Avogadro / scipy.const.gas_constant / temp)

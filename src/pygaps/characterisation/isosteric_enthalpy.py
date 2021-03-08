@@ -1,9 +1,8 @@
 """Module calculating the isosteric enthalpy for isotherms at different temperatures."""
 
 import numpy
-import scipy.constants as const
 
-from ..characterisation import scipy
+from .. import scipy
 from ..graphing.calc_graphs import isosteric_enthalpy_plot
 from ..utilities.exceptions import ParameterError
 
@@ -206,9 +205,9 @@ def isosteric_enthalpy_raw(pressures, temperatures):
             inv_t, log_p
         )
 
-        iso_enth.append(-const.gas_constant * slope / 1000)
+        iso_enth.append(-scipy.const.gas_constant * slope / 1000)
         slopes.append(slope)
         correlations.append(corr_coef)
-        stderrs.append(-const.gas_constant * std_err / 1000)
+        stderrs.append(-scipy.const.gas_constant * std_err / 1000)
 
     return iso_enth, slopes, correlations, stderrs

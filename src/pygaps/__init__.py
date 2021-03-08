@@ -64,6 +64,18 @@ def _load_lazy(fullname):
         return module
 
 
+class scipy_backend():
+    """A backend for scipy, which will be lazy loaded."""
+    def __init__(self):
+        self.optimize = _load_lazy('scipy.optimize')
+        self.integrate = _load_lazy('scipy.integrate')
+        self.interp = _load_lazy('scipy.interpolate')
+        self.stats = _load_lazy('scipy.stats')
+        self.const = _load_lazy('scipy.constants')
+
+
+scipy = scipy_backend()
+
 # Data
 from .data import DATABASE
 from .data import ADSORBATE_LIST

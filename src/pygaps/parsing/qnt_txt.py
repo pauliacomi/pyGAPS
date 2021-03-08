@@ -4,6 +4,9 @@ import re
 
 import dateutil.parser
 import numpy as np
+import pandas
+
+from ..core.pointisotherm import PointIsotherm
 
 _FIELDS = {
     'material': {
@@ -130,9 +133,9 @@ def parse(path):
         elif index >= ads_start:
             raw_data.append(list(map(float, line.split())))
 
-    data = np.array(raw_data).T
+    data_df = pandas.DataFrame(np.array(raw_data).T, columns=data)
 
-    # change units to standard units
+    # Set extra metadata
     meta['mass'] = meta['mass'].split()[0]
     meta['temperature'] = meta['temperature'].split()[0]
     meta['temperature_unit'] = "K"
@@ -142,6 +145,6 @@ def parse(path):
     meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
 
     # amount adsorbed from cc to mmol/g
-    data[2] = data[2] / float(meta['mass']) / 22.414
+    data_df['loading'] = data_df['loading'] / float(meta['mass']) / 22.414
 
-    return meta, data
+    return PointIsotherm(isotherm_data=data_df, **meta)

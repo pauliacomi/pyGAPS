@@ -8,8 +8,8 @@ from pathlib import Path
 
 import numpy
 import pandas
-import scipy.interpolate as interp
 
+from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import psd_plot
 from ..graphing.isotherm_graphs import plot_iso
@@ -17,7 +17,6 @@ from ..graphing.mpl_styles import POINTS_ALL_STYLE
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import bspline
-from . import scipy
 
 _KERNELS = {
     'DFT-N2-77K-carbon-slit':
@@ -375,7 +374,7 @@ def _load_kernel(path):
 
     kernel = {}
     for pore_size in raw_kernel:
-        interpolator = interp.interp1d(
+        interpolator = scipy.interp.interp1d(
             raw_kernel[pore_size].index,
             raw_kernel[pore_size].values,
             kind='cubic'

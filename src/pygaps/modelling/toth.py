@@ -2,7 +2,7 @@
 
 import numpy
 
-from ..characterisation import scipy
+from .. import scipy
 from .base_model import IsothermBaseModel
 
 

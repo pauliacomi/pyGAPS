@@ -11,8 +11,8 @@ import numpy
 import pandas
 
 from ..graphing.isotherm_graphs import plot_iso
-from ..utilities.converter_mode import c_material
 from ..utilities.converter_mode import c_loading
+from ..utilities.converter_mode import c_material
 from ..utilities.converter_mode import c_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError

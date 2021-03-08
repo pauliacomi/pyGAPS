@@ -148,7 +148,7 @@ class TestModelIsotherm():
         isotherm = pygaps.isotherm_from_json(filepath)
 
         pygaps.ModelIsotherm.from_pointisotherm(
-            isotherm, model='guessall', verbose=True
+            isotherm, model='guess', verbose=True
         )
 
         pygaps.ModelIsotherm.from_pointisotherm(

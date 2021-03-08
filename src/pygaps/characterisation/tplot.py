@@ -7,7 +7,7 @@ import warnings
 
 import numpy
 
-from ..characterisation import scipy
+from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import tp_plot
 from ..utilities.exceptions import CalculationError

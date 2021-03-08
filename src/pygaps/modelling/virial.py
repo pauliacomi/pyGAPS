@@ -7,7 +7,7 @@ import warnings
 
 import numpy
 
-from ..characterisation import scipy
+from .. import scipy
 from ..graphing.calc_graphs import virial_plot
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel

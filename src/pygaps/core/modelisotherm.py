@@ -14,8 +14,8 @@ from ..modelling import _GUESS_MODELS
 from ..modelling import _MODELS
 from ..modelling import get_isotherm_model
 from ..modelling import is_base_model
-from ..utilities.converter_mode import c_material
 from ..utilities.converter_mode import c_loading
+from ..utilities.converter_mode import c_material
 from ..utilities.converter_mode import c_pressure
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -328,11 +328,11 @@ class ModelIsotherm(BaseIsotherm):
             An instance of the PointIsotherm parent class to model.
         branch : [None, 'ads', 'des'], optional
             Branch of isotherm to model. Defaults to adsorption branch.
-        model : str, list, 'guessall'
+        model : str, list, 'guess'
             The model to be used to describe the isotherm. Give a single model
             name (`"Langmuir"`) to fit it. Give a list of many model names to
             try them all and return the best fit (`[`Henry`, `Langmuir`]`).
-            Specify `"guessall"` to try all available models.
+            Specify `"guess"` to try all available models.
         param_guess : dict, optional
             Starting guess for model parameters in the data fitting routine.
         optimization_params : dict, optional
@@ -353,7 +353,7 @@ class ModelIsotherm(BaseIsotherm):
         iso_params['loading_key'] = isotherm.loading_key
 
         if isinstance(model, str):
-            if model != 'guessall':
+            if model != 'guess':
                 return cls(
                     branch=branch,
                     model=model,
@@ -380,7 +380,7 @@ class ModelIsotherm(BaseIsotherm):
         pressure_key=None,
         loading_key=None,
         branch='ads',
-        models='guessall',
+        models='guess',
         optimization_params=None,
         verbose=False,
         **isotherm_parameters
@@ -405,9 +405,9 @@ class ModelIsotherm(BaseIsotherm):
             Column of the pandas DataFrame where the pressure is stored.
         loading_key : str
             Column of the pandas DataFrame where the loading is stored.
-        models : 'guessall', list of model names
+        models : 'guess', list of model names
             Attempt to guess which model best fits the isotherm data
-            from the model name list supplied. If set to 'guessall'
+            from the model name list supplied. If set to 'guess'
             A calculation of all models available will be performed,
             therefore it will take a longer time.
 
@@ -425,7 +425,7 @@ class ModelIsotherm(BaseIsotherm):
             Any other parameters of the isotherm which should be stored internally.
         """
         attempts = []
-        if models == 'guessall':
+        if models == 'guess':
             guess_models = _GUESS_MODELS
         else:
             try:

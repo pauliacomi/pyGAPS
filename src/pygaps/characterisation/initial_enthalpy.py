@@ -7,11 +7,11 @@ import warnings
 
 import numpy
 
+from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import initial_enthalpy_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
-from . import scipy
 
 
 def initial_enthalpy_comp(

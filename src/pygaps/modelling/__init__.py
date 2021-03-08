@@ -156,11 +156,11 @@ def model_iso(
         The isotherm to model.
     branch : [None, 'ads', 'des'], optional
         Branch of isotherm to model. Defaults to adsorption branch.
-    model : str, list, 'guessall'
+    model : str, list, 'guess'
         The model to be used to describe the isotherm. Give a single model
         name (`"Langmuir"`) to fit it. Give a list of many model names to
         try them all and return the best fit (`[`Henry`, `Langmuir`]`).
-        Specify `"guessall"` to try all available models.
+        Specify `"guess"` to try all available models.
     param_guess : dict, optional
         Starting guess for model parameters in the data fitting routine.
     optimization_params : dict, optional

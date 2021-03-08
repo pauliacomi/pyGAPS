@@ -5,14 +5,13 @@ import logging
 logger = logging.getLogger('pygaps')
 
 import numpy
-import scipy.constants as const
 
+from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import dra_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
-from . import scipy
 
 
 def dr_plot(isotherm, limits=None, verbose=False):
@@ -348,7 +347,7 @@ def da_plot_raw(
     microp_volume = 10**intercept
     potential = (
         -numpy.log(10)**(exp - 1) *
-        (const.gas_constant * iso_temp)**(exp) / slope
+        (scipy.const.gas_constant * iso_temp)**(exp) / slope
     )**(1 / exp) / 1000
 
     return (

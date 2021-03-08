@@ -7,9 +7,8 @@ import textwrap
 import warnings
 
 import numpy
-import scipy.constants as const
 
-from ..characterisation import scipy
+from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import bet_plot
 from ..graphing.calc_graphs import roq_plot
@@ -342,5 +341,5 @@ def bet_parameters(slope, intercept, cross_section):
     c_const = (slope / intercept) + 1
     n_monolayer = 1 / (intercept * c_const)
     p_monolayer = 1 / (numpy.sqrt(c_const) + 1)
-    bet_area = n_monolayer * cross_section * (10**(-18)) * const.Avogadro
+    bet_area = n_monolayer * cross_section * (10**(-18)) * scipy.const.Avogadro
     return n_monolayer, p_monolayer, c_const, bet_area
