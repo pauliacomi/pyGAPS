@@ -3,9 +3,9 @@
 Material characterisation
 -------------------------
 
-This section will have several examples of adsorbent material characterisation
-that can be performed using pyGAPS. A complete applicability guide and info on
-each function parameters can be found in the
+This section will have several examples of porous material characterisation that
+can be performed using pyGAPS. A complete applicability guide and info on each
+function parameters can be found in the
 :ref:`reference manual <characterisation-manual>`.
 
 .. toctree::

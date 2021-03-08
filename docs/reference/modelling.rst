@@ -98,15 +98,3 @@ Flory-Huggins Vacancy Solution Theory (FH-VST)
 
 .. automodule:: pygaps.modelling.fhvst
     :members:
-
-
-.. _modelling-ref:
-
-Multi-component adsorption modelling
-====================================
-
-IAST
-----
-
-.. automodule:: pygaps.characterisation.iast
-    :members:

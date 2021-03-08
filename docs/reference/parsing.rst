@@ -23,6 +23,13 @@ CSV
 .. automodule:: pygaps.parsing.csv
     :members:
 
+
+NIST ISODB
+----------
+.. automodule:: pygaps.parsing.isodb
+    :members:
+
+
 Apparatus
 ---------
 .. automodule:: pygaps.parsing.bel_dat

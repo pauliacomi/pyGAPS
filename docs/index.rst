@@ -16,7 +16,7 @@ Welcome to the documentation for the pyGAPS framework.
 .. toctree::
    :maxdepth: 4
    :hidden:
-   :caption: Getting started
+   :caption: Getting Started
 
    installation
    examples/quickstart

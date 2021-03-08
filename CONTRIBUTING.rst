@@ -2,8 +2,8 @@
 Contributing
 ============
 
-Contributions are welcome, and they are greatly appreciated! Every
-little bit helps, and credit will always be given.
+Contributions are welcome, and they are greatly appreciated! Every little bit
+helps, and credit will always be given.
 
 Bug reports
 ===========
@@ -20,18 +20,17 @@ A helpful GitHub issue template is provided.
 Documentation improvements
 ==========================
 
-The package could always use more documentation, whether as part of the
-official docs, in docstrings, or even on the web in blog posts,
-articles, and such. If you think something is unclear, incomplete
-or should be rewritten, please submit
-`an issue report <https://github.com/pauliacomi/pygaps/issues>`_
-or make a pull request.
+The package could always use more documentation, whether as part of the official
+docs, in docstrings, or even on the web in blog posts, articles, and such. If
+you think something is unclear, incomplete or should be rewritten, please submit
+`an issue report <https://github.com/pauliacomi/pygaps/issues>`_ or make a pull
+request.
 
 Feature requests and feedback
 =============================
 
 The best way to send feedback is to file
-`an an improvement proposal  <https://github.com/pauliacomi/pygaps/issues>`_
+`an an improvement proposal <https://github.com/pauliacomi/pygaps/issues>`_
 
 If you are proposing a feature:
 
@@ -68,7 +67,7 @@ To set up `pyGAPS` for local development:
 
     python setup.py test
 
-    # or run pytest
+    # or pytest directly
 
     pytest
 
@@ -78,15 +77,14 @@ To set up `pyGAPS` for local development:
     git commit -m "Your detailed description of your changes."
     git push origin name-of-your-bugfix-or-feature
 
-6. Submit a pull request through the GitHub website.
-   Testing on all environments will be automatically
-   performed by `TravisCI <https://travis-ci.org/pauliacomi/pyGAPS>`__.
+6. Submit a pull request through the GitHub website. Testing on all environments
+   will be automatically performed.
 
 Pull Request Guidelines
 -----------------------
 
-If you need some code review or feedback while you're developing
-the code just make the pull request.
+If you need some code review or feedback while you're developing the code just
+make the pull request.
 
 For merging, you should:
 

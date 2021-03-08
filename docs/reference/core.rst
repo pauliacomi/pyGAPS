@@ -25,7 +25,7 @@ Isotherms
 Isotherm
 ........
 
-.. automodule:: pygaps.core.isotherm
+.. automodule:: pygaps.core.baseisotherm
     :members:
 
 
