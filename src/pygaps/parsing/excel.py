@@ -1,6 +1,13 @@
-"""Parse to and from an Excel file format for isotherms."""
+"""
+Parse to and from a Excel format for isotherms.
+
+The _parser_version variable documents any changes to the format,
+and is used to check for any deprecations.
+
+"""
 
 import ast
+import warnings
 
 import pandas
 import xlrd
@@ -14,6 +21,8 @@ from pygaps.utilities.exceptions import ParsingError
 
 from .bel_excel import read_bel_report
 from .mic_excel import read_mic_report
+
+_parser_version = "2.0"
 
 _FIELDS = {
     'material': {
@@ -97,28 +106,23 @@ def isotherm_to_xl(isotherm, path):
     sht = wb.add_sheet('data')
 
     # get the required dictionaries
-    fields = _FIELDS.copy()
     iso_dict = isotherm.to_dict()
+    iso_dict['file_version'] = _parser_version  # version
 
     # Add the required named properties
     prop_style = xlwt.easyxf(
         'align: horiz left; pattern: pattern solid, fore_colour grey25;'
     )
-    for field in fields:
-        val = iso_dict.pop(field, None)
-        sht.write(
-            fields[field]['row'], fields[field]['column'],
-            fields[field]['text'][0], prop_style
-        )
+    for field in _FIELDS.values():
+        val = iso_dict.pop(field['name'], None)
+        print(field['name'], field['row'], field['column'], val)
+        sht.write(field['row'], field['column'], field['text'][0], prop_style)
         if val:
-            sht.write(
-                fields[field]['row'], fields[field]['column'] + 1, val,
-                prop_style
-            )
+            sht.write(field['row'], field['column'] + 1, val, prop_style)
 
     # Get the isotherm type header
-    type_row = fields['isotherm_data']['row']
-    type_col = fields['isotherm_data']['column']
+    type_row = _FIELDS['isotherm_data']['row']
+    type_col = _FIELDS['isotherm_data']['column']
 
     col_width = 256 * 25  # 25 characters wide (-ish)
     sht.col(type_col).width = col_width
@@ -258,17 +262,13 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
         else:
             sht = wb.sheet_by_index(0)
 
-        # get the required dictionaries
-        fields = _FIELDS.copy()
-
         # read the main isotherm parameters
-        for field in fields:
-            raw_dict[field] = sht.cell(
-                fields[field]['row'], fields[field]['column'] + 1
-            ).value
+        for field in _FIELDS.values():
+            raw_dict[field['name']
+                     ] = sht.cell(field['row'], field['column'] + 1).value
 
         # find data/model limits
-        type_row = fields['isotherm_data']['row']
+        type_row = _FIELDS['isotherm_data']['row']
 
         if sht.cell(type_row, 1).value.lower().startswith('data'):
 
@@ -358,7 +358,14 @@ def isotherm_from_xl(path, fmt=None, **isotherm_parameters):
                 row_index += 1
 
         # Put data in order
+        version = raw_dict.pop("file_version", None)
+        if not version or float(version) < float(_parser_version):
+            warnings.warn(
+                f"The file version is {version} while the parser uses version {_parser_version}. "
+                "Strange things might happen, so double check your data."
+            )
         raw_dict.pop('isotherm_data')  # remove useless field
+        # version check
         raw_dict.pop('iso_id', None)  # make sure id is not passed
 
     # Update dictionary with any user parameters

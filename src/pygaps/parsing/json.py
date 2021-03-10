@@ -1,4 +1,10 @@
-"""Parse to and from a JSON file format for isotherms."""
+"""
+Parse to and from a JSON string/file format for isotherms.
+
+The _parser_version variable documents any changes to the format,
+and is used to check for any deprecations.
+
+"""
 
 import json
 import warnings
@@ -14,6 +20,8 @@ from pygaps.utilities.converter_mode import _MOLAR_UNITS
 from pygaps.utilities.converter_mode import _PRESSURE_UNITS
 from pygaps.utilities.converter_mode import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
+
+_parser_version = "2.0"
 
 
 def isotherm_to_json(isotherm, path=None, **args_to_json):
@@ -41,7 +49,8 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
 
     """
     # Isotherm properties
-    raw_dict = isotherm.to_dict()
+    iso_dict = isotherm.to_dict()
+    iso_dict['file_version'] = _parser_version  # version
 
     # Isotherm data
     if isinstance(isotherm, PointIsotherm):
@@ -59,21 +68,21 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
                 value['branch'] = 'des'
             return value
 
-        raw_dict["isotherm_data"] = [
+        iso_dict["isotherm_data"] = [
             process_data(v) for k, v in isotherm_data_dict.items()
         ]
 
     elif isinstance(isotherm, ModelIsotherm):
-        raw_dict["isotherm_model"] = isotherm.model.to_dict()
+        iso_dict["isotherm_model"] = isotherm.model.to_dict()
 
     args_to_json = {} if args_to_json is None else args_to_json
     args_to_json['sort_keys'] = True  # we will sort always
 
     if path:
         with open(path, mode='w') as file:
-            json.dump(raw_dict, file, **args_to_json)
+            json.dump(iso_dict, file, **args_to_json)
     else:
-        return json.dumps(raw_dict, **args_to_json)
+        return json.dumps(iso_dict, **args_to_json)
 
 
 def isotherm_from_json(
@@ -124,6 +133,14 @@ def isotherm_from_json(
                 "Could not parse JSON isotherm. "
                 "The `str_or_path` is invalid or does not exist. "
             )
+
+    # version check
+    version = raw_dict.pop("file_version", None)
+    if not version or float(version) < float(_parser_version):
+        warnings.warn(
+            f"The file version is {version} while the parser uses version {_parser_version}. "
+            "Strange things might happen, so double check your data."
+        )
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)

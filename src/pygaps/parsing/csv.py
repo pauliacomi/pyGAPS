@@ -1,4 +1,10 @@
-"""The csv parsing interface."""
+"""
+Parse to and from a CSV string/file format for isotherms.
+
+The _parser_version variable documents any changes to the format,
+and is used to check for any deprecations.
+
+"""
 
 import ast
 import warnings
@@ -11,6 +17,8 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
+
+_parser_version = "2.0"
 
 
 def _is_float(s):
@@ -80,11 +88,11 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
     """
     output = StringIO()
 
-    isotherm_data = isotherm.to_dict()
+    iso_dict = isotherm.to_dict()
+    iso_dict['file_version'] = _parser_version  # version
 
     output.writelines([
-        x + separator + _to_string(y) + '\n'
-        for (x, y) in isotherm_data.items()
+        x + separator + _to_string(y) + '\n' for (x, y) in iso_dict.items()
     ])
 
     if isinstance(isotherm, PointIsotherm):
@@ -196,8 +204,13 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             "The format may be wrong, check for errors."
         )
 
-    # Update dictionary with any user parameters
-    raw_dict.update(isotherm_parameters)
+    # version check
+    version = raw_dict.pop("file_version", None)
+    if not version or float(version) < float(_parser_version):
+        warnings.warn(
+            f"The file version is {version} while the parser uses version {_parser_version}. "
+            "Strange things might happen, so double check your data."
+        )
 
     # TODO deprecation
     if "adsorbent_basis" in raw_dict:
@@ -212,6 +225,9 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             "adsorbent_unit was replaced with material_unit",
             DeprecationWarning
         )
+
+    # Update dictionary with any user parameters
+    raw_dict.update(isotherm_parameters)
 
     # Now read specific type of isotherm (Point, Model, Base)
     if line.startswith('data'):
