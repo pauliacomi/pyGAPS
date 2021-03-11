@@ -413,6 +413,41 @@ class TestPointIsotherm():
     ##########################
 
     @pytest.mark.parametrize(
+        'parameters', [
+            ({
+                "pressure_mode": "absolute",
+                "pressure_unit": "Pa",
+            }),
+            ({
+                "loading_basis": "mass",
+                "loading_unit": "g",
+            }),
+            ({
+                "material_basis": "volume",
+                "material_unit": "cm3",
+            }),
+            ({
+                "pressure_mode": "absolute",
+                "pressure_unit": "Pa",
+                "loading_basis": "mass",
+                "loading_unit": "g",
+                "material_basis": "volume",
+                "material_unit": "cm3",
+            }),
+        ]
+    )
+    def test_isotherm_convert(
+        self,
+        use_adsorbate,
+        use_material,
+        basic_pointisotherm,
+        parameters,
+    ):
+        """Check convenience conversion function."""
+        # Do the conversion
+        basic_pointisotherm.convert(**parameters)
+
+    @pytest.mark.parametrize(
         'expected, parameters', [
             (1, {
                 "unit_to": "bar",

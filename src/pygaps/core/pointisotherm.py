@@ -311,6 +311,60 @@ class PointIsotherm(BaseIsotherm):
     ##########################################################
     #   Conversion functions
 
+    def convert(
+        self,
+        pressure_mode: str = None,
+        pressure_unit: str = None,
+        loading_basis: str = None,
+        loading_unit: str = None,
+        material_basis: str = None,
+        material_unit: str = None,
+        verbose: bool = False,
+    ):
+        """
+        Convenience function for permanently converting any isotherm
+        mode/basis/units.
+
+        Parameters
+        ----------
+        pressure_mode : {'absolute', 'relative', 'relative%'}
+            The mode in which the isotherm should be converted.
+        pressure_unit : str
+            The unit into which the internal pressure should be converted to.
+            Only makes sense if converting to absolute pressure.
+        loading_basis : {'mass', 'molar', 'volume', 'percent', 'fraction'}
+            The basis in which the isotherm should be converted.
+        loading_unit : str
+            The unit into which the internal loading should be converted to.
+        material_basis : {'mass', 'molar', 'volume'}
+            The basis in which the isotherm should be converted.
+        material_unit : str
+            The unit into which the material should be converted to.
+        verbose : bool
+            Print out steps taken.
+
+        """
+        if pressure_mode or pressure_unit:
+            self.convert_pressure(
+                mode_to=pressure_mode,
+                unit_to=pressure_unit,
+                verbose=verbose,
+            )
+
+        if loading_basis or loading_unit:
+            self.convert_loading(
+                basis_to=loading_basis,
+                unit_to=loading_unit,
+                verbose=verbose,
+            )
+
+        if material_basis or material_unit:
+            self.convert_material(
+                basis_to=material_basis,
+                unit_to=material_unit,
+                verbose=verbose,
+            )
+
     def convert_pressure(
         self, mode_to: str = None, unit_to: str = None, verbose: bool = False
     ):
@@ -375,11 +429,11 @@ class PointIsotherm(BaseIsotherm):
         """
         Convert isotherm loading from one unit to another
         and the basis of the isotherm loading to be
-        either 'mass', 'molar' or 'volume'/'liquid_volume'.
+        either 'mass', 'molar' or 'percent'/'fraction'.
 
         Parameters
         ----------
-        basis_to : {'mass', 'molar', 'volume', 'liquid_volume'}
+        basis_to : {'mass', 'molar', 'volume', 'percent', 'fraction'}
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal loading should be converted to.
@@ -450,7 +504,7 @@ class PointIsotherm(BaseIsotherm):
         basis : {'mass', 'molar', 'volume'}
             The basis in which the isotherm should be converted.
         unit_to : str
-            The unit into which the internal loading should be converted to.
+            The unit into which the material should be converted to.
         verbose : bool
             Print out steps taken.
 
