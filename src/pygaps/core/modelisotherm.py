@@ -460,10 +460,7 @@ class ModelIsotherm(BaseIsotherm):
 
             except CalculationError as e:
                 if verbose:
-                    logger.info(
-                        f"Modelling using {model} failed. "
-                        f"Fitting routine outputs: \n{e}"
-                    )
+                    logger.info(f"Modelling using {model} failed. \n{e}")
 
         if not attempts:
             raise CalculationError(

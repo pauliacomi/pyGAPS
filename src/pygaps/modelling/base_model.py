@@ -220,16 +220,22 @@ class IsothermBaseModel():
             kwargs.update(optimization_params)
 
         # minimize RSS
-        opt_res = scipy.optimize.least_squares(
-            fit_func,
-            guess,  # provide the fit function and initial guess
-            args=(pressure,
-                  loading),  # supply the extra arguments to the fit function
-            **kwargs
-        )
+        try:
+            opt_res = scipy.optimize.least_squares(
+                fit_func,
+                guess,  # provide the fit function and initial guess
+                args=(pressure, loading
+                      ),  # supply the extra arguments to the fit function
+                **kwargs
+            )
+        except ValueError as e:
+            raise CalculationError(
+                f"Fitting routine for {self.name} failed with error:"
+                f"\n\t{e}"
+            )
         if not opt_res.success:
             raise CalculationError(
-                f"\nFitting routine with model {self.name} failed with error:"
+                f"Fitting routine for {self.name} failed with error:"
                 f"\n\t{opt_res.message}"
                 f"\nTry a different starting point in the nonlinear optimization"
                 f"\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
