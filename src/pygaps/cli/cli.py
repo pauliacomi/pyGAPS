@@ -59,8 +59,7 @@ def main():
     prs.add_argument(
         '-cv',
         '--convert',
-        help=
-        'convert the isotherm to another unit/basis, saved as the file specified at \'-o\'',
+        help='convert to another unit/basis, savepath using \'-o\'',
     )
     prs.add_argument(
         '-o',
