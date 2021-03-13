@@ -36,6 +36,7 @@ New features:
    PointIsotherm, effectively wrapping `ModelIsotherm.from_pointisotherm`.
  * Convenience functions for isotherm parsing: `isotherm.to_json()`,
    `isotherm.to_csv()` and `isotherm.to_xl()`.
+ * Parsing from instrument output files now gets more information.
  * Plot quality has been overall improved.
  * Improved performance for isotherm conversions.
  * General refactoring and speed-ups.
@@ -47,6 +48,8 @@ Breaking changes:
  * All parameters like ``adsorbate_basis`` or ``adsorbate_unit`` have been
    changed to ``material_basis`` and ``material_unit`` for consistency. Old
    format should still work for some time.
+ * Some model names have been changed to include only ASCII: ``JensenSeaton``,
+   ``FHVST``, ``WVST``.
  * For isotherm pressure/loading, a `limits` tuple is now passed instead of
    `min_range` and `max_range`, as for other functions in pyGAPS.
  * JSON ModelIsotherms now have ``name`` instead of ``model`` as the model name.
