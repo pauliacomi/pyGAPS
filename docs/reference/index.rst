@@ -22,3 +22,4 @@ inner workings of various functions.
    parsing
    plotting
    utilities
+   cli

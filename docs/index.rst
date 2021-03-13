@@ -28,6 +28,7 @@ Welcome to the documentation for the pyGAPS framework.
 
    manual/index
    examples/index
+   cli
    reference/index
 
 .. toctree::

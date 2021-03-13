@@ -45,7 +45,12 @@ setup(
     package_dir={'': 'src'},
     py_modules=[path.name.suffix for path in Path('./src').glob('*.py')],
     include_package_data=True,
-    zip_safe=False,
+    zip_safe=True,
+    entry_points={
+        'console_scripts': [
+            'pygaps = pygaps.cli:main'
+        ]
+    },
     classifiers=[  # Classifier list at https://pypi.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Science/Research',
