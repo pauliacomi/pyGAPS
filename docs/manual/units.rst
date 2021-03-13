@@ -40,10 +40,12 @@ state from either CoolProp or REFPROP.
 An example isotherm conversion with pressure:
 
 ::
+
     isotherm.convert_pressure(
         mode_to='absolute',
         unit_to='torr',
     )
+
 
 Internally, pressure conversions are handled by the
 :func:`~pygaps.utilities.converter_mode.c_pressure` function.
@@ -71,6 +73,7 @@ state from either CoolProp or REFPROP.
 Examples of isotherm conversion on loading:
 
 ::
+
     isotherm.convert_loading(
         basis_to='percent',
     )
@@ -79,6 +82,7 @@ Examples of isotherm conversion on loading:
         basis_to='mass',
         unit_to='g',
     )
+
 
 Internally, loading conversions are handled by the
 :func:`~pygaps.utilities.converter_mode.c_loading` function.
@@ -100,11 +104,13 @@ below and, check out the :ref:`Material <material-manual-manage>` manual.
 Example of isotherm conversion on material:
 
 ::
+
     isotherm.material.properties['density'] = 2
     isotherm.convert_material(
         basis_to='volume',
         unit_to='cm3',
     )
+
 
 Internally, material conversions are handled by the
 :func:`~pygaps.utilities.converter_mode.c_material`.

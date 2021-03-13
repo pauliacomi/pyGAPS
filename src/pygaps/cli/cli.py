@@ -16,13 +16,13 @@ def main():
         * print isotherm to output (default if no argument is passed)
         * plot the isotherm using a Matplotlib window (``-p/--plot``)
         * run basic automated characterization tests (``-ch/--characterize a_bet``
-        for the BET area for example)
+          for the BET area for example)
         * attempt to model the isotherm using a requested model or guess the best
-        fitting model (``-md/--model guess``) and save the resulting isotherm model
-        using the ``-o/--outfile`` path.
+          fitting model (``-md/--model guess``) and save the resulting isotherm model
+          using the ``-o/--outfile`` path.
         * convert the isotherm to any unit/basis
-        (``-cv/--convert pressure_mode=absolute,pressure_unit=bar``) and save the
-        resulting isotherm model using the ``-o/--outfile`` path.
+          (``-cv/--convert pressure_mode=absolute,pressure_unit=bar``) and save the
+          resulting isotherm model using the ``-o/--outfile`` path.
 
     """
 

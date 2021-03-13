@@ -422,6 +422,8 @@ is instead a slice of data in a particular unit, it is easier to get it directly
 via the data access functions :ref:`above <isotherms-manual-data>`. The
 conversion functions are:
 
+    - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert` which can
+      handle any conversion quantities.
     - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_loading` will
       permanently convert the unit or basis loading of the isotherm, for example
       from molar in *mmol* to mass in *g*.
@@ -440,8 +442,20 @@ pressure from an relative mode into an absolute mode, with units of *atm*:
 
     isotherm.convert_pressure(
         mode_to='absolute',
-        unit_to='atm'
-        )
+        unit_to='atm',
+    )
+
+Or a complicated conversion using the convenience function.
+
+::
+
+    isotherm.convert(
+        pressure_mode='absolute',
+        pressure_unit='atm',
+        loading_basis='fraction',
+        material_basis='volume',
+        material_unit='cm3',
+    )
 
 .. note::
 
