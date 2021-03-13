@@ -50,7 +50,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version : [3.6, 3.7, 3.8, 3.9]
+        python-version : [3.6, 3.7, 3.8] #, 3.9] # 3.9 fails on coolprop, so we disable for now
         include:
           - python-version: 3.6
             toxenv: "py36-cover"
@@ -58,8 +58,8 @@ jobs:
             toxenv: "py37-cover"
           - python-version: 3.8
             toxenv: "py38-cover"
-          - python-version: 3.9
-            toxenv: "py39-cover"
+          # - python-version: 3.9
+          #   toxenv: "py39-cover"
 
     steps:
     - uses: actions/checkout@v2
