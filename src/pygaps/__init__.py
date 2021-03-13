@@ -8,6 +8,7 @@ __version__ = '2.0.2'
 
 import sys
 import logging
+import warnings
 logger = logging.getLogger('pygaps')
 logger.setLevel(logging.DEBUG)
 
@@ -40,7 +41,7 @@ if missing_dependencies:
 
 for dependency in soft_dependencies:
     if not importlib.util.find_spec(dependency):
-        logger.warn(
+        warnings.warn(
             f"Missing important package {dependency}. {soft_dependencies[dependency]}"
         )
 
