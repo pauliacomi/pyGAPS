@@ -6,7 +6,7 @@
 git flow release start x.y.z
 
 # Ensure all tests are passing
-# or use Travis to run automatically
+# or use CI provider to run them automatically
 pytest --cov --cov-report xml:coverage.xml
 
 # Run bumpversion to change any version strings
@@ -18,3 +18,5 @@ git flow release finish x.y.z
 
 # Push, including tags
 git push --tags
+
+# Check CI if project has been successfully pushed to pypi
