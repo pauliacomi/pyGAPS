@@ -1,6 +1,9 @@
 """Contains the Isotherm base class."""
 
+import logging
 import warnings
+
+logger = logging.getLogger('pygaps')
 
 import numpy
 
@@ -118,6 +121,19 @@ class BaseIsotherm():
                 "CoolProp backend disabled for this gas/vapour."
             ))
 
+        # TODO deprecation
+        old_basis = properties.pop('adsorbent_basis', None)
+        old_unit = properties.pop('adsorbent_unit', None)
+        if old_basis or old_unit:
+            logger.warning(
+                "WARNING: adsorbent_basis/adsorbent_unit is deprecated, "
+                "use material_basis/material_unit"
+            )
+            if old_basis:
+                properties['material_basis'] = old_basis
+            if old_unit:
+                properties['material_unit'] = old_unit
+
         # Isotherm units
         #
         with simplewarning():
@@ -128,14 +144,14 @@ class BaseIsotherm():
                     )
                     properties[k] = self._unit_params[k]
 
-        self.pressure_mode = properties.pop('pressure_mode', None)
-        self.pressure_unit = properties.pop('pressure_unit', None)
+        self.pressure_mode = properties.pop('pressure_mode')
+        self.pressure_unit = properties.pop('pressure_unit')
         if self.pressure_mode.startswith('relative'):
             self.pressure_unit = None
-        self.material_basis = properties.pop('material_basis', None)
-        self.material_unit = properties.pop('material_unit', None)
-        self.loading_basis = properties.pop('loading_basis', None)
-        self.loading_unit = properties.pop('loading_unit', None)
+        self.material_basis = properties.pop('material_basis')
+        self.material_unit = properties.pop('material_unit')
+        self.loading_basis = properties.pop('loading_basis')
+        self.loading_unit = properties.pop('loading_unit')
 
         # Check basis
         if self.material_basis not in _MATERIAL_MODE:
