@@ -192,7 +192,7 @@ class Adsorbate():
             ) from None
 
     @property
-    def backend(self) -> str:
+    def backend(self):
         """Return the CoolProp state associated with the fluid."""
         if (
             not self._backend_mode
