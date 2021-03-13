@@ -424,12 +424,12 @@ conversion functions are:
 
     - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert` which can
       handle any conversion quantities.
-    - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_loading` will
-      permanently convert the unit or basis loading of the isotherm, for example
-      from molar in *mmol* to mass in *g*.
     - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_pressure` will
       permanently convert the unit or mode of pressure, for example from *bar*
       to *atm*.
+    - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_loading` will
+      permanently convert the unit or basis loading of the isotherm, for example
+      from molar in *mmol* to mass in *g*.
     - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_material` will
       permanently convert the adsorbent material units or basis, for example
       from a mass basis in *g* to a mass basis in *kg*.
@@ -474,9 +474,9 @@ Converting to relative pressures
 ::::::::::::::::::::::::::::::::
 
 To convert an absolute pressure in a relative pressure, the critical pressure of
-the gas at the experiment temperature must be known. Of course this conversion
+the gas at the experiment temperature must be known. Of course, this conversion
 only works when the isotherm is measured in a subcritical regime. To calculate
-the critical pressure, pyGAPS relies on the ``CoolProp`` library. Therefore, the
+the vapour pressure, pyGAPS relies on the ``CoolProp`` library. Therefore, the
 name of the gas in a format CoolProp understands must be passed to the CoolProp
 API. pyGAPS does this by having an internal list of adsorbates, which is loaded
 from the database at the moment of import. The steps are:

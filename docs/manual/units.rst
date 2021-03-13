@@ -45,6 +45,10 @@ An example isotherm conversion with pressure:
         mode_to='absolute',
         unit_to='torr',
     )
+    # or to relative percent mode
+    isotherm.convert_pressure(
+        mode_to='relative%',
+    )
 
 
 Internally, pressure conversions are handled by the
