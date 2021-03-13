@@ -1,7 +1,9 @@
-import subprocess
-import pytest
-import pygaps
 import os
+import subprocess
+
+import pytest
+
+import pygaps
 
 
 def capture(command, **extra):
