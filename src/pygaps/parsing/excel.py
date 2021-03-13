@@ -115,7 +115,6 @@ def isotherm_to_xl(isotherm, path):
     )
     for field in _FIELDS.values():
         val = iso_dict.pop(field['name'], None)
-        print(field['name'], field['row'], field['column'], val)
         sht.write(field['row'], field['column'], field['text'][0], prop_style)
         if val:
             sht.write(field['row'], field['column'] + 1, val, prop_style)
