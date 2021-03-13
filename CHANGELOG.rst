@@ -2,51 +2,51 @@
 Changelog
 =========
 
-3.0.0 (2021-0-xx)
+3.0.0 (2021-03-14)
 ------------------
 
 New features:
 
-improve import speed
-loading%
-tplot psd
-error from isosteric_enthalpy
-issue with isosteric enthalpy in non-converted isotherms
-
-todo testing & documentation
-    - relative%
-    - csv path or str
-
-get a cli
-
-
-error in isosteric if not in mol/g
-
+ * The internal Adsorbate list now contains over 170 analytes, 81 of which have
+   a correspondence in the thermodynamic backend. This includes multiple
+   vapours, VOCs, and refrigerants.
+ * Added new mode for pressure as "relative%", which represents relative
+   pressure as a percentage rather than a fraction (i.e. p/p0 * 100).
+ * Added two new modes for loading as "fraction" and "percent". This ties the
+   uptake to the same basis as the adsorbate (i.e. weight%, volume%, mol% or
+   fractions thereof).
+ * Conversely, NIST format isotherms based on "wt%" can also be converted.
  * Significant improvements to the Horvath-Kawazoe methods of pore size
    distribution, including more pore geometries (cylindrical and spherical
    through the Saito-Foley and Cheng-Yang modifications) and the inclusion of
    extended HK models, with the Cheng-Yang and Rege-Yang corrections.
- * Isotherm JSON parser (``isotherm_to_json``) now passes extra parameters to the
-   ``json.dump`` function.
- * New convenience functions for isotherm parsing: `isotherm.to_json()`,
+ * Command-line interface: a CLI entry point is automatically added during
+   pyGAPS installation and can be called with ``pygaps -h`` to perform some
+   simple commands.
+ * Isotherm JSON parser (``pygaps.isotherm_to_json``) now passes all extra
+   parameters to the ``json.dump`` function.
+ * Perform isotherm branch separation based on maximum pressure, rather than
+   first derivative. In such way, slight uncertainty in pressures won't lead to
+   a wrong assignment.
+ * The reference area for an alpha_s calculation can now be specified as either
+   "BET" or "Langmuir".
+ * Convenience function `isotherm.convert()` which combines all isotherm
+   conversion modes.
+ * Convenience function `pygaps.model_iso()` which fits a model to a
+   PointIsotherm, effectively wrapping `ModelIsotherm.from_pointisotherm`.
+ * Convenience functions for isotherm parsing: `isotherm.to_json()`,
    `isotherm.to_csv()` and `isotherm.to_xl()`.
- * Added new mode for loading as "fractional", or "percent". This ties the uptake to the same basis
-   as the adsorbate (i.e. weight%, volume%, mol% or fractions thereof)
- * The NIST isotherms based on "wt%" can also be converted.
- * Perform isotherm branch separation based on maximum pressure,
-   rather than first derivative. In such way, slight uncertainty
-   in pressures won't lead to a wrong assignment.
+ * Plot quality has been overall improved.
  * Improved performance for isotherm conversions.
- * The reference area for an alpha_s calculation can now be specified
-   as either "BET" or "Langmuir".
- * Nicer Dubinin-Astakov and Dubinin-Radushkevich plots.
- * Changed the `util_get_file_paths` function to be more intuitive (no . needed).
- * Now using `pathlib` throughout the code.
- * General core refactoring and speed-ups.
+ * General refactoring and speed-ups.
+ * Switched to GitHub actions for CI, now MacOS builds are also tested.
 
 Breaking changes:
 
- * Included Python 3.9/3.8 as versions and deprecated Python 3.5.
+ * Included Python 3.8 and deprecated Python 3.5.
+ * All parameters like ``adsorbate_basis`` or ``adsorbate_unit`` have been
+   changed to ``material_basis`` and ``material_unit`` for consistency. Old
+   format should still work for some time.
  * For isotherm pressure/loading, a `limits` tuple is now passed instead of
    `min_range` and `max_range`, as for other functions in pyGAPS.
  * JSON ModelIsotherms now have ``name`` instead of ``model`` as the model name.
@@ -55,16 +55,17 @@ Breaking changes:
    removed. Functionality has been merged with `isotherm_to_json` similarly to
    the `pandas model
    <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_json.html>`_.
+ * Removed the `util_get_file_paths` function.
 
 Fixes:
-
- * ModelIsotherm creation could in some cases ignore isotherm branch
-   splitting.
+ * Volumetric -> molar conversions were not calculated correctly.
+ * Isosteric enthalpy could not be calculated if the isotherm was not in mmol/g.
+ * ModelIsotherm creation could in some cases ignore isotherm branch splitting.
  * BET area now attempts to pick at least 3 points if physically consistent.
    Should stop failing on some isotherms.
  * BET/Langmuir area maximum calculation was offset by one point.
- * The "section" returned in tplot/alphas is now consistent for both
-   manual and automatic limits: a list indices for selected points
+ * The "section" returned in tplot/alphas is now consistent for both manual and
+   automatic limits: a list indices for selected points
 
 2.0.2 (2019-12-18)
 ------------------
