@@ -351,13 +351,6 @@ class PointIsotherm(BaseIsotherm):
                 verbose=verbose,
             )
 
-        if loading_basis or loading_unit:
-            self.convert_loading(
-                basis_to=loading_basis,
-                unit_to=loading_unit,
-                verbose=verbose,
-            )
-
         if material_basis or material_unit:
             self.convert_material(
                 basis_to=material_basis,
@@ -365,8 +358,18 @@ class PointIsotherm(BaseIsotherm):
                 verbose=verbose,
             )
 
+        if loading_basis or loading_unit:
+            self.convert_loading(
+                basis_to=loading_basis,
+                unit_to=loading_unit,
+                verbose=verbose,
+            )
+
     def convert_pressure(
-        self, mode_to: str = None, unit_to: str = None, verbose: bool = False
+        self,
+        mode_to: str = None,
+        unit_to: str = None,
+        verbose: bool = False,
     ):
         """
         Convert isotherm pressure from one unit to another
@@ -424,7 +427,7 @@ class PointIsotherm(BaseIsotherm):
         self,
         basis_to: str = None,
         unit_to: str = None,
-        verbose: bool = False
+        verbose: bool = False,
     ):
         """
         Convert isotherm loading from one unit to another
