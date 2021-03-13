@@ -1,5 +1,5 @@
 ======================
-Command line interface
+Command Line Interface
 ======================
 
 Some pyGAPS functionality can also be used from the command line. Once
