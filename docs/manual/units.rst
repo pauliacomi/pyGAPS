@@ -37,7 +37,15 @@ a sub-critical regime. In order to calculate it, a info of the specific
 adsorbate is required. This info is obtained internally using an equation of
 state from either CoolProp or REFPROP.
 
-Pressure conversions are handled by the
+An example isotherm conversion with pressure:
+
+::
+    isotherm.convert_pressure(
+        mode_to='absolute',
+        unit_to='torr',
+    )
+
+Internally, pressure conversions are handled by the
 :func:`~pygaps.utilities.converter_mode.c_pressure` function.
 
 
@@ -46,19 +54,33 @@ Adsorbate loading
 
 Adsorbate loading refers to the quantity of gas (adsorbate) which is contained
 in the material on which the isotherm is measured i.e. "moles of nitrogen
-adsorbed" or "grams of CO2 captured". Currently pyGAPS does not differentiate
-between excess and total amount adsorbed.
+adsorbed" or "grams of CO2 captured" or "percent weight adsorbed". Currently
+pyGAPS does not differentiate between excess and total amount adsorbed.
 
 The adsorbate loading is usually represented in *mmol* or *cm3(STP)*, both of
 which are representations of a **molar basis**. Sometimes it is useful if,
 instead of a molar basis, the loading is represented in terms on a
-**mass basis** or **volume basis**. pyGAPS allows for both unit and basis conversions.
+**mass basis** or **volume basis**. It is also possible to represent uptake
+as a **fraction** or **percent** of the material basis.
+pyGAPS allows for both unit and basis conversions.
 
 For these conversions, properties such as molar mass and density of the
 adsorbate are required. This info is obtained internally using an equation of
 state from either CoolProp or REFPROP.
 
-Loading conversions are handled by the
+Examples of isotherm conversion on loading:
+
+::
+    isotherm.convert_loading(
+        basis_to='percent',
+    )
+
+    isotherm.convert_loading(
+        basis_to='mass',
+        unit_to='g',
+    )
+
+Internally, loading conversions are handled by the
 :func:`~pygaps.utilities.converter_mode.c_loading` function.
 
 Material quantity
@@ -72,10 +94,19 @@ is required. pyGAPS allows the basis to be changed to either **mass**,
 **volume** or **molar**.
 
 Depending on the conversion basis, the density or molar mass of the material is
-needed and should be provided by the user. To specify this in a material, check
-out the :ref:`Material <material-manual-manage>` manual.
+needed and should be provided by the user. To specify this in a material see
+below and, check out the :ref:`Material <material-manual-manage>` manual.
 
-Adsorbent conversions are handled by the
+Example of isotherm conversion on material:
+
+::
+    isotherm.material.properties['density'] = 2
+    isotherm.convert_material(
+        basis_to='volume',
+        unit_to='cm3',
+    )
+
+Internally, material conversions are handled by the
 :func:`~pygaps.utilities.converter_mode.c_material`.
 
 
