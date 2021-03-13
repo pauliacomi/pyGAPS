@@ -19,7 +19,7 @@ adsorption data analysis and fitting, written in Python 3.
     * - license
       - | |license|
     * - tests
-      - | |GHA| |travis| |appveyor|
+      - | |GHA| |travis|
         | |codecov|
         | |requires|
     * - package
@@ -49,10 +49,6 @@ adsorption data analysis and fitting, written in Python 3.
 .. |travis| image:: https://api.travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/pauliacomi/pyGAPS
-
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/pauliacomi/pygaps?branch=master&svg=true
-    :alt: AppVeyor Build Status
-    :target: https://ci.appveyor.com/project/pauliacomi/pygaps
 
 .. |requires| image:: https://requires.io/github/pauliacomi/pyGAPS/requirements.svg?branch=master
     :alt: Requirements Status
