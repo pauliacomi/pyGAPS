@@ -71,7 +71,12 @@ project = 'pygaps'
 year = '2021'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '2.0.2'
+try:
+    from importlib.metadata import version as imp_version
+    version = release = imp_version("pygaps")
+except ModuleNotFoundError:
+    from pkg_resources import get_distribution as imp_version
+    version = release = imp_version("pygaps").version
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.']

@@ -2,9 +2,14 @@
 # flake8: noqa
 # isort:skip_file
 
-__author__ = 'Paul A. Iacomi'
+__author__ = 'Paul Iacomi'
 __docformat__ = 'restructuredtext'
-__version__ = '2.0.2'
+
+try:
+    from ._version import version
+    __version__ = version
+except:
+    __version__ = '2.0.2'
 
 import sys
 import logging
