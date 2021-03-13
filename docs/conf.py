@@ -147,7 +147,7 @@ nbsphinx_prolog = r"""
     <div class="admonition note">
       This page was generated from
       <a class="reference external" href="https://github.com/pauliacomi/pyGAPS/blob/v{{ env.config.release|e }}/{{ docname|e }}">{{ docname|e }}</a>.
-      Interactive online version:
+      An interactive online version can be started on Binder:
       <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/v{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.</span>
       <script>
         if (document.location.host) {
@@ -157,7 +157,7 @@ nbsphinx_prolog = r"""
             (window.location.protocol == 'https:' ? 's/' : '/') +
             window.location.host +
             window.location.pathname.slice(0, -4) +
-            'ipynb">View in <em>nbviewer</em></a>.'
+            'ipynb">View in <em>nbviewer</em></a> instead.'
           );
         }
       </script>
