@@ -1,10 +1,8 @@
 name: Publish to PyPI
 
 on:
-  # On a new version, in the master branch
+  # On a new version only
   push:
-    branches:
-      - master
     tags:
       - v*
 
