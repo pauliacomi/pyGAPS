@@ -91,9 +91,9 @@ class DSLangmuir(IsothermBaseModel):
         d = self.params['K2']
 
         x = (a + c - loading) * b * d
-        y = (a*b + c*d - loading*(b+d))
+        y = (a * b + c * d - loading * (b + d))
 
-        res = (-y + numpy.sqrt(y**2 - 4*x*(-loading))) / (2*x)
+        res = (-y + numpy.sqrt(y**2 - 4 * x * (-loading))) / (2 * x)
 
         if numpy.isnan(res).any():
             res = numpy.nan_to_num(res, copy=False)
@@ -148,10 +148,16 @@ class DSLangmuir(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
-        guess = {"n_m1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k,
-                 "n_m2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}
+        guess = {
+            "n_m1": 0.5 * saturation_loading,
+            "K1": 0.4 * langmuir_k,
+            "n_m2": 0.5 * saturation_loading,
+            "K2": 0.6 * langmuir_k
+        }
 
         for param in guess:
             if guess[param] < self.param_bounds[param][0]:

@@ -1,19 +1,25 @@
 """Module calculating the initial henry constant."""
 
+import logging
+
+logger = logging.getLogger('pygaps')
+
 import numpy
 
 from ..core.modelisotherm import ModelIsotherm
-from ..graphing.isothermgraphs import plot_iso
+from ..graphing.isotherm_graphs import plot_iso
 from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParameterError
 
 
-def initial_henry_slope(isotherm,
-                        max_adjrms=0.02,
-                        p_limits=None,
-                        l_limits=None,
-                        verbose=False,
-                        **plot_parameters):
+def initial_henry_slope(
+    isotherm,
+    max_adjrms=0.02,
+    p_limits=None,
+    l_limits=None,
+    verbose=False,
+    **plot_parameters
+):
     """
     Calculate a henry constant based on the initial slope.
 
@@ -47,11 +53,9 @@ def initial_henry_slope(isotherm,
             l_limits = [-numpy.inf, numpy.inf]
 
         pressure = isotherm.pressure(
-            branch='ads', indexed=True,
-            min_range=p_limits[0], max_range=p_limits[1])
-        loading = isotherm.loading(
-            branch='ads', indexed=True,
-            min_range=l_limits[0], max_range=l_limits[1])
+            branch='ads', indexed=True, limits=p_limits
+        )
+        loading = isotherm.loading(branch='ads', indexed=True, limits=l_limits)
 
         pressure, loading = pressure.align(loading, join='inner')
         pressure, loading = pressure.values, loading.values
@@ -81,7 +85,9 @@ def initial_henry_slope(isotherm,
 
     while rows_taken != 1:
 
-        param_guess = henry.initial_guess(pressure[:rows_taken], loading[:rows_taken])
+        param_guess = henry.initial_guess(
+            pressure[:rows_taken], loading[:rows_taken]
+        )
         # fit model to isotherm data
         henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
         adjrmsd = henry.rmse / numpy.ptp(loading)
@@ -92,29 +98,26 @@ def initial_henry_slope(isotherm,
         else:
             break
 
-    # logging for debugging
     if verbose:
-        print("Calculated K = {:.2e}".format(henry.params["K"]))
-        print("Starting points:", initial_rows)
-        print("Selected points:", rows_taken)
-        print("Final adjusted RMSE: {:.2e}".format(adjrmsd))
+        logger.info(f"Calculated K = {henry.params['K']:.2e}")
+        logger.info(f"Starting points: {initial_rows}")
+        logger.info(f"Selected points: {rows_taken}")
+        logger.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
         params = {
-            'plot_type': 'isotherm',
             'branch': 'ads',
-            'fig_title': (' '.join([isotherm.material])),
-            'lgd_keys': ['material_batch', 'adsorbate', 'temperature'],
-            'lgd_pos': 'bottom'
+            'lgd_keys': ['material'],
+            'lgd_pos': 'inner'
         }
         params.update(plot_parameters)
         henry.pressure_range = [pressure[0], pressure[:rows_taken][-1]]
         henry.loading_range = [pressure[0], loading[:rows_taken][-1]]
 
         iso_params = isotherm.to_dict()
-        iso_params['material_batch'] = 'Henry model'
         model_isotherm = ModelIsotherm(
             model=henry,
             **iso_params,
         )
+        model_isotherm.material = "model"
         plot_iso([isotherm, model_isotherm], **params)
 
     # return the henry constant

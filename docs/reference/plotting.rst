@@ -6,19 +6,19 @@ Graphs and plotting
 Isotherm plotting
 -----------------
 
-.. automodule:: pygaps.graphing.isothermgraphs
+.. automodule:: pygaps.graphing.isotherm_graphs
     :members:
 
 
 IAST plotting
 -------------
 
-.. automodule:: pygaps.graphing.iastgraphs
+.. automodule:: pygaps.graphing.iast_graphs
     :members:
 
 
 Calculation plotting
 --------------------
 
-.. automodule:: pygaps.graphing.calcgraph
+.. automodule:: pygaps.graphing.calc_graphs
     :members:

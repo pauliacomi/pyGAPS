@@ -1,8 +1,8 @@
 """Jensen-Seaton isotherm model."""
 
 import numpy
-import scipy
 
+from .. import scipy
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
@@ -48,7 +48,7 @@ class JensenSeaton(IsothermBaseModel):
     """
 
     # Model parameters
-    name = 'Jensen-Seaton'
+    name = 'JensenSeaton'
     calculates = 'loading'
     param_names = ["K", "a", "b", "c"]
     param_bounds = {
@@ -100,9 +100,7 @@ class JensenSeaton(IsothermBaseModel):
         opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+            raise CalculationError(f"Root finding for value {loading} failed.")
 
         return opt_res.x
 
@@ -130,7 +128,9 @@ class JensenSeaton(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
+        return scipy.integrate.quad(
+            lambda x: self.loading(x) / x, 0, pressure
+        )[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -148,7 +148,9 @@ class JensenSeaton(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
         guess = {"K": saturation_loading * langmuir_k, "a": 1, "b": 1, "c": 1}
 

@@ -3,8 +3,8 @@
 from itertools import groupby
 
 import numpy
-import scipy.interpolate as interp
 
+from .. import scipy
 from .exceptions import ParameterError
 
 
@@ -68,27 +68,27 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
 
     # If periodic, extend the point array by count+degree+1
     if periodic:
-        factor, fraction = divmod(count+degree+1, count)
-        cv = numpy.concatenate((cv,) * factor + (cv[:fraction],))
+        factor, fraction = divmod(count + degree + 1, count)
+        cv = numpy.concatenate((cv, ) * factor + (cv[:fraction], ))
         count = len(cv)
         degree = numpy.clip(degree, 1, degree)
 
     # If opened, prevent degree from exceeding count-1
     else:
-        degree = numpy.clip(degree, 1, count-1)
+        degree = numpy.clip(degree, 1, count - 1)
 
     # Calculate knot vector
     kv = None
     if periodic:
-        kv = numpy.arange(0-degree, count+degree+degree-1, dtype='int')
+        kv = numpy.arange(0 - degree, count + degree + degree - 1, dtype='int')
     else:
-        kv = numpy.concatenate(([0]*degree, numpy.arange(count-degree+1), [count-degree]*degree))
+        kv = numpy.concatenate(([0] * degree, numpy.arange(count - degree + 1),
+                                [count - degree] * degree))
 
     # Calculate query range
-    rng = numpy.linspace(periodic, (count-degree), n)
+    rng = numpy.linspace(periodic, (count - degree), n)
 
     # Calculate result
-    res = numpy.array(interp.splev(rng, (kv, cv.T, degree))).T
+    res = numpy.array(scipy.interp.splev(rng, (kv, cv.T, degree))).T
 
-    return (numpy.array([x[0] for x in res]),
-            numpy.array([y[1] for y in res]))
+    return (numpy.array([x[0] for x in res]), numpy.array([y[1] for y in res]))

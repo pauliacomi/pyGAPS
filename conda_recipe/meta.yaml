@@ -1,5 +1,5 @@
 {% set name = "pygaps" %}
-{% set version = "version = release = '2.0.2'" %}
+{% set version = "version = release = '3.0.0'" %}
 
 package:
   name: "{{ name|lower }}"

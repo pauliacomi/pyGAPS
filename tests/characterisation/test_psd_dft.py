@@ -15,14 +15,13 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
-import os
-
 import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
 
 import pygaps
 import pygaps.characterisation.psd_dft as pdft
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
@@ -31,15 +30,14 @@ from .conftest import DATA_N77_PATH
 @pytest.mark.characterisation
 class TestPSDDFT():
     """Test pore size distribution calculation."""
-
     def test_psd_dft_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
         # Will raise a "no kernel exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pdft.psd_dft(basic_pointisotherm, kernel=None)
 
         # Will raise a "no applicable branch exception"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pdft.psd_dft(basic_pointisotherm, branch='test')
 
     @pytest.mark.parametrize('kernel', [
@@ -52,26 +50,29 @@ class TestPSDDFT():
         # exclude datasets where it is not applicable
         if sample.get('psd_dft_pore_volume', None):
 
-            filepath = os.path.join(DATA_N77_PATH, sample['file'])
-            isotherm = pygaps.isotherm_from_jsonf(filepath)
+            filepath = DATA_N77_PATH / sample['file']
+            isotherm = pygaps.isotherm_from_json(filepath)
 
             result_dict = pdft.psd_dft(isotherm, kernel=kernel)
 
-            loc = np.where(result_dict['pore_distribution'] == max(result_dict['pore_distribution']))
+            loc = np.where(
+                result_dict['pore_distribution'] ==
+                max(result_dict['pore_distribution'])
+            )
             principal_peak = result_dict['pore_widths'][loc]
 
             err_relative = 0.05  # 5 percent
             err_absolute = 0.01  # 0.01
 
             assert np.isclose(
-                principal_peak,
-                sample['psd_micro_pore_size'],
-                err_relative, err_absolute)
+                principal_peak, sample['psd_micro_pore_size'], err_relative,
+                err_absolute
+            )
 
     @cleanup
     def test_psd_dft_verbose(self):
         """Test verbosity."""
-        data = DATA['MCM-41']
-        filepath = os.path.join(DATA_N77_PATH, data['file'])
-        isotherm = pygaps.isotherm_from_jsonf(filepath)
+        sample = DATA['MCM-41']
+        filepath = DATA_N77_PATH / sample['file']
+        isotherm = pygaps.isotherm_from_json(filepath)
         pygaps.psd_dft(isotherm, verbose=True)

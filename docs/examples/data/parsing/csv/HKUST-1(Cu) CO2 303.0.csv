@@ -1,5 +1,6 @@
-adsorbent_basis,mass
-adsorbent_unit,g
+file_version,2.0
+material_basis,mass
+material_unit,g
 loading_basis,molar
 loading_unit,mmol
 pressure_mode,absolute
@@ -12,7 +13,6 @@ iso_type,Calorimetrie
 user,ADW
 machine,CV
 date,21/05/2010 00:00
-is_real,True
 t_act,150.0
 lab,MADIREL
 data:[pressure, loading, other...]

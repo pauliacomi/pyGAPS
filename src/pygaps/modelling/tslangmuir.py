@@ -1,8 +1,8 @@
 """Triple Site Langmuir isotherm model."""
 
 import numpy
-import scipy
 
+from .. import scipy
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
 
@@ -17,14 +17,15 @@ class TSLangmuir(IsothermBaseModel):
 
     Notes
     -----
-    An extension to the Langmuir model is to consider the experimental isotherm to be
-    the sum of several Langmuir-type isotherms with different monolayer capacities and
-    affinities [#]_. The assumption is that the adsorbent presents several distinct
-    types of homogeneous adsorption sites, and that separate Langmuir equations
-    should be applied to each. This is particularly applicable in cases where the
-    structure of the adsorbent suggests that different types of sites are present,
-    such as in crystalline materials of variable chemistry like zeolites and MOFs.
-    The resulting isotherm equation is:
+    An extension to the Langmuir model is to consider the experimental isotherm
+    to be the sum of several Langmuir-type isotherms with different monolayer
+    capacities and affinities [#]_. The assumption is that the adsorbent
+    material presents several distinct types of homogeneous adsorption sites,
+    and that separate Langmuir equations should be applied to each. This is
+    particularly applicable in cases where the structure of the adsorbent
+    suggests that different types of sites are present, such as in crystalline
+    materials of variable chemistry like zeolites and MOFs. The resulting
+    isotherm equation is:
 
     .. math::
 
@@ -98,9 +99,7 @@ class TSLangmuir(IsothermBaseModel):
         opt_res = scipy.optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
-            raise CalculationError("""
-            Root finding for value {0} failed.
-            """.format(loading))
+            raise CalculationError(f"Root finding for value {loading} failed.")
 
         return opt_res.x
 
@@ -154,11 +153,18 @@ class TSLangmuir(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
-        guess = {"n_m1": 0.4 * saturation_loading, "K1": 0.2 * langmuir_k,
-                 "n_m2": 0.4 * saturation_loading, "K2": 0.4 * langmuir_k,
-                 "n_m3": 0.2 * saturation_loading, "K3": 0.4 * langmuir_k}
+        guess = {
+            "n_m1": 0.4 * saturation_loading,
+            "K1": 0.2 * langmuir_k,
+            "n_m2": 0.4 * saturation_loading,
+            "K2": 0.4 * langmuir_k,
+            "n_m3": 0.2 * saturation_loading,
+            "K3": 0.4 * langmuir_k
+        }
 
         for param in guess:
             if guess[param] < self.param_bounds[param][0]:

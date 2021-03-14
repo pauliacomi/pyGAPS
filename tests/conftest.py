@@ -22,8 +22,8 @@ def pytest_runtest_setup(item):
         if previousfailed is not None:
             pytest.xfail("previous test failed (%s)" % previousfailed.name)
 
-# Global fixtures
 
+# Global fixtures
 
 LOADING_KEY = 'loading'
 PRESSURE_KEY = 'pressure'
@@ -34,17 +34,13 @@ OTHER_KEY = "enthalpy"
 def isotherm_parameters():
     """Create a dictionary with all parameters for an isotherm."""
     return {
-
         'material': 'TEST',
-        'material_batch': 'TB',
         'temperature': 100.0,
         'adsorbate': 'TA',
-
         'date': '26/06/92',
         't_act': 100.0,
         'lab': 'TL',
         'comment': 'test comment',
-
         'user': 'TU',
         'project': 'TP',
         'machine': 'TM',
@@ -52,21 +48,17 @@ def isotherm_parameters():
         'iso_type': 'calorimetry',
 
         # Units/bases
-        'adsorbent_basis': 'mass',
-        'adsorbent_unit': 'g',
+        'material_basis': 'mass',
+        'material_unit': 'g',
         'loading_basis': 'molar',
         'loading_unit': 'mmol',
         'pressure_mode': 'absolute',
         'pressure_unit': 'bar',
 
         # other properties
-
         'DOI': 'dx.doi/10.0000',
         'origin': 'test',
         'test_parameter': 'parameter',
-
-        # No warnings
-        'warn_off': True
     }
 
 
@@ -83,8 +75,7 @@ def isotherm_data():
 @pytest.fixture(scope='function')
 def basic_isotherm(isotherm_parameters):
     """Create a basic isotherm from basic data."""
-    return pygaps.core.isotherm.Isotherm(
-        no_warn=True, **isotherm_parameters)
+    return pygaps.core.baseisotherm.BaseIsotherm(**isotherm_parameters)
 
 
 @pytest.fixture(scope='function')
@@ -95,7 +86,6 @@ def basic_pointisotherm(isotherm_data, isotherm_parameters):
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         other_keys=[OTHER_KEY],
-        no_warn=True,
         **isotherm_parameters
     )
 
@@ -108,7 +98,6 @@ def basic_modelisotherm(isotherm_data, isotherm_parameters):
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
         model="Henry",
-        no_warn=True,
         **isotherm_parameters
     )
 
@@ -126,8 +115,7 @@ def material_data():
         'type': 'MOF',
         'form': 'powder',
         'comment': 'test comment',
-
-        'density': 10,  # g/cm3
+        'density': 2,  # g/cm3
         'poresize': 14,
         'molar_mass': 10,  # g/mol
     }
@@ -142,9 +130,7 @@ def basic_material(material_data):
 @pytest.fixture()
 def use_material(basic_material):
     """Upload basic material to global list."""
-    material = next(
-        (x for x in pygaps.MATERIAL_LIST if basic_material.name == x.name and basic_material.batch == x.batch), None)
-    if not material:
+    if basic_material not in pygaps.MATERIAL_LIST:
         pygaps.MATERIAL_LIST.append(basic_material)
 
 
@@ -153,10 +139,9 @@ def adsorbate_data():
     """Create a dict with all data for an model adsorbate."""
     return {
         'name': 'TA',
-        'alias': ['ta'],
+        'alias': ['ta1', 'ta2', 'ta'],
         'formula': 'TA21',
-
-        'backend_name': 'nitrogen',
+        'backend_name': 'NITROGEN',
         'molar_mass': 28.01348,
         'cross_sectional_area': 0.162,
         'molecular_diameter': 0.3,
@@ -187,7 +172,5 @@ def basic_adsorbate(adsorbate_data):
 @pytest.fixture()
 def use_adsorbate(basic_adsorbate):
     """Upload basic adsorbate to global list."""
-    adsorbate = next(
-        (x for x in pygaps.ADSORBATE_LIST if basic_adsorbate.name == x.name), None)
-    if not adsorbate:
+    if basic_adsorbate not in pygaps.ADSORBATE_LIST:
         pygaps.ADSORBATE_LIST.append(basic_adsorbate)

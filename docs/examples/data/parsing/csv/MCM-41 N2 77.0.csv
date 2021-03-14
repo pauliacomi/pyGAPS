@@ -1,5 +1,6 @@
-adsorbent_basis,mass
-adsorbent_unit,g
+file_version,2.0
+material_basis,mass
+material_unit,g
 loading_basis,molar
 loading_unit,mmol
 pressure_mode,absolute
@@ -11,7 +12,6 @@ adsorbate,N2
 iso_type,Isotherme
 user,PI
 machine,Triflex
-is_real,True
 t_act,150.0
 lab,MADIREL
 data:[pressure, loading, other...]

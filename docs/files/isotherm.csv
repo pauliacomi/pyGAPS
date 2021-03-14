@@ -1,3 +1,4 @@
+file_version,2.0
 material,HKUST-1(Cu)
 material_batch,KRICT
 temperature,303
@@ -9,7 +10,7 @@ project,ACRONYM
 machine,device1
 type,calorimetry
 loading_unit,mmol
-adsorbent_unit,g
+material_unit,g
 pressure_unit,bar
 data
 pressure,loading,Enthalpy(kJ/mol)

@@ -1,10 +1,4 @@
 """General functions for string transformations."""
-import pygaps
-
-
-def _to_latex(string):
-    """Latex-decorate a string."""
-    return ('$' + string + '$')
 
 
 def convert_chemformula(string):
@@ -13,7 +7,7 @@ def convert_chemformula(string):
 
     Parameters
     ----------
-    string or Isotherm: str
+    string or Adsorbate: str
         String to process.
 
     Returns
@@ -21,31 +15,69 @@ def convert_chemformula(string):
     str
         Processed string.
     """
-    result = result = getattr(string, 'adsorbate', False)
-    if not result:
-        inner = []
-        # Iterate through the string, adding non-numbers to the no_digits list
+    result = getattr(string, 'formula', None)
+    if result is None:
+        result = ""
         number_processing = False
         for i in string:
-            if i.isdigit() and number_processing:
-                number_processing = True
-            elif i.isdigit() and not number_processing:
-                inner.append('_{')
-                number_processing = True
+            if i.isdigit():
+                if not number_processing:
+                    result += '_{'
+                    number_processing = True
             else:
                 if number_processing:
-                    inner.append('}')
+                    result += '}'
                     number_processing = False
-            inner.append(i)
+            result += i
 
-        if inner[-1].isdigit():
-            inner.append('}')
+        if number_processing:
+            result += '}'
 
-        # which put all characters together.
-        result = ''.join(inner)
-    else:
-        try:
-            result = pygaps.Adsorbate.find(result).formula
-        except pygaps.ParameterError:
-            pass
-    return _to_latex(result)
+    return f'${result}$'
+
+
+def convert_unitstr(string: str, negative: bool = False):
+    """
+    Convert a unit string to a nice matplotlib parsable format (latex).
+
+    Parameters
+    ----------
+    string: str
+        String to process.
+    negative: bool
+        Whether the power is negative instead.
+
+    Returns
+    -------
+    str
+        Processed string.
+    """
+    result = ""
+    number_processing = False
+    for i in string:
+        if i.isdigit():
+            if not number_processing:
+                result += '^{'
+                if negative:
+                    result += '-'
+                    negative = False
+                number_processing = True
+        else:
+            if number_processing:
+                result += '}'
+                number_processing = False
+            if i == "(":
+                result += '_{'
+                continue
+            elif i == ")":
+                result += '}'
+                continue
+        result += (i)
+
+    if number_processing:
+        result += '}'
+
+    if negative:
+        result += '^{-1}'
+
+    return result

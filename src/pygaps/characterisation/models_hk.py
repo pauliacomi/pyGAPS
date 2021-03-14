@@ -5,29 +5,39 @@ for use in the Horvath-Kawazoe method.
 
 from ..utilities.exceptions import ParameterError
 
+HK_KEYS = {
+    'molecular_diameter': 'nm',
+    'polarizability': 'nm3',
+    'magnetic_susceptibility': 'nm3',
+    'surface_density': 'molecules/m2',
+}
+
 PROPERTIES_CARBON = {
-    'molecular_diameter': 0.34,            # nm
-    'polarizability': 1.02E-3,             # nm3
-    'magnetic_susceptibility': 1.35E-7,    # nm3
-    'surface_density': 3.845E19,           # molecules/m2
+    'molecular_diameter': 0.34,  # nm
+    'polarizability': 1.02E-3,  # nm3
+    'magnetic_susceptibility': 1.35E-7,  # nm3
+    'surface_density': 3.845E19,  # molecules/m2
 }
 
 PROPERTIES_AlSi_OXIDE_ION = {
-    'molecular_diameter': 0.276,            # nm
-    'polarizability': 2.5E-3,               # nm3
-    'magnetic_susceptibility': 1.3E-7,      # nm3
-    'surface_density': 1.315E19,            # molecules/m2
-}
-PROPERTIES_AlPh_OXIDE_ION = {
-    'molecular_diameter': 0.260,            # nm
-    'polarizability': 2.5E-3,               # nm3
-    'magnetic_susceptibility': 1.3E-7,      # nm3
-    'surface_density': 1.000E19,            # molecules/m2
+    'molecular_diameter': 0.276,  # nm
+    'polarizability': 2.5E-3,  # nm3
+    'magnetic_susceptibility': 1.3E-8,  # nm3
+    'surface_density': 1.315E19,  # molecules/m2
 }
 
-_ADSORBENT_MODELS = {'Carbon(HK)': PROPERTIES_CARBON,
-                     'AlSiOxideIon': PROPERTIES_AlSi_OXIDE_ION,
-                     'AlPhOxideIon': PROPERTIES_AlPh_OXIDE_ION}
+PROPERTIES_AlPh_OXIDE_ION = {
+    'molecular_diameter': 0.260,  # nm
+    'polarizability': 2.5E-3,  # nm3
+    'magnetic_susceptibility': 1.3E-8,  # nm3
+    'surface_density': 1.000E19,  # molecules/m2
+}
+
+_ADSORBENT_MODELS = {
+    'Carbon(HK)': PROPERTIES_CARBON,
+    'AlSiOxideIon': PROPERTIES_AlSi_OXIDE_ION,
+    'AlPhOxideIon': PROPERTIES_AlPh_OXIDE_ION,
+}
 
 
 def get_hk_model(model):
@@ -56,27 +66,26 @@ def get_hk_model(model):
     if isinstance(model, str):
         if model not in _ADSORBENT_MODELS:
             raise ParameterError(
-                "Model parameters {} not an option for pore size distribution.".format(
-                    model),
-                "Available model parameters are {}".format(_ADSORBENT_MODELS.keys()))
+                f"Model ({model}) is not an option for pore size distribution.",
+                f"Available models are {_ADSORBENT_MODELS.keys()}"
+            )
 
         return _ADSORBENT_MODELS[model]
 
     # If the model is an dictionary, use it as is
-    elif isinstance(model, dict):
-        for key in [('molecular_diameter', 'nm'), ('polarizability', 'nm3'),
-                    ('magnetic_susceptibility', 'nm3'), ('surface_density', 'molecules/m2')]:
+    if isinstance(model, dict):
+        for key in HK_KEYS.items():
             if key[0] not in model.keys():
                 raise ParameterError(
-                    'The passed dictionary must contain the parameter {}'
-                    'in the units of {}'.format(key[0], key[1])
+                    f"The passed dictionary must contain the parameter {key[0]} "
+                    f"in the units of {key[1]}"
                 )
 
         return model
 
     # Raise error if anything else is passed
-    else:
-        raise ParameterError(
-            "Not an option for pore size distribution.",
-            "Available models are {}".format(_ADSORBENT_MODELS.keys()),
-            "or pass a dictionary with the required parameters")
+    raise ParameterError(
+        f"Model parameters ({model}) not an option for pore size distribution. ",
+        f"Available models are {_ADSORBENT_MODELS.keys()}."
+        " Or pass a dictionary with the required parameters"
+    )

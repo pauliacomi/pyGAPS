@@ -23,11 +23,7 @@ environment:
   CONDA_ROOT: 'C:\Miniconda3-x64'
 
   matrix:
-    - PYTHON_VERSION: '3.5'
-      platform: x86
 
-    - PYTHON_VERSION: '3.5'
-      platform: x64
 
     - PYTHON_VERSION: '3.6'
       platform: x86
@@ -35,16 +31,26 @@ environment:
     - PYTHON_VERSION: '3.6'
       platform: x64
 
+
+
     - PYTHON_VERSION: '3.7'
       platform: x86
 
     - PYTHON_VERSION: '3.7'
+      platform: x64
+
+
+
+    - PYTHON_VERSION: '3.8'
+      platform: x86
+
+    - PYTHON_VERSION: '3.8'
       platform: x64
 
 
 # initial commands
 init:
-  - echo %PYTHON_VERSION%
+  - ps: echo $env:PYTHON_VERSION
 
 # setup stage
 install:
@@ -71,6 +77,9 @@ test_script:
 
 # cleanup the environment
 after_test:
+
+on_success:
+  - IF DEFINED WHEEL_PATH twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing %WHEEL_PATH%/*.whl
 
 # stuff to do on fail
 on_failure:

@@ -1,4 +1,6 @@
 {
+    "file_version": "2.0",
+
     "material": "HKUST-1(Cu)",
     "material_batch": "KRICT",
     "adsorbate": "CO2",
@@ -6,8 +8,8 @@
 
     "pressure_mode" : "absolute",
     "pressure_unit" : "bar",
-    "adsorbent_basis" : "mass",
-    "adsorbent_unit" : "g",
+    "material_basis" : "mass",
+    "material_unit" : "g",
     "loading_basis" : "molar",
     "loading_unit" : "mmol",
 

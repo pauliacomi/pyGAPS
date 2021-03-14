@@ -1,7 +1,8 @@
+dist: bionic
 language: python
 cache: pip
 git:                    # no need to clone everything
-  depth: 5
+  depth: 1
 
 env:
   global:
@@ -14,7 +15,8 @@ before_install:
   - python --version    # print python version
 
 install:
-  - pip install tox     # install tox
+  - python -m pip install --upgrade pip       # latest setuptools
+  - pip install twine tox-wheel               # install tox/twine
   # display versions of installed components
   - virtualenv --version
   - easy_install --version
@@ -47,60 +49,57 @@ script:
   - tox -v
 
 after_failure:
-  - more .tox/log/* | cat
-  - more .tox/*/log/* | cat
+  - cat .tox/log/*
+  - cat .tox/*/log/*
 
 jobs:
   include:
-    # Checks and docks
+    # Checks and docs
     - stage: test
-      python: '3.7'     # specify python 3.7
-      dist: xenial
+      python: '3.8'     # specify python 3.8
+      dist: bionic
       env:
         - TOXENV=check
     - stage: test
-      python: '3.7'     # specify python 3.7
-      dist: xenial
+      python: '3.8'     # specify python 3.8
+      dist: bionic
       env:
         - TOXENV=docs
       addons:
+        # We need to install pandoc separately to deal with translation of docs to jupyter
         apt_packages:
-        # We need to install pandoc separately to deal
-        # with translation of docs to jupyter
         - pandoc
     # Create an test job on the test stage for each python version
-{%- for env, config in tox_environments|dictsort %}{{ '' }}
+{%- for env in tox_environments %}{{ '' }}
     - stage: test
       python: '{{ env.split("-")[0] if env.startswith("pypy") else "{0[2]}.{0[3]}".format(env) }}'
-    {% if env.startswith('py37') %}
-      dist: xenial
-      {% endif %}
+      dist: bionic
       env:
-        - TOXENV={{ env }}{% if config.cover %},report,codecov{% endif -%}
+        - TOXENV={{ env }}{% if 'cover' in env %},report,codecov{% endif -%}
 {% endfor %}
 
     # If all goes well, we want to deploy to PyPi
-    - stage: deploy
-      python: '3.7'     # specify python 3.7
-      dist: xenial
-      env: TOXENV=none  # overwrite environment var
-      install: skip     # no need to install tox
-      script: skip      # run no tests
-      deploy:           # instead deploy
-        - provider: pypi
-          user: paul.iacomi
-          password:
-            secure: n0/j7ueOm8N0frKsRtEOqWvY1I02iu08dNS3ylK+8q+78PrQwB9xQUlH8QRQselMrkobas9e2l9x8eglYNmN1yYata0mT/UexIy+h1CmHTt6oMxE6TSEiCRuyQ73TwV5F36eOOGLwYYzRLMOYjVaHC5E3f0W1RzGcWstrgZWRtVhHNZ+3IxYW+sqb2+JVeKlhqQgmZY2+LRkwf7UXgoNeYHElKB0WnoPNiK2UpYYm8Et4IWFs7BBQfFBTiHmvmsk2DVwBPUWfju0CLoGFKrf/7Z4polSgo88WIBMtW2vPq3JU7uGr3Bqc/XNs+atc0AT9/eqb7x7DogeikSagJa1dx1h///C90as5FV4pSSHRILTCV5quTl9IFKltefxcNPbQuDtwano7wYIxbU4fbGjb8kGOCzTd2IWaz9oy9XtpC6xLuxBxlG4IphD3qQPtvGqi5udHlC3PX7GTgnQ6ySPuZ6EqhHmTFcpbaT8AXp5jfi2LqHllIo/+PcTv3Bm1/89qEfwcm6biE8O41ejOyjb3WKiB2etOMkw7O0tZE9Ub2LrPFohcCQVJgKFcewKrb5zCtmN61m+S3IFu3tOrean3De13ycD1oYSLbwMxU3Cc2bvRoQ+JcnRSIiNcu4ujaHL7uANQClHTByhUa61PNgWVOH3P6YWU572khCEUzF8cEA=
-          distributions: sdist bdist_wheel
-          on:
-            tags: true
-        - provider: releases
-          api_key:
-            secure: njElANcKbB/8XpjQQvTSLlz0zooirTAyCjMTcunLRzekCLjHRVkMpBpgpAF/bOVWQHc9OOu09cxfrU6nIv0vY1RjyaVoEAkzOM57fijTmEmXMher9GV+O3y9ZO72tJyFMzwDN/FArs5HaGQM4IC3HLjWCSDTLOK3uyauXv5x4Yewqny4taiTjwgAXGdzXOhuR8SysoMeol/DRpqjtZWV6Aht+R0sDRDSB/BCUOqmNn3OXgd+LQmQjT2pvDUUklYn4nr6qtO96YFtuQCe33KWYL80VF9PDKPUkiRsakdY9VDK+P4TQAeOPorZxBuQyrgifiGPHEEUSuOo42A4Kn2dSvQZsWGXuN6cE4UkpCeQ0wT5oztg1XfgizrmUOBOhIzELo3vvtqQz84gDihwAaJokcEbpyKWzG6ysjvqpL/sKYJ9kj8GpCvbNqJwYjzhstlRYwGZtfK/l6k2/bvvxoSmBZ/CaLAP5VPvqjG8b/giLqnORxF6j0YRe7paj8SEpMwdKbRt8xoQuSVSTCR7oDRi3hsP993Aqp9XbSB5fMqksrXFzX4LQrdpTrMvZlpEeXdhAJZvcXjLGRb2sgDZzJjo+uz2/v7B78QzHTBazMcZbqrtlC1msmjxqF2hZ3yjotSTG0CDF2iprQpufQ0+IVem8yc6jPRR/24Ijb/0yrcKCt0=
-          skip_cleanup: true
-          draft: false
-          on:
-            tags: true
+    # - stage: deploy
+    #   python: '3.8'     # specify python 3.8
+    #   dist: bionic
+    #   env: TOXENV=none  # overwrite environment var
+    #   install: skip     # no need to install tox
+    #   script: skip      # run no tests
+    #   deploy:           # instead deploy
+    #     - provider: pypi
+    #       username: paul.iacomi
+    #       password:
+    #         secure: n0/j7ueOm8N0frKsRtEOqWvY1I02iu08dNS3ylK+8q+78PrQwB9xQUlH8QRQselMrkobas9e2l9x8eglYNmN1yYata0mT/UexIy+h1CmHTt6oMxE6TSEiCRuyQ73TwV5F36eOOGLwYYzRLMOYjVaHC5E3f0W1RzGcWstrgZWRtVhHNZ+3IxYW+sqb2+JVeKlhqQgmZY2+LRkwf7UXgoNeYHElKB0WnoPNiK2UpYYm8Et4IWFs7BBQfFBTiHmvmsk2DVwBPUWfju0CLoGFKrf/7Z4polSgo88WIBMtW2vPq3JU7uGr3Bqc/XNs+atc0AT9/eqb7x7DogeikSagJa1dx1h///C90as5FV4pSSHRILTCV5quTl9IFKltefxcNPbQuDtwano7wYIxbU4fbGjb8kGOCzTd2IWaz9oy9XtpC6xLuxBxlG4IphD3qQPtvGqi5udHlC3PX7GTgnQ6ySPuZ6EqhHmTFcpbaT8AXp5jfi2LqHllIo/+PcTv3Bm1/89qEfwcm6biE8O41ejOyjb3WKiB2etOMkw7O0tZE9Ub2LrPFohcCQVJgKFcewKrb5zCtmN61m+S3IFu3tOrean3De13ycD1oYSLbwMxU3Cc2bvRoQ+JcnRSIiNcu4ujaHL7uANQClHTByhUa61PNgWVOH3P6YWU572khCEUzF8cEA=
+    #       distributions: sdist bdist_wheel
+    #       on:
+    #         tags: true
+    #     - provider: releases
+    #       token:
+    #         secure: njElANcKbB/8XpjQQvTSLlz0zooirTAyCjMTcunLRzekCLjHRVkMpBpgpAF/bOVWQHc9OOu09cxfrU6nIv0vY1RjyaVoEAkzOM57fijTmEmXMher9GV+O3y9ZO72tJyFMzwDN/FArs5HaGQM4IC3HLjWCSDTLOK3uyauXv5x4Yewqny4taiTjwgAXGdzXOhuR8SysoMeol/DRpqjtZWV6Aht+R0sDRDSB/BCUOqmNn3OXgd+LQmQjT2pvDUUklYn4nr6qtO96YFtuQCe33KWYL80VF9PDKPUkiRsakdY9VDK+P4TQAeOPorZxBuQyrgifiGPHEEUSuOo42A4Kn2dSvQZsWGXuN6cE4UkpCeQ0wT5oztg1XfgizrmUOBOhIzELo3vvtqQz84gDihwAaJokcEbpyKWzG6ysjvqpL/sKYJ9kj8GpCvbNqJwYjzhstlRYwGZtfK/l6k2/bvvxoSmBZ/CaLAP5VPvqjG8b/giLqnORxF6j0YRe7paj8SEpMwdKbRt8xoQuSVSTCR7oDRi3hsP993Aqp9XbSB5fMqksrXFzX4LQrdpTrMvZlpEeXdhAJZvcXjLGRb2sgDZzJjo+uz2/v7B78QzHTBazMcZbqrtlC1msmjxqF2hZ3yjotSTG0CDF2iprQpufQ0+IVem8yc6jPRR/24Ijb/0yrcKCt0=
+    #       skip_cleanup: true
+    #       draft: false
+    #       on:
+    #         tags: true
 
 
 notifications:

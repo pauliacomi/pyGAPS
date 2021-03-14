@@ -27,10 +27,14 @@ def isotherm_to_hash(isotherm):
 
     # Isotherm data or model
     if isinstance(isotherm, pygaps.PointIsotherm):
-        raw_dict["isotherm_hash"] = str(hash_pandas_object(isotherm.data()).sum())
+        raw_dict["data_hash"] = str(
+            hash_pandas_object(isotherm.data_raw.round(8)).sum()
+        )
     elif isinstance(isotherm, pygaps.ModelIsotherm):
-        raw_dict["isotherm_model"] = isotherm.model.to_dict()
+        raw_dict["data_hash"] = isotherm.model.to_dict()
 
-    md_hasher = hashlib.md5(json.dumps(raw_dict, sort_keys=True).encode('utf-8'))
+    md_hasher = hashlib.md5(
+        json.dumps(raw_dict, sort_keys=True).encode('utf-8')
+    )
 
     return md_hasher.hexdigest()

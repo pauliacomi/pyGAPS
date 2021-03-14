@@ -52,10 +52,11 @@ class GAB(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * self.params["K"] * self.params["C"] * pressure / (
-            (1.0 - self.params["K"] * pressure) *
-            (1.0 - self.params["K"] * pressure +
-             self.params["K"] * self.params["C"] * pressure))
+        return self.params["n_m"] * self.params["K"] * self.params[
+            "C"] * pressure / ((1.0 - self.params["K"] * pressure) * (
+                1.0 - self.params["K"] * pressure +
+                self.params["K"] * self.params["C"] * pressure
+            ))
 
     def pressure(self, loading):
         """
@@ -79,10 +80,10 @@ class GAB(IsothermBaseModel):
         b = self.params['K']
         c = self.params['C']
 
-        x = loading * (1-c) * b**2
-        y = (loading * (c-2) - a*c) * b
+        x = loading * (1 - c) * b**2
+        y = (loading * (c - 2) - a * c) * b
 
-        res = (-y - numpy.sqrt(y**2 - 4*x*loading)) / (2*x)
+        res = (-y - numpy.sqrt(y**2 - 4 * x * loading)) / (2 * x)
 
         if numpy.isnan(res).any():
             res = numpy.nan_to_num(res, copy=False)
@@ -116,10 +117,10 @@ class GAB(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m"] * numpy.log(
-            (1.0 - self.params["K"] * pressure +
-             self.params["K"] * self.params["C"] * pressure) /
-            (1.0 - self.params["K"] * pressure))
+        return self.params["n_m"] * numpy.log((
+            1.0 - self.params["K"] * pressure +
+            self.params["K"] * self.params["C"] * pressure
+        ) / (1.0 - self.params["K"] * pressure))
 
     def initial_guess(self, pressure, loading):
         """
@@ -137,7 +138,9 @@ class GAB(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
         guess = {"n_m": saturation_loading, "C": 10 * langmuir_k, "K": 0.01}
 

@@ -5,7 +5,6 @@ import os
 import sys
 from unittest.mock import MagicMock
 
-
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -13,7 +12,7 @@ if not on_rtd:  # only set the theme if we're building docs locally
     html_theme = 'sphinx_rtd_theme'
 
 
-# Need to mock modules using MagicMock, or else they won't be able to
+# Need to mock modules using MagicMock, as they won't be able to
 # be installed on readthedocs
 class Mock(MagicMock):
     @classmethod
@@ -21,13 +20,22 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = ['matplotlib', 'matplotlib.pyplot', 'matplotlib.ticker',
-                'numpy',
-                'pandas', 'pandas.util',
-                'scipy', 'scipy.constants', 'scipy.stats',
-                'scipy.optimize', 'scipy.interpolate']
+MOCK_MODULES = [
+    'matplotlib',
+    'matplotlib.pyplot',
+    'matplotlib.ticker',
+    'matplotlib.cm',
+    'numpy',
+    'pandas',
+    'pandas.util',
+    'scipy',
+    'scipy.constants',
+    'scipy.stats',
+    'scipy.optimize',
+    'scipy.interpolate',
+    'scipy.integrate',
+]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
-
 
 # -- General configuration -----------------------------------------------------
 
@@ -52,7 +60,6 @@ if os.getenv('SPELLCHECK'):
     spelling_show_suggestions = True
     spelling_lang = 'en_US'
 
-
 # The suffix of source filenames.
 source_suffix = '.rst'
 
@@ -61,10 +68,15 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pygaps'
-year = '2019'
+year = '2021'
 author = 'Paul Iacomi'
 copyright = '{0}, {1}'.format(year, author)
-version = release = '2.0.2'
+try:
+    from importlib.metadata import version as imp_version
+    version = release = imp_version("pygaps")
+except ModuleNotFoundError:
+    from pkg_resources import get_distribution as imp_version
+    version = release = imp_version("pygaps").version
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.']
@@ -85,8 +97,12 @@ extlinks = {
     'pr': ('https://github.com/pauliacomi/pygaps/pull/%s', 'PR #'),
 }
 
+linkcheck_timeout = 3
+linkcheck_retries = 2
 linkcheck_ignore = [
     r'https://github.com/pauliacomi/pygaps/compare/.+',
+    r'https://requires.io/.+',
+    r'https://twitter.com/.+',
 ]
 
 # Checking for internal links
@@ -110,7 +126,6 @@ html_sidebars = {
 }
 html_short_title = '%s-%s' % (project, version)
 
-
 # -- napoleon configuration -----------------------------------------------------
 
 napoleon_use_ivar = True
@@ -121,3 +136,30 @@ napoleon_use_param = False
 
 autodoc_member_order = 'bysource'
 autodoc_mock_imports = ['_tkinter']
+
+# -- nbsphinx configuration -----------------------------------------------------
+
+nbsphinx_prolog = r"""
+{% set docname = 'docs/' + env.doc2path(env.docname, base=None) %}
+
+.. raw:: html
+
+    <div class="admonition note">
+      This page was generated from
+      <a class="reference external" href="https://github.com/pauliacomi/pyGAPS/blob/v{{ env.config.release|e }}/{{ docname|e }}">{{ docname|e }}</a>.
+      An interactive online version can be started on Binder:
+      <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/v{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.</span>
+      <script>
+        if (document.location.host) {
+          $(document.currentScript).replaceWith(
+            '<a class="reference external" ' +
+            'href="https://nbviewer.jupyter.org/url' +
+            (window.location.protocol == 'https:' ? 's/' : '/') +
+            window.location.host +
+            window.location.pathname.slice(0, -4) +
+            'ipynb">View in <em>nbviewer</em></a> instead.'
+          );
+        }
+      </script>
+    </div>
+"""

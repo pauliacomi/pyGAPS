@@ -13,13 +13,13 @@ Functions are tested against pre-calculated values on real isotherms.
 All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
-import os
 
 import numpy
 import pytest
 from matplotlib.testing.decorators import cleanup
 
 import pygaps
+import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_IAST
 from .conftest import DATA_IAST_PATH
@@ -28,10 +28,10 @@ from .conftest import DATA_IAST_PATH
 @pytest.fixture()
 def load_iast():
     """A fixture which loads files from the disk."""
-    filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['CH4'].get('file'))
-    ch4 = pygaps.isotherm_from_jsonf(filepath)
-    filepath = os.path.join(DATA_IAST_PATH, DATA_IAST['C2H6'].get('file'))
-    c2h6 = pygaps.isotherm_from_jsonf(filepath)
+    filepath = DATA_IAST_PATH / DATA_IAST['CH4']['file']
+    ch4 = pygaps.isotherm_from_json(filepath)
+    filepath = DATA_IAST_PATH / DATA_IAST['C2H6']['file']
+    c2h6 = pygaps.isotherm_from_json(filepath)
     return ch4, c2h6
 
 
@@ -47,23 +47,22 @@ def load_iast_models(load_iast):
 @pytest.mark.modelling
 class TestIAST():
     """Test IAST calculations."""
-
     def test_iast_checks(self, load_iast, load_iast_models):
         """Checks for built-in safeguards."""
 
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast([ch4], [0.1], 1)
 
         # Raises "different dimensions of arrays"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast([ch4, c2h6], [0.1], 1)
 
         # Raises "model cannot be used with IAST"
         ch4_m = pygaps.ModelIsotherm.from_pointisotherm(ch4, model='Virial')
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast([ch4_m, c2h6], [0.6, 0.4], 1)
 
         # Warning "extrapolate outside range"
@@ -99,27 +98,26 @@ class TestIAST():
 @pytest.mark.modelling
 class TestReverseIAST():
     """Test reverse IAST calculations."""
-
     def test_reverse_iast_checks(self, load_iast, load_iast_models):
         """Checks for built-in safeguards."""
 
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4], [0.1], 1)
 
         # Raises "different dimensions of arrays"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4, c2h6], [0.1], 1)
 
         # Raises "fractions do not add up to 1"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4, c2h6], [0.1, 0.4], 1)
 
         # Raises "model cannot be used with IAST"
         ch4_m = pygaps.ModelIsotherm.from_pointisotherm(ch4, model='Virial')
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.reverse_iast([ch4_m, c2h6], [0.6, 0.4], 1)
 
         # Warning "extrapolate outside range"
@@ -133,12 +131,15 @@ class TestReverseIAST():
         ideal_gas_fraction = [0.815, 0.185]
 
         gas_fraction, actual_loading = pygaps.reverse_iast(
-            load_iast, ideal_ads_fraction, 1)
+            load_iast, ideal_ads_fraction, 1
+        )
 
         actual_ads_fraction = actual_loading / numpy.sum(actual_loading)
 
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
-        assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
+        assert numpy.isclose(
+            ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05
+        )
 
     def test_reverse_iast_model(self, load_iast_models):
         """Test on pre-calculated data."""
@@ -147,12 +148,15 @@ class TestReverseIAST():
         ideal_gas_fraction = [0.885, 0.115]
 
         gas_fraction, actual_loading = pygaps.reverse_iast(
-            load_iast_models, ideal_ads_fraction, 1)
+            load_iast_models, ideal_ads_fraction, 1
+        )
 
         actual_ads_fraction = actual_loading / numpy.sum(actual_loading)
 
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
-        assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
+        assert numpy.isclose(
+            ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05
+        )
 
     @cleanup
     def test_reverse_iast_verbose(self, load_iast):
@@ -163,14 +167,13 @@ class TestReverseIAST():
 @pytest.mark.modelling
 class TestIASTVLE():
     """Test IAST VLE function."""
-
     def test_iast_vle_checks(self, load_iast):
         """Checks for built-in safeguards."""
 
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast_binary_vle([ch4], 1)
 
     def test_iast_vle(self, load_iast):
@@ -208,18 +211,17 @@ class TestIASTVLE():
 @pytest.mark.modelling
 class TestIASTSVP():
     """Test IAST SVP function."""
-
     def test_iast_svp_checks(self, load_iast):
         """Checks for built-in safeguards."""
 
         ch4, c2h6 = load_iast
 
         # Raises "not enough components error"
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast_binary_svp([ch4], [0.1], [1, 2])
 
         # Raises error not adds to one
-        with pytest.raises(pygaps.ParameterError):
+        with pytest.raises(pgEx.ParameterError):
             pygaps.iast_binary_svp([ch4, c2h6], [0.1, 0.4], [1, 2])
 
     def test_iast_svp(self, load_iast):

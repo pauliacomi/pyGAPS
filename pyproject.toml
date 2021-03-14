@@ -1,0 +1,11 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "setuptools_scm[toml]>=3.4",
+]
+
+[tool.setuptools_scm]
+write_to = "src/pygaps/_version.py"
+local_scheme = 'dirty-tag'
+fallback_version = '3.0.0'

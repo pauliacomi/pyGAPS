@@ -1,8 +1,8 @@
 """Toth isotherm model."""
 
 import numpy
-import scipy
 
+from .. import scipy
 from .base_model import IsothermBaseModel
 
 
@@ -75,8 +75,8 @@ class Toth(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        return (loading / (self.params["n_m"]*self.params["K"])) / \
-            (1 - (loading/self.params["n_m"])**self.params["t"])**(1/self.params["t"])
+        return (loading / (self.params["n_m"] * self.params["K"])) / \
+            (1 - (loading / self.params["n_m"])**self.params["t"])**(1 / self.params["t"])
 
     def spreading_pressure(self, pressure):
         r"""
@@ -102,7 +102,9 @@ class Toth(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
+        return scipy.integrate.quad(
+            lambda x: self.loading(x) / x, 0, pressure
+        )[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -120,7 +122,9 @@ class Toth(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
+        saturation_loading, langmuir_k = super().initial_guess(
+            pressure, loading
+        )
 
         guess = {"n_m": saturation_loading, "K": langmuir_k, "t": 1}
 

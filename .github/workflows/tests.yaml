@@ -1,0 +1,89 @@
+name: Test package and docs
+
+on:
+  [push, pull_request, workflow_dispatch]
+
+jobs:
+  linting-checks:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade setuptools tox
+        pip --version
+        virtualenv --version
+        tox --version
+    - name: Run checks with tox
+      run: tox -v
+      env:
+        TOXENV: check
+
+  docs-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade setuptools tox
+        pip --version
+        virtualenv --version
+        tox --version
+    - name: Install pandoc
+      run: sudo apt-get install pandoc
+    - name: Build docs with tox
+      run: tox -v
+      env:
+        TOXENV: docs
+
+  unittests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version : [3.6, 3.7, 3.8] #, 3.9] # 3.9 fails on coolprop, so we disable for now
+        include:
+          - python-version: 3.6
+            toxenv: "py36-cover"
+          - python-version: 3.7
+            toxenv: "py37-cover"
+          - python-version: 3.8
+            toxenv: "py38-cover"
+          # - python-version: 3.9
+          #   toxenv: "py39-cover"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade setuptools tox
+        pip --version
+        virtualenv --version
+        tox --version
+
+    - name: Install Coolprop dependencies
+      shell: bash
+      run: |
+        python -m pip install flake8 pytest
+        python -m pip install cython requests jinja2 pyyaml
+
+    - name: Test with tox
+      run: tox -v
+      env:
+        TOXENV: ${{ matrix.toxenv }}
+        MPLBACKEND: "Agg"
