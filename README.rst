@@ -30,9 +30,9 @@ adsorption data analysis and fitting, written in Python 3.
     :target: https://www.repostatus.org/#active
     :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v2.0.2/develop.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v3.0.0/develop.svg
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v2.0.2...develop
+    :target: https://github.com/pauliacomi/pygaps/compare/v3.0.0...develop
 
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
@@ -139,10 +139,10 @@ Citing
 Please consider citing the related paper we published if you use
 the program in your research.
 
-Paul Iacomi, Philip L. Llewellyn, *Adsorption* (2019).
-pyGAPS: A Python-Based Framework for Adsorption Isotherm
-Processing and Material Characterisation.
-DOI: https://doi.org/10.1007/s10450-019-00168-5
+    Paul Iacomi, Philip L. Llewellyn, *Adsorption* (2019).
+    pyGAPS: A Python-Based Framework for Adsorption Isotherm
+    Processing and Material Characterisation.
+    DOI: https://doi.org/10.1007/s10450-019-00168-5
 
 Installation
 ============
