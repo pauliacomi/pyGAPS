@@ -27,7 +27,7 @@ setup(
     use_scm_version={
         'local_scheme': 'dirty-tag',
         'write_to': 'src/pygaps/_version.py',
-        'fallback_version': '2.0.2',
+        'fallback_version': '3.0.0',
     },
     license='MIT license',
     description=  # noqa: E251
