@@ -389,13 +389,13 @@ class PointIsotherm(BaseIsotherm):
             Print out steps taken.
 
         """
+        if not mode_to:
+            mode_to = self.pressure_mode
+
         if mode_to == self.pressure_mode and unit_to == self.pressure_unit:
             if verbose:
                 logger.info("Mode and units are the same, no changes made.")
             return
-
-        if not mode_to:
-            mode_to = self.pressure_mode
 
         self.data_raw[self.pressure_key] = c_pressure(
             self.data_raw[self.pressure_key],
@@ -444,6 +444,9 @@ class PointIsotherm(BaseIsotherm):
             Print out steps taken.
 
         """
+        if not basis_to:
+            basis_to = self.loading_basis
+
         if basis_to == self.loading_basis and unit_to == self.loading_unit:
             if verbose:
                 logger.info("Basis and units are the same, no changes made.")
@@ -454,9 +457,6 @@ class PointIsotherm(BaseIsotherm):
                 if verbose:
                     logger.info("There are no loading units in this mode.")
                 return
-
-        if not basis_to:
-            basis_to = self.loading_basis
 
         self.data_raw[self.loading_key] = c_loading(
             self.data_raw[self.loading_key],
@@ -512,6 +512,9 @@ class PointIsotherm(BaseIsotherm):
             Print out steps taken.
 
         """
+        if not basis_to:
+            basis_to = self.material_basis
+
         if basis_to == self.material_basis and unit_to == self.material_unit:
             if verbose:
                 logger.info("Basis and units are the same, no changes made.")
@@ -527,9 +530,6 @@ class PointIsotherm(BaseIsotherm):
             if verbose:
                 logger.info("There are no material units in this mode.")
             return
-
-        if not basis_to:
-            basis_to = self.material_basis
 
         self.data_raw[self.loading_key] = c_material(
             self.data_raw[self.loading_key],

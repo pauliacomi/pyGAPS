@@ -1,8 +1,11 @@
 name: Publish to PyPI
 
 on:
-  # On a new version only
-  push:
+  workflow_run:
+    # When testing is finished
+    workflows:
+      - Test package and docs
+    # On a new version only
     tags:
       - v*
 
