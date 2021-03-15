@@ -80,10 +80,6 @@ jobs:
         virtualenv --version
         tox --version
 
-    - name: Install Coolprop dependency
-      run: |
-        conda install -c conda-forge coolprop
-
     - name: Test with tox
       run: tox -v
       env:
