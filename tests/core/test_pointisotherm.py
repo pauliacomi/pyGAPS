@@ -1,6 +1,5 @@
 """Tests relating to the PointIsotherm class."""
 
-from _pytest.mark import param
 import pandas
 import pytest
 from matplotlib.testing.decorators import cleanup
