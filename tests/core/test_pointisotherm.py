@@ -1,5 +1,6 @@
 """Tests relating to the PointIsotherm class."""
 
+from _pytest.mark import param
 import pandas
 import pytest
 from matplotlib.testing.decorators import cleanup
@@ -447,6 +448,18 @@ class TestPointIsotherm():
         # Do the conversion
         basic_pointisotherm.convert(**parameters)
 
+        # Check for good parameters as well
+        for p in [
+            'pressure_mode',
+            'pressure_unit',
+            'loading_basis',
+            'loading_unit',
+            'material_basis',
+            'material_unit',
+        ]:
+            if p in parameters:
+                assert getattr(basic_pointisotherm, p) == parameters[p]
+
     @pytest.mark.parametrize(
         'expected, parameters', [
             (1, {
@@ -481,6 +494,12 @@ class TestPointIsotherm():
 
         # Check if one datapoint is now as expected
         assert converted == pytest.approx(expected, 0.01)
+
+        # Check for good parameters as well
+        if 'mode_to' in parameters:
+            assert basic_pointisotherm.pressure_mode == parameters['mode_to']
+        if 'unit_to' in parameters:
+            assert basic_pointisotherm.pressure_unit == parameters['unit_to']
 
     @pytest.mark.parametrize(
         'expected, parameters',
@@ -532,6 +551,12 @@ class TestPointIsotherm():
         # Check if one datapoint is now as expected
         assert converted == pytest.approx(expected, 0.01)
 
+        # Check for good parameters as well
+        if 'basis_to' in parameters:
+            assert basic_pointisotherm.loading_basis == parameters['basis_to']
+        if 'unit_to' in parameters:
+            assert basic_pointisotherm.loading_unit == parameters['unit_to']
+
     @pytest.mark.parametrize(
         'expected, parameters', [
             (1, {
@@ -571,6 +596,12 @@ class TestPointIsotherm():
 
         # Check if one datapoint is now as expected
         assert converted == pytest.approx(expected, 0.01)
+
+        # Check for good parameters as well
+        if 'basis_to' in parameters:
+            assert basic_pointisotherm.material_basis == parameters['basis_to']
+        if 'unit_to' in parameters:
+            assert basic_pointisotherm.material_unit == parameters['unit_to']
 
     def test_isotherm_convert_complex(
         self,
