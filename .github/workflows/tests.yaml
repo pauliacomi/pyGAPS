@@ -1,7 +1,7 @@
 name: Test package and docs
 
 on:
-  [push, pull_request, workflow_dispatch]
+  [create, push, pull_request, workflow_dispatch]
 
 jobs:
   linting-checks:
