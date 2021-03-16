@@ -56,13 +56,13 @@ jobs:
         python-version : [3.6, 3.7, 3.8, 3.9]
         include:
           - python-version: 3.6
-            toxenv: "py36-cover"
+            toxenv: "py36-cover,report,codecov"
           - python-version: 3.7
-            toxenv: "py37-cover"
+            toxenv: "py37-cover,report,codecov"
           - python-version: 3.8
-            toxenv: "py38-cover"
+            toxenv: "py38-cover,report,codecov"
           - python-version: 3.9
-            toxenv: "py39-cover"
+            toxenv: "py39-cover,report,codecov"
 
     steps:
     - uses: actions/checkout@v2
