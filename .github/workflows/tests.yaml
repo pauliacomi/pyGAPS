@@ -81,7 +81,9 @@ jobs:
         tox --version
 
     - name: Test with tox
-      run: tox -v
+      run: |
+        conda info
+        tox -v
       env:
         TOXENV: ${{ matrix.toxenv }}
         MPLBACKEND: "Agg"
