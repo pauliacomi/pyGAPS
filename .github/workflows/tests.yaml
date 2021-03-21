@@ -82,8 +82,9 @@ jobs:
 
     - name: Test with tox
       run: |
-        conda info
+        conda env list
         tox -v
       env:
         TOXENV: ${{ matrix.toxenv }}
         MPLBACKEND: "Agg"
+        CONDA_DLL_SEARCH_MODIFICATION_ENABLE: 1
