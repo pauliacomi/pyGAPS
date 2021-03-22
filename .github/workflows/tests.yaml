@@ -74,7 +74,8 @@ jobs:
     - name: Set up Conda
       uses: conda-incubator/setup-miniconda@v2
       with:
-       activate-environment: test
+        python-version: 3.8
+        activate-environment: test
 
     - name: Install dependencies
       run: |
