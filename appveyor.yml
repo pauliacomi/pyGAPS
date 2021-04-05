@@ -48,6 +48,14 @@ environment:
       platform: x64
 
 
+
+    - PYTHON_VERSION: '3.9'
+      platform: x86
+
+    - PYTHON_VERSION: '3.9'
+      platform: x64
+
+
 # initial commands
 init:
   - ps: echo $env:PYTHON_VERSION

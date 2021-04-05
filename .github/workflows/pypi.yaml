@@ -5,6 +5,9 @@ on:
     # When testing is finished
     workflows:
       - Test package and docs
+    # And sucessful
+    types:
+      - completed
     # On a new version only
     tags:
       - v*
