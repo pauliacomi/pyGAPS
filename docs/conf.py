@@ -34,6 +34,7 @@ MOCK_MODULES = [
     'scipy.optimize',
     'scipy.interpolate',
     'scipy.integrate',
+    'coolprop',
 ]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 

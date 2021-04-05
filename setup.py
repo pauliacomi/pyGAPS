@@ -27,7 +27,7 @@ setup(
     use_scm_version={
         'local_scheme': 'dirty-tag',
         'write_to': 'src/pygaps/_version.py',
-        'fallback_version': '3.0.1',
+        'fallback_version': '3.0.2',
     },
     license='MIT license',
     description=  # noqa: E251
@@ -53,7 +53,6 @@ setup(
     },
     classifiers=[  # Classifier list at https://pypi.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Operating System :: Unix',
