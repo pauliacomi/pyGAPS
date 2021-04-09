@@ -12,9 +12,13 @@ import os
 import pathlib
 import warnings
 
+import pandas
 from gemmi import cif
 
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.utilities.converter_mode import _MASS_UNITS
+from pygaps.utilities.converter_mode import _MOLAR_UNITS
+from pygaps.utilities.converter_mode import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
 
 _parser_version = "1.0"
@@ -72,7 +76,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
 
     # required pygaps data
     block.set_pair('_exptl_adsorptive', f"\'{iso_dict.pop('adsorbate')}\'")
-    block.set_pair('_exptl_temperature', f"\'{iso_dict.pop('temperature')}\'")
+    block.set_pair('_exptl_temperature', f"{iso_dict.pop('temperature')}")
     block.set_pair('_sample_material_id', f"\'{iso_dict.pop('material')}\'")
 
     # other possible specs
@@ -81,7 +85,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
             block.set_pair(spec, f"\'{iso_dict.pop(_FIELDS[spec])}\'")
 
     # units
-    block.set_pair('_units_temperature', 'K')
+    block.set_pair('_units_temperature', isotherm.temperature_unit)
     if isotherm.pressure_mode == 'absolute':
         block.set_pair('_units_pressure', isotherm.pressure_unit)
     else:
@@ -97,6 +101,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
         'loading_unit',
         'material_basis',
         'material_unit',
+        'temperature_unit',
     ]:
         iso_dict.pop(unit)
 
@@ -185,8 +190,109 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
             "Strange things might happen, so double check your data."
         )
 
-    # known meta
-    for spec in _FIELDS:
-        val = block.find_value(spec)
-        if val:
-            raw_dict[_FIELDS[spec]] = val
+    # meta
+    excluded = [
+        "_audit_aif_version",
+        "_audit_creation_method",
+        "_units_temperature",
+        "_units_pressure",
+        "_units_loading",
+        "_audit_creation_method",
+    ]
+    for item in block:
+        if item.pair is not None:
+            key, val = item.pair
+            val = val.strip("'")
+            if val == 'None':
+                val = None
+            if key in _FIELDS:
+                raw_dict[_FIELDS[key]] = val
+            elif key.startswith('_pygaps_'):
+                raw_dict[key[8:]] = val
+            elif key not in excluded:
+                raw_dict[key] = val
+
+    # dictionary
+    type_dict = {
+        'activation_temperature': float,
+    }
+    for key in type_dict:
+        if key in raw_dict:
+            raw_dict[key] = type_dict[key](raw_dict[key])
+
+    # pressure units
+    pressure_units = block.find_value('_units_pressure')
+    if pressure_units == 'relative':
+        raw_dict['pressure_mode'] = 'relative'
+    else:
+        raw_dict['pressure_mode'] = 'absolute'
+        raw_dict['pressure_unit'] = pressure_units
+
+    # loading units
+    loading_units = block.find_value('_units_loading')
+    comp = loading_units.split('/')
+    if len(comp) != 2:
+        raise ParsingError(
+            "Isotherm cannot be parsed due to loading string format."
+        )
+
+    loading_unit = comp[0]
+    if loading_unit in _MOLAR_UNITS:
+        raw_dict['loading_basis'] = 'molar'
+    elif loading_unit in _MASS_UNITS:
+        raw_dict['loading_basis'] = 'mass'
+    elif loading_unit in _VOLUME_UNITS:
+        raw_dict['loading_basis'] = 'volume'
+    else:
+        raise ParsingError("Isotherm cannot be parsed due to loading unit.")
+    raw_dict['loading_unit'] = loading_unit
+
+    material_unit = comp[1]
+    if material_unit in _MASS_UNITS:
+        raw_dict['material_basis'] = "mass"
+    elif material_unit in _VOLUME_UNITS:
+        raw_dict['material_basis'] = "volume"
+    elif material_unit in _MOLAR_UNITS:
+        raw_dict['material_basis'] = "molar"
+    else:
+        raise ParsingError("Isotherm cannot be parsed due to material basis.")
+    raw_dict['material_unit'] = material_unit
+
+    # unit temperature
+    raw_dict['temperature_unit'] = block.find_value('_units_temperature')
+
+    # data
+    ads_block = block.find([
+        '_adsorp_pressure', '_adsorp_loading', '?_adsorp_enthalpy'
+    ])
+    columns = ['pressure', 'loading']
+    other_keys = []
+    if ads_block.width() == 3:
+        columns.append('enthalpy')
+        other_keys = ['enthalpy']
+
+    adsorption = pandas.DataFrame(
+        ads_block,
+        columns=columns,
+        dtype=float,
+    )
+    des_block = block.find([
+        '_desorp_pressure', '_desorp_loading', '?_desorp_enthalpy'
+    ])
+    adsorption['branch'] = False
+    desorption = pandas.DataFrame(
+        des_block,
+        columns=columns,
+        dtype=float,
+    )
+    desorption['branch'] = True
+
+    # generate the isotherm
+    return PointIsotherm(
+        isotherm_data=pandas.concat([adsorption, desorption],
+                                    ignore_index=True),
+        pressure_key='pressure',
+        loading_key='loading',
+        other_keys=other_keys,
+        **raw_dict
+    )
