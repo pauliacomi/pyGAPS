@@ -186,12 +186,12 @@
     "lab": "MADIREL",
     "loading_basis": "molar",
     "loading_unit": "mmol",
-    "machine": "CV",
+    "instrument": "CV",
     "material": "Takeda 5A",
     "material_batch": "Test",
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
-    "t_act": 150.0,
+    "activation_temperature": 150.0,
     "temperature": 303.0,
     "user": "ADW"
 }
