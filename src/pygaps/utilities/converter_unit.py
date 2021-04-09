@@ -33,6 +33,10 @@ _PRESSURE_UNITS = {
     "mmHg": 133.322,
     "torr": 133.322,
 }
+_TEMPERATURE_UNITS = {
+    "K": 0,
+    "C": 273.15,
+}
 
 
 def c_unit(unit_list, value, unit_from, unit_to, sign=1):
