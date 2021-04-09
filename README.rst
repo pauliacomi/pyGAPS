@@ -112,9 +112,9 @@ In-depth explanations, examples and theory can be found in the
 `online documentation <https://pygaps.readthedocs.io/>`__. If you are familiar
 with Python and adsorption theory and want to jump right in, look at the
 `quickstart section
-<https://pygaps.readthedocs.io/en/latest/examples/quickstart.html>`__. Examples
+<https://pygaps.readthedocs.io/en/master/examples/quickstart.html>`__. Examples
 on each of the capabilities specified above can be found in the
-`examples <https://pygaps.readthedocs.io/en/latest/examples/index.html>`__. Most
+`examples <https://pygaps.readthedocs.io/en/master/examples/index.html>`__. Most
 of the pages in the documentation are actually Jupyter Notebooks. You can
 download them and run them yourself from the
 `/docs/examples <https://github.com/pauliacomi/pyGAPS/tree/master/docs/examples>`__
@@ -123,13 +123,13 @@ folder.
 To become well familiarised with the concepts introduced by pyGAPS, such as what
 is an Isotherm, how units work, what data is required and can be stored etc., a
 deep dive is available in the
-`manual <https://pygaps.readthedocs.io/en/latest/manual/index.html>`__.
+`manual <https://pygaps.readthedocs.io/en/master/manual/index.html>`__.
 
 Finally, having a strong grasp of the science of adsorption is recommended, to
 understand the strengths and shortcomings of various methods. We have done our
 best to explain the theory and application range of each capability and model.
 To learn more, look at the
-`reference <https://pygaps.readthedocs.io/en/latest/reference/index.html>`__ or
+`reference <https://pygaps.readthedocs.io/en/master/reference/index.html>`__ or
 simply call ``help()`` from a python interpreter (for example
 ``help(pygaps.area_BET)``.
 
