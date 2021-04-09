@@ -18,12 +18,12 @@ def test_convert_chemformula():
 
 
 @pytest.mark.core
-def test_convert_unitstr():
-    assert util.string_utilities.convert_unitstr("mmol") == "mmol"
-    assert util.string_utilities.convert_unitstr("g", True) == "g^{-1}"
-    assert util.string_utilities.convert_unitstr("cm3") == "cm^{3}"
-    assert util.string_utilities.convert_unitstr("cm3(STP)") == "cm^{3}_{STP}"
-    assert util.string_utilities.convert_unitstr("cm3", True) == "cm^{-3}"
+def test_convert_unit_ltx():
+    assert util.string_utilities.convert_unit_ltx("mmol") == "mmol"
+    assert util.string_utilities.convert_unit_ltx("g", True) == "g^{-1}"
+    assert util.string_utilities.convert_unit_ltx("cm3") == "cm^{3}"
+    assert util.string_utilities.convert_unit_ltx("cm3(STP)") == "cm^{3}_{STP}"
+    assert util.string_utilities.convert_unit_ltx("cm3", True) == "cm^{-3}"
 
 
 @pytest.mark.core

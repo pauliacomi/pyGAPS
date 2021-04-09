@@ -1,7 +1,7 @@
 """General functions for string transformations."""
 
 
-def convert_chemformula(string):
+def convert_chemformula(string: str) -> str:
     """
     Convert a chemical formula string to a matplotlib parsable format (latex).
 
@@ -36,7 +36,7 @@ def convert_chemformula(string):
     return f'${result}$'
 
 
-def convert_unitstr(string: str, negative: bool = False):
+def convert_unit_ltx(string: str, negative: bool = False) -> str:
     """
     Convert a unit string to a nice matplotlib parsable format (latex).
 
@@ -81,3 +81,7 @@ def convert_unitstr(string: str, negative: bool = False):
         result += '^{-1}'
 
     return result
+
+
+def convert_loadingstr(string: str) -> str:
+    pass

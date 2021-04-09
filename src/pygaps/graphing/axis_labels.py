@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger('pygaps')
 
 from ..utilities.string_utilities import convert_chemformula
-from ..utilities.string_utilities import convert_unitstr
+from ..utilities.string_utilities import convert_unit_ltx
 
 
 def label_axis_text_pl(iso_params, key):
@@ -23,7 +23,7 @@ def label_axis_text_pl(iso_params, key):
         elif iso_params['loading_basis'] == "fraction":
             text = fr"Loading [${iso_params['material_basis']}\/fraction$]"
         else:
-            text = fr"Loading [${convert_unitstr(iso_params['loading_unit'])}\/{convert_unitstr(iso_params['material_unit'], True)}$]"
+            text = fr"Loading [${convert_unit_ltx(iso_params['loading_unit'])}\/{convert_unit_ltx(iso_params['material_unit'], True)}$]"
     elif key == "enthalpy":
         text = r"$\Delta_{ads}h$ $(-kJ\/mol^{-1})$"
     else:
