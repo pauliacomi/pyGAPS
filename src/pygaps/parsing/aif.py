@@ -19,7 +19,6 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.converter_mode import _MASS_UNITS
 from pygaps.utilities.converter_mode import _MOLAR_UNITS
 from pygaps.utilities.converter_mode import _VOLUME_UNITS
-from pygaps.utilities.exceptions import ParsingError
 
 _parser_version = "1.0"
 
