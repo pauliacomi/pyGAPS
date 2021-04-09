@@ -85,6 +85,11 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
     separator : str, optional
         Separator used int the csv file. Defaults to '',''.
 
+    Returns
+    -------
+    str: optional
+        String representation of the CSV, if path not provided.
+
     """
     output = StringIO()
 
