@@ -152,7 +152,7 @@ example instantiation is given below, with explanations.
         temperature=77,                 # Required
 
         apparatus='X1',                 # User specific
-        t_act=150,                      # User specific
+        activation_temperature=150,     # User specific
         user='John',                    # User specific
         DOI='10.000/mydoi',             # User specific
         something='something',          # User specific
@@ -260,7 +260,7 @@ The code to generate a ModelIsotherm is then:
         temperature=77,                 # Required
 
         apparatus='X1',                 # User specific
-        t_act=150,                      # User specific
+        activation_temperature=150,                      # User specific
         user='John',                    # User specific
         DOI='10.000/mydoi',             # User specific
         something='something',          # User specific
