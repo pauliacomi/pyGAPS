@@ -2,7 +2,6 @@
 
 import pytest
 
-from pygaps.utilities.exceptions import ParsingError
 from pygaps.parsing.aif import isotherm_to_aif
 from pygaps.parsing.aif import isotherm_from_aif
 
