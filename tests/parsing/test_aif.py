@@ -2,8 +2,8 @@
 
 import pytest
 
-from pygaps.parsing.aif import isotherm_to_aif
 from pygaps.parsing.aif import isotherm_from_aif
+from pygaps.parsing.aif import isotherm_to_aif
 
 
 @pytest.mark.parsing
