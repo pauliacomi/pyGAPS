@@ -19,6 +19,7 @@ def db_file(tmpdir_factory):
 
 @pytest.mark.parsing
 class TestDatabase():
+    """All testing of Database interface"""
     def test_db_create(self, db_file):
         """Test the database creation."""
         with pytest.raises(ParsingError):
