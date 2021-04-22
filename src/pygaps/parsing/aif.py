@@ -20,6 +20,10 @@ from pygaps.utilities.converter_mode import _MASS_UNITS
 from pygaps.utilities.converter_mode import _MOLAR_UNITS
 from pygaps.utilities.converter_mode import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
+from pygaps.utilities.string_utilities import _from_bool
+from pygaps.utilities.string_utilities import _is_bool
+from pygaps.utilities.string_utilities import _is_float
+from pygaps.utilities.string_utilities import _is_none
 
 _parser_version = "1.0"
 
@@ -33,6 +37,12 @@ _FIELDS = {
     '_exptl_sample_mass': 'material_mass',
     '_exptl_activation_temperature': 'activation_temperature',
     '_sample_id': 'material_batch',
+}
+_COLUMNS = {
+    'pressure': 'pressure',
+    'p0': 'saturation_pressure',
+    'amount': 'loading',
+    'enthalpy': 'enthalpy',
 }
 
 
@@ -119,7 +129,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
         # write adsorption data
         loop_ads = block.init_loop(
             '_adsorp_',
-            ['pressure', 'loading'] + isotherm.other_keys,
+            ['pressure', 'amount'] + isotherm.other_keys,
         )
         loop_ads.set_all_values(
             isotherm.data(branch='ads'
@@ -130,7 +140,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
         if isotherm.has_branch('des'):
             loop_des = block.init_loop(
                 '_desorp_',
-                ['pressure', 'loading'] + isotherm.other_keys,
+                ['pressure', 'amount'] + isotherm.other_keys,
             )
             loop_des.set_all_values(
                 isotherm.data(branch='des'
@@ -169,7 +179,7 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
 
     """
     if pathlib.Path(str_or_path).exists():
-        aif = cif.read_file(str_or_path)
+        aif = cif.read_file(str(str_or_path))
     else:
         try:
             aif = cif.read_string(str_or_path)
@@ -182,46 +192,85 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
     block = aif.sole_block()
     raw_dict = {}
 
-    # read metadata
+    # read version
     version = block.find_value('_audit_aif_version')
-    if not version or float(version) < float(_parser_version):
+    if not version or float(version.strip("'")) < float(_parser_version):
         warnings.warn(
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."
         )
 
-    # meta
+    # creation method (excluded if created in pygaps)
+    cmethod = block.find_value('_audit_creation_method')
+    if cmethod and cmethod != "pyGAPS":
+        raw_dict["_audit_creation_method"] = cmethod.strip("'")
+
+    # read data and metadata through sequential iteration
+    # some properties are special and read separately
     excluded = [
         "_audit_aif_version",
         "_audit_creation_method",
-        "_units_temperature",
         "_units_pressure",
         "_units_loading",
-        "_audit_creation_method",
+        "_units_temperature",
     ]
+    columns = []
     for item in block:
+        # metadata handling
         if item.pair is not None:
             key, val = item.pair
             val = val.strip("'")
-            if val == 'None':
+
+            # cast various data types
+            if _is_none(val):
                 val = None
+            elif _is_bool(val):
+                val = _from_bool(val)
+            elif val.isnumeric():
+                val = int(val)
+            elif _is_float(val):
+                val = float(val)
+
             if key in _FIELDS:
                 raw_dict[_FIELDS[key]] = val
             elif key.startswith('_pygaps_'):
                 raw_dict[key[8:]] = val
             elif key not in excluded:
                 raw_dict[key] = val
+        # data handling
+        elif item.loop is not None:
+            loop = item.loop
+            loop_data = block.find(loop.tags)
 
-    # dictionary
-    type_dict = {
-        'activation_temperature': float,
-    }
-    for key in type_dict:
-        if key in raw_dict:
-            raw_dict[key] = type_dict[key](raw_dict[key])
+            # check for adsorption or desorption
+            branch = False
+            if loop.tags[0].startswith('_desorp_'):
+                branch = True
+
+            if not columns:
+                other_keys = []
+                for col in [tag[8:] for tag in loop.tags]:
+                    def_col = _COLUMNS[col]
+                    columns.append(def_col)
+                    if def_col not in ['pressure', 'loading']:
+                        other_keys.append(def_col)
+                raw_dict['other_keys'] = other_keys
+
+            data_df = pandas.DataFrame(
+                loop_data,
+                columns=columns,
+                dtype=float,
+            )
+            data_df['branch'] = branch
+            raw_dict[f"data{branch:d}"] = data_df
+
+    ads_branch = raw_dict.pop("data0", None)
+    des_branch = raw_dict.pop("data1", None)
+    if des_branch is not None:
+        ads_branch = pandas.concat([ads_branch, des_branch], ignore_index=True)
 
     # pressure units
-    pressure_units = block.find_value('_units_pressure')
+    pressure_units = block.find_value('_units_pressure').strip("'")
     if pressure_units == 'relative':
         raw_dict['pressure_mode'] = 'relative'
     else:
@@ -229,13 +278,16 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
         raw_dict['pressure_unit'] = pressure_units
 
     # loading units
-    loading_units = block.find_value('_units_loading')
+    loading_units = block.find_value('_units_loading'
+                                     ).strip("'").replace('^', '')
     comp = loading_units.split('/')
+    if len(comp) != 2:
+        comp = loading_units.split(' ')
+        comp[1] = comp[1].replace('-1', '')
     if len(comp) != 2:
         raise ParsingError(
             "Isotherm cannot be parsed due to loading string format."
         )
-
     loading_unit = comp[0]
     if loading_unit in _MOLAR_UNITS:
         raw_dict['loading_basis'] = 'molar'
@@ -247,6 +299,7 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
         raise ParsingError("Isotherm cannot be parsed due to loading unit.")
     raw_dict['loading_unit'] = loading_unit
 
+    # material units
     material_unit = comp[1]
     if material_unit in _MASS_UNITS:
         raw_dict['material_basis'] = "mass"
@@ -258,41 +311,14 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
         raise ParsingError("Isotherm cannot be parsed due to material basis.")
     raw_dict['material_unit'] = material_unit
 
-    # unit temperature
-    raw_dict['temperature_unit'] = block.find_value('_units_temperature')
-
-    # data
-    ads_block = block.find([
-        '_adsorp_pressure', '_adsorp_loading', '?_adsorp_enthalpy'
-    ])
-    columns = ['pressure', 'loading']
-    other_keys = []
-    if ads_block.width() == 3:
-        columns.append('enthalpy')
-        other_keys = ['enthalpy']
-
-    adsorption = pandas.DataFrame(
-        ads_block,
-        columns=columns,
-        dtype=float,
-    )
-    des_block = block.find([
-        '_desorp_pressure', '_desorp_loading', '?_desorp_enthalpy'
-    ])
-    adsorption['branch'] = False
-    desorption = pandas.DataFrame(
-        des_block,
-        columns=columns,
-        dtype=float,
-    )
-    desorption['branch'] = True
+    # temperature units
+    raw_dict['temperature_unit'] = block.find_value('_units_temperature'
+                                                    ).strip("'")
 
     # generate the isotherm
     return PointIsotherm(
-        isotherm_data=pandas.concat([adsorption, desorption],
-                                    ignore_index=True),
+        isotherm_data=ads_branch,
         pressure_key='pressure',
         loading_key='loading',
-        other_keys=other_keys,
         **raw_dict
     )

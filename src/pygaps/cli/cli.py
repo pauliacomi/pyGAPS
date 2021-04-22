@@ -90,6 +90,8 @@ def main():
         iso = pg.isotherm_from_csv(args.iso)
     elif ext == '.xls':
         iso = pg.isotherm_from_xl(args.iso)
+    elif ext == '.aif':
+        iso = pg.isotherm_from_aif(args.iso)
     else:
         from pygaps.utilities.exceptions import ParsingError
         raise ParsingError(f"Cannot read '{ext}' files")
@@ -141,6 +143,8 @@ def main():
                 out_iso.to_csv(args.outfile)
             elif ext == '.xls':
                 out_iso.to_xl(args.outfile)
+            elif ext == '.aif':
+                out_iso.to_aif(args.outfile)
             else:
                 from pygaps.utilities.exceptions import ParsingError
                 raise ParsingError(f"Cannot export as '{ext}' files")
