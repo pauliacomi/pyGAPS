@@ -12,7 +12,7 @@ adsorbate,N2
 iso_type,Isotherme
 user,PI
 machine,Triflex
-t_act,150.0
+activation_temperature,150.0
 lab,MADIREL
 data:[pressure, loading, other...]
 loading(mmol),pressure(bar)

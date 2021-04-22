@@ -13,6 +13,7 @@ from ..core.adsorbate import Adsorbate
 from ..utilities.converter_mode import _MATERIAL_MODE
 from ..utilities.converter_mode import _PRESSURE_MODE
 from ..utilities.converter_unit import _PRESSURE_UNITS
+from ..utilities.converter_unit import _TEMPERATURE_UNITS
 from ..utilities.exceptions import ParameterError
 from ..utilities.hashgen import isotherm_to_hash
 from ..utilities.python_utilities import simplewarning
@@ -77,6 +78,7 @@ class BaseIsotherm():
         'material_unit': 'g',
         'loading_basis': 'molar',
         'loading_unit': 'mmol',
+        'temperature_unit': 'K',
     }
     # other special reserved parameters
     # subclasses overwrite this
@@ -152,6 +154,7 @@ class BaseIsotherm():
         self.material_unit = properties.pop('material_unit')
         self.loading_basis = properties.pop('loading_basis')
         self.loading_unit = properties.pop('loading_unit')
+        self.temperature_unit = properties.pop('temperature_unit')
 
         # Check basis
         if self.material_basis not in _MATERIAL_MODE:
@@ -189,6 +192,12 @@ class BaseIsotherm():
             raise ParameterError(
                 f"Unit selected for material ({self.material_unit}) is not an option. "
                 f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
+            )
+
+        if self.temperature_unit not in _TEMPERATURE_UNITS:
+            raise ParameterError(
+                f"Unit selected for temperature ({self.temperature_unit}) is not an option. "
+                f"See viable values: {_TEMPERATURE_UNITS.keys()}"
             )
 
         # Other named properties of the isotherm
@@ -322,6 +331,24 @@ class BaseIsotherm():
         """
         from ..parsing.excel import isotherm_to_xl
         return isotherm_to_xl(self, path, **kwargs)
+
+    def to_aif(self, path=None, **kwargs):
+        """
+        Convert the isotherm to a AIF representation.
+
+        Parameters
+        ----------
+        path
+            File path or object. If not specified, the result is returned as a string.
+
+        Returns
+        -------
+        None or str
+            If path is None, returns the resulting json format as a string.
+            Otherwise returns None.
+        """
+        from ..parsing.aif import isotherm_to_aif
+        return isotherm_to_aif(self, path, **kwargs)
 
     def to_db(
         self,

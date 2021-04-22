@@ -9,6 +9,7 @@ import pygaps
 
 @pytest.mark.parsing
 class TestJson():
+    """All testing of JSON interface"""
     def test_isotherm_to_json(self, basic_isotherm):
         """Test the parsing of an isotherm to json."""
 

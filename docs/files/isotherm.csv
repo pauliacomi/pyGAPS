@@ -4,7 +4,7 @@ material_batch,KRICT
 temperature,303
 adsorbate,CO2
 date,21/05/2010 00:00
-t_act,150
+activation_temperature,150
 user,PI
 project,ACRONYM
 machine,device1

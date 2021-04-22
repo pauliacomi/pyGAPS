@@ -15,8 +15,8 @@
 
     "iso_type": "calorimetry",
     "date": "2010-05-21 00:00:00",
-    "machine": "device1",
-    "t_act": 150.0,
+    "instrument": "device1",
+    "activation_temperature": 150.0,
     "user": "PI",
     "project": "ACRONYM",
     "comment": "a comment",

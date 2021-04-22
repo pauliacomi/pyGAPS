@@ -152,13 +152,13 @@
     "lab": "MADIREL",
     "loading_basis": "molar",
     "loading_unit": "mmol",
-    "machine": "CV",
+    "instrument": "CV",
     "material": "HKUST-1(Cu)",
     "material_batch": "KRICT",
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
     "project": "EU MACADEMIA",
-    "t_act": 150.0,
+    "activation_temperature": 150.0,
     "temperature": 303.0,
     "user": "ADW"
 }

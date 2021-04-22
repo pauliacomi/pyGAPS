@@ -8,6 +8,7 @@ from pygaps.utilities.exceptions import ParsingError
 
 @pytest.mark.parsing
 class TestCSV():
+    """All testing of CSV interface"""
     def test_csv_isotherm_checks(self):
         """Sanity checks for the CSV parser."""
 

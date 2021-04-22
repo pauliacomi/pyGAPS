@@ -305,13 +305,13 @@
     "lab": "MADIREL",
     "loading_basis": "molar",
     "loading_unit": "mmol",
-    "machine": "Triflex",
+    "instrument": "Triflex",
     "material": "MCM-41",
     "material_batch": "Test",
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
     "project": null,
-    "t_act": 150.0,
+    "activation_temperature": 150.0,
     "temperature": 77.0,
     "user": "PI"
 }

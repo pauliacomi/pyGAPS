@@ -117,7 +117,7 @@
     "material_batch": "Test",
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
-    "t_act": 150.0,
+    "activation_temperature": 150.0,
     "temperature": 298.0,
     "user": "PI"
 }
