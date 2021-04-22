@@ -5,9 +5,9 @@ import pytest
 import pygaps
 
 from .conftest import DATA_BEL_XL
+from .conftest import DATA_JSON
 from .conftest import DATA_MIC_XL
 from .conftest import DATA_XL
-from .conftest import DATA_JSON
 
 
 @pytest.mark.parsing
