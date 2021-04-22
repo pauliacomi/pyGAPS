@@ -148,19 +148,19 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
                 raise ParsingError(
                     f"The isotherm metadata {values} contains more than two values."
                 )
-            elif not values[1]:
+            key, val = values
+            if not val:
                 val = None
-            elif _is_bool(values[1]):
-                val = _from_bool(values[1])
+            elif _is_bool(val):
+                val = _from_bool(val)
             elif val.isnumeric():
                 val = int(val)
-            elif _is_float(values[1]):
-                val = float(values[1])
-            elif _is_list(values[1]):
-                val = _from_list(values[1])
-            else:
-                val = values[1]
-            raw_dict[values[0]] = val
+            elif _is_float(val):
+                val = float(val)
+            elif _is_list(val):
+                val = _from_list(val)
+
+            raw_dict[key] = val
             line = raw_csv.readline().rstrip()
     except Exception:
         raise ParsingError(
