@@ -6,7 +6,6 @@ and is used to check for any deprecations.
 
 """
 
-import ast
 import warnings
 from io import StringIO
 
@@ -17,56 +16,14 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
+from pygaps.utilities.string_utilities import _from_bool
+from pygaps.utilities.string_utilities import _from_list
+from pygaps.utilities.string_utilities import _is_bool
+from pygaps.utilities.string_utilities import _is_float
+from pygaps.utilities.string_utilities import _is_list
+from pygaps.utilities.string_utilities import _to_string
 
 _parser_version = "2.0"
-
-
-def _is_float(s):
-    """Check if a value is a float."""
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def _is_bool(s):
-    """Check a value is a CSV bool."""
-    if s.lower() in ['true', 'false']:
-        return True
-    else:
-        return False
-
-
-def _to_bool(s):
-    """Convert a value into a CSV bool."""
-    if s.lower() == 'true':
-        return True
-    elif s.lower() == 'false':
-        return False
-    else:
-        raise ValueError('String cannot be converted to bool')
-
-
-def _is_list(s):
-    """Check a value is a CSV list."""
-    if s.startswith('[') and s.endswith(']'):
-        return True
-    else:
-        return False
-
-
-def _from_list(s):
-    """Convert a value into a CSV list."""
-    # note that the function will fail if the list has other spaces
-    return ast.literal_eval(s.replace(' ', ","))
-
-
-def _to_string(s):
-    """Convert a value into a CSV-safe string."""
-    if isinstance(s, list):
-        return '[' + ' '.join([str(x) for x in s]) + "]"
-    return str(s)
 
 
 def isotherm_to_csv(isotherm, path=None, separator=','):
@@ -194,14 +151,16 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             elif not values[1]:
                 val = None
             elif _is_bool(values[1]):
-                val = _to_bool(values[1])
+                val = _from_bool(values[1])
+            elif val.isnumeric():
+                val = int(val)
             elif _is_float(values[1]):
                 val = float(values[1])
             elif _is_list(values[1]):
                 val = _from_list(values[1])
             else:
                 val = values[1]
-            raw_dict.update({values[0]: val})
+            raw_dict[values[0]] = val
             line = raw_csv.readline().rstrip()
     except Exception:
         raise ParsingError(
