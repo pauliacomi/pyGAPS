@@ -2,6 +2,17 @@
 Changelog
 =========
 
+3.1.0 (2021-04-22)
+-----------------
+
+New features:
+
+ * pyGAPS is now capable of parsing to and from Adsorption Information Files (AIF).
+   For more info, see *Evans, Jack D., Volodymyr Bon, Irena Senkovska, and
+   Stefan Kaskel. ‘A Universal Standard Archive File for Adsorption Data’.
+   Langmuir, 2 April 2021, DOI: 10.1021/acs.langmuir.1c00122.*
+
+
 3.0.0 (2021-03-14)
 ------------------
 
