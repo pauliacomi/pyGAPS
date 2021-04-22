@@ -27,7 +27,7 @@ setup(
     use_scm_version={
         'local_scheme': 'dirty-tag',
         'write_to': 'src/pygaps/_version.py',
-        'fallback_version': '3.0.3',
+        'fallback_version': '3.1.0',
     },
     license='MIT license',
     description=  # noqa: E251
@@ -82,6 +82,7 @@ setup(
         'xlrd >= 1.1',
         'xlwt >= 1.3',
         'coolprop >= 6.0',
+        'gemmi',
         'requests',
         'importlib_resources; python_version<"3.9"',  # TODO remove after 3.8 is unsupported
     ],

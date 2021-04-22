@@ -38,13 +38,12 @@ def isotherm_parameters():
         'temperature': 100.0,
         'adsorbate': 'TA',
         'date': '26/06/92',
-        't_act': 100.0,
+        'activation_temperature': 100.0,
         'lab': 'TL',
         'comment': 'test comment',
         'user': 'TU',
         'project': 'TP',
         'machine': 'TM',
-        'is_real': True,
         'iso_type': 'calorimetry',
 
         # Units/bases
@@ -54,6 +53,7 @@ def isotherm_parameters():
         'loading_unit': 'mmol',
         'pressure_mode': 'absolute',
         'pressure_unit': 'bar',
+        'temperature_unit': 'K',
 
         # other properties
         'DOI': 'dx.doi/10.0000',
