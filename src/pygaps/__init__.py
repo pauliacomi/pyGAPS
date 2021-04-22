@@ -9,7 +9,7 @@ try:
     from ._version import version
     __version__ = version
 except:
-    __version__ = '3.0.3'
+    __version__ = '3.1.0'
 
 import sys
 import logging
