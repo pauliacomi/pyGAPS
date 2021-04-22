@@ -8,4 +8,4 @@ requires = [
 [tool.setuptools_scm]
 write_to = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
-fallback_version = '3.0.3'
+fallback_version = '3.1.0'
