@@ -10,8 +10,9 @@ import numpy
 from pygaps.core.material import Material
 
 from ..core.adsorbate import Adsorbate
-from ..utilities.converter_mode import _MATERIAL_MODE
 from ..utilities.converter_mode import _PRESSURE_MODE
+from ..utilities.converter_mode import _LOADING_MODE
+from ..utilities.converter_mode import _MATERIAL_MODE
 from ..utilities.converter_unit import _PRESSURE_UNITS
 from ..utilities.converter_unit import _TEMPERATURE_UNITS
 from ..utilities.exceptions import ParameterError
@@ -156,36 +157,36 @@ class BaseIsotherm():
         self.loading_unit = properties.pop('loading_unit')
         self.temperature_unit = properties.pop('temperature_unit')
 
-        # Check basis
-        if self.material_basis not in _MATERIAL_MODE:
-            raise ParameterError(
-                f"Basis selected for material ({self.material_basis}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE.keys()}"
-            )
-
-        if self.loading_basis not in _MATERIAL_MODE:
-            raise ParameterError(
-                f"Basis selected for loading ({self.loading_basis}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE.keys()}"
-            )
-
+        # Check basis / mode
         if self.pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
                 f"Mode selected for pressure ({self.pressure_mode}) is not an option. "
                 f"See viable values: {_PRESSURE_MODE.keys()}"
             )
 
-        # Check units
-        if self.loading_unit not in _MATERIAL_MODE[self.loading_basis]:
+        if self.loading_basis not in _LOADING_MODE:
             raise ParameterError(
-                f"Unit selected for loading ({self.loading_unit}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
+                f"Basis selected for loading ({self.loading_basis}) is not an option. "
+                f"See viable values: {_LOADING_MODE.keys()}"
             )
 
+        if self.material_basis not in _MATERIAL_MODE:
+            raise ParameterError(
+                f"Basis selected for material ({self.material_basis}) is not an option. "
+                f"See viable values: {_MATERIAL_MODE.keys()}"
+            )
+
+        # Check units
         if self.pressure_mode == 'absolute' and self.pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
                 f"Unit selected for pressure ({self.pressure_unit}) is not an option. "
                 f"See viable values: {_PRESSURE_UNITS.keys()}"
+            )
+
+        if self.loading_unit not in _LOADING_MODE[self.loading_basis]:
+            raise ParameterError(
+                f"Unit selected for loading ({self.loading_unit}) is not an option. "
+                f"See viable values: {_LOADING_MODE[self.loading_basis].keys()}"
             )
 
         if self.material_unit not in _MATERIAL_MODE[self.material_basis]:

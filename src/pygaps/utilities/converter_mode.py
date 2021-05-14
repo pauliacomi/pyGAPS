@@ -13,12 +13,18 @@ _PRESSURE_MODE = {
     "relative%": None,
 }
 
-_MATERIAL_MODE = {
+_LOADING_MODE = {
     "mass": _MASS_UNITS,
     "volume": _VOLUME_UNITS,
     "molar": _MOLAR_UNITS,
     "percent": None,
     "fraction": None,
+}
+
+_MATERIAL_MODE = {
+    "mass": _MASS_UNITS,
+    "volume": _VOLUME_UNITS,
+    "molar": _MOLAR_UNITS,
 }
 
 
@@ -177,32 +183,32 @@ def c_loading(
     """
     if basis_from != basis_to:
 
-        if basis_to not in _MATERIAL_MODE:
+        if basis_to not in _LOADING_MODE:
             raise ParameterError(
                 f"Basis selected for loading ({basis_to}) is not an option. "
-                f"Viable basis for uptake are {list(_MATERIAL_MODE)}"
+                f"Viable basis for uptake are {list(_LOADING_MODE)}"
             )
 
-        if _MATERIAL_MODE[basis_to]:
+        if _LOADING_MODE[basis_to]:
             if not unit_to:
                 raise ParameterError(
                     f"To convert to {basis_to} basis, units must be specified."
                 )
-            if unit_to not in _MATERIAL_MODE[basis_to]:
+            if unit_to not in _LOADING_MODE[basis_to]:
                 raise ParameterError(
                     f"Unit selected for loading unit_to ({unit_to}) is not an option. "
-                    f"Viable units are {list(_MATERIAL_MODE[basis_to])}"
+                    f"Viable units are {list(_LOADING_MODE[basis_to])}"
                 )
 
-        if _MATERIAL_MODE[basis_from]:
+        if _LOADING_MODE[basis_from]:
             if not unit_from:
                 raise ParameterError(
                     f"To convert from {basis_from} basis, units must be specified."
                 )
-            if unit_from not in _MATERIAL_MODE[basis_from]:
+            if unit_from not in _LOADING_MODE[basis_from]:
                 raise ParameterError(
                     f"Unit selected for loading unit_from ({unit_from}) is not an option. "
-                    f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
+                    f"Viable units are {list(_LOADING_MODE[basis_from])}"
                 )
 
         _basis_from = basis_from
@@ -260,12 +266,12 @@ def c_loading(
                 sign = -1
 
         return (
-            value * _MATERIAL_MODE[_basis_from][_unit_from] * factor *
-            constant**sign / _MATERIAL_MODE[_basis_to][_unit_to]
+            value * _LOADING_MODE[_basis_from][_unit_from] * factor *
+            constant**sign / _LOADING_MODE[_basis_to][_unit_to]
         )
 
     elif unit_to and unit_from != unit_to:
-        return c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to)
+        return c_unit(_LOADING_MODE[basis_from], value, unit_from, unit_to)
 
     return value
 
@@ -308,7 +314,7 @@ def c_material(value, basis_from, basis_to, unit_from, unit_to, material=None):
         if basis_to not in _MATERIAL_MODE:
             raise ParameterError(
                 f"Basis selected for material ({basis_to}) is not an option. "
-                f"Viable bases are {[base for base in list(_MATERIAL_MODE) if base not in ['percent', 'fraction']]}"
+                f"Viable bases are {[base for base in list(_MATERIAL_MODE)]}"
             )
 
         if (
