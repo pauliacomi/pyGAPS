@@ -147,7 +147,7 @@ def isotherm_from_bel(path):
                     continue
 
             else:
-                values = [v.strip('"') for v in values]
+                values = [v.strip('"').replace(',', ' ') for v in values]
                 key = values[0].lower()
                 try:
                     field = next(
@@ -160,7 +160,7 @@ def isotherm_from_bel(path):
 
     # Read prepared table
     data.seek(0)  # Reset string buffer to 0
-    data_df = pandas.read_csv(data, sep='\t')
+    data_df = pandas.read_csv(data, sep='\t', index_col=False)
     data_df.dropna(inplace=True, how='all', axis='columns')
 
     # Set extra metadata
