@@ -216,6 +216,7 @@ parameters:
     - The ``param_guess`` specifies the initial model parameter
       guesses where optimisation should start. The parameter is optional,
       and will be automatically filled unless the user specifies it.
+    - The ``param_bounds`` specifies the bounds for optimisation parameters.
     - The ``optimization_params`` is a dictionary which will be passed
       to scipy.optimise.least_squares.
     - Finally, the ``verbose`` parameter can be used to
@@ -242,6 +243,7 @@ The code to generate a ModelIsotherm is then:
         model='Henry',                  # Want to fit using the Henry model
         branch='ads',                   # on the adsorption branch
         param_guess={"K" : 2}           # from an initial guess of 2 for the constant
+        param_bounds={"K" : [0, 20]}    # a lower bound of 0 and an upper bound of 20
         verbose='True',                 # and increased verbosity.
 
         # Unit parameters can be specified

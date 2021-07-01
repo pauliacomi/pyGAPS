@@ -48,6 +48,8 @@ class ModelIsotherm(BaseIsotherm):
         The model to be used to describe the isotherm.
     param_guess : dict
         Starting guess for model parameters in the data fitting routine.
+    param_bounds : dict
+        Bounds for model parameters in the data fitting routine (applicable to some models).
     branch : ['ads', 'des'], optional
         The branch on which the model isotherm is based on. It is assumed to be the
         adsorption branch, as it is the most commonly modelled part, although may
@@ -91,7 +93,7 @@ class ModelIsotherm(BaseIsotherm):
 
     """
 
-    _reserved_params = ['model', 'param_guess']
+    _reserved_params = ['model', 'param_guess', 'param_bounds']
 
     ##########################################################
     #   Instantiation and classmethods
@@ -105,6 +107,7 @@ class ModelIsotherm(BaseIsotherm):
         loading_key=None,
         model=None,
         param_guess=None,
+        param_bounds=None,
         optimization_params=None,
         branch='ads',
         verbose=False,
@@ -203,6 +206,16 @@ class ModelIsotherm(BaseIsotherm):
             # The loading range on which the model was built.
             self.model.loading_range = [min(loading), max(loading)]
 
+            # Override defaults if user provides param_bounds dictionary
+            if param_bounds is not None:
+                for param, bound in param_bounds.items():
+                    if param not in self.model.param_bounds.keys():
+                        raise ParameterError(
+                            f"'{param}' is not a valid parameter"
+                            f" in the '{model}' model."
+                        )
+                    self.model.param_bounds[param] = bound
+
             # Dictionary of parameters as a starting point for data fitting.
             self.param_guess = self.model.initial_guess(pressure, loading)
 
@@ -253,6 +266,7 @@ class ModelIsotherm(BaseIsotherm):
         branch='ads',
         model=None,
         param_guess=None,
+        param_bounds=None,
         optimization_params=None,
         verbose=False,
     ):
@@ -284,6 +298,8 @@ class ModelIsotherm(BaseIsotherm):
             The model to be used to describe the isotherm.
         param_guess : dict
             Starting guess for model parameters in the data fitting routine.
+        param_bounds : dict
+            Bounds for model parameters in the data fitting routine.
         optimization_params : dict
             Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
@@ -302,6 +318,7 @@ class ModelIsotherm(BaseIsotherm):
         iso_params['loading_key'] = loading_key
         iso_params['model'] = model
         iso_params['param_guess'] = param_guess
+        iso_params['param_bounds'] = param_bounds
         iso_params['optimization_params'] = optimization_params
         iso_params['branch'] = branch
         iso_params['verbose'] = verbose
@@ -315,6 +332,7 @@ class ModelIsotherm(BaseIsotherm):
         branch='ads',
         model=None,
         param_guess=None,
+        param_bounds=None,
         optimization_params=None,
         verbose=False
     ):
@@ -335,6 +353,8 @@ class ModelIsotherm(BaseIsotherm):
             Specify `"guess"` to try all available models.
         param_guess : dict, optional
             Starting guess for model parameters in the data fitting routine.
+        param_bounds : dict
+            Bounds for model parameters in the data fitting routine.
         optimization_params : dict, optional
             Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
@@ -358,6 +378,7 @@ class ModelIsotherm(BaseIsotherm):
                     branch=branch,
                     model=model,
                     param_guess=param_guess,
+                    param_bounds=param_bounds,
                     optimization_params=optimization_params,
                     verbose=verbose,
                     **iso_params
@@ -449,6 +470,7 @@ class ModelIsotherm(BaseIsotherm):
                     loading_key=loading_key,
                     model=model,
                     param_guess=None,
+                    param_bounds=None,
                     optimization_params=optimization_params,
                     branch=branch,
                     verbose=verbose,

@@ -144,6 +144,7 @@ def model_iso(
     branch='ads',
     model=None,
     param_guess=None,
+    param_bounds=None,
     optimization_params=None,
     verbose=False
 ):
@@ -163,6 +164,8 @@ def model_iso(
         Specify `"guess"` to try all available models.
     param_guess : dict, optional
         Starting guess for model parameters in the data fitting routine.
+    param_bounds : dict, optional
+        Bounds for model parameters in the data fitting routine.
     optimization_params : dict, optional
         Dictionary to be passed to the minimization function to use in fitting model to data.
         See `here
@@ -176,6 +179,7 @@ def model_iso(
         branch=branch,
         model=model,
         param_guess=param_guess,
+        param_bounds=param_bounds,
         optimization_params=optimization_params,
         verbose=verbose,
     )

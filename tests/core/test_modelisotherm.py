@@ -72,6 +72,15 @@ class TestModelIsotherm():
             **isotherm_param
         )
 
+        # regular creation, with bounds
+        pygaps.ModelIsotherm(
+            isotherm_data=isotherm_data,
+            model='Henry',
+            param_guess={'K': 1.0},
+            param_bounds={'K': [0, 100]},
+            **isotherm_param
+        )
+
         # Missing pressure/loading
         with pytest.raises(pgEx.ParameterError):
             pygaps.ModelIsotherm(
