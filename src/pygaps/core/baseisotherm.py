@@ -10,9 +10,9 @@ import numpy
 from pygaps.core.material import Material
 
 from ..core.adsorbate import Adsorbate
-from ..utilities.converter_mode import _PRESSURE_MODE
 from ..utilities.converter_mode import _LOADING_MODE
 from ..utilities.converter_mode import _MATERIAL_MODE
+from ..utilities.converter_mode import _PRESSURE_MODE
 from ..utilities.converter_unit import _PRESSURE_UNITS
 from ..utilities.converter_unit import _TEMPERATURE_UNITS
 from ..utilities.exceptions import ParameterError
