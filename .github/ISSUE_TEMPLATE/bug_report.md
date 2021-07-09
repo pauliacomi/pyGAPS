@@ -28,3 +28,6 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+**Where you are from?/How are you using pyGAPS? (optional)**
+I'm always curious to see how pyGAPS is used and if it is useful to people. Don't fill this in if you don't want to tell me.
