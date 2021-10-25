@@ -41,9 +41,27 @@ def thickness_harkins_jura(pressure):
     return (0.1399 / (0.034 - numpy.log10(pressure)))**0.5
 
 
+def thickness_zero(pressure):
+    """
+    A zero-thickness curve. Applicable for non-wetting adsorbates.
+
+    Parameters
+    ----------
+    pressure : float
+        Relative pressure.
+
+    Returns
+    -------
+    float
+        Thickness of layer in nm.
+    """
+    return numpy.zeros(len(pressure))
+
+
 _THICKNESS_MODELS = {
     "Halsey": thickness_halsey,
-    "Harkins/Jura": thickness_harkins_jura
+    "Harkins/Jura": thickness_harkins_jura,
+    "zero": thickness_zero,
 }
 
 
