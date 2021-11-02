@@ -137,7 +137,7 @@ def bet_plot(
         label='chosen points',
         **POINTS_SEL_STYLE,
     )
-    x_lim = [0, pressure[maximum]]
+    x_lim = [0, pressure[maximum - 1]]
     y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
     ax.plot(
         x_lim,
@@ -156,8 +156,8 @@ def bet_plot(
         label='monolayer point'
     )
 
-    ax.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
-    ax.set_xlim(left=0, right=pressure[maximum] * 1.2)
+    ax.set_ylim(bottom=0, top=bet_points[maximum - 1] * 1.2)
+    ax.set_xlim(left=0, right=pressure[maximum - 1] * 1.2)
     ax.set_title("BET plot")
     ax.set_xlabel('p/p°', fontsize=15)
     ax.set_ylabel('$\\frac{p/p°}{n ( 1- p/p°)}$', fontsize=15)
@@ -212,7 +212,7 @@ def langmuir_plot(
         label='chosen points',
         **POINTS_SEL_STYLE,
     )
-    x_lim = [0, pressure[maximum]]
+    x_lim = [0, pressure[maximum - 1]]
     y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
     ax.plot(
         x_lim,
@@ -222,8 +222,8 @@ def langmuir_plot(
         label='model fit',
     )
 
-    ax.set_ylim(bottom=0, top=langmuir_points[maximum] * 1.2)
-    ax.set_xlim(left=0, right=pressure[maximum] * 1.2)
+    ax.set_ylim(bottom=0, top=langmuir_points[maximum - 1] * 1.2)
+    ax.set_xlim(left=0, right=pressure[maximum - 1] * 1.2)
     ax.set_title("Langmuir plot")
     ax.set_xlabel('p/p°', fontsize=15)
     ax.set_ylabel('(p/p°)/n', fontsize=15)

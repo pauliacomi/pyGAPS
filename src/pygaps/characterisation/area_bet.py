@@ -146,9 +146,21 @@ def area_BET(isotherm, branch='ads', limits=None, verbose=False):
 
     # use the bet function
     (
-        bet_area, c_const, n_monolayer, p_monolayer, slope, intercept, minimum,
-        maximum, corr_coef
-    ) = area_BET_raw(pressure, loading, cross_section, limits=limits)
+        bet_area,
+        c_const,
+        n_monolayer,
+        p_monolayer,
+        slope,
+        intercept,
+        minimum,
+        maximum,
+        corr_coef,
+    ) = area_BET_raw(
+        pressure,
+        loading,
+        cross_section,
+        limits=limits,
+    )
 
     if verbose:
         logger.info(
