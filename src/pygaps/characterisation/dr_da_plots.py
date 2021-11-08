@@ -206,7 +206,13 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
         maximum,
         corr_coef,
     ) = da_plot_raw(
-        pressure, loading, iso_temp, molar_mass, liquid_density, exp, limits
+        pressure,
+        loading,
+        iso_temp,
+        molar_mass,
+        liquid_density,
+        exp,
+        limits,
     )
 
     if verbose:
@@ -226,7 +232,9 @@ def da_plot(isotherm, exp=None, limits=None, verbose=False):
         "pore_volume": microp_volume,
         "adsorption_potential": potential,
         'corr_coef': corr_coef,
-        'limits': [minimum, maximum],
+        'slope': slope,
+        'intercept': intercept,
+        'limits': (minimum, maximum),
     }
 
     if find_exp:
