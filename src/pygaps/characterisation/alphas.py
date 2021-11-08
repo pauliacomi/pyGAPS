@@ -175,7 +175,7 @@ def alpha_s(
         branch='ads', loading_unit='mol', loading_basis='molar'
     )
     reference_loading = reference_isotherm.loading_at(
-        isotherm.pressure(branch='ads', pressure_unit=isotherm.pressure_unit),
+        isotherm.pressure(branch='ads'),
         pressure_unit=isotherm.pressure_unit,
         loading_unit='mol',
         branch='ads'
