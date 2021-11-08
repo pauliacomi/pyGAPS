@@ -29,7 +29,7 @@ def psd_microporous(
     branch: str = 'ads',
     material_model: str = 'Carbon(HK)',
     adsorbate_model: str = None,
-    p_limits: t.List[float] = None,
+    p_limits: t.Optional[t.Tuple[float, float]] = None,
     verbose: bool = False
 ) -> t.Mapping:
     r"""

@@ -490,7 +490,6 @@ def isosteric_enthalpy_plot(
         ax.xaxis.set_major_locator(
             plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20)
         )
-    ax.set_title("Isosteric enthalpy", **TITLE_STYLE)
     ax.set_xlabel(r'Loading [$mmol\/g^{-1}$]', **LABEL_STYLE)
     ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]', **LABEL_STYLE)
     ax.legend(loc='best', **LEGEND_STYLE)

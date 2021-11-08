@@ -2,10 +2,12 @@
 Methods of calculating a pore size distribution for pores in the mesopore range
 (2-100 nm), based on the Kelvin equation and pore condensation/evaporation.
 """
+import typing as t
 
 import numpy
 
 from ..core.adsorbate import Adsorbate
+from ..core.baseisotherm import BaseIsotherm
 from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -19,14 +21,14 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
 def psd_mesoporous(
-    isotherm,
-    psd_model='pygaps-DH',
-    pore_geometry='cylinder',
-    branch='des',
-    thickness_model='Harkins/Jura',
-    kelvin_model='Kelvin',
-    p_limits=None,
-    verbose=False
+    isotherm: BaseIsotherm,
+    psd_model: str = 'pygaps-DH',
+    pore_geometry: str = 'cylinder',
+    branch: str = 'des',
+    thickness_model: str = 'Harkins/Jura',
+    kelvin_model: str = 'Kelvin',
+    p_limits: t.Optional[t.Tuple[float, float]] = None,
+    verbose: bool = False
 ):
     r"""
     Calculate the mesopore size distribution.

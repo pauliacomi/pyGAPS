@@ -130,9 +130,12 @@ def isosteric_enthalpy(
         ) for iso in isotherms
     ]).T
 
-    iso_enthalpy, slopes, correlation, std_errs = isosteric_enthalpy_raw(
-        pressures, temperatures
-    )
+    (
+        iso_enthalpy,
+        slopes,
+        correlation,
+        std_errs,
+    ) = isosteric_enthalpy_raw(pressures, temperatures)
 
     if verbose:
         isosteric_enthalpy_plot(loading, iso_enthalpy, std_errs)

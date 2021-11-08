@@ -161,7 +161,7 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
         'langmuir_slope': slope,
         'langmuir_intercept': intercept,
         'corr_coef': corr_coef,
-        'limits': [minimum, maximum]
+        'limits': (minimum, maximum)
     }
 
 
