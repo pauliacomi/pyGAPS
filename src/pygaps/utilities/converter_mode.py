@@ -346,28 +346,24 @@ def c_material(value, basis_from, basis_to, unit_from, unit_to, material=None):
 
         if basis_from == 'mass':
             if basis_to == 'volume':
-                constant = material.get_prop('density')
+                constant = material.density
                 sign = -1
             elif basis_to == 'molar':
-                constant = material.get_prop('molar_mass')
+                constant = material.molar_mass
                 sign = -1
         elif basis_from == 'volume':
             if basis_to == 'mass':
-                constant = material.get_prop('density')
+                constant = material.density
                 sign = 1
             elif basis_to == 'molar':
-                constant = material.get_prop('density') / material.get_prop(
-                    'molar_mass'
-                )
+                constant = material.density / material.molar_mass
                 sign = 1
         elif basis_from == 'molar':
             if basis_to == 'mass':
-                constant = material.get_prop('molar_mass')
+                constant = material.molar_mass
                 sign = 1
             elif basis_to == 'volume':
-                constant = material.get_prop('density') / material.get_prop(
-                    'molar_mass'
-                )
+                constant = material.density / material.molar_mass
                 sign = -1
 
         return (
