@@ -49,6 +49,7 @@ class DA(IsothermBaseModel):
     """
     # Model parameters
     name = 'DA'
+    formula = r"n(p) = n_t \exp[-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{m}]"
     calculates = 'loading'
     param_names = ["n_m", "e", "m"]
     param_bounds = {

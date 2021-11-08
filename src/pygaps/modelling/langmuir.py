@@ -77,6 +77,7 @@ class Langmuir(IsothermBaseModel):
 
     # Model parameters
     name = 'Langmuir'
+    formula = r"n(p) = n_m\frac{K p}{1 + K p}"
     calculates = 'loading'
     param_names = ["K", "n_m"]
     param_bounds = {

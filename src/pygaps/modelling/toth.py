@@ -28,6 +28,7 @@ class Toth(IsothermBaseModel):
 
     # Model parameters
     name = 'Toth'
+    formula = r"n(p) = n_m \frac{K p}{\sqrt[t]{1 + (K p)^t}}"
     calculates = 'loading'
     param_names = ["n_m", "K", "t"]
     param_bounds = {

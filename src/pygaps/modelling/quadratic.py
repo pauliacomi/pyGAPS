@@ -38,6 +38,7 @@ class Quadratic(IsothermBaseModel):
 
     # Model parameters
     name = 'Quadratic'
+    formula = r"n(p) = n_m \frac{p (K_a + 2 K_b p)}{1 + K_a p + K_b p^2}"
     calculates = 'loading'
     param_names = ["n_m", "Ka", "Kb"]
     param_bounds = {

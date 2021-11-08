@@ -30,6 +30,7 @@ class GAB(IsothermBaseModel):
 
     # Model parameters
     name = 'GAB'
+    formula = r"n(p) = n_m \frac{C K p}{(1 - K p)(1 - K p + K C p)}"
     calculates = 'loading'
     param_names = ["n_m", "C", "K"]
     param_bounds = {

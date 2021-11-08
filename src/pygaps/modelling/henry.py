@@ -41,6 +41,7 @@ class Henry(IsothermBaseModel):
 
     # Model parameters
     name = 'Henry'
+    formula = r"n(p) = K_H p"
     calculates = 'loading'
     param_names = ["K"]
     param_bounds = {

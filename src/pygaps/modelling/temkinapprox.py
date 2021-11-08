@@ -38,6 +38,7 @@ class TemkinApprox(IsothermBaseModel):
 
     # Model parameters
     name = 'TemkinApprox'
+    formula = r"n(p) = n_m \frac{K p}{1 + K p} + n_m \theta (\frac{K p}{1 + K p})^2 (\frac{K p}{1 + K p} -1)"
     calculates = 'loading'
     param_names = ["n_m", "K", "tht"]
     param_bounds = {

@@ -43,6 +43,7 @@ class TSLangmuir(IsothermBaseModel):
 
     # Model parameters
     name = 'TSLangmuir'
+    formula = r"n(p) = n_{m_1} \frac{K_1 p}{1+K_1 p} + n_{m_2} \frac{K_2 p}{1+K_2 p} + n_{m_3} \frac{K_3 p}{1+K_3 p}"
     calculates = 'loading'
     param_names = ["n_m1", "n_m2", "n_m3", "K1", "K2", "K3"]
     param_bounds = {

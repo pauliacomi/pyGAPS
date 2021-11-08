@@ -47,6 +47,7 @@ class Freundlich(IsothermBaseModel):
 
     # Model parameters
     name = 'Freundlich'
+    formula = r"n(p) = K p^{ 1/m }"
     calculates = 'loading'
     param_names = ["K", "m"]
     param_bounds = {

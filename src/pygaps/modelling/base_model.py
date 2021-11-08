@@ -18,6 +18,7 @@ class IsothermBaseModel():
 
     # Class specific
     name = None
+    formula = None  # formula for the model
     calculates = None  # loading/pressure
     param_names = []
     param_bounds = None

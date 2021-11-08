@@ -104,6 +104,7 @@ class BET(IsothermBaseModel):
 
     # Model parameters
     name = 'BET'
+    formula = r"n(p) = n_m \frac{C p}{(1 - N p)(1 - N p + C p)}"
     calculates = 'loading'
     param_names = ["n_m", "C", "N"]
     param_bounds = {

@@ -49,6 +49,7 @@ class JensenSeaton(IsothermBaseModel):
 
     # Model parameters
     name = 'JensenSeaton'
+    formula = r"n(p) = K p [1 + (\frac{K p}{(a (1 + b p)})^c]^{-1/c}"
     calculates = 'loading'
     param_names = ["K", "a", "b", "c"]
     param_bounds = {

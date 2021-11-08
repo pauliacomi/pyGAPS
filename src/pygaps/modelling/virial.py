@@ -19,7 +19,7 @@ class Virial(IsothermBaseModel):
 
     .. math::
 
-        p = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}
+        p(n) = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}
 
     Notes
     -----
@@ -46,6 +46,7 @@ class Virial(IsothermBaseModel):
 
     # Model parameters
     name = 'Virial'
+    formula = r"p(n) = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}"
     calculates = 'pressure'
     param_names = ["K", "A", "B", "C"]
     param_bounds = {

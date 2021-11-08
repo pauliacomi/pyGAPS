@@ -40,6 +40,7 @@ class DSLangmuir(IsothermBaseModel):
 
     # Model parameters
     name = 'DSLangmuir'
+    formula = r"n(p) = n_{m_1}\frac{K_1 p}{1+K_1 p} +  n_{m_2}\frac{K_2 p}{1+K_2 p}"
     calculates = 'loading'
     param_names = ["n_m1", "K1", "n_m2", "K2"]
     param_bounds = {

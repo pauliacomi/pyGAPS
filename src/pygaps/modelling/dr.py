@@ -47,6 +47,7 @@ class DR(IsothermBaseModel):
     """
     # Model parameters
     name = 'DR'
+    formula = r"n(p) = n_t \exp [-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{2}]"
     calculates = 'loading'
     param_names = ["n_m", "e"]
     param_bounds = {
