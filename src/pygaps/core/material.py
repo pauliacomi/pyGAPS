@@ -34,7 +34,7 @@ class Material():
         "molar_mass",
     ]
 
-    def __init__(self, name: str, store: bool = True, **properties):
+    def __init__(self, name: str, store: bool = False, **properties):
         """Instantiate by passing all the parameters."""
         # Material name
         self.name = name
