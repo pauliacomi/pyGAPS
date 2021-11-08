@@ -17,8 +17,8 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 from numpy import linspace
 
-import pygaps.parsing.json as pgpj
 import pygaps.characterisation.area_bet as ab
+import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA

@@ -1,8 +1,8 @@
 """Dubinin-Astakov isotherm model."""
 
 import numpy
-from scipy import integrate
 from scipy import constants
+from scipy import integrate
 
 from .base_model import IsothermBaseModel
 

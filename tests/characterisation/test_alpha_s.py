@@ -17,8 +17,8 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
-import pygaps.parsing.json as pgpj
 import pygaps.characterisation.alphas as als
+import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA

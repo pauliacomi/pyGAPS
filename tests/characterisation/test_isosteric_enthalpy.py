@@ -16,8 +16,8 @@ from matplotlib.testing.decorators import cleanup
 from numpy import average
 from numpy import isclose
 
-import pygaps.parsing as pgp
 import pygaps.characterisation.isosteric_enth as ie
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_ISOSTERIC

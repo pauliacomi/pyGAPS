@@ -2,8 +2,8 @@
 
 import pytest
 
-import pygaps.parsing.json as pgpj
 import pygaps.parsing.bel_dat as pgpbel
+import pygaps.parsing.json as pgpj
 
 from .conftest import DATA_BEL
 

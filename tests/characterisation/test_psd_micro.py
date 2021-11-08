@@ -19,8 +19,8 @@ import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
 
-import pygaps.parsing as pgp
 import pygaps.characterisation.psd_micro as pmic
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 from pygaps.characterisation.models_hk import PROPERTIES_CARBON
 

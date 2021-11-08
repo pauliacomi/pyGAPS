@@ -22,27 +22,27 @@ from .characterisation.alphas import alpha_s
 from .characterisation.alphas import alpha_s_raw
 from .characterisation.area_bet import area_BET
 from .characterisation.area_bet import area_BET_raw
-from .characterisation.area_langmuir import area_langmuir
-from .characterisation.area_langmuir import area_langmuir_raw
+from .characterisation.area_lang import area_langmuir
+from .characterisation.area_lang import area_langmuir_raw
 from .characterisation.dr_da_plots import da_plot
 from .characterisation.dr_da_plots import dr_plot
-from .characterisation.initial_enthalpy import initial_enthalpy_comp
-from .characterisation.initial_enthalpy import initial_enthalpy_point
+from .characterisation.initial_enth import initial_enthalpy_comp
+from .characterisation.initial_enth import initial_enthalpy_point
 from .characterisation.initial_henry import initial_henry_slope
 from .characterisation.initial_henry import initial_henry_virial
-from .characterisation.isosteric_enthalpy import isosteric_enthalpy
-from .characterisation.isosteric_enthalpy import isosteric_enthalpy_raw
-from .characterisation.psd_dft import psd_dft
-from .characterisation.psd_mesoporous import psd_mesoporous
-from .characterisation.psd_microporous import psd_microporous
+from .characterisation.isosteric_enth import isosteric_enthalpy
+from .characterisation.isosteric_enth import isosteric_enthalpy_raw
+from .characterisation.psd_kernel import psd_dft
+from .characterisation.psd_meso import psd_mesoporous
+from .characterisation.psd_micro import psd_microporous
 from .characterisation.tplot import t_plot
 from .characterisation.tplot import t_plot_raw
 
 # IAST
-from .iast.iast import iast
-from .iast.iast import iast_binary_svp
-from .iast.iast import iast_binary_vle
-from .iast.iast import reverse_iast
+from .iast.pgiast import iast
+from .iast.pgiast import iast_binary_svp
+from .iast.pgiast import iast_binary_vle
+from .iast.pgiast import reverse_iast
 
 # Modelling/fitting
 from .modelling import model_iso

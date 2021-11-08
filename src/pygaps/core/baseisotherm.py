@@ -7,8 +7,8 @@ logger = logging.getLogger('pygaps')
 
 import numpy
 
-from pygaps.core.material import Material
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.material import Material
 
 from ..utilities.converter_mode import _LOADING_MODE
 from ..utilities.converter_mode import _MATERIAL_MODE

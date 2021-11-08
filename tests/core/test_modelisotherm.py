@@ -6,8 +6,8 @@ from matplotlib.testing.decorators import cleanup
 from pandas.testing import assert_series_equal
 
 import pygaps
-import pygaps.parsing as pgp
 import pygaps.modelling as pgm
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from ..characterisation.conftest import DATA

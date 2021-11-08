@@ -2,8 +2,8 @@
 
 import pytest
 
-import pygaps.parsing.json as pgpj
 import pygaps.parsing.excel as pgpe
+import pygaps.parsing.json as pgpj
 
 from .conftest import DATA_BEL_XL
 from .conftest import DATA_JSON
