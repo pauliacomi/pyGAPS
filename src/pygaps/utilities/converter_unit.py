@@ -35,8 +35,8 @@ _PRESSURE_UNITS = {
     "torr": 133.322,
 }
 _TEMPERATURE_UNITS = {
-    "K": 0,
-    "C": 273.15,
+    "K": -273.15,
+    "°C": 273.15,
 }
 
 

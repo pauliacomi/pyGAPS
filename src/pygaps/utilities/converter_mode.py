@@ -4,6 +4,7 @@ from .converter_unit import _MASS_UNITS
 from .converter_unit import _MOLAR_UNITS
 from .converter_unit import _PRESSURE_UNITS
 from .converter_unit import _VOLUME_UNITS
+from .converter_unit import _TEMPERATURE_UNITS
 from .converter_unit import c_unit
 from .exceptions import ParameterError
 
@@ -380,3 +381,33 @@ def c_material(value, basis_from, basis_to, unit_from, unit_to, material=None):
         )
 
     return value
+
+
+def c_temperature(value, unit_from, unit_to):
+    """
+    Convert temperatures.
+
+    Parameters
+    ----------
+    value : float
+        The value to convert.
+    unit_from : str
+        Unit from which to convert.
+    unit_from : str
+        Unit to which to convert.
+
+    Returns
+    -------
+    float
+        Temperature converted as requested.
+
+    Raises
+    ------
+    ``ParameterError``
+        If the unit selected is not an option.
+
+    """
+    if unit_from == unit_to:
+        return
+
+    return value - _TEMPERATURE_UNITS[unit_to]
