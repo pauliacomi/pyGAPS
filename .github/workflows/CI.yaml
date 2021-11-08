@@ -53,15 +53,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version : [3.7, 3.8, 3.9, 3.10]
+        python-version : ['3.7', '3.8', '3.9', '3.10']
         include:
-          - python-version: 3.7
+          - python-version: '3.7'
             toxenv: "py37-cover,report,codecov"
-          - python-version: 3.8
+          - python-version: '3.8'
             toxenv: "py38-cover,report,codecov"
-          - python-version: 3.9
+          - python-version: '3.9'
             toxenv: "py39-cover,report,codecov"
-          - python-version: 3.10
+          - python-version: '3.10'
             toxenv: "py310-cover,report,codecov"
         # exclude:
         #   # TODO py39 on windows has errors so we exclude it for now
