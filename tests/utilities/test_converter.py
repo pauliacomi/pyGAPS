@@ -142,7 +142,7 @@ class TestConversions():
             (273.15, '°C', 'K'),  # 0 °C -> 273.15 K
         ]
     )
-    def test_convert_pressure(self, value, u_f, u_t):
+    def test_convert_temperature(self, value, u_f, u_t):
 
         result = converter_mode.c_temperature(
             0,

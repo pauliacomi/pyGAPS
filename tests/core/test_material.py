@@ -35,7 +35,7 @@ class TestMaterial():
         uploaded = pygaps.Material("uploaded", store=True)
         assert uploaded == pygaps.Material.find('uploaded')
 
-        not_uploaded = pygaps.Material("not_uploaded", store=False)
+        pygaps.Material("not_uploaded", store=False)
         with pytest.raises(pgEx.ParameterError):
             pygaps.Material.find('not_uploaded')
 
