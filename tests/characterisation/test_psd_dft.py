@@ -19,8 +19,8 @@ import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
 
-import pygaps
-import pygaps.characterisation.psd_dft as pdft
+import pygaps.parsing as pgp
+import pygaps.characterisation.psd_kernel as psdk
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
@@ -34,11 +34,11 @@ class TestPSDDFT():
         """Checks for built-in safeguards."""
         # Will raise a "no kernel exception"
         with pytest.raises(pgEx.ParameterError):
-            pdft.psd_dft(basic_pointisotherm, kernel=None)
+            psdk.psd_dft(basic_pointisotherm, kernel=None)
 
         # Will raise a "no applicable branch exception"
         with pytest.raises(pgEx.ParameterError):
-            pdft.psd_dft(basic_pointisotherm, branch='test')
+            psdk.psd_dft(basic_pointisotherm, branch='test')
 
     @pytest.mark.parametrize('kernel', [
         'DFT-N2-77K-carbon-slit',
@@ -51,9 +51,9 @@ class TestPSDDFT():
         if sample.get('psd_dft_pore_volume', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
 
-            result_dict = pdft.psd_dft(isotherm, kernel=kernel)
+            result_dict = psdk.psd_dft(isotherm, kernel=kernel)
 
             loc = np.where(
                 result_dict['pore_distribution'] ==
@@ -74,5 +74,5 @@ class TestPSDDFT():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.psd_dft(isotherm, verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        psdk.psd_dft(isotherm, verbose=True)

@@ -6,6 +6,8 @@ from matplotlib.testing.decorators import cleanup
 from pandas.testing import assert_series_equal
 
 import pygaps
+import pygaps.parsing as pgp
+import pygaps.modelling as pgm
 import pygaps.utilities.exceptions as pgEx
 
 from ..characterisation.conftest import DATA
@@ -16,10 +18,11 @@ from .conftest import PRESSURE_AT_PARAM
 from .conftest import PRESSURE_PARAM
 
 
+@pytest.mark.core
 class TestModelConvenience():
     """Test the convenience model function."""
     def test_model_isotherm(self, basic_pointisotherm):
-        pygaps.model_iso(basic_pointisotherm, model="Henry")
+        pgm.model_iso(basic_pointisotherm, model="Henry")
 
 
 @pytest.mark.core
@@ -154,7 +157,7 @@ class TestModelIsotherm():
         """Check isotherm can be guessed from PointIsotherm."""
 
         filepath = DATA_N77_PATH / file
-        isotherm = pygaps.isotherm_from_json(filepath)
+        isotherm = pgp.isotherm_from_json(filepath)
 
         pygaps.ModelIsotherm.from_pointisotherm(
             isotherm, model='guess', verbose=True

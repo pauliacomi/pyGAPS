@@ -15,7 +15,7 @@ from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
 from .area_bet import area_BET
-from .area_langmuir import area_langmuir
+from .area_lang import area_langmuir
 
 
 def alpha_s(

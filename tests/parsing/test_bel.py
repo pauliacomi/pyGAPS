@@ -2,7 +2,8 @@
 
 import pytest
 
-import pygaps
+import pygaps.parsing.json as pgpj
+import pygaps.parsing.bel_dat as pgpbel
 
 from .conftest import DATA_BEL
 
@@ -14,6 +15,6 @@ class TestBEL():
 
         for path in DATA_BEL:
 
-            isotherm = pygaps.isotherm_from_bel(path=path)
+            isotherm = pgpbel.isotherm_from_bel(path=path)
             json_path = str(path).replace('.DAT', '.json')
-            assert isotherm == pygaps.isotherm_from_json(json_path)
+            assert isotherm == pgpj.isotherm_from_json(json_path)

@@ -8,11 +8,12 @@ from itertools import cycle
 
 import numpy
 from cycler import cycler
+from matplotlib import cm
+from matplotlib.figure import Figure
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
 from ..utilities.python_utilities import deep_merge
-from . import plt
 from .axis_labels import label_axis_text_pl
 from .axis_labels import label_lgd
 from .mpl_styles import ISO_STYLES
@@ -264,7 +265,7 @@ def plot_iso(
         ax1 = ax
         fig = ax1.get_figure()
     else:
-        fig = plt.pyplot.figure(**styles['fig_style'])
+        fig = Figure(**styles['fig_style'])
         ax1 = fig.add_subplot(111)
 
     # Create second axes object, populate it if required
@@ -275,9 +276,9 @@ def plot_iso(
     # Color styling
     if color:
         if isinstance(color, bool):
-            colors = (plt.cm.jet(x) for x in numpy.linspace(0, 1, 7))
+            colors = (cm.jet(x) for x in numpy.linspace(0, 1, 7))
         elif isinstance(color, int):
-            colors = (plt.cm.jet(x) for x in numpy.linspace(0, 1, color))
+            colors = (cm.jet(x) for x in numpy.linspace(0, 1, color))
         elif isinstance(color, abc.Iterable):
             colors = color
         else:

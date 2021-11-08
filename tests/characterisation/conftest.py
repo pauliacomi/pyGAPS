@@ -35,7 +35,6 @@ from pathlib import Path
 
 DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
 DATA_N77_PATH = DATA_PATH / 'characterisation'
-DATA_IAST_PATH = DATA_PATH / 'iast'
 DATA_ISOSTERIC_PATH = DATA_PATH / 'isosteric'
 DATA_CALO_PATH = DATA_PATH / 'calorimetry'
 
@@ -101,15 +100,6 @@ DATA = {
         'Khi_virial': 1350000,
         'psd_micro_pore_size': 0.7,
         'psd_dft_pore_size': 0.6,
-    },
-}
-
-DATA_IAST = {
-    'CH4': {
-        'file': 'MOF-5(Zn) - IAST - CH4.json',
-    },
-    'C2H6': {
-        'file': 'MOF-5(Zn) - IAST - C2H6.json',
     },
 }
 

@@ -4,6 +4,7 @@ import subprocess
 import pytest
 
 import pygaps
+import pygaps.parsing as pgp
 
 
 def capture(command, **extra):
@@ -96,7 +97,7 @@ class TestCLI():
         assert exitcode == 0
 
         assert isinstance(
-            pygaps.isotherm_from_json(outpath), pygaps.ModelIsotherm
+            pgp.isotherm_from_json(outpath), pygaps.ModelIsotherm
         )
 
     def test_convert(self, basic_pointisotherm, tmpdir_factory):
@@ -114,4 +115,4 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-        assert pygaps.isotherm_from_json(outpath).pressure_mode == 'relative'
+        assert pgp.isotherm_from_json(outpath).pressure_mode == 'relative'

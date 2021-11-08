@@ -17,6 +17,8 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
+import pygaps.parsing.json as pgpj
+import pygaps.characterisation.alphas as als
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
@@ -31,11 +33,11 @@ class TestAlphaSPlot():
 
         # Will raise a "no reference isotherm" error
         with pytest.raises(pgEx.ParameterError):
-            pygaps.alpha_s(basic_pointisotherm, None)
+            als.alpha_s(basic_pointisotherm, None)
 
         # Will raise a "no reference isotherm" error
         with pytest.raises(pgEx.ParameterError):
-            pygaps.alpha_s(basic_pointisotherm, 'isotherm')
+            als.alpha_s(basic_pointisotherm, 'isotherm')
 
         # Will raise a "adsorbate not the same" error
         ref_iso = pygaps.PointIsotherm(
@@ -46,11 +48,11 @@ class TestAlphaSPlot():
             temperature=87
         )
         with pytest.raises(pgEx.ParameterError):
-            pygaps.alpha_s(basic_pointisotherm, ref_iso)
+            als.alpha_s(basic_pointisotherm, ref_iso)
 
         # Will raise a "bad reducing pressure" error
         with pytest.raises(pgEx.ParameterError):
-            pygaps.alpha_s(
+            als.alpha_s(
                 basic_pointisotherm,
                 basic_pointisotherm,
                 reducing_pressure=1.3
@@ -58,7 +60,7 @@ class TestAlphaSPlot():
 
         # Will raise a "bad reference_area value" error
         with pytest.raises(pgEx.ParameterError):
-            pygaps.alpha_s(
+            als.alpha_s(
                 basic_pointisotherm,
                 basic_pointisotherm,
                 reference_area='some'
@@ -72,14 +74,14 @@ class TestAlphaSPlot():
         if sample.get('as_area', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgpj.isotherm_from_json(filepath)
             ref_filepath = DATA_N77_PATH / DATA[sample['as_ref']]['file']
-            ref_isotherm = pygaps.isotherm_from_json(ref_filepath)
+            ref_isotherm = pgpj.isotherm_from_json(ref_filepath)
             mref_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
                 ref_isotherm, model='BET'
             )
 
-            res = pygaps.alpha_s(isotherm, mref_isotherm)
+            res = als.alpha_s(isotherm, mref_isotherm)
             results = res.get('results')
 
             err_relative = 0.1  # 10 percent
@@ -100,9 +102,9 @@ class TestAlphaSPlot():
 
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
+        isotherm = pgpj.isotherm_from_json(filepath)
 
-        res = pygaps.alpha_s(isotherm, isotherm, limits=[0.7, 1.0])
+        res = als.alpha_s(isotherm, isotherm, limits=[0.7, 1.0])
         results = res.get('results')
 
         err_relative = 0.1  # 10 percent
@@ -123,5 +125,5 @@ class TestAlphaSPlot():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.alpha_s(isotherm, isotherm, verbose=True)
+        isotherm = pgpj.isotherm_from_json(filepath)
+        als.alpha_s(isotherm, isotherm, verbose=True)

@@ -16,7 +16,8 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
-import pygaps
+import pygaps.characterisation.tplot as pt
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
@@ -31,7 +32,7 @@ class TestTPlot():
 
         # Will raise a "no suitable model exception"
         with pytest.raises(pgEx.ParameterError):
-            pygaps.t_plot(basic_pointisotherm, thickness_model='random')
+            pt.t_plot(basic_pointisotherm, thickness_model='random')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_tplot(self, sample):
@@ -41,9 +42,9 @@ class TestTPlot():
         if sample.get('t_area', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
 
-            res = pygaps.t_plot(isotherm)
+            res = pt.t_plot(isotherm)
             results = res.get('results')
 
             err_relative = 0.1  # 10 percent
@@ -64,9 +65,9 @@ class TestTPlot():
 
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
+        isotherm = pgp.isotherm_from_json(filepath)
 
-        res = pygaps.t_plot(isotherm, limits=[0.7, 1.0])
+        res = pt.t_plot(isotherm, limits=[0.7, 1.0])
         results = res.get('results')
 
         err_relative = 0.1  # 10 percent
@@ -87,5 +88,5 @@ class TestTPlot():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.t_plot(isotherm, 'Halsey', verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        pt.t_plot(isotherm, 'Halsey', verbose=True)
