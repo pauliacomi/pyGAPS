@@ -40,6 +40,24 @@ class TestBaseIsotherm():
         with pytest.raises(pgEx.ParameterError):
             pygaps.core.baseisotherm.BaseIsotherm(**isotherm_parameters)
 
+    def test_isotherm_special_members(self):
+        isotherm = pygaps.core.baseisotherm.BaseIsotherm(
+            material='carbon',
+            adsorbate='nitrogen',
+            temperature=77,
+        )
+        assert isotherm._material == isotherm.material
+        assert isotherm._adsorbate == isotherm.adsorbate
+
+        assert isinstance(isotherm.material, pygaps.Material)
+        assert isinstance(isotherm.adsorbate, pygaps.Adsorbate)
+
+        isotherm.material = "zeolite"
+        isotherm.adsorbate = "oxygen"
+
+        assert isinstance(isotherm.material, pygaps.Material)
+        assert isinstance(isotherm.adsorbate, pygaps.Adsorbate)
+
     @pytest.mark.parametrize(
         'update', [
             ({
@@ -94,6 +112,16 @@ class TestBaseIsotherm():
 
         with pytest.raises(pgEx.ParameterError):
             pygaps.core.baseisotherm.BaseIsotherm(**isotherm_parameters)
+
+    def test_isotherm_convert_temperature(self, basic_isotherm):
+        """Test if temperatures can be converted."""
+        temp = basic_isotherm.temperature
+        assert temp == basic_isotherm._temperature
+
+        basic_isotherm.convert_temperature(unit_to="°C", verbose=True)
+        basic_isotherm.convert_temperature(unit_to="K", verbose=True)
+
+        assert temp == basic_isotherm.temperature
 
     def test_isotherm_get_parameters(
         self, isotherm_parameters, basic_isotherm

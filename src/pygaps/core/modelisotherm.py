@@ -93,7 +93,11 @@ class ModelIsotherm(BaseIsotherm):
 
     """
 
-    _reserved_params = ['model', 'param_guess', 'param_bounds']
+    _reserved_params = BaseIsotherm._reserved_params + [
+        'model',
+        'param_guess',
+        'param_bounds',
+    ]
 
     ##########################################################
     #   Instantiation and classmethods

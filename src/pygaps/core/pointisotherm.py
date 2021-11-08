@@ -93,7 +93,7 @@ class PointIsotherm(BaseIsotherm):
 
     """
 
-    _reserved_params = [
+    _reserved_params = BaseIsotherm._reserved_params + [
         'data_raw',
         'l_interpolator',
         'p_interpolator',

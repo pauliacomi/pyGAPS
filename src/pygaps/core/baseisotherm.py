@@ -13,6 +13,7 @@ from ..core.adsorbate import Adsorbate
 from ..utilities.converter_mode import _LOADING_MODE
 from ..utilities.converter_mode import _MATERIAL_MODE
 from ..utilities.converter_mode import _PRESSURE_MODE
+from ..utilities.converter_mode import c_temperature
 from ..utilities.converter_unit import _PRESSURE_UNITS
 from ..utilities.converter_unit import _TEMPERATURE_UNITS
 from ..utilities.exceptions import ParameterError
@@ -82,8 +83,12 @@ class BaseIsotherm():
         'temperature_unit': 'K',
     }
     # other special reserved parameters
-    # subclasses overwrite this
-    _reserved_params = []
+    # subclasses extend this
+    _reserved_params = [
+        "_material",
+        "_adsorbate",
+        "_temperature",
+    ]
 
     ##########################################################
     #   Instantiation and classmethods
@@ -107,22 +112,9 @@ class BaseIsotherm():
 
         # Isotherm material
         self.material = properties.pop('material')
-        try:
-            self.material = Material.find(self.material)
-        except ParameterError:
-            self.material = Material(self.material)
 
         # Isotherm adsorbate
         self.adsorbate = properties.pop('adsorbate')
-        try:
-            self.adsorbate = Adsorbate.find(self.adsorbate)
-        except ParameterError:
-            self.adsorbate = Adsorbate(self.adsorbate)
-            warnings.warn((
-                "Specified adsorbate is not in internal list "
-                "(or name cannot be resolved to an existing one). "
-                "CoolProp backend disabled for this gas/vapour."
-            ))
 
         # TODO deprecation
         old_basis = properties.pop('adsorbent_basis', None)
@@ -219,6 +211,43 @@ class BaseIsotherm():
         """Return an unique identifier of the isotherm."""
         return isotherm_to_hash(self)
 
+    @property
+    def material(self):
+        return self._material
+
+    @material.setter
+    def material(self, value):
+        try:
+            self._material = Material.find(value)
+        except ParameterError:
+            self._material = Material(value)
+
+    @property
+    def adsorbate(self):
+        return self._adsorbate
+
+    @adsorbate.setter
+    def adsorbate(self, value):
+        try:
+            self._adsorbate = Adsorbate.find(value)
+        except ParameterError:
+            self._adsorbate = Adsorbate(value)
+            warnings.warn((
+                "Specified adsorbate is not in internal list "
+                "(or name cannot be resolved to an existing one). "
+                "CoolProp backend disabled for this gas/vapour."
+            ))
+
+    @property
+    def temperature(self):
+        if self.temperature_unit == "K":
+            return self._temperature
+        return c_temperature(self._temperature, self.temperature_unit, "K")
+
+    @temperature.setter
+    def temperature(self, value):
+        self._temperature = value
+
     def __eq__(self, other_isotherm):
         """
         Overload the equality operator of the isotherm.
@@ -271,8 +300,9 @@ class BaseIsotherm():
         parameter_dict = vars(self).copy()
 
         # These line are here to ensure that material/adsorbate are copied as a string
-        parameter_dict['adsorbate'] = str(parameter_dict['adsorbate'])
-        parameter_dict['material'] = str(parameter_dict['material'])
+        parameter_dict['adsorbate'] = str(parameter_dict.pop('_adsorbate'))
+        parameter_dict['material'] = str(parameter_dict.pop('_material'))
+        parameter_dict['temperature'] = parameter_dict.pop('_temperature')
 
         # Remove reserved parameters
         for param in self._reserved_params:
@@ -385,6 +415,19 @@ class BaseIsotherm():
             verbose=verbose,
             **kwargs
         )
+
+    def convert_temperature(
+        self,
+        unit_to: str,
+        verbose: bool = False,
+    ):
+        self._temperature = c_temperature(
+            self._temperature, self.temperature_unit, unit_to
+        )
+        self.temperature_unit = unit_to
+
+        if verbose:
+            logger.info(f"Changed temperature unit to '{unit_to}'.")
 
     # Figure out the adsorption and desorption branches
     @staticmethod
