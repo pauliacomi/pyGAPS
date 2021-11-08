@@ -408,6 +408,6 @@ def c_temperature(value, unit_from, unit_to):
 
     """
     if unit_from == unit_to:
-        return
+        return value
 
     return value - _TEMPERATURE_UNITS[unit_to]

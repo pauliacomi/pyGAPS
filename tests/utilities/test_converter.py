@@ -132,3 +132,22 @@ class TestConversions():
         )
 
         assert result == pytest.approx(value, rel=1e-3)
+
+    @pytest.mark.parametrize(
+        'value, u_f, u_t',
+        [
+            (0, 'K', 'K'),  # 0 K -> 0 K
+            (0, '°C', '°C'),  # 0 °C -> 0 °C
+            (-273.15, 'K', '°C'),  # 0 K -> -273.15 °C
+            (273.15, '°C', 'K'),  # 0 °C -> 273.15 K
+        ]
+    )
+    def test_convert_pressure(self, value, u_f, u_t):
+
+        result = converter_mode.c_temperature(
+            0,
+            unit_from=u_f,
+            unit_to=u_t,
+        )
+
+        assert result == pytest.approx(value, rel=1e-3)
