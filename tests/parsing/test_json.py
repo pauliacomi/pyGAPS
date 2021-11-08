@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 
-import pygaps
 import pygaps.parsing.json as pgpj
 
 
