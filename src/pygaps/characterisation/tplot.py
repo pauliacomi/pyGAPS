@@ -6,8 +6,8 @@ logger = logging.getLogger('pygaps')
 import warnings
 
 import numpy
+from scipy import stats
 
-from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import tp_plot
 from ..utilities.exceptions import CalculationError
@@ -278,7 +278,7 @@ def t_plot_parameters(
 ):
     """Calculate the parameters from a linear section of the t-plot."""
 
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         thickness_curve[section], loading[section]
     )
 

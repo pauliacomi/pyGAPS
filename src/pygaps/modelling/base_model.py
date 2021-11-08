@@ -6,8 +6,8 @@ import logging
 logger = logging.getLogger('pygaps')
 
 import numpy
+from scipy import optimize
 
-from .. import scipy
 from ..utilities.exceptions import CalculationError
 
 
@@ -222,7 +222,7 @@ class IsothermBaseModel():
 
         # minimize RSS
         try:
-            opt_res = scipy.optimize.least_squares(
+            opt_res = optimize.least_squares(
                 fit_func,
                 guess,  # provide the fit function and initial guess
                 args=(pressure, loading

@@ -6,8 +6,8 @@ logger = logging.getLogger('pygaps')
 import warnings
 
 import numpy
+from scipy import optimize
 
-from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import initial_enthalpy_plot
 from ..utilities.exceptions import CalculationError
@@ -315,7 +315,7 @@ def initial_enthalpy_comp(
             logger.info(f"\tprepowa = {guess[4]}, powa = {guess[5]}")
             logger.info(f"\tprepowr = {guess[6]}, powr = {guess[7]}")
 
-        opt_res = scipy.optimize.minimize(
+        opt_res = optimize.minimize(
             residual_sum_of_squares,
             guess,
             bounds=bounds_arr,

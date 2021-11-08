@@ -1,8 +1,9 @@
 """Dubinin-Radushkevitch isotherm model."""
 
 import numpy
+from scipy import constants
+from scipy import integrate
 
-from .. import scipy
 from .base_model import IsothermBaseModel
 
 
@@ -58,7 +59,7 @@ class DR(IsothermBaseModel):
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -scipy.const.gas_constant * parameters['temperature']
+        self.minus_rt = -constants.gas_constant * parameters['temperature']
 
     def loading(self, pressure):
         """
@@ -127,9 +128,7 @@ class DR(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(
-            lambda x: self.loading(x) / x, 0, pressure
-        )[0]
+        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """

@@ -26,10 +26,6 @@ from .characterisation.area_langmuir import area_langmuir
 from .characterisation.area_langmuir import area_langmuir_raw
 from .characterisation.dr_da_plots import da_plot
 from .characterisation.dr_da_plots import dr_plot
-from .iast.iast import iast
-from .iast.iast import iast_binary_svp
-from .iast.iast import iast_binary_vle
-from .iast.iast import reverse_iast
 from .characterisation.initial_enthalpy import initial_enthalpy_comp
 from .characterisation.initial_enthalpy import initial_enthalpy_point
 from .characterisation.initial_henry import initial_henry_slope
@@ -41,6 +37,12 @@ from .characterisation.psd_mesoporous import psd_mesoporous
 from .characterisation.psd_microporous import psd_microporous
 from .characterisation.tplot import t_plot
 from .characterisation.tplot import t_plot_raw
+
+# IAST
+from .iast.iast import iast
+from .iast.iast import iast_binary_svp
+from .iast.iast import iast_binary_vle
+from .iast.iast import reverse_iast
 
 # Modelling/fitting
 from .modelling import model_iso

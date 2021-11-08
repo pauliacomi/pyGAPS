@@ -6,8 +6,8 @@ logger = logging.getLogger('pygaps')
 import warnings
 
 import numpy
+from scipy import optimize
 
-from .. import scipy
 from ..graphing.calc_graphs import virial_plot
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
@@ -77,7 +77,7 @@ class Virial(IsothermBaseModel):
         def fun(x):
             return (self.pressure(x) - pressure)**2
 
-        opt_res = scipy.optimize.minimize(fun, pressure, method='Nelder-Mead')
+        opt_res = optimize.minimize(fun, pressure, method='Nelder-Mead')
 
         if not opt_res.success:
             raise CalculationError(
@@ -245,7 +245,7 @@ class Virial(IsothermBaseModel):
             kwargs.update(optimization_params)
 
         # minimize RSS
-        opt_res = scipy.optimize.least_squares(
+        opt_res = optimize.least_squares(
             fit_func,
             guess,  # provide the fit function and initial guess
             args=(loading, ln_p_over_n

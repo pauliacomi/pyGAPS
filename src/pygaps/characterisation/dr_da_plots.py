@@ -5,8 +5,10 @@ import logging
 logger = logging.getLogger('pygaps')
 
 import numpy
+from scipy import constants
+from scipy import optimize
+from scipy import stats
 
-from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import dra_plot
 from ..utilities.exceptions import CalculationError
@@ -328,7 +330,7 @@ def da_plot_raw(
 
     def fit(exp, ret=False):
         """Linear fit."""
-        slope, intercept, corr_coef, p_val, stderr = scipy.stats.linregress(
+        slope, intercept, corr_coef, p_val, stderr = stats.linregress(
             log_p_exp(pressure, exp), logv
         )
 
@@ -338,9 +340,7 @@ def da_plot_raw(
 
     if exp is None:
 
-        res = scipy.optimize.minimize_scalar(
-            fit, bounds=[1, 3], method='bounded'
-        )
+        res = optimize.minimize_scalar(fit, bounds=[1, 3], method='bounded')
 
         if not res.success:
             raise CalculationError(
@@ -355,7 +355,7 @@ def da_plot_raw(
     microp_volume = 10**intercept
     potential = (
         -numpy.log(10)**(exp - 1) *
-        (scipy.const.gas_constant * iso_temp)**(exp) / slope
+        (constants.gas_constant * iso_temp)**(exp) / slope
     )**(1 / exp) / 1000
 
     return (

@@ -3,8 +3,8 @@
 from itertools import groupby
 
 import numpy
+from scipy import interpolate
 
-from .. import scipy
 from .exceptions import ParameterError
 
 
@@ -89,6 +89,6 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     rng = numpy.linspace(periodic, (count - degree), n)
 
     # Calculate result
-    res = numpy.array(scipy.interp.splev(rng, (kv, cv.T, degree))).T
+    res = numpy.array(interpolate.splev(rng, (kv, cv.T, degree))).T
 
     return (numpy.array([x[0] for x in res]), numpy.array([y[1] for y in res]))

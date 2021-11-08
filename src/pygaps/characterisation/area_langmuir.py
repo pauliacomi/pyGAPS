@@ -7,8 +7,9 @@ import textwrap
 import warnings
 
 import numpy
+from scipy import constants
+from scipy import stats
 
-from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import langmuir_plot
 from ..utilities.exceptions import CalculationError
@@ -263,7 +264,7 @@ def langmuir_transform(pressure, loading):
 
 def langmuir_optimisation(pressure, langmuir_points):
     """Finds the slope and intercept of the Langmuir region."""
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         pressure, langmuir_points
     )
     return slope, intercept, corr_coef
@@ -274,5 +275,5 @@ def langmuir_parameters(slope, intercept, cross_section):
     n_monolayer = 1 / slope
     langmuir_const = 1 / (intercept * n_monolayer)
     langmuir_area = n_monolayer * cross_section * \
-        (10**(-18)) * scipy.const.Avogadro
+        (10**(-18)) * constants.Avogadro
     return n_monolayer, langmuir_const, langmuir_area

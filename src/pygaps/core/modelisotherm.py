@@ -7,9 +7,6 @@ logger = logging.getLogger('pygaps')
 import numpy
 import pandas
 
-from ..graphing.isotherm_graphs import plot_iso
-from ..graphing.mpl_styles import LEGEND_STYLE
-from ..graphing.mpl_styles import POINTS_ALL_STYLE
 from ..modelling import _GUESS_MODELS
 from ..modelling import _MODELS
 from ..modelling import get_isotherm_model
@@ -255,6 +252,7 @@ class ModelIsotherm(BaseIsotherm):
                 ax = self.plot(
                     y1_line_style=dict(markersize=0), x_points=pressure
                 )
+            from pygaps.graphing.mpl_styles import POINTS_ALL_STYLE
             ax.plot(pressure, loading, zorder=-1, **POINTS_ALL_STYLE)
             ax.legend([self.model.name], frameon=False)
 
@@ -500,6 +498,9 @@ class ModelIsotherm(BaseIsotherm):
             if loading is None:
                 pressure = isotherm_data[pressure_key]
                 loading = isotherm_data[loading_key]
+            from pygaps.graphing.isotherm_graphs import plot_iso
+            from pygaps.graphing.mpl_styles import LEGEND_STYLE
+            from pygaps.graphing.mpl_styles import POINTS_ALL_STYLE
             ax = plot_iso(
                 attempts,
                 color=len(attempts),
@@ -578,6 +579,7 @@ class ModelIsotherm(BaseIsotherm):
         )
         plot_dict.update(plot_iso_args)
 
+        from pygaps.graphing.isotherm_graphs import plot_iso
         return plot_iso(self, **plot_dict)
 
     ##########################################################

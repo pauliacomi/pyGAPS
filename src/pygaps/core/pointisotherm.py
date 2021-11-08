@@ -10,7 +10,6 @@ import textwrap
 import numpy
 import pandas
 
-from ..graphing.isotherm_graphs import plot_iso
 from ..utilities.converter_mode import c_loading
 from ..utilities.converter_mode import c_material
 from ..utilities.converter_mode import c_pressure
@@ -631,6 +630,7 @@ class PointIsotherm(BaseIsotherm):
         )
         plot_dict.update(plot_iso_args)
 
+        from pygaps.graphing.isotherm_graphs import plot_iso
         return plot_iso(self, **plot_dict)
 
     ##########################################################

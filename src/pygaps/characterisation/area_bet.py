@@ -7,8 +7,9 @@ import textwrap
 import warnings
 
 import numpy
+from scipy import constants
+from scipy import stats
 
-from .. import scipy
 from ..core.adsorbate import Adsorbate
 from ..graphing.calc_graphs import bet_plot
 from ..graphing.calc_graphs import roq_plot
@@ -341,7 +342,7 @@ def bet_transform(pressure, loading):
 
 def bet_optimisation(pressure, bet_points):
     """Find the slope and intercept of the BET region."""
-    slope, intercept, corr_coef, p, stderr = scipy.stats.linregress(
+    slope, intercept, corr_coef, p, stderr = stats.linregress(
         pressure, bet_points
     )
     return slope, intercept, corr_coef
@@ -353,5 +354,5 @@ def bet_parameters(slope, intercept, cross_section):
     c_const = (slope / intercept) + 1
     n_monolayer = 1 / (intercept * c_const)
     p_monolayer = 1 / (numpy.sqrt(c_const) + 1)
-    bet_area = n_monolayer * cross_section * (10**(-18)) * scipy.const.Avogadro
+    bet_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
     return n_monolayer, p_monolayer, c_const, bet_area
