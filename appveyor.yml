@@ -25,34 +25,42 @@ environment:
   matrix:
 
 
-    - PYTHON_VERSION: '3.6'
+    - PYTHON_VERSION: '3.10-cover'
       platform: x86
 
-    - PYTHON_VERSION: '3.6'
+    - PYTHON_VERSION: '3.10-cover'
       platform: x64
 
 
 
-    - PYTHON_VERSION: '3.7'
+    - PYTHON_VERSION: '3.6-cover'
       platform: x86
 
-    - PYTHON_VERSION: '3.7'
+    - PYTHON_VERSION: '3.6-cover'
       platform: x64
 
 
 
-    - PYTHON_VERSION: '3.8'
+    - PYTHON_VERSION: '3.7-cover'
       platform: x86
 
-    - PYTHON_VERSION: '3.8'
+    - PYTHON_VERSION: '3.7-cover'
       platform: x64
 
 
 
-    - PYTHON_VERSION: '3.9'
+    - PYTHON_VERSION: '3.8-cover'
       platform: x86
 
-    - PYTHON_VERSION: '3.9'
+    - PYTHON_VERSION: '3.8-cover'
+      platform: x64
+
+
+
+    - PYTHON_VERSION: '3.9-cover'
+      platform: x86
+
+    - PYTHON_VERSION: '3.9-cover'
       platform: x64
 
 

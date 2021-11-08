@@ -26,13 +26,13 @@ environment:
 {% for env in tox_environments %}{{ '' }}
 {% if env.startswith(('py2', 'py3')) %}
 
-    - PYTHON_VERSION: '{{ env[2] }}.{{ env[3] }}'
+    - PYTHON_VERSION: '{{ env[2] }}.{{ env[3:] }}'
       platform: x86
 {% if 'nocov' in env %}
       WHEEL_PATH: .tox/dist
 {% endif %}
 
-    - PYTHON_VERSION: '{{ env[2] }}.{{ env[3] }}'
+    - PYTHON_VERSION: '{{ env[2] }}.{{ env[3:] }}'
       platform: x64
 {% if 'nocov' in env %}
       WHEEL_PATH: .tox/dist

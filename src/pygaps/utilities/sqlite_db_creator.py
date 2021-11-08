@@ -71,8 +71,7 @@ def db_execute_general(statement, pth, verbose=False):
     """
     # Attempt to connect
     try:
-        # TODO remove str call on python 3.7
-        with sqlite3.connect(str(pth)) as db:
+        with sqlite3.connect(pth) as db:
 
             # Get a cursor object
             cursor = db.cursor()

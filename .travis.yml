@@ -71,22 +71,27 @@ jobs:
         - pandoc
     # Create an test job on the test stage for each python version
     - stage: test
-      python: '3.6'
+      python: '3.10-cover'
+      dist: bionic
+      env:
+        - TOXENV=py310-cover,report,codecov
+    - stage: test
+      python: '3.6-cover'
       dist: bionic
       env:
         - TOXENV=py36-cover,report,codecov
     - stage: test
-      python: '3.7'
+      python: '3.7-cover'
       dist: bionic
       env:
         - TOXENV=py37-cover,report,codecov
     - stage: test
-      python: '3.8'
+      python: '3.8-cover'
       dist: bionic
       env:
         - TOXENV=py38-cover,report,codecov
     - stage: test
-      python: '3.9'
+      python: '3.9-cover'
       dist: bionic
       env:
         - TOXENV=py39-cover,report,codecov
