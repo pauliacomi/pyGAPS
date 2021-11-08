@@ -27,7 +27,14 @@ class Material():
     which can be set.
 
     """
-    def __init__(self, name: str, **properties):
+    # special reserved parameters
+    _reserved_params = [
+        "name",
+        "density",
+        "molar_mass",
+    ]
+
+    def __init__(self, name: str, store: bool = True, **properties):
         """Instantiate by passing all the parameters."""
         # Material name
         self.name = name
@@ -35,8 +42,10 @@ class Material():
         # Rest of material properties
         self.properties = properties
 
-        # TODO
-        # auto-upload materials to global list?
+        # Store reference in internal list
+        if store:
+            if self not in MATERIAL_LIST:
+                MATERIAL_LIST.append(self)
 
     def __repr__(self):
         """Print material id."""
@@ -124,6 +133,26 @@ class Material():
         parameters_dict.update(self.properties)
         return parameters_dict
 
+    @property
+    def density(self):
+        """Material density (optional)."""
+        return self.properties.get("density")
+
+    @density.setter
+    def density(self, val):
+        if val:
+            self.properties["density"] = float(val)
+
+    @property
+    def molar_mass(self):
+        """Material molar mass (optional)."""
+        return self.properties.get("molar_mass")
+
+    @molar_mass.setter
+    def molar_mass(self, val):
+        if val:
+            self.properties["molar_mass"] = float(val)
+
     def get_prop(self, prop):
         """
         Return a property from the internal dictionary.
@@ -148,9 +177,9 @@ class Material():
         if req_prop is None:
             try:
                 req_prop = getattr(self, prop)
-            except AttributeError:
+            except AttributeError as exc:
                 raise ParameterError(
                     f"Material '{self.name}' does not have a property named '{prop}'."
-                )
+                ) from exc
 
         return req_prop

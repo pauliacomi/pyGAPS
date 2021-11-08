@@ -85,7 +85,15 @@ class Adsorbate():
         adsorbate.backend.p_critical()
 
     """
-    def __init__(self, name: str = None, **properties):
+    # special reserved parameters
+    _reserved_params = [
+        "name",
+        "alias",
+        "_state",
+        "_backend_mode",
+    ]
+
+    def __init__(self, name: str = None, store: bool = False, **properties):
         """Instantiate by passing a dictionary with the parameters."""
         # Adsorbate name
         if name is None:
@@ -116,8 +124,10 @@ class Adsorbate():
         self._state = None
         self._backend_mode = None
 
-        # TODO
-        # auto-upload adsorbates to global list?
+        # Store reference in internal list
+        if store:
+            if self not in ADSORBATE_LIST:
+                ADSORBATE_LIST.append(self)
 
     def __repr__(self):
         """Print adsorbate id."""

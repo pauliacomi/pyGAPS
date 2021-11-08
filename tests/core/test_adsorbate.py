@@ -57,6 +57,13 @@ class TestAdsorbate():
             pygaps.Adsorbate.find(2)
         pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
 
+        uploaded = pygaps.Adsorbate("uploaded", store=True)
+        assert uploaded == pygaps.Adsorbate.find('uploaded')
+
+        not_uploaded = pygaps.Adsorbate("not_uploaded", store=False)
+        with pytest.raises(pgEx.ParameterError):
+            pygaps.Adsorbate.find('not_uploaded')
+
     def test_adsorbate_find_equals(self):
         """Check standard adsorbates can be found."""
         ads = pygaps.Adsorbate.find('N2')
