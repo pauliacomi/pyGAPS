@@ -119,8 +119,11 @@ class ModelIsotherm(BaseIsotherm):
         used and fitting method as well as the parameters required by parent
         class.
         """
-        # Checks
 
+        # Run base class constructor
+        super().__init__(**isotherm_parameters)
+
+        # Checks
         if model is None:
             raise ParameterError(
                 "Specify a model to fit to the pure-component"
@@ -238,9 +241,6 @@ class ModelIsotherm(BaseIsotherm):
                 optimization_params,
                 verbose,
             )
-
-        # Run base class constructor
-        BaseIsotherm.__init__(self, **isotherm_parameters)
 
         # Plot fit if verbose
         if verbose and isotherm_parameters.get('plot_fit', True):

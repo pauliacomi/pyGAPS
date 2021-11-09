@@ -120,6 +120,9 @@ class PointIsotherm(BaseIsotherm):
         DataFrame, the column keys as string as well as the parameters
         required by parent class.
         """
+        # Run base class constructor
+        super().__init__(**isotherm_parameters)
+
         # Checks
         if isotherm_data is not None:
             if None in [pressure_key, loading_key]:
@@ -185,9 +188,6 @@ class PointIsotherm(BaseIsotherm):
                 "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
                 " or directly ``pressure`` and ``loading`` as arrays."
             )
-
-        # Run base class constructor
-        BaseIsotherm.__init__(self, **isotherm_parameters)
 
         # Deal with the isotherm branches
         if 'branch' in self.data_raw.columns:
