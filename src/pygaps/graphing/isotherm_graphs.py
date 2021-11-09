@@ -9,7 +9,7 @@ from itertools import cycle
 import numpy
 from cycler import cycler
 from matplotlib import cm
-from matplotlib.figure import Figure
+from matplotlib.pyplot import figure
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
@@ -265,7 +265,7 @@ def plot_iso(
         ax1 = ax
         fig = ax1.get_figure()
     else:
-        fig = Figure(**styles['fig_style'])
+        fig = figure(**styles['fig_style'])
         ax1 = fig.add_subplot(111)
 
     # Create second axes object, populate it if required
@@ -432,7 +432,7 @@ def plot_iso(
     )
 
     if ax2:
-        return [ax1, ax2]
+        return (ax1, ax2)
     return ax1
 
 
