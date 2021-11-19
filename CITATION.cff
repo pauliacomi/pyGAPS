@@ -1,0 +1,15 @@
+
+@article{iacomiPyGAPSPythonbasedFramework2019,
+	title = {{pyGAPS}: a {Python}-based framework for adsorption isotherm processing and material characterisation},
+	volume = {25},
+	copyright = {All rights reserved},
+	issn = {1572-8757},
+	url = {https://doi.org/10.1007/s10450-019-00168-5},
+	doi = {10.1007/s10450-019-00168-5},
+  number = {8},
+	journal = {Adsorption},
+	author = {Iacomi, Paul and Llewellyn, Philip L.},
+	month = sep,
+	year = {2019},
+	pages = {1533--1542},
+}
