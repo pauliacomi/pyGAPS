@@ -20,6 +20,12 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.hashgen import isotherm_to_hash
 from ..utilities.python_utilities import simplewarning
 
+SHORTHANDS = {
+    'm': "material",
+    't': "temperature",
+    'a': "adsorbate",
+}
+
 
 class BaseIsotherm():
     """
@@ -85,9 +91,7 @@ class BaseIsotherm():
     # other special reserved parameters
     # subclasses extend this
     _reserved_params = [
-        "_material",
-        "_adsorbate",
-        "_temperature",
+        "_material", "_adsorbate", "_temperature", "m", "t", "a"
     ]
 
     ##########################################################
@@ -99,6 +103,12 @@ class BaseIsotherm():
         as well as the info about units, modes and data columns.
 
         """
+        # commonly used shorthands
+        for shorthand in SHORTHANDS:
+            data = properties.pop(shorthand, None)
+            if data:
+                properties[SHORTHANDS[shorthand]] = data
+
         # Must-have properties of the isotherm
         #
         # Basic checks
