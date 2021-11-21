@@ -2,6 +2,19 @@
 Changelog
 =========
 
+3.2.0 (2021-??-??)
+-----------------
+
+New features:
+
+Changes:
+
+* Isotherm ``material`` and ``adsorbate`` are now always instantiated as
+  ``pygaps.Material`` and ``pygaps.Adsorbate`` classes.
+* Added a "zero" thickness model that assumes no mono/multilayer sorption.
+  Useful in the case of condensation in hydrophobic materials.
+
+
 3.1.0 (2021-04-22)
 -----------------
 
