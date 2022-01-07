@@ -412,10 +412,10 @@ def plot_iso(
                 isotherm, 'ads', y1_line_style, y2_line_style, **iso_params
             )
 
-        # Switch to desorption linestyle (dotted, open marker)
-        y1_line_style['markerfacecolor'] = 'none'
+        # Switch to desorption linestyle (dotted, white marker)
+        y1_line_style['markerfacecolor'] = 'white'
         y1_line_style['linestyle'] = '--'
-        y2_line_style['markerfacecolor'] = 'none'
+        y2_line_style['markerfacecolor'] = 'white'
 
         # If there's a desorption branch, plot it
         if des and isotherm.has_branch('des'):
