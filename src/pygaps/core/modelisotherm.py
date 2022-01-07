@@ -647,7 +647,7 @@ class ModelIsotherm(BaseIsotherm):
                 f"ModelIsotherm is based on an '{self.branch}' branch "
                 f"(while parameter supplied was '{branch}')."
             )
-
+        # TODO: to calculate limits like this, better to put the limits directly to evaluate
         # Generate pressure points
         if self.model.calculates == 'loading':
             ret = numpy.linspace(
