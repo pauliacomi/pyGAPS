@@ -61,7 +61,7 @@ def thickness_zero(pressure):
 _THICKNESS_MODELS = {
     "Halsey": thickness_halsey,
     "Harkins/Jura": thickness_harkins_jura,
-    "zero": thickness_zero,
+    "Zero thickness": thickness_zero,
 }
 
 
