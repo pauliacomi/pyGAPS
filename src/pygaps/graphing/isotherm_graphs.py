@@ -197,29 +197,20 @@ def plot_iso(
         return ['loading', 'pressure'] + getattr(iso, 'other_keys', [])
 
     if any(x_data not in keys(isotherm) for isotherm in isotherms):
-        raise GraphingError(
-            f"One of the isotherms supplied does not have {x_data} data."
-        )
+        raise GraphingError(f"One of the isotherms supplied does not have {x_data} data.")
 
     if any(y1_data not in keys(isotherm) for isotherm in isotherms):
-        raise GraphingError(
-            f"One of the isotherms supplied does not have {y1_data} data."
-        )
+        raise GraphingError(f"One of the isotherms supplied does not have {y1_data} data.")
 
     if y2_data:
         if all(y2_data not in keys(isotherm) for isotherm in isotherms):
-            raise GraphingError(
-                f"None of the isotherms supplied have {y2_data} data"
-            )
+            raise GraphingError(f"None of the isotherms supplied have {y2_data} data")
         if any(y2_data not in keys(isotherm) for isotherm in isotherms):
             warnings.warn(f"Some isotherms do not have {y2_data} data")
 
     # Store which branches will be displayed
     if not branch:
-        raise ParameterError(
-            "Specify a branch to display"
-            " e.g. branch=\'ads\'"
-        )
+        raise ParameterError("Specify a branch to display" " e.g. branch=\'ads\'")
     if branch not in _BRANCH_TYPES:
         raise GraphingError(
             "The supplied branch type is not valid."
@@ -232,18 +223,12 @@ def plot_iso(
     log_params = dict(logx=logx, logy1=logy1, logy2=logy2)
     range_params = dict(x_range=x_range, y1_range=y1_range, y2_range=y2_range)
     iso_params = dict(
-        pressure_mode=pressure_mode
-        if pressure_mode else isotherms[0].pressure_mode,
-        pressure_unit=pressure_unit
-        if pressure_unit else isotherms[0].pressure_unit,
-        loading_basis=loading_basis
-        if loading_basis else isotherms[0].loading_basis,
-        loading_unit=loading_unit
-        if loading_unit else isotherms[0].loading_unit,
-        material_basis=material_basis
-        if material_basis else isotherms[0].material_basis,
-        material_unit=material_unit
-        if material_unit else isotherms[0].material_unit,
+        pressure_mode=pressure_mode if pressure_mode else isotherms[0].pressure_mode,
+        pressure_unit=pressure_unit if pressure_unit else isotherms[0].pressure_unit,
+        loading_basis=loading_basis if loading_basis else isotherms[0].loading_basis,
+        loading_unit=loading_unit if loading_unit else isotherms[0].loading_unit,
+        material_basis=material_basis if material_basis else isotherms[0].material_basis,
+        material_unit=material_unit if material_unit else isotherms[0].material_unit,
     )
 
     #######################################
@@ -359,23 +344,13 @@ def plot_iso(
 
         if x_points is not None:
             x_p = x_points
-            y1_p = _get_data(
-                isotherm, y1_data, current_branch, y1_range, x_points,
-                **iso_params
-            )
+            y1_p = _get_data(isotherm, y1_data, current_branch, y1_range, x_points, **iso_params)
         elif y1_points is not None:
-            x_p = _get_data(
-                isotherm, x_data, current_branch, x_range, y1_points,
-                **iso_params
-            )
+            x_p = _get_data(isotherm, x_data, current_branch, x_range, y1_points, **iso_params)
             y1_p = y1_points
         else:
-            x_p = _get_data(
-                isotherm, x_data, current_branch, x_range, **iso_params
-            )
-            y1_p = _get_data(
-                isotherm, y1_data, current_branch, y1_range, **iso_params
-            )
+            x_p = _get_data(isotherm, x_data, current_branch, x_range, **iso_params)
+            y1_p = _get_data(isotherm, y1_data, current_branch, y1_range, **iso_params)
             x_p, y1_p = x_p.align(y1_p, join='inner')
 
         ax1.plot(x_p, y1_p, label=y1_lbl, **y1_style)
@@ -383,14 +358,10 @@ def plot_iso(
         # Plot line 2 (if applicable)
         if y2_data and y2_data in keys(isotherm):
 
-            y2_p = _get_data(
-                isotherm, y2_data, current_branch, y2_range, **iso_params
-            )
+            y2_p = _get_data(isotherm, y2_data, current_branch, y2_range, **iso_params)
             aligned = x_p.align(y2_p, join='inner')
 
-            y2_lbl = label_lgd(
-                isotherm, lgd_keys, current_branch, branch, y2_data
-            )
+            y2_lbl = label_lgd(isotherm, lgd_keys, current_branch, branch, y2_data)
             ax2.plot(aligned[0], aligned[1], label=y2_lbl, **y2_style)
 
     #####################################
@@ -409,7 +380,11 @@ def plot_iso(
         # If there's an adsorption branch, plot it
         if ads and isotherm.has_branch('ads'):
             _data_plot(
-                isotherm, 'ads', y1_line_style, y2_line_style, **iso_params
+                isotherm,
+                'ads',
+                y1_line_style,
+                y2_line_style,
+                **iso_params,
             )
 
         # Switch to desorption linestyle (dotted, white marker)
@@ -420,7 +395,11 @@ def plot_iso(
         # If there's a desorption branch, plot it
         if des and isotherm.has_branch('des'):
             _data_plot(
-                isotherm, 'des', y1_line_style, y2_line_style, **iso_params
+                isotherm,
+                'des',
+                y1_line_style,
+                y2_line_style,
+                **iso_params,
             )
 
     #####################################
@@ -428,7 +407,14 @@ def plot_iso(
     # Final settings
 
     _final_styling(
-        fig, ax1, ax2, log_params, range_params, lgd_pos, styles, save_path
+        fig,
+        ax1,
+        ax2,
+        log_params,
+        range_params,
+        lgd_pos,
+        styles,
+        save_path,
     )
 
     if ax2:
@@ -488,7 +474,14 @@ def _get_data(
 
 
 def _final_styling(
-    fig, ax1, ax2, log_params, range_params, lgd_pos, styles, save_path
+    fig,
+    ax1,
+    ax2,
+    log_params,
+    range_params,
+    lgd_pos,
+    styles,
+    save_path,
 ):
     """Axes scales and limits, legend and graph saving."""
     # Convert the axes into logarithmic if required
