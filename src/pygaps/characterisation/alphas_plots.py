@@ -11,6 +11,7 @@ from scipy import stats
 from ..core.adsorbate import Adsorbate
 from ..core.baseisotherm import BaseIsotherm
 from ..graphing.calc_graphs import tp_plot
+from ..utilities.exceptions import pgError
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import find_linear_sections
@@ -21,10 +22,12 @@ from .area_lang import area_langmuir
 def alpha_s(
     isotherm,
     reference_isotherm,
-    reference_area='BET',
-    reducing_pressure=0.4,
-    limits=None,
-    verbose=False
+    reference_area: str = 'BET',
+    reducing_pressure: float = 0.4,
+    branch: str = 'ads',
+    branch_ref: str = 'ads',
+    t_limits: "tuple[float, float]" = None,
+    verbose: bool = False
 ):
     r"""
     Calculate surface area and pore volume using the alpha-s method.
@@ -32,8 +35,8 @@ def alpha_s(
     Pass an isotherm object to the function to have the alpha-s method applied to it.
     The ``reference_isotherm`` parameter is an Isotherm class which will form the
     x-axis of the alpha-s method.
-    The ``limits`` parameter takes the form of an array of two numbers, which are the
-    upper and lower limits of the section which should be taken for analysis.
+    The ``t_limits`` parameter takes the form of an array of two numbers, which are the
+    upper and lower limits of isotherm the section which should be taken for analysis.
 
     Parameters
     ----------
@@ -49,8 +52,12 @@ def alpha_s(
         p/p0 value at which the loading is reduced.
         Default is 0.4 as it is the closing point for the nitrogen
         hysteresis loop.
-    limits : [float, float], optional
-        Manual limits for region selection.
+    branch : {'ads', 'des'}, optional
+        Branch of the isotherm to use. It defaults to adsorption.
+    branch_ref : {'ads', 'des'}, optional
+        Branch of the reference isotherm to use. It defaults to adsorption.
+    t_limits : [float, float], optional
+        Reference thickness range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
 
@@ -123,9 +130,7 @@ def alpha_s(
 
     """
     # Check to see if reference isotherm is given
-    if reference_isotherm is None or not isinstance(
-        reference_isotherm, BaseIsotherm
-    ):
+    if reference_isotherm is None or not isinstance(reference_isotherm, BaseIsotherm):
         raise ParameterError(
             "No reference isotherm for alpha s calculation "
             "is provided. Must provide an Isotherm instance."
@@ -136,12 +141,10 @@ def alpha_s(
             "calculated isotherm adsorbate."
         )
     if reducing_pressure < 0 or reducing_pressure > 1:
-        raise ParameterError(
-            "The reducing pressure is outside the bounds of 0-1"
-        )
+        raise ParameterError("The reducing pressure is outside the bounds of 0-1")
 
     # Deal with reference area
-    if reference_area in ['BET', None]:
+    if reference_area.lower() in ['bet', None]:
         try:
             reference_area = area_BET(reference_isotherm).get('area')
         except Exception as e:
@@ -150,7 +153,7 @@ def alpha_s(
                 "Either solve the issue or provide a value for reference_area. "
                 f"BET area error is :\n{e}"
             )
-    elif reference_area == 'Langmuir':
+    elif reference_area.lower() == 'langmuir':
         try:
             reference_area = area_langmuir(reference_isotherm).get('area')
         except Exception as e:
@@ -162,7 +165,7 @@ def alpha_s(
     elif not isinstance(reference_area, float):
         raise ParameterError(
             "The reference area should be either a numeric value, 'BET' or 'Langmuir'. "
-            f"The value specified was {reference_area}"
+            f"The value specified was {reference_area}."
         )
 
     # Get adsorbate properties
@@ -172,17 +175,40 @@ def alpha_s(
 
     # Read data in
     loading = isotherm.loading(
-        branch='ads', loading_unit='mol', loading_basis='molar'
+        branch=branch,
+        loading_unit='mol',
+        loading_basis='molar',
     )
+    try:
+        pressure = isotherm.pressure(
+            branch=branch,
+            pressure_mode='relative',
+        )
+    except pgError:
+        raise CalculationError(
+            "The isotherm cannot be converted to a relative basis. "
+            "Is your isotherm supercritical?"
+        )
+    # If on an desorption branch, data will be reversed
+    if branch == 'des':
+        loading = loading[::-1]
+        pressure = pressure[::-1]
+    # Now for reference isotherm
     reference_loading = reference_isotherm.loading_at(
-        isotherm.pressure(branch='ads'),
+        pressure,
         pressure_unit=isotherm.pressure_unit,
         loading_unit='mol',
-        branch='ads'
+        branch=branch_ref,
     )
     alpha_s_point = reference_isotherm.loading_at(
-        0.4, loading_unit='mol', pressure_mode='relative', branch='ads'
+        reducing_pressure,
+        loading_unit='mol',
+        pressure_mode='relative',
+        branch=branch_ref,
     )
+    # If on an desorption branch, reference data will be reversed
+    if branch_ref == 'des':
+        reference_loading = reference_loading[::-1]
 
     # Call alpha s function
     results, alpha_curve = alpha_s_raw(
@@ -192,14 +218,12 @@ def alpha_s(
         reference_area,
         liquid_density,
         molar_mass,
-        limits=limits
+        t_limits=t_limits,
     )
 
     if verbose:
         if not results:
-            logger.info(
-                "Could not find linear regions, attempt a manual limit."
-            )
+            logger.info("Could not find linear regions, attempt a manual limit.")
         else:
             for index, result in enumerate(results):
                 logger.info(f"For linear region {index}")
@@ -211,13 +235,7 @@ def alpha_s(
                     f"The adsorbed volume is {result.get('adsorbed_volume'):.4f} and the area is {result.get('area'):.4f}"
                 )
 
-            tp_plot(
-                alpha_curve,
-                loading,
-                results,
-                alpha_s=True,
-                alpha_reducing_p=reducing_pressure
-            )
+            tp_plot(alpha_curve, loading, results, alpha_s=True, alpha_reducing_p=reducing_pressure)
 
     return {
         'alpha_curve': alpha_curve,
@@ -226,13 +244,13 @@ def alpha_s(
 
 
 def alpha_s_raw(
-    loading,
-    reference_loading,
-    alpha_s_point,
-    reference_area,
-    liquid_density,
-    adsorbate_molar_mass,
-    limits=None
+    loading: list,
+    reference_loading: list,
+    alpha_s_point: float,
+    reference_area: float,
+    liquid_density: float,
+    adsorbate_molar_mass: float,
+    t_limits: "tuple[float,float]" = None,
 ):
     """
     Calculate surface area and pore volume using the alpha-s method.
@@ -255,8 +273,8 @@ def alpha_s_raw(
         Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
         Molar mass of the adsorbate, in g/mol.
-    limits : [float, float], optional
-        Manual limits for region selection.
+    t_limits : [float, float], optional
+        Reference thickness range in which to perform the calculation.
 
     Returns
     -------
@@ -276,9 +294,7 @@ def alpha_s_raw(
 
     """
     if len(loading) != len(reference_loading):
-        raise ParameterError(
-            "The length of the two loading arrays do not match."
-        )
+        raise ParameterError("The length of the two loading arrays do not match.")
 
     # Ensure numpy arrays, if not already
     loading = numpy.asarray(loading)
@@ -291,15 +307,21 @@ def alpha_s_raw(
 
     results = []
 
-    if limits is not None:
-        section = numpy.flatnonzero((alpha_curve > limits[0])
-                                    & (alpha_curve < limits[1]))
-        results.append(
-            alpha_s_plot_parameters(
-                alpha_curve, section, loading, alpha_s_point, reference_area,
-                adsorbate_molar_mass, liquid_density
-            )
+    if t_limits is not None:
+        section = numpy.flatnonzero((alpha_curve > t_limits[0]) & (alpha_curve < t_limits[1]))
+        result = alpha_s_plot_parameters(
+            alpha_curve,
+            loading,
+            section,
+            alpha_s_point,
+            reference_area,
+            adsorbate_molar_mass,
+            liquid_density,
         )
+        if result:
+            results.append(result)
+        else:
+            warnings.warn("Could not fit a linear regression.")
     else:
         # Now we need to find the linear regions in the alpha-s for the
         # assessment of surface area.
@@ -307,24 +329,32 @@ def alpha_s_raw(
 
         # For each section we compute the linear fit
         for section in linear_sections:
-            params = alpha_s_plot_parameters(
-                alpha_curve, section, loading, alpha_s_point, reference_area,
-                adsorbate_molar_mass, liquid_density
+            result = alpha_s_plot_parameters(
+                alpha_curve,
+                loading,
+                section,
+                alpha_s_point,
+                reference_area,
+                adsorbate_molar_mass,
+                liquid_density,
             )
-            if params is not None:
-                results.append(params)
+            if result:
+                results.append(result)
 
-        if len(results) == 0:
-            warnings.warn(
-                'Could not find linear regions, attempt a manual limit'
-            )
+        if not results:
+            warnings.warn("Could not determine linear regions, attempt a manual limit.")
 
     return results, alpha_curve
 
 
 def alpha_s_plot_parameters(
-    alpha_curve, section, loading, alpha_s_point, reference_area, molar_mass,
-    liquid_density
+    alpha_curve,
+    loading,
+    section,
+    alpha_s_point,
+    reference_area,
+    molar_mass,
+    liquid_density,
 ):
     """Get the parameters for the linear region of the alpha-s plot."""
 
@@ -338,7 +368,7 @@ def alpha_s_plot_parameters(
         adsorbed_volume = intercept * molar_mass / liquid_density
         area = (reference_area / alpha_s_point * slope).item()
 
-        result_dict = {
+        return {
             'section': section,
             'slope': slope,
             'intercept': intercept,
@@ -346,7 +376,5 @@ def alpha_s_plot_parameters(
             'adsorbed_volume': adsorbed_volume,
             'area': area,
         }
-
-        return result_dict
 
     return None

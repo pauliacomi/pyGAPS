@@ -9,7 +9,10 @@ from ..utilities.exceptions import ParameterError
 
 
 def isosteric_enthalpy(
-    isotherms, loading_points=None, branch='ads', verbose=False
+    isotherms,
+    loading_points: list = None,
+    branch: str = 'ads',
+    verbose: bool = False,
 ):
     r"""
     Calculate the isosteric enthalpy of adsorption using several isotherms
@@ -89,15 +92,11 @@ def isosteric_enthalpy(
 
     # Check same material
     if not all(x.material == isotherms[0].material for x in isotherms):
-        raise ParameterError(
-            'Isotherms passed are not measured on the same material.'
-        )
+        raise ParameterError('Isotherms passed are not measured on the same material.')
 
     # Check same basis
     if len(set(x.material_basis for x in isotherms)) > 1:
-        raise ParameterError(
-            'Isotherm passed are in a different material basis.'
-        )
+        raise ParameterError('Isotherm passed are in a different material basis.')
 
     # Get temperatures
     temperatures = [x.temperature for x in isotherms]
@@ -106,28 +105,24 @@ def isosteric_enthalpy(
     loading = loading_points
     if loading is None:
         load_args = dict(
+            branch=branch,
             loading_basis='molar',
             loading_unit='mmol',
-            branch=branch,
         )
         # Get a minimum and maximum loading common for all isotherms
-        min_loading = 1.01 * max([
-            min(x.loading(**load_args)) for x in isotherms
-        ])
-        max_loading = 0.99 * min([
-            max(x.loading(**load_args)) for x in isotherms
-        ])
+        min_loading = 1.01 * max([min(x.loading(**load_args)) for x in isotherms])
+        max_loading = 0.99 * min([max(x.loading(**load_args)) for x in isotherms])
         loading = numpy.linspace(min_loading, max_loading, 50)
 
     # Get pressure point for each isotherm at loading
     pressures = numpy.array([
         iso.pressure_at(
             loading,
+            branch=branch,
             pressure_mode='absolute',
             pressure_unit='bar',
             loading_basis='molar',
             loading_unit='mmol',
-            branch=branch
         ) for iso in isotherms
     ]).T
 
@@ -136,10 +131,17 @@ def isosteric_enthalpy(
         slopes,
         correlation,
         std_errs,
-    ) = isosteric_enthalpy_raw(pressures, temperatures)
+    ) = isosteric_enthalpy_raw(
+        pressures,
+        temperatures,
+    )
 
     if verbose:
-        isosteric_enthalpy_plot(loading, iso_enthalpy, std_errs)
+        isosteric_enthalpy_plot(
+            loading,
+            iso_enthalpy,
+            std_errs,
+        )
 
     return {
         'loading': loading,
@@ -150,7 +152,10 @@ def isosteric_enthalpy(
     }
 
 
-def isosteric_enthalpy_raw(pressures, temperatures):
+def isosteric_enthalpy_raw(
+    pressures: list,
+    temperatures: list,
+):
     """
     Calculate the isosteric enthalpy of adsorption using several isotherms
     recorded at different temperatures on the same material.
@@ -205,9 +210,7 @@ def isosteric_enthalpy_raw(pressures, temperatures):
     # Calculate enthalpy for each point by a linear fit
     for log_p in log_pressures:
 
-        slope, intercept, corr_coef, p, std_err = stats.linregress(
-            inv_t, log_p
-        )
+        slope, intercept, corr_coef, p, std_err = stats.linregress(inv_t, log_p)
 
         iso_enth.append(-constants.gas_constant * slope / 1000)
         slopes.append(slope)

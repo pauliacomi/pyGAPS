@@ -18,7 +18,12 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
 
 
-def area_BET(isotherm, branch='ads', limits=None, verbose=False):
+def area_BET(
+    isotherm,
+    branch: str = 'ads',
+    p_limits: "tuple[float, float]" = None,
+    verbose: bool = False,
+):
     r"""
     Calculate BET-determined surface area from an isotherm.
 
@@ -33,8 +38,8 @@ def area_BET(isotherm, branch='ads', limits=None, verbose=False):
         The isotherm of which to calculate the BET surface area.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
-    limits : [float, float], optional
-        Manual limits for region selection.
+    p_limits : [float, float], optional
+        Pressure range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
 
@@ -145,6 +150,11 @@ def area_BET(isotherm, branch='ads', limits=None, verbose=False):
             "Is your isotherm supercritical?"
         )
 
+    # If on an desorption branch, data will be reversed
+    if branch == 'des':
+        loading = loading[::-1]
+        pressure = pressure[::-1]
+
     # use the bet function
     (
         bet_area,
@@ -160,15 +170,15 @@ def area_BET(isotherm, branch='ads', limits=None, verbose=False):
         pressure,
         loading,
         cross_section,
-        limits=limits,
+        p_limits,
     )
 
     if verbose:
         logger.info(
             textwrap.dedent(
                 f"""\
-            BET surface area: a = {bet_area:.2e} m2/{isotherm.material_unit}
-            Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum -1]:.3f}
+            BET area: a = {bet_area:.2e} m2/{isotherm.material_unit}
+            Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum]:.3f}
             The slope of the BET fit: s = {slope:.2e}
             The intercept of the BET fit: i = {intercept:.2e}
             The BET constant is: C = {c_const:.1f}
@@ -178,15 +188,24 @@ def area_BET(isotherm, branch='ads', limits=None, verbose=False):
 
         # Generate plot of the BET points chosen
         bet_plot(
-            pressure, bet_transform(pressure, loading), minimum, maximum,
-            slope, intercept, p_monolayer,
-            bet_transform(p_monolayer, n_monolayer)
+            pressure,
+            bet_transform(pressure, loading),
+            minimum,
+            maximum,
+            slope,
+            intercept,
+            p_monolayer,
+            bet_transform(p_monolayer, n_monolayer),
         )
 
         # Generate plot of the Rouquerol points chosen
         roq_plot(
-            pressure, roq_transform(pressure, loading), minimum, maximum,
-            p_monolayer, roq_transform(p_monolayer, n_monolayer)
+            pressure,
+            roq_transform(pressure, loading),
+            minimum,
+            maximum,
+            p_monolayer,
+            roq_transform(p_monolayer, n_monolayer),
         )
 
     return {
@@ -197,11 +216,16 @@ def area_BET(isotherm, branch='ads', limits=None, verbose=False):
         'bet_slope': slope,
         'bet_intercept': intercept,
         'corr_coef': corr_coef,
-        'limits': (minimum, maximum)
+        'p_limit_indices': (minimum, maximum),
     }
 
 
-def area_BET_raw(pressure, loading, cross_section, limits=None):
+def area_BET_raw(
+    pressure: list,
+    loading: list,
+    cross_section: float,
+    p_limits: "tuple[float,float]" = None,
+):
     """
     Calculate BET-determined surface area.
 
@@ -217,8 +241,8 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
         Loadings, in mol/basis.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
-    limits : [float, float], optional
-        Manual limits for region selection.
+    p_limits : [float, float], optional
+        Pressure range in which to perform the calculation.
 
     Returns
     -------
@@ -244,69 +268,60 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
     """
     # Check lengths
     if len(pressure) != len(loading):
-        raise ParameterError(
-            "The length of the pressure and loading arrays do not match."
-        )
+        raise ParameterError("The length of the pressure and loading arrays do not match.")
     # Ensure numpy arrays, if not already
     loading = numpy.asarray(loading)
     pressure = numpy.asarray(pressure)
 
     # select the maximum and minimum of the points and the pressure associated
-    maximum = len(pressure)
     minimum = 0
+    maximum = len(pressure) - 1  # As we want absolute position
 
-    if limits is None:
-
+    if p_limits is None:
         # Generate the Rouquerol array
         roq_t_array = roq_transform(pressure, loading)
 
         # Find place where array starts decreasing
         # If none is found, maximum will be left as-is
-        for index, value in enumerate(roq_t_array):
+        # We iterate up to len-1 index, to avoid out-of-bounds
+        for index, value in enumerate(roq_t_array[:-1]):
             if value > roq_t_array[index + 1]:
                 maximum = index + 1
                 break
 
-        # Min pressure is initially taken as 10% of max
-        min_p = pressure[maximum] / 10
+        # Min pressure is taken as 10% of max
+        min_p = pressure[maximum] * 0.1
         minimum = numpy.searchsorted(pressure, min_p)
 
-        # Try to extend if not enough points
-        if maximum - minimum < 3:  # (for 3 point minimum)
-            if maximum > 2:  # Can only extend if enough points available
-                minimum = maximum - 3
-            else:
-                raise CalculationError(
-                    "The isotherm does not have enough points (at least 3) "
-                    "in the BET region. Unable to calculate BET area."
-                )
-
     else:
+        if p_limits[0]:
+            minimum = numpy.searchsorted(pressure, p_limits[0])
+        if p_limits[1]:
+            maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
 
-        # Determine the limits
-        if limits[1]:
-            maximum = numpy.searchsorted(pressure, limits[1])
-
-        if limits[0]:
-            minimum = numpy.searchsorted(pressure, limits[0])
-
-        if maximum - minimum < 3:  # (for 3 point minimum)
-            raise CalculationError(
-                "The isotherm does not have enough points (at least 3) "
-                "in the BET region. Unable to calculate BET area."
-            )
+    if maximum - minimum < 2:  # (for 3 point minimum)
+        raise CalculationError(
+            "The isotherm does not have enough points (at least 3) "
+            "in the BET region. Unable to calculate BET area."
+        )
+    pressure = pressure[minimum:maximum + 1]
+    loading = loading[minimum:maximum + 1]
 
     # calculate the BET transform, slope and intercept
     bet_t_array = bet_transform(
-        pressure[minimum:maximum], loading[minimum:maximum]
+        pressure,
+        loading,
     )
-    slope, intercept, corr_coef = bet_optimisation(
-        pressure[minimum:maximum], bet_t_array
+    slope, intercept, corr_coef = bet_fit(
+        pressure,
+        bet_t_array,
     )
 
     # calculate the BET parameters
     n_monolayer, p_monolayer, c_const, bet_area = bet_parameters(
-        slope, intercept, cross_section
+        slope,
+        intercept,
+        cross_section,
     )
 
     # Checks for consistency
@@ -314,7 +329,7 @@ def area_BET_raw(pressure, loading, cross_section, limits=None):
         warnings.warn("The C constant is negative.")
     if corr_coef < 0.99:
         warnings.warn("The correlation is not linear.")
-    if not (loading[minimum] < n_monolayer < loading[maximum - 1]):
+    if not (loading[0] < n_monolayer < loading[-1]):
         warnings.warn("The monolayer point is not within the BET region")
 
     return (
@@ -340,17 +355,14 @@ def bet_transform(pressure, loading):
     return pressure / roq_transform(pressure, loading)
 
 
-def bet_optimisation(pressure, bet_points):
+def bet_fit(pressure, bet_points):
     """Find the slope and intercept of the BET region."""
-    slope, intercept, corr_coef, p, stderr = stats.linregress(
-        pressure, bet_points
-    )
+    slope, intercept, corr_coef, p, stderr = stats.linregress(pressure, bet_points)
     return slope, intercept, corr_coef
 
 
 def bet_parameters(slope, intercept, cross_section):
-    """Calculate the BET parameters from the slope and intercept."""
-
+    """Calculate the BET parameters from slope and intercept."""
     c_const = (slope / intercept) + 1
     n_monolayer = 1 / (intercept * c_const)
     p_monolayer = 1 / (numpy.sqrt(c_const) + 1)

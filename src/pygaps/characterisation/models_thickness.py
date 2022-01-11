@@ -102,5 +102,4 @@ def get_thickness_model(model):
         return _THICKNESS_MODELS[model]
 
     # If the model is an callable, return it instead
-    else:
-        return model
+    return model

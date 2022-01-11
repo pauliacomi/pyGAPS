@@ -18,8 +18,8 @@ from .parsing.sqlite import isotherm_delete_db
 from .parsing.sqlite import isotherm_to_db
 
 # Characterisation
-from .characterisation.alphas import alpha_s
-from .characterisation.alphas import alpha_s_raw
+from .characterisation.alphas_plots import alpha_s
+from .characterisation.alphas_plots import alpha_s_raw
 from .characterisation.area_bet import area_BET
 from .characterisation.area_bet import area_BET_raw
 from .characterisation.area_lang import area_langmuir
@@ -35,8 +35,8 @@ from .characterisation.isosteric_enth import isosteric_enthalpy_raw
 from .characterisation.psd_kernel import psd_dft
 from .characterisation.psd_meso import psd_mesoporous
 from .characterisation.psd_micro import psd_microporous
-from .characterisation.tplot import t_plot
-from .characterisation.tplot import t_plot_raw
+from .characterisation.t_plots import t_plot
+from .characterisation.t_plots import t_plot_raw
 
 # IAST
 from .iast.pgiast import iast

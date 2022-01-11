@@ -17,7 +17,12 @@ from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
 
 
-def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
+def area_langmuir(
+    isotherm,
+    branch: str = 'ads',
+    p_limits: "tuple[float, float]" = None,
+    verbose: bool = False,
+):
     r"""
     Calculate the Langmuir-determined surface area of an isotherm.
 
@@ -27,8 +32,8 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
         The isotherm of which to calculate the Langmuir surface area.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
-    limits : [float, float], optional
-        Manual limits for region selection.
+    p_limits : [float, float], optional
+        Pressure range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
 
@@ -110,7 +115,9 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
 
     # Read data in
     loading = isotherm.loading(
-        branch=branch, loading_unit='mol', loading_basis='molar'
+        branch=branch,
+        loading_unit='mol',
+        loading_basis='molar',
     )
     try:
         pressure = isotherm.pressure(
@@ -123,6 +130,11 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
             "Is your isotherm supercritical?"
         )
 
+    # If on an desorption branch, data will be reversed
+    if branch == 'des':
+        loading = loading[::-1]
+        pressure = pressure[::-1]
+
     # use the langmuir function
     (
         langmuir_area,
@@ -133,17 +145,21 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
         minimum,
         maximum,
         corr_coef,
-    ) = area_langmuir_raw(pressure, loading, cross_section, limits=limits)
+    ) = area_langmuir_raw(
+        pressure,
+        loading,
+        cross_section,
+        p_limits,
+    )
 
     if verbose:
-
         logger.info(
             textwrap.dedent(
                 f"""\
-            Langmuir surface area: a = {langmuir_area:.2e} m2/{isotherm.material_unit}
-            Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum -1]:.3f}
-            The slope of the Langmuir line: s = {slope:.2e}
-            The intercept of the Langmuir line: i = {intercept:.2e}
+            Langmuir area: a = {langmuir_area:.2e} m2/{isotherm.material_unit}
+            Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum]:.3f}
+            The slope of the Langmuir fit: s = {slope:.2e}
+            The intercept of the Langmuir fit: i = {intercept:.2e}
             The Langmuir constant is: K = {langmuir_const:.1f}
             Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.material_unit}"""
             )
@@ -151,8 +167,12 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
 
         # Generate plot of the langmuir points chosen
         langmuir_plot(
-            pressure, langmuir_transform(pressure, loading), minimum, maximum,
-            slope, intercept
+            pressure,
+            langmuir_transform(pressure, loading),
+            minimum,
+            maximum,
+            slope,
+            intercept,
         )
 
     return {
@@ -162,11 +182,16 @@ def area_langmuir(isotherm, branch='ads', limits=None, verbose=False):
         'langmuir_slope': slope,
         'langmuir_intercept': intercept,
         'corr_coef': corr_coef,
-        'limits': (minimum, maximum)
+        'p_limit_indices': (minimum, maximum),
     }
 
 
-def area_langmuir_raw(pressure, loading, cross_section, limits=None):
+def area_langmuir_raw(
+    pressure: list,
+    loading: list,
+    cross_section: float,
+    p_limits: "tuple[float,float]" = None,
+):
     """
     Calculate Langmuir-determined surface area.
 
@@ -182,8 +207,8 @@ def area_langmuir_raw(pressure, loading, cross_section, limits=None):
         Loadings, in mol/basis.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
-    limits : [float, float], optional
-        Manual limits for region selection.
+    p_limits : [float, float], optional
+        Pressure range in which to perform the calculation.
 
     Returns
     -------
@@ -206,43 +231,52 @@ def area_langmuir_raw(pressure, loading, cross_section, limits=None):
 
     """
     if len(pressure) != len(loading):
-        raise ParameterError(
-            "The length of the pressure and loading arrays do not match."
-        )
+        raise ParameterError("The length of the pressure and loading arrays do not match.")
     # Ensure numpy arrays, if not already
     loading = numpy.asarray(loading)
     pressure = numpy.asarray(pressure)
 
     # select the maximum and minimum of the points and the pressure associated
-    if limits is None:
-        limits = [0.05, 0.9]
-
-    maximum = len(pressure) - 1
     minimum = 0
+    maximum = len(pressure) - 1  # As we want absolute position
 
-    if limits[1]:
-        maximum = numpy.searchsorted(pressure, limits[1])
+    if p_limits is None:
+        # Give reasonable automatic limits
+        # Min pressure is taken as 5% of max
+        # Max pressure is taken as 90% of max
+        p_limits = [
+            pressure[maximum] * 0.05,
+            pressure[maximum] * 0.9,
+        ]
 
-    if limits[0]:
-        minimum = numpy.searchsorted(pressure, limits[0])
-
-    if maximum - minimum < 3:  # (for 2 point minimum)
+    # Determine the limits
+    if p_limits[0]:
+        minimum = numpy.searchsorted(pressure, p_limits[0])
+    if p_limits[1]:
+        maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
+    if maximum - minimum < 2:  # (for 2 point minimum)
         raise CalculationError(
             "The isotherm does not have enough points (at least 2) "
             "in selected region. Unable to calculate Langmuir area."
         )
+    pressure = pressure[minimum:maximum + 1]
+    loading = loading[minimum:maximum + 1]
 
     # calculate the Langmuir slope and intercept
     langmuir_array = langmuir_transform(
-        pressure[minimum:maximum], loading[minimum:maximum]
+        pressure,
+        loading,
     )
-    slope, intercept, corr_coef = langmuir_optimisation(
-        pressure[minimum:maximum], langmuir_array
+    slope, intercept, corr_coef = langmuir_fit(
+        pressure,
+        langmuir_array,
     )
 
     # calculate the Langmuir parameters
     n_monolayer, langmuir_const, langmuir_area = langmuir_parameters(
-        slope, intercept, cross_section
+        slope,
+        intercept,
+        cross_section,
     )
 
     # Checks for consistency
@@ -252,8 +286,14 @@ def area_langmuir_raw(pressure, loading, cross_section, limits=None):
         warnings.warn("The correlation is not linear.")
 
     return (
-        langmuir_area, langmuir_const, n_monolayer, slope, intercept, minimum,
-        maximum, corr_coef
+        langmuir_area,
+        langmuir_const,
+        n_monolayer,
+        slope,
+        intercept,
+        minimum,
+        maximum,
+        corr_coef,
     )
 
 
@@ -262,18 +302,15 @@ def langmuir_transform(pressure, loading):
     return pressure / loading
 
 
-def langmuir_optimisation(pressure, langmuir_points):
-    """Finds the slope and intercept of the Langmuir region."""
-    slope, intercept, corr_coef, p, stderr = stats.linregress(
-        pressure, langmuir_points
-    )
+def langmuir_fit(pressure, langmuir_points):
+    """Find the slope and intercept of the Langmuir region."""
+    slope, intercept, corr_coef, p, stderr = stats.linregress(pressure, langmuir_points)
     return slope, intercept, corr_coef
 
 
 def langmuir_parameters(slope, intercept, cross_section):
-    """Calculates the Langmuir parameters from the slope and intercept."""
+    """Calculate the Langmuir parameters from slope and intercept."""
     n_monolayer = 1 / slope
     langmuir_const = 1 / (intercept * n_monolayer)
-    langmuir_area = n_monolayer * cross_section * \
-        (10**(-18)) * constants.Avogadro
+    langmuir_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
     return n_monolayer, langmuir_const, langmuir_area

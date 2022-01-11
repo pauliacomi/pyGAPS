@@ -39,10 +39,10 @@ class TestDAPlot():
 
         # Will raise "bad limits" error.
         with pytest.raises(pgEx.CalculationError):
-            drda.dr_plot(isotherm, limits=[0.2, 0.1])
+            drda.dr_plot(isotherm, p_limits=[0.2, 0.1])
 
         # These limits work
-        drda.dr_plot(isotherm, limits=[0, 0.2])
+        drda.dr_plot(isotherm, p_limits=[0, 0.2])
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_dr_plot(self, sample):
@@ -62,12 +62,8 @@ class TestDAPlot():
             err_relative = 0.05  # 5 percent
             err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(
-                dr_vol, sample['dr_volume'], err_relative, err_absolute
-            )
-            assert isclose(
-                dr_pot, sample['dr_potential'], err_relative, err_absolute
-            )
+            assert isclose(dr_vol, sample['dr_volume'], err_relative, err_absolute)
+            assert isclose(dr_pot, sample['dr_potential'], err_relative, err_absolute)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_da_plot(self, sample):
@@ -79,7 +75,7 @@ class TestDAPlot():
             filepath = DATA_N77_PATH / sample['file']
             isotherm = pgpj.isotherm_from_json(filepath)
 
-            res = drda.da_plot(isotherm, limits=[0, 0.01])
+            res = drda.da_plot(isotherm, p_limits=[0, 0.01])
 
             da_vol = res.get("pore_volume")
             da_pot = res.get("adsorption_potential")
@@ -87,12 +83,8 @@ class TestDAPlot():
             err_relative = 0.05  # 5 percent
             err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(
-                da_vol, sample['da_volume'], err_relative, err_absolute
-            )
-            assert isclose(
-                da_pot, sample['da_potential'], err_relative, err_absolute
-            )
+            assert isclose(da_vol, sample['da_volume'], err_relative, err_absolute)
+            assert isclose(da_pot, sample['da_potential'], err_relative, err_absolute)
 
     @cleanup
     def test_da_output(self):

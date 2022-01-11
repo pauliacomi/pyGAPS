@@ -17,7 +17,7 @@ from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps
-import pygaps.characterisation.alphas as als
+import pygaps.characterisation.alphas_plots as als
 import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
 
@@ -45,26 +45,18 @@ class TestAlphaSPlot():
             loading=[0, 1],
             material='test',
             adsorbate='argon',
-            temperature=87
+            temperature=87,
         )
         with pytest.raises(pgEx.ParameterError):
             als.alpha_s(basic_pointisotherm, ref_iso)
 
         # Will raise a "bad reducing pressure" error
         with pytest.raises(pgEx.ParameterError):
-            als.alpha_s(
-                basic_pointisotherm,
-                basic_pointisotherm,
-                reducing_pressure=1.3
-            )
+            als.alpha_s(basic_pointisotherm, basic_pointisotherm, reducing_pressure=1.3)
 
         # Will raise a "bad reference_area value" error
         with pytest.raises(pgEx.ParameterError):
-            als.alpha_s(
-                basic_pointisotherm,
-                basic_pointisotherm,
-                reference_area='some'
-            )
+            als.alpha_s(basic_pointisotherm, basic_pointisotherm, reference_area='some')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_alphas(self, sample):
@@ -77,9 +69,7 @@ class TestAlphaSPlot():
             isotherm = pgpj.isotherm_from_json(filepath)
             ref_filepath = DATA_N77_PATH / DATA[sample['as_ref']]['file']
             ref_isotherm = pgpj.isotherm_from_json(ref_filepath)
-            mref_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
-                ref_isotherm, model='BET'
-            )
+            mref_isotherm = pygaps.ModelIsotherm.from_pointisotherm(ref_isotherm, model='BET')
 
             res = als.alpha_s(isotherm, mref_isotherm)
             results = res.get('results')
@@ -89,12 +79,11 @@ class TestAlphaSPlot():
             err_absolute_volume = 0.01  # units
 
             assert isclose(
-                results[-1].get('adsorbed_volume'), sample['as_volume'],
-                err_relative, err_absolute_area
+                results[-1].get('adsorbed_volume'), sample['as_volume'], err_relative,
+                err_absolute_area
             )
             assert isclose(
-                results[0].get('area'), sample['as_area'], err_relative,
-                err_absolute_volume
+                results[0].get('area'), sample['as_area'], err_relative, err_absolute_volume
             )
 
     def test_alphas_choice(self):
@@ -104,20 +93,16 @@ class TestAlphaSPlot():
         filepath = DATA_N77_PATH / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
-        res = als.alpha_s(isotherm, isotherm, limits=[0.7, 1.0])
+        res = als.alpha_s(isotherm, isotherm, t_limits=[0.7, 1.0])
         results = res.get('results')
 
         err_relative = 0.1  # 10 percent
         err_absolute_area = 0.1  # units
         err_absolute_volume = 0.01  # units
 
+        assert isclose(results[-1].get('adsorbed_volume'), 0, err_relative, err_absolute_area)
         assert isclose(
-            results[-1].get('adsorbed_volume'), 0, err_relative,
-            err_absolute_area
-        )
-        assert isclose(
-            results[-1].get('area'), sample['s_as_area'], err_relative,
-            err_absolute_volume
+            results[-1].get('area'), sample['s_as_area'], err_relative, err_absolute_volume
         )
 
     @cleanup

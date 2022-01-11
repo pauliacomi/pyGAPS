@@ -86,6 +86,6 @@ def get_hk_model(model):
     # Raise error if anything else is passed
     raise ParameterError(
         f"Model parameters ({model}) not an option for pore size distribution. ",
-        f"Available models are {_ADSORBENT_MODELS.keys()}."
-        " Or pass a dictionary with the required parameters"
+        f"Available models are {_ADSORBENT_MODELS.keys()}. "
+        "Or pass a dictionary with the required parameters"
     )

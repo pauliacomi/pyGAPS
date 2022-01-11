@@ -16,7 +16,7 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
-import pygaps.characterisation.tplot as pt
+import pygaps.characterisation.t_plots as pt
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
@@ -27,7 +27,7 @@ from .conftest import DATA_N77_PATH
 @pytest.mark.characterisation
 class TestTPlot():
     """Tests t-plot calculations."""
-    def test_alphas_checks(self, basic_pointisotherm):
+    def test_t_plot_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
 
         # Will raise a "no suitable model exception"
@@ -35,7 +35,7 @@ class TestTPlot():
             pt.t_plot(basic_pointisotherm, thickness_model='random')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
-    def test_tplot(self, sample):
+    def test_t_plot(self, sample):
         """Test calculation with several model isotherms."""
         sample = DATA[sample]
         # exclude datasets where it is not applicable
@@ -52,22 +52,21 @@ class TestTPlot():
             err_absolute_volume = 0.01  # units
 
             assert isclose(
-                results[-1].get('adsorbed_volume'), sample['t_pore_volume'],
-                err_relative, err_absolute_area
+                results[-1].get('adsorbed_volume'), sample['t_pore_volume'], err_relative,
+                err_absolute_area
             )
             assert isclose(
-                results[0].get('area'), sample['t_area'], err_relative,
-                err_absolute_volume
+                results[0].get('area'), sample['t_area'], err_relative, err_absolute_volume
             )
 
-    def test_tplot_choice(self):
+    def test_t_plot_choice(self):
         """Test choice of points."""
 
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
         isotherm = pgp.isotherm_from_json(filepath)
 
-        res = pt.t_plot(isotherm, limits=[0.7, 1.0])
+        res = pt.t_plot(isotherm, t_limits=[0.7, 1.0])
         results = res.get('results')
 
         err_relative = 0.1  # 10 percent
@@ -75,16 +74,15 @@ class TestTPlot():
         err_absolute_volume = 0.01  # units
 
         assert isclose(
-            results[-1].get('adsorbed_volume'), sample['t_pore_volume'],
-            err_relative, err_absolute_area
+            results[-1].get('adsorbed_volume'), sample['t_pore_volume'], err_relative,
+            err_absolute_area
         )
         assert isclose(
-            results[-1].get('area'), sample['s_t_area'], err_relative,
-            err_absolute_volume
+            results[-1].get('area'), sample['s_t_area'], err_relative, err_absolute_volume
         )
 
     @cleanup
-    def test_tplot_output(self):
+    def test_t_plot_output(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']

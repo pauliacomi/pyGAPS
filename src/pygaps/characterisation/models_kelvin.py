@@ -36,9 +36,7 @@ def get_meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError(
-                "Pore geometry must be either 'cylinder', 'sphere' or 'slit'."
-            )
+            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     elif branch == 'des':
         if pore_geometry == 'cylinder':
             m_geometry = 'hemispherical'
@@ -47,20 +45,20 @@ def get_meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError(
-                "Pore geometry must be either 'cylinder', 'sphere' or 'slit'."
-            )
+            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     else:
-        raise ParameterError(
-            "Adsorption branch must be either 'ads' or 'des'."
-        )
+        raise ParameterError("Adsorption branch must be either 'ads' or 'des'.")
 
     return m_geometry
 
 
 def kelvin_radius(
-    pressure, meniscus_geometry, temperature, liquid_density,
-    adsorbate_molar_mass, adsorbate_surface_tension
+    pressure,
+    meniscus_geometry,
+    temperature,
+    liquid_density,
+    adsorbate_molar_mass,
+    adsorbate_surface_tension,
 ):
     r"""
     Calculate the kelvin radius of the pore, using the standard
@@ -126,8 +124,12 @@ def kelvin_radius(
 
 
 def kelvin_radius_kjs(
-    pressure, meniscus_geometry, temperature, liquid_density,
-    adsorbate_molar_mass, adsorbate_surface_tension
+    pressure,
+    meniscus_geometry,
+    temperature,
+    liquid_density,
+    adsorbate_molar_mass,
+    adsorbate_surface_tension,
 ):
     r"""
     Calculate the kelvin radius of the pore, using the

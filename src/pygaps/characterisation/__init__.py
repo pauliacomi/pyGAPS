@@ -1,8 +1,8 @@
 # pylint: disable=W0614,W0401,W0611,W0622
 # flake8: noqa
 
-from .alphas import alpha_s
-from .alphas import alpha_s_raw
+from .alphas_plots import alpha_s
+from .alphas_plots import alpha_s_raw
 from .area_bet import area_BET
 from .area_bet import area_BET_raw
 from .area_lang import area_langmuir
@@ -18,5 +18,5 @@ from .isosteric_enth import isosteric_enthalpy_raw
 from .psd_kernel import psd_dft
 from .psd_meso import psd_mesoporous
 from .psd_micro import psd_microporous
-from .tplot import t_plot
-from .tplot import t_plot_raw
+from .t_plots import t_plot
+from .t_plots import t_plot_raw
