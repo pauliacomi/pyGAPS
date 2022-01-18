@@ -8,9 +8,9 @@ import numpy
 import pandas
 
 from ..modelling import _GUESS_MODELS
-from ..modelling import _MODELS
+from ..modelling import is_model
+from ..modelling import is_model_class
 from ..modelling import get_isotherm_model
-from ..modelling import is_base_model
 from ..utilities.converter_mode import c_loading
 from ..utilities.converter_mode import c_material
 from ..utilities.converter_mode import c_pressure
@@ -179,7 +179,7 @@ class ModelIsotherm(BaseIsotherm):
 
             process = True
 
-        elif is_base_model(model):
+        elif is_model_class(model):
             self.model = model
             self.branch = branch
 
@@ -452,15 +452,11 @@ class ModelIsotherm(BaseIsotherm):
             guess_models = _GUESS_MODELS
         else:
             try:
-                guess_models = [m for m in models if m in _MODELS]
+                guess_models = [m for m in models if is_model(m)]
             except TypeError:
-                raise ParameterError(
-                    "Could not figure out the list of models. Is it a list?"
-                )
+                raise ParameterError("Could not figure out the list of models. Is it a list?")
             if len(guess_models) != len(models):
-                raise ParameterError(
-                    'Not all models provided correspond to internal models.'
-                )
+                raise ParameterError('Not all models correspond to internal models.')
 
         for model in guess_models:
             try:

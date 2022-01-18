@@ -32,6 +32,17 @@ class TestIsothermModels():
         model.pressure(1)
         model.spreading_pressure(1)
 
+    def test_check_functions(self):
+        assert models.is_model("Henry")
+        assert models.is_model("henry")
+        assert models.is_model("henRY")
+        assert models.is_model("dslangmuir")
+        assert models.is_model_guess("dslangmuir")
+        assert models.is_model_iast("dslangmuir")
+        assert not models.is_model("horny")
+        assert not models.is_model_guess("FHVST")
+        assert not models.is_model_iast("DR")
+
     def test_get_model(self):
         """Test model getter function."""
         for model_name in MODEL_DATA:
@@ -60,9 +71,7 @@ class TestIsothermModels():
         test_values = MODEL_DATA[m_name]['test_values']
 
         for i, p in enumerate(test_values['pressure']):
-            assert numpy.isclose(
-                model.loading(p), test_values['loading'][i], 0.001
-            )
+            assert numpy.isclose(model.loading(p), test_values['loading'][i], 0.001)
 
     @pytest.mark.parametrize("m_name", [key for key in MODEL_DATA])
     def test_models_pressure(self, m_name):
@@ -73,16 +82,12 @@ class TestIsothermModels():
         test_values = MODEL_DATA[m_name]['test_values']
 
         for i, l in enumerate(test_values['loading']):
-            assert numpy.isclose(
-                model.pressure(l), test_values['pressure'][i], 0.001
-            )
+            assert numpy.isclose(model.pressure(l), test_values['pressure'][i], 0.001)
 
     @pytest.mark.parametrize(
         "m_name", [
-            pytest.param(
-                key,
-                marks=MODEL_DATA[key]['test_values']['spreading_pressure_mark']
-            ) for key in MODEL_DATA
+            pytest.param(key, marks=MODEL_DATA[key]['test_values']['spreading_pressure_mark'])
+            for key in MODEL_DATA
         ]
     )
     def test_models_s_pressure(self, m_name):
@@ -94,8 +99,7 @@ class TestIsothermModels():
 
         for i, p in enumerate(test_values['pressure']):
             assert numpy.isclose(
-                model.spreading_pressure(p),
-                test_values['spreading_pressure'][i], 0.001
+                model.spreading_pressure(p), test_values['spreading_pressure'][i], 0.001
             )
 
     @pytest.mark.parametrize("m_name", [key for key in MODEL_DATA])

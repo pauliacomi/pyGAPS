@@ -11,7 +11,7 @@ from scipy import optimize
 
 from ..graphing.iast_graphs import plot_iast_svp
 from ..graphing.iast_graphs import plot_iast_vle
-from ..modelling import is_iast_model
+from ..modelling import is_model_iast
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
@@ -243,11 +243,9 @@ def iast(
 
     """
     for isotherm in isotherms:
-        if hasattr(isotherm, 'model'):
-            if not is_iast_model(isotherm.model.name):
-                raise ParameterError(
-                    f"Model {isotherm.model.name} cannot be used with IAST."
-                )
+        if isinstance(isotherm, pygaps.ModelIsotherm):
+            if not is_model_iast(isotherm.model.name):
+                raise ParameterError(f"Model {isotherm.model.name} cannot be used with IAST.")
 
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:
@@ -451,11 +449,9 @@ def reverse_iast(
 
     """
     for isotherm in isotherms:
-        if hasattr(isotherm, 'model'):
-            if not is_iast_model(isotherm.model.name):
-                raise ParameterError(
-                    f"Model {isotherm.model.name} cannot be used with IAST."
-                )
+        if isinstance(isotherm, pygaps.ModelIsotherm):
+            if not is_model_iast(isotherm.model.name):
+                raise ParameterError(f"Model {isotherm.model.name} cannot be used with IAST.")
 
     n_components = len(isotherms)  # number of components in the mixture
     if n_components == 1:

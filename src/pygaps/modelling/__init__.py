@@ -64,6 +64,78 @@ _IAST_MODELS = [
 ]
 
 
+def is_model(model_name: str) -> bool:
+    """
+    Check whether specified model is in pyGAPS.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model
+
+    Returns
+    -------
+    bool
+        Whether it is applicable or not.
+
+    """
+    return model_name.lower() in map(str.lower, _MODELS)
+
+
+def is_model_guess(model_name: str) -> bool:
+    """
+    Check whether specified model is fast enough to guess the fit.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model
+
+    Returns
+    -------
+    bool
+        Whether it is applicable or not.
+
+    """
+    return model_name.lower() in map(str.lower, _GUESS_MODELS)
+
+
+def is_model_iast(model_name: str) -> bool:
+    """
+    Check whether specified model can be used with IAST.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model
+
+    Returns
+    -------
+    bool
+        Whether it is applicable or not.
+
+    """
+    return model_name.lower() in map(str.lower, _IAST_MODELS)
+
+
+def is_model_class(model):
+    """
+    Check whether the input is derived from the base model.
+
+    Parameters
+    ----------
+    model : Model
+        A derived IsothermBaseModel class
+
+    Returns
+    -------
+    bool
+        True or false.
+
+    """
+    return isinstance(model, IsothermBaseModel)
+
+
 def get_isotherm_model(model_name: str, params: dict = None):
     """
     Check whether specified model name exists and return an instance of that model class.
@@ -85,54 +157,15 @@ def get_isotherm_model(model_name: str, params: dict = None):
     ParameterError
         When the model does not exist
     """
-    for _model in _MODELS:
-        if model_name.lower() == _model.lower():
-            module = importlib.import_module(
-                f"pygaps.modelling.{_model.lower()}"
-            )
-            model = getattr(module, _model)
-            return model(params)
+    if not is_model(model_name):
+        raise ParameterError(f"Model {model_name} not an option. Viable models are {_MODELS}")
 
-    raise ParameterError(
-        f"Model {model_name} not an option. Viable models "
-        f"are {[model for model in _MODELS]}"
-    )
-
-
-def is_iast_model(model_name: dict):
-    """
-    Check whether specified model can be used with IAST.
-
-    Parameters
-    ----------
-    model_name : str
-        The name of the model
-
-    Returns
-    -------
-    bool
-        Whether it is applicable or not.
-
-    """
-    return model_name.lower() in [model.lower() for model in _IAST_MODELS]
-
-
-def is_base_model(model):
-    """
-    Check whether the input is derived from the base model.
-
-    Parameters
-    ----------
-    model : Model
-        A derived IsothermBaseModel class
-
-    Returns
-    -------
-    bool
-        True or false.
-
-    """
-    return isinstance(model, IsothermBaseModel)
+    model_name_lc = model_name.lower()
+    index = [m.lower() for m in _MODELS].index(model_name_lc)
+    pg_model_name = _MODELS[index]
+    module = importlib.import_module(f"pygaps.modelling.{pg_model_name.lower()}")
+    model = getattr(module, pg_model_name)
+    return model(params)
 
 
 def model_from_dict(model_dict):
