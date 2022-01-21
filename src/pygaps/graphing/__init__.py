@@ -2,32 +2,12 @@
 # flake8: noqa
 # isort:skip_file
 
-from .isotherm_graphs import plot_iso
-from .. import _load_lazy
+from .mpl_styles import *
 
 
-class mpl_backend():
-    """A backend for matplotlib, which will be lazy loaded eventually."""
-    def __init__(self):
-        pass
-        # self.pyplot = _load_lazy('matplotlib.pyplot')
-        # self.ticker = _load_lazy('matplotlib.ticker')
-        # self.cm = _load_lazy('matplotlib.cm')
-
-    @property
-    def pyplot(self):
-        import matplotlib.pyplot as plt
-        return plt
-
-    @property
-    def ticker(self):
-        import matplotlib.ticker as tick
-        return tick
-
-    @property
-    def cm(self):
-        import matplotlib.cm as cm
-        return cm
-
-
-plt = mpl_backend()
+# TODO: very bad, temporary solution
+# https://matplotlib.org/stable/tutorials/introductory/customizing.html
+# Ideally the matplotlib custom styles are defined in a better way
+def plot_iso(*args, **kwargs):
+    from .isotherm_graphs import plot_iso
+    plot_iso(*args, **kwargs)

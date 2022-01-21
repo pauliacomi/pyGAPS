@@ -56,20 +56,20 @@ class TestIAST():
 
         # Raises "not enough components error"
         with pytest.raises(pgEx.ParameterError):
-            pgi.iast([ch4], [0.1], 1)
+            pgi.iast_point_fraction([ch4], [0.1], 1)
 
         # Raises "different dimensions of arrays"
         with pytest.raises(pgEx.ParameterError):
-            pgi.iast([ch4, c2h6], [0.1], 1)
+            pgi.iast_point_fraction([ch4, c2h6], [0.1], 1)
 
         # Raises "model cannot be used with IAST"
         ch4_m = pygaps.ModelIsotherm.from_pointisotherm(ch4, model='Virial')
         with pytest.raises(pgEx.ParameterError):
-            pgi.iast([ch4_m, c2h6], [0.6, 0.4], 1)
+            pgi.iast_point_fraction([ch4_m, c2h6], [0.6, 0.4], 1)
 
         # Warning "extrapolate outside range"
         with pytest.warns(Warning):
-            pgi.iast(load_iast_models, [0.5, 0.5], 100)
+            pgi.iast_point_fraction(load_iast_models, [0.5, 0.5], 100)
 
     def test_iast(self, load_iast):
         """Test on pre-calculated data."""
@@ -77,7 +77,7 @@ class TestIAST():
         gas_fraction = [0.5, 0.5]
         adsorbed_fractions = [0.23064, 0.76936]
 
-        loadings = pgi.iast(load_iast, gas_fraction, 1)
+        loadings = pgi.iast_point_fraction(load_iast, gas_fraction, 1)
 
         assert numpy.isclose(adsorbed_fractions[0], loadings[0], 0.001)
 
@@ -87,14 +87,14 @@ class TestIAST():
         gas_fraction = [0.5, 0.5]
         adsorbed_fractions = [0.2833, 0.7167]
 
-        loadings = pgi.iast(load_iast_models, gas_fraction, 1)
+        loadings = pgi.iast_point_fraction(load_iast_models, gas_fraction, 1)
 
         assert numpy.isclose(adsorbed_fractions[0], loadings[0], 0.001)
 
     @cleanup
     def test_iast_verbose(self, load_iast):
         """Test verbosity."""
-        pgi.iast(load_iast, [0.5, 0.5], 1, verbose=True)
+        pgi.iast_point_fraction(load_iast, [0.5, 0.5], 1, verbose=True)
 
 
 @pytest.mark.modelling
@@ -132,16 +132,12 @@ class TestReverseIAST():
         ideal_ads_fraction = [0.5, 0.5]
         ideal_gas_fraction = [0.815, 0.185]
 
-        gas_fraction, actual_loading = pgi.reverse_iast(
-            load_iast, ideal_ads_fraction, 1
-        )
+        gas_fraction, actual_loading = pgi.reverse_iast(load_iast, ideal_ads_fraction, 1)
 
         actual_ads_fraction = actual_loading / numpy.sum(actual_loading)
 
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
-        assert numpy.isclose(
-            ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05
-        )
+        assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
 
     def test_reverse_iast_model(self, load_iast_models):
         """Test on pre-calculated data."""
@@ -149,16 +145,12 @@ class TestReverseIAST():
         ideal_ads_fraction = [0.5, 0.5]
         ideal_gas_fraction = [0.885, 0.115]
 
-        gas_fraction, actual_loading = pgi.reverse_iast(
-            load_iast_models, ideal_ads_fraction, 1
-        )
+        gas_fraction, actual_loading = pgi.reverse_iast(load_iast_models, ideal_ads_fraction, 1)
 
         actual_ads_fraction = actual_loading / numpy.sum(actual_loading)
 
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
-        assert numpy.isclose(
-            ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05
-        )
+        assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
 
     @cleanup
     def test_reverse_iast_verbose(self, load_iast):

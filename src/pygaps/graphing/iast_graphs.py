@@ -1,11 +1,80 @@
 """Functions for plotting graphs related to IAST calculations."""
 
 from ..utilities.string_utilities import convert_chemformula
-from . import plt
+import matplotlib.pyplot as plt
 from .mpl_styles import IAST_STYLES
 
 
-def plot_iast_vle(x_data, y_data, ads1, ads2, pressure, p_unit, ax=None):
+def plot_iast(
+    p_data: list,
+    l_data: list,
+    ads: list,
+    p_unit: str,
+    l_unit: str,
+    ax=None,
+):
+    """
+    Plot uptake-vs-pressure graph from IAST data.
+
+    Parameters
+    ----------
+    p_data : array or list
+        The pressures at which uptakes are calculated.
+    l_data : 2D array or list of lists
+        Uptake for each component a function of pressure.
+    ads : list[str]
+        Names of the adsorbates.
+    p_unit : str
+        Unit of pressure, for axis labelling.
+    l_unit : str
+        Unit of loading, for axis labelling.
+    ax : matplotlib axes object, default None
+        The axes object where to plot the graph if a new figure is
+        not desired.
+
+    Returns
+    -------
+    ax : matplotlib ax
+        The ax object.
+    """
+
+    # Generate the figure if needed
+    if ax is None:
+        fig = plt.figure(**IAST_STYLES['fig_style'])
+        ax = fig.add_subplot(111)
+
+    ads = map(convert_chemformula, ads)
+
+    text_x = f"Pressure [{p_unit}]"
+    text_y = f"Uptake [{l_unit}]"
+    title_graph = f"IAST uptake"
+
+    # graph title
+    ax.set_title(title_graph, **IAST_STYLES['title_style'])
+
+    # labels for the axes
+    ax.set_xlabel(text_x, **IAST_STYLES['label_style'])
+    ax.set_ylabel(text_y, **IAST_STYLES['label_style'])
+    ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
+
+    # Regular data
+    for lo, ads in zip(l_data.T, ads):
+        ax.plot(p_data, lo, marker=".", label=ads)
+
+    ax.legend(loc='best', **IAST_STYLES['lgd_style'])
+
+    return ax
+
+
+def plot_iast_vle(
+    x_data: list,
+    y_data: list,
+    ads1: str,
+    ads2: str,
+    pressure: float,
+    p_unit: str,
+    ax=None,
+):
     """
     Plot a vapour-adsorbed equilibrium graph from IAST data.
 
@@ -34,7 +103,7 @@ def plot_iast_vle(x_data, y_data, ads1, ads2, pressure, p_unit, ax=None):
     """
     # Generate the figure if needed
     if ax is None:
-        fig = plt.pyplot.figure(**IAST_STYLES['fig_style'])
+        fig = plt.figure(**IAST_STYLES['fig_style'])
         ax = fig.add_subplot(111)
 
     ads1 = convert_chemformula(ads1)
@@ -54,7 +123,7 @@ def plot_iast_vle(x_data, y_data, ads1, ads2, pressure, p_unit, ax=None):
     ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
 
     # Regular data
-    ax.plot(y_data, x_data, label=label)
+    ax.plot(y_data, x_data, marker=".", label=label)
 
     # Straight line
     line = [0, 1]
@@ -68,7 +137,15 @@ def plot_iast_vle(x_data, y_data, ads1, ads2, pressure, p_unit, ax=None):
     return ax
 
 
-def plot_iast_svp(p_data, s_data, ads1, ads2, fraction, p_unit, ax=None):
+def plot_iast_svp(
+    p_data: list,
+    s_data: list,
+    ads1: str,
+    ads2: str,
+    fraction: float,
+    p_unit: str,
+    ax=None,
+):
     """
     Plot a selectivity-vs-pressure graph from IAST data.
 
@@ -98,7 +175,7 @@ def plot_iast_svp(p_data, s_data, ads1, ads2, fraction, p_unit, ax=None):
 
     # Generate the figure if needed
     if ax is None:
-        fig = plt.pyplot.figure(**IAST_STYLES['fig_style'])
+        fig = plt.figure(**IAST_STYLES['fig_style'])
         ax = fig.add_subplot(111)
 
     ads1 = convert_chemformula(ads1)
@@ -118,7 +195,7 @@ def plot_iast_svp(p_data, s_data, ads1, ads2, fraction, p_unit, ax=None):
     ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
 
     # Regular data
-    ax.plot(p_data, s_data, label=label)
+    ax.plot(p_data, s_data, marker=".", label=label)
 
     ax.legend(loc='best', **IAST_STYLES['lgd_style'])
 
