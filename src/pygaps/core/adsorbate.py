@@ -10,6 +10,8 @@ from ..utilities.coolprop_utilities import thermodynamic_backend
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
+# TODO think about separating liquid and gas density
+
 
 class Adsorbate():
     """
@@ -97,9 +99,7 @@ class Adsorbate():
         """Instantiate by passing a dictionary with the parameters."""
         # Adsorbate name
         if name is None:
-            raise ParameterError(
-                "Must provide a name for the created adsorbate."
-            )
+            raise ParameterError("Must provide a name for the created adsorbate.")
         self.name = name
 
         # List of aliases
@@ -204,14 +204,9 @@ class Adsorbate():
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
-        if (
-            not self._backend_mode
-            or self._backend_mode != thermodynamic_backend()
-        ):
+        if (not self._backend_mode or self._backend_mode != thermodynamic_backend()):
             self._backend_mode = thermodynamic_backend()
-            self._state = CP.AbstractState(
-                self._backend_mode, self.backend_name
-            )
+            self._state = CP.AbstractState(self._backend_mode, self.backend_name)
 
         return self._state
 
@@ -368,9 +363,7 @@ class Adsorbate():
                 warnings.warn(str(e_info))
                 warnings.warn('Attempting to read dictionary')
                 try:
-                    sat_p = self.saturation_pressure(
-                        temp, unit=unit, calculate=False
-                    )
+                    sat_p = self.saturation_pressure(temp, unit=unit, calculate=False)
                 except ParameterError:
                     raise CalculationError
 

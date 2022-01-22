@@ -2,8 +2,6 @@
 Methods of calculating a pore size distribution for pores in the mesopore range
 (2-100 nm), based on the Kelvin equation and pore condensation/evaporation.
 """
-import typing as t
-
 import numpy
 
 from ..core.adsorbate import Adsorbate

@@ -1163,7 +1163,7 @@ class PointIsotherm(BaseIsotherm):
         loading_basis=None,
         material_unit=None,
         material_basis=None,
-        interp_fill=None
+        interp_fill=None,
     ):
         r"""
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.

@@ -147,14 +147,10 @@ class ModelIsotherm(BaseIsotherm):
             elif branch == 'des':
                 data = data.loc[data['branch']]
             else:
-                raise ParameterError(
-                    "ModelIsotherm branch must be singular: 'ads' or 'des'."
-                )
+                raise ParameterError("ModelIsotherm branch must be singular: 'ads' or 'des'.")
 
             if data.empty:
-                raise ParameterError(
-                    "The required isotherm branch does not contain any points."
-                )
+                raise ParameterError("The required isotherm branch does not contain any points.")
 
             # Get just the pressure and loading columns
             pressure = data[pressure_key].values
@@ -169,9 +165,7 @@ class ModelIsotherm(BaseIsotherm):
                     " arrays, make sure both are specified!"
                 )
             if len(pressure) != len(loading):
-                raise ParameterError(
-                    "Pressure and loading arrays are not equal!"
-                )
+                raise ParameterError("Pressure and loading arrays are not equal!")
 
             # Ensure we are dealing with numpy arrays
             pressure = numpy.asarray(pressure)
@@ -245,13 +239,9 @@ class ModelIsotherm(BaseIsotherm):
         # Plot fit if verbose
         if verbose and isotherm_parameters.get('plot_fit', True):
             if self.model.calculates == 'pressure':
-                ax = self.plot(
-                    y1_line_style=dict(markersize=0), y1_points=loading
-                )
+                ax = self.plot(y1_line_style=dict(markersize=0), y1_points=loading)
             else:
-                ax = self.plot(
-                    y1_line_style=dict(markersize=0), x_points=pressure
-                )
+                ax = self.plot(y1_line_style=dict(markersize=0), x_points=pressure)
             from pygaps.graphing.mpl_styles import POINTS_ALL_STYLE
             ax.plot(pressure, loading, zorder=-1, **POINTS_ALL_STYLE)
             ax.legend([self.model.name], frameon=False)
@@ -365,9 +355,7 @@ class ModelIsotherm(BaseIsotherm):
             Prints out extra information about steps taken.
         """
         if not model:
-            raise ParameterError(
-                "Provide a model name (or a list of them) to fit."
-            )
+            raise ParameterError("Provide a model name (or a list of them) to fit.")
         # get isotherm parameters as a dictionary
         iso_params = isotherm.to_dict()
         iso_params['isotherm_data'] = isotherm.data(branch=branch)
@@ -479,13 +467,12 @@ class ModelIsotherm(BaseIsotherm):
                 attempts.append(isotherm)
 
             except CalculationError as e:
+                logger.info(f"Modelling using {model} failed.")
                 if verbose:
-                    logger.info(f"Modelling using {model} failed. \n{e}")
+                    logger.info(f"\n{e}")
 
         if not attempts:
-            raise CalculationError(
-                "No model could be reliably fit on the isotherm."
-            )
+            raise CalculationError("No model could be reliably fit on the isotherm.")
 
         errors = [x.model.rmse for x in attempts]
         best_fit = attempts[errors.index(min(errors))]
@@ -647,8 +634,9 @@ class ModelIsotherm(BaseIsotherm):
         # Generate pressure points
         if self.model.calculates == 'loading':
             ret = numpy.linspace(
-                self.model.pressure_range[0], self.model.pressure_range[1],
-                points
+                self.model.pressure_range[0],
+                self.model.pressure_range[1],
+                points,
             )
 
             # Convert if needed
@@ -677,8 +665,7 @@ class ModelIsotherm(BaseIsotherm):
         # Select required points
         if limits:
             ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
-                      &
-                      (ret < (numpy.inf if limits[1] is None else limits[1]))]
+                      & (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
@@ -739,8 +726,9 @@ class ModelIsotherm(BaseIsotherm):
 
         if self.model.calculates == 'pressure':
             ret = numpy.linspace(
-                self.model.loading_range[0], self.model.loading_range[1],
-                points
+                self.model.loading_range[0],
+                self.model.loading_range[1],
+                points,
             )
 
             # Convert if needed
@@ -792,8 +780,7 @@ class ModelIsotherm(BaseIsotherm):
         # Select required points
         if limits:
             ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
-                      &
-                      (ret < (numpy.inf if limits[1] is None else limits[1]))]
+                      & (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
@@ -1049,7 +1036,11 @@ class ModelIsotherm(BaseIsotherm):
         return loading
 
     def spreading_pressure_at(
-        self, pressure, branch=None, pressure_unit=None, pressure_mode=None
+        self,
+        pressure,
+        branch=None,
+        pressure_unit=None,
+        pressure_mode=None,
     ):
         r"""
         Calculate reduced spreading pressure at a bulk gas pressure P.

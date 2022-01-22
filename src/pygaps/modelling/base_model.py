@@ -33,12 +33,8 @@ class IsothermBaseModel():
 
         if params:
             self.rmse = params.pop('rmse', numpy.nan)
-            self.pressure_range = params.pop(
-                'pressure_range', [numpy.nan, numpy.nan]
-            )
-            self.loading_range = params.pop(
-                'loading_range', [numpy.nan, numpy.nan]
-            )
+            self.pressure_range = params.pop('pressure_range', [numpy.nan, numpy.nan])
+            self.loading_range = params.pop('loading_range', [numpy.nan, numpy.nan])
             self.params = {}
             for param in self.param_names:
                 try:
@@ -168,9 +164,7 @@ class IsothermBaseModel():
         # guess saturation loading to 10% more than highest loading
         saturation_loading = 1.1 * max(loading)
         # guess langmuir constant from the starting point
-        langmuir_k = loading[0] / pressure[0] / (
-            saturation_loading - loading[0]
-        )
+        langmuir_k = loading[0] / pressure[0] / (saturation_loading - loading[0])
 
         return saturation_loading, langmuir_k
 
@@ -180,7 +174,7 @@ class IsothermBaseModel():
         loading,
         param_guess,
         optimization_params=None,
-        verbose=False
+        verbose=False,
     ):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
@@ -225,15 +219,11 @@ class IsothermBaseModel():
             opt_res = optimize.least_squares(
                 fit_func,
                 guess,  # provide the fit function and initial guess
-                args=(pressure, loading
-                      ),  # supply the extra arguments to the fit function
+                args=(pressure, loading),  # extra arguments to the fit function
                 **kwargs
             )
         except ValueError as e:
-            raise CalculationError(
-                f"Fitting routine for {self.name} failed with error:"
-                f"\n\t{e}"
-            )
+            raise CalculationError(f"Fitting routine for {self.name} failed with error:\n\t{e}")
         if not opt_res.success:
             raise CalculationError(
                 f"Fitting routine for {self.name} failed with error:"

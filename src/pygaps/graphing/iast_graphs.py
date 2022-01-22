@@ -47,7 +47,7 @@ def plot_iast(
 
     text_x = f"Pressure [{p_unit}]"
     text_y = f"Uptake [{l_unit}]"
-    title_graph = f"IAST uptake"
+    title_graph = "IAST uptake"
 
     # graph title
     ax.set_title(title_graph, **IAST_STYLES['title_style'])

@@ -80,10 +80,17 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     # Calculate knot vector
     kv = None
     if periodic:
-        kv = numpy.arange(0 - degree, count + degree + degree - 1, dtype='int')
+        kv = numpy.arange(
+            0 - degree,
+            count + degree + degree - 1,
+            dtype='int',
+        )
     else:
-        kv = numpy.concatenate(([0] * degree, numpy.arange(count - degree + 1),
-                                [count - degree] * degree))
+        kv = numpy.concatenate((
+            [0] * degree,
+            numpy.arange(count - degree + 1),
+            [count - degree] * degree,
+        ))
 
     # Calculate query range
     rng = numpy.linspace(periodic, (count - degree), n)
@@ -91,4 +98,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     # Calculate result
     res = numpy.array(interpolate.splev(rng, (kv, cv.T, degree))).T
 
-    return (numpy.array([x[0] for x in res]), numpy.array([y[1] for y in res]))
+    return (
+        numpy.array([x[0] for x in res]),
+        numpy.array([y[1] for y in res]),
+    )
