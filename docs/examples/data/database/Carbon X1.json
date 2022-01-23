@@ -4,6 +4,7 @@
     "material_batch": "X1",
     "adsorbate": "nitrogen",
     "temperature": 303.0,
+    "temperature_unit": "K",
     "iso_type": "physisorption",
     "user": "Bob",
     "instrument": "homemade1",

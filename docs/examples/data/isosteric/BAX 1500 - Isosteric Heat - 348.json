@@ -188,5 +188,6 @@
     "material_batch": "TB",
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
-    "temperature": 348.15
+    "temperature": 348.15,
+    "temperature_unit": "K"
 }

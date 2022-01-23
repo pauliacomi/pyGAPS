@@ -1,0 +1,281 @@
+{
+    "adsorbate": "methanol",
+    "apparatus": "BEL 00348",
+    "as/m2_g-1:": "0.0000",
+    "average_dead_volume:": "1.7947E+1",
+    "comment4:": "Leak amount : 0.198Pa/Min  Vacuum degree before measurement:8.768E-5Pa",
+    "comments": "",
+    "date": "2015-05-17T00:00:00",
+    "equilibrium_time/sec:": "0",
+    "file_version": "2.0",
+    "intercept_of_dead_volume:": "1.7943E+1",
+    "isotherm_data": [
+        {
+            "deadvolume": 17.94,
+            "loading": 32.254,
+            "measurement": 1.0,
+            "pressure": 0.067414,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.941,
+            "loading": 42.424,
+            "measurement": 2.0,
+            "pressure": 0.0996,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.942,
+            "loading": 77.371,
+            "measurement": 3.0,
+            "pressure": 0.51171,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.943,
+            "loading": 99.337,
+            "measurement": 4.0,
+            "pressure": 1.0088,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.943,
+            "loading": 121.09,
+            "measurement": 5.0,
+            "pressure": 1.4368,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.944,
+            "loading": 143.59,
+            "measurement": 6.0,
+            "pressure": 1.8226,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.945,
+            "loading": 168.17,
+            "measurement": 7.0,
+            "pressure": 2.0727,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.945,
+            "loading": 206.19,
+            "measurement": 8.0,
+            "pressure": 2.5342,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.946,
+            "loading": 217.51,
+            "measurement": 9.0,
+            "pressure": 2.9863,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.946,
+            "loading": 226.9,
+            "measurement": 10.0,
+            "pressure": 3.6604,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.947,
+            "loading": 236.23,
+            "measurement": 11.0,
+            "pressure": 4.8663,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.947,
+            "loading": 244.34,
+            "measurement": 12.0,
+            "pressure": 6.4223,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.947,
+            "loading": 251.51,
+            "measurement": 13.0,
+            "pressure": 8.2259,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.948,
+            "loading": 257.94,
+            "measurement": 14.0,
+            "pressure": 10.637,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.948,
+            "loading": 263.27,
+            "measurement": 15.0,
+            "pressure": 13.18,
+            "pressure_saturation": 16.85
+        },
+        {
+            "deadvolume": 17.949,
+            "loading": 271.08,
+            "measurement": 16.0,
+            "pressure": 15.473,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.949,
+            "loading": 263.72,
+            "measurement": 1.0,
+            "pressure": 13.081,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.949,
+            "loading": 259.37,
+            "measurement": 2.0,
+            "pressure": 10.811,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.949,
+            "loading": 254.02,
+            "measurement": 3.0,
+            "pressure": 8.6911,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.95,
+            "loading": 247.76,
+            "measurement": 4.0,
+            "pressure": 6.8867,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.95,
+            "loading": 240.8,
+            "measurement": 5.0,
+            "pressure": 5.4494,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.951,
+            "loading": 233.74,
+            "measurement": 6.0,
+            "pressure": 4.3061,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.951,
+            "loading": 225.06,
+            "measurement": 7.0,
+            "pressure": 3.3839,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.952,
+            "loading": 215.3,
+            "measurement": 8.0,
+            "pressure": 2.7964,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.952,
+            "loading": 206.05,
+            "measurement": 9.0,
+            "pressure": 2.4801,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.954,
+            "loading": 188.41,
+            "measurement": 10.0,
+            "pressure": 2.2016,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.955,
+            "loading": 156.11,
+            "measurement": 11.0,
+            "pressure": 1.9446,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.955,
+            "loading": 141.96,
+            "measurement": 12.0,
+            "pressure": 1.7718,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.956,
+            "loading": 119.06,
+            "measurement": 13.0,
+            "pressure": 1.3672,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.956,
+            "loading": 102.15,
+            "measurement": 14.0,
+            "pressure": 1.0258,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.957,
+            "loading": 83.275,
+            "measurement": 15.0,
+            "pressure": 0.59883,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.959,
+            "loading": 57.09,
+            "measurement": 16.0,
+            "pressure": 0.19228,
+            "pressure_saturation": 16.85
+        },
+        {
+            "branch": "des",
+            "deadvolume": 17.96,
+            "loading": 54.706,
+            "measurement": 17.0,
+            "pressure": 0.17228,
+            "pressure_saturation": 16.85
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "cm3(STP)",
+    "material": "DUT-67Zr_Methanol",
+    "material_basis": "mass",
+    "material_mass": "0.03520",
+    "material_unit": "g",
+    "measurement_duration": "12:27:04",
+    "measurement_mode:": "1",
+    "molecular_cross-sectional_area:": "0",
+    "molecular_weight_of_adsorbate:": "0.00",
+    "molecular_weight_of_adsorbent:": "0.00",
+    "operator": "Volodymyr",
+    "pressure_mode": "absolute",
+    "pressure_unit": "kPa",
+    "serialnumber": "00348",
+    "slope_of_dead_volume:": "5.3868E-8",
+    "temperature": 298.0,
+    "temperature_unit": "K",
+    "vs/ml:": "24.438"
+}

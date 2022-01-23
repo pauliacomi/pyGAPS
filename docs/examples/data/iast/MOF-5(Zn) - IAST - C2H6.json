@@ -91,5 +91,6 @@
     "pressure_unit": "bar",
     "activation_temperature": 150.0,
     "temperature": 298.0,
+    "temperature_unit": "K",
     "user": "PI"
 }

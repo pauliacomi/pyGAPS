@@ -309,6 +309,7 @@
     "pressure_mode": "relative",
     "pressure_unit": null,
     "activation_temperature": 150.0,
+    "temperature_unit": "K",
     "temperature": 77.355,
     "user": "PI"
 }

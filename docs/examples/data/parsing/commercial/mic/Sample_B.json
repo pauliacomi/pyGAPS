@@ -1,8 +1,5 @@
 {
-    "file_version": "2.0",
     "adsorbate": "nitrogen",
-    "material_basis": "mass",
-    "material_unit": "g",
     "apparatus": "TriStar II 3020 3.02",
     "comment": "Sample that was stopped during collection.",
     "date": "2017-06-13T07:56:30",
@@ -16,6 +13,7 @@
         "1043-  Fewer than 2 points available for BJH Adsorption calculations.",
         "1043-  Fewer than 2 points available for BJH Desorption calculations."
     ],
+    "file_version": "2.0",
     "isotherm_data": [
         {
             "loading": 28.33484691613959,
@@ -26,10 +24,13 @@
     ],
     "loading_basis": "molar",
     "loading_unit": "cm3(STP)",
-    "mass": 0.288,
     "material": "Sample B",
+    "material_basis": "mass",
+    "material_mass": 0.288,
+    "material_unit": "g",
+    "operator": "",
     "pressure_mode": "relative",
     "pressure_unit": null,
     "temperature": 77.3,
-    "user": ""
+    "temperature_unit": "K"
 }
