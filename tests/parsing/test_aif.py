@@ -24,5 +24,5 @@ class TestAIF():
         """Test reading of some AIFs."""
         isotherm = pgp.isotherm_from_aif(path)
         json_path = path.with_suffix('.json')
-        pgp.isotherm_to_json(isotherm, json_path, indent=4)
-        # assert isotherm == pgp.isotherm_from_json(json_path)
+        # pgp.isotherm_to_json(isotherm, json_path, indent=4)
+        assert isotherm == pgp.isotherm_from_json(json_path)

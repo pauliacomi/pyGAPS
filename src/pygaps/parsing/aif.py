@@ -13,6 +13,7 @@ import pathlib
 import warnings
 
 import pandas
+import numpy
 from gemmi import cif
 
 from pygaps.core.pointisotherm import PointIsotherm
@@ -128,7 +129,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
             ['pressure', 'amount'] + isotherm.other_keys,
         )
         loop_ads.set_all_values(
-            isotherm.data(branch='ads')[columns].values.T.astype("|S10").tolist()
+            isotherm.data(branch='ads')[columns].applymap(lambda x: f'{x:.5g}').values.T.tolist()
         )
 
         # write desorption data
@@ -138,7 +139,8 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
                 ['pressure', 'amount'] + isotherm.other_keys,
             )
             loop_des.set_all_values(
-                isotherm.data(branch='des')[columns].values.T.astype("|S10").tolist()
+                isotherm.data(branch='des'
+                              )[columns].applymap(lambda x: f'{x:.5g}').values.T.tolist()
             )
 
     if path:
