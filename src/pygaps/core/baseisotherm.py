@@ -5,8 +5,6 @@ import warnings
 
 logger = logging.getLogger('pygaps')
 
-import numpy
-
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.material import Material
 
@@ -77,8 +75,12 @@ class BaseIsotherm():
     """
 
     # strictly required attributes
-    _required_params = ['material', 'temperature', 'adsorbate']
-    # unit-related attributes
+    _required_params = [
+        'material',
+        'temperature',
+        'adsorbate',
+    ]
+    # unit-related attributes and their defaults
     _unit_params = {
         'pressure_mode': 'absolute',
         'pressure_unit': 'bar',
@@ -91,7 +93,12 @@ class BaseIsotherm():
     # other special reserved parameters
     # subclasses extend this
     _reserved_params = [
-        "_material", "_adsorbate", "_temperature", "m", "t", "a"
+        "_material",
+        "_adsorbate",
+        "_temperature",
+        "m",
+        "t",
+        "a",
     ]
 
     ##########################################################
@@ -125,19 +132,6 @@ class BaseIsotherm():
 
         # Isotherm adsorbate
         self.adsorbate = properties.pop('adsorbate')
-
-        # TODO deprecation
-        old_basis = properties.pop('adsorbent_basis', None)
-        old_unit = properties.pop('adsorbent_unit', None)
-        if old_basis or old_unit:
-            logger.warning(
-                "WARNING: adsorbent_basis/adsorbent_unit is deprecated, "
-                "use material_basis/material_unit"
-            )
-            if old_basis:
-                properties['material_basis'] = old_basis
-            if old_unit:
-                properties['material_unit'] = old_unit
 
         # Isotherm units
         #
@@ -205,13 +199,8 @@ class BaseIsotherm():
 
         # Other named properties of the isotherm
 
-        # Save the rest of the properties as members
-        for attr in properties:
-            if hasattr(self, attr):
-                raise ParameterError(
-                    f"Cannot override standard Isotherm class member '{attr}'."
-                )
-            setattr(self, attr, properties[attr])
+        # Save the rest of the properties as metadata
+        self.properties = properties
 
     ##########################################################
     #   Overloaded and own functions
@@ -317,6 +306,9 @@ class BaseIsotherm():
         # Remove reserved parameters
         for param in self._reserved_params:
             parameter_dict.pop(param, None)
+
+        # Add metadata
+        parameter_dict.update(parameter_dict.pop('properties'))
 
         return parameter_dict
 
@@ -431,9 +423,18 @@ class BaseIsotherm():
         unit_to: str,
         verbose: bool = False,
     ):
-        self._temperature = c_temperature(
-            self._temperature, self.temperature_unit, unit_to
-        )
+        """
+        Convert isotherm temperature from one unit to another.
+
+        Parameters
+        ----------
+        unit_to : str
+            The unit into which the internal temperature should be converted to.
+        verbose : bool
+            Print out steps taken.
+
+        """
+        self._temperature = c_temperature(self._temperature, self.temperature_unit, unit_to)
         self.temperature_unit = unit_to
 
         if verbose:
@@ -446,21 +447,5 @@ class BaseIsotherm():
         Split isotherm data into an adsorption and desorption part and
         return a column which marks the transition between the two.
         """
-        # Generate array
-        split = numpy.array([False for p in range(0, len(data.index))])
-
-        # Get the maximum pressure point (assume where desorption starts)
-        inflexion = data.index.get_loc(data[pressure_key].idxmax()) + 1
-
-        # If the maximum is not the last point
-        if inflexion != len(split):
-
-            # If the first point is the maximum, then it is purely desorption
-            if inflexion == data.index[0]:
-                inflexion = 0
-
-            # Set all instances after the inflexion point to True
-            split[inflexion:] = True
-
-        # Return the new array with the branch column
-        return split
+        from ..utilities.math_utilities import split_ads_data
+        return split_ads_data(data, pressure_key)

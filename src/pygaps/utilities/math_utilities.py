@@ -3,9 +3,61 @@
 from itertools import groupby
 
 import numpy
-from scipy import interpolate
 
-from .exceptions import ParameterError
+from .exceptions import ParameterError, CalculationError
+
+
+def split_ads_data(data, pressure_key):
+    # Generate array
+    split = numpy.array([0 for p in range(0, len(data.index))])
+
+    # Get the maximum pressure point (assume where desorption starts)
+    inflexion = data.index.get_loc(data[pressure_key].idxmax()) + 1
+
+    # If the maximum is not the last point
+    if inflexion != len(split):
+
+        # If the first point is the maximum, then it is purely desorption
+        if inflexion == data.index[0]:
+            inflexion = 0
+
+        # Set all instances after the inflexion point to 1
+        split[inflexion:] = 1
+
+    # Return the new array with the branch column
+    return split
+
+
+def find_limit_indices(
+    array: list,
+    limits: "tuple[float, float]" = None,
+    smallest_selection: int = 3,
+):
+    """Find the indices of an array limits"""
+    # select the maximum and minimum of the points
+    index_min = 0
+    index_max = len(array) - 1  # As we want absolute position
+
+    # Set default values
+    if limits is None:
+        limits = (None, None)
+
+    # Search
+    if limits[0]:
+        index_min = numpy.searchsorted(array, limits[0])
+    if limits[1]:
+        index_max = numpy.searchsorted(array, limits[1]) - 1
+    if index_max - index_min < smallest_selection:
+        raise CalculationError(
+            f"Not enough points (at least {smallest_selection}) in the selected region."
+        )
+    # TODO figure out which is more efficient
+    #     if limits:
+    # ret = ret.loc[ret.between(
+    #     -numpy.inf if limits[0] is None else limits[0],
+    #     numpy.inf if limits[1] is None else limits[1]
+    # )]
+    return index_min, index_max
 
 
 def find_linear_sections(xdata, ydata):
@@ -96,6 +148,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     rng = numpy.linspace(periodic, (count - degree), n)
 
     # Calculate result
+    from scipy import interpolate
     res = numpy.array(interpolate.splev(rng, (kv, cv.T, degree))).T
 
     return (

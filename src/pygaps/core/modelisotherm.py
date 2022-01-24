@@ -143,9 +143,9 @@ class ModelIsotherm(BaseIsotherm):
                 data['branch'] = self._splitdata(data, pressure_key)
 
             if branch == 'ads':
-                data = data.loc[~data['branch']]
+                data = data.loc[data['branch'] == 0]
             elif branch == 'des':
-                data = data.loc[data['branch']]
+                data = data.loc[data['branch'] == 1]
             else:
                 raise ParameterError("ModelIsotherm branch must be singular: 'ads' or 'des'.")
 
@@ -625,7 +625,7 @@ class ModelIsotherm(BaseIsotherm):
             Pressure points in the model pressure range.
 
         """
-        if branch and branch != self.branch:
+        if branch and branch not in [self.branch, 'all']:
             raise ParameterError(
                 f"ModelIsotherm is based on an '{self.branch}' branch "
                 f"(while parameter supplied was '{branch}')."

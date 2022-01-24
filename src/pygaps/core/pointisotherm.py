@@ -199,9 +199,9 @@ class PointIsotherm(BaseIsotherm):
                     self.data_raw, self.pressure_key
                 )
             elif branch == 'ads':
-                self.data_raw.loc[:, 'branch'] = False
+                self.data_raw.loc[:, 'branch'] = 0
             elif branch == 'des':
-                self.data_raw.loc[:, 'branch'] = True
+                self.data_raw.loc[:, 'branch'] = 1
             else:
                 raise ParameterError(
                     "Isotherm branch parameter must be 'guess ,'ads' or 'des'"
@@ -652,12 +652,12 @@ class PointIsotherm(BaseIsotherm):
             The pandas DataFrame containing all isotherm data.
 
         """
-        if branch is None:
+        if branch is None or branch.startswith('all'):
             return self.data_raw
-        elif branch == 'ads':
-            return self.data_raw.loc[~self.data_raw['branch']]
-        elif branch == 'des':
-            return self.data_raw.loc[self.data_raw['branch']]
+        if branch == 'ads':
+            return self.data_raw.loc[self.data_raw['branch'] == 0]
+        if branch == 'des':
+            return self.data_raw.loc[self.data_raw['branch'] == 1]
         raise ParameterError('Bad branch specification.')
 
     def pressure(
