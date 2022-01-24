@@ -8,132 +8,149 @@ import pandas
 
 from ..core.pointisotherm import PointIsotherm
 
-_FIELDS = {
+_META_DICT = {
     'material': {
-        'text': ['Sample ID'],
-        'name': 'material',
+        'text': "sample id",
     },
     'adsorbate': {
-        'text': ['Analysis gas'],
-        'name': 'adsorbate',
+        'text': "analysis gas",
     },
     'temperature': {
-        'text': ['Bath temp.'],
-        'name': 'temperature',
+        'text': "bath temp.",
     },
-    'user': {
-        'text': ['Operator'],
-        'name': 'user',
-    },
-    'apparatus': {
-        'text': ['Instrument:'],
-        'name': 'apparatus',
-    },
-    'mass': {
-        'text': ['Sample Weight'],
-        'name': 'mass',
+    'operator': {
+        'text': "operator",
     },
     'date': {
-        'text': ['Date'],
-        'name': 'date',
+        'text': "date",
+    },
+    'apparatus': {
+        'text': "instrument",
+    },
+    'material_mass': {
+        'text': "sample weight",
+    },
+    'measurement_duration': {
+        'text': "analysis time",
     },
     'sample_description': {
-        'text': ['Sample Desc'],
-        'name': 'sample_description',
-    },
-    'analysis_time': {
-        'text': ['Analysis Time'],
-        'name': 'analysis_time',
+        'text': "sample desc",
     },
     'comment': {
-        'text': ['Comment'],
-        'name': 'comment',
+        'text': "comment",
     },
     'time_outgas': {
-        'text': ['Outgas Time'],
-        'name': 'time_outgas',
+        'text': "outgas time",
+    },
+    'filename': {
+        'text': "filename",
     },
     'nonideality': {
-        'text': ['Non-ideality'],
-        'name': 'nonideality',
+        'text': "non-ideality",
     },
-    'isotherm_data': {
-        'press': 'pressure',
-        'p0': 'pressure_saturation',
-        'volume': 'loading',
-        'time': 'measurement_time',
-        'tol': 'tolerance',
-        'equ': 'equilibrium',
-    }
+}
+
+_DATA_DICT = {
+    'press': 'pressure',
+    'p0': 'pressure_saturation',
+    'volume': 'loading',
+    'time': 'measurement_time',
+    'tol': 'tolerance',
+    'equ': 'equilibrium',
 }
 
 
 def parse(path):
-
-    # load datafile
-    with open(path, "r", encoding="ISO-8859-1") as fp:
-        lines = fp.readlines()
-
-    # get experimental and material parameters
+    """
+    Get the isotherm and sample data from a Quantachrome .txt file.
+    Parameters
+    ----------
+    path : str
+        Path to the file to be read.
+    Returns
+    -------
+    meta : dict
+        Isotherm metadata.
+    data : dict
+        Isotherm data.
+    """
 
     meta = {}
-    columns = []
-    raw_data = []
+    head = []
+    data = []
 
-    for index, line in enumerate(lines):
+    with open(path, 'r', encoding='cp1252') as file:
 
-        if any(
-            v for k, v in _FIELDS.items()
-            if any(t in line for t in v.get('text', []))
-        ):
-            data = re.split(r"\s{2,}|(?<=\D:)", line.strip())
+        # We skip the header
+        for _ in range(6):
+            file.readline()
 
-            # TODO Are quantachrome files always saved with these mistakes?
-            for i, d in enumerate(data):
-                for mistake in ["Operator:", "Filename:", "Comment:"]:
-                    if re.search(r"\w+" + mistake, d):
-                        data[i] = d.split(mistake)[0]
-                        data.insert(i + 1, mistake)
+        possible_keys = (key['text'] for key in _META_DICT.values())
 
-            for i, d in enumerate(data):
-                name = next((
-                    v.get('name', None)
-                    for k, v in _FIELDS.items()
-                    if any(t in d for t in v.get('text', []))
-                ), None)
-                if name not in meta:
-                    if not data[i + 1].endswith(":"):
-                        meta[name] = data[i + 1]
-                    else:
-                        meta[name] = ' '
+        for line in file:
 
-        if "Press" in line:
-            ads_start = (index + 4)
+            if ":" in line:  # this means a line with key/val pairs
 
-    # get the adsorption data
+                # we can only count on :
+                line_clean = line.strip()
+                sep_location = line_clean.find(":")
 
-    for index, line in enumerate(lines):
-        if index == ads_start - 4:
-            file_headers = re.split(r"\s{2,}", line.strip())
-            print(file_headers)
-            for h in file_headers:
-                txt = next((
-                    _FIELDS['isotherm_data'][a]
-                    for a in _FIELDS['isotherm_data']
-                    if h.lower().startswith(a)
-                ), h)
-                print(txt)
-                columns.append(txt)
+                while sep_location != -1:
 
-        elif index == ads_start - 2:
-            units = re.split(r"\s{2,}", line)
-            # TODO handle units
-            print(f"Units are {units}")
+                    try:  # find the standard name in the _META_DICT dictionary
+                        name = next(k for k, v in _META_DICT.items() if key == v.get('text', None))
+                    except StopIteration:  # Discard unknown pairs
+                        continue
 
-        elif index >= ads_start:
-            raw_data.append(list(map(float, line.split())))
+                    line_clean = line_clean[sep_location:]
+                    sep_location = line_clean.find(":")
 
-    data_df = pandas.DataFrame(np.array(raw_data).T, columns=data)
+                for key, val in data_dict.items():
+                    try:  # find the standard name in the _META_DICT dictionary
+                        name = next(k for k, v in _META_DICT.items() if key == v.get('text', None))
+                    except StopIteration:  # Discard unknown pairs
+                        continue
+                    meta[name] = val
+
+                # TODO Are quantachrome files always saved with these mistakes?
+                # for i, d in enumerate(data):
+                #     for mistake in ["Operator:", "Filename:", "Comment:"]:
+                #         if re.search(r"\w+" + mistake, d):
+                #             data[i] = d.split(mistake)[0]
+                #             data.insert(i + 1, mistake)
+
+                # data_dict = {data[i][:-1].lower(): data[i + 1] for i in range(0, len(data), 2)}
+
+                for key, val in data_dict.items():
+                    try:  # find the standard name in the _META_DICT dictionary
+                        name = next(k for k, v in _META_DICT.items() if key == v.get('text', None))
+                    except StopIteration:  # Discard unknown pairs
+                        continue
+                    meta[name] = val
+
+            elif "Press" in line:
+                ads_start = (index + 4)
+
+                # get the adsorption data
+
+                for index, line in enumerate(lines):
+                    if index == ads_start - 4:
+                        file_headers = re.split(r"\s{2,}", line.strip())
+                        print(file_headers)
+                        for h in file_headers:
+                            txt = next(
+                                (_DATA_DICT[a] for a in _DATA_DICT if h.lower().startswith(a)), h
+                            )
+                            print(txt)
+                            columns.append(txt)
+
+                    elif index == ads_start - 2:
+                        units = re.split(r"\s{2,}", line)
+                        # TODO handle units
+                        print(f"Units are {units}")
+
+                    elif index >= ads_start:
+                        data.append(list(map(float, line.split())))
 
     # Set extra metadata
     meta['mass'] = meta['mass'].split()[0]
@@ -145,6 +162,6 @@ def parse(path):
     meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
 
     # amount adsorbed from cc to mmol/g
-    data_df['loading'] = data_df['loading'] / float(meta['mass']) / 22.414
+    data['loading'] = data['loading'] / float(meta['mass']) / 22.414
 
-    return PointIsotherm(isotherm_data=data_df, **meta)
+    return meta, data

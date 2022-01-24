@@ -62,15 +62,13 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
             """
             Specifically mark only the desorption branch.
             """
-            if value.get('branch', False) is False:
+            if value.get('branch', 0) == 0:
                 del value['branch']
             else:
                 value['branch'] = 'des'
             return value
 
-        iso_dict["isotherm_data"] = [
-            process_data(v) for k, v in isotherm_data_dict.items()
-        ]
+        iso_dict["isotherm_data"] = [process_data(v) for v in isotherm_data_dict.values()]
 
     elif isinstance(isotherm, ModelIsotherm):
         iso_dict["isotherm_model"] = isotherm.model.to_dict()
@@ -86,11 +84,7 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
 
 
 def isotherm_from_json(
-    str_or_path,
-    fmt=None,
-    loading_key='loading',
-    pressure_key='pressure',
-    **isotherm_parameters
+    str_or_path, fmt=None, loading_key='loading', pressure_key='pressure', **isotherm_parameters
 ):
     """
     Read a pyGAPS isotherm from a file or from a string.
@@ -151,16 +145,10 @@ def isotherm_from_json(
     # TODO deprecation
     if "adsorbent_basis" in raw_dict:
         raw_dict['material_basis'] = raw_dict.pop("adsorbent_basis")
-        warnings.warn(
-            "adsorbent_basis was replaced with material_basis",
-            DeprecationWarning
-        )
+        warnings.warn("adsorbent_basis was replaced with material_basis", DeprecationWarning)
     if "adsorbent_unit" in raw_dict:
         raw_dict['material_unit'] = raw_dict.pop("adsorbent_unit")
-        warnings.warn(
-            "adsorbent_unit was replaced with material_unit",
-            DeprecationWarning
-        )
+        warnings.warn("adsorbent_unit was replaced with material_unit", DeprecationWarning)
 
     if data:
         # rename keys and get units if needed depending on format
@@ -175,7 +163,7 @@ def isotherm_from_json(
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
-            data['branch'] = data['branch'].fillna(False).replace('des', True)
+            data['branch'] = data['branch'].fillna(0).replace('des', 1)
         else:
             raw_dict['branch'] = 'guess'
 
@@ -229,9 +217,7 @@ def _from_json_nist(raw_dict):
         if comp[0] == 'wt%':
             comp = ('g', 'g')
         else:
-            raise ParsingError(
-                "Isotherm cannot be parsed due to loading string format."
-            )
+            raise ParsingError("Isotherm cannot be parsed due to loading string format.")
 
     loading_unit = comp[0]
     if loading_unit in _MOLAR_UNITS:

@@ -2,19 +2,39 @@
 
 import pytest
 
-import pygaps.parsing.bel_dat as pgpbel
-import pygaps.parsing.json as pgpj
+import pygaps.parsing as pgp
 
 from .conftest import DATA_BEL
+from .conftest import DATA_BEL_XL
+from .conftest import DATA_BEL_CSV
 
 
 @pytest.mark.parsing
 class TestBEL():
-    def test_read_bel(self):
-        """Tests reading of a bel data file"""
+    """Test parsing of BEL files"""
+    @pytest.mark.parametrize("path", DATA_BEL)
+    def test_read_bel_dat(self, path):
+        """Test reading of a BEL data file."""
+        isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='dat')
+        json_path = path.with_suffix('.json')
+        # pgp.isotherm_to_json(isotherm, json_path, indent=4)
+        assert isotherm == pgp.isotherm_from_json(json_path)
 
-        for path in DATA_BEL:
+    @pytest.mark.parametrize("path", DATA_BEL_CSV)
+    def test_read_bel_csv(self, path):
+        """Test reading of BEL CSV files."""
+        lang = "ENG"
+        if path.stem.endswith("_jis"):
+            lang = "JPN"
+        isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='csv', lang=lang)
+        json_path = path.with_suffix('.json')
+        # pgp.isotherm_to_json(isotherm, json_path, indent=4)
+        assert isotherm == pgp.isotherm_from_json(json_path)
 
-            isotherm = pgpbel.isotherm_from_bel(path=path)
-            json_path = str(path).replace('.DAT', '.json')
-            assert isotherm == pgpj.isotherm_from_json(json_path)
+    @pytest.mark.parametrize("path", DATA_BEL_XL)
+    def test_read_bel_excel(self, path):
+        """Test reading of BEL report files."""
+        isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='xl')
+        json_path = path.with_suffix('.json')
+        # pgp.isotherm_to_json(isotherm, json_path, indent=4)
+        assert isotherm == pgp.isotherm_from_json(json_path)

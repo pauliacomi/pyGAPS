@@ -53,9 +53,7 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
     iso_dict = isotherm.to_dict()
     iso_dict['file_version'] = _parser_version  # version
 
-    output.writelines([
-        x + separator + _to_string(y) + '\n' for (x, y) in iso_dict.items()
-    ])
+    output.writelines([x + separator + _to_string(y) + '\n' for (x, y) in iso_dict.items()])
 
     if isinstance(isotherm, PointIsotherm):
 
@@ -70,8 +68,7 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
         # also get the branch data in a regular format
         headings.append('branch')
         data = isotherm.data_raw[headings]
-        data['branch'] = data['branch'].replace(False,
-                                                'ads').replace(True, 'des')
+        data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
         output.write('data:[pressure,loading,[otherdata],branch data]\n')
         data.to_csv(output, sep=separator, index=False, header=True)
@@ -80,17 +77,13 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
 
         output.write('model:[name and parameters]\n')
         output.write(('name' + separator + isotherm.model.name + '\n'))
+        output.write(('rmse' + separator + _to_string(isotherm.model.rmse) + '\n'))
         output.write(
-            ('rmse' + separator + _to_string(isotherm.model.rmse) + '\n')
+            ('pressure range' + separator + _to_string(isotherm.model.pressure_range) + '\n')
         )
-        output.write((
-            'pressure range' + separator +
-            _to_string(isotherm.model.pressure_range) + '\n'
-        ))
-        output.write((
-            'loading range' + separator +
-            _to_string(isotherm.model.loading_range) + '\n'
-        ))
+        output.write(
+            ('loading range' + separator + _to_string(isotherm.model.loading_range) + '\n')
+        )
         output.writelines([
             param + separator + str(isotherm.model.params[param]) + '\n'
             for param in isotherm.model.params
@@ -139,15 +132,11 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
     raw_dict = {}
 
     try:
-        while not (
-            line.startswith('data') or line.startswith('model') or line == ""
-        ):
+        while not (line.startswith('data') or line.startswith('model') or line == ""):
             values = line.strip().split(sep=separator)
 
             if len(values) > 2:
-                raise ParsingError(
-                    f"The isotherm metadata {values} contains more than two values."
-                )
+                raise ParsingError(f"The isotherm metadata {values} contains more than two values.")
             key, val = values
             if not val:
                 val = None
@@ -176,20 +165,6 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             "Strange things might happen, so double check your data."
         )
 
-    # TODO deprecation
-    if "adsorbent_basis" in raw_dict:
-        raw_dict['material_basis'] = raw_dict.pop("adsorbent_basis")
-        warnings.warn(
-            "adsorbent_basis was replaced with material_basis",
-            DeprecationWarning
-        )
-    if "adsorbent_unit" in raw_dict:
-        raw_dict['material_unit'] = raw_dict.pop("adsorbent_unit")
-        warnings.warn(
-            "adsorbent_unit was replaced with material_unit",
-            DeprecationWarning
-        )
-
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)
 
@@ -199,9 +174,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
-            data['branch'] = data['branch'].apply(
-                lambda x: False if x == 'ads' else True
-            )
+            data['branch'] = data['branch'].apply(lambda x: 0 if x == 'ads' else 1)
         else:
             raw_dict['branch'] = 'guess'
 
