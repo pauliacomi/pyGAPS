@@ -9,14 +9,11 @@ import numpy
 from scipy import optimize
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calc_graphs import initial_enthalpy_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 
 
-def initial_enthalpy_comp(
-    isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess
-):
+def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess):
     r"""
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading with a fitting
@@ -91,9 +88,7 @@ def initial_enthalpy_comp(
 
     """
     # Read data in
-    loading = isotherm.loading(
-        branch=branch, loading_unit='mmol', loading_basis='molar'
-    )
+    loading = isotherm.loading(branch=branch, loading_unit='mmol', loading_basis='molar')
     loading = loading / max(loading)
     enthalpy = isotherm.other_data(enthalpy_key, branch=branch)
 
@@ -130,9 +125,7 @@ def initial_enthalpy_comp(
         return params['const']
 
     def exponential_term(loading):
-        return params['preexp'] * 1 / (
-            1 + numpy.exp(params['exp'] * (loading - params['exploc']))
-        )
+        return params['preexp'] * 1 / (1 + numpy.exp(params['exp'] * (loading - params['exploc'])))
 
     def power_term_repulsive(loading):
         return params['prepowr'] * loading**params['powr']
@@ -141,9 +134,9 @@ def initial_enthalpy_comp(
         return params['prepowa'] * loading**params['powa']
 
     def enthalpy_approx(loading):
-        return constant_term(loading) + exponential_term(
+        return constant_term(loading) + exponential_term(loading) + power_term_repulsive(
             loading
-        ) + power_term_repulsive(loading) + power_term_attractive(loading)
+        ) + power_term_attractive(loading)
 
     def residual_sum_of_squares(params_):
         for i, _ in enumerate(param_names):
@@ -174,9 +167,7 @@ def initial_enthalpy_comp(
         enth_liq = adsorbate.enthalpy_liquefaction(isotherm.temperature)
     except (ParameterError, CalculationError):
         enth_liq = 0
-        warnings.warn(
-            "Could not calculate liquid enthalpy, perhaps in supercritical regime"
-        )
+        warnings.warn("Could not calculate liquid enthalpy, perhaps in supercritical regime")
 
     bounds['const_min'] = max(enth_liq, enth_avg) - 2 * enth_stdev
 
@@ -246,9 +237,7 @@ def initial_enthalpy_comp(
 
     if verbose:
         logger.info(f"Bounds: \n\tconst = {bounds_arr[0]}")
-        logger.info(
-            f"\tpreexp = {bounds_arr[1]}, exp = {bounds_arr[2]}, exploc = {bounds_arr[3]}"
-        )
+        logger.info(f"\tpreexp = {bounds_arr[1]}, exp = {bounds_arr[2]}, exploc = {bounds_arr[3]}")
         logger.info(f"\tprepowa = {bounds_arr[4]}, powa = {bounds_arr[5]}")
         logger.info(f"\tprepowr = {bounds_arr[6]}, powr = {bounds_arr[7]}")
 
@@ -283,11 +272,9 @@ def initial_enthalpy_comp(
         # Starting from a constant value
         numpy.array([const_avg, 0, 0, 0, 0, 1, 0, 1]),
         # Starting from an adjusted start and end
-        numpy.array([
-            0.5 * const_avg, dep_first, 0, 0,
-            max(dep_last, 0), 1,
-            min(dep_last, 0), 1
-        ]),
+        numpy.array([0.5 * const_avg, dep_first, 0, 0,
+                     max(dep_last, 0), 1,
+                     min(dep_last, 0), 1]),
         # Starting from a large exponent and gentle power increase
         numpy.array([const_avg, 1.5 * dep_first, 10, 0.1, 0.01, 3, 0, 1]),
         # Starting from no exponent and gentle power decrease
@@ -309,9 +296,7 @@ def initial_enthalpy_comp(
             logger.info('\n')
             logger.info(f"Minimizing routine number {i +1}")
             logger.info(f"Initial guess: \n\tconst = {guess[0]}")
-            logger.info(
-                f"\tpreexp = {guess[1]}, exp = {guess[2]}, exploc = {guess[3]}"
-            )
+            logger.info(f"\tpreexp = {guess[1]}, exp = {guess[2]}, exploc = {guess[3]}")
             logger.info(f"\tprepowa = {guess[4]}, powa = {guess[5]}")
             logger.info(f"\tprepowr = {guess[6]}, powr = {guess[7]}")
 
@@ -329,9 +314,7 @@ def initial_enthalpy_comp(
             best_fit = opt_res.fun
 
     if final_guess is None:
-        raise CalculationError(
-            "\n\tMinimization of RSS fitting failed with all guesses"
-        )
+        raise CalculationError("\n\tMinimization of RSS fitting failed with all guesses")
     if verbose:
         logger.info('\n')
         logger.info(f'Final best fit {best_fit}.')
@@ -341,18 +324,14 @@ def initial_enthalpy_comp(
 
     initial_enthalpy = enthalpy_approx(0)
     if abs(initial_enthalpy - enthalpy[0]) > 50:
-        warnings.warn(
-            "Probable offshoot for exponent, reverting to point method"
-        )
+        warnings.warn("Probable offshoot for exponent, reverting to point method")
         initial_enthalpy = initial_enthalpy_point(
             isotherm, enthalpy_key, branch=branch, verbose=verbose
         ).get('initial_enthalpy')
 
     if verbose:
         logger.info('\n')
-        logger.info(
-            f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}"
-        )
+        logger.info(f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}")
         logger.info(f"The constant contribution is \n\t{params['const']:.2f}")
         if params['const'] < enth_liq:
             warnings.warn(
@@ -382,12 +361,9 @@ def initial_enthalpy_comp(
         )
 
         title = f'{isotherm.material} {isotherm.adsorbate}'
+        from ..graphing.calc_graphs import initial_enthalpy_plot
         initial_enthalpy_plot(
-            loading,
-            enthalpy,
-            enthalpy_approx(loading),
-            title=title,
-            extras=extras
+            loading, enthalpy, enthalpy_approx(loading), title=title, extras=extras
         )
 
     params.update({'initial_enthalpy': initial_enthalpy})
@@ -395,9 +371,7 @@ def initial_enthalpy_comp(
     return params
 
 
-def initial_enthalpy_point(
-    isotherm, enthalpy_key, branch='ads', verbose=False
-):
+def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
     """
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading by taking the
@@ -429,18 +403,11 @@ def initial_enthalpy_point(
     initial_enthalpy = enthalpy[0]
 
     if verbose:
-        logger.info(
-            f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}",
-        )
+        logger.info(f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}", )
 
-        loading = isotherm.loading(
-            branch=branch, loading_unit='mmol', loading_basis='molar'
-        )
+        loading = isotherm.loading(branch=branch, loading_unit='mmol', loading_basis='molar')
         title = f'{isotherm.material} {isotherm.adsorbate}'
-        initial_enthalpy_plot(
-            loading,
-            enthalpy, [initial_enthalpy for i in loading],
-            title=title
-        )
+        from ..graphing.calc_graphs import initial_enthalpy_plot
+        initial_enthalpy_plot(loading, enthalpy, [initial_enthalpy for i in loading], title=title)
 
     return {'initial_enthalpy': initial_enthalpy}

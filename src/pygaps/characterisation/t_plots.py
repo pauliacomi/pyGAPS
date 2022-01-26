@@ -10,7 +10,6 @@ import numpy
 from scipy import stats
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calc_graphs import tp_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
@@ -188,6 +187,7 @@ def t_plot(
                     f"and the area is {result.get('area'):.2f} m2/{isotherm.material_unit}"
                 )
 
+            from ..graphing.calc_graphs import tp_plot
             tp_plot(t_curve, loading, results)
 
     return {

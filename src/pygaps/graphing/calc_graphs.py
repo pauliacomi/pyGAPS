@@ -1,24 +1,27 @@
 """Functions for plotting calculation-specific graphs."""
 
+from typing import Iterable
+
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-from .mpl_styles import FIG_STYLE
-from .mpl_styles import LABEL_STYLE
-from .mpl_styles import LEGEND_STYLE
-from .mpl_styles import POINTS_ALL_STYLE
-from .mpl_styles import POINTS_SEL_STYLE
-from .mpl_styles import TICK_STYLE
-from .mpl_styles import TITLE_STYLE
+from .mpl_styles import BASE_STYLE
+from .mpl_styles import LINE_ERROR
+from .mpl_styles import LINE_FIT
+from .mpl_styles import POINTS_HIGHLIGHTED
+from .mpl_styles import POINTS_IMPORTANT
+from .mpl_styles import POINTS_MUTED
 
 
+@mpl.rc_context(BASE_STYLE)
 def roq_plot(
-    pressure,
-    roq_points,
-    minimum,
-    maximum,
-    p_monolayer,
-    roq_monolayer,
+    pressure: Iterable[float],
+    roq_points: Iterable[float],
+    minimum: int,
+    maximum: int,
+    p_monolayer: float,
+    roq_monolayer: float,
     ax=None,
 ):
     """
@@ -52,44 +55,42 @@ def roq_plot(
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(
-        pressure,
-        roq_points,
-        label='all points',
-        **POINTS_ALL_STYLE,
-    )
-    ax.plot(
-        pressure[minimum:maximum + 1],
-        roq_points[minimum:maximum + 1],
-        label='chosen points',
-        **POINTS_SEL_STYLE,
-    )
-    ax.plot(
-        p_monolayer,
-        roq_monolayer,
-        marker='X',
-        markersize=10,
-        linestyle='',
-        color='k',
-        label='monolayer point'
-    )
+    with mpl.rc_context(POINTS_MUTED):
+        ax.plot(
+            pressure,
+            roq_points,
+            label='all points',
+        )
+    with mpl.rc_context(POINTS_HIGHLIGHTED):
+        ax.plot(
+            pressure[minimum:maximum + 1],
+            roq_points[minimum:maximum + 1],
+            label='chosen points',
+        )
+    with mpl.rc_context(POINTS_IMPORTANT):
+        ax.plot(
+            p_monolayer,
+            roq_monolayer,
+            label='monolayer point',
+        )
     ax.set_title("Rouquerol plot")
-    ax.set_xlabel('p/p°', **LABEL_STYLE)
-    ax.set_ylabel('$n ( 1 - p/p°)$', **LABEL_STYLE)
-    ax.legend(loc='best', **LEGEND_STYLE)
+    ax.set_xlabel('p/p°')
+    ax.set_ylabel('$n ( 1 - p/p°)$')
+    ax.legend(loc='best')
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def bet_plot(
-    pressure,
-    bet_points,
-    minimum,
-    maximum,
-    slope,
-    intercept,
-    p_monolayer,
-    bet_monolayer,
+    pressure: Iterable[float],
+    bet_points: Iterable[float],
+    minimum: int,
+    maximum: int,
+    slope: float,
+    intercept: float,
+    p_monolayer: float,
+    bet_monolayer: float,
     ax=None,
 ):
     """
@@ -127,54 +128,52 @@ def bet_plot(
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(
-        pressure,
-        bet_points,
-        label='all points',
-        **POINTS_ALL_STYLE,
-    )
-    ax.plot(
-        pressure[minimum:maximum + 1],
-        bet_points[minimum:maximum + 1],
-        label='chosen points',
-        **POINTS_SEL_STYLE,
-    )
+    with mpl.rc_context(POINTS_MUTED):
+        ax.plot(
+            pressure,
+            bet_points,
+            label='all points',
+        )
+    with mpl.rc_context(POINTS_HIGHLIGHTED):
+        ax.plot(
+            pressure[minimum:maximum + 1],
+            bet_points[minimum:maximum + 1],
+            label='chosen points',
+        )
     x_lim = [0, pressure[maximum]]
     y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
-    ax.plot(
-        x_lim,
-        y_lim,
-        linestyle='--',
-        color='black',
-        label='model fit',
-    )
-    ax.plot(
-        p_monolayer,
-        bet_monolayer,
-        marker='X',
-        markersize=10,
-        linestyle='',
-        color='k',
-        label='monolayer point'
-    )
+    with mpl.rc_context(LINE_FIT):
+        ax.plot(
+            x_lim,
+            y_lim,
+            color='black',
+            label='model fit',
+        )
+    with mpl.rc_context(POINTS_IMPORTANT):
+        ax.plot(
+            p_monolayer,
+            bet_monolayer,
+            label='monolayer point',
+        )
 
     ax.set_ylim(bottom=0, top=bet_points[maximum] * 1.2)
     ax.set_xlim(left=0, right=pressure[maximum] * 1.2)
     ax.set_title("BET plot")
-    ax.set_xlabel('p/p°', **LABEL_STYLE)
-    ax.set_ylabel('$\\frac{p/p°}{n ( 1- p/p°)}$', **LABEL_STYLE)
-    ax.legend(loc='best', **LEGEND_STYLE)
+    ax.set_xlabel('p/p°')
+    ax.set_ylabel('$\\frac{p/p°}{n ( 1- p/p°)}$')
+    ax.legend(loc='best')
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def langmuir_plot(
-    pressure,
-    langmuir_points,
-    minimum,
-    maximum,
-    slope,
-    intercept,
+    pressure: Iterable[float],
+    langmuir_points: Iterable[float],
+    minimum: int,
+    maximum: int,
+    slope: float,
+    intercept: float,
     ax=None,
 ):
     """
@@ -208,42 +207,44 @@ def langmuir_plot(
     if ax is None:
         _, ax = plt.subplots(figsize=(6, 4))
 
-    ax.plot(
-        pressure,
-        langmuir_points,
-        label='all points',
-        **POINTS_ALL_STYLE,
-    )
-    ax.plot(
-        pressure[minimum:maximum],
-        langmuir_points[minimum:maximum],
-        label='chosen points',
-        **POINTS_SEL_STYLE,
-    )
+    with mpl.rc_context(POINTS_MUTED):
+        ax.plot(
+            pressure,
+            langmuir_points,
+            label='all points',
+        )
+    with mpl.rc_context(POINTS_HIGHLIGHTED):
+        ax.plot(
+            pressure[minimum:maximum],
+            langmuir_points[minimum:maximum],
+            label='chosen points',
+        )
     x_lim = [0, pressure[maximum - 1]]
     y_lim = [slope * x_lim[0] + intercept, slope * x_lim[1] + intercept]
-    ax.plot(
-        x_lim,
-        y_lim,
-        linestyle='--',
-        color='black',
-        label='model fit',
-    )
+    with mpl.rc_context(LINE_FIT):
+        ax.plot(
+            x_lim,
+            y_lim,
+            linestyle='--',
+            color='black',
+            label='model fit',
+        )
 
     ax.set_ylim(bottom=0, top=langmuir_points[maximum - 1] * 1.2)
     ax.set_xlim(left=0, right=pressure[maximum - 1] * 1.2)
     ax.set_title("Langmuir plot")
-    ax.set_xlabel('p/p°', **LABEL_STYLE)
-    ax.set_ylabel('(p/p°)/n', **LABEL_STYLE)
-    ax.legend(loc='best', **LEGEND_STYLE)
+    ax.set_xlabel('p/p°')
+    ax.set_ylabel('(p/p°)/n')
+    ax.legend(loc='best')
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def tp_plot(
-    thickness_curve: list,
-    loading: list,
-    results: list,
+    thickness_curve: Iterable[float],
+    loading: Iterable[float],
+    results: dict,
     alpha_s: bool = False,
     alpha_reducing_p: float = None,
     ax=None,
@@ -296,21 +297,21 @@ def tp_plot(
         label_points = 't transform'
         label_x = 'Layer thickness [nm]'
         label_title = 't-plot method'
+
     ax.plot(
         thickness_curve,
         loading,
         label=label_points,
-        **POINTS_ALL_STYLE,
+        color="k",
     )
-    style = POINTS_SEL_STYLE.copy()
     for index, result in enumerate(results):
-        style['color'] = f"C{index}"
         # plot chosen points
-        ax.plot(
-            thickness_curve[result.get('section')],
-            loading[result.get('section')],
-            **style,
-        )
+        with mpl.rc_context(POINTS_HIGHLIGHTED):
+            ax.plot(
+                thickness_curve[result.get('section')],
+                loading[result.get('section')],
+                color=f"C{index}",
+            )
 
         # plot line
         min_lim = 0
@@ -320,28 +321,33 @@ def tp_plot(
             result.get('slope') * min_lim + result.get('intercept'),
             result.get('slope') * max_lim + result.get('intercept')
         ]
-
-        ax.plot(x_lim, y_lim, linestyle='--', color=f"C{index}", label=f'linear {index+1}')
+    with mpl.rc_context(LINE_FIT):
+        ax.plot(
+            x_lim,
+            y_lim,
+            color=f"C{index}",
+            label=f'linear {index+1}',
+        )
 
     ax.set_title(label_title)
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
     ax.set_xlabel(label_x)
     ax.set_ylabel('Loading')
-    ax.legend(loc='best', **LEGEND_STYLE)
+    ax.legend(loc='best')
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def psd_plot(
-    pore_widths,
-    pore_dist,
+    pore_widths: Iterable[float],
+    pore_dist: Iterable[float],
     pore_vol_cum=None,
-    method=None,
-    labeldiff='distribution',
-    labelcum='cumulative',
-    line_style=None,
-    log=True,
+    method: str = None,
+    labeldiff: str = 'distribution',
+    labelcum: str = 'cumulative',
+    log: bool = True,
     right=None,
     left=None,
     ax=None,
@@ -364,9 +370,7 @@ def psd_plot(
     labelcum : str, optional
         The label for the cumulative data, which will appear in the legend.
         Set to None to remove cumulative distribution
-    line_style : dict, optional
-        The style dictionary to send to the plot() function.
-    log : int
+    log : bool
         Whether to display a logarithmic graph.
     right : int
         Higher bound of the selected pore widths.
@@ -388,24 +392,18 @@ def psd_plot(
         fig = plt.figure(figsize=(15, 5))
         ax = fig.add_subplot(111)
 
-    lst = {'marker': '', 'color': 'k'}
-    if line_style is not None:
-        lst.update(line_style)
-
     l1 = ax.plot(
         pore_widths,
         pore_dist,
         label=labeldiff,
-        **lst,
+        color='k',
     )
     if labelcum:
         ax2 = ax.twinx()
         l2 = ax2.plot(
             pore_widths,
             pore_vol_cum,
-            marker='',
             color='r',
-            linestyle="--",
             label=labelcum,
         )
 
@@ -418,25 +416,25 @@ def psd_plot(
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
         ax.xaxis.set_major_formatter(ticker.FuncFormatter(formatter))
         ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
-        ax.tick_params(axis='x', which='minor', width=0.75, length=2.5, **TICK_STYLE)
-        ax.tick_params(axis='x', which='major', width=2, length=10, **TICK_STYLE)
+        ax.tick_params(axis='x', which='minor', width=0.75, length=2.5)
+        ax.tick_params(axis='x', which='major', width=2, length=10)
         ax.set_xlim(left=left, right=right)
     else:
         if not left:
             left = 0
         ax.set_xlim(left=left, right=right)
-        ax.tick_params(axis='both', which='major', **TICK_STYLE)
+        ax.tick_params(axis='both', which='major')
 
-    ax.set_title("PSD plot " + str(method), **TITLE_STYLE)
-    ax.set_xlabel('Pore width [nm]', **LABEL_STYLE)
-    ax.set_ylabel('Distribution [dV/dw]', **LABEL_STYLE)
+    ax.set_title("PSD plot " + str(method))
+    ax.set_xlabel('Pore width [nm]')
+    ax.set_ylabel('Distribution [dV/dw]')
     if labelcum:
-        ax2.set_ylabel('Cumulative Vol [$cm^3 g^{-1}$]', **LABEL_STYLE)
+        ax2.set_ylabel('Cumulative Vol [$cm^3 g^{-1}$]')
 
     lns = l1
     if labelcum:
         lns = l1 + l2
-    ax.legend(lns, [lbl.get_label() for lbl in lns], loc='lower right', **LEGEND_STYLE)
+    ax.legend(lns, [lbl.get_label() for lbl in lns], loc='lower right')
     ax.set_ylim(bottom=0)
     if labelcum:
         ax2.set_ylim(bottom=0)
@@ -445,6 +443,7 @@ def psd_plot(
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def isosteric_enthalpy_plot(
     loading,
     isosteric_enthalpy,
@@ -478,36 +477,37 @@ def isosteric_enthalpy_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots(**FIG_STYLE)
+        _, ax = plt.subplots()
 
-    ax.errorbar(
-        loading,
-        isosteric_enthalpy,
-        yerr=std_err,
-        marker='o',
-        markersize=3,
-        label=r'$\Delta h_{st}$',
-    )
+    with mpl.rc_context(LINE_ERROR):
+        ax.errorbar(
+            loading,
+            isosteric_enthalpy,
+            yerr=std_err,
+            color='r',
+            label=r'$\Delta h_{st}$',
+        )
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
-    ax.set_xlabel(r'Loading [$mmol\/g^{-1}$]', **LABEL_STYLE)
-    ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]', **LABEL_STYLE)
-    ax.legend(loc='best', **LEGEND_STYLE)
-    ax.tick_params(axis='both', which='major', **TICK_STYLE)
+    ax.set_xlabel(r'Loading [$mmol\/g^{-1}$]')
+    ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]')
+    ax.legend(loc='best')
+    ax.tick_params(axis='both', which='major')
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def initial_enthalpy_plot(
-    loading,
-    enthalpy,
-    fitted_enthalpy,
-    log=False,
-    title=None,
-    extras=None,
+    loading: Iterable[float],
+    enthalpy: Iterable[float],
+    fitted_enthalpy: Iterable[float],
+    log: bool = False,
+    title: str = None,
+    extras=None,  # TODO what is extra used for?
     ax=None,
 ):
     """
@@ -538,37 +538,54 @@ def initial_enthalpy_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots(**FIG_STYLE)
+        _, ax = plt.subplots()
 
-    ax.plot(loading, enthalpy, marker='o', color='black', label='original', linestyle='')
-    ax.plot(loading, fitted_enthalpy, color='r', label='fitted', linestyle='-')
+    with mpl.rc_context(POINTS_MUTED):
+        ax.plot(
+            loading,
+            enthalpy,
+            label='original',
+        )
+    ax.plot(
+        loading,
+        fitted_enthalpy,
+        color='r',
+        label='fitted',
+    )
 
     if extras is not None:
-        for param in extras:
-            ax.plot(param[0], param[1], label=param[2], linestyle='--')
+        with mpl.rc_context(LINE_FIT):
+            for param in extras:
+                ax.plot(
+                    param[0],
+                    param[1],
+                    label=param[2],
+                    linestyle='--',
+                )
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
 
     ax.set_title(title + " initial enthalpy fit")
-    ax.set_xlabel('Loading', **LABEL_STYLE)
-    ax.set_ylabel('Enthalpy', **LABEL_STYLE)
-    ax.legend(loc='best', **LEGEND_STYLE)
+    ax.set_xlabel('Loading')
+    ax.set_ylabel('Enthalpy')
+    ax.legend(loc='best')
     ax.set_ylim(bottom=0, top=(max(enthalpy) * 1.2))
     ax.set_xlim(left=0)
-    ax.tick_params(axis='both', which='major', **TICK_STYLE)
+    ax.tick_params(axis='both', which='major')
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def dra_plot(
-    logv,
-    log_n_p0p,
-    minimum,
-    maximum,
-    slope,
-    intercept,
-    exp,
+    logv: Iterable[float],
+    log_n_p0p: Iterable[float],
+    minimum: int,
+    maximum: int,
+    slope: float,
+    intercept: float,
+    exp: float,
     ax=None,
 ):
     """
@@ -605,31 +622,39 @@ def dra_plot(
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.plot(log_n_p0p, logv, label='all points', **POINTS_ALL_STYLE)
-    ax.plot(
-        log_n_p0p[minimum:maximum + 1],
-        logv[minimum:maximum + 1],
-        marker='o',
-        linestyle='',
-        color='r',
-        label='chosen points'
-    )
-    ax.plot(
-        log_n_p0p, slope * log_n_p0p + intercept, linestyle='--', color='black', label='model fit'
-    )
+    with mpl.rc_context(POINTS_MUTED):
+        ax.plot(
+            log_n_p0p,
+            logv,
+            label='all points',
+        )
+    with mpl.rc_context(POINTS_HIGHLIGHTED):
+        ax.plot(
+            log_n_p0p[minimum:maximum + 1],
+            logv[minimum:maximum + 1],
+            label='chosen points',
+        )
+    with mpl.rc_context(LINE_FIT):
+        ax.plot(
+            log_n_p0p,
+            slope * log_n_p0p + intercept,
+            color='black',
+            label='model fit',
+        )
 
     ax.set_xlabel('log $p^0/p$')
     ax.set_ylabel('log $V/V_0$')
-    ax.legend(**LEGEND_STYLE)
+    ax.legend()
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def virial_plot(
-    loading,
-    ln_p_over_n,
-    n_load,
-    p_load,
+    loading: Iterable[float],
+    ln_p_over_n: Iterable[float],
+    n_load: Iterable[float],
+    p_load: Iterable[float],
     added_point,
     ax=None,
 ):
@@ -638,14 +663,14 @@ def virial_plot(
     """
     # Generate the figure if needed
     if ax is None:
-        _, ax = plt.subplots(**FIG_STYLE)
-    ax.plot(loading, ln_p_over_n, **POINTS_ALL_STYLE)
+        _, ax = plt.subplots()
+    ax.plot(loading, ln_p_over_n)
     ax.plot(n_load, p_load, '-')
     if added_point:
         ax.plot(1e-1, ln_p_over_n[0], 'or')
-    ax.set_title("Virial fit", **TITLE_STYLE)
-    ax.set_xlabel("Loading", **LABEL_STYLE)
-    ax.set_ylabel("ln(p/n)", **LABEL_STYLE)
-    ax.tick_params(axis='both', which='major', **TICK_STYLE)
+    ax.set_title("Virial fit")
+    ax.set_xlabel("Loading")
+    ax.set_ylabel("ln(p/n)")
+    ax.tick_params(axis='both', which='major')
 
     return ax

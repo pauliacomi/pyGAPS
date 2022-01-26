@@ -625,8 +625,6 @@ class PointIsotherm(BaseIsotherm):
             loading_unit=self.loading_unit,
             pressure_unit=self.pressure_unit,
             pressure_mode=self.pressure_mode,
-            fig_title=self.material,
-            lgd_keys=['branch'],
         )
         plot_dict.update(plot_iso_args)
 

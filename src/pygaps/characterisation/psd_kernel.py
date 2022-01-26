@@ -12,9 +12,6 @@ from scipy import interpolate
 from scipy import optimize
 
 from ..core.adsorbate import Adsorbate
-from ..graphing.calc_graphs import psd_plot
-from ..graphing.isotherm_graphs import plot_iso
-from ..graphing.mpl_styles import POINTS_ALL_STYLE
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.math_utilities import bspline
@@ -207,9 +204,7 @@ def psd_dft(
         params = {
             'branch': branch,
             'logx': True,
-            'fig_title': 'DFT Fit',
             'lgd_keys': ['material'],
-            'y1_line_style': POINTS_ALL_STYLE,
             'loading_basis': loading_basis,
             'loading_unit': loading_unit,
             'material_basis': material_basis,
@@ -217,8 +212,11 @@ def psd_dft(
             'pressure_mode': pressure_mode,
             'pressure_unit': pressure_unit,
         }
+        from ..graphing.isotherm_graphs import plot_iso
         ax = plot_iso(isotherm, **params)
         ax.plot(pressure, kernel_final_loading, 'r-')
+        ax.set_title('DFT Fit')
+        from ..graphing.calc_graphs import psd_plot
         psd_plot(
             pore_widths,
             pore_dist,

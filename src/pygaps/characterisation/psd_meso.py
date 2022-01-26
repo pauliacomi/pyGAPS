@@ -6,7 +6,6 @@ import numpy
 
 from ..core.adsorbate import Adsorbate
 from ..core.baseisotherm import BaseIsotherm
-from ..graphing.calc_graphs import psd_plot
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
@@ -216,6 +215,7 @@ def psd_mesoporous(
 
     # Plot if verbose
     if verbose:
+        from ..graphing.calc_graphs import psd_plot
         psd_plot(
             pore_widths,
             pore_dist,

@@ -18,7 +18,9 @@ class TestIsothermGraphs():
     @cleanup
     def test_multi_plot(self, basic_pointisotherm):
         plot_iso([
-            basic_pointisotherm, basic_pointisotherm, basic_pointisotherm
+            basic_pointisotherm,
+            basic_pointisotherm,
+            basic_pointisotherm,
         ])
 
     @cleanup
@@ -27,16 +29,19 @@ class TestIsothermGraphs():
             basic_pointisotherm,
             x_data='pressure',
             y1_data='loading',
-            y2_data='enthalpy'
+            y2_data='enthalpy',
         )
-        plot_iso(basic_pointisotherm, x_data='loading', y1_data='enthalpy')
+        plot_iso(
+            basic_pointisotherm,
+            x_data='loading',
+            y1_data='enthalpy',
+        )
 
     @cleanup
     def test_branch_plot(self, basic_pointisotherm):
-        plot_iso(basic_pointisotherm, branch='ads', fig_title='ads')
-        plot_iso(basic_pointisotherm, branch='des', fig_title='des')
-        plot_iso(basic_pointisotherm, branch='all', fig_title='all')
-        plot_iso(basic_pointisotherm, branch='all-nol', fig_title='all-nol')
+        plot_iso(basic_pointisotherm, branch='ads')
+        plot_iso(basic_pointisotherm, branch='des')
+        plot_iso(basic_pointisotherm, branch='all')
 
     @cleanup
     def test_convert_plot(self, use_adsorbate, basic_pointisotherm):
@@ -50,10 +55,14 @@ class TestIsothermGraphs():
         plot_iso(basic_pointisotherm, x_range=(0, None))
         plot_iso(basic_pointisotherm, y1_range=(3, None))
         plot_iso(basic_pointisotherm, y1_range=(3, None))
+        plot_iso(basic_pointisotherm, y2_range=(3, 100))
+        plot_iso(basic_pointisotherm, y2_range=(None, 10))
 
     @cleanup
     def test_log_plot(self, basic_pointisotherm):
         plot_iso(basic_pointisotherm, logx=True)
+        plot_iso(basic_pointisotherm, logy1=True)
+        plot_iso(basic_pointisotherm, logy2=True)
 
     @cleanup
     def test_color_plot(self, basic_pointisotherm):
@@ -62,16 +71,15 @@ class TestIsothermGraphs():
         plot_iso(basic_pointisotherm, color=['red'])
 
     @cleanup
-    def test_title_plot(self, basic_pointisotherm):
-        plot_iso(basic_pointisotherm, fig_title='Testing figure title')
+    def test_marker_plot(self, basic_pointisotherm):
+        plot_iso(basic_pointisotherm, marker=False)
+        plot_iso(basic_pointisotherm, marker=3)
+        plot_iso(basic_pointisotherm, marker=['o'])
 
     @cleanup
     def test_style_plot(self, basic_pointisotherm):
-        plot_iso(basic_pointisotherm, line_style=dict(linewidth=5))
+        plot_iso(basic_pointisotherm, y1_line_style=dict(linewidth=5))
 
     @cleanup
     def test_legend_plot(self, basic_pointisotherm):
-        plot_iso(
-            basic_pointisotherm,
-            lgd_keys=['material', 'adsorbate', 'temperature']
-        )
+        plot_iso(basic_pointisotherm, lgd_keys=['material', 'temperature'])

@@ -7,18 +7,12 @@ logger = logging.getLogger('pygaps')
 import numpy
 
 from ..core.modelisotherm import ModelIsotherm
-from ..graphing.isotherm_graphs import plot_iso
 from ..modelling import get_isotherm_model
 from ..utilities.exceptions import ParameterError
 
 
 def initial_henry_slope(
-    isotherm,
-    max_adjrms=0.02,
-    p_limits=None,
-    l_limits=None,
-    verbose=False,
-    **plot_parameters
+    isotherm, max_adjrms=0.02, p_limits=None, l_limits=None, verbose=False, **plot_parameters
 ):
     """
     Calculate a henry constant based on the initial slope.
@@ -52,9 +46,7 @@ def initial_henry_slope(
         if not l_limits:
             l_limits = [-numpy.inf, numpy.inf]
 
-        pressure = isotherm.pressure(
-            branch='ads', indexed=True, limits=p_limits
-        )
+        pressure = isotherm.pressure(branch='ads', indexed=True, limits=p_limits)
         loading = isotherm.loading(branch='ads', indexed=True, limits=l_limits)
 
         pressure, loading = pressure.align(loading, join='inner')
@@ -85,9 +77,7 @@ def initial_henry_slope(
 
     while rows_taken != 1:
 
-        param_guess = henry.initial_guess(
-            pressure[:rows_taken], loading[:rows_taken]
-        )
+        param_guess = henry.initial_guess(pressure[:rows_taken], loading[:rows_taken])
         # fit model to isotherm data
         henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
         adjrmsd = henry.rmse / numpy.ptp(loading)
@@ -103,11 +93,7 @@ def initial_henry_slope(
         logger.info(f"Starting points: {initial_rows}")
         logger.info(f"Selected points: {rows_taken}")
         logger.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
-        params = {
-            'branch': 'ads',
-            'lgd_keys': ['material'],
-            'lgd_pos': 'inner'
-        }
+        params = {'branch': 'ads', 'lgd_keys': ['material']}
         params.update(plot_parameters)
         henry.pressure_range = [pressure[0], pressure[:rows_taken][-1]]
         henry.loading_range = [pressure[0], loading[:rows_taken][-1]]
@@ -118,6 +104,7 @@ def initial_henry_slope(
             **iso_params,
         )
         model_isotherm.material = "model"
+        from ..graphing.isotherm_graphs import plot_iso
         plot_iso([isotherm, model_isotherm], **params)
 
     # return the henry constant
@@ -144,9 +131,6 @@ def initial_henry_virial(isotherm, optimization_params=None, verbose=False):
 
     """
     model_isotherm = ModelIsotherm.from_pointisotherm(
-        isotherm,
-        model='Virial',
-        optimization_params=optimization_params,
-        verbose=verbose
+        isotherm, model='Virial', optimization_params=optimization_params, verbose=verbose
     )
     return model_isotherm.model.params['K']

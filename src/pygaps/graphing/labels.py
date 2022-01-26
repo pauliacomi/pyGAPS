@@ -8,7 +8,7 @@ from ..utilities.string_utilities import convert_chemformula
 from ..utilities.string_utilities import convert_unit_ltx
 
 
-def label_axis_text_pl(iso_params, key):
+def label_axis_title(key, iso_params):
     """Build an axis label for pressure/loading/other."""
     if key == "pressure":
         if iso_params['pressure_mode'] == "absolute":
@@ -31,32 +31,29 @@ def label_axis_text_pl(iso_params, key):
     return text
 
 
-def label_lgd(isotherm, lbl_components, current_branch, branch_def, key_def):
+def label_lgd(isotherm, lbl_components, branch, key_def):
     """Build a legend label."""
-    if branch_def == 'all-nol' and current_branch == 'des':
-        return ''
 
-    if lbl_components is None:
-        lbl_components = ['material', 'adsorbate', 'branch']
+    if not lbl_components:
+        lbl_components = ['material', 'adsorbate', 'temperature', 'key']
 
     text = []
     for selected in lbl_components:
         if selected == 'branch':
-            text.append(current_branch)
+            text.append(branch)
+        elif selected == 'adsorbate':
+            text.append(convert_chemformula(isotherm.adsorbate))
+        elif selected == 'temperature':
+            text.append(f"{isotherm.temperature} {isotherm.temperature_unit}")
         elif selected == 'key':
             text.append(key_def)
         else:
             val = getattr(isotherm, selected, None)
-            if val:
-                if selected == 'adsorbate':
-                    text.append(convert_chemformula(isotherm.adsorbate))
-                elif selected == 'temperature':
-                    text.append(f"{isotherm.temperature} K")
-                else:
-                    text.append(str(val))
-            else:
-                logger.warning(
-                    f"Isotherm {isotherm} does not have an {selected} attribute."
-                )
+            if not val:
+                val = isotherm.properties.get(selected, None)
+            if not val:
+                logger.warning(f"Isotherm {isotherm} does not have an {selected} attribute.")
+                continue
+            text.append(str(val))
 
     return " ".join(text)

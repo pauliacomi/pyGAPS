@@ -1,10 +1,14 @@
 """Functions for plotting graphs related to IAST calculations."""
 
 from ..utilities.string_utilities import convert_chemformula
+
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-from .mpl_styles import IAST_STYLES
+
+from .mpl_styles import BASE_STYLE
 
 
+@mpl.rc_context(BASE_STYLE)
 def plot_iast(
     p_data: list,
     l_data: list,
@@ -40,7 +44,7 @@ def plot_iast(
 
     # Generate the figure if needed
     if ax is None:
-        fig = plt.figure(**IAST_STYLES['fig_style'])
+        fig = plt.figure()
         ax = fig.add_subplot(111)
 
     ads = map(convert_chemformula, ads)
@@ -50,22 +54,28 @@ def plot_iast(
     title_graph = "IAST uptake"
 
     # graph title
-    ax.set_title(title_graph, **IAST_STYLES['title_style'])
+    ax.set_title(title_graph)
 
     # labels for the axes
-    ax.set_xlabel(text_x, **IAST_STYLES['label_style'])
-    ax.set_ylabel(text_y, **IAST_STYLES['label_style'])
-    ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
+    ax.set_xlabel(text_x)
+    ax.set_ylabel(text_y)
+    ax.tick_params(axis='both', which='major')
 
     # Regular data
     for lo, ads in zip(l_data.T, ads):
-        ax.plot(p_data, lo, marker=".", label=ads)
+        ax.plot(
+            p_data,
+            lo,
+            label=ads,
+            marker=".",
+        )
 
-    ax.legend(loc='best', **IAST_STYLES['lgd_style'])
+    ax.legend(loc='best')
 
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def plot_iast_vle(
     x_data: list,
     y_data: list,
@@ -103,8 +113,9 @@ def plot_iast_vle(
     """
     # Generate the figure if needed
     if ax is None:
-        fig = plt.figure(**IAST_STYLES['fig_style'])
+        fig = plt.figure()
         ax = fig.add_subplot(111)
+        ax.axis('equal')
 
     ads1 = convert_chemformula(ads1)
     ads2 = convert_chemformula(ads2)
@@ -115,21 +126,26 @@ def plot_iast_vle(
     label = f"{pressure:.2f} {p_unit}"
 
     # graph title
-    ax.set_title(title_graph, **IAST_STYLES['title_style'])
+    ax.set_title(title_graph)
 
     # labels for the axes
-    ax.set_xlabel(text_x, **IAST_STYLES['label_style'])
-    ax.set_ylabel(text_y, **IAST_STYLES['label_style'])
-    ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
+    ax.set_xlabel(text_x)
+    ax.set_ylabel(text_y)
+    ax.tick_params(axis='both', which='major')
 
     # Regular data
-    ax.plot(y_data, x_data, marker=".", label=label)
+    ax.plot(
+        y_data,
+        x_data,
+        label=label,
+        marker=".",
+    )
 
     # Straight line
     line = [0, 1]
     ax.plot(line, line, color='black')
 
-    ax.legend(loc='best', **IAST_STYLES['lgd_style'])
+    ax.legend(loc='best')
 
     ax.set_xlim(left=0, right=1)
     ax.set_ylim(bottom=0, top=1)
@@ -137,6 +153,7 @@ def plot_iast_vle(
     return ax
 
 
+@mpl.rc_context(BASE_STYLE)
 def plot_iast_svp(
     p_data: list,
     s_data: list,
@@ -175,7 +192,7 @@ def plot_iast_svp(
 
     # Generate the figure if needed
     if ax is None:
-        fig = plt.figure(**IAST_STYLES['fig_style'])
+        fig = plt.figure()
         ax = fig.add_subplot(111)
 
     ads1 = convert_chemformula(ads1)
@@ -187,17 +204,22 @@ def plot_iast_svp(
     label = f"{fraction:.2%} {ads1}"
 
     # graph title
-    ax.set_title(title_graph, **IAST_STYLES['title_style'])
+    ax.set_title(title_graph)
 
     # labels for the axes
-    ax.set_xlabel(text_x, **IAST_STYLES['label_style'])
-    ax.set_ylabel(text_y, **IAST_STYLES['label_style'])
-    ax.tick_params(axis='both', which='major', **IAST_STYLES['tick_style'])
+    ax.set_xlabel(text_x)
+    ax.set_ylabel(text_y)
+    ax.tick_params(axis='both', which='major')
 
     # Regular data
-    ax.plot(p_data, s_data, marker=".", label=label)
+    ax.plot(
+        p_data,
+        s_data,
+        label=label,
+        marker=".",
+    )
 
-    ax.legend(loc='best', **IAST_STYLES['lgd_style'])
+    ax.legend(loc='best')
 
     ax.set_ylim(bottom=0)
 

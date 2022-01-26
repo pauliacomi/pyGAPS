@@ -10,7 +10,6 @@ from scipy import stats
 
 from ..core.adsorbate import Adsorbate
 from ..core.baseisotherm import BaseIsotherm
-from ..graphing.calc_graphs import tp_plot
 from ..utilities.exceptions import pgError
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
@@ -235,6 +234,7 @@ def alpha_s(
                     f"The adsorbed volume is {result.get('adsorbed_volume'):.4f} and the area is {result.get('area'):.4f}"
                 )
 
+            from ..graphing.calc_graphs import tp_plot
             tp_plot(alpha_curve, loading, results, alpha_s=True, alpha_reducing_p=reducing_pressure)
 
     return {

@@ -4,7 +4,6 @@ import numpy
 from scipy import constants
 from scipy import stats
 
-from ..graphing.calc_graphs import isosteric_enthalpy_plot
 from ..utilities.exceptions import ParameterError
 
 
@@ -137,6 +136,7 @@ def isosteric_enthalpy(
     )
 
     if verbose:
+        from ..graphing.calc_graphs import isosteric_enthalpy_plot
         isosteric_enthalpy_plot(
             loading,
             iso_enthalpy,

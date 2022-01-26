@@ -242,9 +242,11 @@ class ModelIsotherm(BaseIsotherm):
                 ax = self.plot(y1_line_style=dict(markersize=0), y1_points=loading)
             else:
                 ax = self.plot(y1_line_style=dict(markersize=0), x_points=pressure)
-            from pygaps.graphing.mpl_styles import POINTS_ALL_STYLE
-            ax.plot(pressure, loading, zorder=-1, **POINTS_ALL_STYLE)
-            ax.legend([self.model.name], frameon=False)
+            from pygaps.graphing.mpl_styles import BASE_STYLE
+            import matplotlib as mpl
+            with mpl.rc_context(BASE_STYLE):
+                ax.plot(pressure, loading, zorder=-1)
+                ax.legend([self.model.name])
 
     @classmethod
     def from_isotherm(
@@ -482,23 +484,22 @@ class ModelIsotherm(BaseIsotherm):
                 pressure = isotherm_data[pressure_key]
                 loading = isotherm_data[loading_key]
             from pygaps.graphing.isotherm_graphs import plot_iso
-            from pygaps.graphing.mpl_styles import LEGEND_STYLE
-            from pygaps.graphing.mpl_styles import POINTS_ALL_STYLE
+            from pygaps.graphing.mpl_styles import BASE_STYLE
+            import matplotlib as mpl
             ax = plot_iso(
                 attempts,
-                color=len(attempts),
                 branch=branch,
                 x_points=pressure,
                 lgd_pos=None,
                 y1_line_style=dict(markersize=0),
             )
-            ax.plot(
-                pressure,
-                loading,
-                zorder=-1,
-                **POINTS_ALL_STYLE,
-            )
-            ax.legend([m.model.name for m in attempts], **LEGEND_STYLE)
+            with mpl.rc_context(BASE_STYLE):
+                ax.plot(
+                    pressure,
+                    loading,
+                    zorder=-1,
+                )
+                ax.legend([m.model.name for m in attempts])
             logger.info(f"Best model fit is {best_fit.model.name}.")
 
         return best_fit
@@ -558,7 +559,6 @@ class ModelIsotherm(BaseIsotherm):
             loading_unit=self.loading_unit,
             pressure_unit=self.pressure_unit,
             pressure_mode=self.pressure_mode,
-            fig_title=self.material,
         )
         plot_dict.update(plot_iso_args)
 
