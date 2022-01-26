@@ -57,17 +57,8 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
 
     if isinstance(isotherm, PointIsotherm):
 
-        # get headings in an ordered way
-        headings = [
-            isotherm.pressure_key,
-            isotherm.loading_key,
-        ]
-        if isotherm.other_keys:
-            headings.extend(isotherm.other_keys)
-
-        # also get the branch data in a regular format
-        headings.append('branch')
-        data = isotherm.data_raw[headings]
+        # We get data and replace adsorption terminology
+        data = isotherm.data_raw.copy()
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
         output.write('data:[pressure,loading,[otherdata],branch data]\n')
@@ -178,17 +169,10 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
         else:
             raw_dict['branch'] = 'guess'
 
-        # generate other keys
-        other_keys = [
-            column for column in data.columns.values
-            if column not in [data.columns[0], data.columns[1], 'branch']
-        ]
-
         isotherm = PointIsotherm(
             isotherm_data=data,
             pressure_key=data.columns[0],
             loading_key=data.columns[1],
-            other_keys=other_keys,
             **raw_dict
         )
 

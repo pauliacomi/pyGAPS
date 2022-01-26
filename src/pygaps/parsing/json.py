@@ -167,19 +167,12 @@ def isotherm_from_json(
         else:
             raw_dict['branch'] = 'guess'
 
-        # get the other data in the json
-        other_keys = [
-            column for column in data.columns.values
-            if column not in [loading_key, pressure_key, 'branch']
-        ]
-
         # generate the isotherm
         isotherm = PointIsotherm(
             isotherm_data=data,
             loading_key=loading_key,
             pressure_key=pressure_key,
-            other_keys=other_keys,
-            **raw_dict
+            **raw_dict,
         )
     elif model:
         # generate the isotherm

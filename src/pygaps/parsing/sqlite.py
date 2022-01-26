@@ -1016,11 +1016,6 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
                     for data in isotherm_data
                     if data[0] == row['id']
                 })
-                other_keys = [
-                    key for key in iso_data.columns
-                    if key not in ('pressure', 'loading')
-                ]
-                iso_params.update({'other_keys': other_keys})
 
                 # build isotherm object
                 isotherms.append(

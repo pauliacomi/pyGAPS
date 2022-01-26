@@ -107,7 +107,6 @@ class TestPointIsotherm():
             isotherm_data=isotherm_data,
             loading_key='loading',
             pressure_key='pressure',
-            other_keys=['enthalpy'],
             branch=branch,
             **isotherm_parameters
         )
@@ -120,14 +119,11 @@ class TestPointIsotherm():
     ):
         """Tests if isotherm branches are well specified."""
         isotherm_datab = isotherm_data.copy()
-        isotherm_datab['branch'] = [
-            False, False, True, True, True, True, True, True
-        ]
+        isotherm_datab['branch'] = [False, False, True, True, True, True, True, True]
         isotherm = pygaps.PointIsotherm(
             isotherm_data=isotherm_datab,
             loading_key='loading',
             pressure_key='pressure',
-            other_keys=['enthalpy'],
             **isotherm_parameters
         )
         assert isotherm.pressure(branch='des')[0] == 3.0
@@ -144,7 +140,6 @@ class TestPointIsotherm():
             isotherm_data=isotherm_data,
             loading_key='loading',
             pressure_key='pressure',
-            other_keys=['enthalpy'],
             **isotherm_parameters
         )
 
@@ -172,25 +167,19 @@ class TestPointIsotherm():
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
             basic_modelisotherm, pressure_points=None
         )
-        assert isotherm.loading_at(3) == pytest.approx(
-            basic_modelisotherm.loading_at(3)
-        )
+        assert isotherm.loading_at(3) == pytest.approx(basic_modelisotherm.loading_at(3))
 
         # Specifying points
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
             basic_modelisotherm, pressure_points=[1, 2, 3, 4]
         )
-        assert isotherm.loading_at(3) == pytest.approx(
-            basic_modelisotherm.loading_at(3)
-        )
+        assert isotherm.loading_at(3) == pytest.approx(basic_modelisotherm.loading_at(3))
 
         # Specifying isotherm
         isotherm = pygaps.PointIsotherm.from_modelisotherm(
             basic_modelisotherm, pressure_points=basic_pointisotherm
         )
-        assert isotherm.loading_at(3) == pytest.approx(
-            basic_modelisotherm.loading_at(3)
-        )
+        assert isotherm.loading_at(3) == pytest.approx(basic_modelisotherm.loading_at(3))
 
     ##########################
 
@@ -210,31 +199,23 @@ class TestPointIsotherm():
         # all data
         assert basic_pointisotherm.data().drop('branch', axis=1).equals(
             pandas.DataFrame({
-                basic_pointisotherm.pressure_key:
-                [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-                basic_pointisotherm.loading_key:
-                [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+                basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+                basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
                 "enthalpy": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
             })
         )
 
         # adsorption branch
-        assert basic_pointisotherm.data(
-            branch='ads'
-        ).drop('branch', axis=1).equals(
+        assert basic_pointisotherm.data(branch='ads').drop('branch', axis=1).equals(
             pandas.DataFrame({
-                basic_pointisotherm.pressure_key:
-                [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-                basic_pointisotherm.loading_key:
-                [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 "enthalpy": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
             })
         )
 
         # desorption branch
-        assert basic_pointisotherm.data(
-            branch='des'
-        ).drop('branch', axis=1).equals(
+        assert basic_pointisotherm.data(branch='des').drop('branch', axis=1).equals(
             pandas.DataFrame({
                 basic_pointisotherm.pressure_key: [4.5, 2.5],
                 basic_pointisotherm.loading_key: [4.5, 2.5],
@@ -263,9 +244,7 @@ class TestPointIsotherm():
         parameters,
     ):
         """Check that the pressure functions of a pointIsotherm return their specified parameter."""
-        assert basic_pointisotherm.pressure(
-            **parameters
-        )[0] == pytest.approx(expected, 1e-5)
+        assert basic_pointisotherm.pressure(**parameters)[0] == pytest.approx(expected, 1e-5)
 
     def test_isotherm_ret_pressure_indexed(
         self,
@@ -294,9 +273,7 @@ class TestPointIsotherm():
         parameters,
     ):
         """Check that the loading functions of a pointIsotherm return their specified parameter."""
-        assert basic_pointisotherm.loading(
-            **parameters
-        )[0] == pytest.approx(expected, 1e-5)
+        assert basic_pointisotherm.loading(**parameters)[0] == pytest.approx(expected, 1e-5)
 
     def test_isotherm_ret_loading_indexed(
         self,
@@ -324,8 +301,7 @@ class TestPointIsotherm():
                    ) == set([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
 
         # Range specified
-        assert set(basic_pointisotherm.other_data(other_key, limits=(3, 4.5))
-                   ) == set([4.0, 4.0])
+        assert set(basic_pointisotherm.other_data(other_key, limits=(3, 4.5))) == set([4.0, 4.0])
 
         # Indexed option specified
         assert basic_pointisotherm.other_data(other_key, indexed=True).equals(
@@ -406,9 +382,8 @@ class TestPointIsotherm():
         expected,
     ):
         """Check the PointIsotherm spreading pressure calculation."""
-        assert basic_pointisotherm.spreading_pressure_at(
-            inp, **parameters
-        ) == pytest.approx(expected, 1e-5)
+        assert basic_pointisotherm.spreading_pressure_at(inp, **parameters
+                                                         ) == pytest.approx(expected, 1e-5)
 
     ##########################
 
@@ -528,9 +503,7 @@ class TestPointIsotherm():
                 'basis_to': 'percent',
             }),  # Percent weight
             pytest.param(1, {"unit_to": "bad_unit"}, marks=pytest.mark.xfail),
-            pytest.param(
-                1, {"basis_to": "bad_basis"}, marks=pytest.mark.xfail
-            ),
+            pytest.param(1, {"basis_to": "bad_basis"}, marks=pytest.mark.xfail),
         ]
     )
     def test_isotherm_convert_loading(
@@ -574,9 +547,7 @@ class TestPointIsotherm():
                 "unit_to": "cm3",
             }),
             pytest.param(1, {"unit_to": "bad_unit"}, marks=pytest.mark.xfail),
-            pytest.param(
-                1, {"basis_to": "bad_basis"}, marks=pytest.mark.xfail
-            ),
+            pytest.param(1, {"basis_to": "bad_basis"}, marks=pytest.mark.xfail),
         ]
     )
     def test_isotherm_convert_material(
@@ -612,19 +583,13 @@ class TestPointIsotherm():
 
         # Convert from mmol/g -> wt% (g/g)
         basic_pointisotherm.convert_loading(basis_to='fraction')
-        assert (
-            basic_pointisotherm.loading()[0] == pytest.approx(0.028, 0.001)
-        )
+        assert (basic_pointisotherm.loading()[0] == pytest.approx(0.028, 0.001))
         # Convert from wt% (g/g) to vol% (cm3/cm3)
         basic_pointisotherm.convert_material(basis_to='volume', unit_to='cm3')
-        assert (
-            basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001)
-        )
+        assert (basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001))
         # Convert from vol% (cm3/cm3) to vol% (m3/m3)
         basic_pointisotherm.convert_material(basis_to='volume', unit_to='m3')
-        assert (
-            basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001)
-        )
+        assert (basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001))
         # Convert from vol% (m3/m3) to mol% (mol/mol)
         basic_pointisotherm.convert_material(basis_to='molar', unit_to='mol')
         assert (basic_pointisotherm.loading()[0] == pytest.approx(0.01, 0.001))

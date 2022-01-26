@@ -70,7 +70,6 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
 
     meta['loading_key'] = 'loading'
     meta['pressure_key'] = 'pressure'
-    meta['other_keys'] = sorted([a for a in data if a not in ['loading', 'pressure', 'branch']])
 
     # TODO pyGAPS does not yet handle saturation pressure recorded at each point
     # Therefore, we use the relative pressure column as our true pressure,
@@ -78,7 +77,6 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
     if 'pressure_relative' in data.columns:
         data['pressure'] = data['pressure_relative']
         data = data.drop('pressure_relative', axis=1)
-        meta['other_keys'].remove('pressure_relative')
         meta['pressure_mode'] = 'relative'
         meta['pressure_unit'] = None
 

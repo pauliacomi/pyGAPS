@@ -343,7 +343,7 @@ def plot_iso(
 
 
 def _get_keys(iso):
-    return ['loading', 'pressure'] + getattr(iso, 'other_keys', [])
+    return ['loading', 'pressure'] + iso.other_keys
 
 
 def _get_colors(color, palette):

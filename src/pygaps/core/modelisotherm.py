@@ -483,23 +483,8 @@ class ModelIsotherm(BaseIsotherm):
             if loading is None:
                 pressure = isotherm_data[pressure_key]
                 loading = isotherm_data[loading_key]
-            from pygaps.graphing.isotherm_graphs import plot_iso
-            from pygaps.graphing.mpl_styles import BASE_STYLE
-            import matplotlib as mpl
-            ax = plot_iso(
-                attempts,
-                branch=branch,
-                x_points=pressure,
-                lgd_pos=None,
-                y1_line_style=dict(markersize=0),
-            )
-            with mpl.rc_context(BASE_STYLE):
-                ax.plot(
-                    pressure,
-                    loading,
-                    zorder=-1,
-                )
-                ax.legend([m.model.name for m in attempts])
+            from pygaps.graphing.model_graphs import plot_model_guesses
+            plot_model_guesses(attempts, pressure, loading)
             logger.info(f"Best model fit is {best_fit.model.name}.")
 
         return best_fit
@@ -785,6 +770,13 @@ class ModelIsotherm(BaseIsotherm):
         if indexed:
             return pandas.Series(ret)
         return ret
+
+    @property
+    def other_keys(self):
+        """
+        Return column names of any supplementary data points.
+        """
+        return []
 
     ##########################################################
     #   Functions that calculate values of the isotherm data

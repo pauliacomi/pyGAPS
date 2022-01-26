@@ -13,7 +13,6 @@ import pathlib
 import warnings
 
 import pandas
-import numpy
 from gemmi import cif
 
 from pygaps.core.pointisotherm import PointIsotherm
@@ -121,23 +120,18 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
     # data
     if isinstance(isotherm, PointIsotherm):
 
-        columns = [isotherm.pressure_key, isotherm.loading_key] + isotherm.other_keys
+        other_keys = isotherm.other_keys
+        columns = [isotherm.pressure_key, isotherm.loading_key] + other_keys
 
         # write adsorption data
-        loop_ads = block.init_loop(
-            '_adsorp_',
-            ['pressure', 'amount'] + isotherm.other_keys,
-        )
+        loop_ads = block.init_loop('_adsorp_', ['pressure', 'amount'] + other_keys)
         loop_ads.set_all_values(
             isotherm.data(branch='ads')[columns].applymap(lambda x: f'{x:.5g}').values.T.tolist()
         )
 
         # write desorption data
         if isotherm.has_branch('des'):
-            loop_des = block.init_loop(
-                '_desorp_',
-                ['pressure', 'amount'] + isotherm.other_keys,
-            )
+            loop_des = block.init_loop('_desorp_', ['pressure', 'amount'] + other_keys)
             loop_des.set_all_values(
                 isotherm.data(branch='des'
                               )[columns].applymap(lambda x: f'{x:.5g}').values.T.tolist()
@@ -244,13 +238,9 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
                 branch = 1
 
             if not columns:
-                other_keys = []
                 for col in [tag[8:] for tag in loop.tags]:
                     def_col = _DATA_DICT[col]
                     columns.append(def_col)
-                    if def_col not in ['pressure', 'loading']:
-                        other_keys.append(def_col)
-                raw_dict['other_keys'] = other_keys
 
             data_df = pandas.DataFrame(
                 loop_data,

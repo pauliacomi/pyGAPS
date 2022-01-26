@@ -47,8 +47,6 @@ class PointIsotherm(BaseIsotherm):
         The title of the pressure data in the DataFrame provided.
     loading_key : str
         The title of the loading data in the DataFrame provided.
-    other_keys : iterable
-        Other pandas DataFrame columns which contain data to be stored.
     branch : ['guess', ads', 'des', iterable], optional
         The branch of the isotherm. The code will automatically attempt to
         guess if there's an adsorption and desorption branch.
@@ -111,7 +109,6 @@ class PointIsotherm(BaseIsotherm):
         isotherm_data=None,
         pressure_key=None,
         loading_key=None,
-        other_keys=None,
         branch='guess',
         **isotherm_parameters
     ):
@@ -138,23 +135,18 @@ class PointIsotherm(BaseIsotherm):
             # Name of column in the dataframe that contains pressure.
             self.pressure_key = pressure_key
 
-            # List of column in the dataframe that contains other points.
-            if other_keys:
-                self.other_keys = other_keys
-            else:
-                self.other_keys = []
-
             # Pandas DataFrame that stores the data.
-            columns = [self.pressure_key, self.loading_key
-                       ] + sorted(self.other_keys)
-            if not all([a in isotherm_data.columns for a in columns]):
+            columns = [self.pressure_key, self.loading_key]
+            if not all(a in isotherm_data.columns for a in columns):
                 raise ParameterError(
-                    "Could not find specified columns "
+                    "Could not find columns "
                     f"({[a for a in columns if a not in isotherm_data.columns]})"
                     " in the adsorption DataFrame."
                 )
-            if 'branch' in isotherm_data.columns:
+            if 'branch' not in isotherm_data.columns:
                 columns.append('branch')
+            other_keys = [c for c in isotherm_data.columns if c not in columns]
+            columns = columns + sorted(other_keys)
             self.data_raw = isotherm_data.reindex(columns=columns)
 
         elif pressure is not None or loading is not None:
@@ -164,19 +156,11 @@ class PointIsotherm(BaseIsotherm):
                     " arrays, make sure both are specified!"
                 )
             if len(pressure) != len(loading):
-                raise ParameterError(
-                    "Pressure and loading arrays are not equal!"
-                )
-            if other_keys:
-                raise ParameterError(
-                    "Cannot specify other isotherm components in this mode."
-                    " Use the ``isotherm_data`` method."
-                )
+                raise ParameterError("Pressure and loading arrays are not equal!")
 
             # Standard column names
             self.pressure_key = 'pressure'
             self.loading_key = 'loading'
-            self.other_keys = []
 
             # DataFrame creation
             self.data_raw = pandas.DataFrame({
@@ -190,18 +174,16 @@ class PointIsotherm(BaseIsotherm):
             )
 
         # Deal with the isotherm branches
-        if 'branch' in self.data_raw.columns:
+        if isotherm_data is not None and 'branch' in isotherm_data.columns:
             pass
         elif isinstance(branch, str):
             if branch == 'guess':
                 # Split the data in adsorption/desorption
-                self.data_raw.loc[:, 'branch'] = self._splitdata(
-                    self.data_raw, self.pressure_key
-                )
+                self.data_raw['branch'] = self._splitdata(self.data_raw, self.pressure_key)
             elif branch == 'ads':
-                self.data_raw.loc[:, 'branch'] = 0
+                self.data_raw['branch'] = 0
             elif branch == 'des':
-                self.data_raw.loc[:, 'branch'] = 1
+                self.data_raw['branch'] = 1
             else:
                 raise ParameterError(
                     "Isotherm branch parameter must be 'guess ,'ads' or 'des'"
@@ -228,7 +210,6 @@ class PointIsotherm(BaseIsotherm):
         isotherm_data=None,
         pressure_key=None,
         loading_key=None,
-        other_keys=None
     ):
         """
         Construct a point isotherm using a parent isotherm as the template for
@@ -259,7 +240,6 @@ class PointIsotherm(BaseIsotherm):
         iso_params['isotherm_data'] = isotherm_data
         iso_params['pressure_key'] = pressure_key
         iso_params['loading_key'] = loading_key
-        iso_params['other_keys'] = other_keys
 
         return cls(**iso_params)
 
@@ -297,10 +277,8 @@ class PointIsotherm(BaseIsotherm):
         # this is not ideal
         return PointIsotherm(
             isotherm_data=pandas.DataFrame({
-                'pressure':
-                pressure,
-                'loading':
-                modelisotherm.loading_at(pressure)
+                'pressure': pressure,
+                'loading': modelisotherm.loading_at(pressure)
             }),
             loading_key='loading',
             pressure_key='pressure',
@@ -418,9 +396,7 @@ class PointIsotherm(BaseIsotherm):
         self.p_interpolator = None
 
         if verbose:
-            logger.info(
-                f"Changed pressure to mode '{mode_to}', unit '{unit_to}'."
-            )
+            logger.info(f"Changed pressure to mode '{mode_to}', unit '{unit_to}'.")
 
     def convert_loading(
         self,
@@ -471,9 +447,7 @@ class PointIsotherm(BaseIsotherm):
 
         if basis_to != self.loading_basis:
             self.loading_basis = basis_to
-        if unit_to != self.loading_unit and basis_to not in [
-            'percent', 'fraction'
-        ]:
+        if unit_to != self.loading_unit and basis_to not in ['percent', 'fraction']:
             self.loading_unit = unit_to
         else:
             self.loading_unit = None
@@ -483,16 +457,9 @@ class PointIsotherm(BaseIsotherm):
         self.p_interpolator = None
 
         if verbose:
-            logger.info(
-                f"Changed loading to basis '{basis_to}', unit '{unit_to}'."
-            )
+            logger.info(f"Changed loading to basis '{basis_to}', unit '{unit_to}'.")
 
-    def convert_material(
-        self,
-        basis_to: str = None,
-        unit_to: str = None,
-        verbose: bool = False
-    ):
+    def convert_material(self, basis_to: str = None, unit_to: str = None, verbose: bool = False):
         """
         Convert the material of the isotherm from one unit to another and the
         basis of the isotherm loading to be either 'per mass' or 'per volume' or
@@ -520,8 +487,7 @@ class PointIsotherm(BaseIsotherm):
             return
 
         if (
-            self.loading_basis in ['percent', 'fraction']
-            and basis_to == self.material_basis
+            self.loading_basis in ['percent', 'fraction'] and basis_to == self.material_basis
             and unit_to != self.material_unit
         ):
             # We "virtually" change the unit without any conversion
@@ -555,9 +521,7 @@ class PointIsotherm(BaseIsotherm):
                 temp=self.temperature,
             )
             if verbose:
-                logger.info(
-                    f"Changed loading to basis '{basis_to}', unit '{unit_to}'."
-                )
+                logger.info(f"Changed loading to basis '{basis_to}', unit '{unit_to}'.")
 
         if unit_to != self.material_unit:
             self.material_unit = unit_to
@@ -569,9 +533,7 @@ class PointIsotherm(BaseIsotherm):
         self.p_interpolator = None
 
         if verbose:
-            logger.info(
-                f"Changed material to basis '{basis_to}', unit '{unit_to}'."
-            )
+            logger.info(f"Changed material to basis '{basis_to}', unit '{unit_to}'.")
 
     ###########################################################
     #   Info functions
@@ -659,12 +621,7 @@ class PointIsotherm(BaseIsotherm):
         raise ParameterError('Bad branch specification.')
 
     def pressure(
-        self,
-        branch=None,
-        pressure_unit=None,
-        pressure_mode=None,
-        limits=None,
-        indexed=False
+        self, branch=None, pressure_unit=None, pressure_mode=None, limits=None, indexed=False
     ):
         """
         Return pressure points as an array.
@@ -823,6 +780,16 @@ class PointIsotherm(BaseIsotherm):
             return ret
         return ret.values
 
+    @property
+    def other_keys(self):
+        """
+        Return column names of any supplementary data points.
+        """
+        return [
+            c for c in self.data_raw.columns
+            if c not in (self.pressure_key, self.loading_key, 'branch')
+        ]
+
     def other_data(
         self,
         key,
@@ -951,8 +918,7 @@ class PointIsotherm(BaseIsotherm):
 
         # Check if interpolator is applicable
         if (
-            self.p_interpolator is None
-            or self.p_interpolator.interp_branch != branch
+            self.p_interpolator is None or self.p_interpolator.interp_branch != branch
             or self.p_interpolator.interp_kind != interpolation_type
             or self.p_interpolator.interp_fill != interp_fill
         ):
@@ -1083,8 +1049,7 @@ class PointIsotherm(BaseIsotherm):
 
         # Check if interpolator is applicable
         if (
-            self.l_interpolator is None
-            or self.l_interpolator.interp_branch != branch
+            self.l_interpolator is None or self.l_interpolator.interp_branch != branch
             or self.l_interpolator.interp_kind != interpolation_type
             or self.l_interpolator.interp_fill != interp_fill
         ):
@@ -1214,9 +1179,7 @@ class PointIsotherm(BaseIsotherm):
         """
         # Get all data points
         pressures = self.pressure(
-            branch=branch,
-            pressure_unit=pressure_unit,
-            pressure_mode=pressure_mode
+            branch=branch, pressure_unit=pressure_unit, pressure_mode=pressure_mode
         )
         loadings = self.loading(
             branch=branch,
@@ -1272,8 +1235,7 @@ class PointIsotherm(BaseIsotherm):
         # get area between P_1 and P_k, where P_k < P < P_{k+1}
         for i in range(n_points - 1):
             # linear interpolation of isotherm data
-            slope = (loadings[i + 1] -
-                     loadings[i]) / (pressures[i + 1] - pressures[i])
+            slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] - pressures[i])
             intercept = loadings[i] - slope * pressures[i]
             # add area of this segment
             area += slope * (pressures[i + 1] - pressures[i]) + intercept * \

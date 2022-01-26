@@ -128,17 +128,12 @@ def isotherm_to_xl(isotherm, path):
         # Get the data row
         data_row = type_row + 1
 
-        # Generate the headings
-        headings = [isotherm.loading_key, isotherm.pressure_key]
-        headings.extend(isotherm.other_keys)
-
-        # We also write the branch data
-        headings.append('branch')
-        data = isotherm.data_raw[headings]
+        # We get data and replace adsorption terminology
+        data = isotherm.data_raw.copy()
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
         # Write all data
-        for col_index, heading in enumerate(headings):
+        for col_index, heading in enumerate(data.columns):
             sht.write(data_row, col_index, heading)
             for row_index, datapoint in enumerate(data[heading]):
                 sht.write(data_row + row_index + 1, col_index, datapoint)
@@ -250,10 +245,6 @@ def isotherm_from_xl(path, *isotherm_parameters):
 
         raw_dict['loading_key'] = headers[0]
         raw_dict['pressure_key'] = headers[1]
-        raw_dict['other_keys'] = [
-            column for column in data.columns.values
-            if column not in [raw_dict['loading_key'], raw_dict['pressure_key'], 'branch']
-        ]
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
