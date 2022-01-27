@@ -143,6 +143,14 @@ class BaseIsotherm():
                     )
                     properties[k] = self._unit_params[k]
 
+        # TODO deprecation
+        if self._unit_params['loading_basis'] == 'volume':
+            self._unit_params['loading_basis'] = 'volume_gas'
+            logger.warning(
+                "Loading basis as 'volume' is unclear and deprecated. "
+                "Assumed as 'volume_gas'."
+            )
+
         self.pressure_mode = properties.pop('pressure_mode')
         self.pressure_unit = properties.pop('pressure_unit')
         if self.pressure_mode.startswith('relative'):

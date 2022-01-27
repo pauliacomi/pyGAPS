@@ -493,7 +493,7 @@ class TestPointIsotherm():
                 "unit_to": "g",
             }),
             (0.876484, {
-                "basis_to": "volume",
+                "basis_to": "volume_gas",
                 "unit_to": "cm3",
             }),
             (0.0280135, {
@@ -586,10 +586,10 @@ class TestPointIsotherm():
         assert (basic_pointisotherm.loading()[0] == pytest.approx(0.028, 0.001))
         # Convert from wt% (g/g) to vol% (cm3/cm3)
         basic_pointisotherm.convert_material(basis_to='volume', unit_to='cm3')
-        assert (basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001))
+        assert (basic_pointisotherm.loading()[0] == pytest.approx(0.08123, 0.001))
         # Convert from vol% (cm3/cm3) to vol% (m3/m3)
         basic_pointisotherm.convert_material(basis_to='volume', unit_to='m3')
-        assert (basic_pointisotherm.loading()[0] == pytest.approx(1.7529, 0.001))
+        assert (basic_pointisotherm.loading()[0] == pytest.approx(0.08123, 0.001))
         # Convert from vol% (m3/m3) to mol% (mol/mol)
         basic_pointisotherm.convert_material(basis_to='molar', unit_to='mol')
         assert (basic_pointisotherm.loading()[0] == pytest.approx(0.01, 0.001))

@@ -16,7 +16,8 @@ _PRESSURE_MODE = {
 
 _LOADING_MODE = {
     "mass": _MASS_UNITS,
-    "volume": _VOLUME_UNITS,
+    "volume_gas": _VOLUME_UNITS,
+    "volume_liquid": _VOLUME_UNITS,
     "molar": _MOLAR_UNITS,
     "percent": None,
     "fraction": None,
@@ -30,7 +31,13 @@ _MATERIAL_MODE = {
 
 
 def c_pressure(
-    value, mode_from, mode_to, unit_from, unit_to, adsorbate=None, temp=None
+    value: float,
+    mode_from: str,
+    mode_to: str,
+    unit_from: str,
+    unit_to: str,
+    adsorbate=None,
+    temp: float = None,
 ):
     """
     Convert pressure units and modes.
@@ -104,9 +111,7 @@ def c_pressure(
                 sign = -1
 
             if not temp:
-                raise ParameterError(
-                    "A temperature is required for this conversion."
-                )
+                raise ParameterError("A temperature is required for this conversion.")
 
             factor = adsorbate.saturation_pressure(temp, unit=unit)
 
@@ -192,9 +197,7 @@ def c_loading(
 
         if _LOADING_MODE[basis_to]:
             if not unit_to:
-                raise ParameterError(
-                    f"To convert to {basis_to} basis, units must be specified."
-                )
+                raise ParameterError(f"To convert to {basis_to} basis, units must be specified.")
             if unit_to not in _LOADING_MODE[basis_to]:
                 raise ParameterError(
                     f"Unit selected for loading unit_to ({unit_to}) is not an option. "
@@ -233,6 +236,8 @@ def c_loading(
                     return value * 100
             else:
                 # convert from physical -> percent/fraction
+                if basis_material == 'volume':
+                    basis_material = 'volume_liquid'
                 if bf_b:
                     _basis_from = basis_material
                     _unit_from = unit_material
@@ -244,31 +249,53 @@ def c_loading(
                     if basis_to == 'percent':
                         factor = 100
 
+        # TODO: this list grew, should find a better way
         if _basis_from == 'mass':
-            if _basis_to == 'volume':
+            if _basis_to == 'volume_gas':
                 constant = adsorbate.gas_density(temp=temp)
+                sign = -1
+            elif _basis_to == 'volume_liquid':
+                constant = adsorbate.liquid_density(temp=temp)
                 sign = -1
             elif _basis_to == 'molar':
                 constant = adsorbate.molar_mass()
                 sign = -1
-        elif _basis_from == 'volume':
+        elif _basis_from == 'volume_gas':
             if _basis_to == 'mass':
                 constant = adsorbate.gas_density(temp=temp)
                 sign = 1
             elif _basis_to == 'molar':
                 constant = adsorbate.gas_molar_density(temp=temp)
                 sign = 1
+            elif _basis_to == 'volume_liquid':
+                constant = adsorbate.gas_molar_density(temp=temp) /\
+                     adsorbate.liquid_molar_density(temp=temp)
+                sign = 1
+        elif _basis_from == 'volume_liquid':
+            if _basis_to == 'mass':
+                constant = adsorbate.liquid_density(temp=temp)
+                sign = 1
+            elif _basis_to == 'molar':
+                constant = adsorbate.liquid_molar_density(temp=temp)
+                sign = 1
+            elif _basis_to == 'volume_gas':
+                constant = adsorbate.gas_molar_density(temp=temp) /\
+                     adsorbate.liquid_molar_density(temp=temp)
+                sign = -1
         elif _basis_from == 'molar':
             if _basis_to == 'mass':
                 constant = adsorbate.molar_mass()
                 sign = 1
-            elif _basis_to == 'volume':
+            elif _basis_to == 'volume_gas':
                 constant = adsorbate.gas_molar_density(temp=temp)
+                sign = -1
+            elif _basis_to == 'volume_liquid':
+                constant = adsorbate.liquid_molar_density(temp=temp)
                 sign = -1
 
         return (
-            value * _LOADING_MODE[_basis_from][_unit_from] * factor *
-            constant**sign / _LOADING_MODE[_basis_to][_unit_to]
+            value * _LOADING_MODE[_basis_from][_unit_from] * factor * constant**sign /
+            _LOADING_MODE[_basis_to][_unit_to]
         )
 
     elif unit_to and unit_from != unit_to:
@@ -277,7 +304,14 @@ def c_loading(
     return value
 
 
-def c_material(value, basis_from, basis_to, unit_from, unit_to, material=None):
+def c_material(
+    value: float,
+    basis_from: str,
+    basis_to: str,
+    unit_from: str,
+    unit_to: str,
+    material=None,
+):
     """
     Convert material units and basis.
 
@@ -318,10 +352,7 @@ def c_material(value, basis_from, basis_to, unit_from, unit_to, material=None):
                 f"Viable bases are {[base for base in list(_MATERIAL_MODE)]}"
             )
 
-        if (
-            basis_from in ['percent', 'fraction']
-            or basis_to in ['percent', 'fraction']
-        ):
+        if (basis_from in ['percent', 'fraction'] or basis_to in ['percent', 'fraction']):
             ParameterError(
                 "If you want to convert to/from fraction/percent, convert using loading, not adsorbate."
             )
@@ -372,14 +403,16 @@ def c_material(value, basis_from, basis_to, unit_from, unit_to, material=None):
         )
 
     elif unit_to and unit_from != unit_to:
-        return c_unit(
-            _MATERIAL_MODE[basis_from], value, unit_from, unit_to, sign=-1
-        )
+        return c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to, sign=-1)
 
     return value
 
 
-def c_temperature(value, unit_from, unit_to):
+def c_temperature(
+    value: float,
+    unit_from: str,
+    unit_to: str,
+):
     """
     Convert temperatures.
 

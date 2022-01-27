@@ -447,10 +447,10 @@ class PointIsotherm(BaseIsotherm):
 
         if basis_to != self.loading_basis:
             self.loading_basis = basis_to
-        if unit_to != self.loading_unit and basis_to not in ['percent', 'fraction']:
-            self.loading_unit = unit_to
-        else:
+        if basis_to in ['percent', 'fraction']:
             self.loading_unit = None
+        else:
+            self.loading_unit = unit_to
 
         # Reset interpolators
         self.l_interpolator = None
@@ -510,11 +510,18 @@ class PointIsotherm(BaseIsotherm):
         # Here, the loading must be simultaneously converted.
         # e.g.: wt% = g/g -> cm3/cm3 = vol%
         if self.loading_basis in ['percent', 'fraction']:
-
+            if basis_to == 'volume':
+                _basis_to = 'volume_liquid'
+            else:
+                _basis_to = basis_to
+            if self.material_basis == 'volume':
+                _basis_from = 'volume_liquid'
+            else:
+                _basis_from = self.material_basis
             self.data_raw[self.loading_key] = c_loading(
                 self.data_raw[self.loading_key],
-                basis_from=self.material_basis,
-                basis_to=basis_to,
+                basis_from=_basis_from,
+                basis_to=_basis_to,
                 unit_from=self.material_unit,
                 unit_to=unit_to,
                 adsorbate=self.adsorbate,

@@ -28,7 +28,7 @@ LOADING_PARAM = [
         'loading_unit': 'mol'
     }),  # Loading unit specified
     (0.876484, {
-        'loading_basis': 'volume',
+        'loading_basis': 'volume_gas',
         'loading_unit': 'cm3'
     }),  # Loading basis specified
     (1000, {
@@ -44,20 +44,16 @@ LOADING_PARAM = [
     (2.80134, {
         'loading_basis': 'percent',
     }),  # Percent weight
-    (
-        0.01, {
-            'loading_basis': 'fraction',
-            'material_basis': 'molar',
-            'material_unit': 'mmol',
-        }
-    ),  # Fractional molar (will be 1/1000 mol * 10 g/mol)
-    (
-        1.7529697, {
-            'loading_basis': 'fraction',
-            'material_basis': 'volume',
-            'material_unit': 'cm3',
-        }
-    ),  # Fractional volume
+    (0.01, {
+        'loading_basis': 'fraction',
+        'material_basis': 'molar',
+        'material_unit': 'mmol',
+    }),  # Fractional molar (will be 1/1000 mol * 10 g/mol)
+    (0.081274, {
+        'loading_basis': 'fraction',
+        'material_basis': 'volume',
+        'material_unit': 'cm3',
+    }),  # Fractional volume
     (
         56.02696, {
             'loading_basis': 'mass',
