@@ -40,8 +40,8 @@ def plot_iso(
     x_range=(None, None),
     y1_range=(None, None),
     y2_range=(None, None),
-    x_points=None,
-    y1_points=None,
+    x_points: list = None,
+    y1_points: list = None,
     material_basis: str = None,
     material_unit: str = None,
     loading_basis: str = None,
@@ -53,9 +53,9 @@ def plot_iso(
     logy2: bool = False,
     color=True,
     marker=True,
-    y1_line_style=(None, None),
-    y2_line_style=(None, None),
-    lgd_keys=None,
+    y1_line_style: dict = None,
+    y2_line_style: dict = None,
+    lgd_keys: list = None,
     lgd_pos: str = 'best',
     save_path: str = None,
 ):
@@ -190,6 +190,8 @@ def plot_iso(
     ads, des = _BRANCH_TYPES[branch]
 
     # Ensure iterable
+    y1_line_style = y1_line_style if y1_line_style else {}
+    y2_line_style = y2_line_style if y2_line_style else {}
     lgd_keys = lgd_keys if lgd_keys else []
 
     # Pack other parameters
@@ -269,10 +271,10 @@ def plot_iso(
     for isotherm in isotherms:
 
         # Line styles for the current isotherm
-        y1_line_style = next(pc_y1)
-        y2_line_style = next(pc_y2)
-        y1_line_style.update(y1_line_style)
-        y2_line_style.update(y2_line_style)
+        y1_ls = next(pc_y1)
+        y2_ls = next(pc_y2)
+        y1_ls.update(y1_line_style)
+        y2_ls.update(y2_line_style)
 
         # If there's an adsorption branch, plot it
         if ads and isotherm.has_branch('ads'):
@@ -286,17 +288,17 @@ def plot_iso(
             )
             # Plot line 1
             y1_lbl = label_lgd(isotherm, lgd_keys, 'ads', y1_data)
-            ax1.plot(x1_p, y1_p, label=y1_lbl, **y1_line_style)
+            ax1.plot(x1_p, y1_p, label=y1_lbl, **y1_ls)
 
             # Plot line 2
-            if y2_data:
+            if y2_data and y2_p is not None:
                 y2_lbl = label_lgd(isotherm, lgd_keys, 'ads', y2_data)
-                ax2.plot(x2_p, y2_p, label=y2_lbl, **y2_line_style)
+                ax2.plot(x2_p, y2_p, label=y2_lbl, **y2_ls)
 
         # Switch to desorption linestyle (dotted, white marker)
-        y1_line_style['markerfacecolor'] = 'white'
-        y1_line_style['linestyle'] = '--'
-        y2_line_style['markerfacecolor'] = 'white'
+        y1_ls['markerfacecolor'] = 'white'
+        y1_ls['linestyle'] = '--'
+        y2_ls['markerfacecolor'] = 'white'
 
         # If there's a desorption branch, plot it
         if des and isotherm.has_branch('des'):
@@ -313,15 +315,15 @@ def plot_iso(
                 y1_lbl = ''
             else:
                 y1_lbl = label_lgd(isotherm, lgd_keys, 'des', y1_data)
-            ax1.plot(x1_p, y1_p, label=y1_lbl, **y1_line_style)
+            ax1.plot(x1_p, y1_p, label=y1_lbl, **y1_ls)
 
             # Plot line 2
-            if y2_data:
+            if y2_data and y2_p is not None:
                 if branch == 'all' and 'branch' not in lgd_keys:
                     y2_lbl = ''
                 else:
                     y2_lbl = label_lgd(isotherm, lgd_keys, 'des', y2_data)
-                ax2.plot(x2_p, y2_p, label=y2_lbl, **y2_line_style)
+                ax2.plot(x2_p, y2_p, label=y2_lbl, **y2_ls)
 
     #####################################
     #
