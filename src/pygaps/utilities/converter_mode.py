@@ -5,6 +5,7 @@ from .converter_unit import _MOLAR_UNITS
 from .converter_unit import _PRESSURE_UNITS
 from .converter_unit import _TEMPERATURE_UNITS
 from .converter_unit import _VOLUME_UNITS
+from .converter_unit import _check_unit
 from .converter_unit import c_unit
 from .exceptions import ParameterError
 
@@ -28,6 +29,19 @@ _MATERIAL_MODE = {
     "volume": _VOLUME_UNITS,
     "molar": _MOLAR_UNITS,
 }
+
+
+def _check_basis(basis, bases, btype):
+    if not basis:
+        raise ParameterError(
+            "Specify the base to convert."
+            f"Viable options are {list(bases.keys())}"
+        )
+    if basis not in bases:
+        raise ParameterError(
+            f"Basis selected for {btype} ({basis}) is not an option. "
+            f"Viable options are {list(bases.keys())}"
+        )
 
 
 def c_pressure(
@@ -55,7 +69,7 @@ def c_pressure(
         Whether to convert to a mode.
     unit_from : str
         Unit from which to convert.
-    unit_from : str
+    unit_to : str
         Unit to which to convert.
     adsorbate : Adsorbate, optional
         Adsorbate on which the pressure is to be
@@ -74,13 +88,10 @@ def c_pressure(
     ``ParameterError``
         If the mode selected is not an option.
     """
-    if mode_from != mode_to:
+    _check_basis(mode_from, _PRESSURE_MODE, 'pressure')
+    _check_basis(mode_to, _PRESSURE_MODE, 'pressure')
 
-        if mode_to not in _PRESSURE_MODE:
-            raise ParameterError(
-                f"Mode selected for pressure ({mode_to}) is not an option. "
-                f"Viable modes are {list(_PRESSURE_MODE)}"
-            )
+    if mode_from != mode_to:
 
         unit = None
         sign = 1
@@ -89,24 +100,12 @@ def c_pressure(
         # Now go through various global options
         if "absolute" in [mode_to, mode_from]:
             if mode_to == "absolute":
-                if not unit_to:
-                    raise ParameterError("Specify unit to convert to.")
-                if unit_to not in _PRESSURE_UNITS:
-                    raise ParameterError(
-                        f"Unit selected for pressure ({unit_to}) is not an option. "
-                        f"Viable units are {list(_PRESSURE_UNITS)}"
-                    )
+                _check_unit(unit_to, _PRESSURE_UNITS, 'pressure')
                 unit = unit_to
                 sign = 1
 
             if mode_from == "absolute":
-                if not unit_from:
-                    raise ParameterError("Specify unit to convert from.")
-                if unit_from not in _PRESSURE_UNITS:
-                    raise ParameterError(
-                        f"Unit selected for pressure ({unit_from}) is not an option. "
-                        f"Viable units are {list(_PRESSURE_UNITS)}"
-                    )
+                _check_unit(unit_from, _PRESSURE_UNITS, 'pressure')
                 unit = unit_from
                 sign = -1
 
@@ -162,7 +161,7 @@ def c_loading(
         Whether to convert to a basis.
     unit_from : str
         Unit from which to convert.
-    unit_from : str
+    unit_to : str
         Unit to which to convert.
     adsorbate : str, optional
         Adsorbate for which the pressure is to be converted.
@@ -187,33 +186,16 @@ def c_loading(
     ``ParameterError``
         If the mode selected is not an option.
     """
+    _check_basis(basis_from, _LOADING_MODE, 'loading')
+    _check_basis(basis_to, _LOADING_MODE, 'loading')
+
     if basis_from != basis_to:
 
-        if basis_to not in _LOADING_MODE:
-            raise ParameterError(
-                f"Basis selected for loading ({basis_to}) is not an option. "
-                f"Viable basis for uptake are {list(_LOADING_MODE)}"
-            )
-
         if _LOADING_MODE[basis_to]:
-            if not unit_to:
-                raise ParameterError(f"To convert to {basis_to} basis, units must be specified.")
-            if unit_to not in _LOADING_MODE[basis_to]:
-                raise ParameterError(
-                    f"Unit selected for loading unit_to ({unit_to}) is not an option. "
-                    f"Viable units are {list(_LOADING_MODE[basis_to])}"
-                )
+            _check_unit(unit_to, _LOADING_MODE[basis_to], 'loading')
 
         if _LOADING_MODE[basis_from]:
-            if not unit_from:
-                raise ParameterError(
-                    f"To convert from {basis_from} basis, units must be specified."
-                )
-            if unit_from not in _LOADING_MODE[basis_from]:
-                raise ParameterError(
-                    f"Unit selected for loading unit_from ({unit_from}) is not an option. "
-                    f"Viable units are {list(_LOADING_MODE[basis_from])}"
-                )
+            _check_unit(unit_from, _LOADING_MODE[basis_from], 'loading')
 
         _basis_from = basis_from
         _unit_from = unit_from
@@ -328,7 +310,7 @@ def c_material(
         Whether to convert to a basis.
     unit_from : str
         Unit from which to convert.
-    unit_from : str
+    unit_to : str
         Unit to which to convert.
     material : str
         Name of the material on which the value is based.
@@ -344,33 +326,18 @@ def c_material(
         If the mode selected is not an option.
 
     """
-    if basis_from != basis_to:
+    _check_basis(basis_from, _MATERIAL_MODE, 'material')
+    _check_basis(basis_to, _MATERIAL_MODE, 'material')
 
-        if basis_to not in _MATERIAL_MODE:
-            raise ParameterError(
-                f"Basis selected for material ({basis_to}) is not an option. "
-                f"Viable bases are {[base for base in list(_MATERIAL_MODE)]}"
-            )
+    if basis_from != basis_to:
 
         if (basis_from in ['percent', 'fraction'] or basis_to in ['percent', 'fraction']):
             ParameterError(
                 "If you want to convert to/from fraction/percent, convert using loading, not adsorbate."
             )
 
-        if not unit_to or not unit_from:
-            raise ParameterError("Specify both 'from' and 'to' units.")
-
-        if unit_to not in _MATERIAL_MODE[basis_to]:
-            raise ParameterError(
-                f"Unit selected for material unit_to ({unit_to}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[unit_to])}"
-            )
-
-        if unit_from not in _MATERIAL_MODE[basis_from]:
-            raise ParameterError(
-                f"Unit selected for material unit_from ({unit_from}) is not an option. "
-                f"Viable units are {list(_MATERIAL_MODE[basis_from])}"
-            )
+        _check_unit(unit_to, _MATERIAL_MODE[basis_to], 'material')
+        _check_unit(unit_from, _MATERIAL_MODE[basis_from], 'material')
 
         constant = 1
         sign = 1
@@ -422,7 +389,7 @@ def c_temperature(
         The value to convert.
     unit_from : str
         Unit from which to convert.
-    unit_from : str
+    unit_to : str
         Unit to which to convert.
 
     Returns
@@ -436,6 +403,9 @@ def c_temperature(
         If the unit selected is not an option.
 
     """
+    _check_unit(unit_to, _TEMPERATURE_UNITS, 'temperature')
+    _check_unit(unit_from, _TEMPERATURE_UNITS, 'temperature')
+
     if unit_from == unit_to:
         return value
 
