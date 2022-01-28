@@ -71,7 +71,7 @@ def convert_unit_ltx(string: str, negative: bool = False) -> str:
             if i == "(":
                 result += '_{'
                 continue
-            elif i == ")":
+            if i == ")":
                 result += '}'
                 continue
         result += (i)
@@ -83,10 +83,6 @@ def convert_unit_ltx(string: str, negative: bool = False) -> str:
         result += '^{-1}'
 
     return result
-
-
-def convert_loadingstr(string: str) -> str:
-    pass
 
 
 def _is_none(s):
@@ -117,10 +113,9 @@ def _from_bool(s):
     """Convert a boolean into a string."""
     if s.lower() == 'true':
         return True
-    elif s.lower() == 'false':
+    if s.lower() == 'false':
         return False
-    else:
-        raise ValueError('String cannot be converted to bool')
+    raise ValueError('String cannot be converted to bool')
 
 
 def _is_list(s):

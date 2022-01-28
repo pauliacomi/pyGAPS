@@ -189,7 +189,7 @@ class Adsorbate():
         # Skip search if already adsorbate
         if isinstance(name, Adsorbate):
             return name
-        elif not isinstance(name, str):
+        if not isinstance(name, str):
             raise ParameterError("Pass a string as an adsorbate name.")
 
         # See if adsorbate exists in master list
@@ -536,8 +536,8 @@ class Adsorbate():
                 warnings.warn('Attempting to read dictionary')
                 try:
                     return self.gas_density(temp, calculate=False)
-                except ParameterError:
-                    raise CalculationError
+                except ParameterError as e:
+                    raise CalculationError from e
 
         return self.get_prop("gas_density")
 
