@@ -2,11 +2,127 @@
 import pytest
 
 import pygaps
+from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities import converter_mode
 
 
-@pytest.mark.core
+@pytest.mark.utilities
 class TestConversions():
+    @pytest.mark.parametrize(
+        'm_f, u_f, m_t, u_t, t', [
+            ('absolute', 'bar', None, 'bar', 77),
+            (None, 'bar', 'relative', 'bar', 77),
+            ('absolute', 'bar', 'None', 'bar', 77),
+            ('None', 'bar', 'relative', 'bar', 77),
+            ('absolute', None, 'relative', 'bar', 77),
+            ('relative', 'bar', 'absolute', None, 77),
+            ('absolute', 'None', 'relative', 'bar', 77),
+            ('relative', 'bar', 'absolute', 'None', 77),
+            ('absolute', 'bar', 'relative', '', None),
+        ]
+    )
+    def test_conversion_pressure_checks(self, m_f, u_f, m_t, u_t, t):
+        with pytest.raises(ParameterError):
+            converter_mode.c_pressure(
+                1,
+                mode_from=m_f,
+                unit_from=u_f,
+                mode_to=m_t,
+                unit_to=u_t,
+                adsorbate=pygaps.Adsorbate.find('N2'),
+                temp=t
+            )
+
+    @pytest.mark.parametrize(
+        'm_f, u_f, m_t, u_t', [
+            ('molar', 'mmol', None, 'g'),
+            (None, 'mmol', 'mass', 'g'),
+            ('molar', 'mmol', 'None', 'g'),
+            ('None', 'mmol', 'mass', 'g'),
+            ('molar', None, 'mass', 'g'),
+            ('molar', 'mmol', 'mass', None),
+            ('molar', 'None', 'mass', 'g'),
+            ('molar', 'mmol', 'mass', 'None'),
+        ]
+    )
+    def test_conversion_loading_checks(self, m_f, u_f, m_t, u_t):
+        with pytest.raises(ParameterError):
+            converter_mode.c_loading(
+                1,
+                basis_from=m_f,
+                unit_from=u_f,
+                basis_to=m_t,
+                unit_to=u_t,
+            )
+
+    @pytest.mark.parametrize(
+        'm_f, u_f, m_t, u_t', [
+            ('molar', 'mmol', None, 'g'),
+            (None, 'mmol', 'mass', 'g'),
+            ('molar', 'mmol', 'None', 'g'),
+            ('None', 'mmol', 'mass', 'g'),
+            ('molar', None, 'mass', 'g'),
+            ('molar', 'mmol', 'mass', None),
+            ('molar', 'None', 'mass', 'g'),
+            ('molar', 'mmol', 'mass', 'None'),
+        ]
+    )
+    def test_conversion_material_checks(self, m_f, u_f, m_t, u_t, use_material):
+        with pytest.raises(ParameterError):
+            converter_mode.c_material(
+                1,
+                basis_from=m_f,
+                unit_from=u_f,
+                basis_to=m_t,
+                unit_to=u_t,
+                material=pygaps.Material.find('TEST'),
+            )
+
+    @pytest.mark.parametrize(
+        'u_f, u_t', [
+            ('K', None),
+            (None, 'K'),
+            ('K', 'None'),
+            ('None', 'K'),
+        ]
+    )
+    def test_conversion_temperature_checks(self, u_f, u_t):
+        with pytest.raises(ParameterError):
+            converter_mode.c_temperature(
+                0,
+                unit_from=u_f,
+                unit_to=u_t,
+            )
+
+    @pytest.mark.parametrize(
+        'value, m_f, u_f, m_t, u_t',
+        [
+            (1, 'absolute', 'bar', 'absolute', 'bar'),  # 1 bar -> 1 bar
+            (100000, 'absolute', 'bar', 'absolute', 'Pa'),  # 1 bar -> 1E5 Pa
+            (0.9869, 'absolute', 'bar', 'absolute', 'atm'),  # 1 bar -> 0.98 atm
+            (1, 'relative', 'bar', 'relative', 'Pa'),  # 1 p/p0 (N2, 77K) -> 1 p/p0 (N2, 77K)
+            (0.9882, 'absolute', 'bar', 'relative', ''),  # 1 bar -> ~0.98 p/p0 (N2, 77K)
+            (98.82, 'absolute', 'bar', 'relative%', ''),  # 1 bar -> ~0.98 p/p0 (N2, 77K)
+            (101193.756, 'relative', None, 'absolute', 'Pa'),  # 1 p/p0 -> 101K Pa
+            (101193.756, 'relative', 'Pa', 'absolute', 'Pa'),  # 1 p/p0 -> 101K Pa
+            (100, 'relative', '', 'relative%', ''),  # 1 p/p0 -> 101K Pa
+            (0.01, 'relative%', '', 'relative', ''),  # 1 p/p0 -> 101K Pa
+        ]
+    )
+    def test_convert_pressure(self, value, m_f, u_f, m_t, u_t):
+
+        result = converter_mode.c_pressure(
+            1,
+            mode_from=m_f,
+            unit_from=u_f,
+            mode_to=m_t,
+            unit_to=u_t,
+            adsorbate=pygaps.Adsorbate.find('N2'),
+            temp=77.344
+        )
+
+        assert result == pytest.approx(value, rel=1e-3)
+
     @pytest.mark.parametrize(
         'value, b_f, u_f, b_t, u_t, b_a, u_a',
         [
@@ -35,7 +151,7 @@ class TestConversions():
             (10, 'percent', None, 'mass', 'mg', 'mass', 'g'),  # 1 percent -> 10 mg/g
         ]
     )
-    def test_convert_loading(self, value, b_f, u_f, b_t, u_t, b_a, u_a, use_adsorbate):
+    def test_convert_loading(self, value, b_f, u_f, b_t, u_t, b_a, u_a):
         result = converter_mode.c_loading(
             1,
             basis_from=b_f,
@@ -75,32 +191,6 @@ class TestConversions():
             unit_from=u_f,
             unit_to=u_t,
             material=pygaps.Material.find('TEST')
-        )
-
-        assert result == pytest.approx(value, rel=1e-3)
-
-    @pytest.mark.parametrize(
-        'value, m_f, u_f, m_t, u_t',
-        [
-            (1, 'absolute', 'bar', 'absolute', 'bar'),  # 1 bar -> 1 bar
-            (100000, 'absolute', 'bar', 'absolute', 'Pa'),  # 1 bar -> 1E5 Pa
-            (0.9869, 'absolute', 'bar', 'absolute', 'atm'),  # 1 bar -> 0.98 atm
-            (1, 'relative', 'bar', 'relative', 'Pa'),  # 1 p/p0 (N2, 77K) -> 1 p/p0 (N2, 77K)
-            (0.9882, 'absolute', 'bar', 'relative', 'bar'),  # 1 bar -> ~0.98 p/p0 (N2, 77K)
-            (101193.756, 'relative', None, 'absolute', 'Pa'),  # 1 p/p0 -> 101K Pa
-            (101193.756, 'relative', 'Pa', 'absolute', 'Pa'),  # 1 p/p0 -> 101K Pa
-        ]
-    )
-    def test_convert_pressure(self, value, m_f, u_f, m_t, u_t):
-
-        result = converter_mode.c_pressure(
-            1,
-            mode_from=m_f,
-            unit_from=u_f,
-            mode_to=m_t,
-            unit_to=u_t,
-            adsorbate=pygaps.Adsorbate.find('N2'),
-            temp=77.344
         )
 
         assert result == pytest.approx(value, rel=1e-3)

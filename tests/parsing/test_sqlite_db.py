@@ -10,9 +10,9 @@ from pygaps.utilities.sqlite_db_creator import db_execute_general
 
 
 @pytest.fixture(scope='session')
-def db_file(tmpdir_factory):
+def db_file(tmp_path_factory):
     """Generate the database in a temporary folder."""
-    pth = tmpdir_factory.mktemp('database').join('test.db')
+    pth = tmp_path_factory.mktemp('database') / 'test.db'
     db_create(pth)
     return pth
 
@@ -28,11 +28,7 @@ class TestDatabase():
 
     def test_adsorbate_type(self, db_file, adsorbate_data):
         """Test functions related to adsorbate type table then inserts required data."""
-        test_dict = {
-            "type": "prop",
-            "unit": "test unit",
-            "description": "Test"
-        }
+        test_dict = {"type": "prop", "unit": "test unit", "description": "Test"}
 
         # Upload test
         pgsql.adsorbate_property_type_to_db(test_dict, db_path=db_file)
@@ -42,20 +38,14 @@ class TestDatabase():
             pgsql.adsorbate_property_type_to_db(test_dict, db_path=db_file)
 
         # Get test
-        assert test_dict in pgsql.adsorbate_property_types_from_db(
-            db_path=db_file
-        )
+        assert test_dict in pgsql.adsorbate_property_types_from_db(db_path=db_file)
 
         # Delete test
-        pgsql.adsorbate_property_type_delete_db(
-            test_dict["type"], db_path=db_file
-        )
+        pgsql.adsorbate_property_type_delete_db(test_dict["type"], db_path=db_file)
 
         # Delete fail test
         with pytest.raises(ParsingError):
-            pgsql.adsorbate_property_type_delete_db(
-                test_dict["type"], db_path=db_file
-            )
+            pgsql.adsorbate_property_type_delete_db(test_dict["type"], db_path=db_file)
 
     def test_adsorbates(self, db_file, adsorbate_data, basic_adsorbate):
         """Test functions related to adsorbate table, then inserts a test adsorbate."""
@@ -98,11 +88,7 @@ class TestDatabase():
     def test_material_type(self, db_file, material_data):
         """Test functions related to material type table then inserts required data."""
 
-        test_dict = {
-            "type": "prop",
-            "unit": "test unit",
-            "description": "Test"
-        }
+        test_dict = {"type": "prop", "unit": "test unit", "description": "Test"}
 
         # Upload test
         pgsql.material_property_type_to_db(test_dict, db_path=db_file)
@@ -112,28 +98,18 @@ class TestDatabase():
             pgsql.material_property_type_to_db(test_dict, db_path=db_file)
 
         # Get test
-        assert test_dict in pgsql.material_property_types_from_db(
-            db_path=db_file
-        )
+        assert test_dict in pgsql.material_property_types_from_db(db_path=db_file)
 
         # Delete test
-        pgsql.material_property_type_delete_db(
-            test_dict['type'], db_path=db_file
-        )
+        pgsql.material_property_type_delete_db(test_dict['type'], db_path=db_file)
 
         # Delete fail test
         with pytest.raises(ParsingError):
-            pgsql.material_property_type_delete_db(
-                test_dict["type"], db_path=db_file
-            )
+            pgsql.material_property_type_delete_db(test_dict["type"], db_path=db_file)
 
         # Property type upload
         for prop in material_data:
-            pgsql.material_property_type_to_db({
-                'type': prop,
-                'unit': "test unit"
-            },
-                                               db_path=db_file)
+            pgsql.material_property_type_to_db({'type': prop, 'unit': "test unit"}, db_path=db_file)
 
     def test_material(self, db_file, material_data, basic_material):
         """Test functions related to materials table, then inserts a test material."""
@@ -158,8 +134,7 @@ class TestDatabase():
             mat for mat in pgsql.materials_from_db(db_path=db_file)
             if mat.name == basic_material.name
         )
-        assert got_material.properties['comment'] == basic_material.properties[
-            'comment']
+        assert got_material.properties['comment'] == basic_material.properties['comment']
 
         # Delete test
         pgsql.material_delete_db(basic_material, db_path=db_file)
@@ -216,9 +191,7 @@ class TestDatabase():
         with pytest.raises(ParsingError):
             pgsql.isotherm_delete_db(basic_isotherm, db_path=db_file)
 
-    def test_isotherm_autoinsert(
-        self, db_file, basic_isotherm, basic_adsorbate, basic_material
-    ):
+    def test_isotherm_autoinsert(self, db_file, basic_isotherm, basic_adsorbate, basic_material):
         """Test the autoupload functionality."""
 
         pgsql.material_delete_db(basic_material, db_path=db_file)
@@ -227,20 +200,14 @@ class TestDatabase():
             pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
         if basic_material in pygaps.MATERIAL_LIST:
             pygaps.MATERIAL_LIST.remove(basic_material)
-        basic_isotherm.to_db(
-            db_path=db_file,
-            autoinsert_material=True,
-            autoinsert_adsorbate=True
-        )
+        basic_isotherm.to_db(db_path=db_file, autoinsert_material=True, autoinsert_adsorbate=True)
         pgsql.isotherm_delete_db(basic_isotherm, db_path=db_file)
         pgsql.material_delete_db(basic_material, db_path=db_file)
         pgsql.adsorbate_delete_db(basic_adsorbate, db_path=db_file)
         pgsql.material_to_db(basic_material, db_path=db_file)
         pgsql.adsorbate_to_db(basic_adsorbate, db_path=db_file)
 
-    def test_pointisotherm(
-        self, db_file, isotherm_parameters, basic_pointisotherm
-    ):
+    def test_pointisotherm(self, db_file, isotherm_parameters, basic_pointisotherm):
         """Test functions related to isotherms table, then inserts a test isotherm."""
 
         # Upload test
@@ -263,9 +230,7 @@ class TestDatabase():
         # Convenience function test
         basic_pointisotherm.to_db(db_file)
 
-    def test_modelisotherm(
-        self, db_file, isotherm_parameters, basic_modelisotherm
-    ):
+    def test_modelisotherm(self, db_file, isotherm_parameters, basic_modelisotherm):
         """Test functions related to isotherms table, then inserts a test isotherm."""
 
         # Upload test

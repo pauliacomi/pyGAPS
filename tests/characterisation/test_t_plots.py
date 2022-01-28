@@ -27,7 +27,7 @@ from .conftest import DATA_N77_PATH
 @pytest.mark.characterisation
 class TestTPlot():
     """Tests t-plot calculations."""
-    def test_t_plot_checks(self, basic_pointisotherm):
+    def test_t_plot_checks(self, use_adsorbate, basic_pointisotherm):
         """Checks for built-in safeguards."""
 
         # Will raise a "no suitable model exception"

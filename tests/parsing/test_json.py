@@ -34,9 +34,9 @@ class TestJson():
         new_isotherm = pgpj.isotherm_from_json(test_isotherm_json)
         assert basic_modelisotherm.to_dict() == new_isotherm.to_dict()
 
-    def test_json_isotherm_file(self, basic_pointisotherm, tmpdir_factory):
+    def test_json_isotherm_file(self, basic_pointisotherm, tmp_path_factory):
         """Test the parsing of an isotherm to a json file."""
-        path = tmpdir_factory.mktemp('json').join('pointisotherm.json').strpath
+        path = tmp_path_factory.mktemp('json') / 'pointisotherm.json'
         pgpj.isotherm_to_json(basic_pointisotherm, path)
         isotherm = pgpj.isotherm_from_json(path)
         assert isotherm == basic_pointisotherm

@@ -34,36 +34,36 @@ class TestCSV():
         text = "material,test\nadsorbate,test\ntemperature,303\nnew,[1 2 3]"
         assert isotherm_from_csv(text).properties['new'] == [1, 2, 3]
 
-    def test_csv_isotherm(self, basic_isotherm, tmpdir_factory):
+    def test_csv_isotherm(self, basic_isotherm, tmp_path_factory):
         """Test creation of the Isotherm CSV."""
-        path = tmpdir_factory.mktemp('csv').join('baseisotherm.csv').strpath
+        path = tmp_path_factory.mktemp('csv') / 'baseisotherm.csv'
         isotherm_to_csv(basic_isotherm, path)
         isotherm = isotherm_from_csv(path)
         assert isotherm == basic_isotherm
 
-    def test_csv_iso_material(self, basic_isotherm, basic_material, tmpdir_factory):
+    def test_csv_iso_material(self, basic_isotherm, basic_material, tmp_path_factory):
         """Test the parsing of an isotherm that has a special material to json."""
-        path = tmpdir_factory.mktemp('csv').join('isotherm_mat.csv').strpath
+        path = tmp_path_factory.mktemp('csv') / 'isotherm_mat.csv'
         basic_isotherm.material = basic_material
         isotherm_to_csv(basic_isotherm, path)
         isotherm = isotherm_from_csv(path)
         assert isotherm == basic_isotherm
 
-    def test_csv_pointisotherm(self, basic_pointisotherm, tmpdir_factory):
+    def test_csv_pointisotherm(self, basic_pointisotherm, tmp_path_factory):
         """Test creation of the PointIsotherm CSV."""
-        path = tmpdir_factory.mktemp('csv').join('pointisotherm.csv').strpath
+        path = tmp_path_factory.mktemp('csv') / 'pointisotherm.csv'
         isotherm_to_csv(basic_pointisotherm, path)
         isotherm = isotherm_from_csv(path)
         assert isotherm == basic_pointisotherm
 
-    def test_csv_modelisotherm(self, basic_modelisotherm, tmpdir_factory):
+    def test_csv_modelisotherm(self, basic_modelisotherm, tmp_path_factory):
         """Test creation of the ModelIsotherm CSV."""
-        path = tmpdir_factory.mktemp('csv').join('modelisotherm.csv').strpath
+        path = tmp_path_factory.mktemp('csv') / 'modelisotherm.csv'
         isotherm_to_csv(basic_modelisotherm, path)
         isotherm = isotherm_from_csv(path)
         assert isotherm.to_dict() == basic_modelisotherm.to_dict()
 
-    def test_csv_isotherm_self(self, basic_isotherm, tmpdir_factory):
+    def test_csv_isotherm_self(self, basic_isotherm, tmp_path_factory):
         """Test creation of class 'to_csv' function."""
         isotherm_json_std = isotherm_to_csv(basic_isotherm)
         new_isotherm_cls = basic_isotherm.to_csv()
