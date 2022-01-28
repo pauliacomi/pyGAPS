@@ -74,6 +74,13 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
     """
     iso_dict = isotherm.to_dict()
 
+    # Parse material
+    material = iso_dict['material']
+    if isinstance(material, dict):
+        iso_dict['material'] = material.pop('name')
+        iso_dict.update({f"sample_{key}": val for key, val in material.items()})
+
+    # Start writing AIF
     aif = cif.Document()
 
     # initialize aif block
@@ -297,7 +304,21 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
     # temperature units
     raw_dict['temperature_unit'] = block.find_value('_units_temperature').strip("'")
 
+    # check if material needs parsing
+    material = {}
+    for key, val in raw_dict.items():
+        if key.startswith("sample_"):
+            material[key.replace("sample_", "")] = val
+    if material:
+        for key in material.keys():
+            raw_dict.pop("sample_" + key)
+        material['name'] = raw_dict['material']
+        raw_dict['material'] = material
+
     # generate the isotherm
     return PointIsotherm(
-        isotherm_data=ads_branch, pressure_key='pressure', loading_key='loading', **raw_dict
+        isotherm_data=ads_branch,
+        pressure_key='pressure',
+        loading_key='loading',
+        **raw_dict,
     )

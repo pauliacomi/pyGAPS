@@ -105,7 +105,7 @@ class Material():
         # Skip search if already material
         if isinstance(name, Material):
             return name
-        elif not isinstance(name, str):
+        if not isinstance(name, str):
             raise ParameterError("Pass a string as an material name.")
 
         # Checks to see if material exists in master list

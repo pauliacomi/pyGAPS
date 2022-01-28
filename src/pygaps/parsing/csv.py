@@ -23,7 +23,7 @@ from pygaps.utilities.string_utilities import _is_float
 from pygaps.utilities.string_utilities import _is_list
 from pygaps.utilities.string_utilities import _to_string
 
-_parser_version = "2.0"
+_parser_version = "3.0"
 
 
 def isotherm_to_csv(isotherm, path=None, separator=','):
@@ -53,6 +53,12 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
     iso_dict = isotherm.to_dict()
     iso_dict['file_version'] = _parser_version  # version
 
+    # Parse material
+    material = iso_dict['material']
+    if isinstance(material, dict):
+        iso_dict['material'] = material.pop('name')
+        iso_dict.update({f"_material_{key}": val for key, val in material.items()})
+
     output.writelines([x + separator + _to_string(y) + '\n' for (x, y) in iso_dict.items()])
 
     if isinstance(isotherm, PointIsotherm):
@@ -81,7 +87,7 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
         ])
 
     if path:
-        with open(path, mode='w', newline='\n') as file:
+        with open(path, mode='w', newline='\n', encoding='utf-8') as file:
             file.write(output.getvalue())
     else:
         return output.getvalue()
@@ -108,16 +114,16 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
 
     """
     try:
-        with open(str_or_path) as f:
+        with open(str_or_path, encoding='utf-8') as f:
             raw_csv = StringIO(f.read())
     except OSError:
         try:
             raw_csv = StringIO(str_or_path)
-        except Exception:
+        except Exception as e:
             raise ParsingError(
                 "Could not parse CSV isotherm. "
                 "The `str_or_path` is invalid or does not exist. "
-            )
+            ) from e
 
     line = raw_csv.readline().rstrip()
     raw_dict = {}
@@ -142,11 +148,11 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
 
             raw_dict[key] = val
             line = raw_csv.readline().rstrip()
-    except Exception:
+    except Exception as e:
         raise ParsingError(
             "Could not parse CSV isotherm. "
             "The format may be wrong, check for errors."
-        )
+        ) from e
 
     # version check
     version = raw_dict.pop("file_version", None)
@@ -155,6 +161,17 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."
         )
+
+    # check if material needs parsing
+    material = {}
+    for key, val in raw_dict.items():
+        if key.startswith("_material_"):
+            material[key.replace("_material_", "")] = val
+    if material:
+        for key in material.keys():
+            raw_dict.pop("_material_" + key)
+        material['name'] = raw_dict['material']
+        raw_dict['material'] = material
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)

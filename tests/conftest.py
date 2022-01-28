@@ -85,7 +85,6 @@ def basic_pointisotherm(isotherm_data, isotherm_parameters):
         isotherm_data=isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
-        other_keys=[OTHER_KEY],
         **isotherm_parameters
     )
 
@@ -115,9 +114,9 @@ def material_data():
         'type': 'MOF',
         'form': 'powder',
         'comment': 'test comment',
-        'density': 2,  # g/cm3
-        'poresize': 14,
-        'molar_mass': 10,  # g/mol
+        'density': 2.0,  # g/cm3
+        'poresize': 14.0,
+        'molar_mass': 10.0,  # g/mol
     }
 
 

@@ -224,6 +224,14 @@ class BaseIsotherm():
 
     @material.setter
     def material(self, value):
+        if isinstance(value, dict):
+            name = value.pop('name', None)
+            try:
+                self._material = Material.find(name)
+                self._material.properties.update(**value)
+            except ParameterError:
+                self._material = Material(name, **value)
+            return
         try:
             self._material = Material.find(value)
         except ParameterError:
@@ -308,7 +316,11 @@ class BaseIsotherm():
 
         # These line are here to ensure that material/adsorbate are copied as a string
         parameter_dict['adsorbate'] = str(parameter_dict.pop('_adsorbate'))
-        parameter_dict['material'] = str(parameter_dict.pop('_material'))
+        material = parameter_dict.pop('_material')
+        if material.properties:
+            parameter_dict['material'] = material.to_dict()
+        else:
+            parameter_dict['material'] = str(material)
         parameter_dict['temperature'] = parameter_dict.pop('_temperature')
 
         # Remove reserved parameters

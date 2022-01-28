@@ -14,6 +14,7 @@ import pandas
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.core.material import Material
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.converter_mode import _MASS_UNITS
 from pygaps.utilities.converter_mode import _MOLAR_UNITS
@@ -21,7 +22,7 @@ from pygaps.utilities.converter_mode import _PRESSURE_UNITS
 from pygaps.utilities.converter_mode import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
 
-_parser_version = "2.0"
+_parser_version = "3.0"
 
 
 def isotherm_to_json(isotherm, path=None, **args_to_json):
@@ -77,7 +78,7 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
     args_to_json['sort_keys'] = True  # we will sort always
 
     if path:
-        with open(path, mode='w') as file:
+        with open(path, mode='w', encoding='utf-8') as file:
             json.dump(iso_dict, file, **args_to_json)
     else:
         return json.dumps(iso_dict, **args_to_json)
@@ -117,7 +118,7 @@ def isotherm_from_json(
     """
     # Parse isotherm in dictionary
     try:
-        with open(str_or_path) as f:
+        with open(str_or_path, encoding='utf-8') as f:
             raw_dict = json.load(f)
     except OSError:
         try:
@@ -136,19 +137,17 @@ def isotherm_from_json(
             "Strange things might happen, so double check your data."
         )
 
+    # Parse material
+    if 'material' in isotherm_parameters:
+        material = isotherm_parameters['material']
+        if isinstance(material, dict):
+            isotherm_parameters['material'] = Material(material)
+
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)
 
     data = raw_dict.pop("isotherm_data", None)
     model = raw_dict.pop("isotherm_model", None)
-
-    # TODO deprecation
-    if "adsorbent_basis" in raw_dict:
-        raw_dict['material_basis'] = raw_dict.pop("adsorbent_basis")
-        warnings.warn("adsorbent_basis was replaced with material_basis", DeprecationWarning)
-    if "adsorbent_unit" in raw_dict:
-        raw_dict['material_unit'] = raw_dict.pop("adsorbent_unit")
-        warnings.warn("adsorbent_unit was replaced with material_unit", DeprecationWarning)
 
     if data:
         # rename keys and get units if needed depending on format

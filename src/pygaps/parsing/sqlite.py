@@ -862,6 +862,11 @@ def isotherm_to_db(
         param: iso_dict.pop(param, None)
         for param in BaseIsotherm._required_params
     })
+    
+    # Ensure material is correct
+    material = upload_dict['material']
+    if isinstance(material, dict):
+        upload_dict['material'] = material['name']
 
     # Upload isotherm info to database
     db_columns = ["id", "iso_type"] + BaseIsotherm._required_params

@@ -19,7 +19,7 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
 
-_parser_version = "2.0"
+_parser_version = "3.0"
 
 _META_DICT = {
     'material': {
@@ -104,6 +104,12 @@ def isotherm_to_xl(isotherm, path):
     iso_dict = isotherm.to_dict()
     iso_dict['file_version'] = _parser_version  # version
 
+    # Parse material
+    material = iso_dict['material']
+    if isinstance(material, dict):
+        iso_dict['material'] = material.pop('name')
+        iso_dict.update({f"_material_{key}": val for key, val in material.items()})
+
     # Add the required named properties
     prop_style = xlwt.easyxf('align: horiz left; pattern: pattern solid, fore_colour grey25;')
     for field in _META_DICT.values():
@@ -119,6 +125,10 @@ def isotherm_to_xl(isotherm, path):
     col_width = 256 * 25  # 25 characters wide (-ish)
     sht.col(type_col).width = col_width
     sht.col(type_col + 1).width = col_width
+
+    if isinstance(isotherm, BaseIsotherm):
+        # Write the type
+        sht.write(type_row, type_col + 1, 'metadata', prop_style)
 
     if isinstance(isotherm, PointIsotherm):
 
@@ -194,10 +204,7 @@ def isotherm_from_xl(path, *isotherm_parameters):
     # isotherm type (point/model)
     isotype = 0
 
-    raw_dict = {
-        'pressure_key': 'pressure',
-        'loading_key': 'loading',
-    }
+    raw_dict = {}
 
     # Get excel workbook and sheet
     wb = xlrd.open_workbook(path)
@@ -292,6 +299,7 @@ def isotherm_from_xl(path, *isotherm_parameters):
             row_index += 1
 
     # Put data in order
+    # version check
     version = raw_dict.pop("file_version", None)
     if not version or float(version) < float(_parser_version):
         warnings.warn(
@@ -299,8 +307,18 @@ def isotherm_from_xl(path, *isotherm_parameters):
             "Strange things might happen, so double check your data."
         )
     raw_dict.pop('isotherm_data')  # remove useless field
-    # version check
     raw_dict.pop('iso_id', None)  # make sure id is not passed
+
+    # check if material needs parsing
+    material = {}
+    for key, val in raw_dict.items():
+        if key.startswith("_material_"):
+            material[key.replace("_material_", "")] = val
+    if material:
+        for key in material.keys():
+            raw_dict.pop("_material_" + key)
+        material['name'] = raw_dict['material']
+        raw_dict['material'] = material
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)

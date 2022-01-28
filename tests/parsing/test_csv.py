@@ -36,21 +36,29 @@ class TestCSV():
 
     def test_csv_isotherm(self, basic_isotherm, tmpdir_factory):
         """Test creation of the Isotherm CSV."""
-        path = tmpdir_factory.mktemp('csv').join('isotherm.csv').strpath
+        path = tmpdir_factory.mktemp('csv').join('baseisotherm.csv').strpath
+        isotherm_to_csv(basic_isotherm, path)
+        isotherm = isotherm_from_csv(path)
+        assert isotherm == basic_isotherm
+
+    def test_csv_iso_material(self, basic_isotherm, basic_material, tmpdir_factory):
+        """Test the parsing of an isotherm that has a special material to json."""
+        path = tmpdir_factory.mktemp('csv').join('isotherm_mat.csv').strpath
+        basic_isotherm.material = basic_material
         isotherm_to_csv(basic_isotherm, path)
         isotherm = isotherm_from_csv(path)
         assert isotherm == basic_isotherm
 
     def test_csv_pointisotherm(self, basic_pointisotherm, tmpdir_factory):
         """Test creation of the PointIsotherm CSV."""
-        path = tmpdir_factory.mktemp('csv').join('isotherm.csv').strpath
+        path = tmpdir_factory.mktemp('csv').join('pointisotherm.csv').strpath
         isotherm_to_csv(basic_pointisotherm, path)
         isotherm = isotherm_from_csv(path)
         assert isotherm == basic_pointisotherm
 
     def test_csv_modelisotherm(self, basic_modelisotherm, tmpdir_factory):
         """Test creation of the ModelIsotherm CSV."""
-        path = tmpdir_factory.mktemp('csv').join('isotherm.csv').strpath
+        path = tmpdir_factory.mktemp('csv').join('modelisotherm.csv').strpath
         isotherm_to_csv(basic_modelisotherm, path)
         isotherm = isotherm_from_csv(path)
         assert isotherm.to_dict() == basic_modelisotherm.to_dict()
