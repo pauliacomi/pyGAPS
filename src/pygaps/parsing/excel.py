@@ -126,10 +126,6 @@ def isotherm_to_xl(isotherm, path):
     sht.col(type_col).width = col_width
     sht.col(type_col + 1).width = col_width
 
-    if isinstance(isotherm, BaseIsotherm):
-        # Write the type
-        sht.write(type_row, type_col + 1, 'metadata', prop_style)
-
     if isinstance(isotherm, PointIsotherm):
 
         # Write the type
@@ -148,7 +144,7 @@ def isotherm_to_xl(isotherm, path):
             for row_index, datapoint in enumerate(data[heading]):
                 sht.write(data_row + row_index + 1, col_index, datapoint)
 
-    if isinstance(isotherm, ModelIsotherm):
+    elif isinstance(isotherm, ModelIsotherm):
 
         # Write the type
         sht.write(type_row, type_col + 1, 'model', prop_style)
@@ -170,6 +166,10 @@ def isotherm_to_xl(isotherm, path):
         for row_index, param in enumerate(isotherm.model.params):
             sht.write(model_row + row_index + 1, 0, param)
             sht.write(model_row + row_index + 1, 1, isotherm.model.params[param])
+
+    elif isinstance(isotherm, BaseIsotherm):
+        # Write the type
+        sht.write(type_row, type_col + 1, 'metadata', prop_style)
 
     # Now add the other keys
     sht = wb.add_sheet('otherdata')
