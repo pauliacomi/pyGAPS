@@ -41,8 +41,7 @@ class TestMaterial():
 
     def test_material_get_properties(self, material_data, basic_material):
         """Check if properties of a material can be located."""
-        assert basic_material.get_prop('comment'
-                                       ) == material_data.get('comment')
+        assert basic_material.get_prop('comment') == material_data.get('comment')
 
         prop = basic_material.properties.pop('comment')
         with pytest.raises(pgEx.ParameterError):
@@ -61,4 +60,6 @@ class TestMaterial():
 
     def test_material_print(self, basic_material):
         """Checks the printing can be done."""
+        repr(basic_material)
         print(basic_material)
+        basic_material.print_info()

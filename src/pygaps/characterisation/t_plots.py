@@ -1,13 +1,11 @@
 """This module contains the t-plot calculation."""
 
-import logging
 import typing as t
-
-logger = logging.getLogger('pygaps')
-import warnings
 
 import numpy
 from scipy import stats
+
+from pygaps import logger
 
 from ..core.adsorbate import Adsorbate
 from ..utilities.exceptions import CalculationError
@@ -269,7 +267,7 @@ def t_plot_raw(
         if result:
             results.append(result)
         else:
-            warnings.warn("Could not fit a linear regression.")
+            logger.warning("Could not fit a linear regression.")
 
     # If not, attempt to find limits manually
     else:
@@ -290,7 +288,7 @@ def t_plot_raw(
                 results.append(result)
 
         if not results:
-            warnings.warn("Could not determine linear regions, attempt a manual limit.")
+            logger.warning("Could not determine linear regions, attempt a manual limit.")
 
     return results, thickness_curve
 

@@ -1,13 +1,11 @@
 """Module calculating IAST, given the pure-component adsorption isotherm model."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
 import textwrap
-import warnings
 
 import numpy
 from scipy import optimize
+
+from pygaps import logger
 
 from ..core.modelisotherm import ModelIsotherm
 from ..graphing.iast_graphs import plot_iast_svp
@@ -49,7 +47,7 @@ def iast_binary_vle(
         Starting guesses for adsorbed phase mole fractions that
         `iast` solves for.
     warningoff: bool, optional
-        When False, warnings will print when the IAST
+        When False, logger.warning will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data.
     verbose : bool, optional
@@ -137,7 +135,7 @@ def iast_binary_svp(
     pressures : list
         Pressure values at which the selectivity should be calculated.
     warningoff: bool, optional
-        When False, warnings will print when the IAST
+        When False, logger.warning will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data.
     adsorbed_mole_fraction_guess : array or list, optional
@@ -233,7 +231,7 @@ def iast_point_fraction(
     verbose : bool, optional
         Print off a lot of information.
     warningoff: bool, optional
-        When False, warnings will print when the IAST
+        When False, logger.warning will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data.
     adsorbed_mole_fraction_guess : array or list, optional
@@ -285,7 +283,7 @@ def iast_point(
     verbose : bool, optional
         Print off a lot of information.
     warningoff: bool, optional
-        When False, warnings will print when the IAST
+        When False, logger.warning will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data.
     adsorbed_mole_fraction_guess : array or list, optional
@@ -432,7 +430,7 @@ def iast_point(
     if not warningoff:
         for i in range(n_components):
             if pressure0[i] > isotherms[i].pressure(branch='ads').max():
-                warnings.warn(
+                logger.warning(
                     textwrap.dedent(
                         f"""
                         WARNING:
@@ -476,7 +474,7 @@ def reverse_iast(
     verbose : bool
         Print extra information.
     warningoff : bool
-        When False, warnings will print when the IAST
+        When False, logger.warning will print when the IAST
         calculation result required extrapolation of the pure-component
         adsorption isotherm beyond the highest pressure in the data.
     gas_mole_fraction_guess : array or list
@@ -630,7 +628,7 @@ def reverse_iast(
     if not warningoff:
         for i in range(n_components):
             if pressure0[i] > isotherms[i].pressure(branch='ads').max():
-                warnings.warn(
+                logger.warning(
                     textwrap.dedent(
                         f"""
                         WARNING:

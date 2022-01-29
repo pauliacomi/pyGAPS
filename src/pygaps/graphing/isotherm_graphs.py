@@ -1,24 +1,24 @@
 """Functions for plotting and comparing isotherms."""
 
 import math
-import warnings
 from collections import abc
 from itertools import cycle
 
-from cycler import cycler
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from cycler import cycler
 
-from .mpl_styles import BASE_STYLE
-from .mpl_styles import ISO_STYLE
-from .mpl_styles import ISO_MARKERS
-from .mpl_styles import Y1_COLORS
-from .mpl_styles import Y2_COLORS
+from pygaps import logger
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
 from .labels import label_axis_title
 from .labels import label_lgd
+from .mpl_styles import BASE_STYLE
+from .mpl_styles import ISO_MARKERS
+from .mpl_styles import ISO_STYLE
+from .mpl_styles import Y1_COLORS
+from .mpl_styles import Y2_COLORS
 
 # list of branch types
 _BRANCH_TYPES = {
@@ -177,7 +177,7 @@ def plot_iso(
         if all(y2_data not in _get_keys(isotherm) for isotherm in isotherms):
             raise GraphingError(f"None of the isotherms supplied have {y2_data} data")
         if any(y2_data not in _get_keys(isotherm) for isotherm in isotherms):
-            warnings.warn(f"Some isotherms do not have {y2_data} data")
+            logger.warning(f"Some isotherms do not have {y2_data} data")
 
     # Store which branches will be displayed
     if not branch:

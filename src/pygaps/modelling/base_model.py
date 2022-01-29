@@ -1,12 +1,11 @@
 """Base class for all isotherm models."""
 
 import abc
-import logging
-
-logger = logging.getLogger('pygaps')
 
 import numpy
 from scipy import optimize
+
+from pygaps import logger
 
 from ..utilities.exceptions import CalculationError
 

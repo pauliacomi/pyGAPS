@@ -1,16 +1,14 @@
 """Class representing a model of and isotherm."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-
 import numpy
 import pandas
 
+from pygaps import logger
+
 from ..modelling import _GUESS_MODELS
+from ..modelling import get_isotherm_model
 from ..modelling import is_model
 from ..modelling import is_model_class
-from ..modelling import get_isotherm_model
 from ..utilities.converter_mode import c_loading
 from ..utilities.converter_mode import c_material
 from ..utilities.converter_mode import c_pressure
@@ -242,8 +240,9 @@ class ModelIsotherm(BaseIsotherm):
                 ax = self.plot(y1_line_style=dict(markersize=0), y1_points=loading)
             else:
                 ax = self.plot(y1_line_style=dict(markersize=0), x_points=pressure)
-            from pygaps.graphing.mpl_styles import BASE_STYLE
             import matplotlib as mpl
+
+            from pygaps.graphing.mpl_styles import BASE_STYLE
             with mpl.rc_context(BASE_STYLE):
                 ax.plot(pressure, loading, zorder=-1)
                 ax.legend([self.model.name])

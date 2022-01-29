@@ -1,8 +1,6 @@
-import logging
+from pygaps import logger
 
 from ..utilities.exceptions import ParsingError
-
-logger = logging.getLogger('pygaps')
 
 _META_DICT = {
     'material': {

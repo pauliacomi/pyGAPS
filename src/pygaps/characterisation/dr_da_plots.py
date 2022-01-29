@@ -1,20 +1,16 @@
 """Dubinin-Radushkevich equation and related plots."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-
 import numpy
 from scipy import constants
 from scipy import optimize
 from scipy import stats
 
+from pygaps import logger
+
 from ..core.adsorbate import Adsorbate
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
-
-#TODO surface area?
 
 
 def dr_plot(

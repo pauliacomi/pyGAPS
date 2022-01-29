@@ -10,11 +10,11 @@ acs.langmuir.1c00122. https://doi.org/10.1021/acs.langmuir.1c00122.
 """
 import os
 import pathlib
-import warnings
 
 import pandas
 from gemmi import cif
 
+from pygaps import logger
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.converter_mode import _MASS_UNITS
 from pygaps.utilities.converter_mode import _MOLAR_UNITS
@@ -192,7 +192,7 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
     # read version
     version = block.find_value('_audit_aif_version')
     if not version or float(version.strip("'")) < float(_parser_version):
-        warnings.warn(
+        logger.warning(
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."
         )

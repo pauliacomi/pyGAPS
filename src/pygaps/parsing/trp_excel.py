@@ -1,11 +1,10 @@
 """Parse 3P xls output files."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
 from datetime import datetime
 
 import openpyxl
+
+from pygaps import logger
 
 _META_DICT = {
     'material': {

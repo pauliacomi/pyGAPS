@@ -4,14 +4,13 @@
 @modified Paul Iacomi
 """
 
-import logging
-
-logger = logging.getLogger('pygaps')
 import re
 from itertools import product
 
 import dateutil.parser
 import xlrd
+
+from pygaps import logger
 
 from ..utilities.exceptions import ParsingError
 

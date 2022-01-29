@@ -13,7 +13,6 @@ except:
 
 import sys
 import logging
-import warnings
 
 logger = logging.getLogger('pygaps')
 logger.setLevel(logging.DEBUG)
@@ -32,9 +31,7 @@ if sys.version_info[0] != 3:
 
 # Let users know if they're missing any hard dependencies
 hard_dependencies = ("numpy", "pandas", "scipy")
-soft_dependencies = {
-    "CoolProp": "Used for many thermodynamic backend calculations."
-}
+soft_dependencies = {"CoolProp": "Used for many thermodynamic backend calculations."}
 missing_dependencies = []
 
 import importlib
@@ -47,9 +44,7 @@ if missing_dependencies:
 
 for dependency in soft_dependencies:
     if not importlib.util.find_spec(dependency):
-        warnings.warn(
-            f"Missing important package {dependency}. {soft_dependencies[dependency]}"
-        )
+        logging.warning(f"Missing important package {dependency}. {soft_dependencies[dependency]}")
 
 del hard_dependencies, soft_dependencies, dependency, missing_dependencies
 

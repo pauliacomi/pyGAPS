@@ -1,10 +1,8 @@
 """Module calculating the initial henry constant."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-
 import numpy
+
+from pygaps import logger
 
 from ..core.modelisotherm import ModelIsotherm
 from ..modelling import get_isotherm_model

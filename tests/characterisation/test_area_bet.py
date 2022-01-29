@@ -11,6 +11,7 @@ Functions are tested against pre-calculated values on real isotherms.
 All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
+import logging
 
 import pytest
 from matplotlib.testing.decorators import cleanup
@@ -91,15 +92,16 @@ class TestAreaBET():
 
         assert isclose(area, sample['bet_area_s'], err_relative, err_absolute)
 
-    def test_area_BET_branch(self):
+    def test_area_BET_branch(self, caplog):
         """Test branch to use."""
 
         sample = DATA['SiO2']
         filepath = DATA_N77_PATH / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
-        with pytest.warns(Warning):  # warns about the monolayer value
+        with caplog.at_level(logging.WARNING):  # warns about the monolayer value
             area = ab.area_BET(isotherm, branch="des").get("area")
+        assert caplog.records
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2

@@ -1,12 +1,9 @@
 """Virial isotherm model."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-import warnings
-
 import numpy
 from scipy import optimize
+
+from pygaps import logger
 
 from ..graphing.calc_graphs import virial_plot
 from ..utilities.exceptions import CalculationError
@@ -80,9 +77,7 @@ class Virial(IsothermBaseModel):
         opt_res = optimize.minimize(fun, pressure, method='Nelder-Mead')
 
         if not opt_res.success:
-            raise CalculationError(
-                f"Root finding failed. Error: \n\t{opt_res.message}"
-            )
+            raise CalculationError(f"Root finding failed. Error: \n\t{opt_res.message}")
 
         return opt_res.x
 
@@ -149,9 +144,7 @@ class Virial(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k, "A": 0, "B": 0, "C": 0}
 
@@ -163,14 +156,7 @@ class Virial(IsothermBaseModel):
 
         return guess
 
-    def fit(
-        self,
-        pressure,
-        loading,
-        param_guess,
-        optimization_params=None,
-        verbose=False
-    ):
+    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -199,7 +185,7 @@ class Virial(IsothermBaseModel):
         # remove invalid values in function
         zero_values = ~numpy.logical_and(pressure > 0, loading > 0)
         if any(zero_values):
-            warnings.warn('Removed points which are equal to 0.')
+            logger.warning('Removed points which are equal to 0.')
             pressure = pressure[~zero_values]
             loading = loading[~zero_values]
 
@@ -248,8 +234,7 @@ class Virial(IsothermBaseModel):
         opt_res = optimize.least_squares(
             fit_func,
             guess,  # provide the fit function and initial guess
-            args=(loading, ln_p_over_n
-                  ),  # supply the extra arguments to the fit function
+            args=(loading, ln_p_over_n),  # supply the extra arguments to the fit function
             **kwargs
         )
         if not opt_res.success:
@@ -273,6 +258,5 @@ class Virial(IsothermBaseModel):
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
             virial_plot(
                 loading, ln_p_over_n, n_load,
-                numpy.log(numpy.divide(self.pressure(n_load), n_load)),
-                added_point
+                numpy.log(numpy.divide(self.pressure(n_load), n_load)), added_point
             )

@@ -1,14 +1,12 @@
 """This module contains Langmuir area calculations."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
 import textwrap
-import warnings
 
 import numpy
 from scipy import constants
 from scipy import stats
+
+from pygaps import logger
 
 from ..core.adsorbate import Adsorbate
 from ..utilities.exceptions import CalculationError
@@ -281,9 +279,9 @@ def area_langmuir_raw(
 
     # Checks for consistency
     if langmuir_const < 0:
-        warnings.warn("The Langmuir constant is negative.")
+        logger.warning("The Langmuir constant is negative.")
     if corr_coef < 0.99:
-        warnings.warn("The correlation is not linear.")
+        logger.warning("The correlation is not linear.")
 
     return (
         langmuir_area,

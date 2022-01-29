@@ -2,13 +2,12 @@
 This module contains the main class that describes an isotherm through discrete points.
 """
 
-import logging
-
-logger = logging.getLogger('pygaps')
 import textwrap
 
 import numpy
 import pandas
+
+from pygaps import logger
 
 from ..utilities.converter_mode import c_loading
 from ..utilities.converter_mode import c_material
@@ -428,6 +427,7 @@ class PointIsotherm(BaseIsotherm):
             return
 
         if self.loading_basis in ['percent', 'fraction']:
+            # TODO this is
             if basis_to == self.loading_basis and unit_to != self.loading_unit:
                 if verbose:
                     logger.info("There are no loading units in this mode.")

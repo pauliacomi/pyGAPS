@@ -7,12 +7,12 @@ and is used to check for any deprecations.
 """
 
 import ast
-import warnings
 
 import pandas
 import xlrd
 import xlwt
 
+from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
@@ -302,7 +302,7 @@ def isotherm_from_xl(path, *isotherm_parameters):
     # version check
     version = raw_dict.pop("file_version", None)
     if not version or float(version) < float(_parser_version):
-        warnings.warn(
+        logger.warning(
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."
         )

@@ -7,14 +7,14 @@ and is used to check for any deprecations.
 """
 
 import json
-import warnings
 
 import pandas
 
+from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.core.material import Material
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
-from pygaps.core.material import Material
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.converter_mode import _MASS_UNITS
 from pygaps.utilities.converter_mode import _MOLAR_UNITS
@@ -132,7 +132,7 @@ def isotherm_from_json(
     # version check
     version = raw_dict.pop("file_version", None)
     if not version or float(version) < float(_parser_version):
-        warnings.warn(
+        logger.warning(
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."
         )

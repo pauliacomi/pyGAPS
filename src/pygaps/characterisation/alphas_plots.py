@@ -1,18 +1,15 @@
 """This module contains the alpha-s calculation."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-import warnings
-
 import numpy
 from scipy import stats
 
+from pygaps import logger
+
 from ..core.adsorbate import Adsorbate
 from ..core.baseisotherm import BaseIsotherm
-from ..utilities.exceptions import pgError
 from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
+from ..utilities.exceptions import pgError
 from ..utilities.math_utilities import find_linear_sections
 from .area_bet import area_BET
 from .area_lang import area_langmuir
@@ -321,7 +318,7 @@ def alpha_s_raw(
         if result:
             results.append(result)
         else:
-            warnings.warn("Could not fit a linear regression.")
+            logger.warning("Could not fit a linear regression.")
     else:
         # Now we need to find the linear regions in the alpha-s for the
         # assessment of surface area.
@@ -342,7 +339,7 @@ def alpha_s_raw(
                 results.append(result)
 
         if not results:
-            warnings.warn("Could not determine linear regions, attempt a manual limit.")
+            logger.warning("Could not determine linear regions, attempt a manual limit.")
 
     return results, alpha_curve
 

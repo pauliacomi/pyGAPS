@@ -1,14 +1,12 @@
 """This module contains BET area calculations."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
 import textwrap
-import warnings
 
 import numpy
 from scipy import constants
 from scipy import stats
+
+from pygaps import logger
 
 from ..core.adsorbate import Adsorbate
 from ..utilities.exceptions import CalculationError
@@ -326,11 +324,11 @@ def area_BET_raw(
 
     # Checks for consistency
     if c_const < 0:
-        warnings.warn("The C constant is negative.")
+        logger.warning("The C constant is negative.")
     if corr_coef < 0.99:
-        warnings.warn("The correlation is not linear.")
+        logger.warning("The correlation is not linear.")
     if not (loading[0] < n_monolayer < loading[-1]):
-        warnings.warn("The monolayer point is not within the BET region")
+        logger.warning("The monolayer point is not within the BET region")
 
     return (
         bet_area,

@@ -1,8 +1,6 @@
 """Utilities for interacting with the CoolProp backend."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
+from pygaps import logger
 
 try:
     import CoolProp as CP

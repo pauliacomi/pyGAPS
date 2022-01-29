@@ -1,11 +1,9 @@
 """Flory-Huggins-VST isotherm model."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-
 import numpy
 from scipy import optimize
+
+from pygaps import logger
 
 from ..utilities.exceptions import CalculationError
 from .base_model import IsothermBaseModel
@@ -111,9 +109,7 @@ class FHVST(IsothermBaseModel):
         opt_res = optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
-            raise CalculationError(
-                f"Root finding for value {pressure} failed."
-            )
+            raise CalculationError(f"Root finding for value {pressure} failed.")
 
         return opt_res.x
 
@@ -183,9 +179,7 @@ class FHVST(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k, "a1v": 0}
 
@@ -197,14 +191,7 @@ class FHVST(IsothermBaseModel):
 
         return guess
 
-    def fit(
-        self,
-        pressure,
-        loading,
-        param_guess,
-        optimization_params=None,
-        verbose=False
-    ):
+    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -245,8 +232,7 @@ class FHVST(IsothermBaseModel):
         opt_res = optimize.least_squares(
             fit_func,
             guess,  # provide the fit function and initial guess
-            args=(pressure,
-                  loading),  # supply the extra arguments to the fit function
+            args=(pressure, loading),  # supply the extra arguments to the fit function
             **kwargs
         )
         if not opt_res.success:

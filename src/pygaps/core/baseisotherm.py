@@ -1,10 +1,6 @@
 """Contains the Isotherm base class."""
 
-import logging
-import warnings
-
-logger = logging.getLogger('pygaps')
-
+from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.material import Material
 
@@ -138,7 +134,7 @@ class BaseIsotherm():
         with simplewarning():
             for k in self._unit_params:
                 if k not in properties:
-                    warnings.warn(
+                    logger.warning(
                         f"WARNING: '{k}' was not specified , assumed as '{self._unit_params[k]}'"
                     )
                     properties[k] = self._unit_params[k]
@@ -247,11 +243,11 @@ class BaseIsotherm():
             self._adsorbate = Adsorbate.find(value)
         except ParameterError:
             self._adsorbate = Adsorbate(value)
-            warnings.warn((
+            logger.warning(
                 "Specified adsorbate is not in internal list "
                 "(or name cannot be resolved to an existing one). "
                 "CoolProp backend disabled for this gas/vapour."
-            ))
+            )
 
     @property
     def temperature(self):

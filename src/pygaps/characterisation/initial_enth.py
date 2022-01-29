@@ -1,12 +1,9 @@
 """Module calculating the initial enthalpy of adsorption."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-import warnings
-
 import numpy
 from scipy import optimize
+
+from pygaps import logger
 
 from ..core.adsorbate import Adsorbate
 from ..utilities.exceptions import CalculationError
@@ -167,7 +164,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         enth_liq = adsorbate.enthalpy_liquefaction(isotherm.temperature)
     except (ParameterError, CalculationError):
         enth_liq = 0
-        warnings.warn("Could not calculate liquid enthalpy, perhaps in supercritical regime")
+        logger.warning("Could not calculate liquid enthalpy, perhaps in supercritical regime")
 
     bounds['const_min'] = max(enth_liq, enth_avg) - 2 * enth_stdev
 
@@ -324,7 +321,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
 
     initial_enthalpy = enthalpy_approx(0)
     if abs(initial_enthalpy - enthalpy[0]) > 50:
-        warnings.warn("Probable offshoot for exponent, reverting to point method")
+        logger.warning("Probable offshoot for exponent, reverting to point method")
         initial_enthalpy = initial_enthalpy_point(
             isotherm, enthalpy_key, branch=branch, verbose=verbose
         ).get('initial_enthalpy')
@@ -334,7 +331,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         logger.info(f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}")
         logger.info(f"The constant contribution is \n\t{params['const']:.2f}")
         if params['const'] < enth_liq:
-            warnings.warn(
+            logger.warning(
                 'CARE: Base enthalpy of adsorption is lower than enthalpy of liquefaction.'
             )
         logger.info(

@@ -1,8 +1,6 @@
 """Utilities for creating various axis labels."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
+from pygaps import logger
 
 from ..utilities.string_utilities import convert_chemformula
 from ..utilities.string_utilities import convert_unit_ltx

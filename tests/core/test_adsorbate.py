@@ -5,7 +5,8 @@ import warnings
 import pytest
 
 import pygaps
-import pygaps.utilities.exceptions as pgEx
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import CalculationError
 
 
 @pytest.mark.core
@@ -13,7 +14,7 @@ class TestAdsorbate():
     """Test the adsorbate class."""
     def test_adsorbate_basic(self):
         """Basic creation tests."""
-        with pytest.raises(pgEx.ParameterError):
+        with pytest.raises(ParameterError):
             ads = pygaps.Adsorbate()
         ads = pygaps.Adsorbate('Test')
         assert ads == 'Test'
@@ -42,15 +43,19 @@ class TestAdsorbate():
 
     def test_adsorbate_retrieved_list(self, adsorbate_data, basic_adsorbate):
         """Check adsorbate can be retrieved from master list."""
+
+        found_adsorbate = pygaps.Adsorbate.find(basic_adsorbate)
+        assert basic_adsorbate == basic_adsorbate
+
         pygaps.ADSORBATE_LIST.append(basic_adsorbate)
         uploaded_adsorbate = pygaps.Adsorbate.find(adsorbate_data.get('name'))
 
         assert adsorbate_data == uploaded_adsorbate.to_dict()
 
-        with pytest.raises(pgEx.ParameterError):
+        with pytest.raises(ParameterError):
             pygaps.Adsorbate.find('noname')
 
-        with pytest.raises(pgEx.ParameterError):
+        with pytest.raises(ParameterError):
             pygaps.Adsorbate.find(2)
         pygaps.ADSORBATE_LIST.remove(basic_adsorbate)
 
@@ -58,7 +63,7 @@ class TestAdsorbate():
         assert uploaded == pygaps.Adsorbate.find('uploaded')
 
         pygaps.Adsorbate("not_uploaded", store=False)
-        with pytest.raises(pgEx.ParameterError):
+        with pytest.raises(ParameterError):
             pygaps.Adsorbate.find('not_uploaded')
 
     def test_adsorbate_find_equals(self):
@@ -68,6 +73,12 @@ class TestAdsorbate():
         assert ads == 'nitrogen'
         assert ads == 'Nitrogen'
 
+    def test_adsorbate_formula(self):
+        ads = pygaps.Adsorbate.find('N2')
+        assert ads.formula == 'N_{2}'
+        ads = pygaps.Adsorbate.find('D4')
+        assert ads.formula == 'octamethylcyclotetrasiloxane'
+
     def test_adsorbate_get_properties(self, adsorbate_data, basic_adsorbate):
         """Check if properties of a adsorbate can be located."""
 
@@ -75,9 +86,14 @@ class TestAdsorbate():
         assert basic_adsorbate.backend_name == adsorbate_data.get('backend_name')
 
         name = basic_adsorbate.properties.pop('backend_name')
-        with pytest.raises(pgEx.ParameterError):
+        with pytest.raises(ParameterError):
             name = basic_adsorbate.backend_name
         basic_adsorbate.properties['backend_name'] = name
+
+    def test_adsorbate_fallback(self):
+        ads = pygaps.Adsorbate("test")
+        ads.properties["molar_mass"] = 142
+        assert ads.molar_mass() == 142
 
     @pytest.mark.parametrize('calculated', [True, False])
     def test_adsorbate_named_props(self, adsorbate_data, basic_adsorbate, calculated):
@@ -101,26 +117,23 @@ class TestAdsorbate():
             adsorbate_data.get('enthalpy_liquefaction'), 0.001
         )
 
-    @pytest.mark.parametrize(
-        'calculated, error', [(True, pgEx.CalculationError), (False, pgEx.ParameterError)]
-    )
-    def test_adsorbate_miss_named_props(self, calculated, error):
+    def test_adsorbate_miss_named_props(self):
         temp = 77.355
-        ads = pygaps.Adsorbate(name='n', formula='C2')
+        ads = pygaps.Adsorbate(name='temp')
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            with pytest.raises(error):
-                ads.molar_mass(calculated)
-            with pytest.raises(error):
-                ads.saturation_pressure(temp, calculate=calculated)
-            with pytest.raises(error):
-                ads.surface_tension(temp, calculate=calculated)
-            with pytest.raises(error):
-                ads.liquid_density(temp, calculate=calculated)
-            with pytest.raises(error):
-                ads.gas_density(temp, calculate=calculated)
-            with pytest.raises(error):
-                ads.enthalpy_liquefaction(temp, calculate=calculated)
+            with pytest.raises(CalculationError):
+                ads.molar_mass()
+            with pytest.raises(CalculationError):
+                ads.saturation_pressure(temp)
+            with pytest.raises(CalculationError):
+                ads.surface_tension(temp)
+            with pytest.raises(CalculationError):
+                ads.liquid_density(temp)
+            with pytest.raises(CalculationError):
+                ads.gas_density(temp)
+            with pytest.raises(CalculationError):
+                ads.enthalpy_liquefaction(temp)
 
     def test_adsorbate_print(self, basic_adsorbate):
         """Check printing is possible."""

@@ -2,6 +2,7 @@
 
 import collections.abc as abc
 import pathlib
+
 import warnings
 
 from .exceptions import pgError
@@ -40,10 +41,7 @@ def deep_merge(a, b, path=None, update=True):
         path = []
     for key, val in b.items():
         if key in a:
-            if (
-                isinstance(a[key], abc.Mapping)
-                and isinstance(val, abc.Mapping)
-            ):
+            if (isinstance(a[key], abc.Mapping) and isinstance(val, abc.Mapping)):
                 deep_merge(a[key], val, path + [str(key)], update)
             elif a[key] == val:
                 pass  # same leaf value

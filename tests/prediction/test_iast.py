@@ -14,6 +14,8 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
+import logging
+
 import numpy
 import pytest
 from matplotlib.testing.decorators import cleanup
@@ -49,7 +51,7 @@ def load_iast_models(load_iast):
 @pytest.mark.prediction
 class TestIAST():
     """Test IAST calculations."""
-    def test_iast_checks(self, load_iast, load_iast_models):
+    def test_iast_checks(self, load_iast, load_iast_models, caplog):
         """Checks for built-in safeguards."""
 
         ch4, c2h6 = load_iast
@@ -68,8 +70,9 @@ class TestIAST():
             pgi.iast_point_fraction([ch4_m, c2h6], [0.6, 0.4], 1)
 
         # Warning "extrapolate outside range"
-        with pytest.warns(Warning):
+        with caplog.at_level(logging.WARNING):
             pgi.iast_point_fraction(load_iast_models, [0.5, 0.5], 100)
+        assert caplog.records
 
     def test_iast(self, load_iast):
         """Test on pre-calculated data."""
@@ -100,7 +103,7 @@ class TestIAST():
 @pytest.mark.modelling
 class TestReverseIAST():
     """Test reverse IAST calculations."""
-    def test_reverse_iast_checks(self, load_iast, load_iast_models):
+    def test_reverse_iast_checks(self, load_iast, load_iast_models, caplog):
         """Checks for built-in safeguards."""
 
         ch4, c2h6 = load_iast
@@ -123,8 +126,9 @@ class TestReverseIAST():
             pgi.reverse_iast([ch4_m, c2h6], [0.6, 0.4], 1)
 
         # Warning "extrapolate outside range"
-        with pytest.warns(Warning):
+        with caplog.at_level(logging.WARNING):
             pgi.reverse_iast(load_iast_models, [0.5, 0.5], 100)
+        assert len(caplog.records) == 1
 
     def test_reverse_iast(self, load_iast):
         """Test on pre-calculated data."""
