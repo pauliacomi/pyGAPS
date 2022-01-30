@@ -265,8 +265,11 @@ def area_BET_raw(
 
     """
     # Check lengths
+    if len(pressure) == 0:
+        raise ParameterError("Empty input values!")
     if len(pressure) != len(loading):
         raise ParameterError("The length of the pressure and loading arrays do not match.")
+
     # Ensure numpy arrays, if not already
     loading = numpy.asarray(loading)
     pressure = numpy.asarray(pressure)

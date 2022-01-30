@@ -273,9 +273,11 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     constraint that the contribution of each kernel isotherm cannot be negative.
 
     """
-    # Parameter checks
+    # Check lengths
+    if len(pressure) == 0:
+        raise ParameterError("Empty input values!")
     if len(pressure) != len(loading):
-        raise Exception("The length of the pressure and loading arrays" " do not match")
+        raise ParameterError("The length of the pressure and loading arrays do not match.")
 
     # get the interpolation kernel
     kernel = _load_kernel(kernel_path)

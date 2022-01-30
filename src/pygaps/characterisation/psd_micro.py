@@ -491,6 +491,12 @@ def psd_horvath_kawazoe(
     if missing:
         raise ParameterError(f"Adsorbate properties dictionary is missing parameters: {missing}.")
 
+    # Check lengths
+    if len(pressure) == 0:
+        raise ParameterError("Empty input values!")
+    if len(pressure) != len(loading):
+        raise ParameterError("The length of the pressure and loading arrays do not match.")
+
     # ensure numpy arrays
     pressure = numpy.asarray(pressure)
     loading = numpy.asarray(loading)

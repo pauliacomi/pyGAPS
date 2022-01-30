@@ -13,6 +13,8 @@ from ..utilities.exceptions import CalculationError
 from ..utilities.exceptions import ParameterError
 from ..utilities.exceptions import pgError
 
+# TODO: does the langmuir area require relative pressure?
+
 
 def area_langmuir(
     isotherm,
@@ -228,8 +230,12 @@ def area_langmuir_raw(
         Correlation coefficient of the straight line in the Langmuir plot.
 
     """
+    # Check lengths
+    if len(pressure) == 0:
+        raise ParameterError("Empty input values!")
     if len(pressure) != len(loading):
         raise ParameterError("The length of the pressure and loading arrays do not match.")
+
     # Ensure numpy arrays, if not already
     loading = numpy.asarray(loading)
     pressure = numpy.asarray(pressure)

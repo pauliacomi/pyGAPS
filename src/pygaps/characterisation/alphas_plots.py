@@ -290,6 +290,9 @@ def alpha_s_raw(
         The generated thickness curve at each point using the thickness model.
 
     """
+    # Check lengths
+    if len(loading) == 0:
+        raise ParameterError("Empty input values!")
     if len(loading) != len(reference_loading):
         raise ParameterError("The length of the two loading arrays do not match.")
 

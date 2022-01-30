@@ -335,8 +335,10 @@ def psd_pygapsdh(
 
     """
     # Checks
+    if len(relative_pressure) == 0:
+        raise ParameterError("Empty input values!")
     if len(volume_adsorbed) != len(relative_pressure):
-        raise ParameterError("The length of the pressure and loading arrays do not match")
+        raise ParameterError("The length of the pressure and loading arrays do not match.")
 
     # Pore geometry specifics
     if pore_geometry == 'slit':
@@ -481,9 +483,11 @@ def psd_bjh(
        and K. Sing, Academic Press, 1999
 
     """
-    # Parameter checks
+    # Checks
+    if len(relative_pressure) == 0:
+        raise ParameterError("Empty input values!")
     if len(volume_adsorbed) != len(relative_pressure):
-        raise ParameterError("The length of the pressure and loading arrays" " do not match")
+        raise ParameterError("The length of the pressure and loading arrays do not match.")
 
     if pore_geometry in ('slit', 'sphere'):
         raise ParameterError(
@@ -621,8 +625,10 @@ def psd_dollimore_heal(
 
     """
     # Checks
+    if len(relative_pressure) == 0:
+        raise ParameterError("Empty input values!")
     if len(volume_adsorbed) != len(relative_pressure):
-        raise ParameterError("The length of the pressure and loading arrays" " do not match")
+        raise ParameterError("The length of the pressure and loading arrays do not match.")
 
     if pore_geometry in ('slit', 'sphere'):
         raise ParameterError(

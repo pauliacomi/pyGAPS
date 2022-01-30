@@ -241,6 +241,9 @@ def t_plot_raw(
         The generated thickness curve at each point using the thickness model.
 
     """
+    # Check lengths
+    if len(pressure) == 0:
+        raise ParameterError("Empty input values!")
     if len(pressure) != len(loading):
         raise ParameterError("The length of the pressure and loading arrays do not match.")
 
