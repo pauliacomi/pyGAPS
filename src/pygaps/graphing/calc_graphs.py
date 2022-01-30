@@ -6,6 +6,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
+from .labels import label_units_iso
+
 from .mpl_styles import BASE_STYLE
 from .mpl_styles import LINE_ERROR
 from .mpl_styles import LINE_FIT
@@ -321,13 +323,13 @@ def tp_plot(
             result.get('slope') * min_lim + result.get('intercept'),
             result.get('slope') * max_lim + result.get('intercept')
         ]
-    with mpl.rc_context(LINE_FIT):
-        ax.plot(
-            x_lim,
-            y_lim,
-            color=f"C{index}",
-            label=f'linear {index+1}',
-        )
+        with mpl.rc_context(LINE_FIT):
+            ax.plot(
+                x_lim,
+                y_lim,
+                color=f"C{index}",
+                label=f'linear {index+1}',
+            )
 
     ax.set_title(label_title)
     ax.set_xlim(left=0)
@@ -448,6 +450,7 @@ def isosteric_enthalpy_plot(
     loading,
     isosteric_enthalpy,
     std_err,
+    isotherm,
     log=False,
     ax=None,
 ):
@@ -462,6 +465,8 @@ def isosteric_enthalpy_plot(
         The isosteric enthalpy corresponding to each loading.
     std_err : array
         Standard error for each point.
+    isotherm : array
+        An isotherm to determine graph units.
     log : int
         Whether to display a logarithmic graph.
     ax : matplotlib axes object, default None
@@ -490,7 +495,7 @@ def isosteric_enthalpy_plot(
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
-    ax.set_xlabel(r'Loading [$mmol\/g^{-1}$]')
+    ax.set_xlabel(label_units_iso(isotherm, 'loading'))
     ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]')
     ax.legend(loc='best')
     ax.tick_params(axis='both', which='major')

@@ -12,7 +12,7 @@ from pygaps import logger
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
-from .labels import label_axis_title
+from .labels import label_units_dict
 from .labels import label_lgd
 from .mpl_styles import BASE_STYLE
 from .mpl_styles import ISO_MARKERS
@@ -258,10 +258,10 @@ def plot_iso(
     pc_y2 = _cycle_compose(y2_marker_cy, y2_color_cy, cycle_compose)
 
     # Labels
-    ax1.set_xlabel(label_axis_title(x_data, unit_params))
-    ax1.set_ylabel(label_axis_title(y1_data, unit_params))
+    ax1.set_xlabel(label_units_dict(x_data, unit_params))
+    ax1.set_ylabel(label_units_dict(y1_data, unit_params))
     if y2_data:
-        ax2.set_ylabel(label_axis_title(y2_data, unit_params))
+        ax2.set_ylabel(label_units_dict(y2_data, unit_params))
 
     #####################################
     #

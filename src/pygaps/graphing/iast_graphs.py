@@ -13,8 +13,8 @@ def plot_iast(
     p_data: list,
     l_data: list,
     ads: list,
-    p_unit: str,
-    l_unit: str,
+    p_label: str,
+    l_label: str,
     ax=None,
 ):
     """
@@ -49,16 +49,14 @@ def plot_iast(
 
     ads = map(convert_chemformula, ads)
 
-    text_x = f"Pressure [{p_unit}]"
-    text_y = f"Uptake [{l_unit}]"
     title_graph = "IAST uptake"
 
     # graph title
     ax.set_title(title_graph)
 
     # labels for the axes
-    ax.set_xlabel(text_x)
-    ax.set_ylabel(text_y)
+    ax.set_xlabel(p_label)
+    ax.set_ylabel(l_label)
     ax.tick_params(axis='both', which='major')
 
     # Regular data

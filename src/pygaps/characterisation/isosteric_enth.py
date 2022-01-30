@@ -94,6 +94,8 @@ def isosteric_enthalpy(
         raise ParameterError('Isotherms passed are not measured on the same material.')
 
     # Check same basis
+    if len(set(x.loading_basis for x in isotherms)) > 1:
+        raise ParameterError('Isotherm passed are in a different loading basis.')
     if len(set(x.material_basis for x in isotherms)) > 1:
         raise ParameterError('Isotherm passed are in a different material basis.')
 
@@ -101,29 +103,20 @@ def isosteric_enthalpy(
     temperatures = [x.temperature for x in isotherms]
 
     # Loading
+    load_args = {
+        'branch': branch,
+        'loading_unit': isotherms[0].loading_unit,
+        'material_unit': isotherms[0].material_unit,
+    }
     loading = loading_points
     if loading is None:
-        load_args = dict(
-            branch=branch,
-            loading_basis='molar',
-            loading_unit='mmol',
-        )
         # Get a minimum and maximum loading common for all isotherms
         min_loading = 1.01 * max([min(x.loading(**load_args)) for x in isotherms])
         max_loading = 0.99 * min([max(x.loading(**load_args)) for x in isotherms])
         loading = numpy.linspace(min_loading, max_loading, 50)
 
     # Get pressure point for each isotherm at loading
-    pressures = numpy.array([
-        iso.pressure_at(
-            loading,
-            branch=branch,
-            pressure_mode='absolute',
-            pressure_unit='bar',
-            loading_basis='molar',
-            loading_unit='mmol',
-        ) for iso in isotherms
-    ]).T
+    pressures = numpy.array([iso.pressure_at(loading, **load_args) for iso in isotherms]).T
 
     (
         iso_enthalpy,
@@ -141,6 +134,7 @@ def isosteric_enthalpy(
             loading,
             iso_enthalpy,
             std_errs,
+            isotherms[0],
         )
 
     return {

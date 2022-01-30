@@ -6,22 +6,34 @@ from ..utilities.string_utilities import convert_chemformula
 from ..utilities.string_utilities import convert_unit_ltx
 
 
-def label_axis_title(key, iso_params):
+def label_units_iso(iso, key):
+    unit_params = {
+        "pressure_mode": iso.pressure_mode,
+        "pressure_unit": iso.pressure_unit,
+        "loading_basis": iso.loading_basis,
+        "loading_unit": iso.loading_unit,
+        "material_basis": iso.material_basis,
+        "material_unit": iso.material_unit,
+    }
+    return label_units_dict(key, unit_params)
+
+
+def label_units_dict(key, unit_params):
     """Build an axis label for pressure/loading/other."""
     if key == "pressure":
-        if iso_params['pressure_mode'] == "absolute":
-            text = f"Pressure [${iso_params['pressure_unit']}$]"
-        elif iso_params['pressure_mode'] == "relative":
+        if unit_params['pressure_mode'] == "absolute":
+            text = f"Pressure [${unit_params['pressure_unit']}$]"
+        elif unit_params['pressure_mode'] == "relative":
             text = "Pressure [$p/p^0$]"
-        elif iso_params['pressure_mode'] == "relative%":
+        elif unit_params['pressure_mode'] == "relative%":
             text = "Pressure [%$p/p^0$]"
     elif key == 'loading':
-        if iso_params['loading_basis'] == "percent":
-            text = f"Loading [${iso_params['material_basis']}$%]"
-        elif iso_params['loading_basis'] == "fraction":
-            text = fr"Loading [${iso_params['material_basis']}\/fraction$]"
+        if unit_params['loading_basis'] == "percent":
+            text = f"Loading [${unit_params['material_basis']}$%]"
+        elif unit_params['loading_basis'] == "fraction":
+            text = fr"Loading [${unit_params['material_basis']}\/fraction$]"
         else:
-            text = fr"Loading [${convert_unit_ltx(iso_params['loading_unit'])}\/{convert_unit_ltx(iso_params['material_unit'], True)}$]"
+            text = fr"Loading [${convert_unit_ltx(unit_params['loading_unit'])}\/{convert_unit_ltx(unit_params['material_unit'], True)}$]"
     elif key == "enthalpy":
         text = r"$\Delta_{ads}h$ $(-kJ\/mol^{-1})$"
     else:
@@ -29,7 +41,7 @@ def label_axis_title(key, iso_params):
     return text
 
 
-def label_lgd(isotherm, lbl_components, branch, key_def):
+def label_lgd(isotherm, lbl_components, branch: str = None, key_def: str = None):
     """Build a legend label."""
 
     if not lbl_components:
