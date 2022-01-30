@@ -680,7 +680,7 @@ class PointIsotherm(BaseIsotherm):
                 )
 
             # Select required points
-            if limits:
+            if limits and any(limits):
                 ret = ret.loc[ret.between(
                     -numpy.inf if limits[0] is None else limits[0],
                     numpy.inf if limits[1] is None else limits[1]
@@ -777,7 +777,7 @@ class PointIsotherm(BaseIsotherm):
                 )
 
             # Select required points
-            if limits:
+            if limits and any(limits):
                 ret = ret.loc[ret.between(
                     -numpy.inf if limits[0] is None else limits[0],
                     numpy.inf if limits[1] is None else limits[1]
@@ -832,7 +832,7 @@ class PointIsotherm(BaseIsotherm):
 
             if not ret.empty:
                 # Select required points
-                if limits:
+                if limits and any(limits):
                     ret = ret.loc[ret.between(
                         -numpy.inf if limits[0] is None else limits[0],
                         numpy.inf if limits[1] is None else limits[1]

@@ -647,7 +647,7 @@ class ModelIsotherm(BaseIsotherm):
             )
 
         # Select required points
-        if limits:
+        if limits and any(limits):
             ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
                       & (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
@@ -762,7 +762,7 @@ class ModelIsotherm(BaseIsotherm):
             )
 
         # Select required points
-        if limits:
+        if limits and any(limits):
             ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
                       & (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
