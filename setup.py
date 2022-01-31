@@ -18,8 +18,7 @@ def read(name, **kwargs):
 
 def remove_badges(text):
     """Remove badge text from the readme."""
-    return re.compile('^.. start-badges.*^.. end-badges',
-                      re.M | re.S).sub('', text)
+    return re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', text)
 
 
 setup(
@@ -78,9 +77,10 @@ setup(
         'scipy >= 1.6',
         'pandas',
         'matplotlib',
+        'coolprop >= 6.0',
         'xlrd >= 1.1',
         'xlwt >= 1.3',
-        'coolprop >= 6.0',
+        'openpyxl',
         'gemmi',
         'requests',
         'importlib_resources; python_version<"3.9"',  # TODO remove after 3.8 is unsupported
