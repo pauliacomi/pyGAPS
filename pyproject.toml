@@ -9,3 +9,93 @@ requires = [
 write_to = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
 fallback_version = '3.1.0'
+
+# linting: pydocstyle
+[tool.pydocstyle]
+convention = "numpy"
+match-dir = "src\\/.*"
+
+# formatting: isort
+[tool.yapf]
+based_on_style = "pep8"
+dedent_closing_brackets = true
+coalesce_brackets = true
+split_complex_comprehension = true
+split_before_dot = true
+
+# formatting: isort
+[tool.isort]
+force_single_line = true
+line_length = 120
+known_first_party = "pygaps"
+default_section = "THIRDPARTY"
+forced_separate = "test_pygaps"
+skip = [".tox",".eggs","ci/templates","build","dist"]
+
+# testing: pytest.py
+[tool.pytest.ini_options]
+testpaths = [
+	"tests",
+]
+norecursedirs = [
+	".git",
+	".tox",
+	".env",
+	"dist",
+	"build",
+	"migrations",
+    ]
+python_files = [
+	"test_*.py",
+	"*_test.py",
+    "tests.py",
+]
+addopts = [
+	"-ra",
+    "--cov",
+    "--cov-report=xml",
+	"--doctest-glob=\\*.rst",
+	"--tb=short",
+]
+markers = [
+	"core: core pygaps python functionality.",
+	"utilities: python and scientific tools/utilities.",
+	"characterisation: characterisation tests on isotherms.",
+	"modelling: model generation from isotherms.",
+	"graphing: plotting functionality testing.",
+	"parsing: parsing functionality testing.",
+	"okay: custom emtpy marker.",
+]
+filterwarnings = [
+	"ignore::UserWarning",
+]
+
+# testing: coverage.py
+[tool.coverage.run]
+branch = false
+source = [
+	"src",
+]
+omit = [
+	"*/tests/*",
+]
+parallel = true
+[tool.coverage.paths]
+source = [
+	"src",
+	"*/site-packages",
+]
+[tool.coverage.report]
+ignore_errors = true
+show_missing = true
+precision = 1
+omit = [
+    "*migrations*",
+]
+exclude_lines = [
+	"pragma: no cover",
+	"if self.debug",
+	"raise AssertionError",
+	"raise NotImplementedError",
+	"if __name__ == .__main__.",
+]
