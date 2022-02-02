@@ -5,8 +5,8 @@ import pytest
 import pygaps.parsing as pgp
 
 from .conftest import DATA_BEL
-from .conftest import DATA_BEL_XL
 from .conftest import DATA_BEL_CSV
+from .conftest import DATA_BEL_XL
 
 
 @pytest.mark.parsing

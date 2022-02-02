@@ -12,8 +12,8 @@ from pygaps import logger
 
 from ..utilities.exceptions import GraphingError
 from ..utilities.exceptions import ParameterError
-from .labels import label_units_dict
 from .labels import label_lgd
+from .labels import label_units_dict
 from .mpl_styles import BASE_STYLE
 from .mpl_styles import ISO_MARKERS
 from .mpl_styles import ISO_STYLE

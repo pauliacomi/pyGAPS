@@ -1,12 +1,9 @@
 """Interface with BEL-generated DAT files."""
 
 import dateutil.parser
-
 import pandas
 
-from ..core.pointisotherm import PointIsotherm
 from ..utilities.exceptions import ParsingError
-
 from .bel_common import _META_DICT
 from .bel_common import _parse_header
 from .bel_common import _parse_unit

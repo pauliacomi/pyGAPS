@@ -1,7 +1,8 @@
+import matplotlib as mpl
+
 from pygaps.graphing.isotherm_graphs import plot_iso
 from pygaps.graphing.mpl_styles import BASE_STYLE
 from pygaps.graphing.mpl_styles import POINTS_MUTED
-import matplotlib as mpl
 
 
 @mpl.rc_context(BASE_STYLE)

@@ -1,10 +1,9 @@
 """Functions for plotting graphs related to IAST calculations."""
 
-from ..utilities.string_utilities import convert_chemformula
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+from ..utilities.string_utilities import convert_chemformula
 from .mpl_styles import BASE_STYLE
 
 

@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 from .labels import label_units_iso
-
 from .mpl_styles import BASE_STYLE
 from .mpl_styles import LINE_ERROR
 from .mpl_styles import LINE_FIT

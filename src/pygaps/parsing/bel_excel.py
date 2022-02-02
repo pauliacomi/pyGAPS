@@ -6,8 +6,8 @@ import dateutil.parser
 import xlrd
 
 from .bel_common import _META_DICT
-from .bel_common import _parse_header
 from .bel_common import _check
+from .bel_common import _parse_header
 
 
 def parse(path):

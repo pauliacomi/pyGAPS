@@ -4,7 +4,8 @@ from itertools import groupby
 
 import numpy
 
-from .exceptions import ParameterError, CalculationError
+from .exceptions import CalculationError
+from .exceptions import ParameterError
 
 
 def split_ads_data(data, pressure_key):

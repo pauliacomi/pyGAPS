@@ -5,8 +5,8 @@ import warnings
 import pytest
 
 import pygaps
-from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
 
 
 @pytest.mark.core

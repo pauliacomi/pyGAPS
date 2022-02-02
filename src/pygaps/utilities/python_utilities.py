@@ -2,7 +2,6 @@
 
 import collections.abc as abc
 import pathlib
-
 import warnings
 
 from .exceptions import pgError

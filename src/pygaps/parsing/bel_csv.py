@@ -7,8 +7,6 @@ Modified from https://github.com/AIF-development-team/adsorptioninformationforma
 
 import dateutil.parser
 
-from ..utilities.exceptions import ParsingError
-
 from .bel_common import _META_DICT
 from .bel_common import _parse_header
 

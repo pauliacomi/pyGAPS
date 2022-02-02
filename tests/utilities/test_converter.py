@@ -2,8 +2,8 @@
 import pytest
 
 import pygaps
-from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities import converter_mode
+from pygaps.utilities.exceptions import ParameterError
 
 
 @pytest.mark.utilities
