@@ -8,6 +8,10 @@ import pygaps.parsing as pgp
 
 
 def capture(command, **extra):
+    """Run and capture the output of a subprocess."""
+    # TODO remove on python 3.7+
+    command = map(str, command)
+
     proc = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
