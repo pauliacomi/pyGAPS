@@ -9,6 +9,11 @@ New features:
 
 Changes:
 
+* removed other_keys syntax
+* move all test data somewhere
+* removed smart naming of isotherm parameters
+* branches are internally 0,1 instead of false/true
+
 * Isotherm ``material`` and ``adsorbate`` are now always instantiated as
   ``pygaps.Material`` and ``pygaps.Adsorbate`` classes.
 * Added a "zero" thickness model that assumes no mono/multilayer sorption.

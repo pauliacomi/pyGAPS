@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+"""Configuration for documentation building"""
+# -- Init -----------------------------------------------------
 
 import os
 import sys
@@ -12,6 +12,7 @@ if not on_rtd:  # only set the theme if we're building docs locally
     html_theme = 'sphinx_rtd_theme'
 
 
+# -- Mocking of modules -----------------------------------------------------
 # Need to mock modules using MagicMock, as they won't be able to
 # be installed on readthedocs
 class Mock(MagicMock):
@@ -57,7 +58,7 @@ extensions = [
 ]
 # If currently spellchecking
 if os.getenv('SPELLCHECK'):
-    extensions += 'sphinxcontrib.spelling',
+    extensions += 'sphinxcontrib.spelling'
     spelling_show_suggestions = True
     spelling_lang = 'en_US'
 
@@ -71,7 +72,7 @@ master_doc = 'index'
 project = 'pygaps'
 year = '2021'
 author = 'Paul Iacomi'
-copyright = '{0}, {1}'.format(year, author)
+copyright = f'{year}, {author}'
 try:
     from importlib.metadata import version as imp_version
     version = release = imp_version("pygaps")
@@ -83,14 +84,19 @@ except ModuleNotFoundError:
 templates_path = ['.']
 
 # Needed for jupyter notebook compilation by nbsphinx
-exclude_patterns = ['_build', '**.ipynb_checkpoints']
+exclude_patterns = [
+    '_build',
+    '**.ipynb_checkpoints',
+]
 
 # Needed for jupyter notebook compilation by nbsphinx
 pygments_style = 'trac'
 
 # Suppressing the nonlocal_uri image warning, as it appears due to
 # github badges being stored on another server
-suppress_warnings = ['image.nonlocal_uri']
+suppress_warnings = [
+    'image.nonlocal_uri',
+]
 
 # External links
 extlinks = {

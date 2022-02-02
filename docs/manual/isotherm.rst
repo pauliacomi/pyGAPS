@@ -166,8 +166,8 @@ calorimetry data, magnetic field strengths, or other simultaneous measurements.
 
 If a DataFrame is used, ``loading_key`` and ``pressure_key`` are required
 parameters specifying which column in the DataFrame contains what data of the
-isotherm. If other columns are to be stored in the isotherm object, their names
-should be passed in a list as the ``other_keys`` parameter. As an example:
+isotherm. Other columns in the dataframe are also stored in the isotherm object.
+As an example:
 
 ::
 
@@ -185,8 +185,6 @@ should be passed in a list as the ``other_keys`` parameter. As an example:
 
         loading_key='loading',          # The loading column
         pressure_key='pressure',        # The pressure column
-        other_keys=['enthalpy',
-                    'xrd_peak_1'],      # The columns containing the other data
 
         # Other required isotherm parameters
 
