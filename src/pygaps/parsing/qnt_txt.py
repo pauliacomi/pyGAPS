@@ -3,10 +3,6 @@
 import re
 
 import dateutil.parser
-import numpy as np
-import pandas
-
-from ..core.pointisotherm import PointIsotherm
 
 _META_DICT = {
     'material': {
@@ -85,8 +81,6 @@ def parse(path):
         for _ in range(6):
             file.readline()
 
-        possible_keys = (key['text'] for key in _META_DICT.values())
-
         for line in file:
 
             if ":" in line:  # this means a line with key/val pairs
@@ -98,19 +92,12 @@ def parse(path):
                 while sep_location != -1:
 
                     try:  # find the standard name in the _META_DICT dictionary
-                        name = next(k for k, v in _META_DICT.items() if key == v.get('text', None))
+                        name = next(k for k, v in _META_DICT.items() if k == v.get('text', None))
                     except StopIteration:  # Discard unknown pairs
                         continue
 
                     line_clean = line_clean[sep_location:]
                     sep_location = line_clean.find(":")
-
-                for key, val in data_dict.items():
-                    try:  # find the standard name in the _META_DICT dictionary
-                        name = next(k for k, v in _META_DICT.items() if key == v.get('text', None))
-                    except StopIteration:  # Discard unknown pairs
-                        continue
-                    meta[name] = val
 
                 # TODO Are quantachrome files always saved with these mistakes?
                 # for i, d in enumerate(data):
@@ -119,7 +106,7 @@ def parse(path):
                 #             data[i] = d.split(mistake)[0]
                 #             data.insert(i + 1, mistake)
 
-                # data_dict = {data[i][:-1].lower(): data[i + 1] for i in range(0, len(data), 2)}
+                data_dict = {data[i][:-1].lower(): data[i + 1] for i in range(0, len(data), 2)}
 
                 for key, val in data_dict.items():
                     try:  # find the standard name in the _META_DICT dictionary
@@ -129,28 +116,30 @@ def parse(path):
                     meta[name] = val
 
             elif "Press" in line:
-                ads_start = (index + 4)
-
                 # get the adsorption data
 
-                for index, line in enumerate(lines):
-                    if index == ads_start - 4:
-                        file_headers = re.split(r"\s{2,}", line.strip())
-                        print(file_headers)
-                        for h in file_headers:
-                            txt = next(
-                                (_DATA_DICT[a] for a in _DATA_DICT if h.lower().startswith(a)), h
-                            )
-                            print(txt)
-                            columns.append(txt)
+                file_headers = re.split(r"\s{2,}", line.strip())
+                print(file_headers)
+                for h in file_headers:
+                    txt = next((_DATA_DICT[a] for a in _DATA_DICT if h.lower().startswith(a)), h)
+                    print(txt)
+                    head.append(txt)
 
-                    elif index == ads_start - 2:
-                        units = re.split(r"\s{2,}", line)
-                        # TODO handle units
-                        print(f"Units are {units}")
+                # skip line
+                file.readline()
+                file.readline()
 
-                    elif index >= ads_start:
-                        data.append(list(map(float, line.split())))
+                units = re.split(r"\s{2,}", line)
+                # TODO handle units
+                print(f"Units are {units}")
+
+                # skip line
+                file.readline()
+                file.readline()
+
+                while line:
+                    data.append(list(map(float, line.split())))
+                    line = file.readline()
 
     # Set extra metadata
     meta['mass'] = meta['mass'].split()[0]
@@ -162,6 +151,7 @@ def parse(path):
     meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
 
     # amount adsorbed from cc to mmol/g
+    data = dict(zip(head, map(lambda *x: list(x), *data)))
     data['loading'] = data['loading'] / float(meta['mass']) / 22.414
 
     return meta, data

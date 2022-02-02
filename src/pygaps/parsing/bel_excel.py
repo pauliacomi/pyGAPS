@@ -148,21 +148,3 @@ def _find_datapoints(sheet, row, col):
                 point = None
 
     return (ads_start_row, ads_final_row, des_start_row, des_final_row)
-
-
-def _get_errors(sheet, row, col, ref):
-    """
-    Look for all cells that contain errors.
-
-    (are below a cell labelled primary data).
-    """
-    field = _META_DICT['primary data']
-    val = sheet.cell(row + ref[0], col + ref[1]).value
-    if not val:
-        return []
-    final_row = row + ref[0]
-    error = sheet.cell(final_row, col + ref[1]).value
-    while error:
-        final_row += 1
-        error = sheet.cell(final_row, col + ref[1]).value
-    return [sheet.cell(i, col + ref[1]).value for i in range(row + ref[0], final_row)]

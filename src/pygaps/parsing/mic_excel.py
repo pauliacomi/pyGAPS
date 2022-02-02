@@ -160,7 +160,7 @@ def parse(path):
     # Set extra metadata
     try:
         meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
-    except:
+    except BaseException:
         logger.warning("Could not convert date.")
     meta['pressure_mode'] = 'absolute'
     meta['loading_basis'] = 'molar'

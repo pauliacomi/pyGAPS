@@ -171,6 +171,9 @@ def isotherm_to_xl(isotherm, path):
         # Write the type
         sht.write(type_row, type_col + 1, 'metadata', prop_style)
 
+    else:
+        raise ParsingError("Could not determine isotherm type")
+
     # Now add the other keys
     sht = wb.add_sheet('otherdata')
     row = 0
