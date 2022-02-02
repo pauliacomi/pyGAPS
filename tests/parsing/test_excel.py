@@ -5,7 +5,6 @@ import pytest
 import pygaps.parsing.excel as pgpe
 import pygaps.parsing.json as pgpj
 
-from .conftest import DATA_JSON
 from .conftest import DATA_XL
 
 
@@ -45,5 +44,7 @@ class TestExcel():
         """Test read excel files file."""
         for path in DATA_XL:
             isotherm = pgpe.isotherm_from_xl(path=path)
-            isotherm2 = pgpj.isotherm_from_json(next(DATA_JSON))
+            json_path = path.with_suffix(".json")
+            # isotherm.to_json(json_path)
+            isotherm2 = pgpj.isotherm_from_json(json_path)
             assert isotherm.to_dict() == isotherm2.to_dict()
