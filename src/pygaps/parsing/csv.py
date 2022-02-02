@@ -67,7 +67,7 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
         data = isotherm.data_raw.copy()
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
-        output.write('data:[pressure,loading,[otherdata],branch data]\n')
+        output.write('data:[pressure,loading,branch,(otherdata)]\n')
         data.to_csv(output, sep=separator, index=False, header=True)
 
     elif isinstance(isotherm, ModelIsotherm):
