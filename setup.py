@@ -88,7 +88,7 @@ setup(
     tests_require=[
         'pytest',
         'pytest-cov',
-        'coverage',
+        'coverage[toml]',
         'nose',
     ],
     extras_require={

@@ -61,7 +61,7 @@ jobs:
             toxenv: "py38-cover,report,codecov"
           - python-version: '3.9'
             toxenv: "py39-cover,report,codecov"
-          # TODO py39 not implemented on tox-conda yet
+          # TODO py310 not implemented on tox-conda yet
           # - python-version: '3.10'
           #   toxenv: "py310-cover,report,codecov"
 
