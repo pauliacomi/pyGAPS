@@ -53,7 +53,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version : ['3.7', '3.8', '3.9'] #, '3.10']
+        python-version : ['3.7', '3.8', '3.9', '3.10']
         include:
           - python-version: '3.7'
             toxenv: "py37-cover,report,codecov"
@@ -61,9 +61,8 @@ jobs:
             toxenv: "py38-cover,report,codecov"
           - python-version: '3.9'
             toxenv: "py39-cover,report,codecov"
-          # TODO py310 not implemented on tox-conda yet
-          # - python-version: '3.10'
-          #   toxenv: "py310-cover,report,codecov"
+          - python-version: '3.10'
+            toxenv: "py310-cover,report,codecov"
 
     steps:
     - uses: actions/checkout@v2
