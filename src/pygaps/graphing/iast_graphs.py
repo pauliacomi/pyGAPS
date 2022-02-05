@@ -112,7 +112,6 @@ def plot_iast_vle(
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.axis('equal')
 
     ads1 = convert_chemformula(ads1)
     ads2 = convert_chemformula(ads2)
@@ -144,8 +143,8 @@ def plot_iast_vle(
 
     ax.legend(loc='best')
 
-    ax.set_xlim(left=0, right=1)
-    ax.set_ylim(bottom=0, top=1)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
 
     return ax
 
