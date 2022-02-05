@@ -267,9 +267,9 @@ def iast_point_fraction(
         isotherms,
         partial_pressures,
         branch=branch,
-        verbose=False,
-        warningoff=False,
-        adsorbed_mole_fraction_guess=None
+        verbose=verbose,
+        warningoff=warningoff,
+        adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess
     )
 
 
