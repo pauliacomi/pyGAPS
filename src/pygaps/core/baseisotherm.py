@@ -291,10 +291,8 @@ class BaseIsotherm():
             string += f"\tPressure in: {self.pressure_unit}\n"
 
         string += "Other properties: \n"
-        for prop in vars(self):
-            if prop not in self._required_params + \
-                    list(self._unit_params) + self._reserved_params:
-                string += (f"\t{prop}: {str(getattr(self, prop))}\n")
+        for prop, val in self.properties.items():
+            string += (f"\t{prop}: {str(val)}\n")
 
         return string
 
