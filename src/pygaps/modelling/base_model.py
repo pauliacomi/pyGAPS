@@ -221,8 +221,8 @@ class IsothermBaseModel():
                 args=(pressure, loading),  # extra arguments to the fit function
                 **kwargs
             )
-        except ValueError as e:
-            raise CalculationError(f"Fitting routine for {self.name} failed with error:\n\t{e}")
+        except ValueError as err:
+            raise CalculationError(f"Fitting routine for {self.name} failed with error:\n\t{err}")
         if not opt_res.success:
             raise CalculationError(
                 f"Fitting routine for {self.name} failed with error:"

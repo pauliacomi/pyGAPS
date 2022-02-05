@@ -143,20 +143,20 @@ def alpha_s(
     if reference_area.lower() in ['bet', None]:
         try:
             reference_area = area_BET(reference_isotherm).get('area')
-        except Exception as e:
+        except Exception as err:
             raise CalculationError(
                 "Could not calculate a BET area for the reference isotherm. "
                 "Either solve the issue or provide a value for reference_area. "
-                f"BET area error is :\n{e}"
+                f"BET area error is :\n{err}"
             )
     elif reference_area.lower() == 'langmuir':
         try:
             reference_area = area_langmuir(reference_isotherm).get('area')
-        except Exception as e:
+        except Exception as err:
             raise CalculationError(
                 "Could not calculate a Langmuir area for the reference isotherm. "
                 "Either solve the issue or provide a value for reference_area. "
-                f"Langmuir area error is :\n{e}"
+                f"Langmuir area error is :\n{err}"
             )
     elif not isinstance(reference_area, float):
         raise ParameterError(

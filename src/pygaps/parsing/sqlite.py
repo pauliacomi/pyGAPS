@@ -29,6 +29,7 @@ from pygaps.utilities.sqlite_utilities import build_update
 
 
 def with_connection(func):
+    """Contextmanager for sqlite connection."""
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
@@ -47,13 +48,13 @@ def with_connection(func):
             cursor.execute('PRAGMA foreign_keys = ON')
             ret = func(*args, **kwargs, cursor=cursor)
 
-        except sqlite3.IntegrityError as e:
+        except sqlite3.IntegrityError as err:
             conn.rollback()
-            raise ParsingError(e)
+            raise ParsingError from err
 
-        except sqlite3.InterfaceError as e:
+        except sqlite3.InterfaceError as err:
             conn.rollback()
-            raise ParsingError(e)
+            raise ParsingError from err
 
         else:
             conn.commit()
@@ -92,8 +93,8 @@ def _upload_one_all_columns(
     insert_dict = {key: input_dict.get(key) for key in to_insert}
     try:
         cursor.execute(sql_com, insert_dict)
-    except sqlite3.Error as e:
-        raise type(e)(f"Error inserting dict {insert_dict}. Original error:\n {e}")
+    except sqlite3.Error as err:
+        raise type(err)(f"Error inserting dict {insert_dict}. Original error:\n {err}")
 
     if verbose:
         # Print success
@@ -111,8 +112,8 @@ def _get_all_no_id(
     """Get all elements from a table as a dictionary, excluding id."""
     try:
         cursor.execute("""SELECT * FROM """ + table_name)
-    except sqlite3.Error as e:
-        raise type(e)(f"Error getting data from {table_name}. Original error:\n {e}")
+    except sqlite3.Error as err:
+        raise type(err)(f"Error getting data from {table_name}. Original error:\n {err}")
 
     values = []
     for row in cursor:
@@ -148,8 +149,8 @@ def _delete_by_id(
 
     try:
         cursor.execute(build_delete(table=table_name, where=[table_id]), {table_id: element_id})
-    except sqlite3.Error as e:
-        raise type(e)(f"Error deleting {element_id} from {table_name}. Original error:\n {e}")
+    except sqlite3.Error as err:
+        raise type(err)(f"Error deleting {element_id} from {table_name}. Original error:\n {err}")
 
     if verbose:
         # Print success
@@ -230,8 +231,11 @@ def adsorbate_to_db(adsorbate, db_path=None, overwrite=False, verbose=True, **kw
             for vl in val:
                 try:
                     cursor.execute(sql_insert, {'ads_id': ads_id, 'type': prop, 'value': vl})
-                except sqlite3.InterfaceError as e:
-                    raise type(e)(f"Cannot process property {prop}: {vl}" f"Original error:\n{e}")
+                except sqlite3.InterfaceError as err:
+                    raise type(err)(
+                        f"Cannot process property {prop}: {vl}"
+                        f"Original error:\n{err}"
+                    )
 
     # Add to existing list
     if overwrite:
@@ -338,8 +342,8 @@ def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
 
         # Delete original name in adsorbates table
         cursor.execute(build_delete(table='adsorbates', where=['id']), {'id': ads_id})
-    except sqlite3.Error as e:
-        raise type(e)(
+    except sqlite3.Error as err:
+        raise type(err)(
             "Could not delete adsorbate, are there still isotherms referencing it?"
         ) from None
 
@@ -518,10 +522,10 @@ def material_to_db(
             for vl in val:
                 try:
                     cursor.execute(sql_insert, {'mat_id': mat_id, 'type': prop, 'value': vl})
-                except sqlite3.InterfaceError as e:
-                    raise type(e)(
+                except sqlite3.InterfaceError as err:
+                    raise type(err)(
                         f"Cannot process property {prop}: {vl}"
-                        f"Original error:\n{e}"
+                        f"Original error:\n{err}"
                     ) from None
 
     # Add to existing list
@@ -620,8 +624,8 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
     try:
         # Delete material info in materials table
         cursor.execute(build_delete(table='materials', where=['id']), {'id': mat_id})
-    except sqlite3.Error as e:
-        raise type(e)(
+    except sqlite3.Error as err:
+        raise type(err)(
             "Could not delete material, are there still isotherms referencing it?"
         ) from None
 
@@ -807,11 +811,11 @@ def isotherm_to_db(
     db_columns = ["id", "iso_type"] + BaseIsotherm._required_params
     try:
         cursor.execute(build_insert(table='isotherms', to_insert=db_columns), upload_dict)
-    except sqlite3.Error as e:
-        raise type(e)(
+    except sqlite3.Error as err:
+        raise type(err)(
             f"""Error inserting isotherm "{upload_dict["id"]}" base properties. """
             f"""Ensure material "{upload_dict["material"]}", and adsorbate "{upload_dict["adsorbate"]}" """
-            f"""exist in the database already. Original error:\n {e}"""
+            f"""exist in the database already. Original error:\n {err}"""
         ) from None
 
     # TODO insert multiple

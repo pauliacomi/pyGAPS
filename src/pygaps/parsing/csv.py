@@ -119,11 +119,11 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
     except OSError:
         try:
             raw_csv = StringIO(str_or_path)
-        except Exception as e:
+        except Exception as err:
             raise ParsingError(
                 "Could not parse CSV isotherm. "
                 "The `str_or_path` is invalid or does not exist. "
-            ) from e
+            ) from err
 
     line = raw_csv.readline().rstrip()
     raw_dict = {}
@@ -148,11 +148,11 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
 
             raw_dict[key] = val
             line = raw_csv.readline().rstrip()
-    except Exception as e:
+    except Exception as err:
         raise ParsingError(
             "Could not parse CSV isotherm. "
             "The format may be wrong, check for errors."
-        ) from e
+        ) from err
 
     # version check
     version = raw_dict.pop("file_version", None)

@@ -467,10 +467,10 @@ class ModelIsotherm(BaseIsotherm):
 
                 attempts.append(isotherm)
 
-            except CalculationError as e:
+            except CalculationError as err:
                 logger.info(f"Modelling using {model} failed.")
                 if verbose:
-                    logger.info(f"\n{e}")
+                    logger.info(f"\n{err}")
 
         if not attempts:
             raise CalculationError("No model could be reliably fit on the isotherm.")
