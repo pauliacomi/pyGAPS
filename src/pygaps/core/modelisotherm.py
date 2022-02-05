@@ -235,17 +235,9 @@ class ModelIsotherm(BaseIsotherm):
             )
 
         # Plot fit if verbose
-        if verbose and isotherm_parameters.get('plot_fit', True):
-            if self.model.calculates == 'pressure':
-                ax = self.plot(y1_line_style=dict(markersize=0), y1_points=loading)
-            else:
-                ax = self.plot(y1_line_style=dict(markersize=0), x_points=pressure)
-            import matplotlib as mpl
-
-            from pygaps.graphing.mpl_styles import BASE_STYLE
-            with mpl.rc_context(BASE_STYLE):
-                ax.plot(pressure, loading, zorder=-1)
-                ax.legend([self.model.name])
+        if verbose and isotherm_parameters.pop('plot_fit', True):
+            from pygaps.graphing.model_graphs import plot_model_guesses
+            plot_model_guesses([self], pressure, loading)
 
     @classmethod
     def from_isotherm(
