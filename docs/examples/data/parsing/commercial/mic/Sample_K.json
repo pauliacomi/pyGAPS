@@ -1,7 +1,7 @@
 {
     "adsorbate": "acetylene",
     "date": "2021-04-14T09:20:40",
-    "file_version": "2.0",
+    "file_version": "3.0",
     "isotherm_data": [
         {
             "loading": 0.19411186353264537,

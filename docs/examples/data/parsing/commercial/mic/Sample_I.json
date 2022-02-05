@@ -1,7 +1,7 @@
 {
     "adsorbate": "nitrogen",
     "date": "2019-12-14T12:00:05",
-    "file_version": "2.0",
+    "file_version": "3.0",
     "isotherm_data": [
         {
             "loading": 9.889230366291269,

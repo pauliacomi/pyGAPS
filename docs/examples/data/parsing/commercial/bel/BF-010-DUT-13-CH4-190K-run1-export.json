@@ -17,7 +17,7 @@
     "equilibrium_time_unit": "SEC",
     "file_name": "BF-010-DUT-13-CH4-190K-run1.DAT",
     "file_name_of_wall_adsorption": "",
-    "file_version": "2.0",
+    "file_version": "3.0",
     "isotherm_data": [
         {
             "loading": 1.5621,
