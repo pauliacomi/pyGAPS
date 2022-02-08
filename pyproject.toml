@@ -101,3 +101,110 @@ exclude_lines = [
 	"raise NotImplementedError",
 	"if __name__ == .__main__.",
 ]
+
+# testing: tox [keep this as last section!]
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist =
+    clean,
+    check,
+    docs,
+    py310-cover,
+    py36-cover,
+    py37-cover,
+    py38-cover,
+    py39-cover,
+    report
+
+[testenv]
+wheel = true
+basepython =
+    bootstrap: python
+    py310: {env:TOXPYTHON:python3.10-cover}
+    py36: {env:TOXPYTHON:python3.6-cover}
+    py37: {env:TOXPYTHON:python3.7-cover}
+    py38: {env:TOXPYTHON:python3.8-cover}
+    py39: {env:TOXPYTHON:python3.9-cover}
+    {docs,spell,clean,check,report,codecov}: {env:TOXPYTHON:python3}
+setenv =
+    PYTHONPATH={toxinidir}/tests
+    PYTHONUNBUFFERED=yes
+    cover: SETUP_PY_EXT_COVERAGE=yes
+passenv =
+    *
+conda_channels=
+    defaults
+    conda-forge
+conda_deps =
+    cover: numpy
+    cover: pandas
+    cover: scipy
+    cover: coolprop
+usedevelop =
+    cover: true
+    nocov: false
+deps =
+    pytest
+    cover: coverage[toml]
+    cover: pytest-cov
+commands =
+    cover: python setup.py clean --all build_ext --force --inplace
+    nocov: {posargs:pytest -vv}
+    cover: {posargs:pytest --cov --cov-report=term-missing -vv}
+
+[testenv:bootstrap]
+deps =
+    jinja2
+    tox
+skip_install = true
+commands =
+    python ci/bootstrap.py --no-env
+passenv =
+    *
+
+[testenv:check]
+deps =
+    docutils
+    pygments
+    isort
+    flake8
+    pylint
+    # darglint
+skip_install = true
+usedevelop = false
+commands =
+    python setup.py check --strict --metadata --restructuredtext
+    isort --verbose --check-only --diff src tests setup.py
+    flake8 src tests setup.py
+    # pylint src tests setup.py
+
+[testenv:docs]
+usedevelop = true
+extras = docs
+commands =
+    sphinx-build -E -j auto -b doctest docs dist/docs
+    sphinx-build -E -j auto -b html docs dist/docs
+    sphinx-build -j auto -b linkcheck docs dist/docs
+
+[testenv:codecov]
+deps =
+    coverage[toml]
+    codecov
+skip_install = true
+commands =
+    coverage xml --ignore-errors
+    codecov []
+
+[testenv:report]
+deps = coverage[toml]
+skip_install = true
+commands =
+    coverage report
+    coverage html
+
+[testenv:clean]
+deps = coverage[toml]
+commands = coverage erase
+skip_install = true
+"""

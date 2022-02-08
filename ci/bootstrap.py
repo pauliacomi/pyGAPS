@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 import subprocess
@@ -21,6 +18,7 @@ def check_call(args):
 
 
 def exec_in_env():
+    """Execute command in environment."""
     env_path = join(base_path, ".tox", "bootstrap")
     if sys.platform == "win32":
         bin_path = join(env_path, "Scripts")
@@ -49,6 +47,7 @@ def exec_in_env():
 
 
 def main():
+    """Main entrypoint."""
     import jinja2
 
     print("Project path: {0}".format(base_path))
@@ -67,22 +66,26 @@ def main():
         # This uses sys.executable the same way that the call in
         # cookiecutter-pylibrary/hooks/post_gen_project.py
         # invokes this bootstrap.py itself.
-        for line in
-        subprocess.check_output([sys.executable, '-m', 'tox', '--listenvs'],
-                                universal_newlines=True).splitlines()
+        for line in subprocess.check_output([sys.executable, '-m', 'tox', '--listenvs'],
+                                            universal_newlines=True).splitlines()
     ]
-    tox_environments = [
-        line for line in tox_environments if line.startswith('py')
-    ]
+    tox_environments = [line for line in tox_environments if line.startswith('py')]
 
     for name in os.listdir(join("ci", "templates")):
+
+        loc = 0
+        with open(join(base_path, name), "r") as fh:
+            lines = fh.readlines()
+            for ind, line in enumerate(lines):
+                if line.startswith("# testing: tox"):
+                    loc = ind + 1
+                    break
+
         with open(join(base_path, name), "w") as fh:
-            fh.write(
-                jinja.get_template(name).render(
-                    tox_environments=tox_environments
-                )
-            )
-        print("Wrote {}".format(name))
+            fh.writelines(lines[:loc])
+            fh.write(jinja.get_template(name).render(tox_environments=tox_environments))
+
+        print(f"Wrote {name}")
     print("DONE.")
 
 

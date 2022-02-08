@@ -1,3 +1,5 @@
+[tool.tox]
+legacy_tox_ini = """
 [tox]
 envlist =
     clean,
@@ -70,10 +72,7 @@ commands =
 
 [testenv:docs]
 usedevelop = true
-install_command =
-    python -m pip install --no-use-pep517 {opts} {packages}
-deps =
-    -r{toxinidir}/docs/requirements.txt
+extras = docs
 commands =
     sphinx-build -E -j auto -b doctest docs dist/docs
     sphinx-build -E -j auto -b html docs dist/docs
@@ -99,3 +98,4 @@ commands =
 deps = coverage[toml]
 commands = coverage erase
 skip_install = true
+"""
