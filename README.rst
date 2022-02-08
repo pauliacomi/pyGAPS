@@ -46,10 +46,6 @@ adsorption data analysis and fitting, written in Python 3.
     :alt: GHA-CI Build Status
     :target: https://github.com/pauliacomi/pyGAPS/actions
 
-.. |travis| image:: https://api.travis-ci.org/pauliacomi/pyGAPS.svg?branch=master
-    :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/pauliacomi/pyGAPS
-
 .. |requires| image:: https://requires.io/github/pauliacomi/pyGAPS/requirements.svg?branch=master
     :alt: Requirements Status
     :target: https://requires.io/github/pauliacomi/pyGAPS/requirements/?branch=master
