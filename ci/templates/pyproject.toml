@@ -65,7 +65,7 @@ deps =
 skip_install = true
 usedevelop = false
 commands =
-    python setup.py check --strict --metadata --restructuredtext
+    python setup.py check --metadata --restructuredtext
     isort --verbose --check-only --diff src tests setup.py
     flake8 src tests setup.py
     # pylint src tests setup.py
