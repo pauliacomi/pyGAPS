@@ -243,7 +243,12 @@ class PointIsotherm(BaseIsotherm):
         return cls(**iso_params)
 
     @classmethod
-    def from_modelisotherm(cls, modelisotherm, pressure_points=None):
+    def from_modelisotherm(
+        cls,
+        modelisotherm,
+        pressure_points=None,
+        loading_points=None,
+    ):
         """
         Construct a PointIsotherm from a ModelIsothem class.
 
@@ -265,22 +270,42 @@ class PointIsotherm(BaseIsotherm):
                   of the pressure points in the passed isotherm. This is useful for
                   comparing a model overlap with the real isotherm.
         """
-        if pressure_points is None:
-            pressure = modelisotherm.pressure()
-        elif isinstance(pressure_points, PointIsotherm):
-            pressure = pressure_points.pressure(branch=modelisotherm.branch)
-        else:
-            pressure = pressure_points
+        if pressure_points is not None and loading_points is not None:
+            raise ParameterError("""Cannot specify both pressure and loading points.""")
 
-        # TODO: in case the model isotherm calculates pressure from loading
-        # this is not ideal
+        pressure = None
+        loading = None
+        if modelisotherm.model.calculates == "loading":
+            # The user may request loading even if the model calculates pressure
+            if loading_points is None:
+                if pressure_points is None:
+                    pressure = modelisotherm.pressure()
+                elif isinstance(pressure_points, PointIsotherm):
+                    pressure = pressure_points.pressure(branch=modelisotherm.branch)
+                else:
+                    pressure = pressure_points
+                loading = modelisotherm.loading_at(pressure)
+            else:
+                loading = loading_points
+                pressure = modelisotherm.pressure_at(loading_points)
+        elif modelisotherm.model.calculates == "pressure":
+            # The user may request pressure even if the model calculates loading
+            if pressure_points is None:
+                if loading_points is None:
+                    loading = modelisotherm.loading()
+                elif isinstance(loading_points, PointIsotherm):
+                    loading = loading_points.loading(branch=modelisotherm.branch)
+                else:
+                    loading = loading_points
+                pressure = modelisotherm.pressure_at(loading)
+            else:
+                pressure = pressure_points
+                loading = modelisotherm.loading_at(pressure)
+
         return PointIsotherm(
-            isotherm_data=pandas.DataFrame({
-                'pressure': pressure,
-                'loading': modelisotherm.loading_at(pressure)
-            }),
-            loading_key='loading',
-            pressure_key='pressure',
+            pressure=pressure,
+            loading=loading,
+            model_from=modelisotherm.model.name,
             **modelisotherm.to_dict()
         )
 
