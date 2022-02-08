@@ -4,7 +4,9 @@ requires = [
     "wheel",
     "setuptools_scm[toml]>=3.4",
 ]
+build-backend = "setuptools.build_meta"
 
+# versioning: setuptools_scm
 [tool.setuptools_scm]
 write_to = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
@@ -15,7 +17,7 @@ fallback_version = '3.1.0'
 convention = "numpy"
 match-dir = "src\\/.*"
 
-# formatting: isort
+# formatting: yapf
 [tool.yapf]
 based_on_style = "pep8"
 dedent_closing_brackets = true
