@@ -1,0 +1,318 @@
+{
+    "activation_temperature": 150.0,
+    "adsorbate": "nitrogen",
+    "comment": null,
+    "date": null,
+    "file_version": "3.0",
+    "instrument": "Triflex",
+    "iso_type": "Isotherme",
+    "isotherm_data": [
+        {
+            "loading": 0.389345,
+            "pressure": 7.02e-06
+        },
+        {
+            "loading": 1.15322,
+            "pressure": 0.000187
+        },
+        {
+            "loading": 1.85566,
+            "pressure": 0.00167
+        },
+        {
+            "loading": 2.42349,
+            "pressure": 0.00729
+        },
+        {
+            "loading": 2.83781,
+            "pressure": 0.0185
+        },
+        {
+            "loading": 3.13538,
+            "pressure": 0.0337
+        },
+        {
+            "loading": 3.36742,
+            "pressure": 0.0513
+        },
+        {
+            "loading": 3.56129,
+            "pressure": 0.0705
+        },
+        {
+            "loading": 3.73012,
+            "pressure": 0.0903
+        },
+        {
+            "loading": 3.88453,
+            "pressure": 0.110667
+        },
+        {
+            "loading": 4.02829,
+            "pressure": 0.131255
+        },
+        {
+            "loading": 4.1668,
+            "pressure": 0.15225
+        },
+        {
+            "loading": 4.30201,
+            "pressure": 0.173172
+        },
+        {
+            "loading": 4.43407,
+            "pressure": 0.193883
+        },
+        {
+            "loading": 4.63732,
+            "pressure": 0.226004
+        },
+        {
+            "loading": 4.82881,
+            "pressure": 0.255854
+        },
+        {
+            "loading": 5.0316,
+            "pressure": 0.286423
+        },
+        {
+            "loading": 5.24524,
+            "pressure": 0.316808
+        },
+        {
+            "loading": 5.50617,
+            "pressure": 0.347235
+        },
+        {
+            "loading": 6.13495,
+            "pressure": 0.376793
+        },
+        {
+            "loading": 7.94121,
+            "pressure": 0.411034
+        },
+        {
+            "loading": 8.76256,
+            "pressure": 0.451615
+        },
+        {
+            "loading": 8.96272,
+            "pressure": 0.476502
+        },
+        {
+            "loading": 9.06807,
+            "pressure": 0.493532
+        },
+        {
+            "loading": 9.22302,
+            "pressure": 0.530518
+        },
+        {
+            "loading": 9.29822,
+            "pressure": 0.559943
+        },
+        {
+            "loading": 9.36113,
+            "pressure": 0.589179
+        },
+        {
+            "loading": 9.4263,
+            "pressure": 0.619884
+        },
+        {
+            "loading": 9.48929,
+            "pressure": 0.649308
+        },
+        {
+            "loading": 9.55802,
+            "pressure": 0.680035
+        },
+        {
+            "loading": 9.62846,
+            "pressure": 0.710035
+        },
+        {
+            "loading": 9.70286,
+            "pressure": 0.739805
+        },
+        {
+            "loading": 9.78372,
+            "pressure": 0.769679
+        },
+        {
+            "loading": 9.87215,
+            "pressure": 0.799433
+        },
+        {
+            "loading": 9.97242,
+            "pressure": 0.829261
+        },
+        {
+            "loading": 10.0898,
+            "pressure": 0.85949
+        },
+        {
+            "loading": 10.2351,
+            "pressure": 0.888336
+        },
+        {
+            "loading": 10.4477,
+            "pressure": 0.918398
+        },
+        {
+            "loading": 10.7866,
+            "pressure": 0.945189
+        },
+        {
+            "loading": 12.0325,
+            "pressure": 0.976575
+        },
+        {
+            "loading": 13.0881,
+            "pressure": 0.984457
+        },
+        {
+            "branch": "des",
+            "loading": 12.0923,
+            "pressure": 0.965092
+        },
+        {
+            "branch": "des",
+            "loading": 10.7908,
+            "pressure": 0.930869
+        },
+        {
+            "branch": "des",
+            "loading": 10.3975,
+            "pressure": 0.90036
+        },
+        {
+            "branch": "des",
+            "loading": 10.1278,
+            "pressure": 0.857946
+        },
+        {
+            "branch": "des",
+            "loading": 10.0008,
+            "pressure": 0.827904
+        },
+        {
+            "branch": "des",
+            "loading": 9.90559,
+            "pressure": 0.80003
+        },
+        {
+            "branch": "des",
+            "loading": 9.78982,
+            "pressure": 0.761104
+        },
+        {
+            "branch": "des",
+            "loading": 9.72036,
+            "pressure": 0.735223
+        },
+        {
+            "branch": "des",
+            "loading": 9.63671,
+            "pressure": 0.701582
+        },
+        {
+            "branch": "des",
+            "loading": 9.57455,
+            "pressure": 0.674646
+        },
+        {
+            "branch": "des",
+            "loading": 9.49566,
+            "pressure": 0.639345
+        },
+        {
+            "branch": "des",
+            "loading": 9.44293,
+            "pressure": 0.614518
+        },
+        {
+            "branch": "des",
+            "loading": 9.3764,
+            "pressure": 0.58265
+        },
+        {
+            "branch": "des",
+            "loading": 9.31419,
+            "pressure": 0.553072
+        },
+        {
+            "branch": "des",
+            "loading": 9.2609,
+            "pressure": 0.52813
+        },
+        {
+            "branch": "des",
+            "loading": 9.1959,
+            "pressure": 0.498167
+        },
+        {
+            "branch": "des",
+            "loading": 9.1254,
+            "pressure": 0.469563
+        },
+        {
+            "branch": "des",
+            "loading": 9.03235,
+            "pressure": 0.44063
+        },
+        {
+            "branch": "des",
+            "loading": 8.66245,
+            "pressure": 0.422393
+        },
+        {
+            "branch": "des",
+            "loading": 7.21208,
+            "pressure": 0.394453
+        },
+        {
+            "branch": "des",
+            "loading": 5.76374,
+            "pressure": 0.362461
+        },
+        {
+            "branch": "des",
+            "loading": 5.39397,
+            "pressure": 0.333072
+        },
+        {
+            "branch": "des",
+            "loading": 5.13392,
+            "pressure": 0.298424
+        },
+        {
+            "branch": "des",
+            "loading": 4.91495,
+            "pressure": 0.266157
+        },
+        {
+            "branch": "des",
+            "loading": 4.714,
+            "pressure": 0.235134
+        },
+        {
+            "branch": "des",
+            "loading": 4.52049,
+            "pressure": 0.204614
+        }
+    ],
+    "lab": "MADIREL",
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
+    "material": "MCM-41",
+    "material_basis": "mass",
+    "material_batch": "Test",
+    "material_unit": "g",
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "project": null,
+    "temperature": 77.0,
+    "temperature_unit": "K",
+    "user": "PI"
+}
