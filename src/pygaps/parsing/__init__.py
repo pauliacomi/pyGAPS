@@ -42,7 +42,9 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
     """
 
     if manufacturer not in _COMMERCIAL_FORMATS.keys():
-        raise ParsingError(f"Currently available manufacturers are {_COMMERCIAL_FORMATS.keys()}")
+        raise ParsingError(
+            f"Currently available manufacturers are {list(_COMMERCIAL_FORMATS.keys())})"
+        )
 
     if fmt not in _COMMERCIAL_FORMATS[manufacturer]:
         raise ParsingError(f"Currently available formats are {_COMMERCIAL_FORMATS[manufacturer]}")

@@ -16,6 +16,7 @@ if not on_rtd:  # only set the theme if we're building docs locally
 # Need to mock modules using MagicMock, as they won't be able to
 # be installed on readthedocs
 class Mock(MagicMock):
+    """Simple mock class."""
     @classmethod
     def __getattr__(cls, name):
         return MagicMock()

@@ -9,7 +9,7 @@ installed, an entrypoint is automatically generated under the name ``pygaps``.
 
     pygaps -h
 
-Currently the CLI can read any pyGAPS format (JSON, CSV, Excel) and then:
+Currently the CLI can read any pyGAPS format (JSON, AIF, CSV, Excel) and then:
 
     * print isotherm to output (default if no argument is passed)
     * plot the isotherm using a Matplotlib TKinter window (``-p/--plot``)
