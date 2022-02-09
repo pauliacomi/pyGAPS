@@ -12,15 +12,13 @@ adsorption data analysis and fitting, written in Python 3.
     :stub-columns: 1
 
     * - status
-      - | |status|
-        | |commits-since|
+      - | |status| |commits-since|
     * - docs
       - | |docs|
     * - license
       - | |license|
     * - tests
-      - | |GHA| |travis|
-        | |codecov|
+      - | |GHA| |codecov|
         | |requires|
     * - package
       - | |version| |wheel|
