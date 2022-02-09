@@ -28,9 +28,9 @@ adsorption data analysis and fitting, written in Python 3.
     :target: https://www.repostatus.org/#active
     :alt: Project Status: Active – The project has reached a stable, usable state and is being actively developed.
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/v3.1.0/develop.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/pauliacomi/pygaps/latest
     :alt: Commits since latest release
-    :target: https://github.com/pauliacomi/pygaps/compare/v3.1.0...develop
+    :target: https://github.com/pauliacomi/pygaps/compare/master...develop
 
 .. |docs| image:: https://readthedocs.org/projects/pygaps/badge/?style=flat
     :target: https://readthedocs.org/projects/pygaps
