@@ -153,11 +153,12 @@ def psd_mesoporous(
             branch=branch,
             pressure_mode='relative',
         )
-    except pgError:
+    except pgError as err:
         raise CalculationError(
             "The isotherm cannot be converted to a relative basis. "
             "Is your isotherm supercritical?"
-        )
+        ) from err
+
     # If on an desorption branch, data will be reversed
     if branch == 'des':
         loading = loading[::-1]
@@ -343,42 +344,42 @@ def psd_pygapsdh(
     # Pore geometry specifics
     if pore_geometry == 'slit':
         c_length = 1
-
     elif pore_geometry == 'cylinder':
         c_length = 2
-
     elif pore_geometry == 'sphere':
         c_length = 3
+    else:
+        raise ParameterError("Unknown pore geometry.")
 
-    # We reverse the arrays
+    # We reverse the arrays, starting from the highest loading
     volume_adsorbed = volume_adsorbed[::-1]
     relative_pressure = relative_pressure[::-1]
 
     # Calculate the adsorbed volume of liquid and diff
-    d_volume = numpy.negative(numpy.diff(volume_adsorbed))
+    d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
     thickness = thickness_model(relative_pressure)
-    avg_thickness = numpy.add(thickness[:-1], thickness[1:]) / 2
-    d_thickness = numpy.negative(numpy.diff(thickness))
+    avg_thickness = (thickness[:-1] + thickness[1:]) / 2
+    d_thickness = -numpy.diff(thickness)
 
     # Generate the Kelvin pore radii and average
     kelvin_radius = condensation_model(relative_pressure)
 
     # Critical pore radii as a combination of the adsorbed
     # layer thickness and kelvin pore radius, with average and diff
-    pore_widths = 2 * numpy.add(thickness, kelvin_radius)
-    avg_pore_widths = numpy.add(pore_widths[:-1], pore_widths[1:]) / 2
-    d_pore_widths = numpy.negative(numpy.diff(pore_widths))
+    pore_widths = 2 * (thickness + kelvin_radius)
+    avg_pore_widths = (pore_widths[:-1] + pore_widths[1:]) / 2
+    d_pore_widths = -numpy.diff(pore_widths)
 
     # Now we can iteratively calculate the pore size distribution
     sum_area_factor = 0
     pore_volumes = []
 
-    for i in range(len(avg_pore_widths)):
+    for i, avg_pore_width in enumerate(avg_pore_widths):
 
         # Calculate the ratio of the pore to the evaporated capillary "core"
-        ratio_factor = (avg_pore_widths[i] / (avg_pore_widths[i] - 2 * thickness[i]))**c_length
+        ratio_factor = (avg_pore_width / (avg_pore_width - 2 * thickness[i]))**c_length
 
         # Calculate the volume desorbed from thinning of all pores previously emptied
         thickness_factor = -d_thickness[i] * sum_area_factor
@@ -388,9 +389,9 @@ def psd_pygapsdh(
         pore_volumes.append(pore_volume)
 
         # Calculate the area of the newly emptied pore then add it to the total pore area
-        pore_area_correction = ((avg_pore_widths[i] - 2 * avg_thickness[i]) /
-                                avg_pore_widths[i])**(c_length - 1)
-        pore_avg_area = 2 * c_length * pore_volume / avg_pore_widths[i]
+        pore_area_correction = ((avg_pore_width - 2 * avg_thickness[i]) /
+                                avg_pore_width)**(c_length - 1)
+        pore_avg_area = 2 * c_length * pore_volume / avg_pore_width
         sum_area_factor += pore_area_correction * pore_avg_area
 
     pore_dist = pore_volumes / d_pore_widths
@@ -495,32 +496,36 @@ def psd_bjh(
             " to cylindrical pores. Use the pyGAPS-DH method for other options."
         )
 
+    # We reverse the arrays, starting from the highest loading
+    volume_adsorbed = volume_adsorbed[::-1]
+    relative_pressure = relative_pressure[::-1]
+
     # Calculate the adsorbed volume of liquid and diff
-    d_volume = numpy.negative(numpy.diff(volume_adsorbed))
+    d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
     thickness = thickness_model(relative_pressure)
-    avg_thickness = numpy.add(thickness[:-1], thickness[1:]) / 2
-    d_thickness = numpy.negative(numpy.diff(thickness))
+    avg_thickness = (thickness[:-1] + thickness[1:]) / 2
+    d_thickness = -numpy.diff(thickness)
 
     # Generate the Kelvin pore radii and average
     kelvin_radius = condensation_model(relative_pressure)
-    avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
+    avg_k_radius = (kelvin_radius[:-1] + kelvin_radius[1:]) / 2
 
     # Critical pore radii as a combination of the adsorbed
     # layer thickness and kelvin pore radius, with average and diff
-    pore_widths = 2 * numpy.add(thickness, kelvin_radius)
-    avg_pore_widths = 2 * numpy.add(avg_thickness, avg_k_radius)
-    d_pore_widths = numpy.negative(numpy.diff(pore_widths))
+    pore_widths = 2 * (thickness + kelvin_radius)
+    avg_pore_widths = 2 * (avg_thickness + avg_k_radius)
+    d_pore_widths = -numpy.diff(pore_widths)
 
     # Now we can iteratively calculate the pore size distribution
     sum_area_factor = 0
     pore_volumes = []
 
-    for i in range(len(avg_pore_widths)):
+    for i, avg_pore_width in enumerate(avg_pore_widths):
 
         # Calculate the ratio of the pore to the evaporated capillary "core"
-        ratio_factor = (avg_pore_widths[i] / (2 * (avg_k_radius[i] + d_thickness[i])))**2
+        ratio_factor = (avg_pore_width / (2 * (avg_k_radius[i] + d_thickness[i])))**2
 
         # Calculate the volume desorbed from thinning of all pores previously emptied
         thickness_factor = -d_thickness[i] * sum_area_factor
@@ -530,13 +535,12 @@ def psd_bjh(
         pore_volumes.append(pore_volume)
 
         # Calculate the area of the newly emptied pore then add it to the total pore area
-        pore_area_correction = (avg_pore_widths[i] - 2 * avg_thickness[i]) / avg_pore_widths[i]
-        pore_avg_area = (4 * pore_volume / avg_pore_widths[i])
+        pore_area_correction = (avg_pore_width - 2 * avg_thickness[i]) / avg_pore_width
+        pore_avg_area = (4 * pore_volume / avg_pore_width)
         sum_area_factor += pore_area_correction * pore_avg_area
 
     pore_dist = pore_volumes / d_pore_widths
 
-    # TODO cumulative pore volume for bjh and dh is not correct, due to inversions of the volume array
     return pore_widths[:0:-1], pore_dist[::-1], numpy.cumsum(pore_volumes[::-1])
 
 
@@ -636,33 +640,37 @@ def psd_dollimore_heal(
             " to cylindrical pores. Use the pyGAPS-DH method for other options."
         )
 
+    # We reverse the arrays, starting from the highest loading
+    volume_adsorbed = volume_adsorbed[::-1]
+    relative_pressure = relative_pressure[::-1]
+
     # Calculate the first differential of volume adsorbed
-    d_volume = numpy.negative(numpy.diff(volume_adsorbed))
+    d_volume = -numpy.diff(volume_adsorbed)
 
     # Generate the thickness curve, average and diff
     thickness = thickness_model(relative_pressure)
-    avg_thickness = numpy.add(thickness[:-1], thickness[1:]) / 2
-    d_thickness = numpy.negative(numpy.diff(thickness))
+    avg_thickness = (thickness[:-1] + thickness[1:]) / 2
+    d_thickness = -numpy.diff(thickness)
 
     # Generate the Kelvin pore radii and average
     kelvin_radius = condensation_model(relative_pressure)
-    avg_k_radius = numpy.add(kelvin_radius[:-1], kelvin_radius[1:]) / 2
+    avg_k_radius = (kelvin_radius[:-1] + kelvin_radius[1:]) / 2
 
     # Critical pore radii as a combination of the adsorbed
     # layer thickness and kelvin pore radius, with average and diff
-    pore_widths = 2 * numpy.add(thickness, kelvin_radius)
-    avg_pore_widths = 2 * numpy.add(avg_thickness, avg_k_radius)
-    d_pore_widths = numpy.negative(numpy.diff(pore_widths))
+    pore_widths = 2 * (thickness + kelvin_radius)
+    avg_pore_widths = 2 * (avg_thickness + avg_k_radius)
+    d_pore_widths = -numpy.diff(pore_widths)
 
     # Now we can iteratively calculate the pore size distribution
     sum_area_factor = 0
     sum_length_factor = 0
     pore_volumes = []
 
-    for i in range(len(d_pore_widths)):
+    for i, avg_pore_width in enumerate(avg_pore_widths):
 
         # Calculate the ratio of the pore to the evaporated capillary "core"
-        ratio_factor = (avg_pore_widths[i] / (avg_pore_widths[i] - 2 * thickness[i]))**2
+        ratio_factor = (avg_pore_width / (avg_pore_width - 2 * thickness[i]))**2
 
         # Calculate the volume desorbed from thinning of all pores previously emptied
         thickness_factor = - d_thickness[i] * sum_area_factor + \
@@ -673,8 +681,8 @@ def psd_dollimore_heal(
         pore_volumes.append(pore_volume)
 
         # Calculate the two factors in the DH method, for area and length
-        pore_avg_area = (4 * pore_volume / avg_pore_widths[i])
-        pore_avg_length = (8 * pore_volume / avg_pore_widths[i]**2)
+        pore_avg_area = (4 * pore_volume / avg_pore_width)
+        pore_avg_length = (8 * pore_volume / avg_pore_width**2)
         sum_area_factor += pore_avg_area
         sum_length_factor += pore_avg_length
 
