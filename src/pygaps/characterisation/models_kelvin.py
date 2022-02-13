@@ -185,8 +185,8 @@ def kelvin_radius_kjs(
     # Check for correct geometry
     if meniscus_geometry != 'cylindrical':
         raise ParameterError(
-            "The KJS Kelvin correction is not applicable for geometries "
-            "other than cylindrical."
+            "The KJS Kelvin correction is not applicable for meniscus "
+            "geometries other than cylindrical (adsorption branch + cylindrical pore geometry)."
         )
 
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
