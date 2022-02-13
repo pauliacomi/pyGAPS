@@ -28,7 +28,7 @@ from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
-class TestPSDDFT():
+class TestPSDKernel():
     """Test pore size distribution calculation."""
     def test_psd_dft_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
@@ -56,8 +56,7 @@ class TestPSDDFT():
             result_dict = psdk.psd_dft(isotherm, kernel=kernel)
 
             loc = np.where(
-                result_dict['pore_distribution'] ==
-                max(result_dict['pore_distribution'])
+                result_dict['pore_distribution'] == max(result_dict['pore_distribution'])
             )
             principal_peak = result_dict['pore_widths'][loc]
 
@@ -65,8 +64,7 @@ class TestPSDDFT():
             err_absolute = 0.01  # 0.01
 
             assert np.isclose(
-                principal_peak, sample['psd_micro_pore_size'], err_relative,
-                err_absolute
+                principal_peak, sample['psd_micro_pore_size'], err_relative, err_absolute
             )
 
     @cleanup
