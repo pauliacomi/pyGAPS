@@ -62,29 +62,26 @@ class ModelIsotherm(BaseIsotherm):
         Dictionary to be passed to the minimization function to use in fitting model to data.
         See `here
         <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html>`__.
+    pressure_mode : str, optional
+        The pressure mode, either 'absolute' pressure or 'relative'
+        ('relative%') in the form of p/p0.
+    pressure_unit : str, optional
+        Unit of pressure, if applicable.
+    loading_basis : str, optional
+        Whether the adsorbed amount is in terms of either 'volume_gas'
+        'volume_liquid', 'molar', 'mass', or a fractional/percent basis.
+    loading_unit : str, optional
+        Unit in which the loading basis is expressed.
     material_basis : str, optional
-        Whether the adsorption is read in terms of either 'per volume'
+        Whether the underlying material is in terms of 'per volume'
         'per molar amount' or 'per mass' of material.
     material_unit : str, optional
         Unit in which the material basis is expressed.
-    loading_basis : str, optional
-        Whether the adsorbed material is read in terms of either 'volume'
-        'molar' or 'mass'.
-    loading_unit : str, optional
-        Unit in which the loading basis is expressed.
-    pressure_mode : str, optional
-        The pressure mode, either 'absolute' pressures or 'relative'/'relative%' in
-        the form of p/p0.
-    pressure_unit : str, optional
-        Unit of pressure.
-    verbose : bool
-        Prints out extra information about steps taken.
 
     Notes
     -----
-    Models supported are found in :mod:modelling.
-    Here, :math:`L` is the adsorbate uptake and
-    :math:`P` is pressure (fugacity technically).
+    Models supported are found in :mod:modelling. Here, :math:`L` is the
+    adsorbate uptake and :math:`P` is pressure (fugacity technically).
 
     """
 
@@ -631,7 +628,7 @@ class ModelIsotherm(BaseIsotherm):
                     adsorbate=self.adsorbate,
                     temp=self.temperature
                 )
-        else:
+        elif self.model.calculates == 'pressure':
             ret = self.pressure_at(
                 self.loading(points),
                 pressure_mode=pressure_mode,
@@ -672,7 +669,7 @@ class ModelIsotherm(BaseIsotherm):
         loading_unit : str, optional
             Unit in which the loading should be returned. If None
             it defaults to which loading unit the isotherm is currently in.
-        loading_basis : {None, 'mass', 'volume'}
+        loading_basis : {None, 'mass', 'volume_gas', 'volume_liquid'}
             The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         material_unit : str, optional
@@ -806,7 +803,7 @@ class ModelIsotherm(BaseIsotherm):
         loading_unit : str
             Unit the loading is specified in. If ``None``, it defaults to
             internal isotherm units.
-        loading_basis : {None, 'mass', 'volume'}
+        loading_basis : {None, 'mass', 'volume_gas', 'volume_liquid'}
             The basis the loading is specified in. If ``None``,
             assumes the basis the isotherm is currently in.
         material_unit : str, optional
@@ -928,7 +925,7 @@ class ModelIsotherm(BaseIsotherm):
         loading_unit : str, optional
             Unit in which the loading should be returned. If None
             it defaults to which loading unit the isotherm is currently in.
-        loading_basis : {None, 'mass', 'volume'}
+        loading_basis : {None, 'mass',  'volume_gas', 'volume_liquid'}
             The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         material_unit : str, optional

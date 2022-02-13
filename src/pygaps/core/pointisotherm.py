@@ -64,25 +64,24 @@ class PointIsotherm(BaseIsotherm):
 
     Other Parameters
     ----------------
+    pressure_mode : str, optional
+        The pressure mode, either 'absolute' pressure or 'relative'
+        ('relative%') in the form of p/p0.
+    pressure_unit : str, optional
+        Unit of pressure, if applicable.
+    loading_basis : str, optional
+        Whether the adsorbed amount is in terms of either 'volume_gas'
+        'volume_liquid', 'molar', 'mass', or a fractional/percent basis.
+    loading_unit : str, optional
+        Unit in which the loading basis is expressed.
     material_basis : str, optional
-        Whether the adsorption is read in terms of either 'per volume'
+        Whether the underlying material is in terms of 'per volume'
         'per molar amount' or 'per mass' of material.
     material_unit : str, optional
         Unit in which the material basis is expressed.
-    loading_basis : str, optional
-        Whether the adsorbed material is read in terms of either 'volume'
-        'molar' or 'mass'.
-    loading_unit : str, optional
-        Unit in which the loading basis is expressed.
-    pressure_mode : str, optional
-        The pressure mode, either 'absolute' pressures or 'relative' in
-        the form of p/p0.
-    pressure_unit : str, optional
-        Unit of pressure.
 
     Notes
     -----
-
     This class assumes that the datapoints do not contain noise.
     Detection of adsorption/desorption branches will not work if
     data is noisy.
@@ -333,7 +332,7 @@ class PointIsotherm(BaseIsotherm):
         pressure_unit : str
             The unit into which the internal pressure should be converted to.
             Only makes sense if converting to absolute pressure.
-        loading_basis : {'mass', 'molar', 'volume', 'percent', 'fraction'}
+        loading_basis : {'mass', 'molar', 'volume_gas', 'volume_liquid', 'percent', 'fraction'}
             The basis in which the isotherm should be converted.
         loading_unit : str
             The unit into which the internal loading should be converted to.
@@ -435,7 +434,7 @@ class PointIsotherm(BaseIsotherm):
 
         Parameters
         ----------
-        basis_to : {'mass', 'molar', 'volume', 'percent', 'fraction'}
+        basis_to : {'mass', 'molar', 'volume_gas', 'volume_liquid', 'percent', 'fraction'}
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal loading should be converted to.
@@ -736,7 +735,7 @@ class PointIsotherm(BaseIsotherm):
         loading_unit : str, optional
             Unit in which the loading should be returned. If ``None``
             it defaults to which loading unit the isotherm is currently in.
-        loading_basis : {None, 'mass', 'volume', 'molar'}
+        loading_basis : {None, 'mass', 'volume_gas', 'volume_liquid', 'molar'}
             The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         material_unit : str, optional
@@ -929,7 +928,7 @@ class PointIsotherm(BaseIsotherm):
         loading_unit : str
             Unit the loading is specified in. If ``None``, it defaults to
             internal isotherm units.
-        loading_basis : {None, 'mass', 'volume'}
+        loading_basis : {None, 'mass', 'molar', 'volume_gas', 'volume_liquid'}
             The basis the loading is specified in. If ``None``,
             assumes the basis the isotherm is currently in.
         material_unit : str, optional
@@ -1060,7 +1059,7 @@ class PointIsotherm(BaseIsotherm):
         loading_unit : str, optional
             Unit in which the loading should be returned. If ``None``
             it defaults to which loading unit the isotherm is currently in.
-        loading_basis : {None, 'mass', 'volume', 'molar'}
+        loading_basis : {None, 'mass', 'molar', 'volume_gas', 'volume_liquid'}
             The basis on which to return the loading, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         material_unit : str, optional
