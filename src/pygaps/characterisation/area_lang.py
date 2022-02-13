@@ -7,11 +7,10 @@ from scipy import constants
 from scipy import stats
 
 from pygaps import logger
-
-from ..core.adsorbate import Adsorbate
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import pgError
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
 
 # TODO: does the langmuir area require relative pressure?
 
@@ -165,7 +164,7 @@ def area_langmuir(
         )
 
         # Generate plot of the langmuir points chosen
-        from ..graphing.calc_graphs import langmuir_plot
+        from pygaps.graphing.calc_graphs import langmuir_plot
         langmuir_plot(
             pressure,
             langmuir_transform(pressure, loading),

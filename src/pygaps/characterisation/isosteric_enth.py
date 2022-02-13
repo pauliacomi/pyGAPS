@@ -4,7 +4,7 @@ import numpy
 from scipy import constants
 from scipy import stats
 
-from ..utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
 
 
 def isosteric_enthalpy(
@@ -129,7 +129,7 @@ def isosteric_enthalpy(
     )
 
     if verbose:
-        from ..graphing.calc_graphs import isosteric_enthalpy_plot
+        from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
         isosteric_enthalpy_plot(
             loading,
             iso_enthalpy,

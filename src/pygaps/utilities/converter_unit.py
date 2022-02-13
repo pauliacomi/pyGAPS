@@ -1,6 +1,6 @@
 """Define and perform conversions between different units used."""
 
-from .exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
 
 _MOLAR_UNITS = {
     "mmol": 0.001,

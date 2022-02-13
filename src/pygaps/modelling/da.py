@@ -4,7 +4,7 @@ import numpy
 from scipy import constants
 from scipy import integrate
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class DA(IsothermBaseModel):
@@ -104,9 +104,8 @@ class DA(IsothermBaseModel):
 
         """
         return numpy.exp(
-            self.params['e'] / self.minus_rt * numpy.power(
-                -numpy.log(loading / self.params['n_m']), 1 / self.params['m']
-            )
+            self.params['e'] / self.minus_rt *
+            numpy.power(-numpy.log(loading / self.params['n_m']), 1 / self.params['m'])
         )
 
     def spreading_pressure(self, pressure):
@@ -151,9 +150,7 @@ class DA(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "e": -self.minus_rt, "m": 1}
 

@@ -4,8 +4,8 @@ import numpy
 from scipy import integrate
 from scipy import optimize
 
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class JensenSeaton(IsothermBaseModel):
@@ -148,9 +148,7 @@ class JensenSeaton(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k, "a": 1, "b": 1, "c": 1}
 

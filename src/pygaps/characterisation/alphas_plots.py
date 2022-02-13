@@ -4,15 +4,14 @@ import numpy
 from scipy import stats
 
 from pygaps import logger
-
-from ..core.adsorbate import Adsorbate
-from ..core.baseisotherm import BaseIsotherm
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import pgError
-from ..utilities.math_utilities import find_linear_sections
-from .area_bet import area_BET
-from .area_lang import area_langmuir
+from pygaps.characterisation.area_bet import area_BET
+from pygaps.characterisation.area_lang import area_langmuir
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.math_utilities import find_linear_sections
 
 
 def alpha_s(
@@ -231,7 +230,7 @@ def alpha_s(
                     f"The adsorbed volume is {result.get('adsorbed_volume'):.4f} and the area is {result.get('area'):.4f}"
                 )
 
-            from ..graphing.calc_graphs import tp_plot
+            from pygaps.graphing.calc_graphs import tp_plot
             tp_plot(alpha_curve, loading, results, alpha_s=True, alpha_reducing_p=reducing_pressure)
 
     return {

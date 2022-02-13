@@ -9,13 +9,13 @@ import numpy
 from scipy import constants
 from scipy import optimize
 
-from ..core.adsorbate import Adsorbate
-from ..core.baseisotherm import BaseIsotherm
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import pgError
-from .models_hk import HK_KEYS
-from .models_hk import get_hk_model
+from pygaps.characterisation.models_hk import HK_KEYS
+from pygaps.characterisation.models_hk import get_hk_model
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
 
 _MICRO_PSD_MODELS = ['HK', 'HK-CY', 'RY', 'RY-CY']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
@@ -241,7 +241,7 @@ def psd_microporous(
         )
 
     if verbose:
-        from ..graphing.calc_graphs import psd_plot
+        from pygaps.graphing.calc_graphs import psd_plot
         psd_plot(
             pore_widths,
             pore_dist,

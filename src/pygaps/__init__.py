@@ -54,10 +54,10 @@ del hard_dependencies, soft_dependencies, dependency, missing_dependencies
 def _load_lazy(fullname):
     try:
         return sys.modules[fullname]
-    except KeyError:
+    except KeyError as err:
         spec = importlib.util.find_spec(fullname)
         if not spec:
-            raise ModuleNotFoundError(f"Could not import {fullname}.")
+            raise ModuleNotFoundError(f"Could not import {fullname}.") from err
         loader = importlib.util.LazyLoader(spec.loader)
         module = importlib.util.module_from_spec(spec)
         # Make module with proper locking and get it inserted into sys.modules.
@@ -67,21 +67,21 @@ def _load_lazy(fullname):
 
 
 # Data
-from .data import DATABASE
-from .data import ADSORBATE_LIST
-from .data import MATERIAL_LIST
-from .data import load_data
+from pygaps.data import DATABASE
+from pygaps.data import ADSORBATE_LIST
+from pygaps.data import MATERIAL_LIST
+from pygaps.data import load_data
 
 # Thermodynamic backend
-from .utilities.coolprop_utilities import thermodynamic_backend
-from .utilities.coolprop_utilities import backend_use_coolprop
-from .utilities.coolprop_utilities import backend_use_refprop
+from pygaps.utilities.coolprop_utilities import thermodynamic_backend
+from pygaps.utilities.coolprop_utilities import backend_use_coolprop
+from pygaps.utilities.coolprop_utilities import backend_use_refprop
 
 # Core classes
-from .core.adsorbate import Adsorbate
-from .core.material import Material
-from .core.pointisotherm import PointIsotherm
-from .core.modelisotherm import ModelIsotherm
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.material import Material
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.core.modelisotherm import ModelIsotherm
 
 # Data load
 load_data()

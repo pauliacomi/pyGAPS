@@ -3,8 +3,8 @@
 import numpy
 from scipy import optimize
 
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class TSLangmuir(IsothermBaseModel):
@@ -154,9 +154,7 @@ class TSLangmuir(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {
             "n_m1": 0.4 * saturation_loading,

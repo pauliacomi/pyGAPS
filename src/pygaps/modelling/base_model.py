@@ -6,8 +6,7 @@ import numpy
 from scipy import optimize
 
 from pygaps import logger
-
-from ..utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import CalculationError
 
 
 class IsothermBaseModel():

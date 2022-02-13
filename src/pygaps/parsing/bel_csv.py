@@ -7,8 +7,8 @@ Modified from https://github.com/AIF-development-team/adsorptioninformationforma
 
 import dateutil.parser
 
-from .bel_common import _META_DICT
-from .bel_common import _parse_header
+from pygaps.parsing.bel_common import _META_DICT
+from pygaps.parsing.bel_common import _parse_header
 
 
 def parse(path, separator=",", lang="ENG"):

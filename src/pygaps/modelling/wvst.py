@@ -4,9 +4,8 @@ import numpy
 from scipy import optimize
 
 from pygaps import logger
-
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class WVST(IsothermBaseModel):

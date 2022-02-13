@@ -1,7 +1,7 @@
 # pylint: disable=W0614,W0611,W0622
 # flake8: noqa
 # isort:skip_file
-from ..utilities.exceptions import ParsingError
+from pygaps.utilities.exceptions import ParsingError
 
 from .csv import isotherm_from_csv
 from .csv import isotherm_to_csv

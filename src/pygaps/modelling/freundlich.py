@@ -2,7 +2,7 @@
 
 import numpy
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class Freundlich(IsothermBaseModel):
@@ -121,9 +121,7 @@ class Freundlich(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["m"] * self.params["K"] * pressure**(
-            1 / self.params["m"]
-        )
+        return self.params["m"] * self.params["K"] * pressure**(1 / self.params["m"])
 
     def initial_guess(self, pressure, loading):
         """
@@ -141,9 +139,7 @@ class Freundlich(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k, "m": 1}
 

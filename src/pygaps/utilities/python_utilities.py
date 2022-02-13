@@ -4,7 +4,7 @@ import collections.abc as abc
 import pathlib
 import warnings
 
-from .exceptions import pgError
+from pygaps.utilities.exceptions import pgError
 
 
 def _one_pass(iters):

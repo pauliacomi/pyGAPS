@@ -4,10 +4,9 @@ import numpy
 from scipy import optimize
 
 from pygaps import logger
-
-from ..graphing.calc_graphs import virial_plot
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps.graphing.calc_graphs import virial_plot
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class Virial(IsothermBaseModel):

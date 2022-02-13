@@ -9,16 +9,15 @@ import matplotlib.pyplot as plt
 from cycler import cycler
 
 from pygaps import logger
-
-from ..utilities.exceptions import GraphingError
-from ..utilities.exceptions import ParameterError
-from .labels import label_lgd
-from .labels import label_units_dict
-from .mpl_styles import BASE_STYLE
-from .mpl_styles import ISO_MARKERS
-from .mpl_styles import ISO_STYLE
-from .mpl_styles import Y1_COLORS
-from .mpl_styles import Y2_COLORS
+from pygaps.graphing.labels import label_lgd
+from pygaps.graphing.labels import label_units_dict
+from pygaps.graphing.mpl_styles import BASE_STYLE
+from pygaps.graphing.mpl_styles import ISO_MARKERS
+from pygaps.graphing.mpl_styles import ISO_STYLE
+from pygaps.graphing.mpl_styles import Y1_COLORS
+from pygaps.graphing.mpl_styles import Y2_COLORS
+from pygaps.utilities.exceptions import GraphingError
+from pygaps.utilities.exceptions import ParameterError
 
 # list of branch types
 _BRANCH_TYPES = {

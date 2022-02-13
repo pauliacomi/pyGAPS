@@ -1,14 +1,13 @@
 """Contains the adsorbate class."""
 
 from pygaps import logger
-
-from ..data import ADSORBATE_LIST
-from ..utilities.converter_unit import _PRESSURE_UNITS
-from ..utilities.converter_unit import c_unit
-from ..utilities.coolprop_utilities import CP
-from ..utilities.coolprop_utilities import thermodynamic_backend
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
+from pygaps.data import ADSORBATE_LIST
+from pygaps.utilities.converter_unit import _PRESSURE_UNITS
+from pygaps.utilities.converter_unit import c_unit
+from pygaps.utilities.coolprop_utilities import CP
+from pygaps.utilities.coolprop_utilities import thermodynamic_backend
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
 
 
 class Adsorbate():

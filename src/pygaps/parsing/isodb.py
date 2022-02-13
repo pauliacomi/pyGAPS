@@ -1,8 +1,7 @@
 """Interaction with the NIST ISODB."""
 
 from pygaps import logger
-
-from .json import isotherm_from_json
+from pygaps.parsing.json import isotherm_from_json
 
 _ISODB_API = "https://adsorption.nist.gov/isodb/api"
 

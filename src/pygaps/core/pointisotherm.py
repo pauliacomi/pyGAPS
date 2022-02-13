@@ -8,14 +8,13 @@ import numpy
 import pandas
 
 from pygaps import logger
-
-from ..utilities.converter_mode import c_loading
-from ..utilities.converter_mode import c_material
-from ..utilities.converter_mode import c_pressure
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.isotherm_interpolator import IsothermInterpolator
-from .baseisotherm import BaseIsotherm
+from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.utilities.converter_mode import c_loading
+from pygaps.utilities.converter_mode import c_material
+from pygaps.utilities.converter_mode import c_pressure
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.isotherm_interpolator import IsothermInterpolator
 
 
 class PointIsotherm(BaseIsotherm):

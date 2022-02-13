@@ -6,13 +6,12 @@ import numpy
 from scipy import stats
 
 from pygaps import logger
-
-from ..core.adsorbate import Adsorbate
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import pgError
-from ..utilities.math_utilities import find_linear_sections
-from .models_thickness import get_thickness_model
+from pygaps.characterisation.models_thickness import get_thickness_model
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.math_utilities import find_linear_sections
 
 
 def t_plot(
@@ -185,7 +184,7 @@ def t_plot(
                     f"and the area is {result.get('area'):.2f} m2/{isotherm.material_unit}"
                 )
 
-            from ..graphing.calc_graphs import tp_plot
+            from pygaps.graphing.calc_graphs import tp_plot
             tp_plot(t_curve, loading, results)
 
     return {

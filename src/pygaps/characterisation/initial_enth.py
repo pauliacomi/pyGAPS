@@ -4,10 +4,9 @@ import numpy
 from scipy import optimize
 
 from pygaps import logger
-
-from ..core.adsorbate import Adsorbate
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
 
 
 def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess):
@@ -358,7 +357,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         )
 
         title = f'{isotherm.material} {isotherm.adsorbate}'
-        from ..graphing.calc_graphs import initial_enthalpy_plot
+        from pygaps.graphing.calc_graphs import initial_enthalpy_plot
         initial_enthalpy_plot(
             loading, enthalpy, enthalpy_approx(loading), title=title, extras=extras
         )
@@ -404,7 +403,7 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
 
         loading = isotherm.loading(branch=branch, loading_unit='mmol', loading_basis='molar')
         title = f'{isotherm.material} {isotherm.adsorbate}'
-        from ..graphing.calc_graphs import initial_enthalpy_plot
+        from pygaps.graphing.calc_graphs import initial_enthalpy_plot
         initial_enthalpy_plot(loading, enthalpy, [initial_enthalpy for i in loading], title=title)
 
     return {'initial_enthalpy': initial_enthalpy}

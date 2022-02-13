@@ -3,16 +3,15 @@
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.material import Material
-
-from ..utilities.converter_mode import _LOADING_MODE
-from ..utilities.converter_mode import _MATERIAL_MODE
-from ..utilities.converter_mode import _PRESSURE_MODE
-from ..utilities.converter_mode import c_temperature
-from ..utilities.converter_unit import _PRESSURE_UNITS
-from ..utilities.converter_unit import _TEMPERATURE_UNITS
-from ..utilities.exceptions import ParameterError
-from ..utilities.hashgen import isotherm_to_hash
-from ..utilities.python_utilities import simplewarning
+from pygaps.utilities.converter_mode import _LOADING_MODE
+from pygaps.utilities.converter_mode import _MATERIAL_MODE
+from pygaps.utilities.converter_mode import _PRESSURE_MODE
+from pygaps.utilities.converter_mode import c_temperature
+from pygaps.utilities.converter_unit import _PRESSURE_UNITS
+from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.hashgen import isotherm_to_hash
+from pygaps.utilities.python_utilities import simplewarning
 
 SHORTHANDS = {
     'm': "material",
@@ -345,7 +344,7 @@ class BaseIsotherm():
             If path is None, returns the resulting json format as a string.
             Otherwise returns None.
         """
-        from ..parsing.json import isotherm_to_json
+        from pygaps.parsing.json import isotherm_to_json
         return isotherm_to_json(self, path, **kwargs)
 
     def to_csv(self, path=None, separator=',', **kwargs):
@@ -365,7 +364,7 @@ class BaseIsotherm():
             If path is None, returns the resulting json format as a string.
             Otherwise returns None.
         """
-        from ..parsing.csv import isotherm_to_csv
+        from pygaps.parsing.csv import isotherm_to_csv
         return isotherm_to_csv(self, path, separator, **kwargs)
 
     def to_xl(self, path, **kwargs):
@@ -378,7 +377,7 @@ class BaseIsotherm():
             Path where to save Excel file.
 
         """
-        from ..parsing.excel import isotherm_to_xl
+        from pygaps.parsing.excel import isotherm_to_xl
         return isotherm_to_xl(self, path, **kwargs)
 
     def to_aif(self, path=None, **kwargs):
@@ -396,7 +395,7 @@ class BaseIsotherm():
             If path is None, returns the resulting json format as a string.
             Otherwise returns None.
         """
-        from ..parsing.aif import isotherm_to_aif
+        from pygaps.parsing.aif import isotherm_to_aif
         return isotherm_to_aif(self, path, **kwargs)
 
     def to_db(
@@ -424,7 +423,7 @@ class BaseIsotherm():
             Extra information printed to console.
 
         """
-        from ..parsing.sqlite import isotherm_to_db
+        from pygaps.parsing.sqlite import isotherm_to_db
         return isotherm_to_db(
             self,
             db_path=db_path,
@@ -463,5 +462,5 @@ class BaseIsotherm():
         Split isotherm data into an adsorption and desorption part and
         return a column which marks the transition between the two.
         """
-        from ..utilities.math_utilities import split_ads_data
+        from pygaps.utilities.math_utilities import split_ads_data
         return split_ads_data(data, pressure_key)

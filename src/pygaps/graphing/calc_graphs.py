@@ -6,13 +6,13 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-from .labels import label_units_iso
-from .mpl_styles import BASE_STYLE
-from .mpl_styles import LINE_ERROR
-from .mpl_styles import LINE_FIT
-from .mpl_styles import POINTS_HIGHLIGHTED
-from .mpl_styles import POINTS_IMPORTANT
-from .mpl_styles import POINTS_MUTED
+from pygaps.graphing.labels import label_units_iso
+from pygaps.graphing.mpl_styles import BASE_STYLE
+from pygaps.graphing.mpl_styles import LINE_ERROR
+from pygaps.graphing.mpl_styles import LINE_FIT
+from pygaps.graphing.mpl_styles import POINTS_HIGHLIGHTED
+from pygaps.graphing.mpl_styles import POINTS_IMPORTANT
+from pygaps.graphing.mpl_styles import POINTS_MUTED
 
 
 @mpl.rc_context(BASE_STYLE)

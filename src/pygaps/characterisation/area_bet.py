@@ -7,11 +7,10 @@ from scipy import constants
 from scipy import stats
 
 from pygaps import logger
-
-from ..core.adsorbate import Adsorbate
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import pgError
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
 
 
 def area_BET(
@@ -183,7 +182,7 @@ def area_BET(
         )
 
         # Generate plot of the BET points chosen
-        from ..graphing.calc_graphs import bet_plot
+        from pygaps.graphing.calc_graphs import bet_plot
         bet_plot(
             pressure,
             bet_transform(pressure, loading),
@@ -196,7 +195,7 @@ def area_BET(
         )
 
         # Generate plot of the Rouquerol points chosen
-        from ..graphing.calc_graphs import roq_plot
+        from pygaps.graphing.calc_graphs import roq_plot
         roq_plot(
             pressure,
             roq_transform(pressure, loading),

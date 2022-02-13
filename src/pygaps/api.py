@@ -3,19 +3,19 @@
 # isort:skip_file
 
 # Parsing
-from .parsing.csv import isotherm_from_csv
-from .parsing.csv import isotherm_to_csv
-from .parsing.aif import isotherm_from_aif
-from .parsing.aif import isotherm_to_aif
-from .parsing.bel_dat import isotherm_from_bel
-from .parsing.excel import isotherm_from_xl
-from .parsing.excel import isotherm_to_xl
-from .parsing.isodb import isotherm_from_isodb
-from .parsing.json import isotherm_from_json
-from .parsing.json import isotherm_to_json
-from .parsing.sqlite import isotherms_from_db
-from .parsing.sqlite import isotherm_delete_db
-from .parsing.sqlite import isotherm_to_db
+from pygaps.parsing.csv import isotherm_from_csv
+from pygaps.parsing.csv import isotherm_to_csv
+from pygaps.parsing.aif import isotherm_from_aif
+from pygaps.parsing.aif import isotherm_to_aif
+from pygaps.parsing.bel_dat import isotherm_from_bel
+from pygaps.parsing.excel import isotherm_from_xl
+from pygaps.parsing.excel import isotherm_to_xl
+from pygaps.parsing.isodb import isotherm_from_isodb
+from pygaps.parsing.json import isotherm_from_json
+from pygaps.parsing.json import isotherm_to_json
+from pygaps.parsing.sqlite import isotherms_from_db
+from pygaps.parsing.sqlite import isotherm_delete_db
+from pygaps.parsing.sqlite import isotherm_to_db
 
 # Characterisation
 from .characterisation.alphas_plots import alpha_s

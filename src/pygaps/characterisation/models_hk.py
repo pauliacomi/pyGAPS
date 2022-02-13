@@ -3,7 +3,7 @@ Dictionaries or generators which provide properties
 for use in the Horvath-Kawazoe method.
 """
 
-from ..utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
 
 HK_KEYS = {
     'molecular_diameter': 'nm',

@@ -3,8 +3,8 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from ..utilities.string_utilities import convert_chemformula
-from .mpl_styles import BASE_STYLE
+from pygaps.graphing.mpl_styles import BASE_STYLE
+from pygaps.utilities.string_utilities import convert_chemformula
 
 
 @mpl.rc_context(BASE_STYLE)

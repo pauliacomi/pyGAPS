@@ -9,8 +9,8 @@ If adding a custom model, it should be also added below as a string.
 
 import importlib
 
-from ..utilities.exceptions import ParameterError
-from .base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.modelling.base_model import IsothermBaseModel
 
 # This list has all the available models
 _MODELS = [
@@ -207,7 +207,7 @@ def model_iso(
     verbose : bool
         Prints out extra information about steps taken.
     """
-    from ..core.modelisotherm import ModelIsotherm
+    from pygaps.core.modelisotherm import ModelIsotherm
     return ModelIsotherm.from_pointisotherm(
         isotherm,
         branch=branch,

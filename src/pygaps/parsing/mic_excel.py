@@ -11,8 +11,7 @@ import dateutil.parser
 import xlrd
 
 from pygaps import logger
-
-from ..utilities.exceptions import ParsingError
+from pygaps.utilities.exceptions import ParsingError
 
 _NUMBER_REGEX = re.compile(r"^(-)?\d+(.|,)?\d+")
 _BRACKET_REGEX = re.compile(r"(?<=\().+?(?=\))")

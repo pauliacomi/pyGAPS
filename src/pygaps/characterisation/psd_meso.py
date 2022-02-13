@@ -4,14 +4,14 @@ Methods of calculating a pore size distribution for pores in the mesopore range
 """
 import numpy
 
-from ..core.adsorbate import Adsorbate
-from ..core.baseisotherm import BaseIsotherm
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import pgError
-from .models_kelvin import get_kelvin_model
-from .models_kelvin import get_meniscus_geometry
-from .models_thickness import get_thickness_model
+from pygaps.characterisation.models_kelvin import get_kelvin_model
+from pygaps.characterisation.models_kelvin import get_meniscus_geometry
+from pygaps.characterisation.models_thickness import get_thickness_model
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
 
 _MESO_PSD_MODELS = ['pygaps-DH', 'BJH', 'DH']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
@@ -216,7 +216,7 @@ def psd_mesoporous(
 
     # Plot if verbose
     if verbose:
-        from ..graphing.calc_graphs import psd_plot
+        from pygaps.graphing.calc_graphs import psd_plot
         psd_plot(
             pore_widths,
             pore_dist,

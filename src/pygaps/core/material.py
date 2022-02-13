@@ -1,7 +1,7 @@
 """Contains the material class."""
 
-from ..data import MATERIAL_LIST
-from ..utilities.exceptions import ParameterError
+from pygaps.data import MATERIAL_LIST
+from pygaps.utilities.exceptions import ParameterError
 
 
 class Material():

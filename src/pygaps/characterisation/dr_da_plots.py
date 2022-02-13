@@ -6,11 +6,10 @@ from scipy import optimize
 from scipy import stats
 
 from pygaps import logger
-
-from ..core.adsorbate import Adsorbate
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.exceptions import pgError
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
 
 
 def dr_plot(
@@ -247,7 +246,7 @@ def da_plot(
         logger.info(f"Micropore volume is: {microp_volume:.3f} cm3")
         logger.info(f"Effective adsorption potential is : {potential:.3f} kJ/mol")
         # Plot
-        from ..graphing.calc_graphs import dra_plot
+        from pygaps.graphing.calc_graphs import dra_plot
         dra_plot(
             log_v_adj(loading, molar_mass, liquid_density),
             log_p_exp(pressure, exp),

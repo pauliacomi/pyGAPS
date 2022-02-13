@@ -5,9 +5,9 @@ from itertools import product
 import dateutil.parser
 import xlrd
 
-from .bel_common import _META_DICT
-from .bel_common import _check
-from .bel_common import _parse_header
+from pygaps.parsing.bel_common import _META_DICT
+from pygaps.parsing.bel_common import _check
+from pygaps.parsing.bel_common import _parse_header
 
 
 def parse(path):

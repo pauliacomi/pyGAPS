@@ -6,13 +6,12 @@ import numpy
 from scipy import optimize
 
 from pygaps import logger
-
-from ..core.modelisotherm import ModelIsotherm
-from ..graphing.iast_graphs import plot_iast_svp
-from ..graphing.iast_graphs import plot_iast_vle
-from ..modelling import is_model_iast
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.graphing.iast_graphs import plot_iast_svp
+from pygaps.graphing.iast_graphs import plot_iast_vle
+from pygaps.modelling import is_model_iast
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
 
 # TODO add _raw functions to ensure that sanity checks only happen once
 

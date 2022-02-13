@@ -4,7 +4,7 @@ as a function of pressure.
 """
 import numpy
 
-from ..utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
 
 
 def thickness_halsey(pressure):

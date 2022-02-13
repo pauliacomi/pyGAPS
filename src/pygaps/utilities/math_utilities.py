@@ -4,8 +4,8 @@ from itertools import groupby
 
 import numpy
 
-from .exceptions import CalculationError
-from .exceptions import ParameterError
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
 
 
 def split_ads_data(data, pressure_key):

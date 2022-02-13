@@ -2,9 +2,9 @@
 
 import dateutil.parser
 
-from ..utilities.exceptions import ParsingError
-from .bel_common import _META_DICT
-from .bel_common import _parse_header
+from pygaps.parsing.bel_common import _META_DICT
+from pygaps.parsing.bel_common import _parse_header
+from pygaps.utilities.exceptions import ParsingError
 
 
 def parse(path):

@@ -11,10 +11,10 @@ import pandas
 from scipy import interpolate
 from scipy import optimize
 
-from ..core.adsorbate import Adsorbate
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from ..utilities.math_utilities import bspline
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.math_utilities import bspline
 
 _KERNELS = {
     'DFT-N2-77K-carbon-slit': Path(__file__).parent / 'kernels' / 'DFT-N2-77K-carbon-slit.csv',
@@ -212,11 +212,11 @@ def psd_dft(
             'pressure_mode': pressure_mode,
             'pressure_unit': pressure_unit,
         }
-        from ..graphing.isotherm_graphs import plot_iso
+        from pygaps.graphing.isotherm_graphs import plot_iso
         ax = plot_iso(isotherm, **params)
         ax.plot(pressure, kernel_final_loading, 'r-')
         ax.set_title('DFT Fit')
-        from ..graphing.calc_graphs import psd_plot
+        from pygaps.graphing.calc_graphs import psd_plot
         psd_plot(
             pore_widths,
             pore_dist,

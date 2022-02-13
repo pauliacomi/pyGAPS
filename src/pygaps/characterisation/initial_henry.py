@@ -3,10 +3,9 @@
 import numpy
 
 from pygaps import logger
-
-from ..core.modelisotherm import ModelIsotherm
-from ..modelling import get_isotherm_model
-from ..utilities.exceptions import ParameterError
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.modelling import get_isotherm_model
+from pygaps.utilities.exceptions import ParameterError
 
 
 def initial_henry_slope(
@@ -102,7 +101,7 @@ def initial_henry_slope(
             **iso_params,
         )
         model_isotherm.material = "model"
-        from ..graphing.isotherm_graphs import plot_iso
+        from pygaps.graphing.isotherm_graphs import plot_iso
         plot_iso([isotherm, model_isotherm], **params)
 
     # return the henry constant

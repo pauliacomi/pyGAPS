@@ -8,7 +8,7 @@ from functools import partial
 import numpy
 from scipy import constants
 
-from ..utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
 
 
 def get_meniscus_geometry(branch, pore_geometry):

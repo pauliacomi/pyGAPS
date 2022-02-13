@@ -4,17 +4,16 @@ import numpy
 import pandas
 
 from pygaps import logger
-
-from ..modelling import _GUESS_MODELS
-from ..modelling import get_isotherm_model
-from ..modelling import is_model
-from ..modelling import is_model_class
-from ..utilities.converter_mode import c_loading
-from ..utilities.converter_mode import c_material
-from ..utilities.converter_mode import c_pressure
-from ..utilities.exceptions import CalculationError
-from ..utilities.exceptions import ParameterError
-from .baseisotherm import BaseIsotherm
+from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.modelling import _GUESS_MODELS
+from pygaps.modelling import get_isotherm_model
+from pygaps.modelling import is_model
+from pygaps.modelling import is_model_class
+from pygaps.utilities.converter_mode import c_loading
+from pygaps.utilities.converter_mode import c_material
+from pygaps.utilities.converter_mode import c_pressure
+from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
 
 
 class ModelIsotherm(BaseIsotherm):
