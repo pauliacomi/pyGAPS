@@ -107,10 +107,10 @@ class BaseIsotherm():
 
         """
         # commonly used shorthands
-        for shorthand in SHORTHANDS:
+        for shorthand, prop in SHORTHANDS.items():
             data = properties.pop(shorthand, None)
             if data:
-                properties[SHORTHANDS[shorthand]] = data
+                properties[prop] = data
 
         # Must-have properties of the isotherm
         #
@@ -132,12 +132,12 @@ class BaseIsotherm():
         # Isotherm units
         #
         with simplewarning():
-            for k in self._unit_params:
-                if k not in properties:
+            for uparam, udefault in self._unit_params.items():
+                if uparam not in properties:
                     logger.warning(
-                        f"WARNING: '{k}' was not specified , assumed as '{self._unit_params[k]}'"
+                        f"WARNING: '{uparam}' was not specified , assumed as '{udefault}'"
                     )
-                    properties[k] = self._unit_params[k]
+                    properties[uparam] = udefault
 
         # TODO deprecation
         if self._unit_params['loading_basis'] == 'volume':
@@ -216,6 +216,7 @@ class BaseIsotherm():
 
     @property
     def material(self):
+        """Return underlying material."""
         return self._material
 
     @material.setter
@@ -235,6 +236,7 @@ class BaseIsotherm():
 
     @property
     def adsorbate(self):
+        """Return underlying adsorbate."""
         return self._adsorbate
 
     @adsorbate.setter
@@ -251,6 +253,7 @@ class BaseIsotherm():
 
     @property
     def temperature(self):
+        """Return underlying temperature, always in kelvin."""
         if self.temperature_unit == "K":
             return self._temperature
         return c_temperature(self._temperature, self.temperature_unit, "K")

@@ -148,7 +148,7 @@ def alpha_s(
                 "Could not calculate a BET area for the reference isotherm. "
                 "Either solve the issue or provide a value for reference_area. "
                 f"BET area error is :\n{err}"
-            )
+            ) from err
     elif reference_area.lower() == 'langmuir':
         try:
             reference_area = area_langmuir(reference_isotherm).get('area')
@@ -157,7 +157,7 @@ def alpha_s(
                 "Could not calculate a Langmuir area for the reference isotherm. "
                 "Either solve the issue or provide a value for reference_area. "
                 f"Langmuir area error is :\n{err}"
-            )
+            ) from err
     elif not isinstance(reference_area, float):
         raise ParameterError(
             "The reference area should be either a numeric value, 'BET' or 'Langmuir'. "
