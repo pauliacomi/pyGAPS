@@ -151,7 +151,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
     except Exception as err:
         raise ParsingError(
             "Could not parse CSV isotherm. "
-            "The format may be wrong, check for errors."
+            f"The format may be wrong, check for errors in line {line}."
         ) from err
 
     # version check
