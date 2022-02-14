@@ -253,8 +253,8 @@ def isotherm_from_xl(path, *isotherm_parameters):
             header_col += 1
         data = pandas.DataFrame(experiment_data)
 
-        raw_dict['loading_key'] = headers[0]
-        raw_dict['pressure_key'] = headers[1]
+        raw_dict['pressure_key'] = headers[0]
+        raw_dict['loading_key'] = headers[1]
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
