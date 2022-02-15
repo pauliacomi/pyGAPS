@@ -13,13 +13,13 @@ proprietary*REFPROP* backend. pyGAPS defaults to using the HEOS backend, but it
 the user has REFPROP installed and configured on their computer, they can enable
 it by using the switching function:
 
-::
+.. code:: python
 
     pygaps.backend_use_refprop()
 
 To go back to the standard CoolProp backend, use:
 
-::
+.. code:: python
 
     pygaps.backend_use_coolprop()
 

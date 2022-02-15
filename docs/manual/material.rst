@@ -8,20 +8,25 @@ The Material class
 Overview
 --------
 
-Similarly to ``Adsorbates``, a ``Material`` is a helper wrapper class around
-pyGAPS concepts. The user might want to store details about adsorbent materials
-they use. The information can range from date of synthesis, material density,
-etc. For this case, pyGAPS provides the Material class.
+Similarly to :class:`~pygaps.core.adsorbate.Adsorbate`, a
+:class:`~pygaps.core.material.Material` is a helper wrapper class around pyGAPS
+concepts. The user might want to store details about adsorbent materials they
+use. The information can range from date of synthesis, material density, etc.
+For this case, pyGAPS provides the Material class.
 
 The isotherm required property of ``material`` is used to connect an Isotherm
-instance to a specific Material. Each time an isotherm is created, pyGAPS looks
-in the main material list (``pygaps.MATERIAL_LIST``) for an object with the same
-name. This list is populated as import-time with materials stored in the
-internal database. The user can also add their own material to the list, or
-upload it to the database for permanent storage.
+instance to a specific :class:`~pygaps.core.material.Material`. Each time an
+isotherm is created, pyGAPS looks in the main material list
+(``pygaps.MATERIAL_LIST``) for an object with the same name. This list is
+populated as import-time with materials stored in the internal database. The
+user can also add their own material to the list, or upload it to the database
+for permanent storage.
 
-For a complete list of methods and individual descriptions look at the
-:class:`~pygaps.core.material.Material` reference.
+.. note::
+
+    For a complete list of methods and individual descriptions look at the
+    :class:`~pygaps.core.material.Material` reference.
+
 
 .. _material-manual-create:
 
@@ -34,13 +39,13 @@ the rest of the parameters being optional.
 
 An example of how to create a material:
 
-::
+.. code:: python
 
     my_material = pygaps.Material(
         'carbon',                   # Name
         batch='X1',                 # User specific
         owner='Test User',          # User specific
-        type='powder',              # User specific
+        form='powder',              # User specific
         density=1,                  # User specific
         treatment='acid etching'    # User specific
     )
@@ -49,9 +54,18 @@ An example of how to create a material:
 To view a summary of the material properties, the standard python print function
 can be used.
 
-::
+.. code:: python
 
     print(my_material)
+
+.. hint::
+
+    All custom properties are found in the ``Material.properties`` dictionary.
+
+    .. code:: python
+
+        my_material.properties["form"]
+        >> "powder"
 
 
 .. _material-manual-manage:
@@ -65,15 +79,16 @@ stored in ``pygaps.MATERIAL_LIST``. The easiest way to retrieve a material from
 the list is to use the :meth:`~pygaps.core.material.Material.find` class method.
 It takes the material name as parameter.
 
-::
+.. code:: python
 
-    my_material2 = pygaps.Material.find('carbon')
+    carbon = pygaps.Material.find('carbon')
 
 At first use the database will be empty. To populate the database with
-materials, the user should create the materials first and then upload them to
-the list for temporary storage, or to database for permanent storage.
+materials, the user should create the materials first and then append them to
+the list for temporary storage, or upload them to a database for permanent
+storage.
 
-::
+.. code:: python
 
     # To store in the main list
     pyGAPS.MATERIAL_LIST.append(my_material)

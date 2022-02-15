@@ -2,5 +2,5 @@
 t-plot
 ......
 
-.. automodule:: pygaps.characterisation.tplot
+.. automodule:: pygaps.characterisation.t_plots
     :members: t_plot, t_plot_raw

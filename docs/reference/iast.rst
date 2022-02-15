@@ -7,5 +7,5 @@ Multi-component adsorption modelling
 IAST
 ----
 
-.. automodule:: pygaps.iast.iast
+.. automodule:: pygaps.iast
     :members:

@@ -72,7 +72,7 @@ the user decides to have an external database, they can either copy the internal
 database (located in the `/pygaps/database` directory) or generate an empty one
 using the ``db_create`` command.
 
-::
+.. code:: python
 
     from pygaps.utilities.sqlite_db_creator import db_create
     db_create("path/to/database")

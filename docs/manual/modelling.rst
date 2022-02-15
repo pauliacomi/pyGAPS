@@ -43,22 +43,22 @@ model for only one branch, determined at initialisation.
 
 Currently the models implemented are:
 
-    - :mod:`~pygaps.modelling.henry` - Henry
-    - :mod:`~pygaps.modelling.langmuir` - Langmuir
-    - :mod:`~pygaps.modelling.dslangmuir` - Double Site Langmuir
-    - :mod:`~pygaps.modelling.tslangmuir` - Triple Site Langmuir
-    - :mod:`~pygaps.modelling.bet` - Brunnauer-Emmet-Teller (BET)
-    - :mod:`~pygaps.modelling.gab` - Guggenheim-Anderson-de Boer (GAB)
-    - :mod:`~pygaps.modelling.freundlich` - Freundlich
-    - :mod:`~pygaps.modelling.dr` - Dubinin-Radushkevitch (DR)
-    - :mod:`~pygaps.modelling.da` - Dubinin-Astakov (DA)
-    - :mod:`~pygaps.modelling.quadratic` - Quadratic
-    - :mod:`~pygaps.modelling.temkinapprox` - Temkin Approximation
-    - :mod:`~pygaps.modelling.toth` - Toth
-    - :mod:`~pygaps.modelling.jensenseaton` - Jensen-Seaton
-    - :mod:`~pygaps.modelling.wvst` - Wilson Vacancy Solution Theory (W-VST)
-    - :mod:`~pygaps.modelling.fhvst` - Flory-Huggins Vacancy Solution Theory
-      (FH-VST)
+- :mod:`~pygaps.modelling.henry` - Henry
+- :mod:`~pygaps.modelling.langmuir` - Langmuir
+- :mod:`~pygaps.modelling.dslangmuir` - Double Site Langmuir
+- :mod:`~pygaps.modelling.tslangmuir` - Triple Site Langmuir
+- :mod:`~pygaps.modelling.bet` - Brunnauer-Emmet-Teller (BET)
+- :mod:`~pygaps.modelling.gab` - Guggenheim-Anderson-de Boer (GAB)
+- :mod:`~pygaps.modelling.freundlich` - Freundlich
+- :mod:`~pygaps.modelling.dr` - Dubinin-Radushkevitch (DR)
+- :mod:`~pygaps.modelling.da` - Dubinin-Astakov (DA)
+- :mod:`~pygaps.modelling.quadratic` - Quadratic
+- :mod:`~pygaps.modelling.temkinapprox` - Temkin Approximation
+- :mod:`~pygaps.modelling.toth` - Toth
+- :mod:`~pygaps.modelling.jensenseaton` - Jensen-Seaton
+- :mod:`~pygaps.modelling.wvst` - Wilson Vacancy Solution Theory (W-VST)
+- :mod:`~pygaps.modelling.fhvst` - Flory-Huggins Vacancy Solution Theory
+  (FH-VST)
 
 For an explanation of each model, visit its respective reference page. Custom
 models can also be added to the list if you are willing to write them. See the
@@ -80,7 +80,7 @@ To do so, the class includes a specific class method,
 allows a PointIsotherm to be used. Alternatively, a utility function
 ``model_iso`` is provided. An example is:
 
-::
+.. code:: python
 
     model_isotherm = pygaps.model_iso(
         point_isotherm,
@@ -107,7 +107,7 @@ significantly more resources than simply specifying the model manually. As a
 consequence, some models which require a lot of overhead, such as the virial
 model, have been excluded from this option.
 
-::
+.. code:: python
 
     # Attempting all basic models
     model_isotherm = pygaps.model_iso(
@@ -128,18 +128,17 @@ Once the a ModelIsotherm is generated, it can be used as a regular
 PointIsotherm, as it contains the same common methods. Some slight differences
 exist:
 
-    - ModelIsotherms do not contain the ``data`` method, as they contain no
-      data. Instead the user can access the ``model.params`` property, to get a
-      dictionary of the calculated model parameters.
+- ModelIsotherms do not contain the ``data`` method, as they contain no data.
+  Instead the user can access the ``model.params`` property, to get a dictionary
+  of the calculated model parameters.
 
-    - The ``loading`` and ``pressure`` functions will return equidistant points
-      over the whole range of the isotherm instead of returning actual
-      datapoints.
+- The ``loading`` and ``pressure`` functions will return equidistant points over
+  the whole range of the isotherm instead of returning actual datapoints.
 
-    - Some models calculate pressure(loading), others calculate
-      loading(pressure). If the model function cannot be inverted, the requested
-      data will have to be computed using numerical methods. Depending on the
-      model, the minimisation may or may not converge.
+- Some models calculate pressure(loading), others calculate loading(pressure).
+  If the model function cannot be inverted, the requested data will have to be
+  computed using numerical methods. Depending on the model, the minimisation may
+  or may not converge.
 
 
 .. _modelling-compare:
@@ -151,7 +150,7 @@ The ModelIsotherms can easily be plotted using the same function as
 PointIsotherms. For example, to graphically compare a model and an experimental
 isotherm:
 
-::
+.. code:: python
 
     pygaps.plot_iso([model_isotherm, point_isotherm])
 
@@ -162,7 +161,7 @@ user wants the pressure points to be identical one can pass the pressure or
 loading points in the plotting function as the ``x_points`` and ``y1_points``,
 respectively.
 
-::
+.. code:: python
 
     pygaps.plot_iso(
             [model_isotherm, point_isotherm],
@@ -182,7 +181,7 @@ purpose. The function method takes as parameters a ModelIsotherm, and a
 where the loading is calculated. If a PointIsotherm is passed instead, the
 loading is calculated at each of the points of this isotherm.
 
-::
+.. code:: python
 
     # Create a PointIsotherm from the model
     new_point_isotherm = pygaps.PointIsotherm.from_modelisotherm(
@@ -216,18 +215,18 @@ which should be inherited by a custom model.
 
 The parameters to be specified are the following:
 
-    - The model name.
-    - A dictionary with the model parameters names and possible bounds.
-    - A function that returns an initial guess for the model parameters
-      (``initial_guess()``).
-    - A fitting function that determines the model parameters starting from the
-      loading and pressure data (``fit()``). Alternatively, the template fitting
-      function can be used if inherited.
-    - Functions that return the loading and pressure calculated from the model
-      parameters (``loading(pressure)`` and ``pressure(loading)``). These can be
-      calculated analytically or numerically.
-    - A function which returns the spreading pressure, if the model is to be
-      used for IAST calculations (``spreading_pressure(pressure)``).
+- The model name.
+- A dictionary with the model parameters names and possible bounds.
+- A function that returns an initial guess for the model parameters
+  (``initial_guess()``).
+- A fitting function that determines the model parameters starting from the
+  loading and pressure data (``fit()``). Alternatively, the template fitting
+  function can be used if inherited.
+- Functions that return the loading and pressure calculated from the model
+  parameters (``loading(pressure)`` and ``pressure(loading)``). These can be
+  calculated analytically or numerically.
+- A function which returns the spreading pressure, if the model is to be used
+  for IAST calculations (``spreading_pressure(pressure)``).
 
 Once the model is written, it should be added to the list of usable models. This
 can be found in the */pygaps/modelling/__init__.py* file.

@@ -16,10 +16,10 @@ The main plotting tool is in the
 :func:`~pygaps.graphing.isotherm_graphs.plot_iso` function, which handles the
 plotting of isotherms. Some common use-case scenarios for the functionality are:
 
-    - Visualising the data after isotherm instantiation.
-    - Quickly comparing several isotherms.
-    - Checking the overlap of a model isotherm and the point data.
-    - Generating graphs for a publication.
+- Visualising the data after isotherm instantiation.
+- Quickly comparing several isotherms.
+- Checking the overlap of a model isotherm and the point data.
+- Generating graphs for a publication.
 
 The function can take many parameters which will modify the graph style, colours
 etc. The function also accepts keywords to specify the unit, pressure mode and

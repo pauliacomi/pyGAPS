@@ -1,5 +1,7 @@
+pygments>=2.11
 sphinx>=1.4
 ipykernel
 nbsphinx
-sphinx-rtd-theme
+sphinx-copybutton
+furo
 -e .

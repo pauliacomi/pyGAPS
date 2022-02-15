@@ -93,14 +93,14 @@ Documentation
 
 pyGAPS is built with three key mantras in mind:
 
-    - **opinionated**: There are many places where the code will suggest or
-      default to what the it considers a good practice. As examples: the
-      standard units, pore size distribution methods and BET calculation limits.
-    - **flexible**: While the defaults are there for a reason, you can override
-      pretty much any parameter. Want to pass a custom adsorbate thickness
-      function or use volumetric bases? Can do!
-    - **transparency**: All code is well documented and open source. There are
-      no black boxes.
+- **opinionated**: There are many places where the code will suggest or
+  default to what the it considers a good practice. As examples: the
+  standard units, pore size distribution methods and BET calculation limits.
+- **flexible**: While the defaults are there for a reason, you can override
+  pretty much any parameter. Want to pass a custom adsorbate thickness
+  function or use volumetric bases? Can do!
+- **transparency**: All code is well documented and open source. There are
+  no black boxes.
 
 In-depth explanations, examples and theory can be found in the
 `online documentation <https://pygaps.readthedocs.io/>`__. If you are familiar
@@ -125,7 +125,7 @@ best to explain the theory and application range of each capability and model.
 To learn more, look at the
 `reference <https://pygaps.readthedocs.io/en/master/reference/index.html>`__ or
 simply call ``help()`` from a python interpreter (for example
-``help(pygaps.area_BET)``.
+``help(pygaps.PointIsotherm)``.
 
 Citing
 ======
@@ -154,7 +154,7 @@ environments for you. First create a new environment and use conda to
 install the dependencies (or start with one that already has a full
 instalation). Then use pip inside your environment.
 
-.. code-block:: bash
+.. code:: bash
 
     conda create -n myenv python=3 numpy scipy pandas matplotlib
     conda activate myenv
@@ -163,7 +163,7 @@ instalation). Then use pip inside your environment.
 To install the development branch, clone the repository from GitHub.
 Then install the package with pip either in regular or developer mode.
 
-.. code-block:: bash
+.. code:: bash
 
     git clone https://github.com/pauliacomi/pyGAPS
 

@@ -31,20 +31,20 @@ IAST calculations in pyGAPS
 To use the IAST functionality, a list of pure component isotherms is needed. The
 isotherms can be either:
 
-    - A ModelIsotherm class, where the model will be used for the calculation of
-      spreading pressure. Some models cannot be used for IAST calculations.
-    - A PointIsotherm class, where the spreading pressure calculation will use
-      interpolated data.
+- A ModelIsotherm class, where the model will be used for the calculation of
+  spreading pressure. Some models cannot be used for IAST calculations.
+- A PointIsotherm class, where the spreading pressure calculation will use
+  interpolated data.
 
 The original pyIAST functions still exist, as
-:func:`~pygaps.iast.iast.iast` and
-:func:`~pygaps.iast.iast.reverse_iast`. They can be used to
+:func:`~pygaps.iast.pgiast.iast_point` and
+:func:`~pygaps.iast.pgiast.reverse_iast`. They can be used to
 determine the adsorbed fraction of each adsorbate given their partial pressures,
 or vice-versa.
 
 To use:
 
-::
+.. code:: python
 
     isotherms = [iso1, iso2, iso3]
     mole_fractions = [0.1, 0.4, 0.5]
@@ -57,37 +57,36 @@ Since IAST is often used for binary mixture adsorption prediction, several new
 functions have been introduced which make it easier to do common calculations
 and generate graphs:
 
-    - :func:`~pygaps.iast.iast.iast_binary_svp` is a function to
-      calculate the selectivity of a known composition mixture as a function of
-      pressure.
+- :func:`~pygaps.iast.pgiast.iast_binary_svp` is a function to calculate the
+  selectivity of a known composition mixture as a function of pressure.
 
-      For example, this will plot selectivities over a pressure range of 0.01 to
-      10 of an equimolar mixture of methane and ethane:
+  For example, this will plot selectivities over a pressure range of 0.01 to
+  10 of an equimolar mixture of methane and ethane:
 
-      ::
+  .. code:: python
 
-        import numpy
-        import matplotlib.pyplot as plt
+      import numpy
+      import matplotlib.pyplot as plt
 
-        partial_pressures = [0.5, 0.5]
-        pressure_range = numpy.linspace(0.01, 10, 30)
+      partial_pressures = [0.5, 0.5]
+      pressure_range = numpy.linspace(0.01, 10, 30)
 
-        result_dict = pygaps.iast_binary_svp(
-            [ch4, c2h6], partial_pressures, pressure_range, verbose=True,
-        )
+      result_dict = pygaps.iast_binary_svp(
+          [ch4, c2h6], partial_pressures, pressure_range, verbose=True,
+      )
 
-    - :func:`~pygaps.iast.iast.iast_binary_vle` is a function to
-      calculate the gas-adsorbed equilibrium at a constant pressure, over the
-      entire range of molar fractions.
+- :func:`~pygaps.iast.pgiast.iast_binary_vle` is a function to
+  calculate the gas-adsorbed equilibrium at a constant pressure, over the
+  entire range of molar fractions.
 
-      For example, this will plot the gas-adsorbed equilibrium for all molar
-      fractions of methane in ethane at a pressure of 2 bar:
+  For example, this will plot the gas-adsorbed equilibrium for all molar
+  fractions of methane in ethane at a pressure of 2 bar:
 
-      ::
+  .. code:: python
 
-        import matplotlib.pyplot as plt
+      import matplotlib.pyplot as plt
 
-        result_dict = pygaps.iast_binary_vle([ch4, c2h6], 2, verbose=True)
+      result_dict = pygaps.iast_binary_vle([ch4, c2h6], 2, verbose=True)
 
 
 

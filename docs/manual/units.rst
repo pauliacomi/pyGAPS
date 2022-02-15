@@ -15,9 +15,9 @@ basis.
 
 Units can be specified for the following properties:
 
-    - Isotherm pressure.
-    - Adsorbate loading, or the amount of gas adsorbed.
-    - Material, or the adsorbent on which adsorption takes place.
+- Isotherm pressure.
+- Adsorbate loading, or the amount of gas adsorbed.
+- Material, or the adsorbent on which adsorption takes place.
 
 An explanation follows of the concepts follows.
 
@@ -39,7 +39,7 @@ state from either CoolProp or REFPROP.
 
 An example isotherm conversion with pressure:
 
-::
+.. code:: python
 
     isotherm.convert_pressure(
         mode_to='absolute',
@@ -76,7 +76,7 @@ state from either CoolProp or REFPROP.
 
 Examples of isotherm conversion on loading:
 
-::
+.. code:: python
 
     isotherm.convert_loading(
         basis_to='percent',
@@ -107,7 +107,7 @@ below and, check out the :ref:`Material <material-manual-manage>` manual.
 
 Example of isotherm conversion on material:
 
-::
+.. code:: python
 
     isotherm.material.properties['density'] = 2
     isotherm.convert_material(
@@ -132,7 +132,7 @@ and :mod:`pygaps.utilities.converter_unit` module.
 
 An example pressure conversion:
 
-::
+.. code:: python
 
     from pygaps.utilities.converter_mode import c_pressure
 
@@ -143,7 +143,7 @@ An example pressure conversion:
 
 An example loading conversion:
 
-::
+.. code:: python
 
     from pygaps.utilities.converter_mode import c_loading
 
@@ -154,7 +154,7 @@ An example loading conversion:
 
 An example pressure conversion:
 
-::
+.. code:: python
 
     from pygaps.utilities.converter_mode import c_material
 
