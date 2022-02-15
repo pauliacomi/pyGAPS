@@ -23,9 +23,11 @@ extension-pkg-whitelist = [
 disable = [
     "logging-fstring-interpolation", # fstrings are fast
     "import-outside-toplevel", # required for optimisations
+    "wrong-import-position", # often done through code for optimisations
     "too-many-instance-attributes", # we don't need these
     "too-many-branches", # we don't need these
     "too-many-locals", # we don't need these
+    "too-many-arguments", # we don't need these
 ]
 
 # linting: pydocstyle
