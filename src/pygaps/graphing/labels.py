@@ -66,7 +66,9 @@ def label_lgd(isotherm, lbl_components, branch: str = None, key_def: str = None)
             if not val:
                 val = isotherm.properties.get(selected, None)
             if not val:
-                logger.warning(f"Isotherm {isotherm} does not have an {selected} attribute.")
+                logger.warning(
+                    f"Isotherm {isotherm.__repr__()} does not have an {selected} attribute."
+                )
                 continue
             text.append(str(val))
 
