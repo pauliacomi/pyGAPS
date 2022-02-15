@@ -131,9 +131,9 @@ html_favicon = 'favicon.ico'
 
 # Custom CSS/JS
 html_static_path = ["_static"]
-# html_css_files = [
-#     'css/custom.js',
-# ]
+html_css_files = [
+    'css/custom.css',
+]
 # html_js_files = [
 #     'js/darkmode.js',
 # ]

@@ -2,3 +2,8 @@
     --warning: #CD4949;
     --attention: #49CDAC;
 }
+
+/* This ensures Matplotlib png images are legible on the dark background */
+.output_area>img {
+    background-color: #cbd9d7;
+}
