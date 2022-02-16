@@ -154,12 +154,13 @@ def area_langmuir(
         logger.info(
             textwrap.dedent(
                 f"""\
-            Langmuir area: a = {langmuir_area:.2e} m2/{isotherm.material_unit}
-            Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum]:.3f}
-            The slope of the Langmuir fit: s = {slope:.2e}
-            The intercept of the Langmuir fit: i = {intercept:.2e}
-            The Langmuir constant is: K = {langmuir_const:.1f}
-            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.material_unit}"""
+            Langmuir area: a = {langmuir_area:.4g} m2/{isotherm.material_unit}
+            Minimum pressure point is {pressure[minimum]:.3g} and maximum is {pressure[maximum]:.3g}
+            The Langmuir constant is: K = {langmuir_const:.3g}
+            Amount Langmuir monolayer is: n = {n_monolayer:.3g} mol/{isotherm.material_unit}
+            The slope of the Langmuir fit: s = {slope:.3g}
+            The intercept of the Langmuir fit: i = {intercept:.3g}
+            """
             )
         )
 

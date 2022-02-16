@@ -253,7 +253,7 @@ class Virial(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.4g}")
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
             virial_plot(
                 loading, ln_p_over_n, n_load,

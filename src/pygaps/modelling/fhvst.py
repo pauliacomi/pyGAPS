@@ -251,4 +251,4 @@ class FHVST(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.4g}")

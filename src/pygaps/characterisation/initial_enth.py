@@ -327,24 +327,24 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
 
     if verbose:
         logger.info('\n')
-        logger.info(f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}")
-        logger.info(f"The constant contribution is \n\t{params['const']:.2f}")
+        logger.info(f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.3g}")
+        logger.info(f"The constant contribution is \n\t{params['const']:.3g}")
         if params['const'] < enth_liq:
             logger.warning(
                 'CARE: Base enthalpy of adsorption is lower than enthalpy of liquefaction.'
             )
         logger.info(
             "The exponential contribution is \n\t"
-            f"{params['preexp']:.2f} * exp({params['exp']:.2E} * n)"
-            f"with the limit at {params['exploc']:.2f}"
+            f"{params['preexp']:.3g} * exp({params['exp']:.3g} * n)"
+            f"with the limit at {params['exploc']:..3g}"
         )
         logger.info(
             "The guest-guest attractive contribution is \n\t"
-            f"{params['prepowa']:.2g} * n^{params['powa']:.2}"
+            f"{params['prepowa']:.3g} * n^{params['powa']:.3g}"
         )
         logger.info(
             "The guest-guest repulsive contribution is \n\t"
-            f"{params['prepowr']:.2g} * n^{params['powr']:.2}"
+            f"{params['prepowr']:.3g} * n^{params['powr']:.3g}"
         )
 
         x_axis = numpy.linspace(0, 1)
@@ -399,7 +399,7 @@ def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
     initial_enthalpy = enthalpy[0]
 
     if verbose:
-        logger.info(f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.2f}", )
+        logger.info(f"The initial enthalpy of adsorption is: \n\tE = {initial_enthalpy:.3g}", )
 
         loading = isotherm.loading(branch=branch, loading_unit='mmol', loading_basis='molar')
         title = f'{isotherm.material} {isotherm.adsorbate}'

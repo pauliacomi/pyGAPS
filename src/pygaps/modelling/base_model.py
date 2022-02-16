@@ -56,15 +56,15 @@ class IsothermBaseModel():
         """Print model name and parameters."""
         ret_string = (
             f"{self.name} isotherm model.\n"
-            f"RMSE = {self.rmse:.4f}\n"
+            f"RMSE = {self.rmse:.4g}\n"
             "Model parameters:\n"
         )
         for param, val in self.params.items():
-            ret_string += f"\t{param} = {val:.2f}\n"
+            ret_string += f"\t{param} = {val:.4g}\n"
         ret_string += (
             "Model applicable range:\n" +
-            f"\tPressure range: {self.pressure_range[0]:.2f} - {self.pressure_range[1]:.2f}\n"
-            f"\tLoading range: {self.loading_range[0]:.2f} - {self.loading_range[1]:.2f}\n"
+            f"\tPressure range: {self.pressure_range[0]:.3g} - {self.pressure_range[1]:.3g}\n"
+            f"\tLoading range: {self.loading_range[0]:.3g} - {self.loading_range[1]:.3g}\n"
         )
 
         return ret_string

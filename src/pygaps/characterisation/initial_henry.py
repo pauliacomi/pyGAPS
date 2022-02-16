@@ -86,10 +86,10 @@ def initial_henry_slope(
             break
 
     if verbose:
-        logger.info(f"Calculated K = {henry.params['K']:.2e}")
+        logger.info(f"Calculated K = {henry.params['K']:.4g}")
         logger.info(f"Starting points: {initial_rows}")
         logger.info(f"Selected points: {rows_taken}")
-        logger.info(f"Final adjusted RMSE: {adjrmsd:.2e}")
+        logger.info(f"Final adjusted RMSE: {adjrmsd:.3g}")
         params = {'branch': 'ads', 'lgd_keys': ['material']}
         params.update(plot_parameters)
         henry.pressure_range = [pressure[0], pressure[:rows_taken][-1]]

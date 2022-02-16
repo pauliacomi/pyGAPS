@@ -119,7 +119,7 @@ def plot_iast_vle(
     text_x = f"Bulk fraction {ads1}"
     text_y = f"Adsorbed fraction {ads1}"
     title_graph = f"{ads1} in {ads2}"
-    label = f"{pressure:.2f} {p_unit}"
+    label = f"{pressure:.2g} {p_unit}"
 
     # graph title
     ax.set_title(title_graph)

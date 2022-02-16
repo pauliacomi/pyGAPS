@@ -136,7 +136,7 @@ def alpha_s(
             "calculated isotherm adsorbate."
         )
     if reducing_pressure < 0 or reducing_pressure > 1:
-        raise ParameterError("The reducing pressure is outside the bounds of 0-1")
+        raise ParameterError("The reducing pressure is outside the bounds of 0-1 p/p0.")
 
     # Deal with reference area
     if reference_area.lower() in ['bet', None]:
@@ -223,11 +223,13 @@ def alpha_s(
             for index, result in enumerate(results):
                 logger.info(f"For linear region {index}")
                 logger.info(
-                    f"The slope is {result.get('slope'):.4f} and the intercept is {result.get('intercept'):.4f}, "
-                    f"with a correlation coefficient of {result.get('corr_coef'):.4f}"
+                    f"The slope is {result.get('slope'):.4g} "
+                    f"and the intercept is {result.get('intercept'):.4g}, "
+                    f"with a correlation coefficient of {result.get('corr_coef'):.4g}"
                 )
                 logger.info(
-                    f"The adsorbed volume is {result.get('adsorbed_volume'):.4f} and the area is {result.get('area'):.4f}"
+                    f"The adsorbed volume is {result.get('adsorbed_volume'):.3g} cm3/{isotherm.material_unit} "
+                    f"and the area is {result.get('area'):.4g} m2/{isotherm.material_unit}"
                 )
 
             from pygaps.graphing.calc_graphs import tp_plot

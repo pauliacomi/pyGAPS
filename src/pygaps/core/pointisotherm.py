@@ -1226,7 +1226,7 @@ class PointIsotherm(BaseIsotherm):
                 textwrap.dedent(
                     f"""
                 To compute the spreading pressure at this bulk adsorbate pressure,
-                we would need to extrapolate the isotherm since this pressure ({pressure:.3f} {self.pressure_unit})
+                we would need to extrapolate the isotherm since this pressure ({pressure:.3g} {self.pressure_unit})
                 is outside the range of the highest pressure in your pure-component
                 isotherm data ({pressures.max()} {self.pressure_unit}).
 

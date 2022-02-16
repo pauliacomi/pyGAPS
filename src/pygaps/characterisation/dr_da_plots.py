@@ -242,9 +242,9 @@ def da_plot(
 
     if verbose:
         if find_exp:
-            logger.info(f"Exponent is: {exp:.2f}")
-        logger.info(f"Micropore volume is: {microp_volume:.3f} cm3")
-        logger.info(f"Effective adsorption potential is : {potential:.3f} kJ/mol")
+            logger.info(f"Exponent is: {exp:.2g}")
+        logger.info(f"Micropore volume is: {microp_volume:.3g} cm3")
+        logger.info(f"Effective adsorption potential is : {potential:.3g} kJ/mol")
         # Plot
         from pygaps.graphing.calc_graphs import dra_plot
         dra_plot(

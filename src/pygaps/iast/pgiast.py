@@ -336,7 +336,7 @@ def iast_point(
     if verbose:
         logger.info(f"{n_components:d} components.")
         for i in range(n_components):
-            logger.info(f"\tPartial pressure component {i:d} = {partial_pressures[i]:.4f}")
+            logger.info(f"\tPartial pressure component {i:d} = {partial_pressures[i]:.4g}")
 
     # Assert that the spreading pressures of each component are equal
     def spreading_pressure_differences(adsorbed_mole_fractions):
@@ -442,12 +442,12 @@ def iast_point(
         # print IAST loadings and corresponding pure-component loadings
         for i in range(n_components):
             logger.info(f"Component {i}")
-            logger.info(f"\tp = {partial_pressures[i]:.4f}")
-            logger.info(f"\tp^0 = {pressure0[i]:.4f}")
-            logger.info(f"\tLoading = {loadings[i]:.4f}")
-            logger.info(f"\tx = {adsorbed_mole_fractions[i]:.4f}")
+            logger.info(f"\tp = {partial_pressures[i]:.4g}")
+            logger.info(f"\tp^0 = {pressure0[i]:.4g}")
+            logger.info(f"\tLoading = {loadings[i]:.4g}")
+            logger.info(f"\tx = {adsorbed_mole_fractions[i]:.4g}")
             logger.info(
-                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4f}"
+                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4g}"
             )
 
     # print warning if had to extrapolate isotherm in spreading pressure
@@ -458,8 +458,8 @@ def iast_point(
                     textwrap.dedent(
                         f"""
                         WARNING:
-                        Component {i:d}: p0 = {pressure0[i]:.2f} > \
-                            {isotherms[i].pressure(branch=branch).max():.2f}
+                        Component {i:d}: p0 = {pressure0[i]:.4g} > \
+                            {isotherms[i].pressure(branch=branch).max():.4g}
                         the highest pressure exhibited in the pure-component
                         isotherm data. Thus, pyGAPS had to extrapolate the
                         isotherm data to achieve this IAST result."""
@@ -543,7 +543,7 @@ def reverse_iast(
         logger.info(f"{n_components:d} components.")
         for i in range(n_components):
             logger.info(
-                f"\tDesired adsorbed phase mole fraction of component {i:d} = {adsorbed_mole_fractions[i]:.4f}"
+                f"\tDesired adsorbed phase mole fraction of component {i:d} = {adsorbed_mole_fractions[i]:.4g}"
             )
 
     # assert that the spreading pressures of each component are equal
@@ -642,15 +642,15 @@ def reverse_iast(
         for i in range(n_components):
             logger.info(f"Component {i}")
             logger.info(
-                f"\tDesired mole fraction in adsorbed phase, x = {adsorbed_mole_fractions[i]:.4f}"
+                f"\tDesired mole fraction in adsorbed phase, x = {adsorbed_mole_fractions[i]:.4g}"
             )
             logger.info(
-                f"\tBulk gas mole fraction that gives this, y = {gas_mole_fractions[i]:.4f}"
+                f"\tBulk gas mole fraction that gives this, y = {gas_mole_fractions[i]:.4g}"
             )
-            logger.info(f"\tp^0 = {pressure0[i]:.4f}")
-            logger.info(f"\tLoading = {loadings[i]:.4f}")
+            logger.info(f"\tp^0 = {pressure0[i]:.4g}")
+            logger.info(f"\tLoading = {loadings[i]:.4g}")
             logger.info(
-                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4f}"
+                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4g}"
             )
 
     # print warning if had to extrapolate isotherm in spreading pressure

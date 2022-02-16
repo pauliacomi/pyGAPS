@@ -175,13 +175,13 @@ def t_plot(
             for index, result in enumerate(results):
                 logger.info(f"For linear region {index + 1}")
                 logger.info(
-                    f"The slope is {result.get('slope'):.2e} "
-                    f"and the intercept is {result.get('intercept'):.2e}, "
-                    f"with a correlation coefficient of {result.get('corr_coef'):.2e}"
+                    f"The slope is {result.get('slope'):.4g} "
+                    f"and the intercept is {result.get('intercept'):.4g}, "
+                    f"with a correlation coefficient of {result.get('corr_coef'):.4g}"
                 )
                 logger.info(
-                    f"The adsorbed volume is {result.get('adsorbed_volume'):.2f} cm3/{isotherm.material_unit} "
-                    f"and the area is {result.get('area'):.2f} m2/{isotherm.material_unit}"
+                    f"The adsorbed volume is {result.get('adsorbed_volume'):.3g} cm3/{isotherm.material_unit} "
+                    f"and the area is {result.get('area'):.4g} m2/{isotherm.material_unit}"
                 )
 
             from pygaps.graphing.calc_graphs import tp_plot

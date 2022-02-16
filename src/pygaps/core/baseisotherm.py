@@ -291,7 +291,8 @@ class BaseIsotherm():
         else:
             string += f"\tPressure in: {self.pressure_unit}\n"
 
-        string += "Other properties: \n"
+        if self.properties:
+            string += "Other properties: \n"
         for prop, val in self.properties.items():
             string += (f"\t{prop}: {str(val)}\n")
 

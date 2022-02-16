@@ -172,12 +172,13 @@ def area_BET(
         logger.info(
             textwrap.dedent(
                 f"""\
-            BET area: a = {bet_area:.2e} m2/{isotherm.material_unit}
-            Minimum pressure point is {pressure[minimum]:.3f} and maximum is {pressure[maximum]:.3f}
-            The slope of the BET fit: s = {slope:.2e}
-            The intercept of the BET fit: i = {intercept:.2e}
+            BET area: a = {bet_area:.4g} m2/{isotherm.material_unit}
             The BET constant is: C = {c_const:.1f}
-            Amount for a monolayer: n = {n_monolayer:.2e} mol/{isotherm.material_unit}"""
+            Minimum pressure point is {pressure[minimum]:.3g} and maximum is {pressure[maximum]:.3g}
+            Statistical monolayer at: n = {n_monolayer:.3g} mol/{isotherm.material_unit}
+            The slope of the BET fit: s = {slope:.3g}
+            The intercept of the BET fit: i = {intercept:.3g}
+            """
             )
         )
 
