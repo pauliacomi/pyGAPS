@@ -97,10 +97,10 @@ pyGAPS is built with three key mantras in mind:
   default to what the it considers a good practice. As examples: the
   standard units, pore size distribution methods and BET calculation limits.
 - **flexible**: While the defaults are there for a reason, you can override
-  pretty much any parameter. Want to pass a custom adsorbate thickness
-  function or use volumetric bases? Can do!
-- **transparency**: All code is well documented and open source. There are
-  no black boxes.
+  pretty much any parameter. Want to pass a custom adsorbate thickness function
+  or use volumetric bases? Can do!
+- **transparent**: All code is well documented and open source. There are no
+  black boxes.
 
 In-depth explanations, examples and theory can be found in the
 `online documentation <https://pygaps.readthedocs.io/>`__. If you are familiar

@@ -4,4 +4,3 @@ ipykernel
 nbsphinx
 sphinx-copybutton
 furo
--e .
