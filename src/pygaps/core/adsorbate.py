@@ -92,7 +92,12 @@ class Adsorbate():
         "_backend_mode",
     ]
 
-    def __init__(self, name: str = None, store: bool = False, **properties):
+    def __init__(
+        self,
+        name: str,
+        store: bool = False,
+        **properties,
+    ):
         """Instantiate by passing a dictionary with the parameters."""
         # Adsorbate name
         if name is None:
@@ -233,7 +238,7 @@ class Adsorbate():
         parameters_dict.update(self.properties)
         return parameters_dict
 
-    def get_prop(self, prop):
+    def get_prop(self, prop: str):
         """
         Return a property from the 'properties' dictionary.
 
@@ -263,7 +268,7 @@ class Adsorbate():
         return req_prop
 
     @property
-    def backend_name(self):
+    def backend_name(self) -> str:
         """
         Get the CoolProp interaction name of the adsorbate.
 
@@ -286,7 +291,7 @@ class Adsorbate():
             )
         return c_name
 
-    def molar_mass(self, calculate=True):
+    def molar_mass(self, calculate: bool = True) -> float:
         """
         Return the molar mass of the adsorbate.
 
@@ -320,7 +325,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def saturation_pressure(self, temp, unit=None, calculate=True):
+    def saturation_pressure(self, temp, unit=None, calculate: bool = True) -> float:
         """
         Get the saturation pressure at a particular temperature.
 
@@ -367,7 +372,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def surface_tension(self, temp, calculate=True):
+    def surface_tension(self, temp, calculate: bool = True) -> float:
         """
         Get the surface tension at a particular temperature.
 
@@ -408,7 +413,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def liquid_density(self, temp, calculate=True):
+    def liquid_density(self, temp, calculate: bool = True) -> float:
         """
         Get the liquid density at a particular temperature.
 
@@ -448,7 +453,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def liquid_molar_density(self, temp, calculate=True):
+    def liquid_molar_density(self, temp, calculate: bool = True) -> float:
         """
         Get the liquid molar density at a particular temperature.
 
@@ -488,7 +493,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def gas_density(self, temp, calculate=True):
+    def gas_density(self, temp, calculate: bool = True) -> float:
         """
         Get the gas molar density at a particular temperature.
 
@@ -528,7 +533,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def gas_molar_density(self, temp, calculate=True):
+    def gas_molar_density(self, temp, calculate: bool = True) -> float:
         """
         Get the gas density at a particular temperature.
 
@@ -568,7 +573,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def enthalpy_liquefaction(self, temp, calculate=True):
+    def enthalpy_liquefaction(self, temp, calculate: bool = True) -> float:
         """
         Get the enthalpy of liquefaction at a particular temperature.
 

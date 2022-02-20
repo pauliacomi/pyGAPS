@@ -34,7 +34,12 @@ class Material():
         "molar_mass",
     ]
 
-    def __init__(self, name: str, store: bool = False, **properties):
+    def __init__(
+        self,
+        name: str,
+        store: bool = False,
+        **properties,
+    ):
         """Instantiate by passing all the parameters."""
         # Material name
         self.name = name
@@ -112,11 +117,11 @@ class Material():
         # Checks to see if material exists in master list
         try:
             return next(mat for mat in MATERIAL_LIST if name == mat)
-        except StopIteration:
+        except StopIteration as err:
             raise ParameterError(
                 f"Material {name} does not exist in list of materials. "
                 "First populate pygaps.MATERIAL_LIST with required material class"
-            )
+            ) from err
 
     def to_dict(self) -> dict:
         """
@@ -135,26 +140,26 @@ class Material():
         return parameters_dict
 
     @property
-    def density(self):
+    def density(self) -> float:
         """Material density (optional)."""
         return self.properties.get("density")
 
     @density.setter
-    def density(self, val):
+    def density(self, val: float):
         if val:
             self.properties["density"] = float(val)
 
     @property
-    def molar_mass(self):
+    def molar_mass(self) -> float:
         """Material molar mass (optional)."""
         return self.properties.get("molar_mass")
 
     @molar_mass.setter
-    def molar_mass(self, val):
+    def molar_mass(self, val: float):
         if val:
             self.properties["molar_mass"] = float(val)
 
-    def get_prop(self, prop):
+    def get_prop(self, prop: str):
         """
         Return a property from the internal dictionary.
 

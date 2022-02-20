@@ -1,5 +1,7 @@
 """Contains the Isotherm base class."""
 
+import typing as t
+
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.material import Material
@@ -208,17 +210,17 @@ class BaseIsotherm():
     #   Overloaded and own functions
 
     @property
-    def iso_id(self):
+    def iso_id(self) -> str:
         """Return an unique identifier of the isotherm."""
         return isotherm_to_hash(self)
 
     @property
-    def material(self):
+    def material(self) -> Material:
         """Return underlying material."""
         return self._material
 
     @material.setter
-    def material(self, value):
+    def material(self, value: t.Union[str, dict, Material]):
         if isinstance(value, dict):
             name = value.pop('name', None)
             try:
@@ -233,12 +235,12 @@ class BaseIsotherm():
             self._material = Material(value)
 
     @property
-    def adsorbate(self):
+    def adsorbate(self) -> Adsorbate:
         """Return underlying adsorbate."""
         return self._adsorbate
 
     @adsorbate.setter
-    def adsorbate(self, value):
+    def adsorbate(self, value: t.Union[str, Adsorbate]):
         try:
             self._adsorbate = Adsorbate.find(value)
         except ParameterError:
@@ -250,17 +252,17 @@ class BaseIsotherm():
             )
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         """Return underlying temperature, always in kelvin."""
         if self.temperature_unit == "K":
             return self._temperature
         return c_temperature(self._temperature, self.temperature_unit, "K")
 
     @temperature.setter
-    def temperature(self, value):
+    def temperature(self, value: float):
         self._temperature = value
 
-    def __eq__(self, other_isotherm):
+    def __eq__(self, other_isotherm) -> bool:
         """
         Overload the equality operator of the isotherm.
 
@@ -270,11 +272,11 @@ class BaseIsotherm():
         """
         return self.iso_id == other_isotherm.iso_id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Print key isotherm parameters."""
         return f"<{type(self).__name__} {self.iso_id}>: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Print a short summary of all the isotherm parameters."""
         string = ""
 
@@ -298,7 +300,7 @@ class BaseIsotherm():
 
         return string
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Returns a dictionary of the isotherm class
         Is the same dictionary that was used to create it.
@@ -328,7 +330,7 @@ class BaseIsotherm():
 
         return parameter_dict
 
-    def to_json(self, path=None, **kwargs):
+    def to_json(self, path=None, **kwargs) -> t.Union[None, str]:
         """
         Convert the isotherm to a JSON representation.
 
@@ -342,13 +344,13 @@ class BaseIsotherm():
         Returns
         -------
         None or str
-            If path is None, returns the resulting json format as a string.
+            If path is None, returns the resulting json as a string.
             Otherwise returns None.
         """
         from pygaps.parsing.json import isotherm_to_json
         return isotherm_to_json(self, path, **kwargs)
 
-    def to_csv(self, path=None, separator=',', **kwargs):
+    def to_csv(self, path=None, separator=',', **kwargs) -> t.Union[None, str]:
         """
         Convert the isotherm to a CSV representation.
 
@@ -362,7 +364,7 @@ class BaseIsotherm():
         Returns
         -------
         None or str
-            If path is None, returns the resulting json format as a string.
+            If path is None, returns the resulting csv as a string.
             Otherwise returns None.
         """
         from pygaps.parsing.csv import isotherm_to_csv
@@ -381,7 +383,7 @@ class BaseIsotherm():
         from pygaps.parsing.excel import isotherm_to_xl
         return isotherm_to_xl(self, path, **kwargs)
 
-    def to_aif(self, path=None, **kwargs):
+    def to_aif(self, path=None, **kwargs) -> t.Union[None, str]:
         """
         Convert the isotherm to a AIF representation.
 
@@ -393,7 +395,7 @@ class BaseIsotherm():
         Returns
         -------
         None or str
-            If path is None, returns the resulting json format as a string.
+            If path is None, returns the resulting AIF as a string.
             Otherwise returns None.
         """
         from pygaps.parsing.aif import isotherm_to_aif
@@ -402,9 +404,9 @@ class BaseIsotherm():
     def to_db(
         self,
         db_path=None,
-        verbose=True,
-        autoinsert_material=True,
-        autoinsert_adsorbate=True,
+        verbose: bool = True,
+        autoinsert_material: bool = True,
+        autoinsert_adsorbate: bool = True,
         **kwargs
     ):
         """
@@ -458,7 +460,7 @@ class BaseIsotherm():
 
     # Figure out the adsorption and desorption branches
     @staticmethod
-    def _splitdata(data, pressure_key):
+    def _splitdata(data, pressure_key: bool):
         """
         Split isotherm data into an adsorption and desorption part and
         return a column which marks the transition between the two.

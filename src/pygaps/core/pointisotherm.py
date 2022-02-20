@@ -3,6 +3,7 @@ This module contains the main class that describes an isotherm through discrete 
 """
 
 import textwrap
+import typing as t
 
 import numpy
 import pandas
@@ -22,14 +23,15 @@ class PointIsotherm(BaseIsotherm):
     Class which contains the points from an adsorption isotherm.
 
     This class is designed to be a complete description of a discrete isotherm.
-    It extends the Isotherm class, which contains all the description of the
-    isotherm parameters, but also holds the datapoints recorded during an experiment
-    or simulation.
+    It extends the BaseIsotherm class, which contains all the description of the
+    isotherm parameters, but also holds the datapoints recorded during an
+    experiment or simulation.
 
-    The minimum arguments required to instantiate the class, besides those required for
-    the parent Isotherm, are data, specified either as pressure and loading arrays or
-    as isotherm_data (a pandas dataframe containing the discrete points), as well as
-    string keys for the columns of the dataframe which have the loading and the pressure data.
+    The minimum arguments required to instantiate the class, besides those
+    required for the parent BaseIsotherm, is the actual data, specified either
+    as `pressure` + `loading` arrays or as `isotherm_data` (a
+    `pandas.DataFrame`) + keys for the columns of the dataframe which have the
+    loading and the pressure data.
 
     Parameters
     ----------
@@ -39,7 +41,7 @@ class PointIsotherm(BaseIsotherm):
     loading : list
         Create an isotherm directly from an array. Values for loading.
         If the ``isotherm_data`` dataframe is specified, these values are ignored.
-    isotherm_data : DataFrame
+    isotherm_data : `pandas.DataFrame`
         Pure-component adsorption isotherm data.
     pressure_key : str
         The title of the pressure data in the DataFrame provided.
@@ -101,13 +103,13 @@ class PointIsotherm(BaseIsotherm):
 
     def __init__(
         self,
-        pressure=None,
-        loading=None,
-        isotherm_data=None,
-        pressure_key=None,
-        loading_key=None,
-        branch='guess',
-        **isotherm_parameters
+        pressure: t.List[float] = None,
+        loading: t.List[float] = None,
+        isotherm_data: pandas.DataFrame = None,
+        pressure_key: str = None,
+        loading_key: str = None,
+        branch: t.Union[str, t.List[bool]] = 'guess',
+        **other_properties
     ):
         """
         Instantiation is done by passing the discrete data as a pandas
@@ -115,7 +117,7 @@ class PointIsotherm(BaseIsotherm):
         required by parent class.
         """
         # Run base class constructor
-        super().__init__(**isotherm_parameters)
+        super().__init__(**other_properties)
 
         # Checks
         if isotherm_data is not None:
@@ -201,12 +203,12 @@ class PointIsotherm(BaseIsotherm):
     @classmethod
     def from_isotherm(
         cls,
-        isotherm,
-        pressure=None,
-        loading=None,
-        isotherm_data=None,
-        pressure_key=None,
-        loading_key=None,
+        isotherm: BaseIsotherm,
+        pressure: t.List[float] = None,
+        loading: t.List[float] = None,
+        isotherm_data: pandas.DataFrame = None,
+        pressure_key: str = None,
+        loading_key: str = None,
     ):
         """
         Construct a point isotherm using a parent isotherm as the template for
@@ -244,8 +246,8 @@ class PointIsotherm(BaseIsotherm):
     def from_modelisotherm(
         cls,
         modelisotherm,
-        pressure_points=None,
-        loading_points=None,
+        pressure_points: t.List[float] = None,
+        loading_points: t.List[float] = None,
     ):
         """
         Construct a PointIsotherm from a ModelIsothem class.
@@ -482,7 +484,12 @@ class PointIsotherm(BaseIsotherm):
         if verbose:
             logger.info(f"Changed loading to basis '{basis_to}', unit '{unit_to}'.")
 
-    def convert_material(self, basis_to: str = None, unit_to: str = None, verbose: bool = False):
+    def convert_material(
+        self,
+        basis_to: str = None,
+        unit_to: str = None,
+        verbose: bool = False,
+    ):
         """
         Convert the material of the isotherm from one unit to another and the
         basis of the isotherm loading to be either 'per mass' or 'per volume' or
@@ -626,7 +633,7 @@ class PointIsotherm(BaseIsotherm):
     ##########################################################
     #   Functions that return part of the isotherm data
 
-    def data(self, branch=None):
+    def data(self, branch: str = None) -> pandas.DataFrame:
         """
         Return underlying isotherm data.
 
@@ -651,8 +658,13 @@ class PointIsotherm(BaseIsotherm):
         raise ParameterError('Bad branch specification.')
 
     def pressure(
-        self, branch=None, pressure_unit=None, pressure_mode=None, limits=None, indexed=False
-    ):
+        self,
+        branch: str = None,
+        pressure_unit: str = None,
+        pressure_mode: str = None,
+        limits: t.Tuple[float, float] = None,
+        indexed: bool = False,
+    ) -> t.Union[numpy.ndarray, pandas.Series]:
         """
         Return pressure points as an array.
 
@@ -715,14 +727,14 @@ class PointIsotherm(BaseIsotherm):
 
     def loading(
         self,
-        branch=None,
-        loading_unit=None,
-        loading_basis=None,
-        material_unit=None,
-        material_basis=None,
-        limits=None,
-        indexed=False
-    ):
+        branch: str = None,
+        loading_unit: str = None,
+        loading_basis: str = None,
+        material_unit: str = None,
+        material_basis: str = None,
+        limits: t.Tuple[float, float] = None,
+        indexed: bool = False
+    ) -> t.Union[numpy.ndarray, pandas.Series]:
         """
         Return loading points as an array.
 
@@ -822,11 +834,11 @@ class PointIsotherm(BaseIsotherm):
 
     def other_data(
         self,
-        key,
-        branch=None,
-        limits=None,
-        indexed=False,
-    ):
+        key: str,
+        branch: str = None,
+        limits: t.Tuple[float, float] = None,
+        indexed: bool = False,
+    ) -> t.Union[numpy.ndarray, pandas.Series]:
         """
         Return supplementary data points as an array.
 
@@ -867,7 +879,7 @@ class PointIsotherm(BaseIsotherm):
 
         raise ParameterError(f"Isotherm does not contain any {key} data.")
 
-    def has_branch(self, branch):
+    def has_branch(self, branch: str) -> bool:
         """
         Check if the isotherm has an specific branch.
 
@@ -889,17 +901,17 @@ class PointIsotherm(BaseIsotherm):
 
     def pressure_at(
         self,
-        loading,
-        branch='ads',
-        interpolation_type='linear',
-        interp_fill=None,
-        pressure_unit=None,
-        pressure_mode=None,
-        loading_unit=None,
-        loading_basis=None,
-        material_unit=None,
-        material_basis=None,
-    ):
+        loading: t.List[float],
+        branch: str = 'ads',
+        interpolation_type: str = 'linear',
+        interp_fill: t.Union[float, t.Tuple[float, float], str] = None,
+        pressure_unit: str = None,
+        pressure_mode: str = None,
+        loading_unit: str = None,
+        loading_basis: str = None,
+        material_unit: str = None,
+        material_basis: str = None,
+    ) -> numpy.ndarray:
         """
         Interpolate isotherm to compute pressure at any loading given.
 
@@ -1020,17 +1032,17 @@ class PointIsotherm(BaseIsotherm):
 
     def loading_at(
         self,
-        pressure,
-        branch='ads',
-        interpolation_type='linear',
-        interp_fill=None,
-        pressure_unit=None,
-        pressure_mode=None,
-        loading_unit=None,
-        loading_basis=None,
-        material_unit=None,
-        material_basis=None,
-    ):
+        pressure: t.List[float],
+        branch: str = 'ads',
+        interpolation_type: str = 'linear',
+        interp_fill: t.Union[float, t.Tuple[float, float], str] = None,
+        pressure_unit: str = None,
+        pressure_mode: str = None,
+        loading_unit: str = None,
+        loading_basis: str = None,
+        material_unit: str = None,
+        material_basis: str = None,
+    ) -> numpy.ndarray:
         """
         Interpolate isotherm to compute loading at any pressure given.
 
@@ -1148,16 +1160,16 @@ class PointIsotherm(BaseIsotherm):
 
     def spreading_pressure_at(
         self,
-        pressure,
-        branch='ads',
-        pressure_unit=None,
-        pressure_mode=None,
-        loading_unit=None,
-        loading_basis=None,
-        material_unit=None,
-        material_basis=None,
-        interp_fill=None,
-    ):
+        pressure: t.List[float],
+        branch: str = 'ads',
+        pressure_unit: str = None,
+        pressure_mode: str = None,
+        loading_unit: str = None,
+        loading_basis: str = None,
+        material_unit: str = None,
+        material_basis: str = None,
+        interp_fill: t.Union[float, t.Tuple[float, float], str] = None,
+    ) -> numpy.ndarray:
         r"""
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.
 

@@ -1,5 +1,7 @@
 """Class representing a model of and isotherm."""
 
+import typing as t
+
 import numpy
 import pandas
 
@@ -95,18 +97,18 @@ class ModelIsotherm(BaseIsotherm):
 
     def __init__(
         self,
-        pressure=None,
-        loading=None,
-        isotherm_data=None,
-        pressure_key=None,
-        loading_key=None,
-        model=None,
-        param_guess=None,
-        param_bounds=None,
-        optimization_params=None,
-        branch='ads',
-        verbose=False,
-        **isotherm_parameters
+        pressure: t.List[float] = None,
+        loading: t.List[float] = None,
+        isotherm_data: pandas.DataFrame = None,
+        pressure_key: str = None,
+        loading_key: str = None,
+        branch: str = 'ads',
+        model: t.Union[str, list[str], t.Any] = None,
+        param_guess: dict = None,
+        param_bounds: dict = None,
+        optimization_params: dict = None,
+        verbose: bool = False,
+        **other_properties
     ):
         """
         Instantiation is done by passing the data to be fitted, model to be
@@ -115,7 +117,7 @@ class ModelIsotherm(BaseIsotherm):
         """
 
         # Run base class constructor
-        super().__init__(**isotherm_parameters)
+        super().__init__(**other_properties)
 
         # Checks
         if model is None:
@@ -190,7 +192,7 @@ class ModelIsotherm(BaseIsotherm):
             self.model = get_isotherm_model(model)
 
             # Pass odd parameters
-            self.model.__init_parameters__(isotherm_parameters)
+            self.model.__init_parameters__(other_properties)
 
             # The pressure range on which the model was built.
             self.model.pressure_range = [min(pressure), max(pressure)]
@@ -231,25 +233,25 @@ class ModelIsotherm(BaseIsotherm):
             )
 
         # Plot fit if verbose
-        if verbose and isotherm_parameters.pop('plot_fit', True):
+        if verbose and other_properties.pop('plot_fit', True):
             from pygaps.graphing.model_graphs import plot_model_guesses
             plot_model_guesses([self], pressure, loading)
 
     @classmethod
     def from_isotherm(
         cls,
-        isotherm,
-        pressure=None,
-        loading=None,
-        isotherm_data=None,
-        pressure_key=None,
-        loading_key=None,
-        branch='ads',
-        model=None,
-        param_guess=None,
-        param_bounds=None,
-        optimization_params=None,
-        verbose=False,
+        isotherm: BaseIsotherm,
+        pressure: t.List[float] = None,
+        loading: t.List[float] = None,
+        isotherm_data: pandas.DataFrame = None,
+        pressure_key: str = None,
+        loading_key: str = None,
+        branch: str = 'ads',
+        model: t.Union[str, list[str], t.Any] = None,
+        param_guess: dict = None,
+        param_bounds: dict = None,
+        optimization_params: dict = None,
+        verbose: bool = False,
     ):
         """
         Construct a ModelIsotherm using a parent isotherm as the template for
@@ -258,8 +260,8 @@ class ModelIsotherm(BaseIsotherm):
         Parameters
         ----------
 
-        isotherm : Isotherm
-            An instance of the Isotherm parent class.
+        isotherm : BaseIsotherm
+            An instance of the BaseIsotherm parent class.
         pressure : list
             Create an isotherm directly from an array. Values for pressure.
             If the ``isotherm_data`` dataframe is specified, these values are ignored.
@@ -310,12 +312,12 @@ class ModelIsotherm(BaseIsotherm):
     def from_pointisotherm(
         cls,
         isotherm,
-        branch='ads',
-        model=None,
-        param_guess=None,
-        param_bounds=None,
-        optimization_params=None,
-        verbose=False
+        branch: str = 'ads',
+        model: t.Union[str, list[str], t.Any] = None,
+        param_guess: dict = None,
+        param_bounds: dict = None,
+        optimization_params: dict = None,
+        verbose: bool = False
     ):
         """
         Constructs a ModelIsotherm using data from a PointIsotherm and all its
@@ -374,16 +376,16 @@ class ModelIsotherm(BaseIsotherm):
     @classmethod
     def guess(
         cls,
-        pressure=None,
-        loading=None,
-        isotherm_data=None,
-        pressure_key=None,
-        loading_key=None,
-        branch='ads',
+        pressure: t.List[float] = None,
+        loading: t.List[float] = None,
+        isotherm_data: pandas.DataFrame = None,
+        pressure_key: str = None,
+        loading_key: str = None,
+        branch: str = 'ads',
         models='guess',
-        optimization_params=None,
-        verbose=False,
-        **isotherm_parameters
+        optimization_params: dict = None,
+        verbose: bool = False,
+        **other_properties
     ):
         """
         Attempt to model the data using supplied list of model names,
@@ -421,7 +423,7 @@ class ModelIsotherm(BaseIsotherm):
             set to desorption as well.
         verbose : bool, optional
             Prints out extra information about steps taken.
-        isotherm_parameters:
+        other_properties:
             Any other parameters of the isotherm which should be stored internally.
         """
         attempts = []
@@ -450,7 +452,7 @@ class ModelIsotherm(BaseIsotherm):
                     branch=branch,
                     verbose=verbose,
                     plot_fit=False,  # we don't want to plot at this stage
-                    **isotherm_parameters
+                    **other_properties
                 )
 
                 attempts.append(isotherm)
@@ -479,7 +481,7 @@ class ModelIsotherm(BaseIsotherm):
     ###########################################################
     #   Info function
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Print a short summary of all the isotherm parameters."""
         return super().__str__() + self.model.__str__()
 
@@ -540,7 +542,7 @@ class ModelIsotherm(BaseIsotherm):
     ##########################################################
     #   Methods
 
-    def has_branch(self, branch):
+    def has_branch(self, branch: str) -> bool:
         """
         Check if the isotherm has an specific branch.
 
@@ -559,12 +561,12 @@ class ModelIsotherm(BaseIsotherm):
 
     def pressure(
         self,
-        points=60,
-        branch=None,
-        pressure_unit=None,
-        pressure_mode=None,
-        limits=None,
-        indexed=False
+        points: int = 60,
+        branch: str = None,
+        pressure_unit: str = None,
+        pressure_mode: str = None,
+        limits: t.Tuple[float, float] = None,
+        indexed: bool = False
     ):
         """
         Return a numpy.linspace generated array with
@@ -645,14 +647,14 @@ class ModelIsotherm(BaseIsotherm):
 
     def loading(
         self,
-        points=60,
-        branch=None,
-        loading_unit=None,
-        loading_basis=None,
-        material_unit=None,
-        material_basis=None,
-        limits=None,
-        indexed=False
+        points: int = 60,
+        branch: str = None,
+        loading_unit: str = None,
+        loading_basis: str = None,
+        material_unit: str = None,
+        material_basis: str = None,
+        limits: t.Tuple[float, float] = None,
+        indexed: bool = False
     ):
         """
         Return the loading calculated at equidistant pressure
@@ -770,14 +772,14 @@ class ModelIsotherm(BaseIsotherm):
 
     def pressure_at(
         self,
-        loading,
-        branch=None,
-        pressure_unit=None,
-        pressure_mode=None,
-        loading_unit=None,
-        loading_basis=None,
-        material_unit=None,
-        material_basis=None,
+        loading: t.Union[float, t.List[float]],
+        branch: str = None,
+        pressure_unit: str = None,
+        pressure_mode: str = None,
+        loading_unit: str = None,
+        loading_basis: str = None,
+        material_unit: str = None,
+        material_basis: str = None,
     ):
         """
         Compute pressure at loading L, given stored model parameters.
@@ -892,14 +894,14 @@ class ModelIsotherm(BaseIsotherm):
 
     def loading_at(
         self,
-        pressure,
-        branch=None,
-        pressure_unit=None,
-        pressure_mode=None,
-        loading_unit=None,
-        loading_basis=None,
-        material_unit=None,
-        material_basis=None,
+        pressure: t.Union[float, t.List[float]],
+        branch: str = None,
+        pressure_unit: str = None,
+        pressure_mode: str = None,
+        loading_unit: str = None,
+        loading_basis: str = None,
+        material_unit: str = None,
+        material_basis: str = None,
     ):
         """
         Compute loading at pressure P, given stored model parameters.
@@ -1016,10 +1018,10 @@ class ModelIsotherm(BaseIsotherm):
 
     def spreading_pressure_at(
         self,
-        pressure,
-        branch=None,
-        pressure_unit=None,
-        pressure_mode=None,
+        pressure: t.Union[float, t.List[float]],
+        branch: str = None,
+        pressure_unit: str = None,
+        pressure_mode: str = None,
     ):
         r"""
         Calculate reduced spreading pressure at a bulk gas pressure P.
