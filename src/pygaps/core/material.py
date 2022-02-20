@@ -75,13 +75,14 @@ class Material():
 
     def print_info(self):
         """Print a short summary of all the material parameters."""
-        string = f"pyGAPS Material: {self.name}\n"
+        string = f"pyGAPS Material: '{self.name}'\n"
 
         if self.properties:
-            for prop in self.properties:
-                string += f"{prop}:{str(self.properties.get(prop))}\n"
+            string += "Other properties: \n"
+            for prop, val in self.properties.items():
+                string += (f"\t{prop}: {str(val)}\n")
 
-        return string
+        print(string)
 
     @classmethod
     def find(cls, name: str):

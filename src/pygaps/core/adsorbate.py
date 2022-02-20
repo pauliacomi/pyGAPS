@@ -154,15 +154,15 @@ class Adsorbate():
 
     def print_info(self):
         """Print a short summary of all the adsorbate parameters."""
-        string = ""
-
-        string += f"Adsorbate: {self.name}\n"
+        string = f"pyGAPS Adsorbate: '{self.name}'\n"
         string += f"Aliases: { *self.alias,}\n"
 
-        for prop in self.properties:
-            string += f"{prop}:{str(self.properties.get(prop))}\n"
+        if self.properties:
+            string += "Other properties: \n"
+            for prop, val in self.properties.items():
+                string += (f"\t{prop}: {str(val)}\n")
 
-        return string
+        print(string)
 
     @classmethod
     def find(cls, name: str):
