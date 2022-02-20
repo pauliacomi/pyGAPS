@@ -336,7 +336,7 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
         logger.info(
             "The exponential contribution is \n\t"
             f"{params['preexp']:.3g} * exp({params['exp']:.3g} * n)"
-            f"with the limit at {params['exploc']:..3g}"
+            f"with the limit at {params['exploc']:.3g}"
         )
         logger.info(
             "The guest-guest attractive contribution is \n\t"
