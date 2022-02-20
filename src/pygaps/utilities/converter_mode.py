@@ -403,6 +403,10 @@ def c_temperature(
         If the unit selected is not an option.
 
     """
+    if unit_to and "c" in unit_to.lower():
+        unit_to = "°C"
+    if unit_from and "c" in unit_from.lower():
+        unit_from = "°C"
     _check_unit(unit_to, _TEMPERATURE_UNITS, 'temperature')
     _check_unit(unit_from, _TEMPERATURE_UNITS, 'temperature')
 
