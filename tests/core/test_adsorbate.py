@@ -15,7 +15,7 @@ class TestAdsorbate():
     def test_adsorbate_basic(self):
         """Basic creation tests."""
         with pytest.raises(ParameterError):
-            ads = pygaps.Adsorbate()
+            ads = pygaps.Adsorbate(None)
         ads = pygaps.Adsorbate('Test')
         assert ads == 'Test'
         assert ads == 'test'
