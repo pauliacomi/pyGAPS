@@ -12,17 +12,7 @@ except ImportError:
     __version__ = '3.1.0'
 
 import sys
-import logging
-
-logger = logging.getLogger('pygaps')
-logger.setLevel(logging.DEBUG)
-
-# create console handler
-ch = logging.StreamHandler(stream=sys.stdout)
-ch.setLevel(logging.INFO)
-
-# add the handlers to the logger
-logger.addHandler(ch)
+from .logging import logger
 
 # This code is written for Python 3.
 if sys.version_info[0] != 3:
@@ -42,29 +32,11 @@ for dependency in hard_dependencies:
 if missing_dependencies:
     raise ImportError(f"Missing required dependencies {missing_dependencies}")
 
-for dependency in soft_dependencies:
+for dependency, reason in soft_dependencies.items():
     if not importlib.util.find_spec(dependency):
-        logging.warning(f"Missing important package {dependency}. {soft_dependencies[dependency]}")
+        logger.warning(f"Missing important package {dependency}. {reason}")
 
 del hard_dependencies, soft_dependencies, dependency, missing_dependencies
-
-
-# This lazy load function will be used for non-critical modules to speed import time
-# Examples: matplotlib, scipy.optimize
-def _load_lazy(fullname):
-    try:
-        return sys.modules[fullname]
-    except KeyError as err:
-        spec = importlib.util.find_spec(fullname)
-        if not spec:
-            raise ModuleNotFoundError(f"Could not import {fullname}.") from err
-        loader = importlib.util.LazyLoader(spec.loader)
-        module = importlib.util.module_from_spec(spec)
-        # Make module with proper locking and get it inserted into sys.modules.
-        loader.exec_module(module)
-        sys.modules[fullname] = module
-        return module
-
 
 # Data
 from pygaps.data import DATABASE
