@@ -28,10 +28,10 @@ class Freundlich(IsothermBaseModel):
 
     There are two parameters which define the model:
 
-        * A surface interaction constant `K` denoting the interaction
-          with the material surface.
-        * An exponential term `m` accounting for the decrease in
-          available adsorption sites at higher loading.
+    * A surface interaction constant `K` denoting the interaction with the
+      material surface.
+    * An exponential term `m` accounting for the decrease in available
+      adsorption sites at higher loading.
 
     The model can also be derived from a more physical basis,
     using the potential theory of Polanyi, essentially resulting in

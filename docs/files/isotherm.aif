@@ -1,0 +1,54 @@
+data_830a707e2c95c8db400979a9cba7c92d
+_audit_aif_version 1.0
+_audit_creation_method pyGAPS
+_exptl_adsorptive 'carbon dioxide'
+_exptl_temperature 303.0
+_sample_material_id 'HKUST-1(Cu)'
+_exptl_operator 'PI'
+_exptl_date '2010-05-21 00:00:00'
+_exptl_instrument 'device1'
+_exptl_activation_temperature '150.0'
+_sample_id 'KRICT'
+_units_temperature K
+_units_pressure bar
+_units_loading mmol/g
+_pygaps_iso_type 'calorimetry'
+_pygaps_project 'ACRONYM'
+_pygaps_comment 'a comment'
+
+loop_
+_adsorp_pressure
+_adsorp_amount
+_adsorp_enthalpy
+0.15584 0.76233 28.788
+0.32594 1.5333 28.761
+0.55444 2.4976 28.75
+0.80724 3.4701 28.848
+1.0339 4.2555 28.963
+1.2515 4.9354 28.849
+1.5303 5.7126 28.736
+1.8097 6.397 28.577
+2.0767 6.9739 28.537
+3.4574 9.1217 28.97
+5.3613 10.796 29.791
+6.7474 11.526 31.493
+9.1746 12.356 32.981
+10.661 12.657 39.655
+12.109 12.931 35.166
+15.142 13.472 30.487
+16.874 13.779 25.011
+18.419 14.059 22.062
+20.188 14.386 20.186
+24.68 15.003 20.186
+
+loop_
+_desorp_pressure
+_desorp_amount
+_desorp_enthalpy
+22.197 14.938 20.186
+18.272 14.714 20.186
+14.975 14.404 20.186
+12.236 14.023 20.186
+9.3094 13.404 20.186
+6.7259 12.531 20.186
+4.4989 11.199 20.186

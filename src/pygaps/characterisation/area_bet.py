@@ -87,7 +87,7 @@ def area_BET(
 
     .. math::
 
-        a(BET) = n_m A_N \sigma
+        a_{BET} = n_m A_N \sigma
 
 
     *Limitations*
@@ -96,25 +96,25 @@ def area_BET(
     as there are many assumptions made in the calculation. To augment the validity of the BET
     method, Rouquerol [#]_ proposed several checks to ensure that the BET region selected is valid
 
-        * The BET constant (C) obtained should be positive
-        * In the corresponding Rouquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
-          with respect to :math:`p/p_0`, the points chosen for BET analysis should be
-          strictly increasing
-        * The loading at the statistical monolayer should be situated within the
-          limits of the BET region
+    * The BET constant (C) obtained should be positive
+    * In the corresponding Rouquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
+      with respect to :math:`p/p_0`, the points chosen for BET analysis should be
+      strictly increasing
+    * The loading at the statistical monolayer should be situated within the
+      limits of the BET region
 
     This module implements all these checks.
 
     Regardless, the BET surface area should still be interpreted carefully. The following
     assumptions are implicitly made in this approach:
 
-        * Adsorption takes place on the pore surface. Microporous materials which have pores
-          in similar size as the molecule adsorbed cannot posses a realistic surface area
-        * The cross-sectional area of the molecule on the surface cannot be guaranteed
-          For example, nitrogen has been known to adopt different orientations on the
-          surface of some materials due to inter-molecular forces, which effectively
-          lowers its cross-sectional area.
-        * No account is made for heterogeneous adsorbate-adsorbent interaction in the BET theory
+    * Adsorption takes place on the pore surface. Microporous materials which have pores
+      in similar size as the molecule adsorbed cannot posses a realistic surface area
+    * The cross-sectional area of the molecule on the surface cannot be guaranteed
+      For example, nitrogen has been known to adopt different orientations on the
+      surface of some materials due to inter-molecular forces, which effectively
+      lowers its cross-sectional area.
+    * No account is made for heterogeneous adsorbate-adsorbent interaction in the BET theory
 
     References
     ----------

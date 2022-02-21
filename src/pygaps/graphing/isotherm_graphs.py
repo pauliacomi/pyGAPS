@@ -1,6 +1,7 @@
 """Functions for plotting and comparing isotherms."""
 
 import math
+import typing as t
 from collections import abc
 from itertools import cycle
 
@@ -19,7 +20,7 @@ from pygaps.graphing.mpl_styles import Y2_COLORS
 from pygaps.utilities.exceptions import GraphingError
 from pygaps.utilities.exceptions import ParameterError
 
-# list of branch types
+#: list of branch types
 _BRANCH_TYPES = {
     "ads": (True, False),
     "des": (False, True),
@@ -36,11 +37,11 @@ def plot_iso(
     y1_data: str = 'loading',
     y2_data: str = None,
     branch: str = "all",
-    x_range=(None, None),
-    y1_range=(None, None),
-    y2_range=(None, None),
-    x_points: list = None,
-    y1_points: list = None,
+    x_range: t.Tuple[float, float] = (None, None),
+    y1_range: t.Tuple[float, float] = (None, None),
+    y2_range: t.Tuple[float, float] = (None, None),
+    x_points: t.Iterable[float] = None,
+    y1_points: t.Iterable[float] = None,
     material_basis: str = None,
     material_unit: str = None,
     loading_basis: str = None,
@@ -50,8 +51,8 @@ def plot_iso(
     logx: bool = False,
     logy1: bool = False,
     logy2: bool = False,
-    color=True,
-    marker=True,
+    color: t.Union[bool, str, t.Iterable[str]] = True,
+    marker: t.Union[bool, str, t.Iterable[str]] = True,
     y1_line_style: dict = None,
     y2_line_style: dict = None,
     lgd_keys: list = None,
@@ -157,6 +158,8 @@ def plot_iso(
     # Make iterable if not already
     if not isinstance(isotherms, abc.Iterable):
         isotherms = (isotherms, )
+    else:
+        isotherms = list(isotherms)
 
     # Check for plot validity
     if None in [x_data, y1_data]:

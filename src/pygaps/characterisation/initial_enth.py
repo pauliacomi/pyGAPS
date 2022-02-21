@@ -15,10 +15,10 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     calculate the enthalpy of adsorption at zero loading with a fitting
     method with separate contributions:
 
-        * A constant contribution
-        * An 'active site' decaying exponential contribution
-        * A power contribution to model adsorbate-adsorbate attraction
-        * A power contribution to model adsorbate-adsorbate repulsion
+    * A constant contribution
+    * An 'active site' decaying exponential contribution
+    * A power contribution to model adsorbate-adsorbate attraction
+    * A power contribution to model adsorbate-adsorbate repulsion
 
     It can be represented by the following equation:
 

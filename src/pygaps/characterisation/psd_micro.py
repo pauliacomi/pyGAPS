@@ -61,9 +61,9 @@ def psd_microporous(
     dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths`` (array) : the widths of the pores
-            - ``pore_distribution`` (array) : contribution of each pore width to the
-              overall pore distribution
+        - ``pore_widths`` (array) : the widths of the pores
+        - ``pore_distribution`` (array) : contribution of each pore width to the
+          overall pore distribution
 
     Notes
     -----
@@ -85,12 +85,12 @@ def psd_microporous(
     There are two main approaches which pyGAPS implements, chosen by passing
     the ``psd_model`` parameter:
 
-        - The "HK", or the original Horvath-Kawazoe method [#hk1]_.
-        - The "RY", or the modified Rege-Yang method [#ry1]_.
+    - The "HK", or the original Horvath-Kawazoe method [#hk1]_.
+    - The "RY", or the modified Rege-Yang method [#ry1]_.
 
     Detailed explanations for both methods can be found in
-    :py:func:`~pygaps.characterisation.psd_microporous.psd_horvath_kawazoe` and
-    :py:func:`~pygaps.characterisation.psd_microporous.psd_horvath_kawazoe_ry`,
+    :py:func:`~pygaps.characterisation.psd_micro.psd_horvath_kawazoe` and
+    :py:func:`~pygaps.characterisation.psd_micro.psd_horvath_kawazoe_ry`,
     respectively. Additionally for both models, the Cheng-Yang correction
     [#cy1]_ can be applied by appending *"-CY"*, such as ``psd_model="HK-CY"``
     or ``"RY-CY"``. This correction attempts to change the expression for the
@@ -127,8 +127,8 @@ def psd_microporous(
 
     See Also
     --------
-    pygaps.characterisation.psd_microporous.psd_horvath_kawazoe : low level HK (Horvath-Kawazoe) method
-    pygaps.characterisation.psd_microporous.psd_horvath_kawazoe_ry : low level RY (Rege-Yang) method
+    pygaps.characterisation.psd_micro.psd_horvath_kawazoe : low level HK (Horvath-Kawazoe) method
+    pygaps.characterisation.psd_micro.psd_horvath_kawazoe_ry : low level RY (Rege-Yang) method
 
     """
     # Function parameter checks
@@ -284,14 +284,14 @@ def psd_horvath_kawazoe(
     adsorbate_properties : dict
         Properties for the adsorbate in the form of::
 
-            adsorbate_properties = dict(
+            adsorbate_properties = {
                 'molecular_diameter': 0,           # nm
                 'polarizability': 0,               # nm3
                 'magnetic_susceptibility': 0,      # nm3
                 'surface_density': 0,              # molecules/m2
                 'liquid_density': 0,               # g/cm3
                 'adsorbate_molar_mass': 0,         # g/mol
-            )
+            }
 
     material_properties : dict
         Properties for the adsorbate in the same form
@@ -449,23 +449,21 @@ def psd_horvath_kawazoe(
 
     The main assumptions made by using the H-K method are:
 
-        - It does not have a description of capillary condensation. This means
-          that the pore size distribution can only be considered accurate up to
-          a maximum of 5 nm.
+    - It does not have a description of capillary condensation. This means that
+      the pore size distribution can only be considered accurate up to a maximum
+      of 5 nm.
 
-        - The surface is made up of a single layer of atoms. Furthermore, since
-          the HK method is reliant on knowing the properties of the surface
-          atoms as well as the adsorbate molecules the material should ideally
-          be homogenous.
+    - The surface is made up of a single layer of atoms. Furthermore, since the
+      HK method is reliant on knowing the properties of the surface atoms as
+      well as the adsorbate molecules the material should ideally be homogenous.
 
-        - Only dispersive forces are accounted for. If the adsorbate-adsorbent
-          interactions have other contributions, such as charged interactions,
-          the Lennard-Jones potential function will not be an accurate
-          description of pore environment.
+    - Only dispersive forces are accounted for. If the adsorbate-adsorbent
+      interactions have other contributions, such as charged interactions, the
+      Lennard-Jones potential function will not be an accurate description of
+      pore environment.
 
-        - Each pore is uniform and of infinite length. Materials with varying
-          pore shapes or highly interconnected networks may not give realistic
-          results.
+    - Each pore is uniform and of infinite length. Materials with varying pore
+      shapes or highly interconnected networks may not give realistic results.
 
     References
     ----------
@@ -651,14 +649,14 @@ def psd_horvath_kawazoe_ry(
     adsorbate_properties : dict
         Properties for the adsorbate in the form of::
 
-            adsorbate_properties = dict(
+            adsorbate_properties = {
                 'molecular_diameter': 0,           # nm
                 'polarizability': 0,               # nm3
                 'magnetic_susceptibility': 0,      # nm3
                 'surface_density': 0,              # molecules/m2
                 'liquid_density': 0,               # g/cm3
                 'adsorbate_molar_mass': 0,         # g/mol
-            )
+            }
 
     material_properties : dict
         Properties for the adsorbate in the same form
@@ -680,7 +678,7 @@ def psd_horvath_kawazoe_ry(
     -----
     This approach attempts to address two main shortcomings of the H-K method,
     (see details here
-    :py:func:`~pygaps.characterisation.psd_microporous.psd_horvath_kawazoe_ry`)
+    :py:func:`~pygaps.characterisation.psd_micro.psd_horvath_kawazoe_ry`)
     namely its odd summation of contributions from the adsorbate-surface and
     adsorbate-adsorbate contributions and the assumption of a continuous
     distributions of guest molecules inside a pore.

@@ -3,6 +3,32 @@
 Core classes
 ============
 
+.. _isotherms-ref:
+
+Isotherms
+---------
+
+Base Isotherm
+.............
+
+.. automodule:: pygaps.core.baseisotherm
+    :members:
+
+
+Point Isotherm
+...............
+
+.. automodule:: pygaps.core.pointisotherm
+    :members:
+
+
+Model Isotherm
+...............
+
+.. automodule:: pygaps.core.modelisotherm
+    :members:
+
+
 Adsorbate
 ---------
 
@@ -16,30 +42,3 @@ Material
 .. automodule:: pygaps.core.material
     :members:
 
-.. _isotherms-ref:
-
-Isotherms
----------
-
-
-Isotherm
-........
-
-.. automodule:: pygaps.core.baseisotherm
-    :members:
-
-
-Point Isotherm
-...............
-
-.. _isotherms-pointisotherm:
-
-.. automodule:: pygaps.core.pointisotherm
-    :members:
-
-
-Model Isotherm
-...............
-
-.. automodule:: pygaps.core.modelisotherm
-    :members:

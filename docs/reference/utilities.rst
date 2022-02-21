@@ -1,8 +1,11 @@
 .. _utilities-ref:
 
 
+Utilities
+=========
+
 Unit Converters
-===============
+---------------
 
 .. automodule:: pygaps.utilities.converter_mode
     :members:
@@ -12,19 +15,20 @@ Unit Converters
     :members:
 
 Interpolator
-============
+------------
 
 .. automodule:: pygaps.utilities.isotherm_interpolator
     :members:
 
 Exceptions
-==========
+----------
 
 .. automodule:: pygaps.utilities.exceptions
     :members:
 
 Other utilities
-===============
+---------------
+
 .. automodule:: pygaps.utilities.coolprop_utilities
     :members:
 

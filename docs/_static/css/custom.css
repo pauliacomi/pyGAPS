@@ -1,9 +1,28 @@
-:root[color-mode="dark"] {
+body[data-theme=dark] {
     --warning: #CD4949;
     --attention: #49CDAC;
+    --color-graph-background: #cbd9d7;
+}
+
+body[data-theme=light] {
+    --warning: #CD4949;
+    --attention: #49CDAC;
+    --color-graph-background: #ffffff00;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme=light]) {
+        --color-graph-background: #cbd9d7;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    body:not([data-theme=dark]) {
+        --color-graph-background: #ffffff00;
+    }
 }
 
 /* This ensures Matplotlib png images are legible on the dark background */
 .output_area>img {
-    background-color: #cbd9d7;
+    background-color: var(--color-graph-background);
 }

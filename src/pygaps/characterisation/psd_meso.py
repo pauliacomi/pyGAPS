@@ -57,9 +57,9 @@ def psd_mesoporous(
     dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths`` (array) : the widths of the pores
-            - ``pore_distribution`` (array) : contribution of each pore width to the
-              overall pore distribution
+        - ``pore_widths`` (array) : the widths of the pores
+        - ``pore_distribution`` (array) : contribution of each pore width to the
+          overall pore distribution
 
     Notes
     -----
@@ -79,22 +79,22 @@ def psd_mesoporous(
 
     Currently, the methods provided are:
 
-        - the pygaps-DH model, an expanded DH model for multiple geometries
-        - the original BJH or Barrett, Joyner and Halenda method
-        - the original DH or Dollimore-Heal method, an extension of the BJH method
+    - the pygaps-DH model, an expanded DH model for multiple geometries
+    - the original BJH or Barrett, Joyner and Halenda method
+    - the original DH or Dollimore-Heal method, an extension of the BJH method
 
     According to Rouquerol [#]_, in adopting this approach, it is assumed that:
 
-        - The Kelvin equation is applicable over the pore range (mesopores). Therefore
-          in pores which are below a certain size (around 2.5 nm), the granularity
-          of the liquid-vapour interface becomes too large for classical bulk methods
-          to be applied.
-        - The meniscus curvature is controlled be the pore size and shape. Ideal shapes
-          for the curvature are assumed.
-        - The pores are rigid and of well defined shape. They are considered
-          open-ended and non-intersecting
-        - The filling/emptying of each pore does not depend on its location.
-        - The adsorption on the pore walls is not different from surface adsorption.
+    - The Kelvin equation is applicable over the pore range (mesopores).
+      Therefore in pores which are below a certain size (around 2.5 nm), the
+      granularity of the liquid-vapour interface becomes too large for classical
+      bulk methods to be applied.
+    - The meniscus curvature is controlled be the pore size and shape. Ideal
+      shapes for the curvature are assumed.
+    - The pores are rigid and of well defined shape. They are considered
+      open-ended and non-intersecting
+    - The filling/emptying of each pore does not depend on its location.
+    - The adsorption on the pore walls is not different from surface adsorption.
 
     .. caution::
 
@@ -108,9 +108,9 @@ def psd_mesoporous(
 
     See Also
     --------
-    pygaps.characterisation.psd_mesoporous.psd_pygapsdh : the pygaps-DH method
-    pygaps.characterisation.psd_mesoporous.psd_bjh : the BJH or Barrett, Joyner and Halenda method
-    pygaps.characterisation.psd_mesoporous.psd_dollimore_heal : the DH or Dollimore-Heal method
+    pygaps.characterisation.psd_meso.psd_pygapsdh : the pygaps-DH method
+    pygaps.characterisation.psd_meso.psd_bjh : the BJH or Barrett, Joyner and Halenda method
+    pygaps.characterisation.psd_meso.psd_dollimore_heal : the DH or Dollimore-Heal method
 
     """
     # Function parameter checks
@@ -308,25 +308,26 @@ def psd_pygapsdh(
     In order to account for different geometries, factors are calculated in
     terms of a characteristic number of the system:
 
-        - In a slit pore, the relationship between pore volume and pore surface
-          is :math:`A_p = 2 V_p / w_p`. The pore area stays the same throughout
-          any changes in layer thickness, therefore no correction factor is applied.
-          Finally, the relationship between the volume of the kelvin capillary and the
-          total pore width is :math:`\frac{\bar{w}_{p,i}}{\bar{w}_{p,i} - 2 t_{n,i}}`.
+    - In a slit pore, the relationship between pore volume and pore surface is
+      :math:`A_p = 2 V_p / w_p`. The pore area stays the same throughout any
+      changes in layer thickness, therefore no correction factor is applied.
+      Finally, the relationship between the volume of the kelvin capillary and
+      the total pore width is
+      :math:`\frac{\bar{w}_{p,i}}{\bar{w}_{p,i} - 2 t_{n,i}}`.
 
-        - In a cylindrical pore, the relationship between pore volume and pore surface
-          is :math:`A_p = 4 V_p / w_p`. The ratio between average pore area at a point
-          and total pore area can be expressed by using
-          :math:`\frac{\bar{w}_{p,i} - 2 t_{n,i}}{\bar{w}_{p,i}}`.
-          Finally, the relationship between the inner Kelvin capillary and the
-          total pore diameter is :math:`\frac{\bar{w}_{p,i}}{\bar{w}_{p,i} - 2 t_{n,i}}^2`.
+    - In a cylindrical pore, the relationship between pore volume and pore
+      surface is :math:`A_p = 4 V_p / w_p`. The ratio between average pore area
+      at a point and total pore area can be expressed by using
+      :math:`\frac{\bar{w}_{p,i} - 2 t_{n,i}}{\bar{w}_{p,i}}`. Finally, the
+      relationship between the inner Kelvin capillary and the total pore
+      diameter is :math:`\frac{\bar{w}_{p,i}}{\bar{w}_{p,i} - 2 t_{n,i}}^2`.
 
-        - In a spherical pore, the relationship between pore volume and pore surface
-          is :math:`A_p = 6 V_p / w_p`. The ratio between average pore area at a point
-          and total pore area can be expressed by using
-          :math:`\frac{\bar{w}_{p,i} - 2 t_{n,i}}{\bar{w}_{p,i}}^2`.
-          Finally, the relationship between the inner Kelvin sphere and the
-          total pore diameter is :math:`\frac{\bar{w}_{p,i}}{\bar{w}_{p,i} - 2 t_{n,i}}^3`.
+    - In a spherical pore, the relationship between pore volume and pore surface
+      is :math:`A_p = 6 V_p / w_p`. The ratio between average pore area at a
+      point and total pore area can be expressed by using
+      :math:`\frac{\bar{w}_{p,i} - 2 t_{n,i}}{\bar{w}_{p,i}}^2`. Finally, the
+      relationship between the inner Kelvin sphere and the total pore diameter
+      is :math:`\frac{\bar{w}_{p,i}}{\bar{w}_{p,i} - 2 t_{n,i}}^3`.
 
 
     References
@@ -434,22 +435,25 @@ def psd_bjh(
 
     Notes
     -----
-    The BJH or Barrett, Joyner and Halenda [#]_ method for calculation of pore size distribution
-    is based on a classical description of the adsorbate behaviour in the adsorbent pores.
-    Under this method, the adsorbate is adsorbing on the pore walls in a predictable way,
-    and decreasing the apparent pore volume until condensation takes place, filling the
-    entire pore. The two variables, layer thickness and radius where condensation takes
-    place can be modelled by a thickness model (such as Halsey, Harkins & Jura, etc.) and a
-    critical radius model for condensation/evaporation, based on a form of the Kelvin equation.
+    The BJH or Barrett, Joyner and Halenda [#]_ method for calculation of pore
+    size distribution is based on a classical description of the adsorbate
+    behaviour in the adsorbent pores. Under this method, the adsorbate is
+    adsorbing on the pore walls in a predictable way, and decreasing the
+    apparent pore volume until condensation takes place, filling the entire
+    pore. The two variables, layer thickness and radius where condensation takes
+    place can be modelled by a thickness model (such as Halsey, Harkins & Jura,
+    etc.) and a critical radius model for condensation/evaporation, based on a
+    form of the Kelvin equation.
 
     .. math::
 
         r_p = t + r_k
 
-    The original model used the desorption curve as a basis for calculating pore size distribution.
-    Between two points of the curve, the volume desorbed can be described as the volume contribution
-    from pore evaporation and the volume from layer thickness decrease as per the equation
-    above. The computation is done cumulatively, starting from the filled pores and calculating for each
+    The original model used the desorption curve as a basis for calculating pore
+    size distribution. Between two points of the curve, the volume desorbed can
+    be described as the volume contribution from pore evaporation and the volume
+    from layer thickness decrease as per the equation above. The computation is
+    done cumulatively, starting from the filled pores and calculating for each
     point the volume adsorbed in a pore from the following equation:
 
     .. math::
@@ -583,23 +587,25 @@ def psd_dollimore_heal(
     extension of the BJH method, which takes into account the geometry of the pores
     by introducing a length component.
 
-    Like the BJH method, it is based on a classical description of the adsorbate behaviour
-    in the adsorbent pores. Under this method, the adsorbate is adsorbing on the pore walls
-    in a predictable way, and decreasing the apparent pore volume until condensation takes
-    place, filling the entire pore. The two variables, layer thickness and radius where
-    condensation takes place can be modelled by a thickness model (such as Halsey, Harkins
-    & Jura, etc.) and a critical radius model for condensation/evaporation, based
-    on a form of the Kelvin equation.
+    Like the BJH method, it is based on a classical description of the adsorbate
+    behaviour in the adsorbent pores. Under this method, the adsorbate is
+    adsorbing on the pore walls in a predictable way, and decreasing the
+    apparent pore volume until condensation takes place, filling the entire
+    pore. The two variables, layer thickness and radius where condensation takes
+    place can be modelled by a thickness model (such as Halsey, Harkins & Jura,
+    etc.) and a critical radius model for condensation/evaporation, based on a
+    form of the Kelvin equation.
 
     .. math::
 
         r_p = t + r_k
 
-    The original model used the desorption curve as a basis for calculating pore size distribution.
-    Between two points of the curve, the volume desorbed can be described as the volume contribution
-    from pore evaporation and the volume from layer thickness decrease as per the equation
-    above. The computation is done cumulatively, starting from the filled pores and calculating for
-    each point the volume adsorbed in a pore from the following equation:
+    The original model used the desorption curve as a basis for calculating pore
+    size distribution. Between two points of the curve, the volume desorbed can
+    be described as the volume contribution from pore evaporation and the volume
+    from layer thickness decrease as per the equation above. The computation is
+    done cumulatively, starting from the filled pores and calculating for each
+    point the volume adsorbed in a pore from the following equation:
 
     .. math::
 

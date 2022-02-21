@@ -38,11 +38,11 @@ def isosteric_enthalpy(
     result_dict : dict
         A dictionary with the isosteric enthalpies per loading, with the form:
 
-            - ``isosteric_enthalpy`` (array) : the isosteric enthalpy of adsorption in kj/mmol
-            - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol
-            - ``slopes`` (array) : the exact log(p) vs 1/T slope for each point
-            - ``correlation`` (array) : correlation coefficient for each point
-            - ``std_errors`` (array) : estimated standard errors for each point
+        - ``isosteric_enthalpy`` (array) : the isosteric enthalpy of adsorption in kj/mmol
+        - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol
+        - ``slopes`` (array) : the exact log(p) vs 1/T slope for each point
+        - ``correlation`` (array) : correlation coefficient for each point
+        - ``std_errors`` (array) : estimated standard errors for each point
 
     Notes
     -----
@@ -164,13 +164,15 @@ def isosteric_enthalpy_raw(
         A two dimensional array of pressures for each isotherm at same loading point,
         in bar. For example, if using two isotherms to calculate the isosteric enthalpy::
 
-            [[p1_iso1, p1_iso2],
-            [p2_iso1, p2_iso2],
-            [p3_iso1, p3_iso2],
-            ...]
+            [
+                [p1_iso1, p1_iso2],
+                [p2_iso1, p2_iso2],
+                [p3_iso1, p3_iso2],
+                ...
+            ]
 
     temperatures : array
-        Temperatures of the isotherms are taken, kelvin.
+        Temperatures of the isotherms are taken, Kelvin.
 
     Returns
     -------

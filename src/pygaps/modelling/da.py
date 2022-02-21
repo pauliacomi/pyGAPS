@@ -32,11 +32,11 @@ class DA(IsothermBaseModel):
 
     There are three parameters which define the model:
 
-        * The total amount adsorbed (`n_t`), analogous to the monolayer
-          capacity in the Langmuir model.
-        * A potential energy term `e`.
-        * A power term, `m`, which can vary between 1 and 3.
-          The DA model becomes the DR models when m=2.
+    * The total amount adsorbed (`n_t`), analogous to the monolayer capacity in
+      the Langmuir model.
+    * A potential energy term `e`.
+    * A power term, `m`, which can vary between 1 and 3. The DA model becomes
+      the DR model when m=2.
 
     It describes adsorption in a single uniform type of pores. To note
     that the model does not reduce to Henry's law at low pressure

@@ -1,6 +1,6 @@
 """Functions for plotting calculation-specific graphs."""
 
-from typing import Iterable
+import typing as t
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -17,8 +17,8 @@ from pygaps.graphing.mpl_styles import POINTS_MUTED
 
 @mpl.rc_context(BASE_STYLE)
 def roq_plot(
-    pressure: Iterable[float],
-    roq_points: Iterable[float],
+    pressure: t.Iterable[float],
+    roq_points: t.Iterable[float],
     minimum: int,
     maximum: int,
     p_monolayer: float,
@@ -84,8 +84,8 @@ def roq_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def bet_plot(
-    pressure: Iterable[float],
-    bet_points: Iterable[float],
+    pressure: t.Iterable[float],
+    bet_points: t.Iterable[float],
     minimum: int,
     maximum: int,
     slope: float,
@@ -169,8 +169,8 @@ def bet_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def langmuir_plot(
-    pressure: Iterable[float],
-    langmuir_points: Iterable[float],
+    pressure: t.Iterable[float],
+    langmuir_points: t.Iterable[float],
     minimum: int,
     maximum: int,
     slope: float,
@@ -243,8 +243,8 @@ def langmuir_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def tp_plot(
-    thickness_curve: Iterable[float],
-    loading: Iterable[float],
+    thickness_curve: t.Iterable[float],
+    loading: t.Iterable[float],
     results: dict,
     alpha_s: bool = False,
     alpha_reducing_p: float = None,
@@ -264,13 +264,13 @@ def tp_plot(
     results : dict
         Dictionary of linear regions selected with the members:
 
-            - ``section(array)`` : the points of the plot chosen for the line
-            - ``area(float)`` : calculated surface area, from the section parameters
-            - ``adsorbed_volume(float)`` : the amount adsorbed in the pores as calculated
-              per section
-            - ``slope(float)`` : slope of the straight trendline fixed through the region
-            - ``intercept(float)`` : intercept of the straight trendline through the region
-            - ``corr_coef(float)`` : correlation coefficient of the linear region
+        - ``section`` (array) : the points of the plot chosen for the line
+        - ``area`` (float) : calculated surface area, from the section parameters
+        - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as
+          calculated per section
+        - ``slope`` (float) : slope of the straight trendline fixed through the region
+        - ``intercept`` (float) : intercept of the straight trendline through the region
+        - ``corr_coef`` (float) : correlation coefficient of the linear region
 
     alpha_s : bool
         Whether the function is used for alpha_s display.
@@ -342,8 +342,8 @@ def tp_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def psd_plot(
-    pore_widths: Iterable[float],
-    pore_dist: Iterable[float],
+    pore_widths: t.Iterable[float],
+    pore_dist: t.Iterable[float],
     pore_vol_cum=None,
     method: str = None,
     labeldiff: str = 'distribution',
@@ -506,9 +506,9 @@ def isosteric_enthalpy_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def initial_enthalpy_plot(
-    loading: Iterable[float],
-    enthalpy: Iterable[float],
-    fitted_enthalpy: Iterable[float],
+    loading: t.Iterable[float],
+    enthalpy: t.Iterable[float],
+    fitted_enthalpy: t.Iterable[float],
     log: bool = False,
     title: str = None,
     extras=None,  # TODO what is extra used for?
@@ -583,8 +583,8 @@ def initial_enthalpy_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def dra_plot(
-    logv: Iterable[float],
-    log_n_p0p: Iterable[float],
+    logv: t.Iterable[float],
+    log_n_p0p: t.Iterable[float],
     minimum: int,
     maximum: int,
     slope: float,
@@ -655,10 +655,10 @@ def dra_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def virial_plot(
-    loading: Iterable[float],
-    ln_p_over_n: Iterable[float],
-    n_load: Iterable[float],
-    p_load: Iterable[float],
+    loading: t.Iterable[float],
+    ln_p_over_n: t.Iterable[float],
+    n_load: t.Iterable[float],
+    p_load: t.Iterable[float],
     added_point,
     ax=None,
 ):

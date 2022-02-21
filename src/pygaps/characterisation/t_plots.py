@@ -56,15 +56,15 @@ def t_plot(
         results will be derived from the basis of the isotherm (per mass or per
         volume of adsorbent):
 
-            - ``thickness curve`` (list) : Calculated thickness curve
-            - ``results`` (list of dicts):
+        - ``thickness curve`` (list) : Calculated thickness curve
+        - ``results`` (list of dicts):
 
-                - ``section`` (array) : the points of the plot chosen for the line
-                - ``area`` (float) : calculated surface area, from the section parameters
-                - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated per section
-                - ``slope`` (float) : slope of the straight trendline fixed through the region
-                - ``intercept`` (float) : intercept of the straight trendline through the region
-                - ``corr_coef`` (float) : correlation coefficient of the linear region
+          - ``section`` (array) : the points of the plot chosen for the line
+          - ``area`` (float) : calculated surface area, from the section parameters
+          - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated per section
+          - ``slope`` (float) : slope of the straight trendline fixed through the region
+          - ``intercept`` (float) : intercept of the straight trendline through the region
+          - ``corr_coef`` (float) : correlation coefficient of the linear region
 
     Notes
     -----
@@ -80,8 +80,8 @@ def t_plot(
     and ideal surface adsorption, the t-plot will deviate and form features which can
     be analysed to describe the material characteristics.
 
-        - a sharp vertical deviation will indicate condensation in a type of pore
-        - a gradual slope will indicate adsorption on the wall of a particular pore
+    - a sharp vertical deviation will indicate condensation in a type of pore
+    - a gradual slope will indicate adsorption on the wall of a particular pore
 
     The slope of the linear section can be used to calculate the area where the adsorption
     is taking place. If it is of a linear region at the start of the curve, it will represent
@@ -228,13 +228,13 @@ def t_plot_raw(
     results : list
         A list of dictionaries with the following components:
 
-            - ``section`` (array) : the indices of points chosen for the line fit
-            - ``area`` (float) : calculated surface area, from the section parameters
-            - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as calculated
-              per section
-            - ``slope`` (float) : slope of the straight trendline fixed through the region
-            - ``intercept`` (float) : intercept of the straight trendline through the region
-            - ``corr_coef`` (float) : correlation coefficient of the linear region
+        - ``section`` (array) : the indices of points chosen for the line fit
+        - ``area`` (float) : calculated surface area, from the section parameters
+        - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as
+          calculated per section
+        - ``slope`` (float) : slope of the straight trendline fixed through the region
+        - ``intercept`` (float) : intercept of the straight trendline through the region
+        - ``corr_coef`` (float) : correlation coefficient of the linear region
 
     thickness_curve : array
         The generated thickness curve at each point using the thickness model.

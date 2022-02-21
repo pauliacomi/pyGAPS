@@ -76,41 +76,41 @@ Features
 ========
 
     - Advanced adsorption data import and manipulation.
-    - Routine analysis such as BET/Langmuir surface area, t-plot, alpha-s,
-      Dubinin plots etc.
+    - Routine analysis such as BET/Langmuir surface area, t-plots, alpha-s
+      plots, Dubinin plots etc.
     - Pore size distribution calculations for mesopores (BJH, Dollimore-Heal).
     - Pore size distribution calculations for micropores (Horvath-Kawazoe).
-    - Pore size distribution calculations using DFT kernels
-    - Isotherm model fitting (Henry, Langmuir, DS/TS Langmuir, etc..)
-    - Isosteric enthalpy of adsorption calculation.
-    - IAST calculations for binary and multicomponent adsorption.
-    - Parsing to and from multiple formats such as Excel, CSV and JSON.
-    - An sqlite database backend for storing and retrieving data.
+    - Pore size distribution calculations using kernels (DFT, QSDFT, ...)
+    - Isotherm fitting with various models (Henry, Langmuir, DS/TS Langmuir,
+      etc..)
+    - Isosteric enthalpy of adsorption calculations.
+    - IAST predictions for binary and multicomponent adsorption.
+    - Parsing to and from multiple formats such as AIF, Excel, CSV and JSON.
     - Simple methods for isotherm graphing and comparison.
+    - An database backend for storing and retrieving data.
 
 Documentation
 =============
 
 pyGAPS is built with three key mantras in mind:
 
-- **opinionated**: There are many places where the code will suggest or
-  default to what the it considers a good practice. As examples: the
-  standard units, pore size distribution methods and BET calculation limits.
-- **flexible**: While the defaults are there for a reason, you can override
+- **Opinionated**: there are many places where the code will suggest or default
+  to what the it considers a good practice. As examples: the standard units,
+  pore size distribution methods and BET calculation limits.
+- **Flexible**: while the defaults are there for a reason, you can override
   pretty much any parameter. Want to pass a custom adsorbate thickness function
   or use volumetric bases? Can do!
-- **transparent**: All code is well documented and open source. There are no
+- **Transparent**: all code is well documented and open source. There are no
   black boxes.
 
 In-depth explanations, examples and theory can be found in the
 `online documentation <https://pygaps.readthedocs.io/>`__. If you are familiar
-with Python and adsorption theory and want to jump right in, look at the
-`quickstart section
-<https://pygaps.readthedocs.io/en/master/examples/quickstart.html>`__. Examples
-on each of the capabilities specified above can be found in the
-`examples <https://pygaps.readthedocs.io/en/master/examples/index.html>`__. Most
-of the pages in the documentation are actually Jupyter Notebooks. You can
-download them and run them yourself from the
+with Python and adsorption and want to jump right in, look at the `quickstart
+section <https://pygaps.readthedocs.io/en/master/examples/quickstart.html>`__.
+Examples for each of the capabilities specified above can be found documented
+`here <https://pygaps.readthedocs.io/en/master/examples/index.html>`__. Most of
+the pages are actually Jupyter Notebooks, you can download them and run them
+yourself from the
 `/docs/examples <https://github.com/pauliacomi/pyGAPS/tree/master/docs/examples>`__
 folder.
 
@@ -145,7 +145,7 @@ The easiest way to install pyGAPS is from the command line.
 Make sure that you have ``numpy``, ``scipy``, ``pandas`` and ``matplotlib``,
 as well as ``CoolProp`` already installed.
 
-.. code-block:: bash
+.. code:: bash
 
     pip install pygaps
 
@@ -170,7 +170,7 @@ Then install the package with pip either in regular or developer mode.
     # then install
     pip install pyGAPS/
 
-    # or developer mode
+    # or in editable/develop mode
     pip install -e pyGAPS/
 
 Development

@@ -20,14 +20,14 @@ class WVST(IsothermBaseModel):
 
     The VST model is defined as follows:
 
-        * A vacancy is an imaginary entity defined as a vacuum space
-          which acts as the solvent in both the gas and adsorbed phases.
-        * The properties of the adsorbed phase are defined as excess properties
-          in relation to a dividing surface.
-        * The entire system including the material are in thermal equilibrium
-          however only the gas and adsorbed phases are in thermodynamic equilibrium.
-        * The equilibrium of the system is maintained by the spreading pressure
-          which arises from a potential field at the surface
+    * A vacancy is an imaginary entity defined as a vacuum space which acts as
+      the solvent in both the gas and adsorbed phases.
+    * The properties of the adsorbed phase are defined as excess properties in
+      relation to a dividing surface.
+    * The entire system including the material are in thermal equilibrium
+      however only the gas and adsorbed phases are in thermodynamic equilibrium.
+    * The equilibrium of the system is maintained by the spreading pressure
+      which arises from a potential field at the surface
 
     It is possible to derive expressions for the vacancy chemical potential in both
     the adsorbed phase and the gas phase, which when equated give the following equation

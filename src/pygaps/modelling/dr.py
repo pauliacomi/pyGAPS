@@ -31,9 +31,9 @@ class DR(IsothermBaseModel):
 
     There are two parameters which define the model:
 
-        * The total amount adsorbed (`n_t`), analogous to the monolayer
-          capacity in the Langmuir model.
-        * A potential energy term `e`.
+    * The total amount adsorbed (`n_t`), analogous to the monolayer capacity in
+      the Langmuir model.
+    * A potential energy term `e`.
 
     It describes adsorption in a single uniform type of pores. To note
     that the model does not reduce to Henry's law at low pressure

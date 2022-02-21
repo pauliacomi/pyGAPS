@@ -3,6 +3,12 @@
 Isotherm fitting and models
 ===========================
 
+Base Model Class
+----------------
+
+.. automodule:: pygaps.modelling.base_model
+    :members:
+
 Henry
 -----
 

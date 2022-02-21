@@ -3,6 +3,7 @@
     "adsorbate": "nitrogen",
     "material_basis": "mass",
     "material_unit": "g",
+    "temperature_unit": "K",
     "iso_type": "Isotherme",
     "isotherm_data": [
         {

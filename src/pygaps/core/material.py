@@ -141,7 +141,7 @@ class Material():
 
     @property
     def density(self) -> float:
-        """Material density (optional)."""
+        """Material density, in g/cm3 (optional)."""
         return self.properties.get("density")
 
     @density.setter
@@ -151,7 +151,7 @@ class Material():
 
     @property
     def molar_mass(self) -> float:
-        """Material molar mass (optional)."""
+        """Material molar mass, in g/mol (optional)."""
         return self.properties.get("molar_mass")
 
     @molar_mass.setter

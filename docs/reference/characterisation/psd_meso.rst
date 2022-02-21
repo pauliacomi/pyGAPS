@@ -2,5 +2,5 @@
 Mesoporous pore size distribution
 .................................
 
-.. automodule:: pygaps.characterisation.psd_mesoporous
+.. automodule:: pygaps.characterisation.psd_meso
     :members:

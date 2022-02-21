@@ -5,7 +5,8 @@ from pygaps.utilities.string_utilities import convert_chemformula
 from pygaps.utilities.string_utilities import convert_unit_ltx
 
 
-def label_units_iso(iso, key):
+def label_units_iso(iso, key: str):
+    """Build an axis label for pressure/loading/other starting from an isotherm."""
     unit_params = {
         "pressure_mode": iso.pressure_mode,
         "pressure_unit": iso.pressure_unit,
@@ -17,7 +18,7 @@ def label_units_iso(iso, key):
     return label_units_dict(key, unit_params)
 
 
-def label_units_dict(key, unit_params):
+def label_units_dict(key: str, unit_params: dict):
     """Build an axis label for pressure/loading/other."""
     if key == "pressure":
         if unit_params['pressure_mode'] == "absolute":
@@ -40,7 +41,7 @@ def label_units_dict(key, unit_params):
     return text
 
 
-def label_lgd(isotherm, lbl_components, branch: str = None, key_def: str = None):
+def label_lgd(isotherm, lbl_components: list, branch: str = None, key_def: str = None):
     """Build a legend label."""
 
     if not lbl_components:

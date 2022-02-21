@@ -224,7 +224,7 @@ class PointIsotherm(BaseIsotherm):
         loading : list
             Create an isotherm directly from an array. Values for loading.
             If the ``isotherm_data`` dataframe is specified, these values are ignored.
-        isotherm_data : DataFrame
+        isotherm_data : pandas.DataFrame
             Pure-component adsorption isotherm data.
         loading_key : str
             Column of the pandas DataFrame where the loading is stored.
@@ -262,13 +262,13 @@ class PointIsotherm(BaseIsotherm):
         pressure_points : None or List or PointIsotherm
             How the pressure points should be chosen for the resulting PointIsotherm.
 
-                - If ``None``, the PointIsotherm returned has a fixed number of
-                  equidistant points
-                - If an array, the PointIsotherm returned has points at each of the
-                  values of the array
-                - If a PointIsotherm is passed, the values will be calculated at each
-                  of the pressure points in the passed isotherm. This is useful for
-                  comparing a model overlap with the real isotherm.
+            - If ``None``, the PointIsotherm returned has a fixed number of
+              equidistant points
+            - If an array, the PointIsotherm returned has points at each of the
+              values of the array
+            - If a PointIsotherm is passed, the values will be calculated at
+              each of the pressure points in the passed isotherm. This is useful
+              for comparing a model overlap with the real isotherm.
         """
         if pressure_points is not None and loading_points is not None:
             raise ParameterError("""Cannot specify both pressure and loading points.""")
@@ -1050,7 +1050,7 @@ class PointIsotherm(BaseIsotherm):
         ----------
         pressure : float or array
             Pressure at which to compute loading.
-        branch : {'ads','des'}
+        branch : {'ads', 'des'}
             The branch the interpolation takes into account.
         interpolation_type : str
             The type of scipy.interp1d used: `linear`, `nearest`, `zero`,

@@ -1,12 +1,12 @@
 .. _characterisation-manual:
 
-Adsorbent characterisation
-==========================
+Adsorbent material characterisation
+===================================
 
 Overview
 --------
 
-The main purpose behind the pyGAPS framework is to allow standard isotherm
+One of the main features of the pyGAPS framework is to allow standard isotherm
 characterisation techniques to be carried out in bulk for high throughput
 testing, as well as to disconnect adsorption data processing from the machine
 used to record it.
@@ -21,17 +21,20 @@ characterisation:
 - Pore size distribution (PSD) calculations
 
   - Mesoporous PSD calculations function
-    :meth:`~pygaps.characterisation.psd_mesoporous` with the module containing
-    the individual model references: :mod:`pygaps.characterisation.psd_meso`
+    :meth:`~pygaps.characterisation.psd_meso.psd_mesoporous` with the module
+    containing the individual model references:
+    :mod:`pygaps.characterisation.psd_meso`
   - Microporous PSD calculations function
-    :meth:`~pygaps.characterisation.psd_microporous` with the module containing
-    the individual model references: :mod:`~pygaps.characterisation.psd_micro`
-  - DFT kernel fitting PSD function :meth:`~pygaps.characterisation.psd_dft`
-    with the module containing the individual model references:
+    :meth:`~pygaps.characterisation.psd_micro.psd_microporous` with the module
+    containing the individual model references:
+    :mod:`~pygaps.characterisation.psd_micro`
+  - Kernel fitting PSD functions, like DFT
+    :meth:`~pygaps.characterisation.psd_kernel.psd_dft` with the module
+    containing the individual model references:
     :mod:`~pygaps.characterisation.psd_kernel`
 
 - Isosteric enthalpy of adsorption calculations
-  :meth:`~pygaps.characterisation.isosteric_enthalpy.isosteric_enthalpy`
+  :meth:`~pygaps.characterisation.isosteric_enth`
 - Dubinin-Radushevitch and Dubinin-Astakov plots
   (:meth:`~pygaps.characterisation.dr_da_plots.dr_plot`,
   :meth:`~pygaps.characterisation.dr_da_plots.da_plot`)

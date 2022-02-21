@@ -13,8 +13,8 @@ html_theme = "furo"
 
 
 # -- Mocking of modules -----------------------------------------------------
-# Need to mock modules using MagicMock, as they won't be able to
-# be installed on readthedocs
+# Need to mock most modules using MagicMock, as they won't be able to
+# be installed on ReadTheDocs
 class Mock(MagicMock):
     """Simple mock class."""
     @classmethod
@@ -22,22 +22,23 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-MOCK_MODULES = [
-    'matplotlib',
-    'matplotlib.pyplot',
-    'matplotlib.ticker',
-    'matplotlib.cm',
-    'numpy',
-    'pandas',
-    'pandas.util',
-    'scipy',
-    'scipy.constants',
-    'scipy.stats',
-    'scipy.optimize',
-    'scipy.interpolate',
-    'scipy.integrate',
-    'coolprop',
-]
+# MOCK_MODULES = [
+#     'matplotlib',
+#     'matplotlib.pyplot',
+#     'matplotlib.ticker',
+#     'matplotlib.cm',
+#     'matplotlib.rc_context',
+#     'numpy',
+#     'pandas',
+#     'pandas.util',
+#     'scipy',
+#     'scipy.constants',
+#     'scipy.stats',
+#     'scipy.optimize',
+#     'scipy.interpolate',
+#     'scipy.integrate',
+#     'coolprop',
+# ]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration -----------------------------------------------------
@@ -150,14 +151,19 @@ html_short_title = '%s-%s' % (project, version)
 html_theme_options = {
     "sidebar_hide_name": True,
     "navigation_with_keys": True,
+    "announcement":
+    "A <a href=\"https://github.com/pauliacomi/pyGAPS-gui\" >graphical user interface</a> for pyGAPS is now available!",
     "light_css_variables": {
         "color-brand-primary": "#c2389e",
         "color-background-secondary": "#f0fbff",
+        "color-announcement-background": "#5d0f60",
     },
     "dark_css_variables": {
         "color-brand-primary": "#c2389e",
         "color-background-primary": "#151420",
         "color-background-secondary": "#1a1d25",
+        "color-announcement-background": "#5d0f60",
+        "color-admonition-background": "#190242",
     },
 }
 
@@ -170,7 +176,15 @@ napoleon_use_param = False
 # -- autodoc configuration -----------------------------------------------------
 
 autodoc_member_order = 'bysource'
-autodoc_mock_imports = ['_tkinter']
+autodoc_mock_imports = [
+    # '_tkinter',
+    # 'matplotlib',
+    # 'numpy',
+    # 'pandas',
+    # 'scipy',
+    # 'coolprop',
+]
+autodoc_typehints_format = 'short'
 
 # -- nbsphinx configuration -----------------------------------------------------
 
@@ -182,7 +196,7 @@ nbsphinx_prolog = r"""
     <div class="admonition note">
       This page was generated from
       <a class="reference external" href="https://github.com/pauliacomi/pyGAPS/blob/v{{ env.config.release|e }}/{{ docname|e }}">{{ docname|e }}</a>.
-      An interactive online version can be started on Binder:
+      To start an interactive version:
       <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/v{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.</span>
       <script>
         if (document.location.host) {

@@ -14,7 +14,8 @@ for standard plots to be generated.
 
 The main plotting tool is in the
 :func:`~pygaps.graphing.isotherm_graphs.plot_iso` function, which handles the
-plotting of isotherms. Some common use-case scenarios for the functionality are:
+plotting of all isotherm types. Some common use-case scenarios for the
+functionality are:
 
 - Visualising the data after isotherm instantiation.
 - Quickly comparing several isotherms.
@@ -26,7 +27,7 @@ etc. The function also accepts keywords to specify the unit, pressure mode and
 basis of the graphs. A complete list of parameters can be found in the
 :ref:`reference <plotting-ref>`.
 
-The function also returns the ``matplotlib`` Axes, to allow for further
+The function also returns the ``matplotlib.Axes``, to allow for further
 customisation for the resulting plot.
 
 

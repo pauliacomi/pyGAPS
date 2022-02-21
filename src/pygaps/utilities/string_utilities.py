@@ -85,14 +85,14 @@ def convert_unit_ltx(string: str, negative: bool = False) -> str:
     return result
 
 
-def _is_none(s):
+def _is_none(s: str):
     """Check if a value is a text None."""
     if s == 'None':
         return True
     return False
 
 
-def _is_float(s):
+def _is_float(s: str):
     """Check if a value is a float."""
     try:
         float(s)
@@ -101,7 +101,7 @@ def _is_float(s):
         return False
 
 
-def _is_bool(s):
+def _is_bool(s: str):
     """Check a value is a text bool."""
     if s.lower() in ['true', 'false']:
         return True
@@ -109,7 +109,7 @@ def _is_bool(s):
         return False
 
 
-def _from_bool(s):
+def _from_bool(s: str):
     """Convert a boolean into a string."""
     if s.lower() == 'true':
         return True
@@ -118,7 +118,7 @@ def _from_bool(s):
     raise ValueError('String cannot be converted to bool')
 
 
-def _is_list(s):
+def _is_list(s: str):
     """Check a value is a simple list."""
     if s.startswith('[') and s.endswith(']'):
         return True
@@ -126,7 +126,7 @@ def _is_list(s):
         return False
 
 
-def _from_list(s):
+def _from_list(s: str):
     """Convert a value into a string list."""
     # note that the function will fail if the list has other spaces
     return ast.literal_eval(s.replace(' ', ","))

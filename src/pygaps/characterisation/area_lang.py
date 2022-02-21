@@ -57,12 +57,12 @@ def area_langmuir(
     adsorption happens on active sites on a surface in a single layer. It is
     derived based on several assumptions.
 
-        * All sites are equivalent and have the same chance of being occupied
-        * Each adsorbate molecule can occupy one adsorption site
-        * There are no interactions between adsorbed molecules
-        * The rates of adsorption and desorption are proportional to the number
-          of sites currently free and currently occupied, respectively
-        * Adsorption is complete when all sites are filled.
+    * All sites are equivalent and have the same chance of being occupied
+    * Each adsorbate molecule can occupy one adsorption site
+    * There are no interactions between adsorbed molecules
+    * The rates of adsorption and desorption are proportional to the number of
+      sites currently free and currently occupied, respectively
+    * Adsorption is complete when all sites are filled.
 
     The Langmuir equation is then:
 

@@ -8,135 +8,124 @@ The Isotherm classes
 Overview
 --------
 
-In pyGAPS, an isotherm can be represented in two ways: as a
-:class:`~pygaps.core.pointisotherm.PointIsotherm` object or as a
-:class:`~pygaps.core.modelisotherm.ModelIsotherm` object. These two classes have
-many common methods and attributes, but they differ in the way they represent
-the relationship between pressure and loading:
+In pyGAPS, an adsorption isotherm can be represented in two ways: as a
+:class:`~pygaps.core.pointisotherm.PointIsotherm` or as a
+:class:`~pygaps.core.modelisotherm.ModelIsotherm`. These two classes have many
+common methods and attributes, but they differ in the way they define the
+relationship between pressure (concentration) and loading (uptake):
 
-- The PointIsotherm class is a collection of discrete points, stored in a
-  pandas.DataFrame object. It can contain both an adsorption and desorption
-  branch, which are determined automatically at instantiation or specified by
-  the user.
-- The ModelIsotherm class is a collection of parameters which are used to
-  describe a model of adsorption behaviour. It can only model a single branch of
-  the data, either adsorption or desorption.
+- The :class:`~pygaps.core.pointisotherm.PointIsotherm` class is a collection of
+  discrete points, stored in a ``pandas.DataFrame`` object.
+- The :class:`~pygaps.core.modelisotherm.ModelIsotherm` class is a dictionary of
+  parameters which are used to describe a model of adsorption behaviour (Henry,
+  Langmuir, etc..).
 
-Both classes are derived from the :class:`~pygaps.core.baseisotherm.BaseIsotherm`
-class. This class holds parameters of the isotherm besides data, such as the
-adsorbate used, the material's name and the temperature at which the isotherm
-was measured. These parameters are then inherited by the two child isotherm
-objects. The user is unlikely to use this class directly.
-
+Both classes are derived from the
+:class:`~pygaps.core.baseisotherm.BaseIsotherm` class. This class holds
+parameters of the isotherm besides data, such as the adsorbate used, the
+material's name and the temperature at which the isotherm was measured. These
+parameters are then inherited by the two isotherm objects. The user is unlikely
+to use this class directly.
 
 To work with pyGAPS isotherms check out the following topics:
 
 - :ref:`Creating an isotherm <isotherms-manual-create>`
 - :ref:`Accessing isotherm data <isotherms-manual-data>`
 - :ref:`Isotherm units, modes and basis <isotherms-manual-convert>`
-- :ref:`Ensuring isotherm uniqueness <isotherms-manual-unique>`
 - :ref:`Exporting an isotherm <isotherms-manual-export>`
+- :ref:`Ensuring isotherm uniqueness <isotherms-manual-unique>`
 
-A detailed explanation of each isotherm class and methods is written in the
-respective docstrings and can be accessed in the
-:ref:`reference <isotherms-ref>`. Only a general overview will be given here.
+.. note::
+
+    A detailed explanation of each isotherm class and methods is written in their
+    docstrings and can be also read in the :ref:`reference <isotherms-ref>`.
 
 .. _isotherms-manual-create:
 
-Creating an isotherm
---------------------
+Creating isotherms
+------------------
+
+.. _isotherms-manual-create-point:
 
 Creating a PointIsotherm
 ::::::::::::::::::::::::
 
-There are several ways to create a PointIsotherm object:
+There are several ways to create a
+:class:`~pygaps.core.pointisotherm.PointIsotherm` object:
 
-- Passing a *pressure* and a *loading* array.
+- Passing a ``pressure`` and a ``loading`` array.
 - From a ``pandas.DataFrame``. This is the most extensible way to create a
   PointIsotherm, as other data types can be specified.
 - Parsed from one of the formats known to pyGAPS:
 
-  - From a pyGAPS **json** string or file.
-    See :ref:`parsing from json <parsing-manual-json>`.
-  - From an `AIF file <https://adsorptioninformationformat.com>`__.
-    See :ref:`parsing from aif <parsing-manual-aif>`.
-  - From a pyGAPS **csv** string or file.
-    See :ref:`parsing from csv <parsing-manual-csv>`.
-  - From an pyGAPS **excel** file.
-    See :ref:`parsing from excel <parsing-manual-excel>`.
+  .. include:: parsing_modes.rst
 
 - Imported from one of many device manufacturer formats. See
   :ref:`parsing manufacturer files <parsing-manual-manufacturer>`.
-- From an internal sqlite database: pyGAPS contains functionality to store and
+- From an internal database: pyGAPS contains functionality to store and
   retrieve constructed isotherms in an sqlite database. See
   :ref:`database <parsing-manual-sqlite>`.
 
 This section will explain how to create an isotherm from raw data. The fastest
-way to create an isotherm is to pass a pressure and a loading array to the
-constructor as the ``pressure`` and ``loading`` parameters.
+way is to pass pressure and loading arrays to the constructor as the
+``pressure`` and ``loading`` parameters.
 
-The code does its best to attempt to guess whether the data passed is part of an
-adsorption branch, desorption branch or has both. It does this by looking at
-whether pressure is increasing or decreasing between two consecutive points. It
-then marks the particular branch internally. If the data isn't well conditioned,
-this functionality will likely not produce good results. In this case, the user
-can specify whether the data is an adsorption or desorption branch by using the
-``branch`` argument. What's more, the user can specify where the branches are
-located by passing an iterable as the ``branch`` parameter. See more in the
-:ref:`reference <isotherms-pointisotherm>`.
+The other information that needs to be passed to the constructor is isotherm
+metadata. This is information about the material the isotherm was measured on,
+the adsorbate which was used, as well as data about the temperature, units used
+and so on. The isotherm metadata must include:
 
-.. caution::
+- The material name (``material`` or ``m``).
+- The adsorbate used (``adsorbate`` or ``a``).
+- The temperature at which the data was recorded (``temperature`` or ``t``).
 
-    The data in the columns is assumed to be free of errors and anomalies.
-    Negative pressures or loadings, noisy signals or erroneous points may give
-    undefined behaviour.
-
-The other information that needs to be passed to the constructor is related to
-the parameters of the isotherm. This is information about the material the
-isotherm was measured on, the adsorbate which was used, as well as data about
-the temperature, units used and so on.
-
-Besides data, the isotherm parameters must include:
-
-- The material name (``material``)
-- The adsorbate used (``adsorbate``)
-- The temperature, in K at which the data was recorded (``temperature``)
-
-The isotherm units can also be specified here. If not specified, the framework
-will assume default values: absolute pressure in *bar* and amount adsorbed in
-terms of *mmol* per *g* (molar basis loading per adsorbent material mass basis).
-Options are:
-
-- The ``pressure_mode`` parameter specifies if the pressure is absolute or
-  relative (p/p0). If not passed, the pressure is assumed to be absolute.
-
-- The ``pressure_unit`` specifies the unit the pressure is measured in, if
-  applicable. It can be *bar*, *Pa*, *kPa*, etc. and it defaults to *bar*.
-
-- The ``loading_basis`` parameter specifies if the amount adsorbed is
-  defined in terms of moles, volume or mass. If not passed, it is assumed to
-  be molar.
-
-- The ``loading_unit`` specifies the unit the amount adsorbed is in.
-  Depending on the basis it can be a mass, volume or molar unit. By default,
-  the loading is read in *mmol*.
-
-- The ``material_basis`` parameter specifies if the quantity of material
-  is defined in terms of moles, volume or mass. If not passed, it is assumed
-  to be on a mass basis.
-
-- The ``material_unit`` specifies the unit the material itself is in.
-  Depending on the basis it can be a mass, volume or molar unit. By default,
-  the material is is read in *g*.
-
-Other user parameters can be passed as well, and will be stored in the isotherm
-object as properties. Will these components, an isotherm can now be created. An
-example instantiation is given below, with explanations.
+As such, the simplest creation statement is:
 
 .. code:: python
 
     point_isotherm = pygaps.PointIsotherm(
+        pressure=[1,2,3,4],
+        loading=[1,2,3,4],
+        m='carbon',
+        a='nitrogen',
+        t=77,
+    )
 
+The isotherm units can also be specified. If not given, the framework will
+assume default values: temperature in Kelvin, absolute pressure in *bar* and
+amount adsorbed in terms of *mmol* per *g* (molar basis loading per mass basis
+material). Options are:
+
+- ``pressure_mode`` specifies if the pressure is absolute or
+  relative (p/p0). If not passed, the pressure is assumed to be absolute.
+
+- ``pressure_unit`` specifies the unit the pressure is measured in, if
+  applicable. It can be *bar*, *Pa*, *kPa*, etc. and it defaults to *bar*.
+
+- ``loading_basis`` specifies if the amount adsorbed is defined in terms of
+  moles, gas volume, liquid volume, mass, fractional or percentage. If not
+  passed, it is assumed to be molar.
+
+- ``loading_unit`` specifies the unit the amount adsorbed is in. Depending on
+  the ``loading_basis`` it can be a mass, volume or molar unit. By default, the
+  loading is read in *mmol*.
+
+- ``material_basis`` specifies if the quantity of material is defined in terms
+  of moles, volume or mass. If not passed, it is assumed to be on a mass basis.
+
+- ``material_unit`` specifies the unit the material itself is in. Depending on
+  the ``material_basis`` it can be a mass, volume or molar unit. By default, the
+  material is is read in *g*.
+
+- ``temperature_unit`` for the given ``temperature``, *K* by default.
+
+Other user metadata can be passed as well, and will be stored in the isotherm
+object ``properties`` dictionary. Will these components, an isotherm can now be
+created. A more complex instantiation is given below, with explanations.
+
+.. code:: python
+
+    point_isotherm = pygaps.PointIsotherm(
         pressure=[1,2,3],               # pressure here
         loading=[1,2,3],                # loading here
 
@@ -161,23 +150,36 @@ example instantiation is given below, with explanations.
         something='something',          # User specific
     )
 
-Alternatively, a ``pandas.DataFrame`` can be passed in. This allows for more data
-than just pressure and loading to be stored in a single isotherm. The DataFrame
-should have at least two columns: the pressures at which each point was
-recorded, and the loadings for each point. Other data columns can represent
-calorimetry data, magnetic field strengths, or other simultaneous measurements.
+The code does its best to attempt to guess whether the data passed is part of an
+adsorption branch, desorption branch or has both. It does this by looking at
+whether pressure is increasing or decreasing between two consecutive points and
+marks branches internally. If the data isn't well conditioned, this
+functionality will likely not produce good results. In this case, the user can
+specify whether the data is an adsorption or desorption branch by using the
+``branch`` argument. The user can also divide the data directly by passing a
+list of ``int`` as the ``branch`` parameter. See more in the
+:class:`~pygaps.core.pointisotherm.PointIsotherm` reference.
 
-If a DataFrame is used, ``loading_key`` and ``pressure_key`` are required
-parameters specifying which column in the DataFrame contains what data of the
-isotherm. Other columns in the dataframe are also stored in the isotherm object.
-As an example:
+.. caution::
+
+    The data in the columns is assumed to be free of errors and anomalies.
+    Negative pressures or loadings, noisy signals or erroneous points may give
+    undefined behaviour.
+
+Alternatively, a ``pandas.DataFrame`` can be passed in. This allows for more
+data than just pressure and loading to be stored in a single isotherm. The
+DataFrame should have at least two columns: one for pressure and one for
+loading. Other data columns can represent secondary measurements: calorimetry
+data, magnetic field strengths, and are stored in the ``PointIsotherm``.
+
+If a DataFrame is used, ``pressure_key`` and ``loading_key`` are two required
+parameters specifying which column in the DataFrame contains the pressure and
+loading, respectively. As an example:
 
 .. code:: python
 
     point_isotherm = pygaps.PointIsotherm(
-
-        # First the pandas.DataFrame with the points
-        # and the keys to what the columns represent.
+        # First the pandas.DataFrame
         isotherm_data=pandas.DataFrame({
             'pressure' : [1, 2, 3, 4, 5, 3, 2],             # required
             'loading' : [1, 2, 3, 4, 5, 3, 2],              # required
@@ -185,6 +187,7 @@ As an example:
             'xrd_peak_1' : [0, 0, 1, 2, 2, 1, 0],
         }),
 
+        # and the keys to what the columns represent.
         loading_key='loading',          # The loading column
         pressure_key='pressure',        # The pressure column
 
@@ -195,26 +198,25 @@ As an example:
     )
 
 
+.. _isotherms-manual-create-model:
+
 Creating a ModelIsotherm
 ::::::::::::::::::::::::
 
-To create a ModelIsotherm, one can use either raw data, in a process similar to
-the PointIsotherm creation above, or a PointIsotherm can be used directly.
+To create a :class:`~pygaps.core.modelisotherm.ModelIsotherm`, one can either
+use raw similar to above, or create one from an existing PointIsotherm.
 
 ModelIsotherm creation from raw data is almost identical to the PointIsotherm
-creation. The same data and parameters can be used, but with a few other
-parameters:
+creation. The same data and parameters can be used, with a few differences:
 
-- The ``model`` parameter specifies which model/models to use to attempt to fit
-  the data.
-- The ``branch`` parameter will specify which isotherm branch (adsorption or
-  desorption) will be represented by the model, as both cannot be used at the
-  same time. It defaults to the adsorption branch.
-- The ``param_guess`` specifies the initial model parameter guesses where
+- ``model`` specifies which model/models to use to attempt to fit the data.
+- ``branch`` will specify which *single* isotherm branch (adsorption or
+  desorption) is represented by the model. It defaults to the adsorption branch.
+- ``param_guess`` specifies the initial model parameter guesses where fitting
   optimisation should start. The parameter is optional, and will be
   automatically filled unless the user specifies it.
-- The ``param_bounds`` specifies the bounds for optimisation parameters.
-- The ``optimization_params`` is a dictionary which will be passed to
+- ``param_bounds`` specifies the bounds for optimisation parameters.
+- ``optimization_params`` is a dictionary which will be passed to
   ``scipy.optimise.least_squares``.
 - Finally, the ``verbose`` parameter can be used to increase the amount of
   information printed during the model fitting procedure.
@@ -222,7 +224,7 @@ parameters:
 .. note::
 
     The ModelIsotherm cannot be used to model tertiary data. Therefore, only
-    *loading* and *pressure* will be used. Any other columns in the DataFrame
+    *loading* and *pressure* will be saved. Any other columns in the DataFrame
     will be ignored.
 
 The code to generate a ModelIsotherm is then:
@@ -230,7 +232,6 @@ The code to generate a ModelIsotherm is then:
 .. code:: python
 
     model_isotherm = pygaps.ModelIsotherm(
-
         pressure=[1,2,3],               # pressure here
         loading=[1,2,3],                # loading here
 
@@ -295,25 +296,26 @@ using the following functions:
 To access the isotherm data, one of several functions can be used. There are
 individual methods for each data type: ``pressure``, ``loading`` and
 ``other_data``. The first two are applicable to both PointIsotherms and
-ModelIsotherms. While PointIsotherm methods return the actual discrete data,
+ModelIsotherms. PointIsotherm methods return the actual discrete data, while
 ModelIsotherms use their internal model to generate data with the
 characteristics required.
 
-- For loading: PointIsotherm
+- For getting loading: PointIsotherm
   :meth:`~pygaps.core.pointisotherm.PointIsotherm.loading` and ModelIsotherm
   :meth:`~pygaps.core.modelisotherm.ModelIsotherm.loading`.
 
-- For pressure: PointIsotherm
+- For getting pressure: PointIsotherm
   :meth:`~pygaps.core.pointisotherm.PointIsotherm.pressure` and ModelIsotherm
   :meth:`~pygaps.core.modelisotherm.ModelIsotherm.pressure`.
 
-- For tertiary data columns: PointIsotherm
+- For getting tertiary data columns: PointIsotherm
   :meth:`~pygaps.core.pointisotherm.PointIsotherm.other_data`.
 
-All data-specific functions can return either a ``pandas.Series`` object or a
-``numpy.array``, depending on the parameters passed to it. Other optional
-parameters can specify the unit, the mode/basis, the branch the data is returned
-from as well as a particular range the data should be selected in. For example:
+All data-specific functions can return either a ``numpy.array`` object or a
+``pandas.Series``, depending on the whether the ``indexed`` parameter is
+``False`` (default) or ``True``. Other optional parameters can specify the unit,
+the mode/basis, the branch the data is returned from as well as a particular
+range for slicing data. For example:
 
 .. code:: python
 
@@ -336,7 +338,7 @@ PointIsotherm object.
 
     # Will return the enthalpy points of the desorption part of the
     # isotherm in the range if 10-40 kJ/mol as an indexed
-    # pandas.Series
+    # ``pandas.Series``
 
     isotherm.other_data(
         'enthalpy',
@@ -362,10 +364,10 @@ directly or retrieve the DataFrame. To access the DataFrame directly, use the
 
     isotherm.data_raw
 
-Besides functions which give access to the internal datapoints, the isotherm
+Besides functions which give access to the internal data points, the isotherm
 object can also return the value of pressure and loading at any point specified
 by the user. To differentiate them from the functions returning internal data,
-the functions have **_at** in their name.
+the functions have ``_at`` in their name.
 
 In the ModelIsotherm class, the internal model is used to calculate the data
 required. In the PointIsotherm class, the functions rely on an internal
@@ -393,7 +395,7 @@ parameters and the output parameters.
 
     isotherm.loading_at(
         1,
-        pressure_unit = 'atm',      # the pressure is passed in atmospheres (= 1 atm)
+        pressure_unit='atm',        # the pressure is passed in atmospheres (= 1 atm)
         branch='des',               # use the desorption branch of the isotherm
         loading_unit='mol',         # return the loading in mol
         material_basis='mass',      # return the adsorbent in mass basis
@@ -417,11 +419,10 @@ Converting isotherm units, modes and basis
 
 The PointIsotherm class also includes methods which can be used to permanently
 convert the internal data. This is useful in certain cases, like when you want
-to export the converted isotherm in an excel or json form. To understand how
-units work in pyGAPS, see :ref:`this section <units-manual>`. If what is desired
-is instead a slice of data in a particular unit, it is easier to get it directly
-via the data access functions :ref:`above <isotherms-manual-data>`. The
-conversion functions are:
+to export the converted isotherm. To understand how units work in pyGAPS, see
+:ref:`this section <units-manual>`. If what is desired is instead a slice of
+data in a particular unit, it is easier to get it directly via the data access
+functions :ref:`above <isotherms-manual-data>`. The conversion functions are:
 
 - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert` which can
   handle any conversion quantities.
@@ -434,6 +435,15 @@ conversion functions are:
 - :meth:`~pygaps.core.pointisotherm.PointIsotherm.convert_material` will
   permanently convert the adsorbent material units or basis, for example
   from a mass basis in *g* to a mass basis in *kg*.
+- :meth:`~pygaps.core.baseisotherm.BaseIsotherm.convert_temperature` will
+  permanently the temperature unit.
+
+.. important::
+
+    In order for pyGAPS to correctly convert between some modes and basis, the
+    user might have to take some extra steps to provide the required information
+    for these conversions (adsorbate molar mass for instance, which is
+    calculated automatically for known adsorbates).
 
 These conversion functions also reset the internal interpolator to the
 particular unit and basis set requested. An example of how to convert the
@@ -462,14 +472,9 @@ Or a complicated conversion using the convenience function.
 
     The ModelIsotherm model parameters cannot be converted permanently to new
     states (although the data can still be obtained in that state by using the
-    data functions). For fast calculations, it is better to first convert the
-    data in the format required in a PointIsotherm, then generate the
-    ModelIsotherm.
+    data functions). For fast calculations, it is better to first convert a
+    PointIsotherm, then re-fit the ModelIsotherm.
 
-In order for pyGAPS to correctly convert between some modes and basis, the user
-might have to take some extra steps to provide the required information for
-these conversions (adsorbate molar mass for instance, which is calculated
-automatically for known adsorbates).
 
 Converting to relative pressures
 ::::::::::::::::::::::::::::::::
@@ -477,38 +482,34 @@ Converting to relative pressures
 To convert an absolute pressure in a relative pressure, the critical pressure of
 the gas at the experiment temperature must be known. Of course, this conversion
 only works when the isotherm is measured in a subcritical regime. To calculate
-the vapour pressure, pyGAPS relies on the ``CoolProp`` library. Therefore, the
+the vapour pressure, pyGAPS relies on the
+`CoolProp <http://www.coolprop.org/>`__ thermodynamic library. Therefore, the
 name of the gas in a format CoolProp understands must be passed to the CoolProp
 API. pyGAPS does this by having an internal list of adsorbates, which is loaded
-from the database at the moment of import. The steps are:
+from its database at import-time. The steps are:
 
+- The ``isotherm.adsorbate`` is linked to a ``pygaps.Adsorbate`` class at
+  isotherm creation.
 - User requests conversion from absolute to relative pressure for an isotherm
-  object
-- The adsorbate name is taken from the isotherm parameter and matched against
-  the name of an adsorbate in the internal list.
-- CoolProp calculates the critical point pressure for the adsorbate.
-- The relative pressure is calculated by dividing by the critical point
-  pressure.
+  object.
+- CoolProp backend calculates the vapour pressure (p0) for the adsorbate.
+- The relative pressure is calculated by dividing by p0.
 
 If using common gasses, the user should not be worried about this process, as an
-extensive list of adsorbates is stored in the internal database. However, if a
-new adsorbate is to be used, the user might have to add it to the master list
-themselves. For more info on this see the
-:ref:`Adsorbate class manual <adsorbate-manual>`
+extensive list of adsorbates is available. However, if a new adsorbate is to be
+used, the user might have to add it to the list themselves. For more info on
+this see the :ref:`Adsorbate class manual <adsorbate-manual>`.
 
 Converting loading basis
 ::::::::::::::::::::::::
 
 For loading basis conversions, the relationship between the two bases must be
-known. Between a mass and a volume basis, density of the material is needed and
-between mass and molar basis, the specific molar mass of the adsorbent material
-is required.
+known. Between a mass and a volume basis, density of the adsorbent is needed and
+between mass and molar basis, the specific molar mass is required.
 
-For each specific adsorbate, these properties are also calculated using
-CoolProp. The molar mass is independent of any variables, while the density is a
-function of temperature. Here, it is assumed that the density is that of a gas,
-and therefore converting an isotherm to a volumetric loading basis gives you the
-volume that the gas adsorbed would occupy at the isotherm temperature.
+For most adsorbates, these properties are also calculated using the
+thermodynamic backend. The molar mass is independent of any variables, while the
+gas/liquid density is a function of temperature.
 
 Converting material basis
 ::::::::::::::::::::::::::
@@ -518,38 +519,11 @@ required, depending on the conversion requested. These properties are specific
 to each material and cannot be calculated. Therefore, they have to be specified
 by the user.
 
-Similar to the list of adsorbates described above, pyGAPS includes a list of
-samples, stored as Material objects. This is populated at import-time from the
-database. It is this list from where the required properties are retrieved.
-
-To specify the properties, the user must create a Material instance, populate it
-with the density value and the molar mass, and then upload it either to the
-internal list or the internal database. For more info on this see the
-:ref:`Material class manual <material-manual>`
-
-
-.. _isotherms-manual-unique:
-
-Ensuring isotherm uniqueness
-----------------------------
-
-Each PointIsotherm can generate an id. This id is a fingerprint of the isotherm
-and should be unique to each object. The id string is an md5 hash of the
-isotherms parameters and data/model. The id is also used internally for database
-storage.
-
-The id is generated automatically every time the isotherm.iso_id is called. The
-hashlib.md5 function is used to obtain a hash of the json string. It can be read
-as:
-
-.. code:: python
-
-    point_isotherm.iso_id
-
-.. note::
-
-    Both ModelIsotherm and PointIsotherm classes are supported and contain an
-    ID. They are based on different data so cannot be compared.
+Similar to the list of adsorbates described above, pyGAPS stores a list of
+``Material`` objects. This is linked to the ``isotherm.material``. To specify
+the properties, the user must manually set density and the molar mass for an
+isotherm material. For more info on this see the
+:ref:`Material class manual <material-manual>`.
 
 
 .. _isotherms-manual-export:
@@ -559,6 +533,9 @@ Exporting an isotherm
 
 To export an isotherm, pyGAPS provides several choices to the user:
 
+- Converting the isotherm to an
+  `AIF format <https://adsorptioninformationformat.com>`__., using the
+  :meth:`~pygaps.parsing.aif.isotherm_to_aif` function
 - Converting the isotherm in a JSON format, using the
   :meth:`~pygaps.parsing.json.isotherm_to_json` function
 - Converting the isotherm to a CSV file, using the
@@ -571,3 +548,36 @@ To export an isotherm, pyGAPS provides several choices to the user:
   manual.
 
 More info can be found on the respective parsing pages of the manual.
+
+
+.. _isotherms-manual-unique:
+
+Ensuring isotherm uniqueness
+----------------------------
+
+An interesting question is how to ensure an isotherm is unique. To this end,
+each Isotherm generates an id, which is an md5 hash of the isotherms parameters
+and data/model. The id is also used internally for database storage.
+
+The id is generated automatically every time the ``isotherm.iso_id`` is called.
+The ``hashlib.md5`` function is used to obtain a hash of the json string. It can
+be read as:
+
+.. code:: python
+
+    point_isotherm.iso_id
+
+This means that we can perform identity checks such as:
+
+.. code:: python
+
+    if point_isotherm1 == point_isotherm2:
+        print("same data")
+
+    if iso in list_of_isos:
+        print("isotherm in collection")
+
+.. note::
+
+    Both ModelIsotherm and PointIsotherm classes are supported and contain an
+    ID.

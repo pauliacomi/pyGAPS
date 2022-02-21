@@ -60,9 +60,9 @@ def psd_dft(
     dict
         A dictionary with the pore widths and the pore distributions, of the form:
 
-            - ``pore_widths`` (array) : the widths of the pores
-            - ``pore_distribution`` (array) : contribution of each pore width to the
-              overall pore distribution
+        - ``pore_widths`` (array) : the widths of the pores
+        - ``pore_distribution`` (array) : contribution of each pore width to the
+          overall pore distribution
 
     Notes
     -----
@@ -75,14 +75,14 @@ def psd_dft(
     in pores is a computationally intensive task, with modern computing power
     significantly improving the scales on which the modelling can be applied.
 
-    The theory can be used to model adsorption in a simplified pore of a particular
-    width which yields the the adsorption isotherm on a material comprised solely
-    on pores of that width. The calculation is then repeated on pores of different
-    sizes, to obtain a 'DFT kernel' or a collection of ideal isotherms on a
-    distribution of pores. The generation of this kernel should be judicious, as
-    both the adsorbent and the adsorbate must be modelled accurately. As it is a
-    field in of in itself, the DFT calculations themselves are outside the scope
-    of this program.
+    The theory can be used to model adsorption in a simplified pore of a
+    particular width which yields the the adsorption isotherm on a material
+    comprised solely on pores of that width. The calculation is then repeated on
+    pores of different sizes, to obtain a 'kernel' or a collection of ideal
+    isotherms on a distribution of pores. The generation of this kernel should
+    be judicious, as both the adsorbent and the adsorbate must be modelled
+    accurately. As it is a field in of in itself, the DFT calculations
+    themselves are outside the scope of this program.
 
     Using the kernel, the isotherm obtained through experimental means can be
     modelled. The contributions of each kernel isotherm to the overall data is
@@ -116,7 +116,7 @@ def psd_dft(
 
     See Also
     --------
-    pygaps.characterisation.psd_dft.psd_dft_kernel_fit : backend function for DFT kernel fitting
+    pygaps.characterisation.psd_kernel.psd_dft_kernel_fit : backend function for DFT kernel fitting
 
     References
     ----------
