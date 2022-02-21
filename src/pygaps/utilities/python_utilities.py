@@ -85,10 +85,12 @@ def get_file_paths(folder, extension=None):
     return pathlib.Path(folder).rglob(f"*.{extension}")
 
 
-class simplewarning():
+class SimpleWarning():
     """
     Context manager overrides warning formatter to remove unneeded info.
     """
+    old_formatter = None
+
     def __enter__(self):
         # ignore everything except the message
         def custom_formatwarning(msg, *args, **kwargs):
@@ -98,6 +100,6 @@ class simplewarning():
         warnings.formatwarning = custom_formatwarning
         return True
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, typ, value, traceback):
         warnings.formatwarning = self.old_formatter
         return True
