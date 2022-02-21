@@ -22,23 +22,23 @@ class Mock(MagicMock):
         return MagicMock()
 
 
-# MOCK_MODULES = [
-#     'matplotlib',
-#     'matplotlib.pyplot',
-#     'matplotlib.ticker',
-#     'matplotlib.cm',
-#     'matplotlib.rc_context',
-#     'numpy',
-#     'pandas',
-#     'pandas.util',
-#     'scipy',
-#     'scipy.constants',
-#     'scipy.stats',
-#     'scipy.optimize',
-#     'scipy.interpolate',
-#     'scipy.integrate',
-#     'coolprop',
-# ]
+MOCK_MODULES = [
+    #     'matplotlib',
+    #     'matplotlib.pyplot',
+    #     'matplotlib.ticker',
+    #     'matplotlib.cm',
+    #     'matplotlib.rc_context',
+    #     'numpy',
+    #     'pandas',
+    #     'pandas.util',
+    #     'scipy',
+    #     'scipy.constants',
+    #     'scipy.stats',
+    #     'scipy.optimize',
+    #     'scipy.interpolate',
+    #     'scipy.integrate',
+    'coolprop',
+]
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration -----------------------------------------------------

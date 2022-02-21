@@ -4,3 +4,6 @@ ipykernel
 nbsphinx
 sphinx-copybutton
 furo
+numpy
+scipy
+matplotlib
