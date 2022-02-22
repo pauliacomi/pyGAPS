@@ -28,6 +28,7 @@ disable = [
     "too-many-branches", # we don't need these
     "too-many-locals", # we don't need these
     "too-many-arguments", # we don't need these
+    "too-many-statements", # we don't need these
 ]
 
 # linting: pydocstyle
