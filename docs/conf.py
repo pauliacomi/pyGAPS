@@ -115,6 +115,11 @@ linkcheck_ignore = [
 
 # Checking for internal links
 nitpicky = True
+nitpick_ignore = [
+    ('py:class', 'numpy.ndarray'),
+    ('py:class', 'pandas.core.frame.DataFrame'),
+    ('py:class', 'pandas.core.series.Series'),
+]
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -149,7 +154,7 @@ html_short_title = '%s-%s' % (project, version)
 
 # Other options
 html_theme_options = {
-    "sidebar_hide_name": True,
+    "sidebar_hide_name": False,
     "navigation_with_keys": True,
     "announcement":
     "A <a href=\"https://github.com/pauliacomi/pyGAPS-gui\" >graphical user interface</a> for pyGAPS is now available!",
@@ -167,24 +172,20 @@ html_theme_options = {
     },
 }
 
-# -- napoleon configuration -----------------------------------------------------
-
-napoleon_use_ivar = True
-napoleon_use_rtype = False
-napoleon_use_param = False
-
 # -- autodoc configuration -----------------------------------------------------
 
 autodoc_member_order = 'bysource'
-autodoc_mock_imports = [
-    # '_tkinter',
-    # 'matplotlib',
-    # 'numpy',
-    # 'pandas',
-    # 'scipy',
-    # 'coolprop',
-]
+autodoc_mock_imports = []
 autodoc_typehints_format = 'short'
+
+# -- napoleon configuration -----------------------------------------------------
+
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
+napoleon_use_ivar = True
+napoleon_use_param = True
+napoleon_use_rtype = False
+napoleon_use_admonition_for_references = True
 
 # -- nbsphinx configuration -----------------------------------------------------
 
@@ -197,7 +198,7 @@ nbsphinx_prolog = r"""
       This page was generated from
       <a class="reference external" href="https://github.com/pauliacomi/pyGAPS/blob/v{{ env.config.release|e }}/{{ docname|e }}">{{ docname|e }}</a>.
       To start an interactive version:
-      <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/v{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>.</span>
+      <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/v{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span>
       <script>
         if (document.location.host) {
           $(document.currentScript).replaceWith(
@@ -206,7 +207,7 @@ nbsphinx_prolog = r"""
             (window.location.protocol == 'https:' ? 's/' : '/') +
             window.location.host +
             window.location.pathname.slice(0, -4) +
-            'ipynb">View in <em>nbviewer</em></a> instead.'
+            'ipynb">or view in <em>nbviewer</em></a> instead.'
           );
         }
       </script>
