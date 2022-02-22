@@ -99,7 +99,13 @@ class BaseIsotherm():
     ##########################################################
     #   Instantiation and classmethods
 
-    def __init__(self, **properties):
+    def __init__(
+        self,
+        material: t.Union[str, dict, Material] = None,
+        adsorbate: t.Union[str, Adsorbate] = None,
+        temperature: t.Union[float, str] = None,
+        **properties: dict,
+    ):
         """
         Instantiate is done by passing a dictionary with the parameters,
         as well as the info about units, modes and data columns.
@@ -109,24 +115,24 @@ class BaseIsotherm():
         for shorthand, prop in SHORTHANDS.items():
             data = properties.pop(shorthand, None)
             if data:
-                properties[prop] = data
+                if prop == "material":
+                    material = data
+                elif prop == "adsorbate":
+                    adsorbate = data
+                elif prop == "temperature":
+                    temperature = data
 
         # Must-have properties of the isotherm
         #
         # Basic checks
-        if any(k not in properties for k in self._required_params):
+        if None in [material, adsorbate, temperature]:
             raise ParameterError(
-                f"Isotherm MUST have the following properties:{self._required_params}"
+                f"Isotherm MUST have the following properties: {self._required_params}"
             )
 
-        # Isotherm temperature.
-        self.temperature = float(properties.pop('temperature'))
-
-        # Isotherm material
-        self.material = properties.pop('material')
-
-        # Isotherm adsorbate
-        self.adsorbate = properties.pop('adsorbate')
+        self.material = material
+        self.adsorbate = adsorbate
+        self.temperature = temperature
 
         # Isotherm units
         #
@@ -255,8 +261,8 @@ class BaseIsotherm():
         return c_temperature(self._temperature, self.temperature_unit, "K")
 
     @temperature.setter
-    def temperature(self, value: float):
-        self._temperature = value
+    def temperature(self, value: t.Union[float, str]):
+        self._temperature = float(value)
 
     def __eq__(self, other_isotherm) -> bool:
         """
