@@ -111,6 +111,7 @@ linkcheck_ignore = [
     r'https://github.com/pauliacomi/pygaps/compare/.+',
     r'https://requires.io/.+',
     r'https://twitter.com/.+',
+    r'https://www.coolprop.org/.+',
 ]
 
 # Checking for internal links
