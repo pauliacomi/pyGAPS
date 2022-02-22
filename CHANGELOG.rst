@@ -2,26 +2,43 @@
 Changelog
 =========
 
-3.2.0 (2021-??-??)
------------------
+4.0.0 (2022-02-11)
+------------------
 
 New features:
 
-Changes:
-
-* removed other_keys syntax
-* move all test data somewhere
-* removed smart naming of isotherm parameters
-* branches are internally 0,1 instead of false/true
-
-* Isotherm ``material`` and ``adsorbate`` are now always instantiated as
-  ``pygaps.Material`` and ``pygaps.Adsorbate`` classes.
+* Volumetric adsorbed amount is now given in either ``volume_gas`` or
+  `volume_liquid` basis, corresponding to the volume amount the adsorbate would
+  occupy in the bulk gas phase, or the volume of an ideal liquid phase of
+  adsorbate (at isotherm temperature). The old loading_basis of ``volume`` is
+  deprecated and automatically converted to ``volume_gas`` while emitting a
+  warning.
+* Manufacturer parsing is streamlined with the introduction of the
+  ``pygaps.parsing.isotherm_from_commercial`` function.
+* Drastically improved reliability and modularity of code in preparation
+  for the release of the pyGAPS-gui interface.
 * Added a "zero" thickness model that assumes no mono/multilayer sorption.
   Useful in the case of condensation in hydrophobic materials.
+* Better documentation.
 
+Changes:
+
+* Removed the need to pass DataFrame column names with the ``other_keys``
+  syntax. PointIsotherms, now save *all* passed DataFrame columns.
+* Smart assigning of isotherm metadata caused confusion and was removed.
+  Metadata assigned like ``isotherm.myparam`` is now no longer serialized to
+  dictionaries, parsers etc. Instead, isotherms have a `isotherm.properties`
+  dictionary which contains all metadata.
+* Adsorption/desorption branches are internally represented as 0 and 1 instead
+  of False/True. This allows the possibility for further cycles to be introduced
+  in a future release.
+* Isotherm ``material`` and ``adsorbate`` are now always instantiated as
+  ``pygaps.Material`` and ``pygaps.Adsorbate`` classes.
+
+Plus many small and large bugs fixed.
 
 3.1.0 (2021-04-22)
------------------
+------------------
 
 New features:
 
@@ -90,6 +107,7 @@ Breaking changes:
 * Removed the `util_get_file_paths` function.
 
 Fixes:
+
 * Volumetric -> molar conversions were not calculated correctly.
 * Isosteric enthalpy could not be calculated if the isotherm was not in mmol/g.
 * ModelIsotherm creation could in some cases ignore isotherm branch splitting.
