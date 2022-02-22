@@ -1,5 +1,5 @@
-import sys
 import logging
+import sys
 
 logger = logging.getLogger('pygaps')
 logger.setLevel(logging.DEBUG)
