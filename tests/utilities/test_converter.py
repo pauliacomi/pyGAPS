@@ -2,7 +2,7 @@
 import pytest
 
 import pygaps
-from pygaps.utilities import converter_mode
+from pygaps.units import converter_mode
 from pygaps.utilities.exceptions import ParameterError
 
 

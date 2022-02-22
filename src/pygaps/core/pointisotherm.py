@@ -10,9 +10,9 @@ import pandas
 
 from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
-from pygaps.utilities.converter_mode import c_loading
-from pygaps.utilities.converter_mode import c_material
-from pygaps.utilities.converter_mode import c_pressure
+from pygaps.units.converter_mode import c_loading
+from pygaps.units.converter_mode import c_material
+from pygaps.units.converter_mode import c_pressure
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.isotherm_interpolator import IsothermInterpolator

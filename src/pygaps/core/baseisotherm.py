@@ -5,12 +5,12 @@ import typing as t
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.material import Material
-from pygaps.utilities.converter_mode import _LOADING_MODE
-from pygaps.utilities.converter_mode import _MATERIAL_MODE
-from pygaps.utilities.converter_mode import _PRESSURE_MODE
-from pygaps.utilities.converter_mode import c_temperature
-from pygaps.utilities.converter_unit import _PRESSURE_UNITS
-from pygaps.utilities.converter_unit import _TEMPERATURE_UNITS
+from pygaps.units.converter_mode import _LOADING_MODE
+from pygaps.units.converter_mode import _MATERIAL_MODE
+from pygaps.units.converter_mode import _PRESSURE_MODE
+from pygaps.units.converter_mode import c_temperature
+from pygaps.units.converter_unit import _PRESSURE_UNITS
+from pygaps.units.converter_unit import _TEMPERATURE_UNITS
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.hashgen import isotherm_to_hash
 

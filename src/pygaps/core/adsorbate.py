@@ -2,8 +2,8 @@
 
 from pygaps import logger
 from pygaps.data import ADSORBATE_LIST
-from pygaps.utilities.converter_unit import _PRESSURE_UNITS
-from pygaps.utilities.converter_unit import c_unit
+from pygaps.units.converter_unit import _PRESSURE_UNITS
+from pygaps.units.converter_unit import c_unit
 from pygaps.utilities.coolprop_utilities import CP
 from pygaps.utilities.coolprop_utilities import thermodynamic_backend
 from pygaps.utilities.exceptions import CalculationError

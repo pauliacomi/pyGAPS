@@ -13,23 +13,21 @@ def main():
 
     Currently the CLI can read any pyGAPS format (JSON, CSV, Excel) and then:
 
-        * print isotherm to output (default if no argument is passed)
-        * plot the isotherm using a Matplotlib window (``-p/--plot``)
-        * run basic automated characterization tests (``-ch/--characterize a_bet``
-          for the BET area for example)
-        * attempt to model the isotherm using a requested model or guess the best
-          fitting model (``-md/--model guess``) and save the resulting isotherm model
-          using the ``-o/--outfile`` path.
-        * convert the isotherm to any unit/basis
-          (``-cv/--convert pressure_mode=absolute,pressure_unit=bar``) and save the
-          resulting isotherm model using the ``-o/--outfile`` path.
+    * print isotherm to output (default if no argument is passed)
+    * plot the isotherm using a Matplotlib window (``-p/--plot``)
+    * run basic automated characterization tests (``-ch/--characterize a_bet``
+      for the BET area for example)
+    * attempt to model the isotherm using a requested model or guess the best
+      fitting model (``-md/--model guess``) and save the resulting isotherm
+      model using the ``-o/--outfile`` path.
+    * convert the isotherm to any unit/basis
+      (``-cv/--convert pressure_mode=absolute,pressure_unit=bar``) and save the
+      resulting isotherm model using the ``-o/--outfile`` path.
 
     """
 
     # Create the parser
-    prs = argparse.ArgumentParser(
-        description='Command-line interface to pyGAPS'
-    )
+    prs = argparse.ArgumentParser(description='Command-line interface to pyGAPS')
 
     # Add the arguments
     prs.add_argument(

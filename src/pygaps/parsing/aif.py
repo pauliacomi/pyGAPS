@@ -16,9 +16,9 @@ from gemmi import cif
 
 from pygaps import logger
 from pygaps.core.pointisotherm import PointIsotherm
-from pygaps.utilities.converter_mode import _MASS_UNITS
-from pygaps.utilities.converter_mode import _MOLAR_UNITS
-from pygaps.utilities.converter_mode import _VOLUME_UNITS
+from pygaps.units.converter_mode import _MASS_UNITS
+from pygaps.units.converter_mode import _MOLAR_UNITS
+from pygaps.units.converter_mode import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.string_utilities import _from_bool
 from pygaps.utilities.string_utilities import _is_bool

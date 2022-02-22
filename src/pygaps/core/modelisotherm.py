@@ -11,9 +11,9 @@ from pygaps.modelling import _GUESS_MODELS
 from pygaps.modelling import get_isotherm_model
 from pygaps.modelling import is_model
 from pygaps.modelling import is_model_class
-from pygaps.utilities.converter_mode import c_loading
-from pygaps.utilities.converter_mode import c_material
-from pygaps.utilities.converter_mode import c_pressure
+from pygaps.units.converter_mode import c_loading
+from pygaps.units.converter_mode import c_material
+from pygaps.units.converter_mode import c_pressure
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
