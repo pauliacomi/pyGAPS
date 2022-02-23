@@ -1,6 +1,19 @@
-
 Mesoporous pore size distribution
 .................................
 
-.. automodule:: pygaps.characterisation.psd_mesoporous
+Module doc
+~~~~~~~~~~
+
+.. automodule:: pygaps.characterisation.psd_meso
     :members:
+
+Available Kelvin models
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: pygaps.characterisation.models_kelvin
+    :members:
+
+Available thickness models
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See :ref:`thickness-ref`.

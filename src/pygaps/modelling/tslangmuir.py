@@ -1,10 +1,10 @@
 """Triple Site Langmuir isotherm model."""
 
 import numpy
+from scipy import optimize
 
-from .. import scipy
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class TSLangmuir(IsothermBaseModel):
@@ -43,6 +43,7 @@ class TSLangmuir(IsothermBaseModel):
 
     # Model parameters
     name = 'TSLangmuir'
+    formula = r"n(p) = n_{m_1} \frac{K_1 p}{1+K_1 p} + n_{m_2} \frac{K_2 p}{1+K_2 p} + n_{m_3} \frac{K_3 p}{1+K_3 p}"
     calculates = 'loading'
     param_names = ["n_m1", "n_m2", "n_m3", "K1", "K2", "K3"]
     param_bounds = {
@@ -96,7 +97,7 @@ class TSLangmuir(IsothermBaseModel):
         def fun(x):
             return self.loading(x) - loading
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        opt_res = optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {loading} failed.")
@@ -153,9 +154,7 @@ class TSLangmuir(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {
             "n_m1": 0.4 * saturation_loading,

@@ -2,7 +2,7 @@
 
 import numpy
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class DSLangmuir(IsothermBaseModel):
@@ -40,6 +40,7 @@ class DSLangmuir(IsothermBaseModel):
 
     # Model parameters
     name = 'DSLangmuir'
+    formula = r"n(p) = n_{m_1}\frac{K_1 p}{1+K_1 p} +  n_{m_2}\frac{K_2 p}{1+K_2 p}"
     calculates = 'loading'
     param_names = ["n_m1", "K1", "n_m2", "K2"]
     param_bounds = {
@@ -148,9 +149,7 @@ class DSLangmuir(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {
             "n_m1": 0.5 * saturation_loading,

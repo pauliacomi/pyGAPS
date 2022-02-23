@@ -1,7 +1,7 @@
 """Contains the material class."""
 
-from ..data import MATERIAL_LIST
-from ..utilities.exceptions import ParameterError
+from pygaps.data import MATERIAL_LIST
+from pygaps.utilities.exceptions import ParameterError
 
 
 class Material():
@@ -27,7 +27,19 @@ class Material():
     which can be set.
 
     """
-    def __init__(self, name: str, **properties):
+    # special reserved parameters
+    _reserved_params = [
+        "name",
+        "density",
+        "molar_mass",
+    ]
+
+    def __init__(
+        self,
+        name: str,
+        store: bool = False,
+        **properties,
+    ):
         """Instantiate by passing all the parameters."""
         # Material name
         self.name = name
@@ -35,8 +47,10 @@ class Material():
         # Rest of material properties
         self.properties = properties
 
-        # TODO
-        # auto-upload materials to global list?
+        # Store reference in internal list
+        if store:
+            if self not in MATERIAL_LIST:
+                MATERIAL_LIST.append(self)
 
     def __repr__(self):
         """Print material id."""
@@ -66,13 +80,14 @@ class Material():
 
     def print_info(self):
         """Print a short summary of all the material parameters."""
-        string = f"pyGAPS Material: {self.name}\n"
+        string = f"pyGAPS Material: '{self.name}'\n"
 
         if self.properties:
-            for prop in self.properties:
-                string += f"{prop}:{str(self.properties.get(prop))}\n"
+            string += "Other properties: \n"
+            for prop, val in self.properties.items():
+                string += (f"\t{prop}: {str(val)}\n")
 
-        return string
+        print(string)
 
     @classmethod
     def find(cls, name: str):
@@ -96,17 +111,17 @@ class Material():
         # Skip search if already material
         if isinstance(name, Material):
             return name
-        elif not isinstance(name, str):
+        if not isinstance(name, str):
             raise ParameterError("Pass a string as an material name.")
 
         # Checks to see if material exists in master list
         try:
             return next(mat for mat in MATERIAL_LIST if name == mat)
-        except StopIteration:
+        except StopIteration as err:
             raise ParameterError(
                 f"Material {name} does not exist in list of materials. "
                 "First populate pygaps.MATERIAL_LIST with required material class"
-            )
+            ) from err
 
     def to_dict(self) -> dict:
         """
@@ -124,7 +139,27 @@ class Material():
         parameters_dict.update(self.properties)
         return parameters_dict
 
-    def get_prop(self, prop):
+    @property
+    def density(self) -> float:
+        """Material density, in g/cm3 (optional)."""
+        return self.properties.get("density")
+
+    @density.setter
+    def density(self, val: float):
+        if val:
+            self.properties["density"] = float(val)
+
+    @property
+    def molar_mass(self) -> float:
+        """Material molar mass, in g/mol (optional)."""
+        return self.properties.get("molar_mass")
+
+    @molar_mass.setter
+    def molar_mass(self, val: float):
+        if val:
+            self.properties["molar_mass"] = float(val)
+
+    def get_prop(self, prop: str):
         """
         Return a property from the internal dictionary.
 
@@ -148,9 +183,9 @@ class Material():
         if req_prop is None:
             try:
                 req_prop = getattr(self, prop)
-            except AttributeError:
+            except AttributeError as exc:
                 raise ParameterError(
                     f"Material '{self.name}' does not have a property named '{prop}'."
-                )
+                ) from exc
 
         return req_prop

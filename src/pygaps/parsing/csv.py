@@ -6,67 +6,24 @@ and is used to check for any deprecations.
 
 """
 
-import ast
-import warnings
 from io import StringIO
 
 import pandas
 
+from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
+from pygaps.utilities.string_utilities import _from_bool
+from pygaps.utilities.string_utilities import _from_list
+from pygaps.utilities.string_utilities import _is_bool
+from pygaps.utilities.string_utilities import _is_float
+from pygaps.utilities.string_utilities import _is_list
+from pygaps.utilities.string_utilities import _to_string
 
-_parser_version = "2.0"
-
-
-def _is_float(s):
-    """Check if a value is a float."""
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
-
-def _is_bool(s):
-    """Check a value is a CSV bool."""
-    if s.lower() in ['true', 'false']:
-        return True
-    else:
-        return False
-
-
-def _to_bool(s):
-    """Convert a value into a CSV bool."""
-    if s.lower() == 'true':
-        return True
-    elif s.lower() == 'false':
-        return False
-    else:
-        raise ValueError('String cannot be converted to bool')
-
-
-def _is_list(s):
-    """Check a value is a CSV list."""
-    if s.startswith('[') and s.endswith(']'):
-        return True
-    else:
-        return False
-
-
-def _from_list(s):
-    """Convert a value into a CSV list."""
-    # note that the function will fail if the list has other spaces
-    return ast.literal_eval(s.replace(' ', ","))
-
-
-def _to_string(s):
-    """Convert a value into a CSV-safe string."""
-    if isinstance(s, list):
-        return '[' + ' '.join([str(x) for x in s]) + "]"
-    return str(s)
+_parser_version = "3.0"
 
 
 def isotherm_to_csv(isotherm, path=None, separator=','):
@@ -85,57 +42,52 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
     separator : str, optional
         Separator used int the csv file. Defaults to '',''.
 
+    Returns
+    -------
+    str: optional
+        String representation of the CSV, if path not provided.
+
     """
     output = StringIO()
 
     iso_dict = isotherm.to_dict()
     iso_dict['file_version'] = _parser_version  # version
 
-    output.writelines([
-        x + separator + _to_string(y) + '\n' for (x, y) in iso_dict.items()
-    ])
+    # Parse material
+    material = iso_dict['material']
+    if isinstance(material, dict):
+        iso_dict['material'] = material.pop('name')
+        iso_dict.update({f"_material_{key}": val for key, val in material.items()})
+
+    output.writelines([x + separator + _to_string(y) + '\n' for (x, y) in iso_dict.items()])
 
     if isinstance(isotherm, PointIsotherm):
 
-        # get headings in an ordered way
-        headings = [
-            isotherm.pressure_key,
-            isotherm.loading_key,
-        ]
-        if isotherm.other_keys:
-            headings.extend(isotherm.other_keys)
+        # We get data and replace adsorption terminology
+        data = isotherm.data_raw.copy()
+        data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
-        # also get the branch data in a regular format
-        headings.append('branch')
-        data = isotherm.data_raw[headings]
-        data['branch'] = data['branch'].replace(False,
-                                                'ads').replace(True, 'des')
-
-        output.write('data:[pressure,loading,[otherdata],branch data]\n')
+        output.write('data:[pressure,loading,branch,(otherdata)]\n')
         data.to_csv(output, sep=separator, index=False, header=True)
 
     elif isinstance(isotherm, ModelIsotherm):
 
         output.write('model:[name and parameters]\n')
         output.write(('name' + separator + isotherm.model.name + '\n'))
+        output.write(('rmse' + separator + _to_string(isotherm.model.rmse) + '\n'))
         output.write(
-            ('rmse' + separator + _to_string(isotherm.model.rmse) + '\n')
+            ('pressure range' + separator + _to_string(isotherm.model.pressure_range) + '\n')
         )
-        output.write((
-            'pressure range' + separator +
-            _to_string(isotherm.model.pressure_range) + '\n'
-        ))
-        output.write((
-            'loading range' + separator +
-            _to_string(isotherm.model.loading_range) + '\n'
-        ))
+        output.write(
+            ('loading range' + separator + _to_string(isotherm.model.loading_range) + '\n')
+        )
         output.writelines([
             param + separator + str(isotherm.model.params[param]) + '\n'
             for param in isotherm.model.params
         ])
 
     if path:
-        with open(path, mode='w', newline='\n') as file:
+        with open(path, mode='w', newline='\n', encoding='utf-8') as file:
             file.write(output.getvalue())
     else:
         return output.getvalue()
@@ -162,69 +114,64 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
 
     """
     try:
-        with open(str_or_path) as f:
+        with open(str_or_path, encoding='utf-8') as f:
             raw_csv = StringIO(f.read())
     except OSError:
         try:
             raw_csv = StringIO(str_or_path)
-        except Exception:
+        except Exception as err:
             raise ParsingError(
                 "Could not parse CSV isotherm. "
                 "The `str_or_path` is invalid or does not exist. "
-            )
+            ) from err
 
     line = raw_csv.readline().rstrip()
     raw_dict = {}
 
     try:
-        while not (
-            line.startswith('data') or line.startswith('model') or line == ""
-        ):
+        while not (line.startswith('data') or line.startswith('model') or line == ""):
             values = line.strip().split(sep=separator)
 
             if len(values) > 2:
-                raise ParsingError(
-                    f"The isotherm metadata {values} contains more than two values."
-                )
-            elif not values[1]:
+                raise ParsingError(f"The isotherm metadata {values} contains more than two values.")
+            key, val = values
+            if not val:
                 val = None
-            elif _is_bool(values[1]):
-                val = _to_bool(values[1])
-            elif _is_float(values[1]):
-                val = float(values[1])
-            elif _is_list(values[1]):
-                val = _from_list(values[1])
-            else:
-                val = values[1]
-            raw_dict.update({values[0]: val})
+            elif _is_bool(val):
+                val = _from_bool(val)
+            elif val.isnumeric():
+                val = int(val)
+            elif _is_float(val):
+                val = float(val)
+            elif _is_list(val):
+                val = _from_list(val)
+
+            raw_dict[key] = val
             line = raw_csv.readline().rstrip()
-    except Exception:
+    except Exception as err:
         raise ParsingError(
             "Could not parse CSV isotherm. "
-            "The format may be wrong, check for errors."
-        )
+            f"The format may be wrong, check for errors in line {line}."
+        ) from err
 
     # version check
     version = raw_dict.pop("file_version", None)
     if not version or float(version) < float(_parser_version):
-        warnings.warn(
+        logger.warning(
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."
         )
 
-    # TODO deprecation
-    if "adsorbent_basis" in raw_dict:
-        raw_dict['material_basis'] = raw_dict.pop("adsorbent_basis")
-        warnings.warn(
-            "adsorbent_basis was replaced with material_basis",
-            DeprecationWarning
-        )
-    if "adsorbent_unit" in raw_dict:
-        raw_dict['material_unit'] = raw_dict.pop("adsorbent_unit")
-        warnings.warn(
-            "adsorbent_unit was replaced with material_unit",
-            DeprecationWarning
-        )
+    # check if material needs parsing
+    material = {}
+    for key, val in raw_dict.items():
+        if key.startswith("_material_"):
+            material[key.replace("_material_", "")] = val
+    if material:
+        for key in material.keys():
+            raw_dict.pop("_material_" + key)
+        material['name'] = raw_dict['material']
+        raw_dict['material'] = material
 
     # Update dictionary with any user parameters
     raw_dict.update(isotherm_parameters)
@@ -235,23 +182,14 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
-            data['branch'] = data['branch'].apply(
-                lambda x: False if x == 'ads' else True
-            )
+            data['branch'] = data['branch'].apply(lambda x: 0 if x == 'ads' else 1)
         else:
             raw_dict['branch'] = 'guess'
-
-        # generate other keys
-        other_keys = [
-            column for column in data.columns.values
-            if column not in [data.columns[0], data.columns[1], 'branch']
-        ]
 
         isotherm = PointIsotherm(
             isotherm_data=data,
             pressure_key=data.columns[0],
             loading_key=data.columns[1],
-            other_keys=other_keys,
             **raw_dict
         )
 

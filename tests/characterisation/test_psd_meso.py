@@ -19,8 +19,8 @@ import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
 
-import pygaps
-import pygaps.characterisation.psd_mesoporous as pmes
+import pygaps.characterisation.psd_meso as pmes
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
@@ -62,7 +62,7 @@ class TestPSDMeso():
         if sample.get('psd_meso_pore_size', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
 
             result_dict = pmes.psd_mesoporous(
                 isotherm, psd_model=method, branch='des'
@@ -87,5 +87,5 @@ class TestPSDMeso():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.psd_mesoporous(isotherm, verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        pmes.psd_mesoporous(isotherm, verbose=True)

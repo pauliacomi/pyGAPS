@@ -9,10 +9,11 @@ In this file there are:
 
 Explanation of parameters:
 
-'bet_area':             BET area value
-'s_bet_area':           BET area value in a selected range
-'langmuir_area':        Langmuir area value
-'s_langmuir_area':      Langmuir area value in a selected range
+'bet_area':             BET area automatically calculated
+'bet_area_s':           BET area in a selected range
+'bet_area_des':         BET area for desorption branch
+'langmuir_area':        Langmuir area automatically calculated
+'s_langmuir_area':      Langmuir area in a selected range
 't_area':               t-plot calculated area
 't_pore_volume':        t-plot calculated volume
 's_t_area':             t-plot calculated area in a selected range
@@ -35,7 +36,6 @@ from pathlib import Path
 
 DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
 DATA_N77_PATH = DATA_PATH / 'characterisation'
-DATA_IAST_PATH = DATA_PATH / 'iast'
 DATA_ISOSTERIC_PATH = DATA_PATH / 'isosteric'
 DATA_CALO_PATH = DATA_PATH / 'calorimetry'
 
@@ -43,9 +43,9 @@ DATA = {
     'MCM-41': {
         'file': 'MCM-41 N2 77.355.json',
         'bet_area': 350.0,
-        's_bet_area': 350.0,
+        'bet_area_s': 350.0,
         'langmuir_area': 1450.0,
-        's_langmuir_area': 550.0,
+        'langmuir_area_s': 550.0,
         't_area': 340.0,
         't_pore_volume': 0.28,
         's_t_area': 55.0,
@@ -55,8 +55,8 @@ DATA = {
         's_as_area': 360,
         'Khi_slope': 57000,
         'Khi_virial': 195000,
-        'psd_meso_pore_size': 3.2,
-        'psd_dft_pore_size': 3.2,
+        'psd_meso_pore_size': 3.3,
+        'psd_dft_pore_size': 3.4,
     },
     'NaY': {
         'file': 'NaY N2 77.355.json',
@@ -70,7 +70,8 @@ DATA = {
     'SiO2': {
         'file': 'SiO2 N2 77.355.json',
         'bet_area': 200.0,
-        'langmuir_area': 992.5,
+        'bet_area_des': 190.0,
+        'langmuir_area': 800,
         't_area': 250.0,
         't_pore_volume': 0.0,
         'Khi_slope': 780,
@@ -101,15 +102,6 @@ DATA = {
         'Khi_virial': 1350000,
         'psd_micro_pore_size': 0.7,
         'psd_dft_pore_size': 0.6,
-    },
-}
-
-DATA_IAST = {
-    'CH4': {
-        'file': 'MOF-5(Zn) - IAST - CH4.json',
-    },
-    'C2H6': {
-        'file': 'MOF-5(Zn) - IAST - C2H6.json',
     },
 }
 

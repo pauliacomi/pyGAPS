@@ -9,24 +9,22 @@ import pytest
 import pygaps.utilities as util
 
 
-@pytest.mark.core
+@pytest.mark.utilities
 def test_convert_chemformula():
     assert util.string_utilities.convert_chemformula("N2") == "$N_{2}$"
-    assert util.string_utilities.convert_chemformula(
-        "C4H10"
-    ) == "$C_{4}H_{10}$"
+    assert util.string_utilities.convert_chemformula("C4H10") == "$C_{4}H_{10}$"
 
 
-@pytest.mark.core
-def test_convert_unitstr():
-    assert util.string_utilities.convert_unitstr("mmol") == "mmol"
-    assert util.string_utilities.convert_unitstr("g", True) == "g^{-1}"
-    assert util.string_utilities.convert_unitstr("cm3") == "cm^{3}"
-    assert util.string_utilities.convert_unitstr("cm3(STP)") == "cm^{3}_{STP}"
-    assert util.string_utilities.convert_unitstr("cm3", True) == "cm^{-3}"
+@pytest.mark.utilities
+def test_convert_unit_ltx():
+    assert util.string_utilities.convert_unit_ltx("mmol") == "mmol"
+    assert util.string_utilities.convert_unit_ltx("g", True) == "g^{-1}"
+    assert util.string_utilities.convert_unit_ltx("cm3") == "cm^{3}"
+    assert util.string_utilities.convert_unit_ltx("cm3(STP)") == "cm^{3}_{STP}"
+    assert util.string_utilities.convert_unit_ltx("cm3", True) == "cm^{-3}"
 
 
-@pytest.mark.core
+@pytest.mark.utilities
 def test_file_paths():
     path = Path(__file__) / 'tst'
 
@@ -39,7 +37,7 @@ def test_file_paths():
     assert all([path in known_paths for path in paths])
 
 
-@pytest.mark.core
+@pytest.mark.utilities
 def test_deep_merge():
     source = {'hello1': 1}
     overrides = {'hello2': 2}

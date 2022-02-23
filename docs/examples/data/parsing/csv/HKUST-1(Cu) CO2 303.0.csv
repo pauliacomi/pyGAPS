@@ -1,4 +1,4 @@
-file_version,2.0
+file_version,3.0
 material_basis,mass
 material_unit,g
 loading_basis,molar
@@ -13,7 +13,7 @@ iso_type,Calorimetrie
 user,ADW
 machine,CV
 date,21/05/2010 00:00
-t_act,150.0
+activation_temperature,150.0
 lab,MADIREL
 data:[pressure, loading, other...]
 loading(mmol),pressure(bar),Enthalpy(kJ/mol)

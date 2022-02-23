@@ -3,15 +3,16 @@ Module contains functions to calculate the critical
 evaporation/condensation pore radius the mesopore range,
 as a function of pressure.
 """
+import typing as t
 from functools import partial
 
 import numpy
+from scipy import constants
 
-from .. import scipy
-from ..utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
 
 
-def get_meniscus_geometry(branch, pore_geometry):
+def get_meniscus_geometry(branch: str, pore_geometry: str):
     """
     Determine the meniscus geometry.
 
@@ -36,9 +37,7 @@ def get_meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError(
-                "Pore geometry must be either 'cylinder', 'sphere' or 'slit'."
-            )
+            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     elif branch == 'des':
         if pore_geometry == 'cylinder':
             m_geometry = 'hemispherical'
@@ -47,20 +46,20 @@ def get_meniscus_geometry(branch, pore_geometry):
         elif pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError(
-                "Pore geometry must be either 'cylinder', 'sphere' or 'slit'."
-            )
+            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
     else:
-        raise ParameterError(
-            "Adsorption branch must be either 'ads' or 'des'."
-        )
+        raise ParameterError("Adsorption branch must be either 'ads' or 'des'.")
 
     return m_geometry
 
 
 def kelvin_radius(
-    pressure, meniscus_geometry, temperature, liquid_density,
-    adsorbate_molar_mass, adsorbate_surface_tension
+    pressure: "list[float]",
+    meniscus_geometry: str,
+    temperature: float,
+    liquid_density: float,
+    adsorbate_molar_mass: float,
+    adsorbate_surface_tension: float,
 ):
     r"""
     Calculate the kelvin radius of the pore, using the standard
@@ -122,12 +121,16 @@ def kelvin_radius(
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
     return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
-        (geometry_factor * scipy.const.gas_constant * temperature * numpy.log(pressure))
+        (geometry_factor * constants.gas_constant * temperature * numpy.log(pressure))
 
 
 def kelvin_radius_kjs(
-    pressure, meniscus_geometry, temperature, liquid_density,
-    adsorbate_molar_mass, adsorbate_surface_tension
+    pressure: "list[float]",
+    meniscus_geometry: str,
+    temperature: float,
+    liquid_density: float,
+    adsorbate_molar_mass: float,
+    adsorbate_surface_tension: float,
 ):
     r"""
     Calculate the kelvin radius of the pore, using the
@@ -159,7 +162,7 @@ def kelvin_radius_kjs(
     -----
     *Description*
 
-    The KJS correction to the kelvin equation equation is corrected with a constant
+    The KJS correction to the kelvin equation equation is modified with a constant
     term of 0.3 nm. The authors arrived at this constant by using the adsorption
     branch of the isotherm on several MCM-41 materials calibrated with XRD data.
 
@@ -173,7 +176,7 @@ def kelvin_radius_kjs(
 
     References
     ----------
-    .. [#] Kruk M, Jaroniec M, Sayari A (1997) Langmuir 13:6267
+    .. [#] M. Kruk, M. Jaroniec, A. Sayari, Langmuir 13, 6267 (1997)
 
     See Also
     --------
@@ -183,23 +186,24 @@ def kelvin_radius_kjs(
     # Check for correct geometry
     if meniscus_geometry != 'cylindrical':
         raise ParameterError(
-            "The KJS Kelvin correction is not applicable for geometries "
-            "other than cylindrical."
+            "The KJS Kelvin correction is not applicable for meniscus "
+            "geometries other than cylindrical (adsorption branch + cylindrical pore geometry)."
         )
 
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
     return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
-        (scipy.const.gas_constant * temperature * numpy.log(pressure)) + 0.3
+        (constants.gas_constant * temperature * numpy.log(pressure)) + 0.3
 
 
+#: List of kelvin model functions
 _KELVIN_MODELS = {
     'Kelvin': kelvin_radius,
     'Kelvin-KJS': kelvin_radius_kjs,
 }
 
 
-def get_kelvin_model(model, **model_args):
+def get_kelvin_model(model: t.Union[str, t.Callable], **model_args):
     """
     Return a function calculating an kelvin-based critical radius.
 

@@ -1,5 +1,5 @@
 {
-    "file_version": "2.0",
+    "file_version": "3.0",
     "adsorbate": "n-butane",
     "material_basis": "mass",
     "material_unit": "g",
@@ -236,5 +236,6 @@
     "material_batch": "TB",
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
-    "temperature": 298.15
+    "temperature": 298.15,
+    "temperature_unit": "K"
 }

@@ -1,0 +1,823 @@
+{
+    "_units_mass": "g",
+    "adsorbate": "argon",
+    "date": "2020-06-03T00:00:00",
+    "file_version": "3.0",
+    "instrument": "BEL 00218",
+    "isotherm_data": [
+        {
+            "loading": 0.00010258,
+            "pressure": 0.00012621,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 0.1277,
+            "pressure": 0.00036169,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 0.25735,
+            "pressure": 0.00051271,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 0.38481,
+            "pressure": 0.00065335,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 0.51136,
+            "pressure": 0.00079512,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 0.63789,
+            "pressure": 0.00093801,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 0.7648,
+            "pressure": 0.0010922,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 1.4186,
+            "pressure": 0.0020781,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 2.932,
+            "pressure": 0.0047582,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 4.4476,
+            "pressure": 0.0076859,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 5.9556,
+            "pressure": 0.010666,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 16.024,
+            "pressure": 0.030263,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 26.061,
+            "pressure": 0.048555,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 36.088,
+            "pressure": 0.065348,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 43.195,
+            "pressure": 0.075344,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 50.292,
+            "pressure": 0.084489,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 57.417,
+            "pressure": 0.093028,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 64.58,
+            "pressure": 0.10088,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 71.85,
+            "pressure": 0.10869,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 89.689,
+            "pressure": 0.12649,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 107.23,
+            "pressure": 0.14131,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 124.73,
+            "pressure": 0.1545,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 142.27,
+            "pressure": 0.16773,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 159.83,
+            "pressure": 0.18149,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 177.4,
+            "pressure": 0.19707,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 194.95,
+            "pressure": 0.21556,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 212.39,
+            "pressure": 0.24065,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 229.9,
+            "pressure": 0.27723,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 247.3,
+            "pressure": 0.33717,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 261.16,
+            "pressure": 0.41575,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 271.56,
+            "pressure": 0.51024,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 278.63,
+            "pressure": 0.6002,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 285.67,
+            "pressure": 0.71768,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 289.32,
+            "pressure": 0.79372,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 292.96,
+            "pressure": 0.87704,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 296.58,
+            "pressure": 0.96878,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 300.19,
+            "pressure": 1.069,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 303.78,
+            "pressure": 1.1801,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 307.43,
+            "pressure": 1.2814,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 311.04,
+            "pressure": 1.4076,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 314.67,
+            "pressure": 1.5501,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 318.17,
+            "pressure": 1.7007,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 321.71,
+            "pressure": 1.8513,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 325.19,
+            "pressure": 2.0426,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 328.7,
+            "pressure": 2.2421,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 332.14,
+            "pressure": 2.4863,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 335.55,
+            "pressure": 2.759,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 338.86,
+            "pressure": 3.0684,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 341.96,
+            "pressure": 3.4388,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 345.07,
+            "pressure": 3.8866,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 347.91,
+            "pressure": 4.3873,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 350.64,
+            "pressure": 4.9816,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 353.22,
+            "pressure": 5.6736,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 355.58,
+            "pressure": 6.4837,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 357.72,
+            "pressure": 7.3955,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 359.69,
+            "pressure": 8.405,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 361.49,
+            "pressure": 9.5529,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 363.17,
+            "pressure": 10.811,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 364.43,
+            "pressure": 11.885,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 365.33,
+            "pressure": 12.789,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 366.45,
+            "pressure": 13.953,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 367.31,
+            "pressure": 14.955,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 368.12,
+            "pressure": 15.94,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 368.9,
+            "pressure": 16.966,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 369.66,
+            "pressure": 18.073,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 370.44,
+            "pressure": 19.241,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 371.2,
+            "pressure": 20.495,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 372.02,
+            "pressure": 21.875,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 372.8,
+            "pressure": 23.242,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 373.54,
+            "pressure": 24.777,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 374.33,
+            "pressure": 26.389,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 375.16,
+            "pressure": 28.111,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 375.98,
+            "pressure": 29.971,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 376.82,
+            "pressure": 31.941,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 377.75,
+            "pressure": 34.156,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 378.73,
+            "pressure": 36.7,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 379.77,
+            "pressure": 39.448,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 380.83,
+            "pressure": 42.419,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 382.02,
+            "pressure": 45.602,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 383.37,
+            "pressure": 49.058,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 384.72,
+            "pressure": 52.807,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 386.19,
+            "pressure": 56.833,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 387.13,
+            "pressure": 59.129,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 387.96,
+            "pressure": 61.388,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 388.88,
+            "pressure": 63.692,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 389.87,
+            "pressure": 66.082,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 390.89,
+            "pressure": 68.561,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 391.96,
+            "pressure": 71.166,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 393.16,
+            "pressure": 73.812,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 394.45,
+            "pressure": 76.612,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 395.98,
+            "pressure": 79.466,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 397.66,
+            "pressure": 82.437,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 399.59,
+            "pressure": 85.499,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 401.83,
+            "pressure": 88.649,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 404.55,
+            "pressure": 91.918,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 407.83,
+            "pressure": 95.252,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 411.91,
+            "pressure": 98.643,
+            "saturation_pressure": 101.3
+        },
+        {
+            "loading": 415.18,
+            "pressure": 100.63,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 412.38,
+            "pressure": 97.678,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 410.38,
+            "pressure": 95.533,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 407.82,
+            "pressure": 92.048,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 405.53,
+            "pressure": 88.421,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 403.58,
+            "pressure": 84.916,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 401.94,
+            "pressure": 81.546,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 400.44,
+            "pressure": 78.359,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 399.22,
+            "pressure": 75.289,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 398.08,
+            "pressure": 72.326,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 396.96,
+            "pressure": 69.513,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 396.05,
+            "pressure": 66.782,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 395.17,
+            "pressure": 64.156,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 394.33,
+            "pressure": 61.645,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 393.56,
+            "pressure": 59.235,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 392.2,
+            "pressure": 54.867,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 390.84,
+            "pressure": 50.662,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 387.67,
+            "pressure": 47.495,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 384.85,
+            "pressure": 45.517,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 383.43,
+            "pressure": 43.225,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 382.01,
+            "pressure": 39.875,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 380.76,
+            "pressure": 36.72,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 379.65,
+            "pressure": 33.814,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 378.58,
+            "pressure": 31.152,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 377.57,
+            "pressure": 28.685,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 376.57,
+            "pressure": 26.405,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 375.17,
+            "pressure": 23.462,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 373.74,
+            "pressure": 20.735,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 372.32,
+            "pressure": 18.284,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 370.84,
+            "pressure": 16.115,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 369.36,
+            "pressure": 14.185,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 367.47,
+            "pressure": 12.081,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 365.4,
+            "pressure": 10.229,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 363.18,
+            "pressure": 8.6452,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 361.23,
+            "pressure": 7.4973,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 359.26,
+            "pressure": 6.5854,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 356.89,
+            "pressure": 5.7184,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 354.55,
+            "pressure": 5.0142,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 351.82,
+            "pressure": 4.3792,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 349.11,
+            "pressure": 3.8663,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 346.51,
+            "pressure": 3.4714,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 344.09,
+            "pressure": 3.162,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 341.8,
+            "pressure": 2.9137,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 339.63,
+            "pressure": 2.7102,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 333.89,
+            "pressure": 2.2543,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 327.51,
+            "pressure": 1.8676,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 311.89,
+            "pressure": 1.249,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 296.43,
+            "pressure": 0.82888,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 281.41,
+            "pressure": 0.56022,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 266.17,
+            "pressure": 0.40394,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 251.06,
+            "pressure": 0.31697,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 235.96,
+            "pressure": 0.26509,
+            "saturation_pressure": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 220.8,
+            "pressure": 0.23163,
+            "saturation_pressure": 101.3
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "ml(STP)",
+    "material": "unknown",
+    "material_basis": "mass",
+    "material_batch": "aus der BOX",
+    "material_mass": 0.1432,
+    "material_unit": "g",
+    "pressure_mode": "absolute",
+    "pressure_unit": "kPa",
+    "temperature": 87.0,
+    "temperature_unit": "K",
+    "user": "Volodymyr"
+}

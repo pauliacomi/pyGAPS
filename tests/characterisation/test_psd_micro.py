@@ -19,8 +19,8 @@ import numpy as np
 import pytest
 from matplotlib.testing.decorators import cleanup
 
-import pygaps
-import pygaps.characterisation.psd_microporous as pmic
+import pygaps.characterisation.psd_micro as pmic
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 from pygaps.characterisation.models_hk import PROPERTIES_CARBON
 
@@ -140,7 +140,7 @@ class TestPSDMicro():
         if sample.get('psd_micro_pore_size', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
 
             result_dict = pmic.psd_microporous(
                 isotherm, psd_model='HK', pore_geometry='slit'
@@ -165,5 +165,5 @@ class TestPSDMicro():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.psd_microporous(isotherm, verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        pmic.psd_microporous(isotherm, verbose=True)

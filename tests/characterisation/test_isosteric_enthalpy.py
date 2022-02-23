@@ -16,8 +16,8 @@ from matplotlib.testing.decorators import cleanup
 from numpy import average
 from numpy import isclose
 
-import pygaps
-import pygaps.characterisation.isosteric_enthalpy as ie
+import pygaps.characterisation.isosteric_enth as ie
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_ISOSTERIC
@@ -34,7 +34,7 @@ class TestIsostericEnthalpy():
         # load test data
         for sample in DATA_ISOSTERIC:
             filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
         # Will raise a "requires more than one isotherm error"
@@ -58,7 +58,7 @@ class TestIsostericEnthalpy():
 
         for sample in DATA_ISOSTERIC:
             filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
         result_dict = ie.isosteric_enthalpy(isotherms)
@@ -72,7 +72,7 @@ class TestIsostericEnthalpy():
 
         for sample in DATA_ISOSTERIC:
             filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
         ie.isosteric_enthalpy(isotherms, verbose=True)

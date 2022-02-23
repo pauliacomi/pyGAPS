@@ -38,13 +38,12 @@ def isotherm_parameters():
         'temperature': 100.0,
         'adsorbate': 'TA',
         'date': '26/06/92',
-        't_act': 100.0,
+        'activation_temperature': 100.0,
         'lab': 'TL',
         'comment': 'test comment',
         'user': 'TU',
         'project': 'TP',
         'machine': 'TM',
-        'is_real': True,
         'iso_type': 'calorimetry',
 
         # Units/bases
@@ -54,6 +53,7 @@ def isotherm_parameters():
         'loading_unit': 'mmol',
         'pressure_mode': 'absolute',
         'pressure_unit': 'bar',
+        'temperature_unit': 'K',
 
         # other properties
         'DOI': 'dx.doi/10.0000',
@@ -85,7 +85,6 @@ def basic_pointisotherm(isotherm_data, isotherm_parameters):
         isotherm_data=isotherm_data,
         loading_key=LOADING_KEY,
         pressure_key=PRESSURE_KEY,
-        other_keys=[OTHER_KEY],
         **isotherm_parameters
     )
 
@@ -115,9 +114,9 @@ def material_data():
         'type': 'MOF',
         'form': 'powder',
         'comment': 'test comment',
-        'density': 2,  # g/cm3
-        'poresize': 14,
-        'molar_mass': 10,  # g/mol
+        'density': 2.0,  # g/cm3
+        'poresize': 14.0,
+        'molar_mass': 10.0,  # g/mol
     }
 
 
@@ -127,11 +126,12 @@ def basic_material(material_data):
     return pygaps.Material(**material_data)
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def use_material(basic_material):
     """Upload basic material to global list."""
-    if basic_material not in pygaps.MATERIAL_LIST:
-        pygaps.MATERIAL_LIST.append(basic_material)
+    pygaps.MATERIAL_LIST.append(basic_material)
+    yield
+    pygaps.MATERIAL_LIST.pop()
 
 
 @pytest.fixture(scope='session')
@@ -169,8 +169,9 @@ def basic_adsorbate(adsorbate_data):
     return pygaps.Adsorbate(**adsorbate_data)
 
 
-@pytest.fixture()
+@pytest.fixture(scope='function')
 def use_adsorbate(basic_adsorbate):
     """Upload basic adsorbate to global list."""
-    if basic_adsorbate not in pygaps.ADSORBATE_LIST:
-        pygaps.ADSORBATE_LIST.append(basic_adsorbate)
+    pygaps.ADSORBATE_LIST.append(basic_adsorbate)
+    yield
+    pygaps.ADSORBATE_LIST.pop()

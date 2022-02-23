@@ -1,0 +1,43 @@
+body[data-theme=dark] {
+    --warning: #CD4949;
+    --attention: #49CDAC;
+    --color-graph-background: #cbd9d7;
+}
+
+body[data-theme=light] {
+    --warning: #CD4949;
+    --attention: #49CDAC;
+    --color-graph-background: #ffffff00;
+}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme=light]) {
+        --color-graph-background: #cbd9d7;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    body:not([data-theme=dark]) {
+        --color-graph-background: #ffffff00;
+    }
+}
+
+/* This ensures nnbsphinx Matplotlib png images are legible on the dark background */
+div.output_area img {
+    background-color: var(--color-graph-background);
+}
+
+/* This ensures nnbsphinx tables are legible on the dark background */
+div.rendered_html table {
+    background-color: var(--color-graph-background);
+}
+
+/* This removes jarring nnbsphinx borders */
+div.nbinput.container div.input_area {
+    border: none !important;
+}
+
+/* Smaller logo */
+.sidebar-logo {
+    max-width: 50%;
+}

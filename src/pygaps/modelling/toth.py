@@ -1,9 +1,9 @@
 """Toth isotherm model."""
 
 import numpy
+from scipy import integrate
 
-from .. import scipy
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class Toth(IsothermBaseModel):
@@ -28,6 +28,7 @@ class Toth(IsothermBaseModel):
 
     # Model parameters
     name = 'Toth'
+    formula = r"n(p) = n_m \frac{K p}{\sqrt[t]{1 + (K p)^t}}"
     calculates = 'loading'
     param_names = ["n_m", "K", "t"]
     param_bounds = {
@@ -102,9 +103,7 @@ class Toth(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(
-            lambda x: self.loading(x) / x, 0, pressure
-        )[0]
+        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -122,9 +121,7 @@ class Toth(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k, "t": 1}
 

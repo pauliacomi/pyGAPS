@@ -16,7 +16,8 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
-import pygaps
+import pygaps.characterisation.initial_enth as ie
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_CALO
@@ -31,17 +32,17 @@ class TestInitialEnthalpyPoint():
 
         # Will raise a "can't find enthalpy column error"
         with pytest.raises(pgEx.ParameterError):
-            pygaps.initial_enthalpy_point(basic_pointisotherm, 'wrong')
+            ie.initial_enthalpy_point(basic_pointisotherm, 'wrong')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])
     def test_ienthalpy_point(self, sample):
         """The point method."""
         sample = DATA_CALO[sample]
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
+        isotherm = pgp.isotherm_from_json(filepath)
 
-        ienth_poly = pygaps.initial_enthalpy_point(isotherm, 'enthalpy'
-                                                   ).get('initial_enthalpy')
+        ienth_poly = ie.initial_enthalpy_point(isotherm, 'enthalpy'
+                                               ).get('initial_enthalpy')
 
         err_relative = 0.1  # 10 percent
         err_absolute = 1  #
@@ -53,8 +54,8 @@ class TestInitialEnthalpyPoint():
         """Test verbosity."""
         sample = DATA_CALO['Takeda 5A']
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.initial_enthalpy_point(isotherm, 'enthalpy', verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        ie.initial_enthalpy_point(isotherm, 'enthalpy', verbose=True)
 
 
 @pytest.mark.characterisation
@@ -65,17 +66,17 @@ class TestInitialEnthalpyFit():
 
         # Will raise a "can't find enthalpy column error"
         with pytest.raises(pgEx.ParameterError):
-            pygaps.initial_enthalpy_comp(basic_pointisotherm, 'wrong')
+            ie.initial_enthalpy_comp(basic_pointisotherm, 'wrong')
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA_CALO])
     def test_ienthalpy_comb(self, sample):
         """The combined polynomial method"""
         sample = DATA_CALO[sample]
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
+        isotherm = pgp.isotherm_from_json(filepath)
 
-        ienth_poly = pygaps.initial_enthalpy_comp(isotherm, 'enthalpy'
-                                                  ).get('initial_enthalpy')
+        ienth_poly = ie.initial_enthalpy_comp(isotherm, 'enthalpy'
+                                              ).get('initial_enthalpy')
 
         err_relative = 0.1  # 10 percent
         err_absolute = 1  #
@@ -87,5 +88,5 @@ class TestInitialEnthalpyFit():
         """Test verbosity."""
         sample = DATA_CALO['Takeda 5A']
         filepath = DATA_CALO_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.initial_enthalpy_comp(isotherm, 'enthalpy', verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        ie.initial_enthalpy_comp(isotherm, 'enthalpy', verbose=True)

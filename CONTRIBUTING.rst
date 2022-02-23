@@ -10,10 +10,10 @@ Bug reports
 
 When `reporting a bug <https://github.com/pauliacomi/pygaps/issues>`_ please include:
 
-    * Your operating system name and version.
-    * Any details about your local setup that might be helpful in
-      troubleshooting.
-    * Detailed steps to reproduce the bug.
+- Your operating system name and version.
+- Any details about your local setup that might be helpful in
+  troubleshooting.
+- Detailed steps to reproduce the bug.
 
 A helpful GitHub issue template is provided.
 
@@ -34,9 +34,9 @@ The best way to send feedback is to file
 
 If you are proposing a feature:
 
-* Explain in detail how it would work.
-* Keep the scope as narrow as possible, to make it easier to implement.
-* And of course, remember that this project is developed in the
+- Explain in detail how it would work.
+- Keep the scope as narrow as possible, to make it easier to implement.
+- And of course, remember that this project is developed in the
   spare time of the maintainers, and that code contributions are welcome :)
 
 Development
@@ -66,9 +66,7 @@ To set up `pyGAPS` for local development:
    Or you could run the tests with only your own environment by running::
 
     python setup.py test
-
     # or pytest directly
-
     pytest
 
 5. Commit your changes and push your branch to GitHub::

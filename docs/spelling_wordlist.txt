@@ -1,3 +1,4 @@
+pygaps
 builtin
 builtins
 classmethod
@@ -7,5 +8,5 @@ staticmethods
 args
 kwargs
 callstack
-Changelog
-Indices
+changelog
+indices

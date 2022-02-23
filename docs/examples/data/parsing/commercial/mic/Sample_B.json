@@ -1,0 +1,36 @@
+{
+    "adsorbate": "nitrogen",
+    "apparatus": "TriStar II 3020 3.02",
+    "comment": "Sample that was stopped during collection.",
+    "date": "2017-06-13T07:56:30",
+    "errors": [
+        "BET Calculation: At least 2 Points must be supplied for the BET Calculation's Least Squares Fit",
+        "1023-  Preparations failed in primary data.",
+        "BET Calculation: At least 2 Points must be supplied for the BET Calculation's Least Squares Fit",
+        "1023-  Preparations failed in primary data.",
+        "BET Calculation: At least 2 Points must be supplied for the BET Calculation's Least Squares Fit",
+        "1023-  Preparations failed in primary data.",
+        "1043-  Fewer than 2 points available for BJH Adsorption calculations.",
+        "1043-  Fewer than 2 points available for BJH Desorption calculations."
+    ],
+    "file_version": "3.0",
+    "isotherm_data": [
+        {
+            "loading": 28.33484691613959,
+            "pressure": 0.00035662138740906555,
+            "pressure_saturation": 745.736328125,
+            "time": 99
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "cm3(STP)",
+    "material": "Sample B",
+    "material_basis": "mass",
+    "material_mass": 0.288,
+    "material_unit": "g",
+    "operator": "",
+    "pressure_mode": "relative",
+    "pressure_unit": null,
+    "temperature": 77.3,
+    "temperature_unit": "K"
+}

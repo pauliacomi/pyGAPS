@@ -2,7 +2,7 @@
 
 import numpy
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class Quadratic(IsothermBaseModel):
@@ -38,6 +38,7 @@ class Quadratic(IsothermBaseModel):
 
     # Model parameters
     name = 'Quadratic'
+    formula = r"n(p) = n_m \frac{p (K_a + 2 K_b p)}{1 + K_a p + K_b p^2}"
     calculates = 'loading'
     param_names = ["n_m", "Ka", "Kb"]
     param_bounds = {
@@ -62,10 +63,7 @@ class Quadratic(IsothermBaseModel):
         """
         return self.params["n_m"] * (
             self.params["Ka"] + 2.0 * self.params["Kb"] * pressure
-        ) * pressure / (
-            1.0 + self.params["Ka"] * pressure +
-            self.params["Kb"] * pressure**2
-        )
+        ) * pressure / (1.0 + self.params["Ka"] * pressure + self.params["Kb"] * pressure**2)
 
     def pressure(self, loading):
         """
@@ -126,8 +124,7 @@ class Quadratic(IsothermBaseModel):
             Spreading pressure at specified pressure.
         """
         return self.params["n_m"] * numpy.log(
-            1.0 + self.params["Ka"] * pressure +
-            self.params["Kb"] * pressure**2
+            1.0 + self.params["Ka"] * pressure + self.params["Kb"] * pressure**2
         )
 
     def initial_guess(self, pressure, loading):
@@ -146,15 +143,9 @@ class Quadratic(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
-        guess = {
-            "n_m": saturation_loading / 2.0,
-            "Ka": langmuir_k,
-            "Kb": langmuir_k**2.0
-        }
+        guess = {"n_m": saturation_loading / 2.0, "Ka": langmuir_k, "Kb": langmuir_k**2.0}
 
         for param in guess:
             if guess[param] < self.param_bounds[param][0]:

@@ -1,7 +1,52 @@
 """General functions for SQL query building."""
 
+import sqlite3
 
-def build_update(table, to_set, where, prefix=None):
+from pygaps import logger
+from pygaps.utilities.exceptions import ParsingError
+
+
+def db_execute_general(
+    statement: str,
+    pth: str,
+    verbose: bool = False,
+):
+    """
+    Execute general SQL statements.
+
+    Parameters
+    ----------
+    statement : str
+        SQL statement to execute.
+    pth : str
+        Path where the database is located.
+    verbose : bool
+        Print out extra information.
+
+    """
+    # Attempt to connect
+    try:
+        with sqlite3.connect(pth) as db:
+
+            # Get a cursor object
+            cursor = db.cursor()
+            cursor.execute('PRAGMA foreign_keys = ON')
+
+            # Check if table does not exist and create it
+            cursor.executescript(statement)
+
+    # Catch the exception
+    except sqlite3.Error as e_info:
+        logger.info(f"Unable to execute statement: \n{statement}")
+        raise ParsingError from e_info
+
+
+def build_update(
+    table: str,
+    to_set: list,
+    where: list,
+    prefix: str = None,
+):
     """
     Build an update request.
 
@@ -23,12 +68,12 @@ def build_update(table, to_set, where, prefix=None):
 
     """
     return (
-        f"UPDATE \"{table}\" SET " + ", ".join(f"{w} = :{w}" for w in to_set) +
-        " WHERE " + " AND ".join(f"{w} = :{prefix or ''}{w}" for w in where)
+        f"UPDATE \"{table}\" SET " + ", ".join(f"{w} = :{w}" for w in to_set) + " WHERE " +
+        " AND ".join(f"{w} = :{prefix or ''}{w}" for w in where)
     )
 
 
-def build_insert(table, to_insert):
+def build_insert(table: str, to_insert: list):
     """
     Build an insert request.
 
@@ -46,12 +91,16 @@ def build_insert(table, to_insert):
 
     """
     return (
-        f"INSERT INTO \"{table}\" (" + ", ".join(f"{w}" for w in to_insert) +
-        ") VALUES (" + ", ".join(f":{w}" for w in to_insert) + ")"
+        f"INSERT INTO \"{table}\" (" + ", ".join(f"{w}" for w in to_insert) + ") VALUES (" +
+        ", ".join(f":{w}" for w in to_insert) + ")"
     )
 
 
-def build_select(table, to_select, where=None):
+def build_select(
+    table: str,
+    to_select: list,
+    where: list = None,
+):
     """
     Build a select request.
 
@@ -72,16 +121,13 @@ def build_select(table, to_select, where=None):
     """
     if where:
         return (
-            "SELECT " + ", ".join(f"{w}" for w in to_select) +
-            f" FROM \"{table}\" WHERE " +
+            "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\" WHERE " +
             " AND ".join(f"{w} = :{w}" for w in where)
         )
-    return (
-        "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\""
-    )
+    return ("SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\"")
 
 
-def build_select_unnamed(table, to_select, where, join="AND"):
+def build_select_unnamed(table: str, to_select: list, where: list, join: str = "AND"):
     """
     Build an select request with multiple parameters.
 
@@ -103,13 +149,12 @@ def build_select_unnamed(table, to_select, where, join="AND"):
 
     """
     return (
-        "SELECT " + ", ".join(f"{w}" for w in to_select) +
-        f" FROM \"{table}\" WHERE " +
+        "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\" WHERE " +
         (" " + join + " ").join(f"{w} = ?" for w in where)
     )
 
 
-def build_delete(table, where):
+def build_delete(table: str, where: list):
     """
     Build a delete request.
 
@@ -126,7 +171,4 @@ def build_delete(table, where):
         Built query string.
 
     """
-    return (
-        f"DELETE FROM \"{table}\" WHERE " +
-        " AND ".join(f"{w} = :{w}" for w in where)
-    )
+    return (f"DELETE FROM \"{table}\" WHERE " + " AND ".join(f"{w} = :{w}" for w in where))

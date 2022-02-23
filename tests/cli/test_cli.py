@@ -4,9 +4,14 @@ import subprocess
 import pytest
 
 import pygaps
+import pygaps.parsing as pgp
 
 
 def capture(command, **extra):
+    """Run and capture the output of a subprocess."""
+    # TODO remove on python 3.7+
+    command = map(str, command)
+
     proc = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
@@ -26,11 +31,11 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-    def test_default(self, basic_pointisotherm, tmpdir_factory):
+    def test_default(self, basic_pointisotherm, tmp_path_factory):
 
-        tempdir = tmpdir_factory.mktemp('cli')
+        tempdir = tmp_path_factory.mktemp('cli')
 
-        path = tempdir.join('isotherm.json').strpath
+        path = tempdir / 'isotherm.json'
         basic_pointisotherm.to_json(path)
 
         command = ["pygaps", path]
@@ -38,7 +43,7 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-        path = tempdir.join('isotherm.csv').strpath
+        path = tempdir / 'isotherm.csv'
         basic_pointisotherm.to_csv(path)
 
         command = ["pygaps", path]
@@ -46,7 +51,7 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-        path = tempdir.join('isotherm.xls').strpath
+        path = tempdir / 'isotherm.xls'
         basic_pointisotherm.to_xl(path)
 
         command = ["pygaps", path]
@@ -54,9 +59,9 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-    def test_plot(self, basic_pointisotherm, tmpdir_factory):
+    def test_plot(self, basic_pointisotherm, tmp_path_factory):
 
-        path = tmpdir_factory.mktemp('cli').join('isotherm.json').strpath
+        path = tmp_path_factory.mktemp('cli') / 'isotherm.json'
         basic_pointisotherm.to_json(path)
 
         my_env = os.environ.copy()
@@ -67,9 +72,9 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-    def test_characterize(self, basic_pointisotherm, tmpdir_factory):
+    def test_characterize(self, basic_pointisotherm, tmp_path_factory):
 
-        path = tmpdir_factory.mktemp('cli').join('isotherm.json').strpath
+        path = tmp_path_factory.mktemp('cli') / 'isotherm.json'
         basic_pointisotherm.adsorbate = 'N2'
         basic_pointisotherm.to_json(path)
 
@@ -78,10 +83,10 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-    def test_model(self, basic_pointisotherm, tmpdir_factory):
+    def test_model(self, basic_pointisotherm, tmp_path_factory):
 
-        tempdir = tmpdir_factory.mktemp('cli')
-        path = tempdir.join('isotherm.json').strpath
+        tempdir = tmp_path_factory.mktemp('cli')
+        path = tempdir / 'isotherm.json'
         basic_pointisotherm.to_json(path)
 
         command = ["pygaps", "-md", "guess", path]
@@ -89,29 +94,25 @@ class TestCLI():
         print(out, err)
         assert exitcode == 0
 
-        outpath = tempdir.join('model.json').strpath
+        outpath = tempdir / 'model.json'
         command = ["pygaps", "-md", "guess", "-o", outpath, path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
 
-        assert isinstance(
-            pygaps.isotherm_from_json(outpath), pygaps.ModelIsotherm
-        )
+        assert isinstance(pgp.isotherm_from_json(outpath), pygaps.ModelIsotherm)
 
-    def test_convert(self, basic_pointisotherm, tmpdir_factory):
+    def test_convert(self, basic_pointisotherm, tmp_path_factory):
 
-        tempdir = tmpdir_factory.mktemp('cli')
-        path = tempdir.join('isotherm.json').strpath
-        outpath = tempdir.join('model.json').strpath
+        tempdir = tmp_path_factory.mktemp('cli')
+        path = tempdir / 'isotherm.json'
+        outpath = tempdir / 'model.json'
         basic_pointisotherm.adsorbate = 'N2'
         basic_pointisotherm.to_json(path)
 
-        command = [
-            "pygaps", "-cv", "pressure_mode=relative", "-o", outpath, path
-        ]
+        command = ["pygaps", "-cv", "pressure_mode=relative", "-o", outpath, path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
 
-        assert pygaps.isotherm_from_json(outpath).pressure_mode == 'relative'
+        assert pgp.isotherm_from_json(outpath).pressure_mode == 'relative'

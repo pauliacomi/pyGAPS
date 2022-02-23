@@ -1,9 +1,3 @@
-========================
-The pyGAPS documentation
-========================
-
-Welcome to the documentation for the pyGAPS framework.
-
 
 .. include:: ../README.rst
 

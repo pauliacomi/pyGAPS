@@ -2,7 +2,7 @@
 
 import numpy
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class BET(IsothermBaseModel):
@@ -22,12 +22,12 @@ class BET(IsothermBaseModel):
     that incremental layers are formed. The conditions imagined by
     the BET model are:
 
-        * The adsorption sites are equivalent, and therefore the surface is heterogeneous
-        * There are no lateral interactions between adsorbed molecules
-        * The adsorption occurs in layers, with adsorbed molecules acting
-          as adsorption sites for new molecules
-        * The adsorption energy of a molecule on the second and higher
-          layers equals the condensation energy of the adsorbent :math:`E_L`.
+    * The adsorption sites are equivalent, and therefore the surface is heterogeneous
+    * There are no lateral interactions between adsorbed molecules
+    * The adsorption occurs in layers, with adsorbed molecules acting as
+      adsorption sites for new molecules
+    * The adsorption energy of a molecule on the second and higher layers equals
+      the condensation energy of the adsorbent :math:`E_L`.
 
     A particular surface percentage :math:`\theta_x` is occupied with x layers.
     For each layer at equilibrium, the adsorption and desorption rates must be
@@ -104,6 +104,7 @@ class BET(IsothermBaseModel):
 
     # Model parameters
     name = 'BET'
+    formula = r"n(p) = n_m \frac{C p}{(1 - N p)(1 - N p + C p)}"
     calculates = 'loading'
     param_names = ["n_m", "C", "N"]
     param_bounds = {
@@ -210,9 +211,7 @@ class BET(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "C": langmuir_k, "N": 0.01}
 

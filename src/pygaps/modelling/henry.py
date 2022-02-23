@@ -2,7 +2,7 @@
 
 import numpy
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class Henry(IsothermBaseModel):
@@ -41,6 +41,7 @@ class Henry(IsothermBaseModel):
 
     # Model parameters
     name = 'Henry'
+    formula = r"n(p) = K_H p"
     calculates = 'loading'
     param_names = ["K"]
     param_bounds = {
@@ -131,9 +132,7 @@ class Henry(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k}
 

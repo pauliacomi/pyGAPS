@@ -2,7 +2,7 @@
 
 import numpy
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class Langmuir(IsothermBaseModel):
@@ -21,12 +21,12 @@ class Langmuir(IsothermBaseModel):
     It was originally derived from a kinetic model of gas adsorption and
     is based on several assumptions.
 
-        * All sites are equivalent and have the same chance of being occupied
-        * Each adsorbate molecule can occupy one adsorption site
-        * There are no interactions between adsorbed molecules
-        * The rates of adsorption and desorption are proportional to the number
-          of sites currently free and currently occupied, respectively
-        * Adsorption is complete when all sites are filled.
+    * All sites are equivalent and have the same chance of being occupied
+    * Each adsorbate molecule can occupy one adsorption site
+    * There are no interactions between adsorbed molecules
+    * The rates of adsorption and desorption are proportional to the number of
+      sites currently free and currently occupied, respectively
+    * Adsorption is complete when all sites are filled.
 
     Using these assumptions we can define rates for both adsorption and
     desorption. The adsorption rate :math:`r_a`
@@ -77,6 +77,7 @@ class Langmuir(IsothermBaseModel):
 
     # Model parameters
     name = 'Langmuir'
+    formula = r"n(p) = n_m\frac{K p}{1 + K p}"
     calculates = 'loading'
     param_names = ["K", "n_m"]
     param_bounds = {
@@ -171,9 +172,7 @@ class Langmuir(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k}
 

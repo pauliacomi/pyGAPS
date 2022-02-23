@@ -1,9 +1,10 @@
 """Dubinin-Radushkevitch isotherm model."""
 
 import numpy
+from scipy import constants
+from scipy import integrate
 
-from .. import scipy
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class DR(IsothermBaseModel):
@@ -30,9 +31,9 @@ class DR(IsothermBaseModel):
 
     There are two parameters which define the model:
 
-        * The total amount adsorbed (`n_t`), analogous to the monolayer
-          capacity in the Langmuir model.
-        * A potential energy term `e`.
+    * The total amount adsorbed (`n_t`), analogous to the monolayer capacity in
+      the Langmuir model.
+    * A potential energy term `e`.
 
     It describes adsorption in a single uniform type of pores. To note
     that the model does not reduce to Henry's law at low pressure
@@ -47,6 +48,7 @@ class DR(IsothermBaseModel):
     """
     # Model parameters
     name = 'DR'
+    formula = r"n(p) = n_t \exp [-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{2}]"
     calculates = 'loading'
     param_names = ["n_m", "e"]
     param_bounds = {
@@ -57,7 +59,7 @@ class DR(IsothermBaseModel):
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -scipy.const.gas_constant * parameters['temperature']
+        self.minus_rt = -constants.gas_constant * parameters['temperature']
 
     def loading(self, pressure):
         """
@@ -98,8 +100,7 @@ class DR(IsothermBaseModel):
 
         """
         return numpy.exp(
-            self.params['e'] / self.minus_rt *
-            numpy.sqrt(-numpy.log(loading / self.params['n_m']))
+            self.params['e'] / self.minus_rt * numpy.sqrt(-numpy.log(loading / self.params['n_m']))
         )
 
     def spreading_pressure(self, pressure):
@@ -126,9 +127,7 @@ class DR(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(
-            lambda x: self.loading(x) / x, 0, pressure
-        )[0]
+        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -146,9 +145,7 @@ class DR(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "e": -self.minus_rt}
 

@@ -2,7 +2,7 @@
 
 import numpy
 
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class Freundlich(IsothermBaseModel):
@@ -28,10 +28,10 @@ class Freundlich(IsothermBaseModel):
 
     There are two parameters which define the model:
 
-        * A surface interaction constant `K` denoting the interaction
-          with the material surface.
-        * An exponential term `m` accounting for the decrease in
-          available adsorption sites at higher loading.
+    * A surface interaction constant `K` denoting the interaction with the
+      material surface.
+    * An exponential term `m` accounting for the decrease in available
+      adsorption sites at higher loading.
 
     The model can also be derived from a more physical basis,
     using the potential theory of Polanyi, essentially resulting in
@@ -47,6 +47,7 @@ class Freundlich(IsothermBaseModel):
 
     # Model parameters
     name = 'Freundlich'
+    formula = r"n(p) = K p^{ 1/m }"
     calculates = 'loading'
     param_names = ["K", "m"]
     param_bounds = {
@@ -120,9 +121,7 @@ class Freundlich(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["m"] * self.params["K"] * pressure**(
-            1 / self.params["m"]
-        )
+        return self.params["m"] * self.params["K"] * pressure**(1 / self.params["m"])
 
     def initial_guess(self, pressure, loading):
         """
@@ -140,9 +139,7 @@ class Freundlich(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k, "m": 1}
 

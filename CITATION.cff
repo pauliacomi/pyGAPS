@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the published paper as below."
+authors:
+- family-names: "Iacomi"
+  given-names: "Paul"
+  orcid: "https://orcid.org/0000-0001-5477-1503"
+title: "pyGAPS"
+url: "https://github.com/github/pyGAPS"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Iacomi"
+      given-names: "Paul"
+      orcid: "https://orcid.org/0000-0001-5477-1503"
+    - family-names: "Llewellyn"
+      given-names: "Philip L"
+  doi: "10.1007/s10450-019-00168-5"
+  journal: "Adsorption"
+  month: 9
+  start: 1533 # First page number
+  end: 1542 # Last page number
+  title: "pyGAPS: a Python-based framework for adsorption isotherm processing and material characterisation"
+  issue: 8
+  volume: 25
+  year: 2019

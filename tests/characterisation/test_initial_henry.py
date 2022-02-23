@@ -15,7 +15,8 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
-import pygaps
+import pygaps.characterisation.initial_henry as ih
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
@@ -33,11 +34,9 @@ class TestInitialHenry():
         if sample.get('Khi_slope', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
 
-            ihenry_slope = pygaps.initial_henry_slope(
-                isotherm, max_adjrms=0.01
-            )
+            ihenry_slope = ih.initial_henry_slope(isotherm, max_adjrms=0.01)
 
             err_relative = 0.1  # 10 percent
             err_absolute = 10  #
@@ -50,19 +49,13 @@ class TestInitialHenry():
         """Test introducing limits in the initial slope method."""
         sample = DATA['SiO2']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.initial_henry_slope(
-            isotherm, max_adjrms=0.01, p_limits=[0, 0.2]
-        )
-        pygaps.initial_henry_slope(
-            isotherm, max_adjrms=0.01, p_limits=[0.2, None]
-        )
-        pygaps.initial_henry_slope(
-            isotherm, max_adjrms=0.01, l_limits=[5, None]
-        )
+        isotherm = pgp.isotherm_from_json(filepath)
+        ih.initial_henry_slope(isotherm, max_adjrms=0.01, p_limits=[0, 0.2])
+        ih.initial_henry_slope(isotherm, max_adjrms=0.01, p_limits=[0.2, None])
+        ih.initial_henry_slope(isotherm, max_adjrms=0.01, l_limits=[5, None])
 
         with pytest.raises(pgEx.ParameterError):
-            pygaps.initial_henry_slope(
+            ih.initial_henry_slope(
                 isotherm, max_adjrms=0.01, l_limits=[25, None]
             )
 
@@ -71,8 +64,8 @@ class TestInitialHenry():
         """Test verbosity."""
         sample = DATA['MCM-41']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.initial_henry_slope(isotherm, verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        ih.initial_henry_slope(isotherm, verbose=True)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_ihenry_virial(self, sample):
@@ -82,9 +75,9 @@ class TestInitialHenry():
         if sample.get('Khi_slope', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgp.isotherm_from_json(filepath)
 
-            ihenry_virial = pygaps.initial_henry_virial(isotherm)
+            ihenry_virial = ih.initial_henry_virial(isotherm)
 
             err_relative = 0.1  # 10 percent
             err_absolute = 10  #
@@ -98,5 +91,5 @@ class TestInitialHenry():
         """Test verbosity."""
         sample = DATA['SiO2']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.initial_henry_virial(isotherm, verbose=True)
+        isotherm = pgp.isotherm_from_json(filepath)
+        ih.initial_henry_virial(isotherm, verbose=True)

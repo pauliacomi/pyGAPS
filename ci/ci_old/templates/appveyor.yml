@@ -1,0 +1,85 @@
+# vm image to use
+image:
+- Visual Studio 2017
+
+# version number to title
+version: '{branch}-{build}'
+
+# Not an MSBuild project
+build: off
+
+# preserve pip caches between builds
+cache:
+  - '%LOCALAPPDATA%\pip\Cache'
+
+# no need to clone entire repo
+clone_depth: 5
+
+# If required to fail fast
+# matrix:
+#     fast_finish: true
+
+environment:
+  CONDA_ROOT: 'C:\Miniconda3-x64'
+
+  matrix:
+{% for env in tox_environments %}{{ '' }}
+{% if env.startswith(('py2', 'py3')) %}
+
+    - PYTHON_VERSION: '{{ env[2] }}.{{ env[3:] }}'
+      platform: x86
+{% if 'nocov' in env %}
+      WHEEL_PATH: .tox/dist
+{% endif %}
+
+    - PYTHON_VERSION: '{{ env[2] }}.{{ env[3:] }}'
+      platform: x64
+{% if 'nocov' in env %}
+      WHEEL_PATH: .tox/dist
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+# initial commands
+init:
+  - ps: echo $env:PYTHON_VERSION
+
+# setup stage
+install:
+
+  # install our build environment
+  - CALL "%CONDA_ROOT%\\Scripts\\activate.bat"      # run activation script
+  - conda config --set always_yes yes               # always yes
+  - conda update -q conda                           # update (quiet)
+  - conda install conda-build                       # install conda-build
+
+  # get the conda info
+  - conda info -a
+
+  # create environment with dependencies
+  - conda env create -q -n testenv-%PYTHON_VERSION% -f ./conda_recipe/requirements.yaml python=%PYTHON_VERSION%
+  - conda activate testenv-%PYTHON_VERSION%
+
+  # Now install the module
+  - 'pip install -ve .'
+
+# actual testing performed
+test_script:
+  - pytest --cov --cov-report=term-missing -vv
+
+# cleanup the environment
+after_test:
+
+on_success:
+  - IF DEFINED WHEEL_PATH twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing %WHEEL_PATH%/*.whl
+
+# stuff to do on fail
+on_failure:
+
+artifacts:
+  - path: dist\*
+
+### To enable remote debugging uncomment this (also, see: http://www.appveyor.com/docs/how-to/rdp-to-build-worker):
+# on_finish:
+#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

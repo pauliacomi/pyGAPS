@@ -11,7 +11,6 @@ function parameters can be found in the
 .. toctree::
     :glob:
 
-    inspection
     area_calcs
     tplot
     alphas

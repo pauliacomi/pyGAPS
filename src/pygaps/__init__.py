@@ -8,21 +8,11 @@ __docformat__ = 'restructuredtext'
 try:
     from ._version import version
     __version__ = version
-except:
-    __version__ = '3.0.3'
+except ImportError:
+    __version__ = '4.0.0'
 
 import sys
-import logging
-import warnings
-logger = logging.getLogger('pygaps')
-logger.setLevel(logging.DEBUG)
-
-# create console handler
-ch = logging.StreamHandler(stream=sys.stdout)
-ch.setLevel(logging.INFO)
-
-# add the handlers to the logger
-logger.addHandler(ch)
+from .logging import logger
 
 # This code is written for Python 3.
 if sys.version_info[0] != 3:
@@ -31,9 +21,7 @@ if sys.version_info[0] != 3:
 
 # Let users know if they're missing any hard dependencies
 hard_dependencies = ("numpy", "pandas", "scipy")
-soft_dependencies = {
-    "CoolProp": "Used for many thermodynamic backend calculations."
-}
+soft_dependencies = {"CoolProp": "Used for many thermodynamic backend calculations."}
 missing_dependencies = []
 
 import importlib
@@ -44,63 +32,32 @@ for dependency in hard_dependencies:
 if missing_dependencies:
     raise ImportError(f"Missing required dependencies {missing_dependencies}")
 
-for dependency in soft_dependencies:
+for dependency, reason in soft_dependencies.items():
     if not importlib.util.find_spec(dependency):
-        warnings.warn(
-            f"Missing important package {dependency}. {soft_dependencies[dependency]}"
-        )
+        logger.warning(f"Missing important package {dependency}. {reason}")
 
 del hard_dependencies, soft_dependencies, dependency, missing_dependencies
 
-
-# This lazy load function will be used for non-critical modules to speed import time
-# Examples: matplotlib, scipy.optimize
-def _load_lazy(fullname):
-    try:
-        return sys.modules[fullname]
-    except KeyError:
-        spec = importlib.util.find_spec(fullname)
-        if not spec:
-            raise ModuleNotFoundError(f"Could not import {fullname}.")
-        loader = importlib.util.LazyLoader(spec.loader)
-        module = importlib.util.module_from_spec(spec)
-        # Make module with proper locking and get it inserted into sys.modules.
-        loader.exec_module(module)
-        sys.modules[fullname] = module
-        return module
-
-
-class scipy_backend():
-    """A backend for scipy, which will be lazy loaded."""
-    def __init__(self):
-        self.optimize = _load_lazy('scipy.optimize')
-        self.integrate = _load_lazy('scipy.integrate')
-        self.interp = _load_lazy('scipy.interpolate')
-        self.stats = _load_lazy('scipy.stats')
-        self.const = _load_lazy('scipy.constants')
-
-
-scipy = scipy_backend()
-
 # Data
-from .data import DATABASE
-from .data import ADSORBATE_LIST
-from .data import MATERIAL_LIST
-from .data import load_data
+from pygaps.data import DATABASE
+from pygaps.data import ADSORBATE_LIST
+from pygaps.data import MATERIAL_LIST
+from pygaps.data import load_data
 
 # Thermodynamic backend
-from .utilities.coolprop_utilities import thermodynamic_backend
-from .utilities.coolprop_utilities import backend_use_coolprop
-from .utilities.coolprop_utilities import backend_use_refprop
+from pygaps.utilities.coolprop_utilities import thermodynamic_backend
+from pygaps.utilities.coolprop_utilities import backend_use_coolprop
+from pygaps.utilities.coolprop_utilities import backend_use_refprop
 
 # Core classes
-from .core.adsorbate import Adsorbate
-from .core.material import Material
-from .core.pointisotherm import PointIsotherm
-from .core.modelisotherm import ModelIsotherm
+from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.material import Material
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.core.modelisotherm import ModelIsotherm
 
 # Data load
 load_data()
+del load_data
 
 # Other user-facing functions
-from .api import *
+# from .api import *

@@ -1,10 +1,12 @@
 """Collections of various python utilities."""
 
 import collections.abc as abc
+import importlib
 import pathlib
+import sys
 import warnings
 
-from .exceptions import pgError
+from pygaps.utilities.exceptions import pgError
 
 
 def _one_pass(iters):
@@ -40,10 +42,7 @@ def deep_merge(a, b, path=None, update=True):
         path = []
     for key, val in b.items():
         if key in a:
-            if (
-                isinstance(a[key], abc.Mapping)
-                and isinstance(val, abc.Mapping)
-            ):
+            if (isinstance(a[key], abc.Mapping) and isinstance(val, abc.Mapping)):
                 deep_merge(a[key], val, path + [str(key)], update)
             elif a[key] == val:
                 pass  # same leaf value
@@ -88,10 +87,12 @@ def get_file_paths(folder, extension=None):
     return pathlib.Path(folder).rglob(f"*.{extension}")
 
 
-class simplewarning():
+class SimpleWarning():
     """
     Context manager overrides warning formatter to remove unneeded info.
     """
+    old_formatter = None
+
     def __enter__(self):
         # ignore everything except the message
         def custom_formatwarning(msg, *args, **kwargs):
@@ -101,6 +102,27 @@ class simplewarning():
         warnings.formatwarning = custom_formatwarning
         return True
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, typ, value, traceback):
         warnings.formatwarning = self.old_formatter
         return True
+
+
+def _load_lazy(fullname):
+    """
+    This lazy load was used for non-critical modules to speed import time.
+    Examples: matplotlib, scipy.optimize.
+
+    However it tends to destroy the import system. Do not use.
+    """
+    try:
+        return sys.modules[fullname]
+    except KeyError as err:
+        spec = importlib.util.find_spec(fullname)
+        if not spec:
+            raise ModuleNotFoundError(f"Could not import {fullname}.") from err
+        loader = importlib.util.LazyLoader(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        # Make module with proper locking and get it inserted into sys.modules.
+        loader.exec_module(module)
+        sys.modules[fullname] = module
+        return module

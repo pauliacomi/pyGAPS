@@ -1,0 +1,64 @@
+====================
+ System property BELSORP-max Ver1.3.2t
+====================
+"Instrument S/N:"	00348
+"Vs/ml:"	24.438
+=======================
+ Measurement condition
+=======================
+"Adsorptive:"	Hexane
+"Meas. Temp./K:"	298.00
+"Molecular cross-sectional area:"	0
+"Molecular weight of adsorbate:"	0.00
+"Equilibrium time/sec:"	0
+"Measurement mode:"	1
+====================
+ Sample information
+====================
+"Sample weight/g:"	0.03520
+"Comment1:"	"DUT-67Zr_hexane"
+"Comment2:"	"Volodymyr"
+"Comment3:"	""
+"Comment4:"	"Leak amount : 0.187Pa/Min, Vacuum degree before measurement:8.749E-5Pa"
+"as/m2 g-1:"	0.0000
+"Molecular weight of adsorbent:"	0.00
+====================
+ Time and dead volume
+====================
+"Date of measurement:"	17/05/19
+"Time of measurement:"	6:08:26
+"Slope of dead volume:"	-1.1122E-7
+"Intercept of dead volume:"	1.7953E+1
+"Average dead volume:"	1.7946E+1
+====================
+ Adsorption data
+====================
+"No."	"Pe/kPa"	"P0/kPa"	"Vd/ml"	"V/ml(STP) g-1"
+1	3.0979E-2	20.000	17.938	20.774
+2	3.5770E-1	20.000	17.938	58.572
+3	1.2512	20.000	17.938	63.999
+4	2.7739	20.000	17.939	66.947
+5	4.5422	20.000	17.939	68.443
+6	7.1447	20.000	17.939	69.709
+7	10.209	20.000	17.939	70.702
+8	13.357	20.000	17.940	71.502
+9	16.977	20.000	17.940	72.596
+10	19.478	20.000	17.942	87.797
+0	0	0	0	0
+====================
+ Desorption data
+====================
+"No."	"Pe/kPa"	"P0/kPa"	"Vd/ml"	"V/ml(STP) g-1"
+1	17.747	20.000	17.942	72.942
+2	14.416	20.000	17.942	71.558
+3	11.488	20.000	17.942	70.708
+4	8.6279	20.000	17.942	69.832
+5	6.1112	20.000	17.942	68.882
+6	3.9819	20.000	17.942	67.560
+7	2.2336	20.000	17.942	65.701
+8	1.2264	20.000	17.943	63.441
+9	7.6302E-1	20.000	17.943	61.638
+10	5.4017E-1	20.000	17.943	60.174
+11	2.1631E-1	20.000	17.943	54.863
+12	2.0099E-1	20.000	17.943	54.245
+0	0	0	0	0

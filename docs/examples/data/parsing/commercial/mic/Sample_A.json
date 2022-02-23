@@ -1,0 +1,560 @@
+{
+    "adsorbate": "nitrogen",
+    "apparatus": "TriStar II 3020 3.02",
+    "comment": "A completed sample",
+    "date": "2017-06-17T12:27:21",
+    "file_version": "3.0",
+    "isotherm_data": [
+        {
+            "loading": 28.759507494882065,
+            "pressure": 0.006685548883050357,
+            "pressure_saturation": 734.1160888671875,
+            "time": 118
+        },
+        {
+            "loading": 40.31975001064183,
+            "pressure": 0.05231728433951517,
+            "pressure_saturation": 734.1487426757812,
+            "time": 120
+        },
+        {
+            "loading": 42.601724161482956,
+            "pressure": 0.07041405047396126,
+            "pressure_saturation": 734.2459716796875,
+            "time": 122
+        },
+        {
+            "loading": 44.598869599849614,
+            "pressure": 0.08892511591498463,
+            "pressure_saturation": 734.2622680664062,
+            "time": 124
+        },
+        {
+            "loading": 46.54509677359008,
+            "pressure": 0.10924699867416918,
+            "pressure_saturation": 734.172607421875,
+            "time": 126
+        },
+        {
+            "loading": 48.7672047046794,
+            "pressure": 0.13423043214064717,
+            "pressure_saturation": 734.1481323242188,
+            "time": 128
+        },
+        {
+            "loading": 50.073012046187124,
+            "pressure": 0.149775944958958,
+            "pressure_saturation": 734.1556396484375,
+            "time": 129
+        },
+        {
+            "loading": 52.11640931082066,
+            "pressure": 0.17461637657253873,
+            "pressure_saturation": 734.2426147460938,
+            "time": 131
+        },
+        {
+            "loading": 54.1337272143495,
+            "pressure": 0.1996724871411858,
+            "pressure_saturation": 734.340576171875,
+            "time": 133
+        },
+        {
+            "loading": 56.14201785288045,
+            "pressure": 0.22488384684648666,
+            "pressure_saturation": 734.3068237304688,
+            "time": 135
+        },
+        {
+            "loading": 58.14973737295428,
+            "pressure": 0.250130107406667,
+            "pressure_saturation": 734.28,
+            "time": 136
+        },
+        {
+            "loading": 60.183090365292216,
+            "pressure": 0.2752647350554789,
+            "pressure_saturation": 734.2903442382812,
+            "time": 138
+        },
+        {
+            "loading": 62.2972070612926,
+            "pressure": 0.30041329550948936,
+            "pressure_saturation": 734.3053588867188,
+            "time": 140
+        },
+        {
+            "loading": 63.99234709588304,
+            "pressure": 0.3209815887893657,
+            "pressure_saturation": 734.322998046875,
+            "time": 142
+        },
+        {
+            "loading": 65.74106624135621,
+            "pressure": 0.34105554644041614,
+            "pressure_saturation": 734.3302001953125,
+            "time": 144
+        },
+        {
+            "loading": 68.91753471126084,
+            "pressure": 0.3763391600818552,
+            "pressure_saturation": 734.3739013671875,
+            "time": 146
+        },
+        {
+            "loading": 72.80826264410992,
+            "pressure": 0.4167442529624085,
+            "pressure_saturation": 734.360595703125,
+            "time": 148
+        },
+        {
+            "loading": 76.94051210240582,
+            "pressure": 0.45654371041385894,
+            "pressure_saturation": 734.3453979492188,
+            "time": 151
+        },
+        {
+            "loading": 81.4309842832534,
+            "pressure": 0.49586142142797063,
+            "pressure_saturation": 734.362060546875,
+            "time": 153
+        },
+        {
+            "loading": 86.49981873370795,
+            "pressure": 0.5349023629229757,
+            "pressure_saturation": 734.419189453125,
+            "time": 156
+        },
+        {
+            "loading": 92.4031475615429,
+            "pressure": 0.5743313600054919,
+            "pressure_saturation": 734.3931274414062,
+            "time": 159
+        },
+        {
+            "loading": 101.15828681741999,
+            "pressure": 0.6201673965910858,
+            "pressure_saturation": 734.4348754882812,
+            "time": 164
+        },
+        {
+            "loading": 109.07800883728589,
+            "pressure": 0.65378410433389,
+            "pressure_saturation": 734.5614013671875,
+            "time": 168
+        },
+        {
+            "loading": 122.41220127830184,
+            "pressure": 0.6971428191499308,
+            "pressure_saturation": 734.3942260742188,
+            "time": 174
+        },
+        {
+            "loading": 139.54325613720943,
+            "pressure": 0.7341374768215339,
+            "pressure_saturation": 734.3860473632812,
+            "time": 180
+        },
+        {
+            "loading": 160.34152029358393,
+            "pressure": 0.7633701025489135,
+            "pressure_saturation": 734.429443359375,
+            "time": 186
+        },
+        {
+            "loading": 173.45418279273048,
+            "pressure": 0.7780378748639443,
+            "pressure_saturation": 734.36474609375,
+            "time": 191
+        },
+        {
+            "loading": 196.71599836522597,
+            "pressure": 0.7982963709199852,
+            "pressure_saturation": 734.3583374023438,
+            "time": 198
+        },
+        {
+            "loading": 215.47206276992387,
+            "pressure": 0.8124659616163403,
+            "pressure_saturation": 734.28564453125,
+            "time": 205
+        },
+        {
+            "loading": 224.24441029231093,
+            "pressure": 0.8189391340731347,
+            "pressure_saturation": 734.3290405273438,
+            "time": 210
+        },
+        {
+            "loading": 247.38587906021132,
+            "pressure": 0.8384041909632562,
+            "pressure_saturation": 734.3040771484375,
+            "time": 216
+        },
+        {
+            "loading": 266.88178890602495,
+            "pressure": 0.8540962044422318,
+            "pressure_saturation": 734.3484497070312,
+            "time": 224
+        },
+        {
+            "loading": 289.41703699377274,
+            "pressure": 0.8725317176767056,
+            "pressure_saturation": 734.2699584960938,
+            "time": 230
+        },
+        {
+            "loading": 303.7235163639625,
+            "pressure": 0.8853930264429167,
+            "pressure_saturation": 734.31689453125,
+            "time": 235
+        },
+        {
+            "loading": 314.8547794992435,
+            "pressure": 0.8946175787593517,
+            "pressure_saturation": 734.4408569335938,
+            "time": 239
+        },
+        {
+            "loading": 328.9971258529222,
+            "pressure": 0.9062304721104958,
+            "pressure_saturation": 734.3060302734375,
+            "time": 244
+        },
+        {
+            "loading": 341.09964513079603,
+            "pressure": 0.9189164528939713,
+            "pressure_saturation": 734.4854736328125,
+            "time": 248
+        },
+        {
+            "loading": 347.1888397194616,
+            "pressure": 0.9248168954300018,
+            "pressure_saturation": 734.4869384765625,
+            "time": 252
+        },
+        {
+            "loading": 358.6172565771154,
+            "pressure": 0.9401556892734816,
+            "pressure_saturation": 734.6363525390625,
+            "time": 256
+        },
+        {
+            "loading": 362.2817810339242,
+            "pressure": 0.943578629794254,
+            "pressure_saturation": 734.7796630859375,
+            "time": 259
+        },
+        {
+            "loading": 371.35540272400874,
+            "pressure": 0.958329872672027,
+            "pressure_saturation": 734.86865234375,
+            "time": 263
+        },
+        {
+            "loading": 375.3528526848715,
+            "pressure": 0.9663101508808685,
+            "pressure_saturation": 735.0430297851562,
+            "time": 266
+        },
+        {
+            "loading": 376.7062384096052,
+            "pressure": 0.9678868038508164,
+            "pressure_saturation": 734.9357299804688,
+            "time": 268
+        },
+        {
+            "loading": 380.4982077072499,
+            "pressure": 0.9768880141017895,
+            "pressure_saturation": 734.9258422851562,
+            "time": 270
+        },
+        {
+            "loading": 384.2743935041753,
+            "pressure": 0.987035039885159,
+            "pressure_saturation": 735.051025390625,
+            "time": 273
+        },
+        {
+            "loading": 388.4553359678336,
+            "pressure": 0.9948785236357724,
+            "pressure_saturation": 735.0590209960938,
+            "time": 278
+        },
+        {
+            "loading": 389.2714734506774,
+            "pressure": 0.9965098092109875,
+            "pressure_saturation": 734.882568359375,
+            "time": 289
+        },
+        {
+            "loading": 390.0934582687731,
+            "pressure": 0.998486911849802,
+            "pressure_saturation": 734.7591552734375,
+            "time": 300
+        },
+        {
+            "branch": "des",
+            "loading": 387.9581657301926,
+            "pressure": 0.982478737711439,
+            "pressure_saturation": 734.668212890625,
+            "time": 301
+        },
+        {
+            "branch": "des",
+            "loading": 386.1940974222909,
+            "pressure": 0.9670372289285155,
+            "pressure_saturation": 734.626708984375,
+            "time": 303
+        },
+        {
+            "branch": "des",
+            "loading": 384.5325880038158,
+            "pressure": 0.9517110157165594,
+            "pressure_saturation": 734.5822143554688,
+            "time": 304
+        },
+        {
+            "branch": "des",
+            "loading": 384.29759671827827,
+            "pressure": 0.9507962519817608,
+            "pressure_saturation": 734.6199951171875,
+            "time": 305
+        },
+        {
+            "branch": "des",
+            "loading": 383.0834502524028,
+            "pressure": 0.9384612240258898,
+            "pressure_saturation": 734.63232421875,
+            "time": 306
+        },
+        {
+            "branch": "des",
+            "loading": 380.51937389930816,
+            "pressure": 0.919859103155289,
+            "pressure_saturation": 734.55224609375,
+            "time": 309
+        },
+        {
+            "branch": "des",
+            "loading": 379.0329706056041,
+            "pressure": 0.9112085454599543,
+            "pressure_saturation": 734.5023193359375,
+            "time": 310
+        },
+        {
+            "branch": "des",
+            "loading": 377.04016756171075,
+            "pressure": 0.9017396238438228,
+            "pressure_saturation": 734.4608154296875,
+            "time": 312
+        },
+        {
+            "branch": "des",
+            "loading": 374.613035158646,
+            "pressure": 0.8917676910510013,
+            "pressure_saturation": 734.4251098632812,
+            "time": 314
+        },
+        {
+            "branch": "des",
+            "loading": 361.62836166481276,
+            "pressure": 0.860888250898991,
+            "pressure_saturation": 734.5169067382812,
+            "time": 320
+        },
+        {
+            "branch": "des",
+            "loading": 341.7143740065379,
+            "pressure": 0.8309977614342776,
+            "pressure_saturation": 734.4725341796875,
+            "time": 325
+        },
+        {
+            "branch": "des",
+            "loading": 332.7875231126447,
+            "pressure": 0.8203979438019057,
+            "pressure_saturation": 734.488525390625,
+            "time": 329
+        },
+        {
+            "branch": "des",
+            "loading": 310.1495024560537,
+            "pressure": 0.7982188716001815,
+            "pressure_saturation": 734.390869140625,
+            "time": 334
+        },
+        {
+            "branch": "des",
+            "loading": 291.885702204706,
+            "pressure": 0.7846045041017292,
+            "pressure_saturation": 734.3377075195312,
+            "time": 341
+        },
+        {
+            "branch": "des",
+            "loading": 266.4565959968215,
+            "pressure": 0.7703976097639934,
+            "pressure_saturation": 734.1676635742188,
+            "time": 347
+        },
+        {
+            "branch": "des",
+            "loading": 244.03142240325275,
+            "pressure": 0.7586773241082726,
+            "pressure_saturation": 734.1019897460938,
+            "time": 353
+        },
+        {
+            "branch": "des",
+            "loading": 225.35888313259707,
+            "pressure": 0.7492357620857345,
+            "pressure_saturation": 734.0906372070312,
+            "time": 360
+        },
+        {
+            "branch": "des",
+            "loading": 215.46541416584006,
+            "pressure": 0.743845028325559,
+            "pressure_saturation": 734.001953125,
+            "time": 364
+        },
+        {
+            "branch": "des",
+            "loading": 190.17114232164369,
+            "pressure": 0.7295156915833841,
+            "pressure_saturation": 733.9252319335938,
+            "time": 370
+        },
+        {
+            "branch": "des",
+            "loading": 168.4293473259392,
+            "pressure": 0.7157166667539908,
+            "pressure_saturation": 733.8964233398438,
+            "time": 377
+        },
+        {
+            "branch": "des",
+            "loading": 154.06314133833112,
+            "pressure": 0.705391950210623,
+            "pressure_saturation": 733.8922729492188,
+            "time": 382
+        },
+        {
+            "branch": "des",
+            "loading": 130.91485486524974,
+            "pressure": 0.681788665000771,
+            "pressure_saturation": 733.8843994140625,
+            "time": 388
+        },
+        {
+            "branch": "des",
+            "loading": 119.06156163606964,
+            "pressure": 0.6632264647019581,
+            "pressure_saturation": 734.12939453125,
+            "time": 395
+        },
+        {
+            "branch": "des",
+            "loading": 105.02110350775347,
+            "pressure": 0.6260599311057773,
+            "pressure_saturation": 734.0602416992188,
+            "time": 400
+        },
+        {
+            "branch": "des",
+            "loading": 94.34367031605211,
+            "pressure": 0.5793118138789313,
+            "pressure_saturation": 733.9550170898438,
+            "time": 404
+        },
+        {
+            "branch": "des",
+            "loading": 86.91625312722712,
+            "pressure": 0.53449697318297,
+            "pressure_saturation": 733.877685546875,
+            "time": 407
+        },
+        {
+            "branch": "des",
+            "loading": 80.69158087267118,
+            "pressure": 0.4884493868816834,
+            "pressure_saturation": 733.83349609375,
+            "time": 412
+        },
+        {
+            "branch": "des",
+            "loading": 77.82619378862489,
+            "pressure": 0.46427946740373416,
+            "pressure_saturation": 733.8342895507812,
+            "time": 414
+        },
+        {
+            "branch": "des",
+            "loading": 73.47605821355866,
+            "pressure": 0.4244115540050654,
+            "pressure_saturation": 733.9049072265625,
+            "time": 416
+        },
+        {
+            "branch": "des",
+            "loading": 69.41519525470996,
+            "pressure": 0.3834273181081491,
+            "pressure_saturation": 733.904296875,
+            "time": 419
+        },
+        {
+            "branch": "des",
+            "loading": 65.71997875544223,
+            "pressure": 0.3434179187715295,
+            "pressure_saturation": 733.8107299804688,
+            "time": 421
+        },
+        {
+            "branch": "des",
+            "loading": 62.19101537395404,
+            "pressure": 0.3029936481673957,
+            "pressure_saturation": 733.8056640625,
+            "time": 423
+        },
+        {
+            "branch": "des",
+            "loading": 58.047293317386604,
+            "pressure": 0.25314560819998955,
+            "pressure_saturation": 733.8519287109375,
+            "time": 425
+        },
+        {
+            "branch": "des",
+            "loading": 54.027444839900184,
+            "pressure": 0.20351144354425024,
+            "pressure_saturation": 733.89111328125,
+            "time": 427
+        },
+        {
+            "branch": "des",
+            "loading": 49.91769053534808,
+            "pressure": 0.15340035348069625,
+            "pressure_saturation": 733.9122924804688,
+            "time": 429
+        },
+        {
+            "branch": "des",
+            "loading": 45.772488177900655,
+            "pressure": 0.10645563333904307,
+            "pressure_saturation": 734.024658203125,
+            "time": 432
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "cm3(STP)",
+    "material": "Sample A",
+    "material_basis": "mass",
+    "material_mass": 0.1013,
+    "material_unit": "g",
+    "operator": "",
+    "pressure_mode": "relative",
+    "pressure_unit": null,
+    "temperature": 77.3,
+    "temperature_unit": "K"
+}

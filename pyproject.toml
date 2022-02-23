@@ -1,11 +1,230 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=46.4.0",
     "wheel",
-    "setuptools_scm[toml]>=3.4",
+    "setuptools_scm>=6.2",
 ]
+build-backend = "setuptools.build_meta"
 
+# versioning: setuptools_scm
 [tool.setuptools_scm]
 write_to = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
-fallback_version = '3.0.3'
+fallback_version = '4.0.0'
+
+# linting: pylint
+[tool.pylint.basic]
+extension-pkg-whitelist = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+]
+[tool.pylint.messages_control]
+disable = [
+    "logging-fstring-interpolation", # fstrings are fast
+    "import-outside-toplevel", # required for optimisations
+    "wrong-import-position", # often done through code for optimisations
+    "too-many-instance-attributes", # we don't need these
+    "too-many-branches", # we don't need these
+    "too-many-locals", # we don't need these
+    "too-many-arguments", # we don't need these
+    "too-many-statements", # we don't need these
+    "invalid-name", # we don't need these
+]
+
+# linting: pydocstyle
+[tool.pydocstyle]
+convention = "numpy"
+match-dir = "src\\/.*"
+
+# formatting: yapf
+[tool.yapf]
+based_on_style = "pep8"
+dedent_closing_brackets = true
+coalesce_brackets = true
+split_complex_comprehension = true
+split_before_dot = true
+
+# formatting: isort
+[tool.isort]
+force_single_line = true
+line_length = 120
+known_first_party = "pygaps"
+default_section = "THIRDPARTY"
+forced_separate = "test_pygaps"
+skip = [".tox",".eggs","ci/templates","build","dist"]
+
+# testing: pytest.py
+[tool.pytest.ini_options]
+testpaths = [
+	"tests",
+]
+norecursedirs = [
+	".git",
+	".tox",
+	".env",
+	"dist",
+	"build",
+	"migrations",
+    ]
+python_files = [
+	"test_*.py",
+	"*_test.py",
+    "tests.py",
+]
+addopts = [
+	"-ra",
+    "--cov",
+    "--cov-report=xml",
+	"--doctest-glob=\\*.rst",
+	"--tb=short",
+]
+markers = [
+	"core: core pygaps python functionality.",
+	"utilities: python and scientific tools/utilities.",
+	"characterisation: characterisation tests on isotherms.",
+	"modelling: model generation from isotherms.",
+	"graphing: plotting functionality testing.",
+	"parsing: parsing functionality testing.",
+	"okay: custom emtpy marker.",
+]
+filterwarnings = [
+	"ignore::UserWarning",
+]
+
+# testing: coverage.py
+[tool.coverage.run]
+branch = false
+source = [
+	"src",
+]
+omit = [
+	"*/tests/*",
+]
+parallel = true
+[tool.coverage.paths]
+source = [
+	"src",
+	"*/site-packages",
+]
+[tool.coverage.report]
+ignore_errors = true
+show_missing = true
+precision = 1
+omit = [
+    "*migrations*",
+]
+exclude_lines = [
+	"pragma: no cover",
+	"if self.debug",
+	"raise AssertionError",
+	"raise NotImplementedError",
+	"if __name__ == .__main__.",
+]
+
+# testing: tox [keep this as last section!]
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist =
+    clean,
+    check,
+    docs,
+    py310-cover,
+    py36-cover,
+    py37-cover,
+    py38-cover,
+    py39-cover,
+    report
+
+[testenv]
+wheel = true
+basepython =
+    bootstrap: python
+    py310: {env:TOXPYTHON:python3.10-cover}
+    py36: {env:TOXPYTHON:python3.6-cover}
+    py37: {env:TOXPYTHON:python3.7-cover}
+    py38: {env:TOXPYTHON:python3.8-cover}
+    py39: {env:TOXPYTHON:python3.9-cover}
+    {docs,spell,clean,check,report,codecov}: {env:TOXPYTHON:python3}
+setenv =
+    PYTHONPATH={toxinidir}/tests
+    PYTHONUNBUFFERED=yes
+    cover: SETUP_PY_EXT_COVERAGE=yes
+passenv =
+    *
+conda_channels=
+    defaults
+    conda-forge
+conda_deps =
+    cover: numpy
+    cover: pandas
+    cover: scipy
+    cover: coolprop
+usedevelop =
+    cover: true
+    nocov: false
+deps =
+    pytest
+    cover: coverage[toml]
+    cover: pytest-cov
+commands =
+    cover: python setup.py clean --all build_ext --force --inplace
+    nocov: {posargs:pytest -vv}
+    cover: {posargs:pytest --cov --cov-report=term-missing -vv}
+
+[testenv:bootstrap]
+deps =
+    jinja2
+    tox
+skip_install = true
+commands =
+    python ci/bootstrap.py --no-env
+passenv =
+    *
+
+[testenv:check]
+deps =
+    docutils
+    pygments
+    isort
+    flake8
+    pylint
+    # darglint
+skip_install = true
+usedevelop = false
+commands =
+    python setup.py check --metadata --restructuredtext
+    isort --verbose --check-only --diff src tests setup.py
+    flake8 src tests setup.py
+    # pylint src tests setup.py
+
+[testenv:docs]
+usedevelop = true
+extras = docs
+commands =
+    sphinx-build -E -j auto -b doctest docs dist/docs
+    sphinx-build -E -j auto -b html docs dist/docs
+    sphinx-build -j auto -b linkcheck docs dist/docs
+
+[testenv:codecov]
+deps =
+    coverage[toml]
+    codecov
+skip_install = true
+commands =
+    coverage xml --ignore-errors
+    codecov []
+
+[testenv:report]
+deps = coverage[toml]
+skip_install = true
+commands =
+    coverage report
+    coverage html
+
+[testenv:clean]
+deps = coverage[toml]
+commands = coverage erase
+skip_install = true
+"""

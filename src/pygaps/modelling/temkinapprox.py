@@ -1,10 +1,10 @@
 """Temkin Approximation isotherm model."""
 
 import numpy
+from scipy import optimize
 
-from .. import scipy
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class TemkinApprox(IsothermBaseModel):
@@ -38,6 +38,7 @@ class TemkinApprox(IsothermBaseModel):
 
     # Model parameters
     name = 'TemkinApprox'
+    formula = r"n(p) = n_m \frac{K p}{1 + K p} + n_m \theta (\frac{K p}{1 + K p})^2 (\frac{K p}{1 + K p} -1)"
     calculates = 'loading'
     param_names = ["n_m", "K", "tht"]
     param_bounds = {
@@ -60,9 +61,7 @@ class TemkinApprox(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        lang_load = self.params["K"] * pressure / (
-            1.0 + self.params["K"] * pressure
-        )
+        lang_load = self.params["K"] * pressure / (1.0 + self.params["K"] * pressure)
         return self.params["n_m"] * (
             lang_load + self.params["tht"] * lang_load**2 * (lang_load - 1)
         )
@@ -87,7 +86,7 @@ class TemkinApprox(IsothermBaseModel):
         def fun(x):
             return self.loading(x) - loading
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        opt_res = optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {loading} failed.")
@@ -143,9 +142,7 @@ class TemkinApprox(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k, "tht": 0.0}
 

@@ -1,7 +1,7 @@
 .. _sqlite-manual:
 
-Sqlite database
-===============
+Database
+========
 
 .. _sqlite-manual-general:
 
@@ -9,8 +9,11 @@ Overview
 --------
 
 The framework provides capabilities to interact with an sqlite database, in
-order to store objects such as PointIsotherms, ModelIsotherms, Materials,
-Adsorbates.
+order to store objects such as
+:class:`~pygaps.core.pointisotherm.PointIsotherm`,
+:class:`~pygaps.core.modelisotherm.ModelIsotherm`,
+:class:`~pygaps.core.adsorbate.Adsorbate`,
+:class:`~pygaps.core.material.Material`.
 
 The database was initially envisioned as a centralised data storage for the
 MADIREL Laboratory in Marseille. To generalize the concept for this framework,
@@ -69,10 +72,10 @@ Blank database creation
 
 The internal database is already created and usable when pyGAPS is installed. If
 the user decides to have an external database, they can either copy the internal
-database (located in the `/pygaps/database` directory) or generate an empty one
+database (located in the ``pygaps/database`` directory) or generate an empty one
 using the ``db_create`` command.
 
-::
+.. code:: python
 
     from pygaps.utilities.sqlite_db_creator import db_create
     db_create("path/to/database")

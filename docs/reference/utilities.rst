@@ -1,41 +1,46 @@
 .. _utilities-ref:
 
+Utilities
+=========
 
-Unit Converters
-===============
-
-.. automodule:: pygaps.utilities.converter_mode
-    :members:
-
-
-.. automodule:: pygaps.utilities.converter_unit
-    :members:
-
-Interpolator
-============
+Isotherm interpolator
+---------------------
 
 .. automodule:: pygaps.utilities.isotherm_interpolator
     :members:
 
-Exceptions
-==========
+Thermodynamic backend utilities
+-------------------------------
 
-.. automodule:: pygaps.utilities.exceptions
-    :members:
-
-Other utilities
-===============
 .. automodule:: pygaps.utilities.coolprop_utilities
     :members:
+
+Python utilities
+----------------
 
 .. automodule:: pygaps.utilities.python_utilities
     :members:
 
+Exceptions
+----------
+
+.. automodule:: pygaps.utilities.exceptions
+    :members:
+
+Math utilities
+--------------
+
 .. automodule:: pygaps.utilities.math_utilities
     :members:
 
+String processing utilities
+---------------------------
+
 .. automodule:: pygaps.utilities.string_utilities
     :members:
+
+SQLite utilities
+----------------
 
 .. automodule:: pygaps.utilities.sqlite_utilities
     :members:

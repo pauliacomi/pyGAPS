@@ -16,7 +16,8 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
-import pygaps
+import pygaps.characterisation.dr_da_plots as drda
+import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA
@@ -31,17 +32,17 @@ class TestDAPlot():
 
         # Will raise a "negative exponent" error.
         with pytest.raises(pgEx.ParameterError):
-            pygaps.da_plot(basic_pointisotherm, exp=-2)
+            drda.da_plot(basic_pointisotherm, exp=-2)
 
         filepath = DATA_N77_PATH / DATA['Takeda 5A']['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
+        isotherm = pgpj.isotherm_from_json(filepath)
 
         # Will raise "bad limits" error.
         with pytest.raises(pgEx.CalculationError):
-            pygaps.dr_plot(isotherm, limits=[0.2, 0.1])
+            drda.dr_plot(isotherm, p_limits=[0.2, 0.1])
 
         # These limits work
-        pygaps.dr_plot(isotherm, limits=[0, 0.2])
+        drda.dr_plot(isotherm, p_limits=[0, 0.2])
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_dr_plot(self, sample):
@@ -51,9 +52,9 @@ class TestDAPlot():
         if sample.get('dr_volume', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgpj.isotherm_from_json(filepath)
 
-            res = pygaps.dr_plot(isotherm)
+            res = drda.dr_plot(isotherm)
 
             dr_vol = res.get("pore_volume")
             dr_pot = res.get("adsorption_potential")
@@ -61,12 +62,8 @@ class TestDAPlot():
             err_relative = 0.05  # 5 percent
             err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(
-                dr_vol, sample['dr_volume'], err_relative, err_absolute
-            )
-            assert isclose(
-                dr_pot, sample['dr_potential'], err_relative, err_absolute
-            )
+            assert isclose(dr_vol, sample['dr_volume'], err_relative, err_absolute)
+            assert isclose(dr_pot, sample['dr_potential'], err_relative, err_absolute)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_da_plot(self, sample):
@@ -76,9 +73,9 @@ class TestDAPlot():
         if sample.get('da_volume', None):
 
             filepath = DATA_N77_PATH / sample['file']
-            isotherm = pygaps.isotherm_from_json(filepath)
+            isotherm = pgpj.isotherm_from_json(filepath)
 
-            res = pygaps.da_plot(isotherm, limits=[0, 0.01])
+            res = drda.da_plot(isotherm, p_limits=[0, 0.01])
 
             da_vol = res.get("pore_volume")
             da_pot = res.get("adsorption_potential")
@@ -86,17 +83,13 @@ class TestDAPlot():
             err_relative = 0.05  # 5 percent
             err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(
-                da_vol, sample['da_volume'], err_relative, err_absolute
-            )
-            assert isclose(
-                da_pot, sample['da_potential'], err_relative, err_absolute
-            )
+            assert isclose(da_vol, sample['da_volume'], err_relative, err_absolute)
+            assert isclose(da_pot, sample['da_potential'], err_relative, err_absolute)
 
     @cleanup
     def test_da_output(self):
         """Test verbosity."""
         sample = DATA['Takeda 5A']
         filepath = DATA_N77_PATH / sample['file']
-        isotherm = pygaps.isotherm_from_json(filepath)
-        pygaps.da_plot(isotherm, verbose=True)
+        isotherm = pgpj.isotherm_from_json(filepath)
+        drda.da_plot(isotherm, verbose=True)

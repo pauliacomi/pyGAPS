@@ -13,6 +13,7 @@ the `github folder <https://github.com/pauliacomi/pyGAPS/tree/master/docs/exampl
     :maxdepth: 2
 
     import
+    inspection
     characterisation
     modelling
     iast

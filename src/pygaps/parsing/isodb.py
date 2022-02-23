@@ -1,8 +1,7 @@
 """Interaction with the NIST ISODB."""
 
-import warnings
-
-from .json import isotherm_from_json
+from pygaps import logger
+from pygaps.parsing.json import isotherm_from_json
 
 _ISODB_API = "https://adsorption.nist.gov/isodb/api"
 
@@ -30,11 +29,11 @@ def isotherm_from_isodb(filename):
         resp = requests.get(url, timeout=5)
 
     except requests.exceptions.Timeout:
-        warnings.warn('Connection timeout')
+        logger.warning('Connection timeout')
         return None
 
     except requests.exceptions.ConnectionError:
-        warnings.warn('Connection error')
+        logger.warning('Connection error')
         return None
 
     return isotherm_from_json(resp.text, fmt="NIST")

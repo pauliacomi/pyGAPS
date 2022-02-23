@@ -8,14 +8,9 @@ JSON
 .. automodule:: pygaps.parsing.json
     :members:
 
-Excel
------
-.. automodule:: pygaps.parsing.excel
-    :members:
-
-Sqlite
-------
-.. automodule:: pygaps.parsing.sqlite
+AIF
+---
+.. automodule:: pygaps.parsing.aif
     :members:
 
 CSV
@@ -23,14 +18,22 @@ CSV
 .. automodule:: pygaps.parsing.csv
     :members:
 
+Excel
+-----
+.. automodule:: pygaps.parsing.excel
+    :members:
+
+Apparatus files
+---------------
+.. automodule:: pygaps.parsing.isotherm_from_commercial
+    :members:
+
+Sqlite
+------
+.. automodule:: pygaps.parsing.sqlite
+    :members:
 
 NIST ISODB
 ----------
 .. automodule:: pygaps.parsing.isodb
-    :members:
-
-
-Apparatus
----------
-.. automodule:: pygaps.parsing.bel_dat
     :members:

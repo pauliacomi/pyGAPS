@@ -33,8 +33,8 @@ ADSORBATE_LIST = []
 def load_data():
     """Will proceed with filling the data store."""
 
-    from ..parsing.sqlite import adsorbates_from_db
-    from ..parsing.sqlite import materials_from_db
+    from pygaps.parsing.sqlite import adsorbates_from_db
+    from pygaps.parsing.sqlite import materials_from_db
 
     global MATERIAL_LIST
     global ADSORBATE_LIST

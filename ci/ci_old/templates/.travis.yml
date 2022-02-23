@@ -1,0 +1,111 @@
+dist: bionic
+language: python
+cache: pip
+git:                    # no need to clone everything
+  depth: 1
+
+env:
+  global:
+    - LD_PRELOAD=/lib/x86_64-linux-gnu/libSegFault.so
+    - SEGFAULT_SIGNALS=all
+
+before_install:
+  - lsb_release -a      # print linux version
+  - uname -a            # print machine info
+  - python --version    # print python version
+
+install:
+  - python -m pip install --upgrade pip       # latest setuptools
+  - pip install twine tox-wheel               # install tox/twine
+  # display versions of installed components
+  - virtualenv --version
+  - easy_install --version
+  - pip --version
+  - tox --version
+  - |
+    set -ex
+    if [[ $TRAVIS_PYTHON_VERSION == 'pypy' ]]; then
+        (cd $HOME
+         wget https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux64.tar.bz2
+         tar xf pypy2-*.tar.bz2
+         pypy2-*/bin/pypy -m ensurepip
+         pypy2-*/bin/pypy -m pip install -U virtualenv)
+        export PATH=$(echo $HOME/pypy2-*/bin):$PATH
+        export TOXPYTHON=$(echo $HOME/pypy2-*/bin/pypy)
+    fi
+    if [[ $TRAVIS_PYTHON_VERSION == 'pypy3' ]]; then
+        (cd $HOME
+         wget https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux64.tar.bz2
+         tar xf pypy3-*.tar.bz2
+         pypy3-*/bin/pypy3 -m ensurepip
+         pypy3-*/bin/pypy3 -m pip install -U virtualenv)
+        export PATH=$(echo $HOME/pypy3-*/bin):$PATH
+        export TOXPYTHON=$(echo $HOME/pypy3-*/bin/pypy3)
+    fi
+    set +x
+
+script:
+  # start tox to do the testing
+  - tox -v
+
+after_failure:
+  - cat .tox/log/*
+  - cat .tox/*/log/*
+
+jobs:
+  include:
+    # Checks and docs
+    - stage: test
+      python: '3.8'     # specify python 3.8
+      dist: bionic
+      env:
+        - TOXENV=check
+    - stage: test
+      python: '3.8'     # specify python 3.8
+      dist: bionic
+      env:
+        - TOXENV=docs
+      addons:
+        # We need to install pandoc separately to deal with translation of docs to jupyter
+        apt_packages:
+        - pandoc
+    # Create an test job on the test stage for each python version
+{%- for env in tox_environments %}{{ '' }}
+    - stage: test
+      python: '{{ env.split("-")[0] if env.startswith("pypy") else "{0[2]}.".format(env) + env[3:] }}'
+      dist: bionic
+      env:
+        - TOXENV={{ env }}{% if 'cover' in env %},report,codecov{% endif -%}
+{% endfor %}
+
+    # If all goes well, we want to deploy to PyPi
+    # - stage: deploy
+    #   python: '3.8'     # specify python 3.8
+    #   dist: bionic
+    #   env: TOXENV=none  # overwrite environment var
+    #   install: skip     # no need to install tox
+    #   script: skip      # run no tests
+    #   deploy:           # instead deploy
+    #     - provider: pypi
+    #       username: paul.iacomi
+    #       password:
+    #         secure: n0/j7ueOm8N0frKsRtEOqWvY1I02iu08dNS3ylK+8q+78PrQwB9xQUlH8QRQselMrkobas9e2l9x8eglYNmN1yYata0mT/UexIy+h1CmHTt6oMxE6TSEiCRuyQ73TwV5F36eOOGLwYYzRLMOYjVaHC5E3f0W1RzGcWstrgZWRtVhHNZ+3IxYW+sqb2+JVeKlhqQgmZY2+LRkwf7UXgoNeYHElKB0WnoPNiK2UpYYm8Et4IWFs7BBQfFBTiHmvmsk2DVwBPUWfju0CLoGFKrf/7Z4polSgo88WIBMtW2vPq3JU7uGr3Bqc/XNs+atc0AT9/eqb7x7DogeikSagJa1dx1h///C90as5FV4pSSHRILTCV5quTl9IFKltefxcNPbQuDtwano7wYIxbU4fbGjb8kGOCzTd2IWaz9oy9XtpC6xLuxBxlG4IphD3qQPtvGqi5udHlC3PX7GTgnQ6ySPuZ6EqhHmTFcpbaT8AXp5jfi2LqHllIo/+PcTv3Bm1/89qEfwcm6biE8O41ejOyjb3WKiB2etOMkw7O0tZE9Ub2LrPFohcCQVJgKFcewKrb5zCtmN61m+S3IFu3tOrean3De13ycD1oYSLbwMxU3Cc2bvRoQ+JcnRSIiNcu4ujaHL7uANQClHTByhUa61PNgWVOH3P6YWU572khCEUzF8cEA=
+    #       distributions: sdist bdist_wheel
+    #       on:
+    #         tags: true
+    #     - provider: releases
+    #       token:
+    #         secure: njElANcKbB/8XpjQQvTSLlz0zooirTAyCjMTcunLRzekCLjHRVkMpBpgpAF/bOVWQHc9OOu09cxfrU6nIv0vY1RjyaVoEAkzOM57fijTmEmXMher9GV+O3y9ZO72tJyFMzwDN/FArs5HaGQM4IC3HLjWCSDTLOK3uyauXv5x4Yewqny4taiTjwgAXGdzXOhuR8SysoMeol/DRpqjtZWV6Aht+R0sDRDSB/BCUOqmNn3OXgd+LQmQjT2pvDUUklYn4nr6qtO96YFtuQCe33KWYL80VF9PDKPUkiRsakdY9VDK+P4TQAeOPorZxBuQyrgifiGPHEEUSuOo42A4Kn2dSvQZsWGXuN6cE4UkpCeQ0wT5oztg1XfgizrmUOBOhIzELo3vvtqQz84gDihwAaJokcEbpyKWzG6ysjvqpL/sKYJ9kj8GpCvbNqJwYjzhstlRYwGZtfK/l6k2/bvvxoSmBZ/CaLAP5VPvqjG8b/giLqnORxF6j0YRe7paj8SEpMwdKbRt8xoQuSVSTCR7oDRi3hsP993Aqp9XbSB5fMqksrXFzX4LQrdpTrMvZlpEeXdhAJZvcXjLGRb2sgDZzJjo+uz2/v7B78QzHTBazMcZbqrtlC1msmjxqF2hZ3yjotSTG0CDF2iprQpufQ0+IVem8yc6jPRR/24Ijb/0yrcKCt0=
+    #       skip_cleanup: true
+    #       draft: false
+    #       on:
+    #         tags: true
+
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+  slack:
+    secure: Jf9r/+kMz8rnfu/H22vL+k0lCWiGQIQofbpfBQ37L2aqJ8Fzo1I76ptjoIATDpaGaHtsPVtbK6m6hZ3a9VGwKBvAIDE4L+hJRpA+KzolZRzsF4RidoTvgs3MxOOg44E+S7A7v1b+peNHtXyO18s/1i72Q1ALJBU5rGaqH4z5NGD8EIwePgk4G02tKnELM3Uv1/1ekcvKBjFnuyVQbSLlLsnxbnIITVxP3J7skq9x9jFBFfTuLJsMhSpO0l5MmyujKF/TpYEDen581ZPAUF79H8G63DqZSlS/SwnW3aByb5Vr95dOJrvmjQjcOZVhWaRK/c7PARrSpKybURya1R6dwiqLmxKkZKcYLho4NcEDs8QXuZ60GnZzoUXPKop4SzTDPxOXxr+3+ef5VINvUlIEVDmvDLjnPRrhhXu+n6Et2BfgRu7t1CBWtm3tWo3Of84AO/A2jid3++nI0RQkpfAX0+xuxUBJHfyibWAvmQiHl6ALJnfYxsB0Kvz2Hi9G6PuS2QisLnvr03WRnyXniUpRAUznTfm62DbBXu31hM9jOHtMDKL4CNf3scz8CGQHErV9ksdBbU7wa4JF6GxYyrIgxfuieOQYoSyQH+2dQxZQcQE1CP6T8U8qR2Emtrs4Gtjqos0OxDlUcJbC0Bc8eyAe/W1rVUgmwq4LEGI3eEhPX6s=
+

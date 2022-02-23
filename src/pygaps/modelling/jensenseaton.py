@@ -1,10 +1,11 @@
 """Jensen-Seaton isotherm model."""
 
 import numpy
+from scipy import integrate
+from scipy import optimize
 
-from .. import scipy
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class JensenSeaton(IsothermBaseModel):
@@ -49,6 +50,7 @@ class JensenSeaton(IsothermBaseModel):
 
     # Model parameters
     name = 'JensenSeaton'
+    formula = r"n(p) = K p [1 + (\frac{K p}{(a (1 + b p)})^c]^{-1/c}"
     calculates = 'loading'
     param_names = ["K", "a", "b", "c"]
     param_bounds = {
@@ -97,7 +99,7 @@ class JensenSeaton(IsothermBaseModel):
         def fun(x):
             return self.loading(x) - loading
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        opt_res = optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {loading} failed.")
@@ -128,9 +130,7 @@ class JensenSeaton(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(
-            lambda x: self.loading(x) / x, 0, pressure
-        )[0]
+        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -148,9 +148,7 @@ class JensenSeaton(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k, "a": 1, "b": 1, "c": 1}
 

@@ -2,93 +2,142 @@
 Changelog
 =========
 
+4.0.0 (2022-02-23)
+------------------
+
+New features:
+
+* Volumetric adsorbed amount is now given in either ``volume_gas`` or
+  `volume_liquid` basis, corresponding to the volume amount the adsorbate would
+  occupy in the bulk gas phase, or the volume of an ideal liquid phase of
+  adsorbate (at isotherm temperature). The old loading_basis of ``volume`` is
+  deprecated and automatically converted to ``volume_gas`` while emitting a
+  warning.
+* Manufacturer parsing is streamlined with the introduction of the
+  ``pygaps.parsing.isotherm_from_commercial`` function.
+* Drastically improved reliability and modularity of code in preparation
+  for the release of the pyGAPS-gui interface.
+* Added a "zero" thickness model that assumes no mono/multilayer sorption.
+  Useful in the case of condensation in hydrophobic materials.
+* Better documentation.
+
+Changes:
+
+* Minimum python is now 3.7, maximum increased to 3.10.
+* Removed the need to pass DataFrame column names with the ``other_keys``
+  syntax. PointIsotherms, now save *all* passed DataFrame columns.
+* Smart assigning of isotherm metadata caused confusion and was removed.
+  Metadata assigned like ``isotherm.myparam`` is now no longer serialized to
+  dictionaries, parsers etc. Instead, isotherms have a `isotherm.properties`
+  dictionary which contains all metadata.
+* Adsorption/desorption branches are internally represented as 0 and 1 instead
+  of False/True. This allows the possibility for further cycles to be introduced
+  in a future release.
+* Isotherm ``material`` and ``adsorbate`` are now always instantiated as
+  ``pygaps.Material`` and ``pygaps.Adsorbate`` classes.
+
+Plus many small and large bugs fixed.
+
+3.1.0 (2021-04-22)
+------------------
+
+New features:
+
+* pyGAPS is now capable of parsing to and from Adsorption Information Files
+  (AIF). For more info, see *Evans, Jack D., Volodymyr Bon, Irena Senkovska, and
+  Stefan Kaskel. ‘A Universal Standard Archive File for Adsorption Data’.
+  Langmuir, 2 April 2021, DOI: 10.1021/acs.langmuir.1c00122.*
+
+
 3.0.0 (2021-03-14)
 ------------------
 
 New features:
 
- * The internal Adsorbate list now contains over 170 analytes, 81 of which have
-   a correspondence in the thermodynamic backend. This includes multiple
-   vapours, VOCs, and refrigerants.
- * Added new mode for pressure as "relative%", which represents relative
-   pressure as a percentage rather than a fraction (i.e. p/p0 * 100).
- * Added two new modes for loading as "fraction" and "percent". This ties the
-   uptake to the same basis as the adsorbate (i.e. weight%, volume%, mol% or
-   fractions thereof).
- * Conversely, NIST format isotherms based on "wt%" can also be converted.
- * Significant improvements to the Horvath-Kawazoe methods of pore size
-   distribution, including more pore geometries (cylindrical and spherical
-   through the Saito-Foley and Cheng-Yang modifications) and the inclusion of
-   extended HK models, with the Cheng-Yang and Rege-Yang corrections.
- * Command-line interface: a CLI entry point is automatically added during
-   pyGAPS installation and can be called with ``pygaps -h`` to perform some
-   simple commands.
- * Isotherm JSON parser (``pygaps.isotherm_to_json``) now passes all extra
-   parameters to the ``json.dump`` function.
- * Perform isotherm branch separation based on maximum pressure, rather than
-   first derivative. In such way, slight uncertainty in pressures won't lead to
-   a wrong assignment.
- * The reference area for an alpha_s calculation can now be specified as either
-   "BET" or "Langmuir".
- * Convenience function `isotherm.convert()` which combines all isotherm
-   conversion modes.
- * Convenience function `pygaps.model_iso()` which fits a model to a
-   PointIsotherm, effectively wrapping `ModelIsotherm.from_pointisotherm`.
- * Convenience functions for isotherm parsing: `isotherm.to_json()`,
-   `isotherm.to_csv()` and `isotherm.to_xl()`.
- * Parsing from instrument output files now gets more information.
- * Plot quality has been overall improved.
- * Improved performance for isotherm conversions.
- * General refactoring and speed-ups.
- * Switched to GitHub actions for CI, now MacOS builds are also tested.
+* The internal Adsorbate list now contains over 170 analytes, 81 of which have a
+  correspondence in the thermodynamic backend. This includes multiple vapours,
+  VOCs, and refrigerants.
+* Added new mode for pressure as "relative%", which represents relative pressure
+  as a percentage rather than a fraction (i.e. p/p0 * 100).
+* Added two new modes for loading as "fraction" and "percent". This ties the
+  uptake to the same basis as the adsorbate (i.e. weight%, volume%, mol% or
+  fractions thereof).
+* Conversely, NIST format isotherms based on "wt%" can also be converted.
+* Significant improvements to the Horvath-Kawazoe methods of pore size
+  distribution, including more pore geometries (cylindrical and spherical
+  through the Saito-Foley and Cheng-Yang modifications) and the inclusion of
+  extended HK models, with the Cheng-Yang and Rege-Yang corrections.
+* Command-line interface: a CLI entry point is automatically added during pyGAPS
+  installation and can be called with ``pygaps -h`` to perform some simple
+  commands.
+* Isotherm JSON parser (``pygaps.isotherm_to_json``) now passes all extra
+  parameters to the ``json.dump`` function.
+* Perform isotherm branch separation based on maximum pressure, rather than
+  first derivative. In such way, slight uncertainty in pressures won't lead to a
+  wrong assignment.
+* The reference area for an alpha_s calculation can now be specified as either
+  "BET" or "Langmuir".
+* Convenience function `isotherm.convert()` which combines all isotherm
+  conversion modes.
+* Convenience function `pygaps.model_iso()` which fits a model to a
+  PointIsotherm, effectively wrapping `ModelIsotherm.from_pointisotherm`.
+* Convenience functions for isotherm parsing: `isotherm.to_json()`,
+  `isotherm.to_csv()` and `isotherm.to_xl()`.
+* Parsing from instrument output files now gets more information.
+* Plot quality has been overall improved.
+* Improved performance for isotherm conversions.
+* General refactoring and speed-ups.
+* Switched to GitHub actions for CI, now MacOS builds are also tested.
 
 Breaking changes:
 
- * Included Python 3.8 and deprecated Python 3.5.
- * All parameters like ``adsorbate_basis`` or ``adsorbate_unit`` have been
-   changed to ``material_basis`` and ``material_unit`` for consistency. Old
-   format should still work for some time.
- * Some model names have been changed to include only ASCII: ``JensenSeaton``,
-   ``FHVST``, ``WVST``.
- * For isotherm pressure/loading, a `limits` tuple is now passed instead of
-   `min_range` and `max_range`, as for other functions in pyGAPS.
- * JSON ModelIsotherms now have ``name`` instead of ``model`` as the model name.
-   This is now consistent with both CSV and Excel.
- * The `isotherm_to_jsonf` and `isotherm_from_jsonf` functions have been
-   removed. Functionality has been merged with `isotherm_to_json` similarly to
-   the `pandas model
-   <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_json.html>`_.
- * Removed the `util_get_file_paths` function.
+* Included Python 3.8 and deprecated Python 3.5.
+* All parameters like ``adsorbate_basis`` or ``adsorbate_unit`` have been
+  changed to ``material_basis`` and ``material_unit`` for consistency. Old
+  format should still work for some time.
+* Some model names have been changed to include only ASCII: ``JensenSeaton``,
+  ``FHVST``, ``WVST``.
+* For isotherm pressure/loading, a `limits` tuple is now passed instead of
+  `min_range` and `max_range`, as for other functions in pyGAPS.
+* JSON ModelIsotherms now have ``name`` instead of ``model`` as the model name.
+  This is now consistent with both CSV and Excel.
+* The `isotherm_to_jsonf` and `isotherm_from_jsonf` functions have been removed.
+  Functionality has been merged with `isotherm_to_json` similarly to the `pandas
+  model
+  <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_json.html>`_.
+* Removed the `util_get_file_paths` function.
 
 Fixes:
- * Volumetric -> molar conversions were not calculated correctly.
- * Isosteric enthalpy could not be calculated if the isotherm was not in mmol/g.
- * ModelIsotherm creation could in some cases ignore isotherm branch splitting.
- * BET area now attempts to pick at least 3 points if physically consistent.
-   Should stop failing on some isotherms.
- * BET/Langmuir area maximum calculation was offset by one point.
- * The "section" returned in tplot/alphas is now consistent for both manual and
-   automatic limits: a list indices for selected points
+
+* Volumetric -> molar conversions were not calculated correctly.
+* Isosteric enthalpy could not be calculated if the isotherm was not in mmol/g.
+* ModelIsotherm creation could in some cases ignore isotherm branch splitting.
+* BET area now attempts to pick at least 3 points if physically consistent.
+  Should stop failing on some isotherms.
+* BET/Langmuir area maximum calculation was offset by one point.
+* The "section" returned in tplot/alphas is now consistent for both manual and
+  automatic limits: a list indices for selected points
 
 2.0.2 (2019-12-18)
 ------------------
 
 New features:
 
- * Added fluids to database: n-pentane, n-hexane, n-octane, o-xylene, m-xylene, p-xylene,
-   cyclohexane, hydrogen sulfide and sulfur hexafluoride.
+* Added fluids to database: n-pentane, n-hexane, n-octane, o-xylene, m-xylene,
+  p-xylene, cyclohexane, hydrogen sulphide and sulphur hexafluoride.
 
 Fixes:
 
- * Converting Adsorbates to a dictionary now correctly outputs the list of aliases.
- * Changed stored critical point molar mass values for some adsorbates.
+* Converting Adsorbates to a dictionary now correctly outputs the list of
+  aliases.
+* Changed stored critical point molar mass values for some adsorbates.
 
 2.0.1 (2019-07-08)
 ------------------
 
- * Fixed error in dft kernel acquisition.
- * Removed duplicate plot generation from virial initial henry.
- * Fixed Appveyor testing.
+* Fixed error in dft kernel acquisition.
+* Removed duplicate plot generation from virial initial henry.
+* Fixed Appveyor testing.
 
 2.0.0 (2019-07-08)
 ------------------
@@ -100,39 +149,36 @@ Several function names and parameters have changed as well.
 
 Breaking changes:
 
- * Renamed isotherm parameter `t_iso` to `temperature` for clarity.
- * Renamed isotherm parameter `material_name` to `material`.
- * Made `material_batch` an optional parameter.
- * Renamed the `pytest.calculations` submodule to
-   `pytest.characterisation`.
- * Placed all isotherm models in a `pytest.modelling` submodule.
+* Renamed isotherm parameter `t_iso` to `temperature` for clarity.
+* Renamed isotherm parameter `material_name` to `material`.
+* Made `material_batch` an optional parameter.
+* Renamed the `pytest.calculations` submodule to `pytest.characterisation`.
+* Placed all isotherm models in a `pytest.modelling` submodule.
 
 New features:
 
-* The isotherm branches are now saved in the file representation
-  (JSON, CSV, Excel).
+* The isotherm branches are now saved in the file representation (JSON, CSV,
+  Excel).
 * Not specifying units now raises a warning.
-* After attempting a model fit or guess for the creation of a
-  ModelIsotherm, a fit graph is now plotted alongside the data to
-  be modelled.
-* Added a new parameters named logy1 and logy2 to
-  set the plotting vertical axes to be logarithmic.
+* After attempting a model fit or guess for the creation of a ModelIsotherm, a
+  fit graph is now plotted alongside the data to be modelled.
+* Added a new parameters named logy1 and logy2 to set the plotting vertical axes
+  to be logarithmic.
 * To remove the legend now set the lgd_pos to None
 
 * Pore size distribution improvements:
 
-    * Changed names of PSD functions to `psd_microporous`,
-      `psd_mesoporous` and `psd_dft`, respectively.
-    * Simplified functions for ease of use and understanding.
-    * Added cumulative pore volume to the return dictionary of all
-      psd functions.
-    * Generalized Kelvin methods (psd_mesoporous) to other
-      pore geometries, such as slit and sphere.
-    * Added a new Kelvin function, the Kelvin Kruck-Jaroniec-Sayari
-      correction (use with `kelvin_function='Kelvin-KJS'`
-    * Corrected a conversion error in the DFT fitting routing.
-    * Changed HK dictionary name OxideIon(SF) -> 'AlSiOxideIon'
-    * Added a new HK dictionary 'AlPhOxideIon'
+  * Changed names of PSD functions to `psd_microporous`, `psd_mesoporous` and
+    `psd_dft`, respectively.
+  * Simplified functions for ease of use and understanding.
+  * Added cumulative pore volume to the return dictionary of all psd functions.
+  * Generalized Kelvin methods (psd_mesoporous) to other pore geometries, such
+    as slit and sphere.
+  * Added a new Kelvin function, the Kelvin Kruck-Jaroniec-Sayari correction
+    (use with `kelvin_function='Kelvin-KJS'`
+  * Corrected a conversion error in the DFT fitting routing.
+  * Changed HK dictionary name OxideIon(SF) -> 'AlSiOxideIon'
+  * Added a new HK dictionary 'AlPhOxideIon'
 
 
 
@@ -167,7 +213,7 @@ New features:
   simple selection of the marker style.
 * Added three new isotherm models: Freundlich, Dubinin-Radushkevich and
   Dubinin-Astakov. They can be used for fitting by specifying
-  `Freundlich`, `DR` or `DA` as the model, respectivelly.
+  `Freundlich`, `DR` or `DA` as the model, respectively.
 * Faster performance of some models due to analytical calculations,
   as well as more thorough testing
 * Isotherm modelling backend is now more robust.

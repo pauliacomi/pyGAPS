@@ -1,16 +1,12 @@
 """Virial isotherm model."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-import warnings
-
 import numpy
+from scipy import optimize
 
-from .. import scipy
-from ..graphing.calc_graphs import virial_plot
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps import logger
+from pygaps.graphing.calc_graphs import virial_plot
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class Virial(IsothermBaseModel):
@@ -19,7 +15,7 @@ class Virial(IsothermBaseModel):
 
     .. math::
 
-        p = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}
+        p(n) = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}
 
     Notes
     -----
@@ -46,6 +42,7 @@ class Virial(IsothermBaseModel):
 
     # Model parameters
     name = 'Virial'
+    formula = r"p(n) = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}"
     calculates = 'pressure'
     param_names = ["K", "A", "B", "C"]
     param_bounds = {
@@ -76,12 +73,10 @@ class Virial(IsothermBaseModel):
         def fun(x):
             return (self.pressure(x) - pressure)**2
 
-        opt_res = scipy.optimize.minimize(fun, pressure, method='Nelder-Mead')
+        opt_res = optimize.minimize(fun, pressure, method='Nelder-Mead')
 
         if not opt_res.success:
-            raise CalculationError(
-                f"Root finding failed. Error: \n\t{opt_res.message}"
-            )
+            raise CalculationError(f"Root finding failed. Error: \n\t{opt_res.message}")
 
         return opt_res.x
 
@@ -148,9 +143,7 @@ class Virial(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"K": saturation_loading * langmuir_k, "A": 0, "B": 0, "C": 0}
 
@@ -162,14 +155,7 @@ class Virial(IsothermBaseModel):
 
         return guess
 
-    def fit(
-        self,
-        pressure,
-        loading,
-        param_guess,
-        optimization_params=None,
-        verbose=False
-    ):
+    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -198,7 +184,7 @@ class Virial(IsothermBaseModel):
         # remove invalid values in function
         zero_values = ~numpy.logical_and(pressure > 0, loading > 0)
         if any(zero_values):
-            warnings.warn('Removed points which are equal to 0.')
+            logger.warning('Removed points which are equal to 0.')
             pressure = pressure[~zero_values]
             loading = loading[~zero_values]
 
@@ -244,11 +230,10 @@ class Virial(IsothermBaseModel):
             kwargs.update(optimization_params)
 
         # minimize RSS
-        opt_res = scipy.optimize.least_squares(
+        opt_res = optimize.least_squares(
             fit_func,
             guess,  # provide the fit function and initial guess
-            args=(loading, ln_p_over_n
-                  ),  # supply the extra arguments to the fit function
+            args=(loading, ln_p_over_n),  # supply the extra arguments to the fit function
             **kwargs
         )
         if not opt_res.success:
@@ -268,10 +253,9 @@ class Virial(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.4g}")
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
             virial_plot(
                 loading, ln_p_over_n, n_load,
-                numpy.log(numpy.divide(self.pressure(n_load), n_load)),
-                added_point
+                numpy.log(numpy.divide(self.pressure(n_load), n_load)), added_point
             )

@@ -1,14 +1,11 @@
 """Flory-Huggins-VST isotherm model."""
 
-import logging
-
-logger = logging.getLogger('pygaps')
-
 import numpy
+from scipy import optimize
 
-from .. import scipy
-from ..utilities.exceptions import CalculationError
-from .base_model import IsothermBaseModel
+from pygaps import logger
+from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class FHVST(IsothermBaseModel):
@@ -23,14 +20,14 @@ class FHVST(IsothermBaseModel):
 
     The VST model is defined as follows:
 
-        * A vacancy is an imaginary entity defined as a vacuum space
-          which acts as the solvent in both the gas and adsorbed phases.
-        * The properties of the adsorbed phase are defined as excess properties
-          in relation to a dividing surface.
-        * The entire system including the adsorbent are in thermal equilibrium
-          however only the gas and adsorbed phases are in thermodynamic equilibrium.
-        * The equilibrium of the system is maintained by the spreading pressure
-          which arises from a potential field at the surface
+    * A vacancy is an imaginary entity defined as a vacuum space which acts as
+      the solvent in both the gas and adsorbed phases.
+    * The properties of the adsorbed phase are defined as excess properties in
+      relation to a dividing surface.
+    * The entire system including the adsorbent are in thermal equilibrium
+      however only the gas and adsorbed phases are in thermodynamic equilibrium.
+    * The equilibrium of the system is maintained by the spreading pressure
+      which arises from a potential field at the surface
 
     It is possible to derive expressions for the vacancy chemical potential in both
     the adsorbed phase and the gas phase, which when equated give the following equation
@@ -108,12 +105,10 @@ class FHVST(IsothermBaseModel):
         def fun(x):
             return self.pressure(x) - pressure
 
-        opt_res = scipy.optimize.root(fun, 0, method='hybr')
+        opt_res = optimize.root(fun, 0, method='hybr')
 
         if not opt_res.success:
-            raise CalculationError(
-                f"Root finding for value {pressure} failed."
-            )
+            raise CalculationError(f"Root finding for value {pressure} failed.")
 
         return opt_res.x
 
@@ -183,9 +178,7 @@ class FHVST(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "K": langmuir_k, "a1v": 0}
 
@@ -197,14 +190,7 @@ class FHVST(IsothermBaseModel):
 
         return guess
 
-    def fit(
-        self,
-        pressure,
-        loading,
-        param_guess,
-        optimization_params=None,
-        verbose=False
-    ):
+    def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
         """
         Fit model to data using nonlinear optimization with least squares loss function.
 
@@ -242,11 +228,10 @@ class FHVST(IsothermBaseModel):
             kwargs.update(optimization_params)
 
         # minimize RSS
-        opt_res = scipy.optimize.least_squares(
+        opt_res = optimize.least_squares(
             fit_func,
             guess,  # provide the fit function and initial guess
-            args=(pressure,
-                  loading),  # supply the extra arguments to the fit function
+            args=(pressure, loading),  # supply the extra arguments to the fit function
             **kwargs
         )
         if not opt_res.success:
@@ -266,4 +251,4 @@ class FHVST(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
-            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3f}")
+            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.4g}")

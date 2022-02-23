@@ -1,9 +1,12 @@
 """Test CoolProp interaction."""
 
+import pytest
+
 import pygaps
 import pygaps.utilities.exceptions as pgEx
 
 
+@pytest.mark.utilities
 class TestCoolProp():
     """Test CoolProp interaction."""
     def test_backend_change(self):

@@ -1,9 +1,10 @@
 """Dubinin-Astakov isotherm model."""
 
 import numpy
+from scipy import constants
+from scipy import integrate
 
-from .. import scipy
-from .base_model import IsothermBaseModel
+from pygaps.modelling.base_model import IsothermBaseModel
 
 
 class DA(IsothermBaseModel):
@@ -31,11 +32,11 @@ class DA(IsothermBaseModel):
 
     There are three parameters which define the model:
 
-        * The total amount adsorbed (`n_t`), analogous to the monolayer
-          capacity in the Langmuir model.
-        * A potential energy term `e`.
-        * A power term, `m`, which can vary between 1 and 3.
-          The DA model becomes the DR models when m=2.
+    * The total amount adsorbed (`n_t`), analogous to the monolayer capacity in
+      the Langmuir model.
+    * A potential energy term `e`.
+    * A power term, `m`, which can vary between 1 and 3. The DA model becomes
+      the DR model when m=2.
 
     It describes adsorption in a single uniform type of pores. To note
     that the model does not reduce to Henry's law at low pressure
@@ -49,6 +50,7 @@ class DA(IsothermBaseModel):
     """
     # Model parameters
     name = 'DA'
+    formula = r"n(p) = n_t \exp[-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{m}]"
     calculates = 'loading'
     param_names = ["n_m", "e", "m"]
     param_bounds = {
@@ -60,7 +62,7 @@ class DA(IsothermBaseModel):
 
     def __init_parameters__(self, parameters):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -scipy.const.gas_constant * parameters['temperature']
+        self.minus_rt = -constants.gas_constant * parameters['temperature']
 
     def loading(self, pressure):
         """
@@ -102,9 +104,8 @@ class DA(IsothermBaseModel):
 
         """
         return numpy.exp(
-            self.params['e'] / self.minus_rt * numpy.power(
-                -numpy.log(loading / self.params['n_m']), 1 / self.params['m']
-            )
+            self.params['e'] / self.minus_rt *
+            numpy.power(-numpy.log(loading / self.params['n_m']), 1 / self.params['m'])
         )
 
     def spreading_pressure(self, pressure):
@@ -131,9 +132,7 @@ class DA(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return scipy.integrate.quad(
-            lambda x: self.loading(x) / x, 0, pressure
-        )[0]
+        return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def initial_guess(self, pressure, loading):
         """
@@ -151,9 +150,7 @@ class DA(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
-        saturation_loading, langmuir_k = super().initial_guess(
-            pressure, loading
-        )
+        saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
         guess = {"n_m": saturation_loading, "e": -self.minus_rt, "m": 1}
 

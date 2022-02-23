@@ -1,7 +1,9 @@
 """General functions for string transformations."""
 
+import ast
 
-def convert_chemformula(string):
+
+def convert_chemformula(string: str) -> str:
     """
     Convert a chemical formula string to a matplotlib parsable format (latex).
 
@@ -36,7 +38,7 @@ def convert_chemformula(string):
     return f'${result}$'
 
 
-def convert_unitstr(string: str, negative: bool = False):
+def convert_unit_ltx(string: str, negative: bool = False) -> str:
     """
     Convert a unit string to a nice matplotlib parsable format (latex).
 
@@ -69,7 +71,7 @@ def convert_unitstr(string: str, negative: bool = False):
             if i == "(":
                 result += '_{'
                 continue
-            elif i == ")":
+            if i == ")":
                 result += '}'
                 continue
         result += (i)
@@ -81,3 +83,57 @@ def convert_unitstr(string: str, negative: bool = False):
         result += '^{-1}'
 
     return result
+
+
+def _is_none(s: str):
+    """Check if a value is a text None."""
+    if s == 'None':
+        return True
+    return False
+
+
+def _is_float(s: str):
+    """Check if a value is a float."""
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
+def _is_bool(s: str):
+    """Check a value is a text bool."""
+    if s.lower() in ['true', 'false']:
+        return True
+    else:
+        return False
+
+
+def _from_bool(s: str):
+    """Convert a boolean into a string."""
+    if s.lower() == 'true':
+        return True
+    if s.lower() == 'false':
+        return False
+    raise ValueError('String cannot be converted to bool')
+
+
+def _is_list(s: str):
+    """Check a value is a simple list."""
+    if s.startswith('[') and s.endswith(']'):
+        return True
+    else:
+        return False
+
+
+def _from_list(s: str):
+    """Convert a value into a string list."""
+    # note that the function will fail if the list has other spaces
+    return ast.literal_eval(s.replace(' ', ","))
+
+
+def _to_string(s):
+    """Convert a value into a CSV-safe string."""
+    if isinstance(s, list):
+        return '[' + ' '.join([str(x) for x in s]) + "]"
+    return str(s)

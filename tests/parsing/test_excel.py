@@ -2,54 +2,49 @@
 
 import pytest
 
-import pygaps
+import pygaps.parsing.excel as pgpe
+import pygaps.parsing.json as pgpj
 
-from .conftest import DATA_EXCEL_BEL
-from .conftest import DATA_EXCEL_MIC
-from .conftest import DATA_EXCEL_STD
-from .conftest import DATA_JSON_STD
+from .conftest import DATA_XL
 
 
 @pytest.mark.parsing
 class TestExcel():
-    def test_read_create_excel(self, basic_pointisotherm, tmpdir_factory):
+    """All testing of Excel interface"""
+    def test_excel_isotherm(self, basic_isotherm, tmp_path_factory):
         """Test creation/read of point isotherm excel file."""
-        path = tmpdir_factory.mktemp('excel').join('regular.xls').strpath
+        path = tmp_path_factory.mktemp('excel') / 'baseisotherm.xls'
+        pgpe.isotherm_to_xl(basic_isotherm, path=path)
+        isotherm = pgpe.isotherm_from_xl(path)
+        assert isotherm == basic_isotherm
 
-        pygaps.isotherm_to_xl(basic_pointisotherm, path=path)
+    def test_excel_isotherm_material(self, basic_isotherm, basic_material, tmp_path_factory):
+        """Test creation/read of point isotherm excel file."""
+        path = tmp_path_factory.mktemp('excel') / 'isotherm_mat.xls'
+        basic_isotherm.material = basic_material
+        pgpe.isotherm_to_xl(basic_isotherm, path=path)
+        isotherm = pgpe.isotherm_from_xl(path)
+        assert isotherm == basic_isotherm
 
-        isotherm = pygaps.isotherm_from_xl(path)
+    def test_excel_pointisotherm(self, basic_pointisotherm, tmp_path_factory):
+        """Test creation/read of point isotherm excel file."""
+        path = tmp_path_factory.mktemp('excel') / 'pointisotherm.xls'
+        pgpe.isotherm_to_xl(basic_pointisotherm, path=path)
+        isotherm = pgpe.isotherm_from_xl(path)
         assert isotherm == basic_pointisotherm
 
-    def test_read_create_excel_model(
-        self, basic_modelisotherm, tmpdir_factory
-    ):
+    def test_excel_modelisotherm(self, basic_modelisotherm, tmp_path_factory):
         """Test creation/read of model isotherm excel file."""
-        path = tmpdir_factory.mktemp('excel').join('regular.xls').strpath
-
-        pygaps.isotherm_to_xl(basic_modelisotherm, path=path)
-
-        isotherm = pygaps.isotherm_from_xl(path)
+        path = tmp_path_factory.mktemp('excel') / 'modelisotherm.xls'
+        pgpe.isotherm_to_xl(basic_modelisotherm, path=path)
+        isotherm = pgpe.isotherm_from_xl(path)
         assert isotherm == basic_modelisotherm
 
-    def test_read_excel(self, tmpdir_factory):
+    def test_read_excel(self):
         """Test read excel files file."""
-        for index, path in enumerate(DATA_EXCEL_STD):
-            isotherm = pygaps.isotherm_from_xl(path=path)
-            with open(DATA_JSON_STD[index], 'r') as file:
-                isotherm2 = pygaps.isotherm_from_json(file.read())
-                assert isotherm.to_dict() == isotherm2.to_dict()
-
-    def test_read_excel_mic(self):
-        """Test reading of micromeritics report files."""
-        for path in DATA_EXCEL_MIC:
-            isotherm = pygaps.isotherm_from_xl(path=path, fmt='mic')
-            json_path = str(path).replace('.xls', '.json')
-            assert isotherm == pygaps.isotherm_from_json(json_path)
-
-    def test_read_excel_bel(self):
-        """Test reading of bel report files."""
-        for path in DATA_EXCEL_BEL:
-            isotherm = pygaps.isotherm_from_xl(path=path, fmt='bel')
-            json_path = str(path).replace('.xls', '.json')
-            assert isotherm == pygaps.isotherm_from_json(json_path)
+        for path in DATA_XL:
+            isotherm = pgpe.isotherm_from_xl(path=path)
+            json_path = path.with_suffix(".json")
+            # isotherm.to_json(json_path)
+            isotherm2 = pgpj.isotherm_from_json(json_path)
+            assert isotherm.to_dict() == isotherm2.to_dict()

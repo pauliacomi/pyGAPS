@@ -2,12 +2,14 @@
 Functions calculating the thickness of an adsorbed layer
 as a function of pressure.
 """
+import typing as t
+
 import numpy
 
-from ..utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import ParameterError
 
 
-def thickness_halsey(pressure):
+def thickness_halsey(pressure: float):
     """
     Halsey thickness curve. Applicable for nitrogen at 77K.
 
@@ -24,7 +26,7 @@ def thickness_halsey(pressure):
     return 0.354 * ((-5) / numpy.log(pressure))**0.333
 
 
-def thickness_harkins_jura(pressure):
+def thickness_harkins_jura(pressure: float):
     """
     Harkins and Jura thickness curve. Applicable for nitrogen at 77K.
 
@@ -41,13 +43,31 @@ def thickness_harkins_jura(pressure):
     return (0.1399 / (0.034 - numpy.log10(pressure)))**0.5
 
 
+def thickness_zero(pressure: float):
+    """
+    A zero-thickness curve. Applicable for non-wetting adsorbates.
+
+    Parameters
+    ----------
+    pressure : float
+        Relative pressure.
+
+    Returns
+    -------
+    float
+        Thickness of layer in nm.
+    """
+    return numpy.zeros(len(pressure))
+
+
 _THICKNESS_MODELS = {
     "Halsey": thickness_halsey,
-    "Harkins/Jura": thickness_harkins_jura
+    "Harkins/Jura": thickness_harkins_jura,
+    "Zero thickness": thickness_zero,
 }
 
 
-def get_thickness_model(model):
+def get_thickness_model(model: t.Union[str, t.Callable]):
     """
     Return a function calculating an adsorbate thickness.
 
@@ -84,5 +104,4 @@ def get_thickness_model(model):
         return _THICKNESS_MODELS[model]
 
     # If the model is an callable, return it instead
-    else:
-        return model
+    return model

@@ -1,21 +1,24 @@
 """Contains the Isotherm base class."""
 
-import logging
-import warnings
+import typing as t
 
-logger = logging.getLogger('pygaps')
-
-import numpy
-
+from pygaps import logger
+from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.material import Material
+from pygaps.units.converter_mode import _LOADING_MODE
+from pygaps.units.converter_mode import _MATERIAL_MODE
+from pygaps.units.converter_mode import _PRESSURE_MODE
+from pygaps.units.converter_mode import c_temperature
+from pygaps.units.converter_unit import _PRESSURE_UNITS
+from pygaps.units.converter_unit import _TEMPERATURE_UNITS
+from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.hashgen import isotherm_to_hash
 
-from ..core.adsorbate import Adsorbate
-from ..utilities.converter_mode import _MATERIAL_MODE
-from ..utilities.converter_mode import _PRESSURE_MODE
-from ..utilities.converter_unit import _PRESSURE_UNITS
-from ..utilities.exceptions import ParameterError
-from ..utilities.hashgen import isotherm_to_hash
-from ..utilities.python_utilities import simplewarning
+SHORTHANDS = {
+    'm': "material",
+    't': "temperature",
+    'a': "adsorbate",
+}
 
 
 class BaseIsotherm():
@@ -40,22 +43,21 @@ class BaseIsotherm():
 
     Other Parameters
     ----------------
+    pressure_mode : str, optional
+        The pressure mode, either 'absolute' pressure or 'relative'
+        ('relative%') in the form of p/p0.
+    pressure_unit : str, optional
+        Unit of pressure, if applicable.
+    loading_basis : str, optional
+        Whether the adsorbed amount is in terms of either 'volume_gas'
+        'volume_liquid', 'molar', 'mass', or a fractional/percent basis.
+    loading_unit : str, optional
+        Unit in which the loading basis is expressed.
     material_basis : str, optional
-        Whether the adsorption is read in terms of either 'per volume'
+        Whether the underlying material is in terms of 'per volume'
         'per molar amount' or 'per mass' of material.
     material_unit : str, optional
         Unit in which the material basis is expressed.
-    loading_basis : str, optional
-        Whether the adsorbed material is read in terms of either 'volume'
-        'molar' or 'mass'.
-    loading_unit : str, optional
-        Unit in which the loading basis is expressed.
-    pressure_mode : str, optional
-        The pressure mode, either 'absolute' pressures or 'relative' in
-        the form of p/p0.
-    pressure_unit : str, optional
-        Unit of pressure.
-
 
     Notes
     -----
@@ -68,8 +70,12 @@ class BaseIsotherm():
     """
 
     # strictly required attributes
-    _required_params = ['material', 'temperature', 'adsorbate']
-    # unit-related attributes
+    _required_params = [
+        'material',
+        'temperature',
+        'adsorbate',
+    ]
+    # unit-related attributes and their defaults
     _unit_params = {
         'pressure_mode': 'absolute',
         'pressure_unit': 'bar',
@@ -77,72 +83,71 @@ class BaseIsotherm():
         'material_unit': 'g',
         'loading_basis': 'molar',
         'loading_unit': 'mmol',
+        'temperature_unit': 'K',
     }
     # other special reserved parameters
-    # subclasses overwrite this
-    _reserved_params = []
+    # subclasses extend this
+    _reserved_params = [
+        "_material",
+        "_adsorbate",
+        "_temperature",
+        "m",
+        "t",
+        "a",
+    ]
 
     ##########################################################
     #   Instantiation and classmethods
 
-    def __init__(self, **properties):
+    def __init__(
+        self,
+        material: t.Union[str, dict, Material] = None,
+        adsorbate: t.Union[str, Adsorbate] = None,
+        temperature: t.Union[float, str] = None,
+        **properties: dict,
+    ):
         """
         Instantiate is done by passing a dictionary with the parameters,
         as well as the info about units, modes and data columns.
 
         """
+        # commonly used shorthands
+        for shorthand, prop in SHORTHANDS.items():
+            data = properties.pop(shorthand, None)
+            if data:
+                if prop == "material":
+                    material = data
+                elif prop == "adsorbate":
+                    adsorbate = data
+                elif prop == "temperature":
+                    temperature = data
+
         # Must-have properties of the isotherm
         #
         # Basic checks
-        if any(k not in properties for k in self._required_params):
+        if None in [material, adsorbate, temperature]:
             raise ParameterError(
-                f"Isotherm MUST have the following properties:{self._required_params}"
+                f"Isotherm MUST have the following properties: {self._required_params}"
             )
 
-        # Isotherm temperature.
-        self.temperature = float(properties.pop('temperature'))
-
-        # Isotherm material
-        self.material = properties.pop('material')
-        try:
-            self.material = Material.find(self.material)
-        except ParameterError:
-            self.material = Material(self.material)
-
-        # Isotherm adsorbate
-        self.adsorbate = properties.pop('adsorbate')
-        try:
-            self.adsorbate = Adsorbate.find(self.adsorbate)
-        except ParameterError:
-            self.adsorbate = Adsorbate(self.adsorbate)
-            warnings.warn((
-                "Specified adsorbate is not in internal list "
-                "(or name cannot be resolved to an existing one). "
-                "CoolProp backend disabled for this gas/vapour."
-            ))
-
-        # TODO deprecation
-        old_basis = properties.pop('adsorbent_basis', None)
-        old_unit = properties.pop('adsorbent_unit', None)
-        if old_basis or old_unit:
-            logger.warning(
-                "WARNING: adsorbent_basis/adsorbent_unit is deprecated, "
-                "use material_basis/material_unit"
-            )
-            if old_basis:
-                properties['material_basis'] = old_basis
-            if old_unit:
-                properties['material_unit'] = old_unit
+        self.material = material
+        self.adsorbate = adsorbate
+        self.temperature = temperature
 
         # Isotherm units
         #
-        with simplewarning():
-            for k in self._unit_params:
-                if k not in properties:
-                    warnings.warn(
-                        f"WARNING: '{k}' was not specified , assumed as '{self._unit_params[k]}'"
-                    )
-                    properties[k] = self._unit_params[k]
+        for uparam, udefault in self._unit_params.items():
+            if uparam not in properties:
+                logger.warning(f"WARNING: '{uparam}' was not specified , assumed as '{udefault}'")
+                properties[uparam] = udefault
+
+        # TODO deprecation
+        if self._unit_params['loading_basis'] == 'volume':
+            self._unit_params['loading_basis'] = 'volume_gas'
+            logger.warning(
+                "Loading basis as 'volume' is unclear and deprecated. "
+                "Assumed as 'volume_gas'."
+            )
 
         self.pressure_mode = properties.pop('pressure_mode')
         self.pressure_unit = properties.pop('pressure_unit')
@@ -152,37 +157,38 @@ class BaseIsotherm():
         self.material_unit = properties.pop('material_unit')
         self.loading_basis = properties.pop('loading_basis')
         self.loading_unit = properties.pop('loading_unit')
+        self.temperature_unit = properties.pop('temperature_unit')
 
-        # Check basis
-        if self.material_basis not in _MATERIAL_MODE:
-            raise ParameterError(
-                f"Basis selected for material ({self.material_basis}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE.keys()}"
-            )
-
-        if self.loading_basis not in _MATERIAL_MODE:
-            raise ParameterError(
-                f"Basis selected for loading ({self.loading_basis}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE.keys()}"
-            )
-
+        # Check basis / mode
         if self.pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
                 f"Mode selected for pressure ({self.pressure_mode}) is not an option. "
                 f"See viable values: {_PRESSURE_MODE.keys()}"
             )
 
-        # Check units
-        if self.loading_unit not in _MATERIAL_MODE[self.loading_basis]:
+        if self.loading_basis not in _LOADING_MODE:
             raise ParameterError(
-                f"Unit selected for loading ({self.loading_unit}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
+                f"Basis selected for loading ({self.loading_basis}) is not an option. "
+                f"See viable values: {_LOADING_MODE.keys()}"
             )
 
+        if self.material_basis not in _MATERIAL_MODE:
+            raise ParameterError(
+                f"Basis selected for material ({self.material_basis}) is not an option. "
+                f"See viable values: {_MATERIAL_MODE.keys()}"
+            )
+
+        # Check units
         if self.pressure_mode == 'absolute' and self.pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
                 f"Unit selected for pressure ({self.pressure_unit}) is not an option. "
                 f"See viable values: {_PRESSURE_UNITS.keys()}"
+            )
+
+        if self.loading_unit not in _LOADING_MODE[self.loading_basis]:
+            raise ParameterError(
+                f"Unit selected for loading ({self.loading_unit}) is not an option. "
+                f"See viable values: {_LOADING_MODE[self.loading_basis].keys()}"
             )
 
         if self.material_unit not in _MATERIAL_MODE[self.material_basis]:
@@ -191,25 +197,74 @@ class BaseIsotherm():
                 f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
             )
 
+        if self.temperature_unit not in _TEMPERATURE_UNITS:
+            raise ParameterError(
+                f"Unit selected for temperature ({self.temperature_unit}) is not an option. "
+                f"See viable values: {_TEMPERATURE_UNITS.keys()}"
+            )
+
         # Other named properties of the isotherm
 
-        # Save the rest of the properties as members
-        for attr in properties:
-            if hasattr(self, attr):
-                raise ParameterError(
-                    f"Cannot override standard Isotherm class member '{attr}'."
-                )
-            setattr(self, attr, properties[attr])
+        # Save the rest of the properties as metadata
+        self.properties = properties
 
     ##########################################################
     #   Overloaded and own functions
 
     @property
-    def iso_id(self):
+    def iso_id(self) -> str:
         """Return an unique identifier of the isotherm."""
         return isotherm_to_hash(self)
 
-    def __eq__(self, other_isotherm):
+    @property
+    def material(self) -> Material:
+        """Return underlying material."""
+        return self._material
+
+    @material.setter
+    def material(self, value: t.Union[str, dict, Material]):
+        if isinstance(value, dict):
+            name = value.pop('name', None)
+            try:
+                self._material = Material.find(name)
+                self._material.properties.update(**value)
+            except ParameterError:
+                self._material = Material(name, **value)
+            return
+        try:
+            self._material = Material.find(value)
+        except ParameterError:
+            self._material = Material(value)
+
+    @property
+    def adsorbate(self) -> Adsorbate:
+        """Return underlying adsorbate."""
+        return self._adsorbate
+
+    @adsorbate.setter
+    def adsorbate(self, value: t.Union[str, Adsorbate]):
+        try:
+            self._adsorbate = Adsorbate.find(value)
+        except ParameterError:
+            self._adsorbate = Adsorbate(value)
+            logger.warning(
+                "Specified adsorbate is not in internal list "
+                "(or name cannot be resolved to an existing one). "
+                "CoolProp backend disabled for this gas/vapour."
+            )
+
+    @property
+    def temperature(self) -> float:
+        """Return underlying temperature, always in kelvin."""
+        if self.temperature_unit == "K":
+            return self._temperature
+        return c_temperature(self._temperature, self.temperature_unit, "K")
+
+    @temperature.setter
+    def temperature(self, value: t.Union[float, str]):
+        self._temperature = float(value)
+
+    def __eq__(self, other_isotherm) -> bool:
         """
         Overload the equality operator of the isotherm.
 
@@ -219,11 +274,11 @@ class BaseIsotherm():
         """
         return self.iso_id == other_isotherm.iso_id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Print key isotherm parameters."""
         return f"<{type(self).__name__} {self.iso_id}>: '{self.adsorbate}' on '{self.material}' at {self.temperature} K"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Print a short summary of all the isotherm parameters."""
         string = ""
 
@@ -240,15 +295,14 @@ class BaseIsotherm():
         else:
             string += f"\tPressure in: {self.pressure_unit}\n"
 
-        string += "Other properties: \n"
-        for prop in vars(self):
-            if prop not in self._required_params + \
-                    list(self._unit_params) + self._reserved_params:
-                string += (f"\t{prop}: {str(getattr(self, prop))}\n")
+        if self.properties:
+            string += "Other properties: \n"
+        for prop, val in self.properties.items():
+            string += (f"\t{prop}: {str(val)}\n")
 
         return string
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Returns a dictionary of the isotherm class
         Is the same dictionary that was used to create it.
@@ -261,16 +315,24 @@ class BaseIsotherm():
         parameter_dict = vars(self).copy()
 
         # These line are here to ensure that material/adsorbate are copied as a string
-        parameter_dict['adsorbate'] = str(parameter_dict['adsorbate'])
-        parameter_dict['material'] = str(parameter_dict['material'])
+        parameter_dict['adsorbate'] = str(parameter_dict.pop('_adsorbate'))
+        material = parameter_dict.pop('_material')
+        if material.properties:
+            parameter_dict['material'] = material.to_dict()
+        else:
+            parameter_dict['material'] = str(material)
+        parameter_dict['temperature'] = parameter_dict.pop('_temperature')
 
         # Remove reserved parameters
         for param in self._reserved_params:
             parameter_dict.pop(param, None)
 
+        # Add metadata
+        parameter_dict.update(parameter_dict.pop('properties'))
+
         return parameter_dict
 
-    def to_json(self, path=None, **kwargs):
+    def to_json(self, path=None, **kwargs) -> t.Union[None, str]:
         """
         Convert the isotherm to a JSON representation.
 
@@ -284,13 +346,13 @@ class BaseIsotherm():
         Returns
         -------
         None or str
-            If path is None, returns the resulting json format as a string.
+            If path is None, returns the resulting json as a string.
             Otherwise returns None.
         """
-        from ..parsing.json import isotherm_to_json
+        from pygaps.parsing.json import isotherm_to_json
         return isotherm_to_json(self, path, **kwargs)
 
-    def to_csv(self, path=None, separator=',', **kwargs):
+    def to_csv(self, path=None, separator=',', **kwargs) -> t.Union[None, str]:
         """
         Convert the isotherm to a CSV representation.
 
@@ -304,10 +366,10 @@ class BaseIsotherm():
         Returns
         -------
         None or str
-            If path is None, returns the resulting json format as a string.
+            If path is None, returns the resulting csv as a string.
             Otherwise returns None.
         """
-        from ..parsing.csv import isotherm_to_csv
+        from pygaps.parsing.csv import isotherm_to_csv
         return isotherm_to_csv(self, path, separator, **kwargs)
 
     def to_xl(self, path, **kwargs):
@@ -320,15 +382,33 @@ class BaseIsotherm():
             Path where to save Excel file.
 
         """
-        from ..parsing.excel import isotherm_to_xl
+        from pygaps.parsing.excel import isotherm_to_xl
         return isotherm_to_xl(self, path, **kwargs)
+
+    def to_aif(self, path=None, **kwargs) -> t.Union[None, str]:
+        """
+        Convert the isotherm to a AIF representation.
+
+        Parameters
+        ----------
+        path
+            File path or object. If not specified, the result is returned as a string.
+
+        Returns
+        -------
+        None or str
+            If path is None, returns the resulting AIF as a string.
+            Otherwise returns None.
+        """
+        from pygaps.parsing.aif import isotherm_to_aif
+        return isotherm_to_aif(self, path, **kwargs)
 
     def to_db(
         self,
-        db_path=None,
-        verbose=True,
-        autoinsert_material=True,
-        autoinsert_adsorbate=True,
+        db_path: str = None,
+        verbose: bool = True,
+        autoinsert_material: bool = True,
+        autoinsert_adsorbate: bool = True,
         **kwargs
     ):
         """
@@ -348,7 +428,7 @@ class BaseIsotherm():
             Extra information printed to console.
 
         """
-        from ..parsing.sqlite import isotherm_to_db
+        from pygaps.parsing.sqlite import isotherm_to_db
         return isotherm_to_db(
             self,
             db_path=db_path,
@@ -358,28 +438,34 @@ class BaseIsotherm():
             **kwargs
         )
 
+    def convert_temperature(
+        self,
+        unit_to: str,
+        verbose: bool = False,
+    ):
+        """
+        Convert isotherm temperature from one unit to another.
+
+        Parameters
+        ----------
+        unit_to : str
+            The unit into which the internal temperature should be converted to.
+        verbose : bool
+            Print out steps taken.
+
+        """
+        self._temperature = c_temperature(self._temperature, self.temperature_unit, unit_to)
+        self.temperature_unit = unit_to
+
+        if verbose:
+            logger.info(f"Changed temperature unit to '{unit_to}'.")
+
     # Figure out the adsorption and desorption branches
     @staticmethod
-    def _splitdata(data, pressure_key):
+    def _splitdata(data, pressure_key: bool):
         """
         Split isotherm data into an adsorption and desorption part and
         return a column which marks the transition between the two.
         """
-        # Generate array
-        split = numpy.array([False for p in range(0, len(data.index))])
-
-        # Get the maximum pressure point (assume where desorption starts)
-        inflexion = data.index.get_loc(data[pressure_key].idxmax()) + 1
-
-        # If the maximum is not the last point
-        if inflexion != len(split):
-
-            # If the first point is the maximum, then it is purely desorption
-            if inflexion == data.index[0]:
-                inflexion = 0
-
-            # Set all instances after the inflexion point to True
-            split[inflexion:] = True
-
-        # Return the new array with the branch column
-        return split
+        from pygaps.utilities.math_utilities import split_ads_data
+        return split_ads_data(data, pressure_key)

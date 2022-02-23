@@ -1,0 +1,101 @@
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist =
+    clean,
+    check,
+    docs,
+{% for env in tox_environments|sort %}
+    {{ env }},
+{% endfor %}
+    report
+
+[testenv]
+wheel = true
+basepython =
+    bootstrap: python
+{% for env in tox_environments|sort %}
+    {{ env.split("-")[0] }}: {env:TOXPYTHON:{{ env.split("-")[0] if env.startswith("pypy") else "python{0[2]}.".format(env) + env[3:]}}}
+{% endfor %}
+    {docs,spell,clean,check,report,codecov}: {env:TOXPYTHON:python3}
+setenv =
+    PYTHONPATH={toxinidir}/tests
+    PYTHONUNBUFFERED=yes
+    cover: SETUP_PY_EXT_COVERAGE=yes
+passenv =
+    *
+conda_channels=
+    defaults
+    conda-forge
+conda_deps =
+    cover: numpy
+    cover: pandas
+    cover: scipy
+    cover: coolprop
+usedevelop =
+    cover: true
+    nocov: false
+deps =
+    pytest
+    cover: coverage[toml]
+    cover: pytest-cov
+commands =
+    cover: python setup.py clean --all build_ext --force --inplace
+    nocov: {posargs:pytest -vv}
+    cover: {posargs:pytest --cov --cov-report=term-missing -vv}
+
+[testenv:bootstrap]
+deps =
+    jinja2
+    tox
+skip_install = true
+commands =
+    python ci/bootstrap.py --no-env
+passenv =
+    *
+
+[testenv:check]
+deps =
+    docutils
+    pygments
+    isort
+    flake8
+    pylint
+    # darglint
+skip_install = true
+usedevelop = false
+commands =
+    python setup.py check --metadata --restructuredtext
+    isort --verbose --check-only --diff src tests setup.py
+    flake8 src tests setup.py
+    # pylint src tests setup.py
+
+[testenv:docs]
+usedevelop = true
+extras = docs
+commands =
+    sphinx-build -E -j auto -b doctest docs dist/docs
+    sphinx-build -E -j auto -b html docs dist/docs
+    sphinx-build -j auto -b linkcheck docs dist/docs
+
+[testenv:codecov]
+deps =
+    coverage[toml]
+    codecov
+skip_install = true
+commands =
+    coverage xml --ignore-errors
+    codecov []
+
+[testenv:report]
+deps = coverage[toml]
+skip_install = true
+commands =
+    coverage report
+    coverage html
+
+[testenv:clean]
+deps = coverage[toml]
+commands = coverage erase
+skip_install = true
+"""

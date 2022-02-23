@@ -23,26 +23,43 @@ class TestMaterial():
 
     def test_material_retrieved_list(self, material_data, basic_material):
         """Check material can be retrieved from master list."""
+
         pygaps.MATERIAL_LIST.append(basic_material)
         uploaded_material = pygaps.Material.find(material_data.get('name'))
-
-        assert material_data == uploaded_material.to_dict()
+        assert basic_material == uploaded_material
+        pygaps.MATERIAL_LIST.remove(basic_material)
 
         with pytest.raises(pgEx.ParameterError):
             pygaps.Material.find('noname')
-        pygaps.MATERIAL_LIST.remove(basic_material)
+
+        uploaded = pygaps.Material("uploaded", store=True)
+        assert uploaded == pygaps.Material.find('uploaded')
+
+        pygaps.Material("not_uploaded", store=False)
+        with pytest.raises(pgEx.ParameterError):
+            pygaps.Material.find('not_uploaded')
 
     def test_material_get_properties(self, material_data, basic_material):
         """Check if properties of a material can be located."""
+        assert basic_material.get_prop('comment') == material_data.get('comment')
 
-        assert basic_material.get_prop('density'
-                                       ) == material_data.get('density')
-
-        density = basic_material.properties.pop('density')
+        prop = basic_material.properties.pop('comment')
         with pytest.raises(pgEx.ParameterError):
-            basic_material.get_prop('density')
-        basic_material.properties['density'] = density
+            basic_material.get_prop('comment')
+        basic_material.properties['comment'] = prop
+        with pytest.raises(pgEx.ParameterError):
+            basic_material.get_prop('something')
+
+    def test_adsorbate_named_props(self, material_data, basic_material):
+        assert basic_material.density == material_data['density']
+        assert basic_material.molar_mass == material_data['molar_mass']
+        basic_material.density = 100
+        assert basic_material.properties['density'] == 100
+        basic_material.molar_mass = 100
+        assert basic_material.properties['molar_mass'] == 100
 
     def test_material_print(self, basic_material):
         """Checks the printing can be done."""
+        repr(basic_material)
         print(basic_material)
+        basic_material.print_info()
