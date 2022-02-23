@@ -2,7 +2,7 @@
 Changelog
 =========
 
-4.0.0 (2022-02-11)
+4.0.0 (2022-02-23)
 ------------------
 
 New features:
@@ -23,6 +23,7 @@ New features:
 
 Changes:
 
+* Minimum python is now 3.7, maximum increased to 3.10.
 * Removed the need to pass DataFrame column names with the ``other_keys``
   syntax. PointIsotherms, now save *all* passed DataFrame columns.
 * Smart assigning of isotherm metadata caused confusion and was removed.
@@ -123,7 +124,7 @@ Fixes:
 New features:
 
 * Added fluids to database: n-pentane, n-hexane, n-octane, o-xylene, m-xylene,
-  p-xylene, cyclohexane, hydrogen sulfide and sulfur hexafluoride.
+  p-xylene, cyclohexane, hydrogen sulphide and sulphur hexafluoride.
 
 Fixes:
 
@@ -212,7 +213,7 @@ New features:
   simple selection of the marker style.
 * Added three new isotherm models: Freundlich, Dubinin-Radushkevich and
   Dubinin-Astakov. They can be used for fitting by specifying
-  `Freundlich`, `DR` or `DA` as the model, respectivelly.
+  `Freundlich`, `DR` or `DA` as the model, respectively.
 * Faster performance of some models due to analytical calculations,
   as well as more thorough testing
 * Isotherm modelling backend is now more robust.
