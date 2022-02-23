@@ -1,10 +1,22 @@
 {
     "file_version": "3.0",
+    "material": "Carbon X1",
+    "material_batch": "X1",
     "adsorbate": "nitrogen",
+    "temperature": 77.355,
+    "temperature_unit": "K",
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
     "material_basis": "mass",
     "material_unit": "g",
-    "temperature_unit": "K",
-    "iso_type": "Isotherme",
+    "iso_type": "physisorption",
+    "user": "PI",
+    "instrument": "homemade1",
+    "activation_temperature": 150.0,
+    "lab": "local",
+    "treatment": "acid activated",
     "isotherm_data": [
         {
             "loading": 0.510281,
@@ -565,16 +577,5 @@
             "loading": 12.1382,
             "pressure": 0.0884312048252
         }
-    ],
-    "lab": "MADIREL",
-    "loading_basis": "molar",
-    "loading_unit": "mmol",
-    "instrument": "Triflex",
-    "material": "Takeda 5A",
-    "material_batch": "Test",
-    "pressure_mode": "absolute",
-    "pressure_unit": "bar",
-    "activation_temperature": 200.0,
-    "temperature": 77.355,
-    "user": "PI"
+    ]
 }
