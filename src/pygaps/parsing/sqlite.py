@@ -50,11 +50,11 @@ def with_connection(func):
 
         except sqlite3.IntegrityError as err:
             conn.rollback()
-            raise ParsingError from err
+            raise ParsingError(err) from err
 
         except sqlite3.InterfaceError as err:
             conn.rollback()
-            raise ParsingError from err
+            raise ParsingError(err) from err
 
         else:
             conn.commit()
@@ -71,15 +71,15 @@ def with_connection(func):
 
 
 def _upload_one_all_columns(
-    cursor,
-    table_name,
-    table_id,
-    columns,
-    input_dict,
-    overwrite,
-    print_string,
-    verbose,
-    **kwargs,
+    cursor: sqlite3.Cursor,
+    table_name: str,
+    table_id: str,
+    columns: str,
+    input_dict: dict,
+    overwrite: bool,
+    print_string: bool,
+    verbose: bool,
+    **kwargs: dict,
 ):
     """Insert or overwrite a list of things in a table."""
     to_insert = [table_id] + columns
@@ -98,16 +98,16 @@ def _upload_one_all_columns(
 
     if verbose:
         # Print success
-        logger.info(f"{print_string} uploaded {insert_dict.get(table_id)}")
+        logger.info(f"{print_string} uploaded '{insert_dict.get(table_id)}'")
 
 
 def _get_all_no_id(
-    cursor,
-    table_name,
-    table_id,
-    print_string,
-    verbose,
-    **kwargs,
+    cursor: sqlite3.Cursor,
+    table_name: str,
+    table_id: str,
+    print_string: bool,
+    verbose: bool,
+    **kwargs: dict,
 ):
     """Get all elements from a table as a dictionary, excluding id."""
     try:
@@ -125,13 +125,13 @@ def _get_all_no_id(
 
 
 def _delete_by_id(
-    cursor,
-    table_name,
-    table_id,
-    element_id,
-    print_string,
-    verbose,
-    **kwargs,
+    cursor: sqlite3.Cursor,
+    table_name: str,
+    table_id: str,
+    element_id: str,
+    print_string: bool,
+    verbose: bool,
+    **kwargs: dict,
 ):
     """Delete elements in a table by using their ID."""
 
@@ -161,7 +161,14 @@ def _delete_by_id(
 
 
 @with_connection
-def adsorbate_to_db(adsorbate, db_path=None, overwrite=False, verbose=True, **kwargs):
+def adsorbate_to_db(
+    adsorbate: Adsorbate,
+    db_path: str = None,
+    autoinsert_properties: bool = True,
+    overwrite: bool = False,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Upload an adsorbate to the database.
 
@@ -195,6 +202,19 @@ def adsorbate_to_db(adsorbate, db_path=None, overwrite=False, verbose=True, **kw
                 f"Adsorbate to overwrite ({adsorbate.name}) does not exist in database."
             )
         ads_id = ids[0]
+
+        # Delete existing properties
+        try:
+            _delete_by_id(
+                cursor,
+                'adsorbate_properties',
+                'ads_id',
+                ads_id,
+                'adsorbate properties',
+                verbose,
+            )
+        except sqlite3.IntegrityError:
+            pass
     # If overwrite is not specified, we upload it to the adsorbates table
     else:
         cursor.execute(
@@ -206,18 +226,23 @@ def adsorbate_to_db(adsorbate, db_path=None, overwrite=False, verbose=True, **kw
     properties = adsorbate.to_dict()
     del properties['name']  # no need for this
 
-    if properties:
-        if overwrite:
-            # Delete existing properties
-            _delete_by_id(
-                cursor,
-                'adsorbate_properties',
-                'ads_id',
-                ads_id,
-                'adsorbate properties',
-                verbose,
+    # Upload property types if needed
+    if autoinsert_properties:
+        prop_types = [
+            p['type'] for p in adsorbate_property_types_from_db(
+                db_path=db_path,
+                cursor=cursor,
             )
+        ]
+        for prop in properties.keys():
+            if prop not in prop_types:
+                adsorbate_property_type_to_db(
+                    {'type': prop},
+                    db_path=db_path,
+                    cursor=cursor,
+                )
 
+    if properties:
         for prop, val in properties.items():
 
             sql_insert = build_insert(
@@ -249,7 +274,11 @@ def adsorbate_to_db(adsorbate, db_path=None, overwrite=False, verbose=True, **kw
 
 
 @with_connection
-def adsorbates_from_db(db_path=None, verbose=True, **kwargs):
+def adsorbates_from_db(
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+) -> "list[Adsorbate]":
     """
     Get database adsorbates and their properties.
 
@@ -308,7 +337,12 @@ def adsorbates_from_db(db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
+def adsorbate_delete_db(
+    adsorbate: Adsorbate,
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Delete adsorbate from the database.
 
@@ -357,7 +391,13 @@ def adsorbate_delete_db(adsorbate, db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def adsorbate_property_type_to_db(type_dict, db_path=None, overwrite=False, verbose=True, **kwargs):
+def adsorbate_property_type_to_db(
+    type_dict,
+    db_path: str = None,
+    overwrite: bool = False,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Uploads an adsorbate property type.
 
@@ -394,7 +434,11 @@ def adsorbate_property_type_to_db(type_dict, db_path=None, overwrite=False, verb
 
 
 @with_connection
-def adsorbate_property_types_from_db(db_path=None, verbose=True, **kwargs):
+def adsorbate_property_types_from_db(
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+) -> "list[dict]":
     """
     Get all adsorbate property types.
 
@@ -420,7 +464,12 @@ def adsorbate_property_types_from_db(db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def adsorbate_property_type_delete_db(property_type, db_path=None, verbose=True, **kwargs):
+def adsorbate_property_type_delete_db(
+    property_type,
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Delete property type in the database.
 
@@ -448,11 +497,12 @@ def adsorbate_property_type_delete_db(property_type, db_path=None, verbose=True,
 
 @with_connection
 def material_to_db(
-    material,
-    db_path=None,
-    overwrite=False,
-    verbose=True,
-    **kwargs,
+    material: Material,
+    db_path: str = None,
+    autoinsert_properties: bool = True,
+    overwrite: bool = False,
+    verbose: bool = True,
+    **kwargs: dict,
 ):
     """
     Upload a material to the database.
@@ -479,7 +529,11 @@ def material_to_db(
     # If we need to overwrite, we find the id of existing adsorbate.
     if overwrite:
         ids = cursor.execute(
-            build_select(table='materials', to_select=['id'], where=['name']), {
+            build_select(
+                table='materials',
+                to_select=['id'],
+                where=['name'],
+            ), {
                 'name': material.name
             }
         ).fetchone()
@@ -488,6 +542,18 @@ def material_to_db(
                 f"Material to overwrite ({material.name}) does not exist in database."
             )
         mat_id = ids[0]
+        # Delete existing properties
+        try:
+            _delete_by_id(
+                cursor,
+                'material_properties',
+                'mat_id',
+                mat_id,
+                'material properties',
+                verbose,
+            )
+        except sqlite3.IntegrityError:
+            pass
     # If overwrite is not specified, we upload it to the adsorbates table
     else:
         cursor.execute(build_insert(table="materials", to_insert=['name']), {'name': material.name})
@@ -497,18 +563,23 @@ def material_to_db(
     properties = material.to_dict()
     del properties['name']  # no need for this
 
-    if properties:
-        if overwrite:
-            # Delete existing properties
-            _delete_by_id(
-                cursor,
-                'material_properties',
-                'mat_id',
-                mat_id,
-                'material properties',
-                verbose,
+    # Upload property types if needed
+    if autoinsert_properties:
+        prop_types = [
+            p['type'] for p in material_property_types_from_db(
+                db_path=db_path,
+                cursor=cursor,
             )
+        ]
+        for prop in properties.keys():
+            if prop not in prop_types:
+                material_property_type_to_db(
+                    {'type': prop},
+                    db_path=db_path,
+                    cursor=cursor,
+                )
 
+    if properties:
         for prop, val in properties.items():
 
             sql_insert = build_insert(
@@ -541,7 +612,11 @@ def material_to_db(
 
 
 @with_connection
-def materials_from_db(db_path=None, verbose=True, **kwargs):
+def materials_from_db(
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+) -> "list[Material]":
     """
     Get all materials and their properties.
 
@@ -592,7 +667,12 @@ def materials_from_db(db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def material_delete_db(material, db_path=None, verbose=True, **kwargs):
+def material_delete_db(
+    material: Material,
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Delete material from the database.
 
@@ -641,7 +721,13 @@ def material_delete_db(material, db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def material_property_type_to_db(type_dict, db_path=None, overwrite=False, verbose=True, **kwargs):
+def material_property_type_to_db(
+    type_dict: dict,
+    db_path: str = None,
+    overwrite: bool = False,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Uploads a material property type.
 
@@ -678,7 +764,11 @@ def material_property_type_to_db(type_dict, db_path=None, overwrite=False, verbo
 
 
 @with_connection
-def material_property_types_from_db(db_path=None, verbose=True, **kwargs):
+def material_property_types_from_db(
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+) -> "list[dict]":
     """
     Get all material property types.
 
@@ -704,7 +794,12 @@ def material_property_types_from_db(db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def material_property_type_delete_db(material_prop_type, db_path=None, verbose=True, **kwargs):
+def material_property_type_delete_db(
+    material_prop_type: dict,
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Delete material property type in the database.
 
@@ -732,12 +827,12 @@ def material_property_type_delete_db(material_prop_type, db_path=None, verbose=T
 
 @with_connection
 def isotherm_to_db(
-    isotherm,
-    db_path=None,
-    autoinsert_material=True,
-    autoinsert_adsorbate=True,
-    verbose=True,
-    **kwargs
+    isotherm: "BaseIsotherm | PointIsotherm | ModelIsotherm",
+    db_path: str = None,
+    autoinsert_material: bool = True,
+    autoinsert_adsorbate: bool = True,
+    verbose: bool = True,
+    **kwargs: dict,
 ):
     """
     Uploads isotherm to the database.
@@ -765,20 +860,10 @@ def isotherm_to_db(
     # Checks
     if autoinsert_material:
         if isotherm.material not in MATERIAL_LIST:
-            material_to_db(
-                isotherm.material
-                if isinstance(isotherm.material, Material) else Material(isotherm.material),
-                db_path=db_path,
-                cursor=cursor
-            )
+            material_to_db(isotherm.material, db_path=db_path, cursor=cursor)
     if autoinsert_adsorbate:
         if isotherm.adsorbate not in ADSORBATE_LIST:
-            adsorbate_to_db(
-                isotherm.adsorbate
-                if isinstance(isotherm.adsorbate, Adsorbate) else Adsorbate(isotherm.adsorbate),
-                db_path=db_path,
-                cursor=cursor
-            )
+            adsorbate_to_db(isotherm.adsorbate, db_path=db_path, cursor=cursor)
 
     # The isotherm is going to be inserted into the database
     # Build upload dict
@@ -815,24 +900,27 @@ def isotherm_to_db(
         raise type(err)(
             f"""Error inserting isotherm "{upload_dict["id"]}" base properties. """
             f"""Ensure material "{upload_dict["material"]}", and adsorbate "{upload_dict["adsorbate"]}" """
-            f"""exist in the database already. Original error:\n {err}"""
+            f"""exist in the database. Original error:\n {err}"""
         ) from None
 
     # TODO insert multiple
     # Upload the other isotherm parameters
     for key in iso_dict:
-        if key not in isotherm._unit_params:
-            # Deal with bools
-            val = iso_dict[key]
-            if isinstance(val, bool):
-                val = 'TRUE' if val else 'FALSE'
-            cursor.execute(
-                build_insert(table='isotherm_properties', to_insert=['iso_id', 'type', 'value']), {
-                    'iso_id': iso_id,
-                    'type': key,
-                    'value': val
-                }
-            )
+        # Deal with bools
+        val = iso_dict[key]
+        if isinstance(val, bool):
+            val = 'TRUE' if val else 'FALSE'
+        cursor.execute(
+            build_insert(
+                table='isotherm_properties',
+                to_insert=['iso_id', 'type', 'value'],
+            ),
+            {
+                'iso_id': iso_id,
+                'type': key,
+                'value': val
+            },
+        )
 
     # Then, the isotherm data/model will be uploaded into the data table
 
@@ -880,7 +968,12 @@ def isotherm_to_db(
 
 
 @with_connection
-def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
+def isotherms_from_db(
+    criteria: dict = None,
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+) -> "list[BaseIsotherm | PointIsotherm | ModelIsotherm]":
     """
     Get isotherms with the selected criteria from the database.
 
@@ -984,7 +1077,12 @@ def isotherms_from_db(criteria=None, db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherm_delete_db(iso_id, db_path=None, verbose=True, **kwargs):
+def isotherm_delete_db(
+    iso_id: "str | BaseIsotherm | PointIsotherm | ModelIsotherm",
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Delete isotherm in the database.
 
@@ -1030,7 +1128,13 @@ def isotherm_delete_db(iso_id, db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherm_type_to_db(type_dict, db_path=None, overwrite=False, verbose=True, **kwargs):
+def isotherm_type_to_db(
+    type_dict: dict,
+    db_path: str = None,
+    overwrite: bool = False,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Upload an isotherm type.
 
@@ -1067,7 +1171,11 @@ def isotherm_type_to_db(type_dict, db_path=None, overwrite=False, verbose=True, 
 
 
 @with_connection
-def isotherm_types_from_db(db_path=None, verbose=True, **kwargs):
+def isotherm_types_from_db(
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+) -> "list[dict]":
     """
     Get all isotherm types.
 
@@ -1093,7 +1201,12 @@ def isotherm_types_from_db(db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherm_type_delete_db(iso_type, db_path=None, verbose=True, **kwargs):
+def isotherm_type_delete_db(
+    iso_type: str,
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Delete isotherm type in the database.
 
@@ -1117,7 +1230,13 @@ def isotherm_type_delete_db(iso_type, db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherm_property_type_to_db(type_dict, db_path=None, overwrite=False, verbose=True, **kwargs):
+def isotherm_property_type_to_db(
+    type_dict: dict,
+    db_path: str = None,
+    overwrite: bool = False,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Uploads a property type.
 
@@ -1154,7 +1273,11 @@ def isotherm_property_type_to_db(type_dict, db_path=None, overwrite=False, verbo
 
 
 @with_connection
-def isotherm_property_types_from_db(db_path=None, verbose=True, **kwargs):
+def isotherm_property_types_from_db(
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+) -> "list[dict]":
     """
     Get all isotherm property types.
 
@@ -1180,7 +1303,12 @@ def isotherm_property_types_from_db(db_path=None, verbose=True, **kwargs):
 
 
 @with_connection
-def isotherm_property_type_delete_db(property_type, db_path=None, verbose=True, **kwargs):
+def isotherm_property_type_delete_db(
+    property_type: str,
+    db_path: str = None,
+    verbose: bool = True,
+    **kwargs: dict,
+):
     """
     Delete isotherm property type in the database.
 

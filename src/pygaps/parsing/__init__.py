@@ -16,8 +16,10 @@ from .sqlite import isotherms_from_db
 from .sqlite import isotherm_delete_db
 from .sqlite import isotherm_to_db
 from .sqlite import adsorbates_from_db
+from .sqlite import adsorbate_delete_db
 from .sqlite import adsorbate_to_db
 from .sqlite import materials_from_db
+from .sqlite import material_delete_db
 from .sqlite import material_to_db
 
 _COMMERCIAL_FORMATS = {

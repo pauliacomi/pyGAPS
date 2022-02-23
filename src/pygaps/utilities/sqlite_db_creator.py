@@ -1,18 +1,14 @@
 """Generate the default sqlite database."""
 
 import json
-import logging
-
-logger = logging.getLogger('pygaps')
-import sqlite3
 
 import pygaps
 from pygaps.parsing import sqlite as pgsqlite
-from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.sqlite_db_pragmas import PRAGMAS
+from pygaps.utilities.sqlite_utilities import db_execute_general
 
 
-def db_create(pth, verbose=False):
+def db_create(pth: str, verbose: bool = False):
     """
     Create the entire database.
 
@@ -20,6 +16,8 @@ def db_create(pth, verbose=False):
     ----------
     pth : str
         Path where the database is created.
+    verbose : bool
+        Print out extra information.
 
     """
     for pragma in PRAGMAS:
@@ -48,32 +46,3 @@ def db_create(pth, verbose=False):
     pgsqlite.isotherm_type_to_db({'type': 'isotherm'}, db_path=pth)
     pgsqlite.isotherm_type_to_db({'type': 'pointisotherm'}, db_path=pth)
     pgsqlite.isotherm_type_to_db({'type': 'modelisotherm'}, db_path=pth)
-
-
-def db_execute_general(statement, pth, verbose=False):
-    """
-    Execute general SQL statements.
-
-    Parameters
-    ----------
-    statement : str
-        SQL statement to execute.
-    pth : str
-        Path where the database is located.
-
-    """
-    # Attempt to connect
-    try:
-        with sqlite3.connect(pth) as db:
-
-            # Get a cursor object
-            cursor = db.cursor()
-            cursor.execute('PRAGMA foreign_keys = ON')
-
-            # Check if table does not exist and create it
-            cursor.executescript(statement)
-
-    # Catch the exception
-    except sqlite3.Error as e_info:
-        logger.info(f"Unable to execute statement: \n{statement}")
-        raise ParsingError from e_info
