@@ -1,5 +1,4 @@
-
-BET Surface area
+BET surface area
 ................
 
 .. automodule:: pygaps.characterisation.area_bet

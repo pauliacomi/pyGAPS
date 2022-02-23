@@ -1,4 +1,3 @@
-
 Initial enthalpy of adsorption
 ..............................
 

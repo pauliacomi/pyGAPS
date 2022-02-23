@@ -12,6 +12,8 @@ from scipy import interpolate
 from scipy import optimize
 
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.math_utilities import bspline
@@ -24,7 +26,7 @@ _LOADED = {}  # We will keep loaded kernels here
 
 
 def psd_dft(
-    isotherm,
+    isotherm: "PointIsotherm | ModelIsotherm",
     kernel: str = 'DFT-N2-77K-carbon-slit',
     branch: str = 'ads',
     p_limits: "tuple[float, float]" = None,
@@ -33,11 +35,11 @@ def psd_dft(
     verbose: bool = False
 ):
     """
-    Calculate the pore size distribution using a DFT kernel from a PointIsotherm.
+    Calculate the pore size distribution using a DFT kernel from an Isotherm.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : PointIsotherm, ModelIsotherm
         The isotherm for which the pore size distribution will be calculated.
     kernel : str
         The name of the kernel, or the path where it can be found.
@@ -49,11 +51,18 @@ def psd_dft(
         The smoothing order of the b-splines fit to the data.
         If set to 0, data will be returned as-is.
     kernel_units : dict
-        A dictionary of kernel basis and units, contains ``loading_basis``,
+        A dictionary specifying kernel basis and units, contains ``loading_basis``,
         ``loading_unit``, ``material_basis``, ``material_unit``, ``pressure_mode``
-        and "pressure_unit". Defaults to mmol/g in relative pressure.
+        and "pressure_unit". Defaults to mmol/g vs. relative pressure.
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     Returns
     -------
@@ -233,7 +242,12 @@ def psd_dft(
     }
 
 
-def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
+def psd_dft_kernel_fit(
+    pressure: "list[float]",
+    loading: "list[float]",
+    kernel_path: str,
+    bspline_order: int = 2,
+):
     r"""
     Fit a DFT kernel on experimental adsorption data.
 
@@ -337,7 +351,7 @@ def psd_dft_kernel_fit(pressure, loading, kernel_path, bspline_order=2):
     return pore_widths, pore_dist, pore_vol_cum, kernel_final_loading
 
 
-def _load_kernel(path):
+def _load_kernel(path: str):
     """
     Load a kernel from disk or from memory.
 

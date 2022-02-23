@@ -8,29 +8,33 @@ from scipy import stats
 
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
 
-# TODO: does the langmuir area require relative pressure?
-
 
 def area_langmuir(
-    isotherm,
+    isotherm: "PointIsotherm | ModelIsotherm",
     branch: str = 'ads',
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False,
 ):
     r"""
-    Calculate the Langmuir-determined surface area of an isotherm.
+    Calculate the Langmuir area of an isotherm.
+
+    The optional ``p_limits`` parameter allows to specify the upper and lower
+    pressure limits to calculate the Langmuir area, otherwise the limits will be
+    automatically set to 5-90% of isotherm pressure range.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : PointIsotherm, ModelIsotherm
         The isotherm of which to calculate the Langmuir surface area.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
-    p_limits : [float, float], optional
+    p_limits : tuple[float, float], optional
         Pressure range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
@@ -39,8 +43,8 @@ def area_langmuir(
     -------
     dict
         A dictionary of results with the following components. The basis of these
-        results will be derived from the basis of the isotherm (per mass or per
-        volume of material):
+        results will be derived from the basis of the isotherm (per mass, per
+        volume, or per mole of adsorbent):
 
         - ``area`` (float) : calculated Langmuir surface area, in m2/unit of material
         - ``langmuir_const`` (float) : the constant in the Langmuir fit
@@ -49,19 +53,26 @@ def area_langmuir(
         - ``langmuir_intercept`` (float) : intercept of the Langmuir plot
         - ``corr_coef`` (float) : correlation coefficient of the linear region in the Langmuir plot
 
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
+
     Notes
     -----
     *Description*
 
-    The Langmuir theory [#]_, proposed at the start of the 20th century, states that
-    adsorption happens on active sites on a surface in a single layer. It is
-    derived based on several assumptions.
+    The Langmuir theory [#]_, proposed at the start of the 20th century, states
+    that adsorption happens on individual active sites on a surface in a single
+    layer. It is derived based on several assumptions.
 
-    * All sites are equivalent and have the same chance of being occupied
-    * Each adsorbate molecule can occupy one adsorption site
-    * There are no interactions between adsorbed molecules
+    * All sites are equivalent and have the same chance of being occupied.
+    * Each adsorbate molecule can occupy one adsorption site.
+    * There are no interactions between adsorbed molecules.
     * The rates of adsorption and desorption are proportional to the number of
-      sites currently free and currently occupied, respectively
+      sites currently free and currently occupied, respectively.
     * Adsorption is complete when all sites are filled.
 
     The Langmuir equation is then:
@@ -104,7 +115,7 @@ def area_langmuir(
 
     References
     ----------
-    .. [#] I. Langmuir, J. American Chemical Society 38, 2219(1916); 40, 1368(1918)
+    .. [#] I. Langmuir, J. Amer. Chem. Soc., 38, 2219 (1916); 40, 1368 (1918)
 
     """
     # get adsorbate properties
@@ -122,11 +133,11 @@ def area_langmuir(
             branch=branch,
             pressure_mode='relative',
         )
-    except pgError:
+    except pgError as err:
         raise CalculationError(
             "The isotherm cannot be converted to a relative basis. "
             "Is your isotherm supercritical?"
-        )
+        ) from err
 
     # If on an desorption branch, data will be reversed
     if branch == 'des':
@@ -187,8 +198,8 @@ def area_langmuir(
 
 
 def area_langmuir_raw(
-    pressure: list,
-    loading: list,
+    pressure: "list[float]",
+    loading: "list[float]",
     cross_section: float,
     p_limits: "tuple[float,float]" = None,
 ):
@@ -201,13 +212,13 @@ def area_langmuir_raw(
 
     Parameters
     ----------
-    pressure : array
+    pressure : list[float]
         Pressures, relative.
-    loading : array
+    loading : list[float]
         Loadings, in mol/basis.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
-    p_limits : [float, float], optional
+    p_limits : tuple[float, float], optional
         Pressure range in which to perform the calculation.
 
     Returns

@@ -40,7 +40,7 @@ _ADSORBENT_MODELS = {
 }
 
 
-def get_hk_model(model):
+def get_hk_model(model: "str | dict"):
     """
     Get the adsorbent model for HK PSD.
 
@@ -49,7 +49,7 @@ def get_hk_model(model):
 
     Parameters
     ----------
-    model : `str` or `dict`
+    model : str, dict
         Name of the model to use or a dict with the parameters.
 
     Returns

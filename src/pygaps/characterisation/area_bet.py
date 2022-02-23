@@ -8,32 +8,33 @@ from scipy import stats
 
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
 
 
 def area_BET(
-    isotherm,
+    isotherm: "PointIsotherm | ModelIsotherm",
     branch: str = 'ads',
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False,
 ):
     r"""
-    Calculate BET-determined surface area from an isotherm.
+    Calculate BET area from an isotherm.
 
-    Pass an isotherm object to the function to have the BET method applied to it. Since
-    the function automatically takes the properties of the adsorbate from the master
-    list, ensure that it contains all the adsorbates which were used in the isotherms,
-    together with the properties required.
+    The optional ``p_limits`` parameter allows to specify the upper and lower
+    pressure limits to calculate the BET area, otherwise the limits will be
+    automatically selected based on the Rouquerol rules.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : PointIsotherm, ModelIsotherm
         The isotherm of which to calculate the BET surface area.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
-    p_limits : [float, float], optional
+    p_limits : tuple[float, float], optional
         Pressure range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
@@ -42,8 +43,8 @@ def area_BET(
     -------
     dict
         A dictionary of results with the following components. The basis of these
-        results will be derived from the basis of the isotherm (per mass or per
-        volume of adsorbent):
+        results will be derived from the basis of the isotherm (per mass, per
+        volume, or per mole of adsorbent):
 
         - ``area`` (float) : calculated BET surface area, in m2/unit of adsorbent
         - ``c_const`` (float) : the C constant in the BET equation, unitless
@@ -52,6 +53,13 @@ def area_BET(
         - ``bet_slope`` (float) : slope of the BET plot
         - ``bet_intercept`` (float) : intercept of the BET plot
         - ``corr_coef`` (float) : correlation coefficient of the linear region in the BET plot
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     Notes
     -----
@@ -62,7 +70,7 @@ def area_BET(
     through N2 adsorption at 77K, although other adsorbates (Ar, Kr) have been used.
 
     It assumes that the adsorption happens on the surface of the material in
-    incremental layers according to the BET theory. Even if the adsorbent is porous,
+    incremental layers according to the BET theory. Even if the adsorbent is mesoporous,
     the initial amount adsorbed (usually between 0.05 - 0.4 :math:`p/p_0`) can be
     modelled through the BET equation:
 
@@ -70,10 +78,10 @@ def area_BET(
 
         \frac{p/p_0}{n_{ads} (1-p/p_0)} = \frac{1}{n_{m} C} + \frac{C - 1}{n_{m} C}(p/p_0)
 
-    Therefore, if we plot the isotherm points as :math:`\frac{p/p_0}{n_{ads}(1-p/p_0)}` versus
+    If we plot the isotherm points as :math:`\frac{p/p_0}{n_{ads}(1-p/p_0)}` versus
     :math:`p/p_0`, a linear region can usually be found. The slope and intercept of this line
     can then be used to calculate :math:`n_{m}`, the amount adsorbed at the statistical
-    monolayer, as well as C, the BET constant.
+    monolayer, as well as :math:`C`, the BET constant.
 
     .. math::
 
@@ -92,16 +100,17 @@ def area_BET(
 
     *Limitations*
 
-    While a standard for surface area determinations, the BET area should be used with care,
-    as there are many assumptions made in the calculation. To augment the validity of the BET
-    method, Rouquerol [#]_ proposed several checks to ensure that the BET region selected is valid
+    While a standard for surface area determinations, the BET area should be
+    used with care, as there are many assumptions made in the calculation. To
+    augment the validity of the BET method, Rouquerol [#]_ proposed several
+    checks to ensure that the BET region selected is valid:
 
-    * The BET constant (C) obtained should be positive
+    * The BET constant (:math:`C`) obtained should be positive.
     * In the corresponding Rouquerol plot where :math:`n_{ads}(1-p/p_0)` is plotted
       with respect to :math:`p/p_0`, the points chosen for BET analysis should be
-      strictly increasing
+      strictly increasing.
     * The loading at the statistical monolayer should be situated within the
-      limits of the BET region
+      limits of the BET region.
 
     This module implements all these checks.
 
@@ -109,17 +118,17 @@ def area_BET(
     assumptions are implicitly made in this approach:
 
     * Adsorption takes place on the pore surface. Microporous materials which have pores
-      in similar size as the molecule adsorbed cannot posses a realistic surface area
+      in similar size as the molecule adsorbed cannot posses a realistic surface area.
     * The cross-sectional area of the molecule on the surface cannot be guaranteed
       For example, nitrogen has been known to adopt different orientations on the
       surface of some materials due to inter-molecular forces, which effectively
       lowers its cross-sectional area.
-    * No account is made for heterogeneous adsorbate-adsorbent interaction in the BET theory
+    * No account is made for heterogeneous adsorbate-adsorbent interaction in the BET theory.
 
     References
     ----------
-    .. [#] “Adsorption of Gases in Multimolecular Layers”, Stephen Brunauer,
-       P. H. Emmett and Edward Teller, J. Amer. Chem. Soc., 60, 309(1938)
+    .. [#] "Adsorption of Gases in Multimolecular Layers", S. Brunauer,
+       P. H. Emmett and E. Teller, J. Amer. Chem. Soc., 60, 309 (1938)
     .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
        and K. Sing, Academic Press, 1999
 
@@ -139,11 +148,11 @@ def area_BET(
             branch=branch,
             pressure_mode='relative',
         )
-    except pgError:
+    except pgError as err:
         raise CalculationError(
             "The isotherm cannot be converted to a relative basis. "
             "Is your isotherm supercritical?"
-        )
+        ) from err
 
     # If on an desorption branch, data will be reversed
     if branch == 'des':
@@ -219,8 +228,8 @@ def area_BET(
 
 
 def area_BET_raw(
-    pressure: list,
-    loading: list,
+    pressure: "list[float]",
+    loading: "list[float]",
     cross_section: float,
     p_limits: "tuple[float,float]" = None,
 ):
@@ -233,13 +242,13 @@ def area_BET_raw(
 
     Parameters
     ----------
-    pressure : array
+    pressure : list[float]
         Pressures, relative.
-    loading : array
+    loading : list[float]
         Loadings, in mol/basis.
     cross_section : float
         Adsorbed cross-section of the molecule of the adsorbate, in nm.
-    p_limits : [float, float], optional
+    p_limits : tuple[float, float], optional
         Pressure range in which to perform the calculation.
 
     Returns

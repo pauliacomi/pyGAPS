@@ -7,13 +7,15 @@ from scipy import stats
 
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
 
 
 def dr_plot(
-    isotherm,
+    isotherm: "PointIsotherm | ModelIsotherm",
     branch: str = "ads",
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False,
@@ -22,12 +24,13 @@ def dr_plot(
     Calculate pore volume and effective adsorption potential
     through a Dubinin-Radushkevich (DR) plot.
 
-    The function accepts a pyGAPS isotherm, and has the ability
-    to select the pressure limits for point selection.
+    The optional ``p_limits`` parameter allows to specify the upper and lower
+    pressure limits for the calculation, otherwise the entire range will be
+    used.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : PointIsotherm, ModelIsotherm
         The isotherm to use for the DR plot.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
@@ -43,6 +46,13 @@ def dr_plot(
 
         - ``pore_volume`` (float) : calculated total micropore volume, cm3/material unit
         - ``adsorption_potential`` (float) : calculated adsorption potential, in kJ/mol
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     Notes
     -----

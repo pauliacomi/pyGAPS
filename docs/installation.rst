@@ -18,7 +18,7 @@ managing environments a breeze.
 
 .. code-block:: bash
 
-    conda create -n py3 python=3 numpy scipy pandas matplotlib CoolProp
+    conda create -n py3 python=3.8 numpy scipy pandas matplotlib CoolProp
     conda activate py3
     pip install pygaps
 

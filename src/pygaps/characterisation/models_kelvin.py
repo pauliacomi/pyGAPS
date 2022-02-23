@@ -3,6 +3,8 @@ Module contains functions to calculate the critical
 evaporation/condensation pore radius the mesopore range,
 as a function of pressure.
 """
+import typing as t
+
 from functools import partial
 
 import numpy
@@ -11,7 +13,7 @@ from scipy import constants
 from pygaps.utilities.exceptions import ParameterError
 
 
-def get_meniscus_geometry(branch, pore_geometry):
+def get_meniscus_geometry(branch: str, pore_geometry: str):
     """
     Determine the meniscus geometry.
 
@@ -53,12 +55,12 @@ def get_meniscus_geometry(branch, pore_geometry):
 
 
 def kelvin_radius(
-    pressure,
-    meniscus_geometry,
-    temperature,
-    liquid_density,
-    adsorbate_molar_mass,
-    adsorbate_surface_tension,
+    pressure: "list[float]",
+    meniscus_geometry: str,
+    temperature: float,
+    liquid_density: float,
+    adsorbate_molar_mass: float,
+    adsorbate_surface_tension: float,
 ):
     r"""
     Calculate the kelvin radius of the pore, using the standard
@@ -124,12 +126,12 @@ def kelvin_radius(
 
 
 def kelvin_radius_kjs(
-    pressure,
-    meniscus_geometry,
-    temperature,
-    liquid_density,
-    adsorbate_molar_mass,
-    adsorbate_surface_tension,
+    pressure: "list[float]",
+    meniscus_geometry: str,
+    temperature: float,
+    liquid_density: float,
+    adsorbate_molar_mass: float,
+    adsorbate_surface_tension: float,
 ):
     r"""
     Calculate the kelvin radius of the pore, using the
@@ -161,7 +163,7 @@ def kelvin_radius_kjs(
     -----
     *Description*
 
-    The KJS correction to the kelvin equation equation is corrected with a constant
+    The KJS correction to the kelvin equation equation is modified with a constant
     term of 0.3 nm. The authors arrived at this constant by using the adsorption
     branch of the isotherm on several MCM-41 materials calibrated with XRD data.
 
@@ -175,7 +177,7 @@ def kelvin_radius_kjs(
 
     References
     ----------
-    .. [#] Kruk M, Jaroniec M, Sayari A (1997) Langmuir 13:6267
+    .. [#] M. Kruk, M. Jaroniec, A. Sayari, Langmuir 13, 6267 (1997)
 
     See Also
     --------
@@ -201,7 +203,7 @@ _KELVIN_MODELS = {
 }
 
 
-def get_kelvin_model(model, **model_args):
+def get_kelvin_model(model: t.Union[str, t.Callable], **model_args):
     """
     Return a function calculating an kelvin-based critical radius.
 

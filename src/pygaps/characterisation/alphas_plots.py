@@ -8,6 +8,8 @@ from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
@@ -15,8 +17,8 @@ from pygaps.utilities.math_utilities import find_linear_sections
 
 
 def alpha_s(
-    isotherm,
-    reference_isotherm,
+    isotherm: "PointIsotherm | ModelIsotherm",
+    reference_isotherm: "PointIsotherm | ModelIsotherm",
     reference_area: str = 'BET',
     reducing_pressure: float = 0.4,
     branch: str = 'ads',
@@ -27,19 +29,18 @@ def alpha_s(
     r"""
     Calculate surface area and pore volume using the alpha-s method.
 
-    Pass an isotherm object to the function to have the alpha-s method applied to it.
-    The ``reference_isotherm`` parameter is an Isotherm class which will form the
-    x-axis of the alpha-s method.
-    The ``t_limits`` parameter takes the form of an array of two numbers, which are the
-    upper and lower limits of isotherm the section which should be taken for analysis.
+    The ``reference_isotherm`` parameter is an Isotherm class which will form
+    the x-axis of the alpha-s plot. The optional ``t_limits`` parameter has the
+    upper and lower limits of the loading the section which should be taken for
+    analysis.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : PointIsotherm, ModelIsotherm
         The isotherm of which to calculate the alpha-s plot parameters.
-    reference_isotherm : PointIsotherm or ModelIsotherm
+    reference_isotherm : PointIsotherm, ModelIsotherm
         The isotherm to use as reference.
-    reference_area : either (area, 'BET' or 'langmuir'), optional
+    reference_area : float, 'BET', 'langmuir', optional
         Area of the reference material or function to calculate it
         using the reference isotherm.
         If not specified, the BET method is used.
@@ -51,7 +52,7 @@ def alpha_s(
         Branch of the isotherm to use. It defaults to adsorption.
     branch_ref : {'ads', 'des'}, optional
         Branch of the reference isotherm to use. It defaults to adsorption.
-    t_limits : [float, float], optional
+    t_limits : tuple[float, float], optional
         Reference thickness range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
@@ -59,10 +60,10 @@ def alpha_s(
     Returns
     -------
     dict
-        A dictionary containing the t-plot curve, as well as a list of dictionaries
-        with calculated parameters for each straight section. The basis of these
-        results will be derived from the basis of the isotherm (per mass or per
-        volume of adsorbent material):
+        A dictionary containing the t-plot curve, as well as a list of
+        dictionaries with calculated parameters for each straight section. The
+        basis of these results will be derived from the basis of the isotherm
+        (per mass or per volume of adsorbent material):
 
         - ``alpha curve`` (list) : Calculated alpha-s curve
         - ``results`` (list of dicts):
@@ -73,6 +74,13 @@ def alpha_s(
           - ``slope`` (float) : slope of the straight trendline fixed through the region
           - ``intercept`` (float) : intercept of the straight trendline through the region
           - ``corr_coef`` (float) : correlation coefficient of the linear region
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     Notes
     -----
@@ -93,20 +101,22 @@ def alpha_s(
 
     The analysis then proceeds as in the t-plot method.
 
-    The slope of the linear section can be used to calculate the area where the adsorption
-    is taking place. If it is of a linear region at the start of the curve, it will represent
-    the total surface area of the material. If at the end of the curve, it will instead
-    represent external surface area of the material.
-    The calculation uses the known area of the reference material. If unknown, the area
-    will be calculated here using the BET method.
+    The slope of the linear section (:math:`s`) can be used to calculate the
+    area where adsorption is taking place. If it is of a linear region at the
+    start of the curve, it will represent the total surface area of the
+    material. If at the end of the curve, it will instead represent external
+    surface area of the material. The calculation uses the known area of the
+    reference material. If unknown, the area will be calculated here using the
+    BET or Langmuir method.
 
     .. math::
 
         A = \frac{s A_{ref}}{(n_{ref})_{0.4}}
 
-    If the region selected is after a vertical deviation, the intercept of the line
-    will no longer pass through the origin. This intercept be used to calculate the
-    pore volume through the following equation:
+    If the region selected is after a vertical deviation, the intercept
+    (:math:`i`) of the line will no longer pass through the origin. This
+    intercept be used to calculate the pore volume through the following
+    equation:
 
     .. math::
 
@@ -121,7 +131,7 @@ def alpha_s(
 
     References
     ----------
-    .. [#] D.Atkinson, A.I.McLeod, K.S.W.Sing, J.Chim.Phys., 81,791(1984)
+    .. [#] D. Atkinson, A.I. McLeod, K.S.W. Sing, J. Chim. Phys., 81, 791 (1984)
 
     """
     # Check to see if reference isotherm is given
@@ -242,8 +252,8 @@ def alpha_s(
 
 
 def alpha_s_raw(
-    loading: list,
-    reference_loading: list,
+    loading: "list[float]",
+    reference_loading: "list[float]",
     alpha_s_point: float,
     reference_area: float,
     liquid_density: float,
@@ -254,14 +264,14 @@ def alpha_s_raw(
     Calculate surface area and pore volume using the alpha-s method.
 
     This is a 'bare-bones' function to calculate alpha-s parameters which is
-    designed as a low-level alternative to the main function.
-    Designed for advanced use, its parameters have to be manually specified.
+    designed as a low-level alternative to the main function. Designed for
+    advanced use, its parameters have to be manually specified.
 
     Parameters
     ----------
-    loading : array
+    loading : list[float]
         Amount adsorbed at the surface, in mol/material.
-    reference_loading : array
+    reference_loading : list[float]
         Loading of the reference curve corresponding to the same pressures.
     alpha_s_point : float
         p/p0 value at which the loading is reduced.
@@ -271,7 +281,7 @@ def alpha_s_raw(
         Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
         Molar mass of the adsorbate, in g/mol.
-    t_limits : [float, float], optional
+    t_limits : tuple[float, float], optional
         Reference thickness range in which to perform the calculation.
 
     Returns
@@ -279,7 +289,7 @@ def alpha_s_raw(
     results : list
         A list of dictionaries with the following components:
 
-        - ``section`` (array) : the points of the plot chosen for the line
+        - ``section`` (array[float]) : the points of the plot chosen for the line
         - ``area`` (float) : calculated surface area, from the section parameters
         - ``adsorbed_volume`` (float) : the amount adsorbed in the pores as
           calculated per section
@@ -349,13 +359,13 @@ def alpha_s_raw(
 
 
 def alpha_s_plot_parameters(
-    alpha_curve,
-    loading,
-    section,
-    alpha_s_point,
-    reference_area,
-    molar_mass,
-    liquid_density,
+    alpha_curve: "list[float]",
+    loading: "list[float]",
+    section: "list[float]",
+    alpha_s_point: float,
+    reference_area: float,
+    molar_mass: float,
+    liquid_density: float,
 ):
     """Get the parameters for the linear region of the alpha-s plot."""
 

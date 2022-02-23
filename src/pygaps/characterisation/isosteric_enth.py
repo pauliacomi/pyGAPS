@@ -4,11 +4,13 @@ import numpy
 from scipy import constants
 from scipy import stats
 
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import ParameterError
 
 
 def isosteric_enthalpy(
-    isotherms,
+    isotherms: "list[PointIsotherm | ModelIsotherm]",
     loading_points: list = None,
     branch: str = 'ads',
     verbose: bool = False,
@@ -20,10 +22,10 @@ def isosteric_enthalpy(
 
     Parameters
     ----------
-    isotherms : iterable of Isotherms
+    isotherms : list[PointIsotherms | ModelIsotherm]
         The isotherms to use in calculation of the isosteric enthalpy. They should all
         be measured on the same material.
-    loading_points : array, optional
+    loading_points : list[float], optional
         The loading points at which the isosteric enthalpy should be calculated.
         Default will be 50 equally spaced points in the available range.
         The points must be within the range of loading of all passed isotherms, or
@@ -43,6 +45,11 @@ def isosteric_enthalpy(
         - ``slopes`` (array) : the exact log(p) vs 1/T slope for each point
         - ``correlation`` (array) : correlation coefficient for each point
         - ``std_errors`` (array) : estimated standard errors for each point
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
 
     Notes
     -----

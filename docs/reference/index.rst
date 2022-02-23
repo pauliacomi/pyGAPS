@@ -17,9 +17,9 @@ inner workings of various functions.
 
    core
    characterisation
-   modelling
+   fitting
    iast
    parsing
    plotting
+   units
    utilities
-   cli

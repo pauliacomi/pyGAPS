@@ -13,6 +13,7 @@ Material characterisation
    characterisation/psd_meso
    characterisation/psd_micro
    characterisation/psd_dft
+   characterisation/thickness_models
    characterisation/isosteric_enth
    characterisation/initial_hk
    characterisation/initial_enth

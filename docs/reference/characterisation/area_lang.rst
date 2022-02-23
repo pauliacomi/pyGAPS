@@ -1,5 +1,4 @@
-
-Langmuir Surface area
+Langmuir surface area
 .....................
 
 .. automodule:: pygaps.characterisation.area_lang

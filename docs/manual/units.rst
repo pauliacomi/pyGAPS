@@ -74,7 +74,7 @@ Some example isotherm conversions with different pressure modes / units:
     )
 
 Internally, pressure conversions are handled by the
-:func:`~pygaps.utilities.converter_mode.c_pressure` function.
+:func:`~pygaps.units.converter_mode.c_pressure` function.
 
 
 .. _units-manual-loading:
@@ -122,7 +122,7 @@ Examples of isotherm conversion on loading:
     )
 
 Internally, loading conversions are handled by the
-:func:`~pygaps.utilities.converter_mode.c_loading` function.
+:func:`~pygaps.units.converter_mode.c_loading` function.
 
 
 .. _units-manual-material:
@@ -156,7 +156,7 @@ Example of isotherm conversion on material:
 
 
 Internally, material conversions are handled by the
-:func:`~pygaps.utilities.converter_mode.c_material`.
+:func:`~pygaps.units.converter_mode.c_material`.
 
 
 .. _units-manual-temperature:
@@ -196,14 +196,14 @@ Low-level convert
 
 The way units are converted under the hood is through the use of dictionaries
 that store conversion factors between the different unit types. The user can use
-the functions directly by importing the :mod:`pygaps.utilities.converter_mode`
-and :mod:`pygaps.utilities.converter_unit` modules.
+the functions directly by importing the :mod:`pygaps.units.converter_mode`
+and :mod:`pygaps.units.converter_unit` modules.
 
 An example pressure conversion:
 
 .. code:: python
 
-    from pygaps.utilities.converter_mode import c_pressure
+    from pygaps.units.converter_mode import c_pressure
 
     converted = c_pressure(
         1,
@@ -218,7 +218,7 @@ An example loading conversion:
 
 .. code:: python
 
-    from pygaps.utilities.converter_mode import c_loading
+    from pygaps.units.converter_mode import c_loading
 
     converted = c_loading(
         1,
@@ -232,7 +232,7 @@ An example material conversion:
 
 .. code:: python
 
-    from pygaps.utilities.converter_mode import c_material
+    from pygaps.units.converter_mode import c_material
 
     converted = c_material(
         1,

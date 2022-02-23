@@ -4,19 +4,25 @@ import numpy
 
 from pygaps import logger
 from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import get_isotherm_model
 from pygaps.utilities.exceptions import ParameterError
 
 
 def initial_henry_slope(
-    isotherm, max_adjrms=0.02, p_limits=None, l_limits=None, verbose=False, **plot_parameters
+    isotherm: "PointIsotherm | ModelIsotherm",
+    max_adjrms: int = 0.02,
+    p_limits: "tuple[float, float]" = None,
+    l_limits: "tuple[float, float]" = None,
+    verbose: bool = False,
+    **plot_parameters,
 ):
     """
     Calculate a henry constant based on the initial slope.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : PointIsotherm, ModelIsotherm
         Isotherm to use for the calculation.
     max_adjrms : float, optional
         Maximum adjusted root mean square between the linear fit and isotherm data.
@@ -108,7 +114,11 @@ def initial_henry_slope(
     return henry.params["K"]
 
 
-def initial_henry_virial(isotherm, optimization_params=None, verbose=False):
+def initial_henry_virial(
+    isotherm: "PointIsotherm | ModelIsotherm",
+    optimization_params: dict = None,
+    verbose: bool = False,
+):
     """
     Calculate an initial Henry constant based on fitting the virial equation.
 

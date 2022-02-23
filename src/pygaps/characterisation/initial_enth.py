@@ -5,11 +5,19 @@ from scipy import optimize
 
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
 
-def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, **param_guess):
+def initial_enthalpy_comp(
+    isotherm: "PointIsotherm | ModelIsotherm",
+    enthalpy_key: str,
+    branch: str = 'ads',
+    verbose: bool = False,
+    **param_guess,
+):
     r"""
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading with a fitting
@@ -76,11 +84,17 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     prepowr_max : float
         Upper limit for power repulsion contribution coefficient.
 
-
     Returns
     -------
     dict
         Dict containing ``initial_enthalpy`` and fitting parameters.
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     """
     # Read data in
@@ -367,7 +381,12 @@ def initial_enthalpy_comp(isotherm, enthalpy_key, branch='ads', verbose=False, *
     return params
 
 
-def initial_enthalpy_point(isotherm, enthalpy_key, branch='ads', verbose=False):
+def initial_enthalpy_point(
+    isotherm: "PointIsotherm | ModelIsotherm",
+    enthalpy_key: str,
+    branch: str = 'ads',
+    verbose: bool = False,
+):
     """
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading by taking the

@@ -12,7 +12,8 @@ from scipy import optimize
 from pygaps.characterisation.models_hk import HK_KEYS
 from pygaps.characterisation.models_hk import get_hk_model
 from pygaps.core.adsorbate import Adsorbate
-from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
@@ -22,21 +23,23 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
 def psd_microporous(
-    isotherm: BaseIsotherm,
+    isotherm: "PointIsotherm | ModelIsotherm",
     psd_model: str = 'HK',
     pore_geometry: str = 'slit',
     branch: str = 'ads',
-    material_model: str = 'Carbon(HK)',
-    adsorbate_model: str = None,
+    material_model: "str | dict[str, float]" = 'Carbon(HK)',
+    adsorbate_model: "str | dict[str, float]" = None,
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False
-) -> dict:
+) -> "dict[str, list[float]]":
     r"""
     Calculate the microporous size distribution using a Horvath-Kawazoe type model.
 
+    Expected pore geometry must be specified as ``pore_geometry``.
+
     Parameters
     ----------
-    isotherm : Isotherm
+    isotherm : PointIsotherm, ModelIsotherm
         Isotherm for which the pore size distribution will be calculated.
     psd_model : str
         Pore size distribution model to use. Available are 'HK' (original Horvath-Kawazoe),
@@ -45,13 +48,13 @@ def psd_microporous(
         The geometry of the adsorbent pores.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
-    material_model : str or dict
+    material_model : str, dict
         The material model to use for PSD, It defaults to 'Carbon(HK)', the original
         Horvath-Kawazoe activated carbon parameters.
-    adsorbate_model : dict or `None`
+    adsorbate_model : str, dict
         The adsorbate properties to use for PSD, If empty, properties are
         automatically searched from internal database for the Adsorbate.
-    p_limits : [float, float]
+    p_limits : tuple[float, float]
         Pressure range in which to calculate PSD, defaults to [0, 0.2].
     verbose : bool
         Print out extra information on the calculation and graphs the results.
@@ -64,6 +67,13 @@ def psd_microporous(
         - ``pore_widths`` (array) : the widths of the pores
         - ``pore_distribution`` (array) : contribution of each pore width to the
           overall pore distribution
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     Notes
     -----
@@ -273,9 +283,9 @@ def psd_horvath_kawazoe(
 
     Parameters
     ----------
-    pressure : array
+    pressure : list[float]
         Relative pressure.
-    loading : array
+    loading : list[float]
         Adsorbed amount in mmol/g.
     temperature : float
         Temperature of the experiment, in K.
@@ -467,13 +477,13 @@ def psd_horvath_kawazoe(
 
     References
     ----------
-    .. [#hk2] G. Horvath and K. Kawazoe, Method for Calculation of Effective Pore
-       Size Distribution in Molecular Sieve Carbon, J. Chem. Eng. Japan, 16, 470 1983.
-    .. [#sf2] A. Saito and H. C. Foley, Curvature and Parametric Sensitivity in
-       Models for Adsorption in Micropores, AIChE J., 37, 429, 1991.
-    .. [#cy2] L. S. Cheng and R. T. Yang, ‘‘Improved Horvath-Kawazoe Equations
+    .. [#hk2] G. Horvath and K. Kawazoe, "Method for Calculation of Effective Pore
+       Size Distribution in Molecular Sieve Carbon", J. Chem. Eng. Japan, 16, 470 (1983).
+    .. [#sf2] A. Saito and H. C. Foley, "Curvature and Parametric Sensitivity in
+       Models for Adsorption in Micropores", AIChE J., 37, 429, (1991).
+    .. [#cy2] L. S. Cheng and R. T. Yang, "Improved Horvath-Kawazoe Equations
        Including Spherical Pore Models for Calculating Micropore Size
-       Distribution,’’ Chem. Eng. Sci., 49, 2599, 1994.
+       Distribution", Chem. Eng. Sci., 49, 2599, (1994).
 
 
     """
@@ -638,9 +648,9 @@ def psd_horvath_kawazoe_ry(
 
     Parameters
     ----------
-    pressure : array
+    pressure : list[float]
         Relative pressure.
-    loading : array
+    loading : list[float]
         Adsorbed amount in mmol/g.
     temperature : float
         Temperature of the experiment, in K.
@@ -841,12 +851,10 @@ def psd_horvath_kawazoe_ry(
     :math:`b` are calculated as for a cylindrical geometry, as in the case with
     the average potential :math:`\bar{\epsilon}`.
 
-
     References
     ----------
     .. [#ry2] S. U. Rege and R. T. Yang, "Corrected Horváth-Kawazoe equations for
-       pore-size distribution", AIChE Journal, vol. 46, no. 4, pp. 734–750, Apr.
-       2000.
+       pore-size distribution", AIChE Journal, 46, 4, 734-750, (2000).
 
     """
     # Parameter checks

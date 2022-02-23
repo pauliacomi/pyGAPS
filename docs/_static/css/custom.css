@@ -22,7 +22,22 @@ body[data-theme=light] {
     }
 }
 
-/* This ensures Matplotlib png images are legible on the dark background */
-.output_area>img {
+/* This ensures nnbsphinx Matplotlib png images are legible on the dark background */
+div.output_area img {
     background-color: var(--color-graph-background);
+}
+
+/* This ensures nnbsphinx tables are legible on the dark background */
+div.rendered_html table {
+    background-color: var(--color-graph-background);
+}
+
+/* This removes jarring nnbsphinx borders */
+div.nbinput.container div.input_area {
+    border: none !important;
+}
+
+/* Smaller logo */
+.sidebar-logo {
+    max-width: 50%;
 }

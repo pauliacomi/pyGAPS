@@ -54,9 +54,9 @@ extensions = [
     'sphinx.ext.extlinks',
     'sphinx.ext.ifconfig',
     'sphinx.ext.napoleon',
-    'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
+    'sphinx.ext.intersphinx',
     'sphinx_copybutton',
 ]
 # If currently spellchecking
@@ -155,7 +155,7 @@ html_short_title = '%s-%s' % (project, version)
 
 # Other options
 html_theme_options = {
-    "sidebar_hide_name": False,
+    "sidebar_hide_name": True,
     "navigation_with_keys": True,
     "announcement":
     "A <a href=\"https://github.com/pauliacomi/pyGAPS-gui\" >graphical user interface</a> for pyGAPS is now available!",
@@ -174,21 +174,25 @@ html_theme_options = {
 }
 
 # -- autodoc configuration -----------------------------------------------------
+# parse docstrings as documentation
 
 autodoc_member_order = 'bysource'
 autodoc_mock_imports = []
+autodoc_typehints = 'signature'
 autodoc_typehints_format = 'short'
 
 # -- napoleon configuration -----------------------------------------------------
+# parse numpy-style docstrings
 
 napoleon_numpy_docstring = True
 napoleon_google_docstring = False
 napoleon_use_ivar = True
-napoleon_use_param = True
+napoleon_use_param = False
 napoleon_use_rtype = False
-napoleon_use_admonition_for_references = True
+napoleon_use_admonition_for_references = False
 
 # -- nbsphinx configuration -----------------------------------------------------
+# allows parsing of Jupyter notebooks to docs
 
 nbsphinx_prolog = r"""
 {% set docname = 'docs/' + env.doc2path(env.docname, base=None) %}
@@ -214,3 +218,7 @@ nbsphinx_prolog = r"""
       </script>
     </div>
 """
+
+# -- intersphinx configuration --------------------------------------------------
+# allows to link to other documentations
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}

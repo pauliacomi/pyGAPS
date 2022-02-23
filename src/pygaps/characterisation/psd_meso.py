@@ -2,13 +2,16 @@
 Methods of calculating a pore size distribution for pores in the mesopore range
 (2-100 nm), based on the Kelvin equation and pore condensation/evaporation.
 """
+import typing as t
+
 import numpy
 
 from pygaps.characterisation.models_kelvin import get_kelvin_model
 from pygaps.characterisation.models_kelvin import get_meniscus_geometry
 from pygaps.characterisation.models_thickness import get_thickness_model
 from pygaps.core.adsorbate import Adsorbate
-from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
@@ -18,23 +21,30 @@ _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
 
 
 def psd_mesoporous(
-    isotherm: BaseIsotherm,
+    isotherm: "PointIsotherm | ModelIsotherm",
     psd_model: str = 'pygaps-DH',
     pore_geometry: str = 'cylinder',
     branch: str = 'des',
-    thickness_model: str = 'Harkins/Jura',
-    kelvin_model: str = 'Kelvin',
+    thickness_model:
+    "str | PointIsotherm | ModelIsotherm | t.Callable[[float], float]" = 'Harkins/Jura',
+    kelvin_model: "str | t.Callable[[float], float]" = 'Kelvin',
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False
 ):
     r"""
-    Calculate the mesopore size distribution.
+    Calculate the mesopore size distribution using a Kelvin-type model.
 
-    Uses methods based on the Kelvin equation and capillary condensation.
+    Expected pore geometry must be specified as ``pore_geometry``.
+
+    The ``thickness_model`` parameter is a string which names the thickness
+    equation which should be used. Alternatively, a user can implement their own
+    thickness model, either as an Isotherm or a function which describes the
+    adsorbed layer. In that case, instead of a string, pass the Isotherm object
+    or the callable function as the ``thickness_model`` parameter.
 
     Parameters
     ----------
-    isotherm : Isotherm
+    isotherm : PointIsotherm, ModelIsotherm
         Isotherm for which the pore size distribution will be calculated.
     psd_model : str
         The pore size distribution model to use.
@@ -42,12 +52,12 @@ def psd_mesoporous(
         The geometry of the adsorbent pores.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to desorption.
-    kelvin_model : callable, optional
+    thickness_model : str, callable, optional
+        The thickness model to use for PSD, It defaults to ``Harkins/Jura``.
+    kelvin_model : str, callable, optional
         A custom user kelvin model. It should be a callable that only takes
         relative pressure as an argument.
-    thickness_model : str or callable, optional
-        The thickness model to use for PSD, It defaults to Harkins and Jura.
-    p_limits : [float, float]
+    p_limits : tuple[float, float]
         Pressure range in which to calculate PSD, defaults to entire isotherm.
     verbose : bool
         Prints out extra information on the calculation and graphs the results.
@@ -60,6 +70,13 @@ def psd_mesoporous(
         - ``pore_widths`` (array) : the widths of the pores
         - ``pore_distribution`` (array) : contribution of each pore width to the
           overall pore distribution
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     Notes
     -----
@@ -234,11 +251,11 @@ def psd_mesoporous(
 
 
 def psd_pygapsdh(
-    volume_adsorbed,
-    relative_pressure,
-    pore_geometry,
-    thickness_model,
-    condensation_model,
+    volume_adsorbed: "list[float]",
+    relative_pressure: "list[float]",
+    pore_geometry: str,
+    thickness_model: t.Callable,
+    condensation_model: t.Callable,
 ):
     r"""
     Calculate a pore size distribution using an expanded Dollimore-Heal method.
@@ -401,11 +418,11 @@ def psd_pygapsdh(
 
 
 def psd_bjh(
-    volume_adsorbed,
-    relative_pressure,
-    pore_geometry,
-    thickness_model,
-    condensation_model,
+    volume_adsorbed: "list[float]",
+    relative_pressure: "list[float]",
+    pore_geometry: str,
+    thickness_model: t.Callable,
+    condensation_model: t.Callable,
 ):
     r"""
     Calculate a pore size distribution using the BJH method.
@@ -549,11 +566,11 @@ def psd_bjh(
 
 
 def psd_dollimore_heal(
-    volume_adsorbed,
-    relative_pressure,
-    pore_geometry,
-    thickness_model,
-    condensation_model,
+    volume_adsorbed: "list[float]",
+    relative_pressure: "list[float]",
+    pore_geometry: str,
+    thickness_model: t.Callable,
+    condensation_model: t.Callable,
 ):
     r"""
     Calculate a pore size distribution using the Dollimore-Heal method.

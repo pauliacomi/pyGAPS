@@ -1,4 +1,4 @@
-.. _models-ref:
+.. _fitting-ref:
 
 Isotherm fitting and models
 ===========================

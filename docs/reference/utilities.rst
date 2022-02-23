@@ -1,21 +1,10 @@
 .. _utilities-ref:
 
-
 Utilities
 =========
 
-Unit Converters
----------------
-
-.. automodule:: pygaps.utilities.converter_mode
-    :members:
-
-
-.. automodule:: pygaps.utilities.converter_unit
-    :members:
-
-Interpolator
-------------
+Isotherm Interpolator
+---------------------
 
 .. automodule:: pygaps.utilities.isotherm_interpolator
     :members:

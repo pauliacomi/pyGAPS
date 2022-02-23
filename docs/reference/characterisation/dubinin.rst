@@ -1,4 +1,3 @@
-
 Dubinin-Radushkevich and Dubinin-Astakov plots
 ..............................................
 

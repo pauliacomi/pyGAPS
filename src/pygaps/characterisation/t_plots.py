@@ -8,6 +8,8 @@ from scipy import stats
 from pygaps import logger
 from pygaps.characterisation.models_thickness import get_thickness_model
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
@@ -15,8 +17,9 @@ from pygaps.utilities.math_utilities import find_linear_sections
 
 
 def t_plot(
-    isotherm,
-    thickness_model: str = 'Harkins/Jura',
+    isotherm: "PointIsotherm | ModelIsotherm",
+    thickness_model:
+    "str | PointIsotherm | ModelIsotherm | t.Callable[[float], float]" = 'Harkins/Jura',
     branch: str = 'ads',
     t_limits: "tuple[float, float]" = None,
     verbose: bool = False,
@@ -24,26 +27,24 @@ def t_plot(
     r"""
     Calculate surface area and pore volume using a t-plot.
 
-    Pass an isotherm object to the function to have the t-plot method applied to
-    it. The ``thickness_model`` parameter is a string which names the thickness
+    The ``thickness_model`` parameter is a string which names the thickness
     equation which should be used. Alternatively, a user can implement their own
-    thickness model, either as an experimental isotherm or a function which
-    describes the adsorbed layer. In that case, instead of a string, pass the
-    Isotherm object or the callable function as the ``thickness_model``
-    parameter. The ``t_limits`` parameter takes the form of an array of two
-    numbers, which are the upper and lower limits of the thickness section which
-    should be taken for analysis.
+    thickness model, either as an Isotherm or a function which describes the
+    adsorbed layer. In that case, instead of a string, pass the Isotherm object
+    or the callable function as the ``thickness_model`` parameter. The
+    ``t_limits`` specifies the upper and lower limits of the thickness section
+    which should be taken for analysis.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
+    isotherm : PointIsotherm, ModelIsotherm
         The isotherm of which to calculate the t-plot parameters.
-    thickness_model : `str` or `Isotherm` or `callable`, optional
+    thickness_model : str, PointIsotherm, ModelIsotherm, `callable`, optional
         Name of the thickness model to use. Defaults to the Harkins and Jura
         thickness curve.
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
-    t_limits : [float, float], optional
+    t_limits : tuple[float, float], optional
         Thickness range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
@@ -65,6 +66,13 @@ def t_plot(
           - ``slope`` (float) : slope of the straight trendline fixed through the region
           - ``intercept`` (float) : intercept of the straight trendline through the region
           - ``corr_coef`` (float) : correlation coefficient of the linear region
+
+    Raises
+    ------
+    ParameterError
+        When something is wrong with the function parameters.
+    CalculationError
+        When the calculation itself fails.
 
     Notes
     -----
@@ -194,8 +202,8 @@ def t_plot(
 
 
 def t_plot_raw(
-    loading: list,
-    pressure: list,
+    loading: "list[float]",
+    pressure: "list[float]",
     thickness_model: t.Callable[[float], float],
     liquid_density: float,
     adsorbate_molar_mass: float,
@@ -210,17 +218,17 @@ def t_plot_raw(
 
     Parameters
     ----------
-    loading : array
+    loading : list[float]
         Amount adsorbed at the surface, mol/material.
-    pressure : array
+    pressure : list[float]
         Relative pressure corresponding to the loading.
-    thickness_model : callable
+    thickness_model : callable[[float], float]
         Function which which returns the thickness of the adsorbed layer at a pressure p.
     liquid_density : float
         Density of the adsorbate in the adsorbed state, in g/cm3.
     adsorbate_molar_mass : float
         Molar mass of the adsorbate, in g/mol.
-    t_limits : [float, float], optional
+    t_limits : tuple[float, float], optional
         Thickness range in which to perform the calculation.
 
     Returns
