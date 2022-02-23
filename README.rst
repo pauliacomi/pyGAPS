@@ -164,7 +164,7 @@ instalation). Then use pip inside your environment.
 
 .. code:: bash
 
-    conda create -n myenv python=3 numpy scipy pandas matplotlib
+    conda create -n myenv python=3.8 numpy scipy pandas matplotlib
     conda activate myenv
     pip install pygaps
 
