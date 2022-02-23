@@ -18,3 +18,6 @@ A clear and concise description of any alternative solutions or features you've 
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
+
+**Where you are from?/How are you using pyGAPS? (optional)**
+I'm always curious to see how pyGAPS is used and if it is useful to people. Don't fill this in if you don't want to tell me.
