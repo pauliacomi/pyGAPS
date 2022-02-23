@@ -98,6 +98,11 @@ def dr_plot(
        “Theory of volume filling for vapor adsorption,”
        Journal of Colloid and Interface Science, vol. 21, no. 4, pp. 378–393, Apr. 1966.
 
+    See Also
+    --------
+    pygaps.characterisation.dr_da_plots.da_plot : Dubinin-Astakov plot
+    pygaps.characterisation.dr_da_plots.da_plot_raw : low level method
+
     """
     return da_plot(
         isotherm,
@@ -194,6 +199,11 @@ def da_plot(
     .. [#] M. M. Dubinin, “Physical Adsorption of Gases and Vapors in Micropores,”
        in Progress in Surface and Membrane Science, vol. 9, Elsevier, 1975, pp. 1–70.
 
+    See Also
+    --------
+    pygaps.characterisation.dr_da_plots.dr_plot : Dubinin-Radushkevich plot
+    pygaps.characterisation.dr_da_plots.da_plot_raw : low level method
+
     """
 
     # Check consistency of exponent
@@ -253,7 +263,7 @@ def da_plot(
     if verbose:
         if find_exp:
             logger.info(f"Exponent is: {exp:.2g}")
-        logger.info(f"Micropore volume is: {microp_volume:.3g} cm3")
+        logger.info(f"Micropore volume is: {microp_volume:.3g} cm3/{isotherm.material_unit}")
         logger.info(f"Effective adsorption potential is : {potential:.3g} kJ/mol")
         # Plot
         from pygaps.graphing.calc_graphs import dra_plot

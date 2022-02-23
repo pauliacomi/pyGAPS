@@ -5,6 +5,7 @@ for use in the Horvath-Kawazoe method.
 
 from pygaps.utilities.exceptions import ParameterError
 
+#: List of parameters for an HK model
 HK_KEYS = {
     'molecular_diameter': 'nm',
     'polarizability': 'nm3',
@@ -12,6 +13,7 @@ HK_KEYS = {
     'surface_density': 'molecules/m2',
 }
 
+#: List of parameters for the carbon model
 PROPERTIES_CARBON = {
     'molecular_diameter': 0.34,  # nm
     'polarizability': 1.02E-3,  # nm3
@@ -19,6 +21,7 @@ PROPERTIES_CARBON = {
     'surface_density': 3.845E19,  # molecules/m2
 }
 
+#: List of parameters for the AlSi-Oxide model
 PROPERTIES_AlSi_OXIDE_ION = {
     'molecular_diameter': 0.276,  # nm
     'polarizability': 2.5E-3,  # nm3
@@ -26,6 +29,7 @@ PROPERTIES_AlSi_OXIDE_ION = {
     'surface_density': 1.315E19,  # molecules/m2
 }
 
+#: List of parameters for the AlPh-Oxide model
 PROPERTIES_AlPh_OXIDE_ION = {
     'molecular_diameter': 0.260,  # nm
     'polarizability': 2.5E-3,  # nm3
@@ -33,6 +37,7 @@ PROPERTIES_AlPh_OXIDE_ION = {
     'surface_density': 1.000E19,  # molecules/m2
 }
 
+#: List of adsorbent models
 _ADSORBENT_MODELS = {
     'Carbon(HK)': PROPERTIES_CARBON,
     'AlSiOxideIon': PROPERTIES_AlSi_OXIDE_ION,

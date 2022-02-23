@@ -91,6 +91,10 @@ def isosteric_enthalpy(
     effect on the calculated isosteric enthalpies of adsorption, especially at
     high relative pressures and for heavy adsorbates.
 
+    See Also
+    --------
+    pygaps.characterisation.isosteric_enth.isosteric_enthalpy_raw : low level method
+
     """
     # Check more than one isotherm
     if len(isotherms) < 2:

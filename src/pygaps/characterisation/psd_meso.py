@@ -125,9 +125,9 @@ def psd_mesoporous(
 
     See Also
     --------
-    pygaps.characterisation.psd_meso.psd_pygapsdh : the pygaps-DH method
-    pygaps.characterisation.psd_meso.psd_bjh : the BJH or Barrett, Joyner and Halenda method
-    pygaps.characterisation.psd_meso.psd_dollimore_heal : the DH or Dollimore-Heal method
+    pygaps.characterisation.psd_meso.psd_pygapsdh : low-level pygaps-DH method
+    pygaps.characterisation.psd_meso.psd_bjh : low-level BJH or Barrett, Joyner and Halenda method
+    pygaps.characterisation.psd_meso.psd_dollimore_heal : low-level DH or Dollimore-Heal method
 
     """
     # Function parameter checks
@@ -259,6 +259,8 @@ def psd_pygapsdh(
 ):
     r"""
     Calculate a pore size distribution using an expanded Dollimore-Heal method.
+    This function should not be used with isotherms (use instead
+    :func:`pygaps.characterisation.psd_meso.psd_mesoporous`).
 
     Parameters
     ----------
@@ -426,6 +428,8 @@ def psd_bjh(
 ):
     r"""
     Calculate a pore size distribution using the BJH method.
+    This function should not be used with isotherms (use instead
+    :func:`pygaps.characterisation.psd_meso.psd_mesoporous`).
 
     Parameters
     ----------
@@ -574,6 +578,8 @@ def psd_dollimore_heal(
 ):
     r"""
     Calculate a pore size distribution using the Dollimore-Heal method.
+    This function should not be used with isotherms (use instead
+    :func:`pygaps.characterisation.psd_meso.psd_mesoporous`).
 
     Parameters
     ----------

@@ -132,8 +132,7 @@ def psd_microporous(
        Including Spherical Pore Models for Calculating Micropore Size
        Distribution", Chem. Eng. Sci., 49, 2599, 1994.
     .. [#ry1] S. U. Rege and R. T. Yang, "Corrected Horváth-Kawazoe equations for
-       pore-size distribution", AIChE Journal, vol. 46, no. 4, pp. 734–750, Apr.
-       2000.
+       pore-size distribution", AIChE Journal, 46, 4, (2000) 734-750.
 
     See Also
     --------
@@ -280,6 +279,8 @@ def psd_horvath_kawazoe(
 ):
     r"""
     Calculate the pore size distribution using the Horvath-Kawazoe method.
+    This function should not be used with isotherms (use instead
+    :func:`pygaps.characterisation.psd_micro.psd_microporous`).
 
     Parameters
     ----------
@@ -645,6 +646,8 @@ def psd_horvath_kawazoe_ry(
 ):
     r"""
     Calculate the microporous size distribution using a Rege-Yang (R-Y) type model.
+    This function should not be used with isotherms (use instead
+    :func:`pygaps.characterisation.psd_micro.psd_microporous`).
 
     Parameters
     ----------

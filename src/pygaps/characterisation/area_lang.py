@@ -117,6 +117,10 @@ def area_langmuir(
     ----------
     .. [#] I. Langmuir, J. Amer. Chem. Soc., 38, 2219 (1916); 40, 1368 (1918)
 
+    See Also
+    --------
+    pygaps.characterisation.area_lang.area_langmuir_raw : low level method
+
     """
     # get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)

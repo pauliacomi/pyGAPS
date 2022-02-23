@@ -3,10 +3,22 @@
 Utilities
 =========
 
-Isotherm Interpolator
+Isotherm interpolator
 ---------------------
 
 .. automodule:: pygaps.utilities.isotherm_interpolator
+    :members:
+
+Thermodynamic backend utilities
+-------------------------------
+
+.. automodule:: pygaps.utilities.coolprop_utilities
+    :members:
+
+Python utilities
+----------------
+
+.. automodule:: pygaps.utilities.python_utilities
     :members:
 
 Exceptions
@@ -15,20 +27,20 @@ Exceptions
 .. automodule:: pygaps.utilities.exceptions
     :members:
 
-Other utilities
----------------
-
-.. automodule:: pygaps.utilities.coolprop_utilities
-    :members:
-
-.. automodule:: pygaps.utilities.python_utilities
-    :members:
+Math utilities
+--------------
 
 .. automodule:: pygaps.utilities.math_utilities
     :members:
 
+String processing utilities
+---------------------------
+
 .. automodule:: pygaps.utilities.string_utilities
     :members:
+
+SQLite utilities
+----------------
 
 .. automodule:: pygaps.utilities.sqlite_utilities
     :members:

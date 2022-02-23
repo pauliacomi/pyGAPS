@@ -132,6 +132,10 @@ def area_BET(
     .. [#] "Adsorption by Powders & Porous Solids", F. Rouquerol, J Rouquerol
        and K. Sing, Academic Press, 1999
 
+    See Also
+    --------
+    pygaps.characterisation.area_bet.area_BET_raw : low level method
+
     """
     # get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)

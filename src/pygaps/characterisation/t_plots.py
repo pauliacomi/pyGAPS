@@ -122,11 +122,14 @@ def t_plot(
     Interactions at loadings that occur on the t-plot lower than the monolayer
     thickness do not have any physical meaning.
 
-
     References
     ----------
     .. [#] “Studies on Pore Systems in Catalysts V. The t Method”,
        B. C. Lippens and J. H. de Boer, J. Catalysis, 4, 319 (1965)
+
+    See Also
+    --------
+    pygaps.characterisation.t_plots.t_plot_raw : low level method
 
     """
     # Function parameter checks

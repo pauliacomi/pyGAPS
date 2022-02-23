@@ -196,6 +196,7 @@ def kelvin_radius_kjs(
         (constants.gas_constant * temperature * numpy.log(pressure)) + 0.3
 
 
+#: List of kelvin model functions
 _KELVIN_MODELS = {
     'Kelvin': kelvin_radius,
     'Kelvin-KJS': kelvin_radius_kjs,

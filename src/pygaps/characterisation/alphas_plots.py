@@ -133,6 +133,10 @@ def alpha_s(
     ----------
     .. [#] D. Atkinson, A.I. McLeod, K.S.W. Sing, J. Chim. Phys., 81, 791 (1984)
 
+    See Also
+    --------
+    pygaps.characterisation.alphas_plots.alpha_s_raw : low level method
+
     """
     # Check to see if reference isotherm is given
     if reference_isotherm is None or not isinstance(reference_isotherm, BaseIsotherm):

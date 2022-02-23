@@ -12,7 +12,7 @@ Material characterisation
    characterisation/dubinin
    characterisation/psd_meso
    characterisation/psd_micro
-   characterisation/psd_dft
+   characterisation/psd_kernel
    characterisation/thickness_models
    characterisation/isosteric_enth
    characterisation/initial_hk
