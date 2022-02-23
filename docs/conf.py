@@ -72,7 +72,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'pygaps'
+project = 'pyGAPS'
 year = '2022'
 author = 'Paul Iacomi'
 copyright = f'{year}, {author}'
@@ -82,6 +82,8 @@ try:
 except ModuleNotFoundError:
     from pkg_resources import get_distribution as imp_version
     version = release = imp_version("pygaps").version
+
+print("Version defined as ", version)
 
 # Needed for jupyter notebook compilation by nbsphinx
 exclude_patterns = [
@@ -151,11 +153,11 @@ html_split_index = False
 # html_sidebars = {
 #     '**': ['searchbox.html', 'globaltoc.html', 'sourcelink.html'],
 # }
-html_short_title = '%s-%s' % (project, version)
+html_short_title = f"{project}-{version}"
 
 # Other options
 html_theme_options = {
-    "sidebar_hide_name": True,
+    "sidebar_hide_name": False,
     "navigation_with_keys": True,
     "announcement":
     "A <a href=\"https://github.com/pauliacomi/pyGAPS-gui\" >graphical user interface</a> for pyGAPS is now available!",
