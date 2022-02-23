@@ -83,7 +83,7 @@ except ModuleNotFoundError:
     from pkg_resources import get_distribution as imp_version
     version = release = imp_version("pygaps").version
 
-print("Version defined as ", version)
+print(project, " version defined as ", version)
 
 # Needed for jupyter notebook compilation by nbsphinx
 exclude_patterns = [
