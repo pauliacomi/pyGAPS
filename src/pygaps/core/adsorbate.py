@@ -30,7 +30,7 @@ class Adsorbate():
 
     Other Parameters
     ----------------
-    alias : list
+    alias : list[str]
         Other names the same adsorbate might take.
         Example: name=propanol, alias=['1-propanol'].
         pyGAPS disregards capitalisation (Propanol = propanol = PROPANOL).

@@ -344,13 +344,13 @@ def tp_plot(
 def psd_plot(
     pore_widths: t.Iterable[float],
     pore_dist: t.Iterable[float],
-    pore_vol_cum=None,
+    pore_vol_cum: t.Iterable[float] = None,
     method: str = None,
     labeldiff: str = 'distribution',
     labelcum: str = 'cumulative',
     log: bool = True,
-    right=None,
-    left=None,
+    right: int = None,
+    left: int = None,
     ax=None,
 ):
     """
@@ -446,11 +446,11 @@ def psd_plot(
 
 @mpl.rc_context(BASE_STYLE)
 def isosteric_enthalpy_plot(
-    loading,
-    isosteric_enthalpy,
-    std_err,
+    loading: t.Iterable[float],
+    isosteric_enthalpy: t.Iterable[float],
+    std_err: t.Iterable[float],
     isotherm,
-    log=False,
+    log: bool = False,
     ax=None,
 ):
     """
@@ -464,7 +464,7 @@ def isosteric_enthalpy_plot(
         The isosteric enthalpy corresponding to each loading.
     std_err : array
         Standard error for each point.
-    isotherm : array
+    isotherm : PointIsotherm, ModelIsotherm
         An isotherm to determine graph units.
     log : int
         Whether to display a logarithmic graph.
@@ -659,7 +659,7 @@ def virial_plot(
     ln_p_over_n: t.Iterable[float],
     n_load: t.Iterable[float],
     p_load: t.Iterable[float],
-    added_point,
+    added_point: bool,
     ax=None,
 ):
     """

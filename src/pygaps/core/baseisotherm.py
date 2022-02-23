@@ -405,7 +405,7 @@ class BaseIsotherm():
 
     def to_db(
         self,
-        db_path=None,
+        db_path: str = None,
         verbose: bool = True,
         autoinsert_material: bool = True,
         autoinsert_adsorbate: bool = True,
