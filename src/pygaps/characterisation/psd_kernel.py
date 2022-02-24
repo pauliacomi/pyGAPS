@@ -14,13 +14,10 @@ from scipy import optimize
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.data import KERNELS
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.math_utilities import bspline
-
-_KERNELS = {
-    'DFT-N2-77K-carbon-slit': Path(__file__).parent / 'kernels' / 'DFT-N2-77K-carbon-slit.csv',
-}
 
 _LOADED = {}  # We will keep loaded kernels here
 
@@ -145,10 +142,7 @@ def psd_dft(
         raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
     # Get an internal kernel, otherwise assume it is a path
-    if kernel in _KERNELS:
-        kernel_path = _KERNELS[kernel]
-    else:
-        kernel_path = kernel
+    kernel_path = KERNELS.get(kernel, kernel)
 
     # Get units
     if kernel_units is None:
@@ -205,8 +199,16 @@ def psd_dft(
     loading = loading[minimum:maximum + 1]
 
     # Call the DFT function
-    pore_widths, pore_dist, pore_vol_cum, kernel_final_loading = psd_dft_kernel_fit(
-        pressure, loading, kernel_path, bspline_order
+    (
+        pore_widths,
+        pore_dist,
+        pore_vol_cum,
+        kernel_final_loading,
+    ) = psd_dft_kernel_fit(
+        pressure,
+        loading,
+        kernel_path,
+        bspline_order,
     )  # mmol/g
 
     if verbose:
@@ -373,7 +375,8 @@ def _load_kernel(path: str):
     if path in _LOADED:
         return _LOADED[path]
 
-    raw_kernel = pandas.read_csv(path, index_col=0)
+    with open(path, encoding="utf8") as fp:
+        raw_kernel = pandas.read_csv(fp, index_col=0)
 
     # add a 0 in the dataframe for interpolation between lowest values
     raw_kernel = raw_kernel.append(

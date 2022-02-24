@@ -24,20 +24,16 @@ def db_create(pth: str, verbose: bool = False):
         db_execute_general(pragma, pth, verbose=verbose)
 
     # Get json files
-    try:
-        import importlib.resources as pkg_resources
-    except ImportError:
-        # Try backported to PY<37 `importlib_resources`.
-        import importlib_resources as pkg_resources
+    import importlib.resources as importlib_resources
 
     # Get and upload adsorbate property types
-    ads_props_json = pkg_resources.read_text('pygaps.data', 'adsorbate_props.json')
+    ads_props_json = importlib_resources.read_text('pygaps.data', 'adsorbate_props.json')
     ads_props = json.loads(ads_props_json)
     for ap_type in ads_props:
         pgsqlite.adsorbate_property_type_to_db(ap_type, db_path=pth, verbose=verbose)
 
     # Get and upload adsorbates
-    ads_json = pkg_resources.read_text('pygaps.data', 'adsorbates.json')
+    ads_json = importlib_resources.read_text('pygaps.data', 'adsorbates.json')
     adsorbates = json.loads(ads_json)
     for ads in adsorbates:
         pgsqlite.adsorbate_to_db(pygaps.Adsorbate(**ads), db_path=pth, verbose=verbose)
