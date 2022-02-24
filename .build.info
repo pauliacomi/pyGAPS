@@ -16,7 +16,10 @@ bumpversion major/minor/patch
 # Finish branch
 git flow release finish x.y.z
 
-# Push, including tags
+# Push tags
 git push --tags
 
 # Check CI if project has been successfully pushed to pypi
+
+# Update conda recipe with latest hash
+grayskull pypi pygaps
