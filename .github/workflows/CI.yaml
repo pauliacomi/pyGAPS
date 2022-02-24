@@ -78,9 +78,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade setuptools tox tox-conda
-        conda install numpy pandas scipy matplotlib
         conda info
-        conda env list
         pip --version
         virtualenv --version
         tox --version
