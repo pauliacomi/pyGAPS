@@ -149,24 +149,22 @@ the program in your research.
 Installation
 ============
 
-The easiest way to install pyGAPS is from the command line.
-Make sure that you have ``numpy``, ``scipy``, ``pandas`` and ``matplotlib``,
-as well as ``CoolProp`` already installed.
+The easiest way to install pyGAPS is from the command line. Using pip for
+example:
 
 .. code:: bash
 
     pip install pygaps
 
-`Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
-environments for you. First create a new environment and use conda to
-install the dependencies (or start with one that already has a full
-instalation). Then use pip inside your environment.
+However, `Anaconda/Conda <https://www.anaconda.com/>`__ is generally a better
+bet since it manages environments for you. First create a new environment (or
+start with one that you already use), then install using ``pip`` or ``conda``.
 
 .. code:: bash
 
-    conda create -n myenv python=3.8 numpy scipy pandas matplotlib
+    conda create -n myenv python=3.8
     conda activate myenv
-    pip install pygaps
+    conda install pygaps -c conda-forge
 
 To install the development branch, clone the repository from GitHub.
 Then install the package with pip either in regular or developer mode.
