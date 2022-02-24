@@ -52,7 +52,7 @@ line_length = 120
 known_first_party = "pygaps"
 default_section = "THIRDPARTY"
 forced_separate = "test_pygaps"
-skip = [".tox",".eggs","ci/templates","build","dist"]
+skip = [".tox", ".eggs", "ci/templates", "build", "dist"]
 
 # testing: pytest.py
 [tool.pytest.ini_options]
