@@ -7,6 +7,11 @@ Changelog
 
 New features:
 
+* ⚠️ To reduce import bloat pyGAPS is now **modular**. Previously global
+  functions must be accessed through submodules. For example:
+  ``pygaps.area_BET`` now must be imported from
+  ``pygaps.characterisation.area_BET``.
+* 🎆 pyGAPS is now on ``conda-forge``
 * Volumetric adsorbed amount is now given in either ``volume_gas`` or
   `volume_liquid` basis, corresponding to the volume amount the adsorbate would
   occupy in the bulk gas phase, or the volume of an ideal liquid phase of
@@ -23,7 +28,7 @@ New features:
 
 Changes:
 
-* Minimum python is now 3.7, maximum increased to 3.10.
+* ⚠️ Minimum python is now 3.7, maximum increased to 3.10.
 * Removed the need to pass DataFrame column names with the ``other_keys``
   syntax. PointIsotherms, now save *all* passed DataFrame columns.
 * Smart assigning of isotherm metadata caused confusion and was removed.

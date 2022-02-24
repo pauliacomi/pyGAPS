@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
-fallback_version = '4.0.1'
+fallback_version = '4.0.2'
 
 # linting: pylint
 [tool.pylint.basic]
@@ -52,7 +52,7 @@ line_length = 120
 known_first_party = "pygaps"
 default_section = "THIRDPARTY"
 forced_separate = "test_pygaps"
-skip = [".tox",".eggs","ci/templates","build","dist"]
+skip = [".tox", ".eggs", "ci/templates", "build", "dist"]
 
 # testing: pytest.py
 [tool.pytest.ini_options]

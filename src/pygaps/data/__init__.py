@@ -12,7 +12,8 @@ try:
     import importlib.resources as importlib_resources
     from importlib.resources import files as importlib_resources_files
 except ImportError:
-    # Try backported to PY<37 `importlib_resources`.
+    # TODO Deprecation after PY<39
+    # Use backported `importlib_resources`.
     import importlib_resources as importlib_resources
     from importlib_resources import files as importlib_resources_files
 
@@ -41,3 +42,9 @@ def load_data():
 
     MATERIAL_LIST.extend(materials_from_db(verbose=False))
     ADSORBATE_LIST.extend(adsorbates_from_db(verbose=False))
+
+
+_kernel_res = importlib_resources_files('pygaps.data.kernels')
+KERNELS = {
+    'DFT-N2-77K-carbon-slit': _kernel_res / 'DFT-N2-77K-carbon-slit.csv',
+}
