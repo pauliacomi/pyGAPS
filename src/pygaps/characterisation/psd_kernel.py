@@ -4,8 +4,6 @@ kernel. Please note that calculation of DFT/NLDFT/QSDFT kernels is outside the
 scope of this program.
 """
 
-from pathlib import Path
-
 import numpy
 import pandas
 from scipy import interpolate
