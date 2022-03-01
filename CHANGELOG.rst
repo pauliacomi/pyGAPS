@@ -2,6 +2,14 @@
 Changelog
 =========
 
+4.1.0 (2022-03-02)
+------------------
+
+New features:
+
+* 🐍 Minimum python reduced to 3.6 to increase compatibility.
+* 🎆 pyGAPS is now (actually) on ``conda-forge``.
+
 4.0.0 (2022-02-23)
 ------------------
 

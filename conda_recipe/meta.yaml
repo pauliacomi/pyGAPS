@@ -1,34 +1,34 @@
 {% set name = "pygaps" %}
-{% set version = "4.0.2" %}
+{% set version = "4.1.0" %}
 
 package:
-  name: "{{ name|lower }}"
-  version: "{{ version }}"
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: 2e9e15ab683f9a3f5044fd116e1a4d5215ee1705de38883d89a05eb6985c9e58
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/pygaps-{{ version }}.tar.gz
+  sha256: 0914aa95ebdf8aa08276f9823d42fcc02c2b48538e3dabc11d06dc25ebde08ba
 
 build:
-  number: 0
-  noarch: python
+  skip: true  # [py<37]
   entry_points:
     - pygaps = pygaps.cli:main
-  script: "{{ PYTHON }} -m pip install . -vv"
+  script: {{ PYTHON }} -m pip install . -vv
+  number: 0
 
 requirements:
   host:
     - pip
-    - python >=3.6
+    - python
   run:
-    - python >=3.6
+    - python ~=3.7
     - numpy >=1.16.5
     - pandas
     - scipy >=1.6
-    - matplotlib
+    - matplotlib-base
     - coolprop >=6.0
     - gemmi
-    - importlib_resources   # [ py <3.9 ]
+    - importlib-resources  # [py<39]
     - requests
     - xlrd >=1.1
     - xlwt >=1.3
@@ -37,28 +37,17 @@ requirements:
 test:
   imports:
     - pygaps
-    - pygaps.characterisation
-    - pygaps.cli
-    - pygaps.core
-    - pygaps.data
-    - pygaps.graphing
-    - pygaps.iast
-    - pygaps.modelling
-    - pygaps.parsing
-    - pygaps.utilities
   commands:
+    - pip check
     - pygaps --help
   requires:
-    - coverage
-    - nose
-    - pytest
-    - pytest-cov
+    - pip
 
 about:
-  home: "https://github.com/pauliacomi/pygaps"
-  license: "MIT"
-  license_family: "MIT"
-  license_file: "LICENSE"
+  home: https://github.com/pauliacomi/pygaps
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE
   summary: "A framework for processing adsorption data for porous materials"
   doc_url: "https://pygaps.readthedocs.io"
   dev_url: "https://github.com/pauliacomi/pygaps"

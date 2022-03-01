@@ -382,3 +382,8 @@ def bet_parameters(slope, intercept, cross_section):
     p_monolayer = 1 / (numpy.sqrt(c_const) + 1)
     bet_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
     return n_monolayer, p_monolayer, c_const, bet_area
+
+
+def simple_bet(pressure, n_monolayer, c_const):
+    """A simple BET equation returning loading at a pressure."""
+    return (n_monolayer * c_const * pressure / (1 - pressure) / (1 - pressure + c_const * pressure))

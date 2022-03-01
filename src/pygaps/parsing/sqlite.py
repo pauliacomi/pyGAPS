@@ -39,7 +39,9 @@ def with_connection(func):
 
         db_path = kwargs.get('db_path', DATABASE)
         db_path = db_path if db_path else DATABASE
-        conn = sqlite3.connect(db_path)
+        # TODO deprecate 3.6: switch below
+        # conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(str(db_path))
         conn.row_factory = sqlite3.Row
 
         try:

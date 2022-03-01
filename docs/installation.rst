@@ -2,25 +2,25 @@
 Installation
 ============
 
-pyGAPS is made for modern versions of Python, currently requiring at least Python 3.7.
+pyGAPS is made for modern versions of Python, currently requiring at least Python 3.6.
 
 Command line
 ============
 
 The installation process should take care of the dependencies for you.
-If using pip all you need to do is::
+If using ``pip`` all you need to do is::
 
     pip install pygaps
 
 We recommend using the `Anaconda/Conda <https://www.anaconda.com/>`__ environment,
 as it preinstalls most required dependencies as well as making
-managing environments a breeze.
+managing environments a breeze. To create a new environment with pyGAPS:
 
 .. code-block:: bash
 
-    conda create -n py3 python=3.8 numpy scipy pandas matplotlib CoolProp
-    conda activate py3
-    pip install pygaps
+    conda create -n myenv python=3.8
+    conda activate myenv
+    conda install pygaps
 
 To install the development branch, clone the repository from Github. Then
 install the package, in regular or editable mode
@@ -30,10 +30,10 @@ install the package, in regular or editable mode
     git clone https://github.com/pauliacomi/pyGAPS
 
     # then install
-    pip install ./pyGAPS/
+    pip install ./pyGAPS
 
     # alternatively in developer mode
-    pip install -e ./pyGAPS/
+    pip install -e ./pyGAPS
 
 Dependencies
 ============

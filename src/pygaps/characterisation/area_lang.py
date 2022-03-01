@@ -333,3 +333,8 @@ def langmuir_parameters(slope, intercept, cross_section):
     langmuir_const = 1 / (intercept * n_monolayer)
     langmuir_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
     return n_monolayer, langmuir_const, langmuir_area
+
+
+def simple_lang(pressure, n_total, k_const):
+    """A simple Langmuir equation returning loading at a pressure."""
+    return (n_total * k_const * pressure / (1 + k_const * pressure))

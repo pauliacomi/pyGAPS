@@ -149,24 +149,26 @@ the program in your research.
 Installation
 ============
 
-The easiest way to install pyGAPS is from the command line.
-Make sure that you have ``numpy``, ``scipy``, ``pandas`` and ``matplotlib``,
-as well as ``CoolProp`` already installed.
+The easiest way to install pyGAPS is from the command line. Using ``pip`` for
+example:
 
 .. code:: bash
 
     pip install pygaps
 
-`Anaconda/Conda <https://www.anaconda.com/>`__ is your best bet since it manages
-environments for you. First create a new environment and use conda to
-install the dependencies (or start with one that already has a full
-instalation). Then use pip inside your environment.
+or `Anaconda/Conda <https://www.anaconda.com/>`__:
 
 .. code:: bash
 
-    conda create -n myenv python=3.8 numpy scipy pandas matplotlib
-    conda activate myenv
-    pip install pygaps
+    conda install -c conda-forge pygaps
+
+If you are just starting out, `Anaconda/Conda <https://www.anaconda.com/>`__ is
+a good bet since it manages virtual environments for you. Check out
+`<https://pygaps.readthedocs.io/en/master/installation.html>`__ for more
+details.
+
+Development
+===========
 
 To install the development branch, clone the repository from GitHub.
 Then install the package with pip either in regular or developer mode.
@@ -176,16 +178,14 @@ Then install the package with pip either in regular or developer mode.
     git clone https://github.com/pauliacomi/pyGAPS
 
     # then install
-    pip install pyGAPS/
+    pip install ./pyGAPS
 
     # or in editable/develop mode
-    pip install -e pyGAPS/
-
-Development
-===========
+    pip install -e ./pyGAPS
 
 If you want to contribute to pyGAPS or develop your own code from the package,
-check out the detailed information in CONTRIBUTING.rst.
+check out the detailed information in
+`<https://pygaps.readthedocs.io/en/master/contributing.html>`.
 
 Bugs or questions?
 ==================
