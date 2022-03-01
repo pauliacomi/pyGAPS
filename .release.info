@@ -13,6 +13,10 @@ pytest --cov --cov-report xml:coverage.xml
 # scattered throughout the source code
 bumpversion major/minor/patch
 
+# Currently there is an issue with versioning
+# which means that setup.cfg metadata must be
+# updated manually
+
 # Finish branch
 git flow release finish x.y.z
 
@@ -21,5 +25,7 @@ git push --tags
 
 # Check CI if project has been successfully pushed to pypi
 
-# Update conda recipe with latest hash
+# Update conda recipe
+
+# Get latest hash
 grayskull pypi pygaps
