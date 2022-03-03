@@ -183,7 +183,8 @@ def plot_iso(
 
     # Store which branches will be displayed
     if not branch:
-        raise ParameterError("Specify a branch to display" " e.g. branch=\'ads\'")
+        raise ParameterError("Specify a branch to display"
+                             " e.g. branch=\'ads\'")
     if branch not in _BRANCH_TYPES:
         raise GraphingError(
             "The supplied branch type is not valid."
@@ -279,7 +280,9 @@ def plot_iso(
         y2_ls.update(y2_line_style)
 
         # If there's an adsorption branch, plot it
-        if ads and isotherm.has_branch('ads'):
+        iso_has_ads = isotherm.has_branch('ads')
+        iso_has_des = isotherm.has_branch('des')
+        if ads and iso_has_ads:
             # Points
             x1_p, y1_p, x2_p, y2_p = _get_data(
                 isotherm,
@@ -303,7 +306,7 @@ def plot_iso(
         y2_ls['markerfacecolor'] = 'white'
 
         # If there's a desorption branch, plot it
-        if des and isotherm.has_branch('des'):
+        if des and iso_has_des:
             # Points
             x1_p, y1_p, x2_p, y2_p = _get_data(
                 isotherm,
@@ -313,7 +316,7 @@ def plot_iso(
                 range_params=range_params,
             )
             # Plot line 1
-            if branch == 'all' and 'branch' not in lgd_keys:
+            if branch == 'all' and 'branch' not in lgd_keys and iso_has_ads:
                 y1_lbl = ''
             else:
                 y1_lbl = label_lgd(isotherm, lgd_keys, 'des', y1_data)
@@ -321,7 +324,7 @@ def plot_iso(
 
             # Plot line 2
             if y2_data and y2_p is not None:
-                if branch == 'all' and 'branch' not in lgd_keys:
+                if branch == 'all' and 'branch' not in lgd_keys and iso_has_ads:
                     y2_lbl = ''
                 else:
                     y2_lbl = label_lgd(isotherm, lgd_keys, 'des', y2_data)
