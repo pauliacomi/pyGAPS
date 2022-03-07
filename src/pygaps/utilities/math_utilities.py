@@ -9,8 +9,10 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 def split_ads_data(data, pressure_key):
+    """Find the inflection in an adsorption dataset with adsorption/desorption."""
+
     # Generate array
-    split = numpy.array([0 for p in range(0, len(data.index))])
+    split = numpy.zeros(data.shape[0])
 
     # Get the maximum pressure point (assume where desorption starts)
     inflexion = data.index.get_loc(data[pressure_key].idxmax()) + 1
