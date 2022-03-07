@@ -147,7 +147,9 @@ def parse(path):
                 if h == 'time':
                     data[h] = _convert_time(points)[1:]
                 elif h == 'pressure_saturation':
-                    data[h] = points[1:]
+                    data[h] = [float(x) for x in points[1:]]
+                elif h.startswith("pressure") or h.startswith("loading"):
+                    data[h] = [float(x) for x in points]
                 else:
                     data[h] = points
 
