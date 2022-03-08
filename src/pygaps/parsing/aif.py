@@ -122,7 +122,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
 
     # remaining metadata
     for meta in iso_dict:
-        block.set_pair(f"_pygaps_{meta}", f"\'{iso_dict[meta]}\'")
+        block.set_pair(f"_pygaps_{meta.replace(' ', '_')}", f"\'{iso_dict[meta]}\'")
 
     # data
     if isinstance(isotherm, PointIsotherm):
