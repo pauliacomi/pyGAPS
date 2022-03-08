@@ -12,7 +12,7 @@ def split_ads_data(data, pressure_key):
     """Find the inflection in an adsorption dataset with adsorption/desorption."""
 
     # Generate array
-    split = numpy.zeros(data.shape[0])
+    split = numpy.zeros(data.shape[0], dtype=numpy.int8)
 
     # Get the maximum pressure point (assume where desorption starts)
     inflexion = data.index.get_loc(data[pressure_key].idxmax()) + 1
