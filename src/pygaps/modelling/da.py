@@ -52,17 +52,17 @@ class DA(IsothermBaseModel):
     name = 'DA'
     formula = r"n(p) = n_t \exp[-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{m}]"
     calculates = 'loading'
-    param_names = ["n_m", "e", "m"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "e": [0, numpy.inf],
-        "m": [1, 3],
-    }
-    minus_rt = -1000  # base value
+    param_names = ("n_m", "e", "m")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+        (1, 3),
+    )
+    minus_rt = -1000  # initial value for guess
 
-    def __init_parameters__(self, parameters):
+    def __init_parameters__(self, params):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -constants.gas_constant * parameters['temperature']
+        self.minus_rt = -constants.gas_constant * params['temperature']
 
     def loading(self, pressure):
         """
@@ -78,9 +78,10 @@ class DA(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * \
-            numpy.exp(-(self.minus_rt * numpy.log(pressure) / self.params["e"]) ** self.params["m"]
-                      )
+        nm = self.params['n_m']
+        e = self.params['e']
+        m = self.params['m']
+        return nm * numpy.exp(-(self.minus_rt * numpy.log(pressure) / e)**m)
 
     def pressure(self, loading):
         r"""
@@ -103,10 +104,10 @@ class DA(IsothermBaseModel):
             Pressure at specified loading.
 
         """
-        return numpy.exp(
-            self.params['e'] / self.minus_rt *
-            numpy.power(-numpy.log(loading / self.params['n_m']), 1 / self.params['m'])
-        )
+        nm = self.params['n_m']
+        e = self.params['e']
+        m = self.params['m']
+        return numpy.exp(e / self.minus_rt * numpy.power(-numpy.log(loading / nm), 1 / m))
 
     def spreading_pressure(self, pressure):
         r"""
@@ -151,13 +152,6 @@ class DA(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "e": -self.minus_rt, "m": 1}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

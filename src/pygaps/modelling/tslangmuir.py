@@ -46,14 +46,14 @@ class TSLangmuir(IsothermBaseModel):
     formula = r"n(p) = n_{m_1} \frac{K_1 p}{1+K_1 p} + n_{m_2} \frac{K_2 p}{1+K_2 p} + n_{m_3} \frac{K_3 p}{1+K_3 p}"
     calculates = 'loading'
     param_names = ["n_m1", "n_m2", "n_m3", "K1", "K2", "K3"]
-    param_bounds = {
-        "n_m1": [0, numpy.inf],
-        "n_m2": [0, numpy.inf],
-        "n_m3": [0, numpy.inf],
-        "K1": [0, numpy.inf],
-        "K2": [0, numpy.inf],
-        "K3": [0, numpy.inf],
-    }
+    param_default_bounds = (
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -69,7 +69,6 @@ class TSLangmuir(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        # K_i p
         k1p = self.params["K1"] * pressure
         k2p = self.params["K2"] * pressure
         k3p = self.params["K3"] * pressure
@@ -131,12 +130,9 @@ class TSLangmuir(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m1"] * numpy.log(
-            1.0 + self.params["K1"] * pressure) +\
-            self.params["n_m2"] * numpy.log(
-            1.0 + self.params["K2"] * pressure) +\
-            self.params["n_m3"] * numpy.log(
-            1.0 + self.params["K3"] * pressure)
+        return self.params["n_m1"] * numpy.log(1.0 + self.params["K1"] * pressure) +\
+            self.params["n_m2"] * numpy.log(1.0 + self.params["K2"] * pressure) +\
+            self.params["n_m3"] * numpy.log(1.0 + self.params["K3"] * pressure)
 
     def initial_guess(self, pressure, loading):
         """
@@ -164,11 +160,5 @@ class TSLangmuir(IsothermBaseModel):
             "n_m3": 0.2 * saturation_loading,
             "K3": 0.4 * langmuir_k
         }
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

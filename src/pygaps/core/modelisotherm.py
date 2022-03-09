@@ -88,8 +88,6 @@ class ModelIsotherm(BaseIsotherm):
 
     _reserved_params = BaseIsotherm._reserved_params + [
         'model',
-        'param_guess',
-        'param_bounds',
     ]
 
     ##########################################################
@@ -189,45 +187,32 @@ class ModelIsotherm(BaseIsotherm):
 
             # Name of analytical model to fit to pure-component isotherm data
             # adsorption isotherm.
-            self.model = get_isotherm_model(model)
+            self.model = get_isotherm_model(
+                model,
+                pressure_range=(min(pressure), max(pressure)),
+                loading_range=(min(loading), max(loading)),
+                param_bounds=param_bounds,
+            )
 
             # Pass odd parameters
             self.model.__init_parameters__(other_properties)
 
-            # The pressure range on which the model was built.
-            self.model.pressure_range = [min(pressure), max(pressure)]
-
-            # The loading range on which the model was built.
-            self.model.loading_range = [min(loading), max(loading)]
-
-            # Override defaults if user provides param_bounds dictionary
-            if param_bounds is not None:
-                for param, bound in param_bounds.items():
-                    if param not in self.model.param_bounds.keys():
-                        raise ParameterError(
-                            f"'{param}' is not a valid parameter"
-                            f" in the '{model}' model."
-                        )
-                    self.model.param_bounds[param] = bound
-
             # Dictionary of parameters as a starting point for data fitting.
-            self.param_guess = self.model.initial_guess(pressure, loading)
-
-            # Override defaults if user provides param_guess dictionary
-            if param_guess is not None:
-                for param, guess_val in param_guess.items():
-                    if param not in self.param_guess.keys():
+            if param_guess:
+                for param in param_guess.keys():
+                    if param not in self.model.param_names:
                         raise ParameterError(
                             f"'{param}' is not a valid parameter"
                             f" in the '{model}' model."
                         )
-                    self.param_guess[param] = guess_val
+            else:
+                param_guess = self.model.initial_guess(pressure, loading)
 
             # fit model to isotherm data
             self.model.fit(
                 pressure,
                 loading,
-                self.param_guess,
+                param_guess,
                 optimization_params,
                 verbose,
             )

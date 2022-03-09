@@ -30,12 +30,12 @@ class Toth(IsothermBaseModel):
     name = 'Toth'
     formula = r"n(p) = n_m \frac{K p}{\sqrt[t]{1 + (K p)^t}}"
     calculates = 'loading'
-    param_names = ["n_m", "K", "t"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "K": [0, numpy.inf],
-        "t": [0, numpy.inf],
-    }
+    param_names = ("n_m", "K", "t")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+        (0, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -51,9 +51,10 @@ class Toth(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * self.params["K"] * pressure / \
-            (1.0 + (self.params["K"] * pressure)**self.params["t"]) \
-            ** (1 / self.params["t"])
+        n_m = self.params["n_m"]
+        Kp = self.params["K"] * pressure
+        t = self.params["t"]
+        return n_m * Kp / (1.0 + (Kp)**t)**(1 / t)
 
     def pressure(self, loading):
         r"""
@@ -76,8 +77,10 @@ class Toth(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        return (loading / (self.params["n_m"] * self.params["K"])) / \
-            (1 - (loading / self.params["n_m"])**self.params["t"])**(1 / self.params["t"])
+        n_m = self.params["n_m"]
+        K = self.params["K"]
+        t = self.params["t"]
+        return (loading / (n_m * K)) / (1 - (loading / n_m)**t)**(1 / t)
 
     def spreading_pressure(self, pressure):
         r"""
@@ -122,13 +125,6 @@ class Toth(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "K": langmuir_k, "t": 1}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

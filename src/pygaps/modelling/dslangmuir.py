@@ -42,13 +42,13 @@ class DSLangmuir(IsothermBaseModel):
     name = 'DSLangmuir'
     formula = r"n(p) = n_{m_1}\frac{K_1 p}{1+K_1 p} +  n_{m_2}\frac{K_2 p}{1+K_2 p}"
     calculates = 'loading'
-    param_names = ["n_m1", "K1", "n_m2", "K2"]
-    param_bounds = {
-        "n_m1": [0., numpy.inf],
-        "n_m2": [0., numpy.inf],
-        "K1": [0., numpy.inf],
-        "K2": [0., numpy.inf],
-    }
+    param_names = ("n_m1", "K1", "n_m2", "K2")
+    param_default_bounds = (
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -66,8 +66,7 @@ class DSLangmuir(IsothermBaseModel):
         """
         k1p = self.params["K1"] * pressure
         k2p = self.params["K2"] * pressure
-        return self.params["n_m1"] * k1p / (1.0 + k1p) + \
-            self.params["n_m2"] * k2p / (1.0 + k2p)
+        return self.params["n_m1"] * k1p / (1.0 + k1p) + self.params["n_m2"] * k2p / (1.0 + k2p)
 
     def pressure(self, loading):
         """
@@ -86,13 +85,13 @@ class DSLangmuir(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        a = self.params['n_m1']
-        b = self.params['K1']
-        c = self.params['n_m2']
-        d = self.params['K2']
+        nm1 = self.params['n_m1']
+        K1 = self.params['K1']
+        nm2 = self.params['n_m2']
+        K2 = self.params['K2']
 
-        x = (a + c - loading) * b * d
-        y = (a * b + c * d - loading * (b + d))
+        x = (nm1 + nm2 - loading) * K1 * K2
+        y = (nm1 * K1 + nm2 * K2 - loading * (K1 + K2))
 
         res = (-y + numpy.sqrt(y**2 - 4 * x * (-loading))) / (2 * x)
 
@@ -128,10 +127,8 @@ class DSLangmuir(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m1"] * numpy.log(
-            1.0 + self.params["K1"] * pressure) +\
-            self.params["n_m2"] * numpy.log(
-            1.0 + self.params["K2"] * pressure)
+        return self.params["n_m1"] * numpy.log(1.0 + self.params["K1"] * pressure) +\
+            self.params["n_m2"] * numpy.log(1.0 + self.params["K2"] * pressure)
 
     def initial_guess(self, pressure, loading):
         """
@@ -157,11 +154,5 @@ class DSLangmuir(IsothermBaseModel):
             "n_m2": 0.5 * saturation_loading,
             "K2": 0.6 * langmuir_k
         }
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

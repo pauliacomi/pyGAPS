@@ -52,13 +52,13 @@ class JensenSeaton(IsothermBaseModel):
     name = 'JensenSeaton'
     formula = r"n(p) = K p [1 + (\frac{K p}{(a (1 + b p)})^c]^{-1/c}"
     calculates = 'loading'
-    param_names = ["K", "a", "b", "c"]
-    param_bounds = {
-        "K": [0., numpy.inf],
-        "a": [0., numpy.inf],
-        "b": [0., numpy.inf],
-        "c": [0., numpy.inf],
-    }
+    param_names = ("K", "a", "b", "c")
+    param_default_bounds = (
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+        (0., numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -74,10 +74,11 @@ class JensenSeaton(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["K"] * pressure / \
-            (1 + (self.params["K"] * pressure /
-                  (self.params["a"] * (1 + self.params["b"] * pressure))
-                  )**self.params['c'])**(1 / self.params['c'])
+        Kp = self.params["K"] * pressure
+        a = self.params["a"]
+        b = self.params["b"]
+        c = self.params["c"]
+        return Kp / (1 + (Kp / (a * (1 + b * pressure)))**c)**(1 / c)
 
     def pressure(self, loading):
         """
@@ -149,13 +150,6 @@ class JensenSeaton(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"K": saturation_loading * langmuir_k, "a": 1, "b": 1, "c": 1}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

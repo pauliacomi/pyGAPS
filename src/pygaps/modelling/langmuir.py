@@ -79,11 +79,11 @@ class Langmuir(IsothermBaseModel):
     name = 'Langmuir'
     formula = r"n(p) = n_m\frac{K p}{1 + K p}"
     calculates = 'loading'
-    param_names = ["K", "n_m"]
-    param_bounds = {
-        "K": [0, numpy.inf],
-        "n_m": [0, numpy.inf],
-    }
+    param_names = ("K", "n_m")
+    param_default_bounds = (
+        (0., numpy.inf),
+        (0., numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -99,8 +99,8 @@ class Langmuir(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * self.params["K"] * pressure / \
-            (1.0 + self.params["K"] * pressure)
+        kp = self.params["K"] * pressure
+        return self.params["n_m"] * kp / (1.0 + kp)
 
     def pressure(self, loading):
         r"""
@@ -123,8 +123,7 @@ class Langmuir(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        return loading / \
-            (self.params["K"] * (self.params["n_m"] - loading))
+        return loading / (self.params["K"] * (self.params["n_m"] - loading))
 
     def spreading_pressure(self, pressure):
         r"""
@@ -153,8 +152,7 @@ class Langmuir(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m"] * \
-            numpy.log(1.0 + self.params["K"] * pressure)
+        return self.params["n_m"] * numpy.log(1.0 + self.params["K"] * pressure)
 
     def initial_guess(self, pressure, loading):
         """
@@ -173,13 +171,6 @@ class Langmuir(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "K": langmuir_k}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

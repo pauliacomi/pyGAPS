@@ -106,12 +106,12 @@ class BET(IsothermBaseModel):
     name = 'BET'
     formula = r"n(p) = n_m \frac{C p}{(1 - N p)(1 - N p + C p)}"
     calculates = 'loading'
-    param_names = ["n_m", "C", "N"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "C": [0, numpy.inf],
-        "N": [0, numpy.inf],
-    }
+    param_names = ("n_m", "C", "N")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+        (0, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -127,10 +127,10 @@ class BET(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * self.params["C"] * pressure / (
-            (1.0 - self.params["N"] * pressure) *
-            (1.0 - self.params["N"] * pressure + self.params["C"] * pressure)
-        )
+        nm = self.params['n_m']
+        N = self.params['N']
+        C = self.params['C']
+        return nm * C * pressure / ((1.0 - N * pressure) * (1.0 - N * pressure + C * pressure))
 
     def pressure(self, loading):
         """
@@ -149,13 +149,12 @@ class BET(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        a = self.params['n_m']
-        b = self.params['N']
-        c = self.params['C']
+        nm = self.params['n_m']
+        N = self.params['N']
+        C = self.params['C']
 
-        x = loading * b * (b - c)
-        y = loading * c - 2 * loading * b - a * c
-
+        x = loading * N * (N - C)
+        y = loading * C - 2 * loading * N - nm * C
         res = (-y - numpy.sqrt(y**2 - 4 * x * loading)) / (2 * x)
 
         if numpy.isnan(res).any():
@@ -190,10 +189,10 @@ class BET(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m"] * numpy.log(
-            (1.0 - self.params["N"] * pressure + self.params["C"] * pressure) /
-            (1.0 - self.params["N"] * pressure)
-        )
+        nm = self.params['n_m']
+        N = self.params['N']
+        C = self.params['C']
+        return nm * numpy.log((1.0 - N * pressure + C * pressure) / (1.0 - N * pressure))
 
     def initial_guess(self, pressure, loading):
         """
@@ -212,13 +211,6 @@ class BET(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "C": langmuir_k, "N": 0.01}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

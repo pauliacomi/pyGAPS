@@ -11,7 +11,7 @@ class GAB(IsothermBaseModel):
 
     .. math::
 
-        n(p) = n_m \frac{C K p}{(1 - K p)(1 - K p + K C p)}
+        n(p) = n_m \frac{C K p}{(1 - K p)(1 - K p + C K p)}
 
     Notes
     -----
@@ -32,12 +32,12 @@ class GAB(IsothermBaseModel):
     name = 'GAB'
     formula = r"n(p) = n_m \frac{C K p}{(1 - K p)(1 - K p + K C p)}"
     calculates = 'loading'
-    param_names = ["n_m", "C", "K"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "C": [0, numpy.inf],
-        "K": [0, numpy.inf],
-    }
+    param_names = ("n_m", "C", "K")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+        (0, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -53,10 +53,10 @@ class GAB(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * self.params["K"] * self.params["C"] * pressure / (
-            (1.0 - self.params["K"] * pressure) *
-            (1.0 - self.params["K"] * pressure + self.params["K"] * self.params["C"] * pressure)
-        )
+        nm = self.params['n_m']
+        C = self.params['C']
+        Kp = self.params['K'] * pressure
+        return nm * C * Kp / ((1.0 - Kp) * (1.0 - Kp + C * Kp))
 
     def pressure(self, loading):
         """
@@ -75,13 +75,12 @@ class GAB(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
+        nm = self.params['n_m']
+        C = self.params['C']
+        K = self.params['K']
 
-        a = self.params['n_m']
-        b = self.params['K']
-        c = self.params['C']
-
-        x = loading * (1 - c) * b**2
-        y = (loading * (c - 2) - a * c) * b
+        x = loading * (1 - C) * K**2
+        y = (loading * (C - 2) - nm * C) * K
 
         res = (-y - numpy.sqrt(y**2 - 4 * x * loading)) / (2 * x)
 
@@ -117,10 +116,10 @@ class GAB(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m"] * numpy.log(
-            (1.0 - self.params["K"] * pressure + self.params["K"] * self.params["C"] * pressure) /
-            (1.0 - self.params["K"] * pressure)
-        )
+        nm = self.params['n_m']
+        C = self.params['C']
+        Kp = self.params['K'] * pressure
+        return nm * numpy.log((1.0 - Kp + C * Kp) / (1.0 - Kp))
 
     def initial_guess(self, pressure, loading):
         """
@@ -139,13 +138,6 @@ class GAB(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "C": 10 * langmuir_k, "K": 0.01}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

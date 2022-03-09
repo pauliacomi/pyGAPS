@@ -6,7 +6,7 @@ Scaffolding and convenience functions for isotherm fitting.
 
 If adding a custom model, it should be also added below as a string.
 """
-
+import typing as t
 import importlib
 
 from pygaps.utilities.exceptions import ParameterError
@@ -136,7 +136,7 @@ def is_model_class(model):
     return isinstance(model, IsothermBaseModel)
 
 
-def get_isotherm_model(model_name: str, params: dict = None):
+def get_isotherm_model(model_name: str, **params: dict):
     """
     Check whether specified model name exists and return an instance of that model class.
 
@@ -165,22 +165,22 @@ def get_isotherm_model(model_name: str, params: dict = None):
     pg_model_name = _MODELS[index]
     module = importlib.import_module(f"pygaps.modelling.{pg_model_name.lower()}")
     model = getattr(module, pg_model_name)
-    return model(params)
+    return model(**params)
 
 
 def model_from_dict(model_dict):
     """Obtain a model from a dictionary."""
-    return get_isotherm_model(model_dict.pop('name'), model_dict)
+    return get_isotherm_model(model_dict.pop('name'), **model_dict)
 
 
 def model_iso(
     isotherm,
-    branch='ads',
-    model=None,
-    param_guess=None,
-    param_bounds=None,
-    optimization_params=None,
-    verbose=False
+    branch: str = 'ads',
+    model: t.Union[str, t.List[str], t.Any] = None,
+    param_guess: dict = None,
+    param_bounds: dict = None,
+    optimization_params: dict = None,
+    verbose: bool = False,
 ):
     """
     Fits a PointIsotherm with a model.

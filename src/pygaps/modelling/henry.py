@@ -43,10 +43,8 @@ class Henry(IsothermBaseModel):
     name = 'Henry'
     formula = r"n(p) = K_H p"
     calculates = 'loading'
-    param_names = ["K"]
-    param_bounds = {
-        "K": [0, numpy.inf],
-    }
+    param_names = ("K")
+    param_default_bounds = ((0., numpy.inf), )
 
     def loading(self, pressure):
         """
@@ -133,13 +131,6 @@ class Henry(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"K": saturation_loading * langmuir_k}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess
