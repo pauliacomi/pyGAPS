@@ -2,6 +2,15 @@
 Changelog
 =========
 
+4.1.1 (2022-03-10)
+------------------
+
+Fixes:
+
+* AIF file export now more reliable with custom properties
+* Isotherm models correctly instantiate their variables (parameters would
+  otherwise be shared between instances)
+
 4.1.0 (2022-03-02)
 ------------------
 
