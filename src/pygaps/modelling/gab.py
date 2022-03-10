@@ -36,7 +36,7 @@ class GAB(IsothermBaseModel):
     param_default_bounds = (
         (0, numpy.inf),
         (0, numpy.inf),
-        (0, numpy.inf),
+        (0, 1),
     )
 
     def loading(self, pressure):
