@@ -85,14 +85,14 @@ def convert_unit_ltx(string: str, negative: bool = False) -> str:
     return result
 
 
-def _is_none(s: str):
+def _is_none(s: str) -> bool:
     """Check if a value is a text None."""
     if s == 'None':
         return True
     return False
 
 
-def _is_float(s: str):
+def _is_float(s: str) -> bool:
     """Check if a value is a float."""
     try:
         float(s)
@@ -101,7 +101,7 @@ def _is_float(s: str):
         return False
 
 
-def _is_bool(s: str):
+def _is_bool(s: str) -> bool:
     """Check a value is a text bool."""
     if s.lower() in ['true', 'false']:
         return True
@@ -109,8 +109,8 @@ def _is_bool(s: str):
         return False
 
 
-def _from_bool(s: str):
-    """Convert a boolean into a string."""
+def _from_bool(s: str) -> bool:
+    """Convert a string into a boolean."""
     if s.lower() == 'true':
         return True
     if s.lower() == 'false':
@@ -118,16 +118,15 @@ def _from_bool(s: str):
     raise ValueError('String cannot be converted to bool')
 
 
-def _is_list(s: str):
+def _is_list(s: str) -> bool:
     """Check a value is a simple list."""
     if s.startswith('[') and s.endswith(']'):
         return True
-    else:
-        return False
+    return False
 
 
 def _from_list(s: str):
-    """Convert a value into a string list."""
+    """Convert a value into a list/tuple/dict."""
     # note that the function will fail if the list has other spaces
     return ast.literal_eval(s.replace(' ', ","))
 
@@ -136,4 +135,6 @@ def _to_string(s):
     """Convert a value into a CSV-safe string."""
     if isinstance(s, list):
         return '[' + ' '.join([str(x) for x in s]) + "]"
+    if isinstance(s, tuple):
+        return '(' + ' '.join([str(x) for x in s]) + ")"
     return str(s)

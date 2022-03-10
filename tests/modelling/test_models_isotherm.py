@@ -104,6 +104,7 @@ class TestIsothermModels():
 
     @pytest.mark.parametrize("m_name", [key for key in MODEL_DATA])
     def test_models_fit_function(self, m_name):
+        """Test each model's spreading fitting function."""
 
         model = models.get_isotherm_model(m_name)
         test_values = MODEL_DATA[m_name]['test_values']

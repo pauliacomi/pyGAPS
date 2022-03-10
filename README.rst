@@ -164,8 +164,8 @@ or `Anaconda/Conda <https://www.anaconda.com/>`__:
 
 If you are just starting out, `Anaconda/Conda <https://www.anaconda.com/>`__ is
 a good bet since it manages virtual environments for you. Check out
-`<https://pygaps.readthedocs.io/en/master/installation.html>`__ for more
-details.
+`Installation <https://pygaps.readthedocs.io/en/master/installation.html>`__ for
+more details.
 
 Development
 ===========
@@ -185,7 +185,7 @@ Then install the package with pip either in regular or developer mode.
 
 If you want to contribute to pyGAPS or develop your own code from the package,
 check out the detailed information in
-`<https://pygaps.readthedocs.io/en/master/contributing.html>`.
+`CONTRIBUTING.rst <https://pygaps.readthedocs.io/en/master/contributing.html>`__.
 
 Bugs or questions?
 ==================

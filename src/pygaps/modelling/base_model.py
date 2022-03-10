@@ -7,6 +7,7 @@ from scipy import optimize
 
 from pygaps import logger
 from pygaps.utilities.exceptions import CalculationError
+from pygaps.utilities.exceptions import ParameterError
 
 
 class IsothermBaseModel():
@@ -14,38 +15,64 @@ class IsothermBaseModel():
 
     __metaclass__ = abc.ABCMeta
 
+    #
     # Class specific
-    name = None
-    formula = None  # formula for the model
-    calculates = None  # loading/pressure
-    param_names = []
-    param_bounds = None
+    name: str = None
+    formula: str = None  # formula for the model
+    calculates: str = None  # loading/pressure
+    param_names: "tuple[str]" = ()
+    param_default_bounds: "tuple[tuple[float,float]]" = ()
 
+    #
     # Instance specific
-    rmse = numpy.nan
-    pressure_range = [numpy.nan, numpy.nan]
-    loading_range = [numpy.nan, numpy.nan]
+    # Dictionary of model parameters
+    params: "dict[str,float]" = None
+    # Dictionary of bounds for the parameters, if any
+    param_bounds: "dict[str, tuple[float, float]]" = None
+    # The pressure range on which the model was built.
+    pressure_range: "tuple[float,float]" = None
+    # The loading range on which the model was built.
+    loading_range: "tuple[float,float]" = None
+    # Model fit on the provided data
+    rmse: float = None
 
-    def __init__(self, params=None):
-        """Instantiate parameters."""
+    def __init__(self, **params):
+        """Populate instance-specific parameters."""
 
-        if params:
-            self.rmse = params.pop('rmse', numpy.nan)
-            self.pressure_range = params.pop('pressure_range', [numpy.nan, numpy.nan])
-            self.loading_range = params.pop('loading_range', [numpy.nan, numpy.nan])
+        # Model parameters
+        parameters = params.pop('parameters', None)
+        if parameters:
             self.params = {}
             for param in self.param_names:
                 try:
-                    self.params[param] = params['parameters'][param]
+                    self.params[param] = parameters[param]
                 except KeyError as err:
                     raise KeyError(
                         f"""The isotherm model is missing parameter '{param}'."""
                     ) from err
-
         else:
             self.params = {param: numpy.nan for param in self.param_names}
 
-    def __init_parameters__(self, parameters):
+        # Bounds for the parameters
+        parameter_bounds = params.pop('param_bounds', None)
+        if parameter_bounds:
+            self.param_bounds = {}
+            for param, bound in parameter_bounds.items():
+                if param not in self.param_names:
+                    raise ParameterError(
+                        f"'{param}' is not a valid parameter"
+                        f" in the '{self.name}' model."
+                    )
+                self.param_bounds[param] = bound
+        else:
+            self.param_bounds = dict(zip(self.param_names, self.param_default_bounds))
+
+        # Others
+        self.pressure_range = params.pop('pressure_range', (numpy.nan, numpy.nan))
+        self.loading_range = params.pop('loading_range', (numpy.nan, numpy.nan))
+        self.rmse = params.pop('rmse', numpy.nan)
+
+    def __init_parameters__(self, params):
         """Initialize model parameters from isotherm data."""
 
     def __repr__(self):
@@ -75,12 +102,12 @@ class IsothermBaseModel():
             'name': self.name,
             'rmse': self.rmse,
             'parameters': self.params,
-            'pressure_range': tuple(map(float, self.pressure_range)),
-            'loading_range': tuple(map(float, self.loading_range)),
+            'pressure_range': self.pressure_range,
+            'loading_range': self.loading_range,
         }
 
     @abc.abstractmethod
-    def loading(self, pressure):
+    def loading(self, pressure: float) -> float:
         """
         Calculate loading at specified pressure.
 
@@ -94,10 +121,9 @@ class IsothermBaseModel():
         float
             Loading at specified pressure.
         """
-        return
 
     @abc.abstractmethod
-    def pressure(self, loading):
+    def pressure(self, loading: float) -> float:
         """
         Calculate pressure at specified loading.
 
@@ -111,10 +137,9 @@ class IsothermBaseModel():
         float
             Pressure at specified loading.
         """
-        return
 
     @abc.abstractmethod
-    def spreading_pressure(self, pressure):
+    def spreading_pressure(self, pressure: float) -> float:
         """
         Calculate spreading pressure at specified gas pressure.
 
@@ -130,7 +155,7 @@ class IsothermBaseModel():
         """
         return
 
-    def initial_guess(self, pressure, loading):
+    def initial_guess(self, pressure: "list[float]", loading: "list[float]"):
         """
         Return initial guess for fitting.
 
@@ -166,13 +191,23 @@ class IsothermBaseModel():
 
         return saturation_loading, langmuir_k
 
+    def initial_guess_bounds(self, guess):
+        """Trim initial guess to the bounds."""
+        for param, val in guess.items():
+            bounds = self.param_bounds[param]
+            if val < bounds[0]:
+                guess[param] = bounds[0]
+            if val > bounds[1]:
+                guess[param] = bounds[1]
+        return guess
+
     def fit(
         self,
-        pressure,
-        loading,
-        param_guess,
-        optimization_params=None,
-        verbose=False,
+        pressure: "list[float]",
+        loading: "list[float]",
+        param_guess: "list[float]",
+        optimization_params: dict = None,
+        verbose: bool = False,
     ):
         """
         Fit model to data using nonlinear optimization with least squares loss function.

@@ -40,12 +40,12 @@ class TemkinApprox(IsothermBaseModel):
     name = 'TemkinApprox'
     formula = r"n(p) = n_m \frac{K p}{1 + K p} + n_m \theta (\frac{K p}{1 + K p})^2 (\frac{K p}{1 + K p} -1)"
     calculates = 'loading'
-    param_names = ["n_m", "K", "tht"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "K": [0, numpy.inf],
-        "tht": [0, numpy.inf],
-    }
+    param_names = ("n_m", "K", "tht")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+        (0, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -61,10 +61,11 @@ class TemkinApprox(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        lang_load = self.params["K"] * pressure / (1.0 + self.params["K"] * pressure)
-        return self.params["n_m"] * (
-            lang_load + self.params["tht"] * lang_load**2 * (lang_load - 1)
-        )
+        n_m = self.params["n_m"]
+        Kp = self.params["K"] * pressure
+        tht = self.params["tht"]
+        lang_load = Kp / (1.0 + Kp)
+        return n_m * (lang_load + tht * lang_load**2 * (lang_load - 1))
 
     def pressure(self, loading):
         """
@@ -120,11 +121,11 @@ class TemkinApprox(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        one_plus_kp = 1.0 + self.params["K"] * pressure
-        return self.params["n_m"] * (
-            numpy.log(one_plus_kp) + self.params["tht"] *
-            (2.0 * self.params["K"] * pressure + 1.0) / (2.0 * one_plus_kp**2)
-        )
+        n_m = self.params["n_m"]
+        Kp = self.params["K"] * pressure
+        tht = self.params["tht"]
+        one_plus_kp = 1.0 + Kp
+        return n_m * (numpy.log(one_plus_kp) + tht * (2.0 * Kp + 1.0) / (2.0 * one_plus_kp**2))
 
     def initial_guess(self, pressure, loading):
         """
@@ -143,13 +144,6 @@ class TemkinApprox(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "K": langmuir_k, "tht": 0.0}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

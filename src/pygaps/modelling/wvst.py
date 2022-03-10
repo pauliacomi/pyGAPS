@@ -70,13 +70,13 @@ class WVST(IsothermBaseModel):
     # Model parameters
     name = 'WVST'
     calculates = 'pressure'
-    param_names = ["n_m", "K", "L1v", "Lv1"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "K": [0, numpy.inf],
-        "L1v": [-numpy.inf, numpy.inf],
-        "Lv1": [-numpy.inf, numpy.inf],
-    }
+    param_names = ("n_m", "K", "L1v", "Lv1")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+        (-numpy.inf, numpy.inf),
+        (-numpy.inf, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -124,18 +124,16 @@ class WVST(IsothermBaseModel):
             Pressure at specified loading.
 
         """
-        cov = loading / self.params["n_m"]
+        n_m = self.params["n_m"]
+        Lv1 = self.params["Lv1"]
+        L1v = self.params["L1v"]
+        cov = loading / n_m
+        covX1minLv1 = (1 - Lv1) * cov
+        covX1minL1v = (1 - L1v) * cov
 
-        coef = self.params["L1v"] * (1 - (1 - self.params["Lv1"]) * cov) / \
-            (self.params["L1v"] + (1 - self.params["L1v"]) * cov)
-
-        expcoef = -((self.params["Lv1"] * (1 - self.params["Lv1"]) * cov) /
-                    (1 - (1 - self.params["Lv1"]) * cov)) \
-                  - ((1 - self.params["L1v"]) * cov /
-                     (self.params["L1v"] + (1 - self.params["L1v"]) * cov))
-
-        res = (self.params["n_m"] / self.params["K"] * cov / (1 - cov)) * \
-            coef * numpy.exp(expcoef)
+        coef = L1v * (1 - covX1minLv1) / (L1v + covX1minL1v)
+        expcoef = -((Lv1 * covX1minLv1) / (1 - covX1minLv1)) - (covX1minL1v / (L1v + covX1minL1v))
+        res = (n_m / self.params["K"] * cov / (1 - cov)) * coef * numpy.exp(expcoef)
 
         return res
 
@@ -182,15 +180,8 @@ class WVST(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "K": langmuir_k, "L1v": 1, "Lv1": 1}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess
 
     def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):

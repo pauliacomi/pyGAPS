@@ -44,13 +44,13 @@ class Virial(IsothermBaseModel):
     name = 'Virial'
     formula = r"p(n) = n \exp{(-\ln{K_H} + An + Bn^2 + Cn^3)}"
     calculates = 'pressure'
-    param_names = ["K", "A", "B", "C"]
-    param_bounds = {
-        "K": [0, numpy.inf],
-        "A": [-numpy.inf, numpy.inf],
-        "B": [-numpy.inf, numpy.inf],
-        "C": [-numpy.inf, numpy.inf],
-    }
+    param_names = ("K", "A", "B", "C")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (-numpy.inf, numpy.inf),
+        (-numpy.inf, numpy.inf),
+        (-numpy.inf, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -144,15 +144,8 @@ class Virial(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"K": saturation_loading * langmuir_k, "A": 0, "B": 0, "C": 0}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess
 
     def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):

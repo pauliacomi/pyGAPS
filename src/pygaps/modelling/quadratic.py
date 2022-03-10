@@ -40,12 +40,12 @@ class Quadratic(IsothermBaseModel):
     name = 'Quadratic'
     formula = r"n(p) = n_m \frac{p (K_a + 2 K_b p)}{1 + K_a p + K_b p^2}"
     calculates = 'loading'
-    param_names = ["n_m", "Ka", "Kb"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "Ka": [-numpy.inf, numpy.inf],
-        "Kb": [-numpy.inf, numpy.inf],
-    }
+    param_names = ("n_m", "Ka", "Kb")
+    param_default_bounds = (
+        (0., numpy.inf),
+        (-numpy.inf, numpy.inf),
+        (-numpy.inf, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -61,9 +61,10 @@ class Quadratic(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * (
-            self.params["Ka"] + 2.0 * self.params["Kb"] * pressure
-        ) * pressure / (1.0 + self.params["Ka"] * pressure + self.params["Kb"] * pressure**2)
+        nm = self.params["n_m"]
+        Ka = self.params["Ka"]
+        Kb = self.params["Kb"]
+        return nm * (Ka + 2.0 * Kb * pressure) * pressure / (1.0 + Ka * pressure + Kb * pressure**2)
 
     def pressure(self, loading):
         """
@@ -82,12 +83,12 @@ class Quadratic(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        a = self.params['n_m']
-        b = self.params['Ka']
-        c = self.params['Kb']
+        nm = self.params['n_m']
+        Ka = self.params['Ka']
+        Kb = self.params['Kb']
 
-        x = (loading - 2 * a) * c
-        y = (loading - a) * b
+        x = (loading - 2 * nm) * Kb
+        y = (loading - nm) * Ka
 
         res = (-y - numpy.sqrt(y**2 - 4 * x * loading)) / (2 * x)
 
@@ -143,14 +144,8 @@ class Quadratic(IsothermBaseModel):
         dict
             Dictionary of initial guesses for the parameters.
         """
+        # TODO: there must be a better way to get an initial guess?
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading / 2.0, "Ka": langmuir_k, "Kb": langmuir_k**2.0}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

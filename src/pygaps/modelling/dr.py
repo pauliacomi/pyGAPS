@@ -19,13 +19,12 @@ class DR(IsothermBaseModel):
 
     Notes
     -----
-    The Dubinin-Radushkevich isotherm model [#]_ extends the potential theory
-    of Polanyi, which asserts that molecules
-    near a surface are subjected to a potential field.
-    The adsorbate at the surface is in a liquid state and
-    its local pressure is conversely equal to the vapour pressure
-    at the adsorption temperature. The Polanyi theory attempts to
-    relate the surface coverage with the Gibbs free energy of adsorption,
+    The Dubinin-Radushkevich isotherm model [#]_ extends the potential theory of
+    Polanyi, which asserts that molecules near a surface are subjected to a
+    potential field. The adsorbate at the surface is in a liquid state and its
+    local pressure is conversely equal to the vapour pressure at the adsorption
+    temperature. The Polanyi theory attempts to relate the surface coverage with
+    the Gibbs free energy of adsorption,
     :math:`\Delta G^{ads} = - R T \ln p/p_0` and the total coverage
     :math:`\theta`.
 
@@ -50,16 +49,16 @@ class DR(IsothermBaseModel):
     name = 'DR'
     formula = r"n(p) = n_t \exp [-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{2}]"
     calculates = 'loading'
-    param_names = ["n_m", "e"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "e": [0, numpy.inf],
-    }
-    minus_rt = -1000  # base value
+    param_names = ("n_m", "e")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+    )
+    minus_rt = -1000  # initial value for guess
 
-    def __init_parameters__(self, parameters):
+    def __init_parameters__(self, params):
         """Initialize model parameters from isotherm data."""
-        self.minus_rt = -constants.gas_constant * parameters['temperature']
+        self.minus_rt = -constants.gas_constant * params['temperature']
 
     def loading(self, pressure):
         """
@@ -75,8 +74,9 @@ class DR(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["n_m"] * \
-            numpy.exp(-(self.minus_rt * numpy.log(pressure) / self.params["e"]) ** 2)
+        nm = self.params['n_m']
+        e = self.params['e']
+        return nm * numpy.exp(-(self.minus_rt * numpy.log(pressure) / e)**2)
 
     def pressure(self, loading):
         r"""
@@ -99,9 +99,9 @@ class DR(IsothermBaseModel):
             Pressure at specified loading.
 
         """
-        return numpy.exp(
-            self.params['e'] / self.minus_rt * numpy.sqrt(-numpy.log(loading / self.params['n_m']))
-        )
+        nm = self.params['n_m']
+        e = self.params['e']
+        return numpy.exp(e / self.minus_rt * numpy.sqrt(-numpy.log(loading / nm)))
 
     def spreading_pressure(self, pressure):
         r"""
@@ -146,13 +146,6 @@ class DR(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "e": -self.minus_rt}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess

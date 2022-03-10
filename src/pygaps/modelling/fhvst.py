@@ -77,12 +77,12 @@ class FHVST(IsothermBaseModel):
     # Model parameters
     name = 'FHVST'
     calculates = 'pressure'
-    param_names = ["n_m", "K", "a1v"]
-    param_bounds = {
-        "n_m": [0, numpy.inf],
-        "K": [0, numpy.inf],
-        "a1v": [-numpy.inf, numpy.inf],
-    }
+    param_names = ("n_m", "K", "a1v")
+    param_default_bounds = (
+        (0, numpy.inf),
+        (0, numpy.inf),
+        (-numpy.inf, numpy.inf),
+    )
 
     def loading(self, pressure):
         """
@@ -128,13 +128,11 @@ class FHVST(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        cov = loading / self.params["n_m"]
-
-        res = (self.params["n_m"] / self.params["K"]) * (cov / (1 - cov)) * \
-            numpy.exp(self.params["a1v"]**2 * cov /
-                      (1 + self.params["a1v"] * cov))
-
-        return res
+        nm = self.params["n_m"]
+        K = self.params["K"]
+        a1v = self.params["a1v"]
+        cov = loading / nm
+        return (nm / K) * (cov / (1 - cov)) * numpy.exp(a1v**2 * cov / (1 + a1v * cov))
 
     def spreading_pressure(self, pressure):
         r"""
@@ -179,15 +177,8 @@ class FHVST(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-
         guess = {"n_m": saturation_loading, "K": langmuir_k, "a1v": 0}
-
-        for param in guess:
-            if guess[param] < self.param_bounds[param][0]:
-                guess[param] = self.param_bounds[param][0]
-            if guess[param] > self.param_bounds[param][1]:
-                guess[param] = self.param_bounds[param][1]
-
+        guess = self.initial_guess_bounds(guess)
         return guess
 
     def fit(self, pressure, loading, param_guess, optimization_params=None, verbose=False):
