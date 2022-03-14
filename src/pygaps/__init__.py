@@ -9,7 +9,7 @@ try:
     from ._version import version
     __version__ = version
 except ImportError:
-    __version__ = '4.1.1'
+    __version__ = '4.1.2'
 
 import sys
 from .logging import logger
