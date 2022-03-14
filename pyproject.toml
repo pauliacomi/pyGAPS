@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
-fallback_version = '4.1.1'
+fallback_version = '4.1.2'
 
 # linting: pylint
 [tool.pylint.basic]
