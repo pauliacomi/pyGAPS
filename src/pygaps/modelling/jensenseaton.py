@@ -100,7 +100,7 @@ class JensenSeaton(IsothermBaseModel):
         def fun(x):
             return self.loading(x) - loading
 
-        opt_res = optimize.root(fun, 0, method='hybr')
+        opt_res = optimize.root(fun, numpy.zeros_like(loading), method='hybr')
 
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {loading} failed.")

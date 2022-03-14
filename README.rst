@@ -2,7 +2,7 @@
 |
 |
 
-.. image:: https://raw.githubusercontent.com/pauliacomi/pyGAPS/develop/docs/logo.svg
+.. image:: https://raw.githubusercontent.com/pauliacomi/pyGAPS/master/docs/logo.svg
    :width: 200px
    :align: center
 

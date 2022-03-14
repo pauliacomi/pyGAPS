@@ -105,7 +105,7 @@ class FHVST(IsothermBaseModel):
         def fun(x):
             return self.pressure(x) - pressure
 
-        opt_res = optimize.root(fun, 0, method='hybr')
+        opt_res = optimize.root(fun, numpy.zeros_like(pressure), method='hybr')
 
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {pressure} failed.")
