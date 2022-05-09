@@ -71,9 +71,19 @@ def main():
         action='store_true',
         help='increase verbosity',
     )
+    prs.add_argument(
+        '--version',
+        action="store_true",
+        help="Print current version.",
+    )
 
     # Execute the parse_args() method
     args = prs.parse_args()
+
+    if args.version:
+        from importlib.metadata import version
+        print(version("pygaps"))
+        return
 
     # Read the isotherm
     if not args.iso.exists():
