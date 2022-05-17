@@ -7,8 +7,8 @@ from pygaps.utilities.exceptions import CalculationError
 
 
 def heat_vap(
-    p : float,
-    sorptive : str,
+    p: float,
+    sorptive: str,
 ):
     r"""
     Determines the enthalpy of vaporsiation, :math:`\lambda_{p}` for a
@@ -38,8 +38,8 @@ def heat_vap(
 
 
 def whittaker(
-    isotherm : "ModelIsotherm",
-    loading : list = None,
+    isotherm: "ModelIsotherm",
+    loading: list = None,
 ):
     r"""
 
@@ -122,13 +122,13 @@ def whittaker(
         if isotherm.model.name == 'Langmuir':
             t = 1
         else:
-            t = isotherm.model.params['t'] # equivalent to m in Whittaker
+            t = isotherm.model.params['t']  # equivalent to m in Whittaker
 
         b = 1 / (K**t)
 
-        df = pd.DataFrame(columns=['Loading', 'q_st'])
+        iso_enth = []
 
-        first_bracket = p_sat / (b**(1/t))  # don't need to calculate every time
+        first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
         for n in loading:
             p = isotherm.pressure_at(n) * 1000 
             sorptive = str(isotherm.adsorbate)
@@ -142,14 +142,14 @@ def whittaker(
 
                 theta = n / n_m  # second bracket of d_lambda
                 theta_t = theta**t
-                second_bracket = (theta_t / (1 - theta_t))**((t-1)/t)
+                second_bracket = (theta_t / (1 - theta_t))**((t - 1) / t)
                 d_lambda = R * T * np.log(first_bracket * second_bracket)
 
-                q_st = d_lambda + lambda_p + (R*T)
+                q_st = d_lambda + lambda_p + (R * T)
 
-                df = df.append(pd.DataFrame({'Loading': [n],
-                                             'q_st': [q_st]
-                                            }),
-                               ignore_index=True
-                              )
-        return df
+                iso_enth = iso_enth.append(q_st)
+
+        return {
+            'loading': n,
+            'whittaker_enthalpy': q_st,
+        }
