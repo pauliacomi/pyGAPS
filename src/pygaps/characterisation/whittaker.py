@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 import scipy.constants
 from CoolProp.CoolProp import PropsSI
@@ -17,7 +16,7 @@ def heat_vap(
     Parameters
     ----------
     p : float
-        Pressure to calculate at
+    Pressure to calculate at
     sorptive : string
         Specie in question
 
@@ -36,6 +35,19 @@ def heat_vap(
 
     return lambda_p
 
+
+def whittaker_raw(
+    p: float = None,
+    p_sat: float = None,
+    K: float = None,
+    n: float = None,
+    n_m: float = None,
+):
+    """
+    not using yet, placeholder for function that may be helpful for DSLangmuir
+    version.
+    """
+    pass
 
 def whittaker(
     isotherm: "ModelIsotherm",
@@ -103,53 +115,52 @@ def whittaker(
     if isotherm.model.name not in ['Langmuir', 'Toth']:
         raise ParameterError('''Whittaker method requires either a Langmuir or Toth
                          model isotherm''')
-    else:
-        R = scipy.constants.R
-        n_m = isotherm.model.params['n_m']
-        K = isotherm.model.params['K']
-        T = isotherm.temperature
-        try:
-            p_sat = isotherm.adsorbate.saturation_pressure(temp=298, unit='K')
-        except CalculationError:
-            print(f"{isotherm.adsorbate} does not have saturation pressure "
-                  f"at {isotherm.temperature} K. Calculating psduedo-saturation "
-                  f"pressure...")
-            p_c = isotherm.adsorbate.get_prop('p_critical')
-            T_c = isotherm.adsorbate.get_prop('t_critical')
-            p_sat = p_c * ((T / T_c)**2)
-            p_sat = p_sat * 100  # unit conversion
+    R = scipy.constants.R
+    n_m = isotherm.model.params['n_m']
+    K = isotherm.model.params['K']
+    T = isotherm.temperature
+    try:
+        p_sat = isotherm.adsorbate.saturation_pressure(temp=298, unit='kPa')
+    except CalculationError:
+        print(f"{isotherm.adsorbate} does not have saturation pressure "
+              f"at {isotherm.temperature} K. Calculating psduedo-saturation "
+              f"pressure...")
+        p_c = isotherm.adsorbate.p_critical
+        T_c = isotherm.adsorbate.t_critical
+        p_sat = p_c * ((T / T_c)**2)
 
-        if isotherm.model.name == 'Langmuir':
-            t = 1
-        else:
-            t = isotherm.model.params['t']  # equivalent to m in Whittaker
+    if isotherm.model.name == 'Langmuir':
+        t = 1
+    else:
+        t = isotherm.model.params['t']  # equivalent to m in Whittaker
 
         b = 1 / (K**t)
 
-        iso_enth = []
+    whittaker_enth = []
 
-        first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
-        for n in loading:
-            p = isotherm.pressure_at(n) * 1000 
-            sorptive = str(isotherm.adsorbate)
+    first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
+    for n in loading:
+        p = isotherm.pressure_at(n) * 1000 
+        sorptive = str(isotherm.adsorbate.backend_name)
 
-            # check that it is possible to calculate lambda_p
-            if p < PropsSI('PTRIPLE', sorptive) or p > PropsSI('PCRIT', sorptive) or np.isnan(p):
-                pass
+        # check that it is possible to calculate lambda_p
+        if p < p_c or p > isotherm.adsorbate.p_triple or np.isnan(p):
+            loading = np.delete(loading, np.where(loading == n))
+            pass
 
-            else:
-                lambda_p = heat_vap(p, sorptive)
+        else:
+            lambda_p = heat_vap(p, sorptive)
 
-                theta = n / n_m  # second bracket of d_lambda
-                theta_t = theta**t
-                second_bracket = (theta_t / (1 - theta_t))**((t - 1) / t)
-                d_lambda = R * T * np.log(first_bracket * second_bracket)
+            theta = n / n_m  # second bracket of d_lambda
+            theta_t = theta**t
+            second_bracket = (theta_t / (1 - theta_t))**((t - 1) / t)
+            d_lambda = R * T * np.log(first_bracket * second_bracket)
 
-                q_st = d_lambda + lambda_p + (R * T)
+            h_st = d_lambda + lambda_p + (R * T)
 
-                iso_enth = iso_enth.append(q_st)
+            whittaker_enth.append(h_st)
 
-        return {
-            'loading': n,
-            'whittaker_enthalpy': q_st,
-        }
+    return {
+        'loading': loading,
+        'whittaker_enthalpy': whittaker_enth,
+    }
