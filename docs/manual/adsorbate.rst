@@ -162,7 +162,7 @@ without a thermodynamic backend.
 For calculations of other properties, the
 `CoolProp backend <https://www.coolprop.org/coolprop/wrappers/Python/index.html>`__
 can be accessed directly using the ``backend`` property. To calculate the
-retucing temperature for example.
+reducing temperature for example.
 
 .. code:: python
 
