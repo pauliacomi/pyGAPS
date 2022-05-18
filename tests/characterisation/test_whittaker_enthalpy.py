@@ -1,7 +1,5 @@
 import pytest
 from matplotlib.testing.decorators import cleanup
-from numpy import average
-from numpy import isclose
 from numpy import linspace
 
 import pygaps.characterisation.whittaker as we
@@ -12,15 +10,13 @@ import pygaps.utilities.exceptions as pgEx
 from .conftest import DATA_WHITTAKER
 from .conftest import DATA_WHITTAKER_PATH
 
-
 loading = linspace(0.1, 20, 100)
 
 
 @pytest.mark.characterisation
 class TestWhittakerEnthalpy():
-
     def test_whittaker_checks(self):
-        filepath = DATA_WHITTAKER_PATH / DATA_WHITTAKER['example']
+        filepath = DATA_WHITTAKER_PATH / DATA_WHITTAKER['example1']['file']
         isotherm = pgp.isotherm_from_aif(filepath)
 
         model_isotherms = []
@@ -39,10 +35,10 @@ class TestWhittakerEnthalpy():
             model_isotherms.append(model_isotherm)
 
         with pytest.raises(pgEx.ParameterError):
-            we.whittaker(model_isotherms[0])
+            we.whittaker_enthalpy(model_isotherms[0], loading)
 
         with pytest.raises(pgEx.CalculationError):
-            we.whittaker(model_isotherms[1])
+            we.whittaker_enthalpy(model_isotherms[1], loading)
 
     def test_whittaker(self):
         pass
