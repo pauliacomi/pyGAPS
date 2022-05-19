@@ -128,3 +128,9 @@ DATA_CALO = {
         'ienth': 35,
     },
 }
+
+DATA_WHITTAKER = {
+    'example1': {
+        'file': 'example.aiff',
+    }
+}

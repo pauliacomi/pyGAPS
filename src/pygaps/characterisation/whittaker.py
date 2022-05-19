@@ -58,7 +58,11 @@ def whittaker_enthalpy(
     fractional coverage, and :math:`b` is derived from the equilibrium constant,
     :math:`K` as :math:`b = \frac{1}{K^t}`. In the case that the adsorptive is
     above is supercritical, the pseudo saturation pressure is used;
+<<<<<<< HEAD
     :math:`p^{sat} = p_c \left(\frac{T}{T_c}\right)^2.
+=======
+    :math:`p^{sat} = p_c \left(\frac{T}{T_c}\right)^2`.
+>>>>>>> f838bc8a8b84543e587533183c53505a8083f533
 
     The exponent :math:`t` is only relevant to the Toth version of the method,
     as for the Langmuir model it reduces to 1. Thus, :math:`\Delta \lambda`
@@ -102,7 +106,11 @@ def whittaker_enthalpy(
             f"at {isotherm.temperature} K. Calculating pseudo-saturation "
             f"pressure..."
         )
+<<<<<<< HEAD
         T_c = isotherm.adsorbate.backend.t_critical()
+=======
+        T_c = isotherm.adsorbate.t_critical()
+>>>>>>> f838bc8a8b84543e587533183c53505a8083f533
         p_sat = p_c * ((T / T_c)**2)
 
     loading_final = []
@@ -110,8 +118,12 @@ def whittaker_enthalpy(
 
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
+<<<<<<< HEAD
         p = isotherm.pressure_at(n,
                                  pressure_unit='bar')  # TODO what units are we considering here?
+=======
+        p = isotherm.pressure_at(n) * 1000  # TODO what units are we considering here?
+>>>>>>> f838bc8a8b84543e587533183c53505a8083f533
 
         # check that it is possible to calculate lambda_p
         if p < p_c or p > p_t or np.isnan(p):
