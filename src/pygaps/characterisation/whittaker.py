@@ -3,7 +3,6 @@
 import numpy as np
 import scipy.constants
 
-import pygaps.core.adsorbate
 from pygaps import logger
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
@@ -59,11 +58,7 @@ def whittaker_enthalpy(
     fractional coverage, and :math:`b` is derived from the equilibrium constant,
     :math:`K` as :math:`b = \frac{1}{K^t}`. In the case that the adsorptive is
     above is supercritical, the pseudo saturation pressure is used;
-<<<<<<< HEAD
-    :math:`p^{sat} = p_c \left(\frac{T}{T_c}\right)^2.
-=======
     :math:`p^{sat} = p_c \left(\frac{T}{T_c}\right)^2`.
->>>>>>> f838bc8a8b84543e587533183c53505a8083f533
 
     The exponent :math:`t` is only relevant to the Toth version of the method,
     as for the Langmuir model it reduces to 1. Thus, :math:`\Delta \lambda`
@@ -83,6 +78,12 @@ def whittaker_enthalpy(
             '''Whittaker method requires either a Langmuir or Toth
                          model isotherm'''
         )
+
+    isotherm.convert(
+        pressure_unit='kPa',
+        loading_unit='mol',
+        material_unit='kg',
+    )
 
     # Local constants and model parameters
     R = scipy.constants.R
@@ -117,7 +118,6 @@ def whittaker_enthalpy(
     p_sat = p_sat / 1000  # equation requires p_sat in kPa
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
-        # TODO does this need to be temperature-dependent?
         p = isotherm.pressure_at(n,
                                  pressure_unit='Pa')
 
