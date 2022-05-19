@@ -101,7 +101,8 @@ def whittaker_enthalpy(
     p_t = isotherm.adsorbate.p_triple()
     try:
         p_sat = isotherm.adsorbate.saturation_pressure(temp=isotherm.temperature)
-    except CalculationError:
+    except CalculationError:  
+        # TODO should this be in adsorbate.saturation_pressure?
         logger.warning(
             f"{isotherm.adsorbate} does not have saturation pressure "
             f"at {isotherm.temperature} K. Calculating pseudo-saturation "
@@ -113,15 +114,19 @@ def whittaker_enthalpy(
     loading_final = []
     whittaker_enth = []
 
+    p_sat = p_sat / 1000  # equation requires p_sat in kPa
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
-        p = isotherm.pressure_at(n)
+        # TODO does this need to be temperature-dependent?
+        p = isotherm.pressure_at(n,
+                                 pressure_unit='Pa')
 
         # check that it is possible to calculate lambda_p
         if p > p_c or p < p_t or np.isnan(p):
             continue
-
-        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,)
+ 
+        # equation requires enthalpies in J
+        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,) * 1000
 
         theta = n / n_m  # second bracket of d_lambda
         theta_t = theta**t
