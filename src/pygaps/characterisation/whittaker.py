@@ -3,6 +3,7 @@
 import numpy as np
 import scipy.constants
 
+import pygaps.core.adsorbate
 from pygaps import logger
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
@@ -114,13 +115,13 @@ def whittaker_enthalpy(
 
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
-        p = isotherm.pressure_at(n) * 1000  # TODO what units are we considering here?
+        p = isotherm.pressure_at(n)
 
         # check that it is possible to calculate lambda_p
-        if p < p_c or p > p_t or np.isnan(p):
+        if p > p_c or p < p_t or np.isnan(p):
             continue
 
-        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p)
+        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,)
 
         theta = n / n_m  # second bracket of d_lambda
         theta_t = theta**t
