@@ -59,11 +59,7 @@ def whittaker_enthalpy(
     fractional coverage, and :math:`b` is derived from the equilibrium constant,
     :math:`K` as :math:`b = \frac{1}{K^t}`. In the case that the adsorptive is
     above is supercritical, the pseudo saturation pressure is used;
-<<<<<<< HEAD
-    :math:`p^{sat} = p_c \left(\frac{T}{T_c}\right)^2.
-=======
     :math:`p^{sat} = p_c \left(\frac{T}{T_c}\right)^2`.
->>>>>>> f838bc8a8b84543e587533183c53505a8083f533
 
     The exponent :math:`t` is only relevant to the Toth version of the method,
     as for the Langmuir model it reduces to 1. Thus, :math:`\Delta \lambda`
@@ -100,36 +96,42 @@ def whittaker_enthalpy(
     p_c = isotherm.adsorbate.p_critical()
     p_t = isotherm.adsorbate.p_triple()
     try:
-        p_sat = isotherm.adsorbate.saturation_pressure(temp=isotherm.temperature)
-    except CalculationError:  
+        p_sat = isotherm.adsorbate.saturation_pressure(temp=T)
+    except CalculationError:
         # TODO should this be in adsorbate.saturation_pressure?
         logger.warning(
             f"{isotherm.adsorbate} does not have saturation pressure "
-            f"at {isotherm.temperature} K. Calculating pseudo-saturation "
+            f"at {T} K. Calculating pseudo-saturation "
             f"pressure..."
         )
         T_c = isotherm.adsorbate.t_critical()
-        p_sat = p_c * ((T / T_c)**2)
+        p_sat = p_c * (T / T_c)**2
 
+    # get pressure
+    pressures = isotherm.pressure_at(
+        loading,
+        pressure_unit='Pa',
+        pressure_mode="absolute",
+    )
     loading_final = []
     whittaker_enth = []
 
+    # TODO:
+    # having thought about it, p_sat must not be *necessarily* in kPa
+    # it must be in the *same* units that _b_ is in to keep units correct for the first bracket
     p_sat = p_sat / 1000  # equation requires p_sat in kPa
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
-    for n in loading:
-        # TODO does this need to be temperature-dependent?
-        p = isotherm.pressure_at(n,
-                                 pressure_unit='Pa')
+    for n, p in zip(loading, pressures):
 
         # check that it is possible to calculate lambda_p
         if p > p_c or p < p_t or np.isnan(p):
             continue
- 
-        # equation requires enthalpies in J
-        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,) * 1000
 
-        theta = n / n_m  # second bracket of d_lambda
-        theta_t = theta**t
+        # equation requires enthalpies in J
+        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p, ) * 1000
+
+        # second bracket of d_lambda
+        theta_t = (n / n_m)**t
         second_bracket = (theta_t / (1 - theta_t))**((t - 1) / t)
         d_lambda = RT * np.log(first_bracket * second_bracket)
 
@@ -137,6 +139,8 @@ def whittaker_enthalpy(
 
         loading_final.append(n)
         whittaker_enth.append(h_st)
+
+    whittaker_enth = whittaker_enth / 1000
 
     return {
         'loading': loading_final,
