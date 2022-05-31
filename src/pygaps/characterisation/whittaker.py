@@ -26,8 +26,12 @@ def whittaker_enthalpy(
 
     Returns
     -------
-    df : DataFrame
-        DataFrame of isosteric heat of adsorption at input loadings.
+    result_dict : dict
+        A dictionary with the isosteric enthalpies per loading, with the form:
+
+        - ``whittaker_enthalpy`` (array) : the isosteric enthalpy of adsorption in J/mol
+        - ``loading`` (array) : the loading for each point of the isosteric
+        enthalpy, in mmol/g
 
     Raises
     ------
@@ -102,7 +106,7 @@ def whittaker_enthalpy(
     p_t = isotherm.adsorbate.p_triple()
     try:
         p_sat = isotherm.adsorbate.saturation_pressure(temp=isotherm.temperature)
-    except CalculationError:  
+    except CalculationError:
         # TODO should this be in adsorbate.saturation_pressure?
         logger.warning(
             f"{isotherm.adsorbate} does not have saturation pressure "
@@ -124,7 +128,7 @@ def whittaker_enthalpy(
         # check that it is possible to calculate lambda_p
         if p > p_c or p < p_t or np.isnan(p):
             continue
- 
+
         # equation requires enthalpies in J
         lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,) * 1000
 

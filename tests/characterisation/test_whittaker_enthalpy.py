@@ -2,6 +2,7 @@ import pytest
 from matplotlib.testing.decorators import cleanup
 from numpy import linspace
 
+import pygaps
 import pygaps.characterisation.whittaker as we
 import pygaps.parsing as pgp
 import pygaps.modelling as pgm
@@ -9,15 +10,12 @@ import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_WHITTAKER
 from .conftest import DATA_WHITTAKER_PATH
-from .conftest import DATA_ISOSTERIC
-from .conftest import DATA_ISOSTERIC_PATH
 
 loading = linspace(0.1, 20, 100)
 
 
 @pytest.mark.characterisation
 class TestWhittakerEnthalpy():
-
     def test_whittaker_checks(self):
         filepath = DATA_WHITTAKER_PATH / DATA_WHITTAKER['example1']['file']
         isotherm = pgp.isotherm_from_aif(filepath)
@@ -38,19 +36,23 @@ class TestWhittakerEnthalpy():
             model_isotherms.append(model_isotherm)
 
         with pytest.raises(pgEx.ParameterError):
-            we.whittaker_enthalpy(
-                model_isotherms[0],
-                loading
-            )
+            we.whittaker_enthalpy(model_isotherms[0], loading)
 
-        with pytest.raises(pgEx.CalculationError):
-            we.whittaker_enthalpy(
-                model_isotherms[1],
-                loading
-            )
+        we.whittaker_enthalpy(model_isotherms[1], loading)
 
     def test_whittaker(self):
-        pass
+
+        # To get a model
+        model = pgm.get_isotherm_model("Langmuir")
+        model.params["n_m"] = 1
+        model.params["K"] = 1
+
+        iso = pygaps.ModelIsotherm(
+            a="butane",
+            t=303,
+            m="test",
+            model=model,
+        )
 
     @cleanup
     def test_whittaker_output(self):
