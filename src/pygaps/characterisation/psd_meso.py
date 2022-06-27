@@ -6,6 +6,7 @@ import typing as t
 
 import numpy
 
+from pygaps import logger
 from pygaps.characterisation.models_kelvin import get_kelvin_model
 from pygaps.characterisation.models_kelvin import get_meniscus_geometry
 from pygaps.characterisation.models_thickness import get_thickness_model
@@ -15,7 +16,6 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
-from pygaps import logger
 
 _MESO_PSD_MODELS = ['pygaps-DH', 'BJH', 'DH']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'halfopen-cylinder', 'sphere']
