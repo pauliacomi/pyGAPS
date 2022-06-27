@@ -428,9 +428,9 @@ def psd_plot(
 
     ax.set_title("PSD plot " + str(method))
     ax.set_xlabel('Pore width [nm]')
-    ax.set_ylabel('Distribution [dV/dw]')
+    ax.set_ylabel('Distribution, dV/dw [$cm^3 g^{-1} nm^{-1}$]')
     if labelcum:
-        ax2.set_ylabel('Cumulative Vol [$cm^3 g^{-1}$]')
+        ax2.set_ylabel('Cumulative volume [$cm^3 g^{-1}$]')
 
     lns = l1
     if labelcum:

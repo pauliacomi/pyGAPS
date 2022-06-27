@@ -54,7 +54,7 @@ class TestPSDMeso():
         'BJH',
         'DH',
     ])
-    @pytest.mark.parametrize('sample', [sample for sample in DATA])
+    @pytest.mark.parametrize('sample', list(DATA))
     def test_psd_meso(self, sample, method):
         """Test psd calculation with several model isotherms."""
         sample = DATA[sample]
@@ -64,13 +64,10 @@ class TestPSDMeso():
             filepath = DATA_N77_PATH / sample['file']
             isotherm = pgp.isotherm_from_json(filepath)
 
-            result_dict = pmes.psd_mesoporous(
-                isotherm, psd_model=method, branch='des'
-            )
+            result_dict = pmes.psd_mesoporous(isotherm, psd_model=method, branch='des')
 
             loc = np.where(
-                result_dict['pore_distribution'] ==
-                max(result_dict['pore_distribution'])
+                result_dict['pore_distribution'] == max(result_dict['pore_distribution'])
             )
             principal_peak = result_dict['pore_widths'][loc]
 
@@ -78,8 +75,7 @@ class TestPSDMeso():
             err_absolute = 0.01  # 0.01
 
             assert np.isclose(
-                principal_peak, sample['psd_meso_pore_size'], err_relative,
-                err_absolute
+                principal_peak, sample['psd_meso_pore_size'], err_relative, err_absolute
             )
 
     @cleanup
