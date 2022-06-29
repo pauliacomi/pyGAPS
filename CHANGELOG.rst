@@ -2,6 +2,12 @@
 Changelog
 =========
 
+4.2.0 (2022-06-29)
+------------------
+
+* Better error handling of nonphysical mesoporous PSD models
+* CLI now prints package version with `--version` argument
+
 4.1.1 (2022-03-10)
 ------------------
 
