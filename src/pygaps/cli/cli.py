@@ -33,6 +33,7 @@ def main():
     prs.add_argument(
         'iso',
         metavar='isotherm',
+        nargs='?',
         type=pathlib.Path,
         help='isotherm to display or process',
     )
