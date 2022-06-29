@@ -763,7 +763,7 @@ def psd_dollimore_heal(
         # Calculate the volume desorbed from thinning of all pores previously emptied
         # dt * \sum A - t * dt * 2 * \pi * \sum L
         d_thickness_volume = d_thickness[i] * sum_area_factor - \
-            d_thickness[i] * avg_thickness[i] * sum_2pi_length_factor # [cm3/mat]
+            d_thickness[i] * avg_thickness[i] * sum_2pi_length_factor  # [cm3/mat]
 
         # Pore volume, then store
         # dVp = (dV - dVt) * Rp
