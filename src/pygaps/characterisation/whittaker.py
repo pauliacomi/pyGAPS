@@ -85,12 +85,6 @@ def whittaker_enthalpy(
                          model isotherm'''
         )
 
-    isotherm.convert(
-        pressure_unit='kPa',
-        loading_unit='mol',
-        material_unit='kg',
-    )
-
     # Local constants and model parameters
     R = scipy.constants.R
     T = isotherm.temperature
