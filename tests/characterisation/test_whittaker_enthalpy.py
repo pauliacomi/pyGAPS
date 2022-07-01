@@ -40,20 +40,6 @@ class TestWhittakerEnthalpy():
 
         we.whittaker_enthalpy(model_isotherms[1], loading)
 
-    def test_whittaker(self):
-
-        # To get a model
-        model = pgm.get_isotherm_model("Langmuir")
-        model.params["n_m"] = 1
-        model.params["K"] = 1
-
-        iso = pygaps.ModelIsotherm(
-            a="butane",
-            t=303,
-            m="test",
-            model=model,
-        )
-
     @cleanup
     def test_whittaker_output(self):
         pass

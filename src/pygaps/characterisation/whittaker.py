@@ -73,7 +73,9 @@ def whittaker_enthalpy(
 
     References
     ----------
-    .. [#] REFERENCE HERE
+    .. [#] "Predicting isosteric heats for gas adsorption.", Peter B.
+    Whittaker, Xiaolin Wang, Klaus Regenauer-Lieb and Hui Tong Chua,
+    Phys. Chem. Chem. Phys., 15.2, 473-482, (2013)
 
     """
 
