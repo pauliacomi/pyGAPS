@@ -1,6 +1,7 @@
 """General functions for string transformations."""
 
 import ast
+from pygaps.utilities.exceptions import ParsingError
 
 
 def convert_chemformula(string: str) -> str:
@@ -87,7 +88,9 @@ def convert_unit_ltx(string: str, negative: bool = False) -> str:
 
 def _is_none(s: str) -> bool:
     """Check if a value is a text None."""
-    if s == 'None':
+    if not s:
+        return True
+    if s.lower() == 'none':
         return True
     return False
 
@@ -105,8 +108,7 @@ def _is_bool(s: str) -> bool:
     """Check a value is a text bool."""
     if s.lower() in ['true', 'false']:
         return True
-    else:
-        return False
+    return False
 
 
 def _from_bool(s: str) -> bool:
@@ -138,3 +140,20 @@ def _to_string(s):
     if isinstance(s, tuple):
         return '(' + ' '.join([str(x) for x in s]) + ")"
     return str(s)
+
+
+def cast_string(s):
+    """Check and cast strings of various data types."""
+    if _is_none(s):
+        return None
+    if _is_bool(s):
+        return _from_bool(s)
+    if s.isnumeric():
+        return int(s)
+    if _is_float(s):
+        return float(s)
+    if _is_list(s):
+        return _from_list(s)
+    if isinstance(s, str):
+        return s
+    raise ParsingError(f"Could not parse value '{s}'")

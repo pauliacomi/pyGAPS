@@ -10,18 +10,44 @@ import pygaps.utilities as util
 
 
 @pytest.mark.utilities
-def test_convert_chemformula():
-    assert util.string_utilities.convert_chemformula("N2") == "$N_{2}$"
-    assert util.string_utilities.convert_chemformula("C4H10") == "$C_{4}H_{10}$"
+@pytest.mark.parametrize(
+    "test, res",
+    [
+        (None, None),
+        ("none", None),
+        ("None", None),
+        ("true", True),
+        ("False", False),
+        ("30", 30),
+        ("0", 0),
+        ("1.2", 1.2),
+        ("-2.24", -2.24),
+        ("[1,2,3,4]", [1, 2, 3, 4]),
+    ],
+)
+def test_cast_string(test, res):
+    assert util.string_utilities.cast_string(test) == res
 
 
 @pytest.mark.utilities
-def test_convert_unit_ltx():
-    assert util.string_utilities.convert_unit_ltx("mmol") == "mmol"
-    assert util.string_utilities.convert_unit_ltx("g", True) == "g^{-1}"
-    assert util.string_utilities.convert_unit_ltx("cm3") == "cm^{3}"
-    assert util.string_utilities.convert_unit_ltx("cm3(STP)") == "cm^{3}_{STP}"
-    assert util.string_utilities.convert_unit_ltx("cm3", True) == "cm^{-3}"
+@pytest.mark.parametrize("test, res", [("N2", "$N_{2}$"), ("C4H10", "$C_{4}H_{10}$")])
+def test_convert_chemformula(test, res):
+    assert util.string_utilities.convert_chemformula(test) == res
+
+
+@pytest.mark.utilities
+@pytest.mark.parametrize(
+    "test, neg, res",
+    [
+        ("mmol", False, "mmol"),
+        ("g", True, "g^{-1}"),
+        ("cm3", False, "cm^{3}"),
+        ("cm3(STP)", False, "cm^{3}_{STP}"),
+        ("cm3", True, "cm^{-3}"),
+    ],
+)
+def test_convert_unit_ltx(test, neg, res):
+    assert util.string_utilities.convert_unit_ltx(test, neg) == res
 
 
 @pytest.mark.utilities
@@ -37,34 +63,20 @@ def test_file_paths():
     assert all([path in known_paths for path in paths])
 
 
+# yapf: disable
 @pytest.mark.utilities
-def test_deep_merge():
-    source = {'hello1': 1}
-    overrides = {'hello2': 2}
+@pytest.mark.parametrize(
+    "source, overrides, res",
+    [
+        ({'h1': 1}, {'h2': 2}, {'h1': 1, 'h2': 2}),
+        ({'h1': 0}, {'h1': {'b': 1}}, {'h1': {'b': 1}}),
+        ({'h': "to"}, {'h': "tov"}, {'h': "tov"}),
+        ({'h': {'a': 1, 'b': 2}}, {'h': {'a': 2, 'b': 2}}, {'h': {'a': 2, 'b': 2}}),
+        ({'h': {'a': 1, 'b': 2}}, {'h': {'a': {}, 'b': 2}}, {'h': {'a': {}, 'b': 2}}),
+        ({'h': {'a': {}, 'b': 2}}, {'h': {'a': 2}}, {'h': {'a': 2, 'b': 2}}),
+    ]
+)
+def test_deep_merge(source, overrides, res):
     util.python_utilities.deep_merge(source, overrides)
-    assert source == {'hello1': 1, 'hello2': 2}
-
-    source = {'hello1': 0}
-    overrides = {'hello1': {'bar': 1}}
-    util.python_utilities.deep_merge(source, overrides)
-    assert source == {'hello1': {'bar': 1}}
-
-    source = {'hello': 'to_override'}
-    overrides = {'hello': 'over'}
-    util.python_utilities.deep_merge(source, overrides)
-    assert source == {'hello': 'over'}
-
-    source = {'hello': {'value': 'to_override', 'no_change': 1}}
-    overrides = {'hello': {'value': 'over'}}
-    util.python_utilities.deep_merge(source, overrides)
-    assert source == {'hello': {'value': 'over', 'no_change': 1}}
-
-    source = {'hello': {'value': 'to_override', 'no_change': 1}}
-    overrides = {'hello': {'value': {}}}
-    util.python_utilities.deep_merge(source, overrides)
-    assert source == {'hello': {'value': {}, 'no_change': 1}}
-
-    source = {'hello': {'value': {}, 'no_change': 1}}
-    overrides = {'hello': {'value': 2}}
-    util.python_utilities.deep_merge(source, overrides)
-    assert source == {'hello': {'value': 2, 'no_change': 1}}
+    assert source == res
+# yapf: enable

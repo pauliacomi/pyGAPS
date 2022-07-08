@@ -20,23 +20,47 @@ from pygaps.units.converter_mode import _MASS_UNITS
 from pygaps.units.converter_mode import _MOLAR_UNITS
 from pygaps.units.converter_mode import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
-from pygaps.utilities.string_utilities import _from_bool
-from pygaps.utilities.string_utilities import _is_bool
-from pygaps.utilities.string_utilities import _is_float
-from pygaps.utilities.string_utilities import _is_none
+from pygaps.utilities.string_utilities import cast_string
 
 _parser_version = "1.0"
 
 _META_DICT = {
-    '_exptl_temperature': 'temperature',
-    '_exptl_adsorptive': 'adsorbate',
-    '_sample_material_id': 'material',
-    '_exptl_operator': 'user',
-    '_exptl_date': 'date',
-    '_exptl_instrument': 'instrument',
-    '_exptl_sample_mass': 'material_mass',
-    '_exptl_activation_temperature': 'activation_temperature',
-    '_sample_id': 'material_batch',
+    '_exptl_temperature': {
+        'text': 'temperature',
+        'type': float
+    },
+    '_exptl_adsorptive': {
+        'text': 'adsorbate',
+        'type': str
+    },
+    '_sample_material_id': {
+        'text': 'material',
+        'type': str
+    },
+    '_exptl_operator': {
+        'text': 'user',
+        'type': str
+    },
+    '_exptl_date': {
+        'text': 'date',
+        'type': str
+    },
+    '_exptl_instrument': {
+        'text': 'instrument',
+        'type': str
+    },
+    '_exptl_sample_mass': {
+        'text': 'material_mass',
+        'type': float
+    },
+    '_exptl_activation_temperature': {
+        'text': 'activation_temperature',
+        'type': float
+    },
+    '_sample_id': {
+        'text': 'material_batch',
+        'type': str
+    },
 }
 _DATA_DICT = {
     'pressure': 'pressure',
@@ -98,8 +122,8 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
 
     # other possible specs
     for spec in _META_DICT:
-        if _META_DICT[spec] in iso_dict:
-            block.set_pair(spec, f"\'{iso_dict.pop(_META_DICT[spec])}\'")
+        if _META_DICT[spec]['text'] in iso_dict:
+            block.set_pair(spec, f"\'{iso_dict.pop(_META_DICT[spec]['text'])}\'")
 
     # units
     block.set_pair('_units_temperature', isotherm.temperature_unit)
@@ -218,22 +242,12 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
             key, val = item.pair
             val = val.strip("'")
 
-            # cast various data types
-            if _is_none(val):
-                val = None
-            elif _is_bool(val):
-                val = _from_bool(val)
-            elif val.isnumeric():
-                val = int(val)
-            elif _is_float(val):
-                val = float(val)
-
             if key in _META_DICT:
-                raw_dict[_META_DICT[key]] = val
+                raw_dict[_META_DICT[key]['text']] = _META_DICT[key]['type'](val)
             elif key.startswith('_pygaps_'):
-                raw_dict[key[8:]] = val
+                raw_dict[key[8:]] = cast_string(val)
             elif key not in excluded:
-                raw_dict[key] = val
+                raw_dict[key] = cast_string(val)
         # data handling
         elif item.loop is not None:
             loop = item.loop
@@ -246,7 +260,7 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters):
 
             if not columns:
                 for col in [tag[8:] for tag in loop.tags]:
-                    def_col = _DATA_DICT[col]
+                    def_col = _DATA_DICT.get(col, col)
                     columns.append(def_col)
 
             data_df = pandas.DataFrame(
