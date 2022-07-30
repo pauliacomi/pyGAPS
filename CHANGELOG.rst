@@ -2,6 +2,8 @@
 Changelog
 =========
 
+* AIF can read/write all isotherm types now.
+
 4.2.0 (2022-06-29)
 ------------------
 
