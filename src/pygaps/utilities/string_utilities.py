@@ -1,6 +1,7 @@
 """General functions for string transformations."""
 
 import ast
+
 from pygaps.utilities.exceptions import ParsingError
 
 

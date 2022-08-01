@@ -16,9 +16,9 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
-from pygaps.utilities.string_utilities import cast_string
-from pygaps.utilities.string_utilities import _to_string
 from pygaps.utilities.string_utilities import _from_list
+from pygaps.utilities.string_utilities import _to_string
+from pygaps.utilities.string_utilities import cast_string
 
 _parser_version = "3.0"
 
