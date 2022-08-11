@@ -122,6 +122,7 @@ class TestBaseIsotherm():
             BaseIsotherm(**isotherm_parameters)
 
     def test_isotherm_unit_dict(self, basic_isotherm):
+        """Test combined unit dict ouput."""
         units = basic_isotherm.units
         assert all(unit in units for unit in BaseIsotherm._unit_params)
 
