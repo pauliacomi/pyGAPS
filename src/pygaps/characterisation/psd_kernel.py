@@ -137,8 +137,6 @@ def psd_dft(
         raise ParameterError(
             "An existing kernel name or a path to a user kernel to be used must be specified."
         )
-    if not isinstance(isotherm.adsorbate, Adsorbate):
-        raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
     # Get an internal kernel, otherwise assume it is a path
     kernel_path = KERNELS.get(kernel, kernel)

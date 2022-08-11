@@ -163,20 +163,20 @@ def psd_microporous(
 
     # Get adsorbate properties
     if adsorbate_model is None:
-        if not isinstance(isotherm.adsorbate, Adsorbate):
+        try:
+            adsorbate_model = {
+                'molecular_diameter': isotherm.adsorbate.get_prop('molecular_diameter'),
+                'polarizability': isotherm.adsorbate.get_prop('polarizability'),
+                'magnetic_susceptibility': isotherm.adsorbate.get_prop('magnetic_susceptibility'),
+                'surface_density': isotherm.adsorbate.get_prop('surface_density'),
+                'liquid_density': isotherm.adsorbate.liquid_density(isotherm.temperature),
+                'adsorbate_molar_mass': isotherm.adsorbate.molar_mass(),
+            }
+        except ParameterError as err:
             raise ParameterError(
-                "Isotherm adsorbate is not known, cannot calculate PSD."
-                "Either use a recognised adsorbate (i.e. nitrogen) or "
-                "pass a dictionary with your adsorbate parameters."
-            )
-        adsorbate_model = {
-            'molecular_diameter': isotherm.adsorbate.get_prop('molecular_diameter'),
-            'polarizability': isotherm.adsorbate.get_prop('polarizability'),
-            'magnetic_susceptibility': isotherm.adsorbate.get_prop('magnetic_susceptibility'),
-            'surface_density': isotherm.adsorbate.get_prop('surface_density'),
-            'liquid_density': isotherm.adsorbate.liquid_density(isotherm.temperature),
-            'adsorbate_molar_mass': isotherm.adsorbate.molar_mass(),
-        }
+                "Isotherm adsorbate does not have all required HK properties."
+                "Pass a dictionary with your HK adsorbate parameters."
+            ) from err
 
     # Get material properties
     material_properties = get_hk_model(material_model)

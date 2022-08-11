@@ -178,8 +178,6 @@ def psd_mesoporous(
         raise ParameterError(
             f"Branch '{branch}' not an option for PSD.", "Select either 'ads' or 'des'"
         )
-    if not isinstance(isotherm.adsorbate, Adsorbate):
-        raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
     # Get required adsorbate properties
     molar_mass = isotherm.adsorbate.molar_mass()

@@ -250,7 +250,7 @@ class BaseIsotherm():
             logger.warning(
                 "Specified adsorbate is not in internal list "
                 "(or name cannot be resolved to an existing one). "
-                "CoolProp backend disabled for this gas/vapour."
+                "Thermodynamic backend disabled for this gas/vapour."
             )
 
     @property
