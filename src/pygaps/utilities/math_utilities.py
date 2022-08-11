@@ -67,13 +67,16 @@ def find_linear_sections(xdata, ydata):
     """Find all sections of a curve which are linear."""
     linear_sections = []
 
+    xdata_adj = xdata / max(xdata)
+    ydata_adj = ydata / max(ydata)
+
     # To do this we calculate the second
     # derivative of the thickness plot
-    second_deriv = numpy.gradient(numpy.gradient(ydata, xdata), xdata)
+    second_deriv = numpy.gradient(numpy.gradient(ydata_adj, xdata_adj), ydata_adj)
 
     # We then find the points close to zero in the second derivative
     # These are the points where the graph is linear
-    margin = 0.01 / (len(ydata) * max(ydata))
+    margin = 10
     close_zero = numpy.abs(second_deriv) < margin
 
     # This snippet divides the the points in linear sections
