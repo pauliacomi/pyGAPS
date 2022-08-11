@@ -121,6 +121,10 @@ class TestBaseIsotherm():
         with pytest.raises(pgEx.ParameterError):
             BaseIsotherm(**isotherm_parameters)
 
+    def test_isotherm_unit_dict(self, basic_isotherm):
+        units = basic_isotherm.units
+        assert all(unit in units for unit in BaseIsotherm._unit_params)
+
     def test_isotherm_convert_temperature(self, basic_isotherm):
         """Test if temperatures can be converted."""
         temp = basic_isotherm.temperature

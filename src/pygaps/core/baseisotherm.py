@@ -264,6 +264,11 @@ class BaseIsotherm():
     def temperature(self, value: t.Union[float, str]):
         self._temperature = float(value)
 
+    @property
+    def units(self) -> dict:
+        """Return a dictionary of all isotherm units"""
+        return {unit: getattr(self, unit) for unit in self._unit_params}
+
     def __eq__(self, other_isotherm) -> bool:
         """
         Overload the equality operator of the isotherm.
