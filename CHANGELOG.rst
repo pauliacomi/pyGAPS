@@ -2,7 +2,8 @@
 Changelog
 =========
 
-* AIF can read/write all isotherm types now.
+* AIF can read/write all isotherm types (models/points).
+* Added two standard isotherms (silica+carbon black). Can be used in thickness calculations.
 
 4.2.0 (2022-06-29)
 ------------------
