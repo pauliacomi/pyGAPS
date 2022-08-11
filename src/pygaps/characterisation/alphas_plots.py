@@ -185,7 +185,7 @@ def alpha_s(
     # Read data in
     loading = isotherm.loading(
         branch=branch,
-        loading_unit='mol',
+        loading_unit='mmol',
         loading_basis='molar',
     )
     try:
@@ -206,12 +206,12 @@ def alpha_s(
     reference_loading = reference_isotherm.loading_at(
         pressure,
         pressure_unit=isotherm.pressure_unit,
-        loading_unit='mol',
+        loading_unit='mmol',
         branch=branch_ref,
     )
     alpha_s_point = reference_isotherm.loading_at(
         reducing_pressure,
-        loading_unit='mol',
+        loading_unit='mmol',
         pressure_mode='relative',
         branch=branch_ref,
     )
@@ -247,7 +247,16 @@ def alpha_s(
                 )
 
             from pygaps.graphing.calc_graphs import tp_plot
-            tp_plot(alpha_curve, loading, results, alpha_s=True, alpha_reducing_p=reducing_pressure)
+            units = isotherm.units
+            units.update({"loading_basis": "molar", "loading_unit": "mmol"})
+            tp_plot(
+                alpha_curve,
+                loading,
+                results,
+                units,
+                alpha_s=True,
+                alpha_reducing_p=reducing_pressure
+            )
 
     return {
         'alpha_curve': alpha_curve,
@@ -274,7 +283,7 @@ def alpha_s_raw(
     Parameters
     ----------
     loading : list[float]
-        Amount adsorbed at the surface, in mol/material.
+        Amount adsorbed at the surface, in mmol/material.
     reference_loading : list[float]
         Loading of the reference curve corresponding to the same pressures.
     alpha_s_point : float
@@ -380,7 +389,7 @@ def alpha_s_plot_parameters(
     # Check if slope is good
 
     if slope * (max(alpha_curve) / max(loading)) < 3:
-        adsorbed_volume = intercept * molar_mass / liquid_density
+        adsorbed_volume = intercept * molar_mass / liquid_density / 1000
         area = (reference_area / alpha_s_point * slope).item()
 
         return {
