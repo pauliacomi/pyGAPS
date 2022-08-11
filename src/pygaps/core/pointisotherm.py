@@ -15,6 +15,7 @@ from pygaps.units.converter_mode import c_material
 from pygaps.units.converter_mode import c_pressure
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
+from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.isotherm_interpolator import IsothermInterpolator
 
 
@@ -398,15 +399,22 @@ class PointIsotherm(BaseIsotherm):
                 logger.info("Mode and units are the same, no changes made.")
             return
 
-        self.data_raw[self.pressure_key] = c_pressure(
-            self.data_raw[self.pressure_key],
-            mode_from=self.pressure_mode,
-            mode_to=mode_to,
-            unit_from=self.pressure_unit,
-            unit_to=unit_to,
-            adsorbate=self.adsorbate,
-            temp=self.temperature
-        )
+        try:
+            self.data_raw[self.pressure_key] = c_pressure(
+                self.data_raw[self.pressure_key],
+                mode_from=self.pressure_mode,
+                mode_to=mode_to,
+                unit_from=self.pressure_unit,
+                unit_to=unit_to,
+                adsorbate=self.adsorbate,
+                temp=self.temperature
+            )
+        except pgError as err:
+            raise CalculationError(
+                f"The isotherm cannot be converted to a {mode_to} basis ({unit_to}). "
+                "Is your isotherm supercritical? "
+                "Does the adsorbate have a thermodynamical backend?"
+            ) from err
 
         if mode_to != self.pressure_mode:
             self.pressure_mode = mode_to
@@ -704,15 +712,22 @@ class PointIsotherm(BaseIsotherm):
                 if not pressure_unit:
                     pressure_unit = self.pressure_unit
 
-                ret = c_pressure(
-                    ret,
-                    mode_from=self.pressure_mode,
-                    mode_to=pressure_mode,
-                    unit_from=self.pressure_unit,
-                    unit_to=pressure_unit,
-                    adsorbate=self.adsorbate,
-                    temp=self.temperature
-                )
+                try:
+                    ret = c_pressure(
+                        ret,
+                        mode_from=self.pressure_mode,
+                        mode_to=pressure_mode,
+                        unit_from=self.pressure_unit,
+                        unit_to=pressure_unit,
+                        adsorbate=self.adsorbate,
+                        temp=self.temperature
+                    )
+                except pgError as err:
+                    raise CalculationError(
+                        f"The pressure cannot be read in a {pressure_mode} basis ({pressure_unit}). "
+                        "Is your isotherm supercritical? "
+                        "Does the adsorbate have a thermodynamical backend?"
+                    ) from err
 
             # Select required points
             if limits and any(limits):
