@@ -15,7 +15,7 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 _MESO_PSD_MODELS = ['pygaps-DH', 'BJH', 'DH']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'halfopen-cylinder', 'sphere']
@@ -187,28 +187,12 @@ def psd_mesoporous(
     surface_tension = isotherm.adsorbate.surface_tension(isotherm.temperature)
 
     # Read data in, depending on branch requested
-    volume_adsorbed = isotherm.loading(
-        branch=branch,
-        loading_basis='volume_liquid',
-        loading_unit='cm3',
+    pressure, volume_adsorbed = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "volume_liquid",
+            "loading_unit": "cm3"
+        }, {"pressure_mode": "relative"}
     )
-    if volume_adsorbed is None:
-        raise ParameterError("The isotherm does not have the required branch for this calculation")
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError as err:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        ) from err
-
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        pressure = pressure[::-1]
-        volume_adsorbed = volume_adsorbed[::-1]
 
     # select the maximum and minimum of the points and the pressure associated
     minimum = 0

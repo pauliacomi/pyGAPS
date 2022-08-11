@@ -16,7 +16,7 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 _MICRO_PSD_MODELS = ['HK', 'HK-CY', 'RY', 'RY-CY']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
@@ -182,30 +182,12 @@ def psd_microporous(
     material_properties = get_hk_model(material_model)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_basis='molar',
-        loading_unit='mmol',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mmol"
+        }, {"pressure_mode": "relative"}
     )
-    if loading is None:
-        raise ParameterError(
-            "The isotherm does not have the required branch "
-            "for this calculation"
-        )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        )
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
 
     # select the maximum and minimum of the points and the pressure associated
     minimum = 0

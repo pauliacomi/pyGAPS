@@ -12,8 +12,8 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.math_utilities import find_linear_sections
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 
 def alpha_s(
@@ -131,7 +131,7 @@ def alpha_s(
 
     References
     ----------
-    .. [#] D. Atkinson, A.I. McLeod, K.S.W. Sing, J. Chim. Phys., 81, 791 (1984)
+    .. [#] D. Atkinson, A.I. McLeod, K.S.W. Sing, J. Chem. Phys., 81, 791 (1984)
 
     See Also
     --------
@@ -183,25 +183,13 @@ def alpha_s(
     liquid_density = adsorbate.liquid_density(isotherm.temperature)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_unit='mmol',
-        loading_basis='molar',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mmol"
+        }, {"pressure_mode": "relative"}
     )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        )
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
+
     # Now for reference isotherm
     reference_loading = reference_isotherm.loading_at(
         pressure,
