@@ -299,11 +299,11 @@ def psd_dft_kernel_fit(
     # generate the numpy arrays
     try:
         kernel_points = numpy.asarray([kernel[size](pressure) for size in kernel])
-    except ValueError:
+    except ValueError as err:
         raise CalculationError(
             "Could not get kernel values at isotherm points. "
             "Does your kernel pressure range apply to this isotherm?"
-        )
+        ) from err
     pore_widths = numpy.asarray(list(kernel.keys()), dtype='float64')
 
     # define the minimization function
