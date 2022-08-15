@@ -329,7 +329,7 @@ def area_BET_raw(
         logger.warning("The C constant is negative.")
     if corr_coef < 0.99:
         logger.warning("The correlation is not linear.")
-    if not (loading[0] < n_monolayer < loading[-1]):
+    if not loading[0] < n_monolayer < loading[-1]:
         logger.warning("The monolayer point is not within the BET region")
 
     return (

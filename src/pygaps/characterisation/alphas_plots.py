@@ -149,7 +149,7 @@ def alpha_s(
             "The reference isotherm adsorbate is different than the "
             "calculated isotherm adsorbate."
         )
-    if reducing_pressure < 0 or reducing_pressure > 1:
+    if 0 < reducing_pressure < 1:
         raise ParameterError("The reducing pressure is outside the bounds of 0-1 p/p0.")
 
     # Deal with reference area
