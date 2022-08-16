@@ -47,6 +47,17 @@ class TestPointIsotherm():
             **isotherm_param,
         )
 
+        pygaps.PointIsotherm(
+            isotherm_data=pandas.DataFrame({
+                'pressure': pressure,
+                'loading': loading,
+                'extra_data': [f"load{e}" for e in range(len(loading))],
+            }),
+            pressure_key='pressure',
+            loading_key='loading',
+            **isotherm_param,
+        )
+
         # Wrong branch
         with pytest.raises(pgEx.ParameterError):
             pygaps.PointIsotherm(
