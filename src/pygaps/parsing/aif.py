@@ -158,18 +158,16 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
         columns = [isotherm.pressure_key, isotherm.loading_key] + other_keys
 
         # write adsorption data
-        loop_ads = block.init_loop('_adsorp_', ['pressure', 'amount'] + other_keys)
-        loop_ads.set_all_values(
-            isotherm.data(branch='ads')[columns].applymap(lambda x: f'{x:.5g}').values.T.tolist()
-        )
+        if isotherm.has_branch('ads'):
+            loop_ads = block.init_loop('_adsorp_', ['pressure', 'amount'] + other_keys)
+            df = isotherm.data(branch='ads')[columns]
+            loop_ads.set_all_values(df.round(5).astype("string").values.T.tolist())
 
         # write desorption data
         if isotherm.has_branch('des'):
             loop_des = block.init_loop('_desorp_', ['pressure', 'amount'] + other_keys)
-            loop_des.set_all_values(
-                isotherm.data(branch='des'
-                              )[columns].applymap(lambda x: f'{x:.5g}').values.T.tolist()
-            )
+            df = isotherm.data(branch='des')[columns]
+            loop_des.set_all_values(df.round(5).astype("string").values.T.tolist())
 
     elif isinstance(isotherm, ModelIsotherm):
 
