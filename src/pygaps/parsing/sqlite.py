@@ -2,7 +2,6 @@
 This module contains the sql interface for data manipulation.
 """
 
-import array
 import functools
 import json
 import sqlite3
@@ -20,12 +19,14 @@ from pygaps.data import DATABASE
 from pygaps.data import MATERIAL_LIST
 from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
-from pygaps.utilities.python_utilities import checkSQLbool
 from pygaps.utilities.python_utilities import grouped
 from pygaps.utilities.sqlite_utilities import build_delete
 from pygaps.utilities.sqlite_utilities import build_insert
 from pygaps.utilities.sqlite_utilities import build_select
 from pygaps.utilities.sqlite_utilities import build_update
+from pygaps.utilities.sqlite_utilities import check_SQL_bool
+from pygaps.utilities.sqlite_utilities import check_SQL_python_type
+from pygaps.utilities.sqlite_utilities import find_SQL_python_type
 
 
 def with_connection(func):
@@ -927,7 +928,7 @@ def isotherm_to_db(
     # Then, the isotherm data/model will be uploaded into the data table
 
     # Build sql request
-    sql_insert = build_insert(table='isotherm_data', to_insert=['iso_id', 'type', 'data'])
+    sql_insert = build_insert(table='isotherm_data', to_insert=['iso_id', 'type', 'dtype', 'data'])
 
     if isinstance(isotherm, PointIsotherm):
         # Insert standard data fields:
@@ -935,31 +936,38 @@ def isotherm_to_db(
             sql_insert, {
                 'iso_id': iso_id,
                 'type': 'pressure',
-                'data': isotherm.pressure().tobytes()
+                'dtype': 'float',
+                'data': json.dumps(isotherm.pressure().tolist())
             }
         )
         cursor.execute(
             sql_insert, {
                 'iso_id': iso_id,
                 'type': 'loading',
-                'data': isotherm.loading().tobytes()
+                'dtype': 'float',
+                'data': json.dumps(isotherm.loading().tolist())
             }
         )
         # Update or insert other fields:
         for key in isotherm.other_keys:
+            dtype = find_SQL_python_type(isotherm.other_data(key)[0])
+            data = json.dumps(isotherm.other_data(key).tolist())
             cursor.execute(
                 sql_insert, {
                     'iso_id': iso_id,
                     'type': key,
-                    'data': isotherm.other_data(key).tobytes()
+                    'dtype': dtype,
+                    'data': data
                 }
             )
+
     elif isinstance(isotherm, ModelIsotherm):
         # Insert model parameters
         cursor.execute(
             sql_insert, {
                 'iso_id': iso_id,
                 'type': 'model',
+                'dtype': "dict",
                 'data': json.dumps(isotherm.model.to_dict())
             }
         )
@@ -1022,7 +1030,7 @@ def isotherms_from_db(
 
         # Get the properties from the data table
         cursor.execute(
-            f"""SELECT iso_id, type, data FROM "isotherm_data"
+            f"""SELECT iso_id, type, dtype, data FROM "isotherm_data"
                 WHERE iso_id IN ({','.join('?' * len(ids))});""", ids
         )
         isotherm_data = cursor.fetchall()
@@ -1032,18 +1040,19 @@ def isotherms_from_db(
             # Generate the isotherm parameters dictionary
             iso_params = dict(zip(row.keys(), row))
             iso_params.update({
-                prop[1]: checkSQLbool(prop[2])
+                prop[1]: check_SQL_bool(prop[2])
                 for prop in isotherm_props
-                if prop[0] == row['id']
+                if prop["iso_id"] == row['id']
             })
             iso_params.pop('id')
 
             # Generate the isotherm data/model
             if row['iso_type'] == 'pointisotherm':
+
                 iso_data = pandas.DataFrame({
-                    data[1]: array.array('d', data[2])
+                    data["type"]: json.loads(data["data"])
                     for data in isotherm_data
-                    if data[0] == row['id']
+                    if data["iso_id"] == row['id']
                 })
 
                 # build isotherm object
@@ -1060,7 +1069,9 @@ def isotherms_from_db(
 
                 iso_model = model_from_dict(
                     next(
-                        json.loads(data['data']) for data in isotherm_data if data[0] == row['id']
+                        json.loads(data['data'])
+                        for data in isotherm_data
+                        if data["iso_id"] == row['id']
                     )
                 )
 

@@ -213,6 +213,7 @@ class TestPointIsotherm():
                 basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
                 basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
                 "enthalpy": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
+                "text_data": ["a", "b", "c", "d", "e", "f", "g", "h"],
             })
         )
 
@@ -222,6 +223,7 @@ class TestPointIsotherm():
                 basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 "enthalpy": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+                "text_data": ["a", "b", "c", "d", "e", "f"],
             })
         )
 
@@ -231,6 +233,7 @@ class TestPointIsotherm():
                 basic_pointisotherm.pressure_key: [4.5, 2.5],
                 basic_pointisotherm.loading_key: [4.5, 2.5],
                 "enthalpy": [4.0, 4.0],
+                "text_data": ["g", "h"],
             },
                              index=[6, 7])
         )

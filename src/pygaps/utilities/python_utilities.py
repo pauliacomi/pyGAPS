@@ -55,15 +55,6 @@ def deep_merge(a, b, path=None, update=True):
     return a
 
 
-def checkSQLbool(val):
-    """Check if a value is a bool. Useful for sqlite storage."""
-    if val in ['TRUE', 'FALSE']:
-        if val == 'TRUE':
-            return True
-        return False
-    return val
-
-
 def get_file_paths(folder, extension=None):
     """
     Get the paths of the files with the requested extension as a list.
