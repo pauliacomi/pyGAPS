@@ -50,7 +50,7 @@ DATA = {
         't_pore_volume': 0.28,
         's_t_area': 55.0,
         'as_ref': 'SiO2',
-        'as_area': 250,
+        'as_area': 350,
         'as_volume': 0.3,
         's_as_area': 360,
         'Khi_slope': 57000,

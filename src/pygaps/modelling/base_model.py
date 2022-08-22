@@ -77,7 +77,7 @@ class IsothermBaseModel():
 
     def __repr__(self):
         """Print model name."""
-        return f"pyGAPS Isotherm Model, '{self.name}' type"
+        return f"<pyGAPS Isotherm Model, '{self.name}' type>"
 
     def __str__(self):
         """Print model name and parameters."""
@@ -230,33 +230,52 @@ class IsothermBaseModel():
         if verbose:
             logger.info(f"Attempting to model using {self.name}.")
 
-        # parameter names (cannot rely on order in Dict)
-        param_names = [param for param in self.params]
-        guess = numpy.array([param_guess[param] for param in param_names])
-        bounds = [[self.param_bounds[param][0] for param in param_names],
-                  [self.param_bounds[param][1] for param in param_names]]
+        param_names = list(self.params)
+        guess = numpy.array([param_guess[p] for p in param_names])
+        bounds = [[self.param_bounds[p][0] for p in param_names],
+                  [self.param_bounds[p][1] for p in param_names]]
 
-        def fit_func(x, p, L):
+        if self.calculates == "loading":
+            fit_func_base = lambda p, l: self.loading(p) - l
+            model_range = self.loading_range[1] - self.loading_range[0]
+        elif self.calculates == "pressure":
+            fit_func_base = lambda p, l: self.pressure(l) - p
+            model_range = self.pressure_range[1] - self.pressure_range[0]
+
+        def fit_func(x, pressure, loading):
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = x[i]
-            return self.loading(p) - L
+            return fit_func_base(pressure, loading)
 
-        kwargs = dict(
-            bounds=bounds,  # supply the bounds of the parameters
-        )
+        fit_args = {
+            "fun": fit_func,  # fitting function
+            "x0": guess,  # initial guess
+            "bounds": bounds,  # supply the bounds of the parameters
+            "args": (pressure, loading),  # extra arguments to the fit function
+        }
         if optimization_params:
-            kwargs.update(optimization_params)
+            fit_args.update(optimization_params)
 
-        # minimize RSS
+        opt_res = self.fit_leastsq(fit_args)
+
+        # assign params
+        for i, _ in enumerate(param_names):
+            self.params[param_names[i]] = opt_res.x[i]
+
+        # calculate RMSE
+        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading)) / model_range
+
+        if verbose:
+            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3g}")
+
+    def fit_leastsq(self, leastsq_args: dict):
+        """Try fitting parameters using least squares."""
         try:
-            opt_res = optimize.least_squares(
-                fit_func,
-                guess,  # provide the fit function and initial guess
-                args=(pressure, loading),  # extra arguments to the fit function
-                **kwargs
-            )
+            opt_res = optimize.least_squares(**leastsq_args)
         except ValueError as err:
-            raise CalculationError(f"Fitting routine for {self.name} failed with error:\n\t{err}")
+            raise CalculationError(
+                f"Fitting routine for {self.name} failed with error:\n\t{err}"
+            ) from err
         if not opt_res.success:
             raise CalculationError(
                 f"Fitting routine for {self.name} failed with error:"
@@ -264,15 +283,6 @@ class IsothermBaseModel():
                 f"\nTry a different starting point in the nonlinear optimization"
                 f"\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
                 f"\nDefault starting guess for parameters:"
-                f"\n{param_guess}\n"
+                f"\n{leastsq_args['x0']}\n"
             )
-
-        # assign params
-        for index, _ in enumerate(param_names):
-            self.params[param_names[index]] = opt_res.x[index]
-
-        # calculate RMSE
-        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
-
-        if verbose:
-            logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3g}")
+        return opt_res
