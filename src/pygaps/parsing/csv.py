@@ -10,6 +10,7 @@ from io import StringIO
 
 import pandas
 
+from pygaps.parsing import _PARSER_PRECISION
 from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
@@ -65,7 +66,7 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
         output.write('data:[pressure,loading,branch,(otherdata)]\n')
-        data.to_csv(output, sep=separator, index=False, header=True)
+        data.round(_PARSER_PRECISION).to_csv(output, sep=separator, index=False, header=True)
 
     elif isinstance(isotherm, ModelIsotherm):
 

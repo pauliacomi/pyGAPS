@@ -7,7 +7,9 @@ _MOLAR_UNITS = {
     "mol": 1,
     "kmol": 1000,
     "cm3(STP)": 4.461e-5,
-    "ml(STP)": 4.461e-5,
+    "mL(STP)": 4.461e-5,
+    "cc(STP)": 4.461e-2,
+    "L(STP)": 4.461e-2,
 }
 _MASS_UNITS = {
     'amu': 1.66054e-27,
@@ -20,6 +22,7 @@ _MASS_UNITS = {
 _VOLUME_UNITS = {
     'cm3': 1,
     'mL': 1,
+    'cc': 1,
     'dm3': 1e3,
     'L': 1e3,
     'm3': 1e6,

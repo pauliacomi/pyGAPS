@@ -1,5 +1,3 @@
-# TODO saturation_pressure for each point
-# TODO isotherm excess / absolute
 # TODO osmotic ensemble
 # TODO double check all model solvers
 # TODO universal adsorption isotherm model (UAIM)

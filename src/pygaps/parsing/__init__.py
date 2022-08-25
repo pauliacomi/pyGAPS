@@ -3,6 +3,8 @@
 # isort:skip_file
 from pygaps.utilities.exceptions import ParsingError
 
+_PARSER_PRECISION = 8
+
 from .csv import isotherm_from_csv
 from .csv import isotherm_to_csv
 from .aif import isotherm_from_aif
