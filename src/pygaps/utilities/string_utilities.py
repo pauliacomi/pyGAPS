@@ -5,7 +5,7 @@ import ast
 from pygaps.utilities.exceptions import ParsingError
 
 
-def convert_chemformula(string: str) -> str:
+def convert_chemformula_ltx(string: str) -> str:
     """
     Convert a chemical formula string to a matplotlib parsable format (latex).
 
