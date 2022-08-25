@@ -212,7 +212,7 @@ class TestPointIsotherm():
             pandas.DataFrame({
                 basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
                 basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-                "enthalpy": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
+                "enthalpy": [5.2, 5.1, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
                 "text_data": ["a", "b", "c", "d", "e", "f", "g", "h"],
             })
         )
@@ -222,7 +222,7 @@ class TestPointIsotherm():
             pandas.DataFrame({
                 basic_pointisotherm.pressure_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 basic_pointisotherm.loading_key: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-                "enthalpy": [5.0, 5.0, 5.0, 5.0, 5.0, 5.0],
+                "enthalpy": [5.2, 5.1, 5.0, 5.0, 5.0, 5.0],
                 "text_data": ["a", "b", "c", "d", "e", "f"],
             })
         )
@@ -308,18 +308,18 @@ class TestPointIsotherm():
 
         # Standard return
         assert set(basic_pointisotherm.other_data(other_key)
-                   ) == set([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0])
+                   ) == set([5.2, 5.1, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0])
 
         # Branch specified
         assert set(basic_pointisotherm.other_data(other_key, branch='ads')
-                   ) == set([5.0, 5.0, 5.0, 5.0, 5.0, 5.0])
+                   ) == set([5.2, 5.1, 5.0, 5.0, 5.0, 5.0])
 
         # Range specified
         assert set(basic_pointisotherm.other_data(other_key, limits=(3, 4.5))) == set([4.0, 4.0])
 
         # Indexed option specified
         assert basic_pointisotherm.other_data(other_key, indexed=True).equals(
-            pandas.Series([5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0])
+            pandas.Series([5.2, 5.1, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0])
         )
 
         # Error
