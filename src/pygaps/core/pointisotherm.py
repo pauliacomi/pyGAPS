@@ -73,7 +73,7 @@ class PointIsotherm(BaseIsotherm):
         Unit of pressure, if applicable.
     loading_basis : str, optional
         Whether the adsorbed amount is in terms of either 'volume_gas'
-        'volume_liquid', 'molar', 'mass', or a fractional/percent basis.
+        'volume_liquid', 'molar', 'mass', or a fraction/percent basis.
     loading_unit : str, optional
         Unit in which the loading basis is expressed.
     material_basis : str, optional
@@ -544,7 +544,7 @@ class PointIsotherm(BaseIsotherm):
         )
 
         # A special case is when conversion is performed from
-        # a "fractional" basis to another "fractional" basis.
+        # a "fraction" basis to another "fraction" basis.
         # Here, the loading must be simultaneously converted.
         # e.g.: wt% = g/g -> cm3/cm3 = vol%
         if self.loading_basis in ['percent', 'fraction']:

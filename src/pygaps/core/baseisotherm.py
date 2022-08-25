@@ -50,7 +50,7 @@ class BaseIsotherm():
         Unit of pressure, if applicable.
     loading_basis : str, optional
         Whether the adsorbed amount is in terms of either 'volume_gas'
-        'volume_liquid', 'molar', 'mass', or a fractional/percent basis.
+        'volume_liquid', 'molar', 'mass', or a fraction/percent basis.
     loading_unit : str, optional
         Unit in which the loading basis is expressed.
     material_basis : str, optional
@@ -185,13 +185,17 @@ class BaseIsotherm():
                 f"See viable values: {_PRESSURE_UNITS.keys()}"
             )
 
-        if self.loading_unit not in _LOADING_MODE[self.loading_basis]:
+        if self.loading_basis not in [
+            "percent", "fraction"
+        ] and self.loading_unit not in _LOADING_MODE[self.loading_basis]:
             raise ParameterError(
                 f"Unit selected for loading ({self.loading_unit}) is not an option. "
                 f"See viable values: {_LOADING_MODE[self.loading_basis].keys()}"
             )
 
-        if self.material_unit not in _MATERIAL_MODE[self.material_basis]:
+        if self.loading_basis not in [
+            "percent", "fraction"
+        ] and self.material_unit not in _MATERIAL_MODE[self.material_basis]:
             raise ParameterError(
                 f"Unit selected for material ({self.material_unit}) is not an option. "
                 f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
