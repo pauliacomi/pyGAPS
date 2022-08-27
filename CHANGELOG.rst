@@ -2,6 +2,9 @@
 Changelog
 =========
 
+4.3.0 (2022-08-27)
+------------------
+
 * AIF can read/write all isotherm types (models/points).
   Also further improved parsing of units and metadata.
 * Quantachrome `txt` files are now fully parseable
