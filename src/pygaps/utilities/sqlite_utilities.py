@@ -173,4 +173,31 @@ def build_delete(table: str, where: list):
         Built query string.
 
     """
-    return (f"DELETE FROM \"{table}\" WHERE " + " AND ".join(f"{w} = :{w}" for w in where))
+    return f"DELETE FROM \"{table}\" WHERE " + " AND ".join(f"{w} = :{w}" for w in where)
+
+
+def check_SQL_bool(val):
+    """Check if a value is a bool. Useful for storage."""
+    if val in ['TRUE', 'FALSE']:
+        if val == 'TRUE':
+            return True
+        return False
+    return val
+
+
+SUPORTED_TYPES = [bool, int, float, str]
+
+
+def check_SQL_python_type(val):
+    """Convert between the database string dtype and a python data type."""
+    for supported_type in SUPORTED_TYPES:
+        if val == supported_type.__name__:
+            return supported_type
+
+
+def find_SQL_python_type(val):
+    """Convert between a python data type and a database string."""
+    for supported_type in SUPORTED_TYPES:
+        if isinstance(val, supported_type):
+            return supported_type.__name__
+    raise ParsingError(f"Cannot store data of type {type(val)} in the database.")

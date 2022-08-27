@@ -1,12 +1,9 @@
 """Collections of various python utilities."""
 
-import collections.abc as abc
 import importlib
-import pathlib
 import sys
 import warnings
-
-from pygaps.utilities.exceptions import pgError
+from collections import abc
 
 
 def _one_pass(iters):
@@ -53,38 +50,6 @@ def deep_merge(a, b, path=None, update=True):
         else:
             a[key] = val
     return a
-
-
-def checkSQLbool(val):
-    """Check if a value is a bool. Useful for sqlite storage."""
-    if val in ['TRUE', 'FALSE']:
-        if val == 'TRUE':
-            return True
-        return False
-    return val
-
-
-def get_file_paths(folder, extension=None):
-    """
-    Get the paths of the files with the requested extension as a list.
-
-    Parameters
-    ----------
-    folder : str
-        Folder where the function will look in, recursively.
-    extension : str
-        The extension of the files to look for.
-
-    Returns
-    -------
-    list
-        Paths of each file.
-
-    """
-    if extension is None:
-        raise pgError("Must provide a file extension to look for")
-
-    return pathlib.Path(folder).rglob(f"*.{extension}")
 
 
 class SimpleWarning():

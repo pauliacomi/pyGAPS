@@ -25,10 +25,6 @@ def pytest_runtest_setup(item):
 
 # Global fixtures
 
-LOADING_KEY = 'loading'
-PRESSURE_KEY = 'pressure'
-OTHER_KEY = "enthalpy"
-
 
 @pytest.fixture(scope='function')
 def isotherm_parameters():
@@ -66,9 +62,10 @@ def isotherm_parameters():
 def isotherm_data():
     """Create a dataframe with all data for an model isotherm."""
     return pandas.DataFrame({
-        PRESSURE_KEY: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-        LOADING_KEY: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-        OTHER_KEY: [5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
+        "pressure": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        "loading": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+        "enthalpy": [5.2, 5.1, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
+        "text_data": ["a", "b", "c", "d", "e", "f", "g", "h"],
     })
 
 
@@ -83,8 +80,8 @@ def basic_pointisotherm(isotherm_data, isotherm_parameters):
     """Create a point isotherm from basic data."""
     return pygaps.PointIsotherm(
         isotherm_data=isotherm_data,
-        loading_key=LOADING_KEY,
-        pressure_key=PRESSURE_KEY,
+        loading_key="loading",
+        pressure_key="pressure",
         **isotherm_parameters
     )
 
@@ -94,8 +91,8 @@ def basic_modelisotherm(isotherm_data, isotherm_parameters):
     """Creates a model isotherm from basic data."""
     return pygaps.ModelIsotherm(
         isotherm_data=isotherm_data,
-        loading_key=LOADING_KEY,
-        pressure_key=PRESSURE_KEY,
+        loading_key="loading",
+        pressure_key="pressure",
         model="Henry",
         **isotherm_parameters
     )

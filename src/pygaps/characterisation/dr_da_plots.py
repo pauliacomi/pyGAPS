@@ -11,7 +11,7 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 
 def dr_plot(
@@ -220,25 +220,12 @@ def da_plot(
     liquid_density = adsorbate.liquid_density(iso_temp)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_unit='mol',
-        loading_basis='molar',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mol"
+        }, {"pressure_mode": "relative"}
     )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        )
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
 
     # Call the raw function
     (

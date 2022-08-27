@@ -2,6 +2,15 @@
 Changelog
 =========
 
+4.3.0 (2022-08-27)
+------------------
+
+* AIF can read/write all isotherm types (models/points).
+  Also further improved parsing of units and metadata.
+* Quantachrome `txt` files are now fully parseable
+* Isotherm data can now be other things beside numbers.
+* Added two standard isotherms (silica+carbon black). Can be used in thickness calculations.
+
 4.2.0 (2022-06-29)
 ------------------
 

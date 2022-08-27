@@ -619,12 +619,12 @@ class Adsorbate():
 
 def _warn_reading_params(err):
     logger.warning(
-        f"Thermodynamic backend failed with error {err}. "
+        f"Thermodynamic backend failed with error: {err}. "
         "Attempting to read parameters dictionary..."
     )
 
 
 def _raise_calculation_error(err):
     raise CalculationError(
-        f"Thermodynamic backend failed (see traceback for error). Also, {err}"
+        f"Thermodynamic backend failed (see traceback for error): {err}"
     ) from err

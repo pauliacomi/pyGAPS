@@ -48,7 +48,7 @@ def parse(path):
             tp = _META_DICT[name]['type']
             val = sheet.cell(row + ref[0], col + ref[1]).value
 
-            if tp == 'number':
+            if tp == 'numeric':
                 meta[name] = val
             elif tp == 'date':
                 meta[name] = _handle_date(sheet, val)

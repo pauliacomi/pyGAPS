@@ -36,5 +36,5 @@ class TestBEL():
         """Test reading of BEL report files."""
         isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='xl')
         json_path = path.with_suffix('.json')
-        # pgp.isotherm_to_json(isotherm, json_path, indent=4)
+        pgp.isotherm_to_json(isotherm, json_path, indent=4)
         assert isotherm == pgp.isotherm_from_json(json_path)

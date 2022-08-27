@@ -4,7 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from pygaps.graphing.mpl_styles import BASE_STYLE
-from pygaps.utilities.string_utilities import convert_chemformula
+from pygaps.utilities.string_utilities import convert_chemformula_ltx
 
 
 @mpl.rc_context(BASE_STYLE)
@@ -46,7 +46,7 @@ def plot_iast(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ads = map(convert_chemformula, ads)
+    ads = map(convert_chemformula_ltx, ads)
 
     title_graph = "IAST uptake"
 
@@ -113,8 +113,8 @@ def plot_iast_vle(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ads1 = convert_chemformula(ads1)
-    ads2 = convert_chemformula(ads2)
+    ads1 = convert_chemformula_ltx(ads1)
+    ads2 = convert_chemformula_ltx(ads2)
 
     text_x = f"Bulk fraction {ads1}"
     text_y = f"Adsorbed fraction {ads1}"
@@ -191,8 +191,8 @@ def plot_iast_svp(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-    ads1 = convert_chemformula(ads1)
-    ads2 = convert_chemformula(ads2)
+    ads1 = convert_chemformula_ltx(ads1)
+    ads2 = convert_chemformula_ltx(ads2)
 
     text_x = f"Pressure [{p_unit}]"
     text_y = f"Selectivity, {ads1}"

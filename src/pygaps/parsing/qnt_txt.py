@@ -1,59 +1,142 @@
 """Parse Quantachrome txt output files."""
-
 import re
 
 import dateutil.parser
 
+from pygaps.parsing.unit_parsing import parse_temperature_unit
+
 _META_DICT = {
-    'material': {
-        'text': "sample id",
-    },
     'adsorbate': {
-        'text': "analysis gas",
+        "text": ("analysis gas:", ),
+        "type": "string",
     },
-    'temperature': {
-        'text': "bath temp.",
+    'adsorbate_molecular_weight': {
+        "text": ("molec. wt:", ),
+        "type": "numeric",
     },
-    'operator': {
-        'text': "operator",
-    },
-    'date': {
-        'text': "date",
-    },
-    'apparatus': {
-        'text': "instrument",
+    'adsorbate_non_ideality': {
+        "text": ("non-ideality:", ),
+        "type": "numeric",
     },
     'material_mass': {
-        'text': "sample weight",
+        "text": ("sample weight:", ),
+        "type": "numeric",
+    },
+    'material_volume': {
+        "text": ("sample volume:", ),
+        "type": "numeric",
+    },
+    'temperature': {
+        "text": ("bath temp:", "bath temp.:"),
+        "type": "numeric",
+    },
+    'apparatus': {
+        "text": ("instrument:", ),
+        "type": "string",
+    },
+    'apparatus_version': {
+        "text": ("instrument version:", ),
+        "type": "string",
     },
     'measurement_duration': {
-        'text': "analysis time",
+        "text": ("analysis time:", ),
+        "type": "numeric",
     },
-    'sample_description': {
-        'text': "sample desc",
+    'outgas_time': {
+        "text": ("outgas time:", ),
+        "type": "string",
     },
-    'comment': {
-        'text': "comment",
+    'outgas_temperature': {
+        "text": ("outgas temp:", "outgastemp:", "outgas temp.:"),
+        "type": "numeric",
     },
-    'time_outgas': {
-        'text': "outgas time",
+    'pressure_tolerance': {
+        "text": ("press. tolerance:", ),
+        "type": "string",
     },
-    'filename': {
-        'text': "filename",
+    'equilibration_time': {
+        "text": ("equil time:", ),
+        "type": "string",
     },
-    'nonideality': {
-        'text': "non-ideality",
+    'equilibration_timeout': {
+        "text": ("equil timeout:", ),
+        "type": "string",
+    },
+    'void_volume': {
+        "text": ("void vol.:", ),
+        "type": "numeric",
+    },
+    'cell': {
+        "text": ("cell:", "celltype:"),
+        "type": "string",
+    },
+    'cell_id': {
+        "text": ("cell id:", ),
+        "type": "string",
+    },
+    'run_mode': {
+        "text": ("run mode:", ),
+        "type": "string",
+    },
+    'end_of_run': {
+        "text": ("end of run:", ),
+        "type": "datetime",
+    },
+    'extended_info': {
+        "text": ("extended info:", ),
+        "type": "string",
     },
 }
 
 _DATA_DICT = {
-    'press': 'pressure',
-    'p0': 'pressure_saturation',
-    'volume': 'loading',
-    'time': 'measurement_time',
-    'tol': 'tolerance',
-    'equ': 'equilibrium',
+    'pressure': {
+        "text": ("press", )
+    },
+    'pressure_relative': {
+        "text": ("p/p0", "p/po")
+    },
+    'pressure_saturation': {
+        "text": ("p0", "po")
+    },
+    'loading': {
+        "text": ("volume @ stp", )
+    },
+    'measurement_time': {
+        "text": ("time", )
+    },
+    'pressure_tolerance': {
+        "text": ("tol", )
+    },
+    'equilibration_timeout': {
+        "text": ("timeout", )
+    },
+    'equilibration_time': {
+        "text": ("equ", "equlibration")
+    },
 }
+
+
+def find_key_vals_from_position(line, keys, poss):
+    """Find keys of successive key-val pairs, knowing the key position"""
+    vals = []
+    for i, (key, pos) in enumerate(zip(keys, poss)):
+        try:
+            vals.append(line[pos + len(key):poss[i + 1]].strip())
+        except IndexError:
+            vals.append(line[pos + len(key):].strip())
+    return vals
+
+
+def find_key_vals_from_keys(line, keys):
+    """Find keys of successive key-val pairs, not knowing the key position"""
+    vals = []
+    for key in keys:
+        start = line.find(key)
+        if start != 0:
+            vals.append(line[:start].strip())
+        line = line[start + len(key):]
+    vals.append(line.strip())
+    return vals
 
 
 def parse(path):
@@ -81,77 +164,111 @@ def parse(path):
         for _ in range(6):
             file.readline()
 
+        # metadata section
+        #
+        # first four lines are always the same
+        line7 = file.readline()
+        vals = find_key_vals_from_keys(line7, ["Operator:", "Date:", "Operator:", "Date:"])
+        meta['operator'] = vals[0]
+        meta['date'] = vals[1]
+        meta['report_operator'] = vals[2]
+        meta['report_date'] = vals[3]
+
+        line8 = file.readline()
+        vals = find_key_vals_from_keys(line8, ["Sample ID:", "Filename:"])
+        meta['material'] = vals[0]
+        meta['filename'] = vals[1]
+
+        line9 = file.readline()
+        vals = find_key_vals_from_keys(line9, ["Sample Desc:", "Comment:"])
+        meta['material_description'] = vals[0]
+        meta['comment'] = vals[1]
+
+        # next lines are variable
+        local_meta_dict = _META_DICT.copy()
         for line in file:
+            # break if we reach the end of the metadata
+            if line == "\n":
+                break
 
-            if ":" in line:  # this means a line with key/val pairs
+            components = []
+            line_lower = line.lower()
+            for key, names in local_meta_dict.items():
+                # pos = line_lower.find(names["text"])
+                for text in names["text"]:
+                    pos = line_lower.find(text)
+                    if pos != -1:
+                        components.append((pos, key, text))
+                        break
+            if components:
+                components.sort(key=lambda x: x[0])
+                vals = find_key_vals_from_position(
+                    line,
+                    [x[2] for x in components],
+                    [x[0] for x in components],
+                )
+                for x, y in zip(components, vals):
+                    meta[x[1]] = y
+                    del local_meta_dict[x[1]]
 
-                # we can only count on :
-                line_clean = line.strip()
-                sep_location = line_clean.find(":")
+        # data section
+        #
+        # data headers
+        line = file.readline()
+        file_headers = re.split(r"\s{2,}", line.strip())
+        file_header_locations = [line.find(" " + header) + 1 for header in file_headers]
+        for h in file_headers:
+            txt = next((k for k, v in _DATA_DICT.items() if h.lower() in v["text"]), h)
+            head.append(txt)
 
-                while sep_location != -1:
+        # skip line
+        file.readline()
 
-                    try:  # find the standard name in the _META_DICT dictionary
-                        name = next(k for k, v in _META_DICT.items() if k == v.get('text', None))
-                    except StopIteration:  # Discard unknown pairs
-                        continue
+        # data header units
+        line = file.readline()
+        all_units = []
+        stated_units = re.split(r"\s{2,}", line.strip())
+        for loc in file_header_locations:
+            unit = None
+            if loc < len(line):
+                if not line[loc:loc + 8].isspace():
+                    unit = stated_units.pop(0)
+            all_units.append(unit)
 
-                    line_clean = line_clean[sep_location:]
-                    sep_location = line_clean.find(":")
+        # skip line
+        file.readline()
 
-                # TODO Are quantachrome files always saved with these mistakes?
-                # for i, d in enumerate(data):
-                #     for mistake in ["Operator:", "Filename:", "Comment:"]:
-                #         if re.search(r"\w+" + mistake, d):
-                #             data[i] = d.split(mistake)[0]
-                #             data.insert(i + 1, mistake)
+        # data
+        line = file.readline()
+        while line:
+            data.append(list(map(float, line.split())))
+            line = file.readline()
 
-                data_dict = {data[i][:-1].lower(): data[i + 1] for i in range(0, len(data), 2)}
+    # Elaborate and clarify some metadata
+    mass, mass_unit = meta['material_mass'].split()
+    temp, temp_unit = meta['temperature'].split()
+    mass, temp = map(float, (mass, temp))
 
-                for key, val in data_dict.items():
-                    try:  # find the standard name in the _META_DICT dictionary
-                        name = next(k for k, v in _META_DICT.items() if key == v.get('text', None))
-                    except StopIteration:  # Discard unknown pairs
-                        continue
-                    meta[name] = val
+    meta['material_mass'] = mass
+    meta['material_unit'] = mass_unit
+    meta['temperature'] = temp
+    meta['temperature_unit'] = parse_temperature_unit(temp_unit)
 
-            elif "Press" in line:
-                # get the adsorption data
+    # takes care of pressure, loading and other units
+    for i, h in enumerate(head):
+        if h == "pressure_relative":
+            meta["pressure_unit"] = None
+        else:
+            meta[h + '_unit'] = all_units[i]
 
-                file_headers = re.split(r"\s{2,}", line.strip())
-                print(file_headers)
-                for h in file_headers:
-                    txt = next((_DATA_DICT[a] for a in _DATA_DICT if h.lower().startswith(a)), h)
-                    print(txt)
-                    head.append(txt)
+    if meta["loading_unit"] in ["cc"]:
+        meta["loading_unit"] += "(STP)"
 
-                # skip line
-                file.readline()
-                file.readline()
+    if meta.get("date"):
+        meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
 
-                units = re.split(r"\s{2,}", line)
-                # TODO handle units
-                print(f"Units are {units}")
-
-                # skip line
-                file.readline()
-                file.readline()
-
-                while line:
-                    data.append(list(map(float, line.split())))
-                    line = file.readline()
-
-    # Set extra metadata
-    meta['mass'] = meta['mass'].split()[0]
-    meta['temperature'] = meta['temperature'].split()[0]
-    meta['temperature_unit'] = "K"
-    meta['pressure_unit'] = "torr"
-    meta['loading_unit'] = "mmol"
-    meta['material_unit'] = "g"
-    meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
-
-    # amount adsorbed from cc to mmol/g
+    # amount adsorbed from cc to cc/g
     data = dict(zip(head, map(lambda *x: list(x), *data)))
-    data['loading'] = data['loading'] / float(meta['mass']) / 22.414
+    data['loading'] = [ld / mass for ld in data["loading"]]
 
     return meta, data

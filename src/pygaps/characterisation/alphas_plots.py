@@ -12,8 +12,8 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.math_utilities import find_linear_sections
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 
 def alpha_s(
@@ -131,7 +131,7 @@ def alpha_s(
 
     References
     ----------
-    .. [#] D. Atkinson, A.I. McLeod, K.S.W. Sing, J. Chim. Phys., 81, 791 (1984)
+    .. [#] D. Atkinson, A.I. McLeod, K.S.W. Sing, J. Chem. Phys., 81, 791 (1984)
 
     See Also
     --------
@@ -149,7 +149,7 @@ def alpha_s(
             "The reference isotherm adsorbate is different than the "
             "calculated isotherm adsorbate."
         )
-    if reducing_pressure < 0 or reducing_pressure > 1:
+    if not 0 < reducing_pressure < 1:
         raise ParameterError("The reducing pressure is outside the bounds of 0-1 p/p0.")
 
     # Deal with reference area
@@ -183,35 +183,23 @@ def alpha_s(
     liquid_density = adsorbate.liquid_density(isotherm.temperature)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_unit='mol',
-        loading_basis='molar',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mmol"
+        }, {"pressure_mode": "relative"}
     )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        )
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
+
     # Now for reference isotherm
     reference_loading = reference_isotherm.loading_at(
         pressure,
         pressure_unit=isotherm.pressure_unit,
-        loading_unit='mol',
+        loading_unit='mmol',
         branch=branch_ref,
     )
     alpha_s_point = reference_isotherm.loading_at(
         reducing_pressure,
-        loading_unit='mol',
+        loading_unit='mmol',
         pressure_mode='relative',
         branch=branch_ref,
     )
@@ -247,7 +235,16 @@ def alpha_s(
                 )
 
             from pygaps.graphing.calc_graphs import tp_plot
-            tp_plot(alpha_curve, loading, results, alpha_s=True, alpha_reducing_p=reducing_pressure)
+            units = isotherm.units
+            units.update({"loading_basis": "molar", "loading_unit": "mmol"})
+            tp_plot(
+                alpha_curve,
+                loading,
+                results,
+                units,
+                alpha_s=True,
+                alpha_reducing_p=reducing_pressure
+            )
 
     return {
         'alpha_curve': alpha_curve,
@@ -274,7 +271,7 @@ def alpha_s_raw(
     Parameters
     ----------
     loading : list[float]
-        Amount adsorbed at the surface, in mol/material.
+        Amount adsorbed at the surface, in mmol/material.
     reference_loading : list[float]
         Loading of the reference curve corresponding to the same pressures.
     alpha_s_point : float
@@ -380,7 +377,7 @@ def alpha_s_plot_parameters(
     # Check if slope is good
 
     if slope * (max(alpha_curve) / max(loading)) < 3:
-        adsorbed_volume = intercept * molar_mass / liquid_density
+        adsorbed_volume = intercept * molar_mass / liquid_density / 1000
         area = (reference_area / alpha_s_point * slope).item()
 
         return {

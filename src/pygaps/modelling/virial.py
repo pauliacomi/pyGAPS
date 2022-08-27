@@ -215,29 +215,17 @@ class Virial(IsothermBaseModel):
                 + self.params['A'] * L - numpy.log(self.params['K']) - ln_p_over_n
 
         kwargs = dict(
-            bounds=bounds,  # supply the bounds of the parameters
+            fun=fit_func,  # fitting function
+            x0=guess,  # initial guess
+            bounds=bounds,  # bounds of the parameters
+            args=(loading, ln_p_over_n),  # extra arguments to the fit function
             # loss='huber',                     # use a loss function against outliers
             # f_scale=0.1,                      # scale of outliers
         )
         if optimization_params:
             kwargs.update(optimization_params)
 
-        # minimize RSS
-        opt_res = optimize.least_squares(
-            fit_func,
-            guess,  # provide the fit function and initial guess
-            args=(loading, ln_p_over_n),  # supply the extra arguments to the fit function
-            **kwargs
-        )
-        if not opt_res.success:
-            raise CalculationError(
-                f"\nFitting routine with model {self.name} failed with error:"
-                f"\n\t{opt_res.message}"
-                f"\nTry a different starting point in the nonlinear optimization"
-                f"\nby passing a dictionary of parameter guesses, param_guess, to the constructor."
-                f"\nDefault starting guess for parameters:"
-                f"\n{param_guess}\n"
-            )
+        opt_res = self.fit_leastsq(kwargs)
 
         # assign params
         for index, _ in enumerate(param_names):

@@ -4,12 +4,12 @@ from pygaps.utilities.exceptions import ParsingError
 _META_DICT = {
     'material': {
         "text": ('comment1', 'コメント１'),
-        'type': 'string',
+        "type": 'string',
         "xl_ref": (0, 2),
     },
     'adsorbate': {
         "text": ('adsorptive', '吸着質名称'),
-        'type': 'string',
+        "type": 'string',
         "xl_ref": (0, 2),
     },
     'temperature': {
@@ -19,45 +19,45 @@ _META_DICT = {
             "meas. temp",
             '吸着温度',
         ),
-        'type': 'number',
+        "type": "numeric",
         "unit": "temperature_unit",
         "xl_ref": (0, 2),
     },
     'operator': {
         "text": ('comment2', 'コメント２'),
-        'type': 'string',
+        "type": 'string',
         "xl_ref": (0, 2),
     },
     'date': {
         "text": ('date of measurement', '測定日'),
-        'type': 'date',
+        "type": 'date',
         "xl_ref": (0, 2),
     },
     'material_mass': {
         "text": ('sample weight', 'サンプル質量'),
         "unit": "material_unit",
-        'type': 'number',
+        "type": "numeric",
         "xl_ref": (0, 2),
     },
     'measurement_duration': {
         "text": ('time of measurement', '測定時間'),
-        'type': 'time',
+        "type": 'datetime',
         "xl_ref": (0, 2),
     },
     'serialnumber': {
         "text": ('serial number', 's/n', "instrument", 'シリアルナンバー'),
-        'type': 'string',
+        "type": 'string',
         "xl_ref": (0, 2),
     },
     'errors': {
-        'text': ('primary data', ),
-        'type': 'error',
+        "text": ('primary data', ),
+        "type": 'error',
         "xl_ref": (0, 2),
     },
     'comments': {
-        'text': ('comment3', ),
+        "text": ('comment3', ),
         'name': 'comment',
-        'type': 'string',
+        "type": 'string',
         "xl_ref": (0, 2),
     },
 }

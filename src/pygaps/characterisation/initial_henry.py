@@ -11,6 +11,7 @@ from pygaps.utilities.exceptions import ParameterError
 
 def initial_henry_slope(
     isotherm: "PointIsotherm | ModelIsotherm",
+    branch: str = 'ads',
     max_adjrms: int = 0.02,
     p_limits: "tuple[float, float]" = None,
     l_limits: "tuple[float, float]" = None,
@@ -24,6 +25,8 @@ def initial_henry_slope(
     ----------
     isotherm : PointIsotherm, ModelIsotherm
         Isotherm to use for the calculation.
+    branch : {'ads', 'des'}, optional
+        Branch of the isotherm to use. It defaults to adsorption.
     max_adjrms : float, optional
         Maximum adjusted root mean square between the linear fit and isotherm data.
     p_limits : [float, float]
@@ -49,8 +52,8 @@ def initial_henry_slope(
         if not l_limits:
             l_limits = [-numpy.inf, numpy.inf]
 
-        pressure = isotherm.pressure(branch='ads', indexed=True, limits=p_limits)
-        loading = isotherm.loading(branch='ads', indexed=True, limits=l_limits)
+        pressure = isotherm.pressure(branch=branch, indexed=True, limits=p_limits)
+        loading = isotherm.loading(branch=branch, indexed=True, limits=l_limits)
 
         pressure, loading = pressure.align(loading, join='inner')
         pressure, loading = pressure.values, loading.values
@@ -59,8 +62,8 @@ def initial_henry_slope(
             raise ParameterError("Limits chosen lead to no selected data.")
 
     else:
-        pressure = isotherm.pressure(branch='ads')
-        loading = isotherm.loading(branch='ads')
+        pressure = isotherm.pressure(branch=branch)
+        loading = isotherm.loading(branch=branch)
 
     # add a zero point to the graph since the henry
     # constant must have a zero intercept (if needed)
@@ -83,9 +86,9 @@ def initial_henry_slope(
         param_guess = henry.initial_guess(pressure[:rows_taken], loading[:rows_taken])
         # fit model to isotherm data
         henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
-        adjrmsd = henry.rmse / numpy.ptp(loading)
+        adjrmsd = henry.rmse
 
-        if adjrmsd > max_adjrms and rows_taken != 2:
+        if henry.rmse > max_adjrms and rows_taken != 2:
             rows_taken = rows_taken - 1
             continue
         else:

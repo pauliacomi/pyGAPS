@@ -3,6 +3,8 @@
 # isort:skip_file
 from pygaps.utilities.exceptions import ParsingError
 
+_PARSER_PRECISION = 8
+
 from .csv import isotherm_from_csv
 from .csv import isotherm_to_csv
 from .aif import isotherm_from_aif
@@ -26,6 +28,7 @@ _COMMERCIAL_FORMATS = {
     'bel': ('csv', 'xl', 'dat'),
     'mic': ('xl'),
     '3p': ('xl'),
+    'qnt': ('txt-raw'),
 }
 
 
@@ -39,7 +42,7 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
         the location of the file.
     manufacturer : {'mic', 'bel', '3p'}
         Manufacturer of the apparatus.
-    manufacturer : {'mic', 'bel', '3p'}
+    fmt : {'xl', 'txt', ...}
         The format of the import for the isotherm.
 
     Returns
@@ -57,15 +60,16 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
 
     if manufacturer == 'mic' and fmt == 'xl':
         from .mic_excel import parse
-    elif manufacturer == 'bel' and fmt == 'xl':
-        from .bel_excel import parse
-    elif manufacturer == 'bel' and fmt == 'csv':
-        from .bel_csv import parse
-    elif manufacturer == 'bel' and fmt == 'dat':
-        from .bel_dat import parse
+    elif manufacturer == 'bel':
+        if fmt == 'xl':
+            from .bel_excel import parse
+        elif fmt == 'csv':
+            from .bel_csv import parse
+        elif fmt == 'dat':
+            from .bel_dat import parse
     elif manufacturer == '3p' and fmt == 'xl':
         from .trp_excel import parse
-    elif manufacturer == 'qnt' and fmt == 'txt':
+    elif manufacturer == 'qnt' and fmt == 'txt-raw':
         from .qnt_txt import parse
     else:
         raise ParsingError("Something went wrong.")
@@ -85,6 +89,10 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
     if 'pressure_relative' in data.columns:
         data['pressure'] = data['pressure_relative']
         data = data.drop('pressure_relative', axis=1)
+        meta['pressure_mode'] = 'relative'
+        meta['pressure_unit'] = None
+    elif 'pressure_saturation' in data.columns:
+        data['pressure'] = data['pressure'] / data['pressure_saturation']
         meta['pressure_mode'] = 'relative'
         meta['pressure_unit'] = None
 

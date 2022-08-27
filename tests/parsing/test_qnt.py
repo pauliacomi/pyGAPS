@@ -2,9 +2,9 @@
 
 import pytest
 
-from .conftest import DATA_QNT
+import pygaps.parsing as pgp
 
-# from pygaps.parsing.qnt_txt import parse
+from .conftest import DATA_QNT
 
 
 @pytest.mark.parsing
@@ -13,6 +13,7 @@ class TestQuantachrome():
     @pytest.mark.parametrize("path", DATA_QNT)
     def test_read_qnt_txt(self, path):
         """Test reading of Quantachrome txt files."""
-        # TODO Quantachrome txt files are cursed
-        # parse(path)
-        assert True
+        isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='qnt', fmt='txt-raw')
+        json_path = path.with_suffix('.json')
+        # pgp.isotherm_to_json(isotherm, json_path, indent=4)
+        assert isotherm == pgp.isotherm_from_json(json_path)
