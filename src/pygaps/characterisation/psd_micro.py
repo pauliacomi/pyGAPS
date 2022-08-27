@@ -11,7 +11,6 @@ from scipy import optimize
 
 from pygaps.characterisation.models_hk import HK_KEYS
 from pygaps.characterisation.models_hk import get_hk_model
-from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError

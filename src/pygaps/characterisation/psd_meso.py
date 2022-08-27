@@ -10,7 +10,6 @@ from pygaps import logger
 from pygaps.characterisation.models_kelvin import get_kelvin_model
 from pygaps.characterisation.models_kelvin import get_meniscus_geometry
 from pygaps.characterisation.models_thickness import get_thickness_model
-from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError

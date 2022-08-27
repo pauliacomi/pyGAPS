@@ -9,7 +9,6 @@ import pandas
 from scipy import interpolate
 from scipy import optimize
 
-from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.data import KERNELS

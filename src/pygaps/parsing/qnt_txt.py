@@ -269,6 +269,6 @@ def parse(path):
 
     # amount adsorbed from cc to cc/g
     data = dict(zip(head, map(lambda *x: list(x), *data)))
-    data['loading'] = [l / mass for l in data["loading"]]
+    data['loading'] = [ld / mass for ld in data["loading"]]
 
     return meta, data

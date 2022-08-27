@@ -25,7 +25,6 @@ from pygaps.utilities.sqlite_utilities import build_insert
 from pygaps.utilities.sqlite_utilities import build_select
 from pygaps.utilities.sqlite_utilities import build_update
 from pygaps.utilities.sqlite_utilities import check_SQL_bool
-from pygaps.utilities.sqlite_utilities import check_SQL_python_type
 from pygaps.utilities.sqlite_utilities import find_SQL_python_type
 
 

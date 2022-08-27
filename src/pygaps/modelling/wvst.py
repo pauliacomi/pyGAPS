@@ -3,7 +3,6 @@
 import numpy
 from scipy import optimize
 
-from pygaps import logger
 from pygaps.modelling.base_model import IsothermBaseModel
 from pygaps.utilities.exceptions import CalculationError
 
