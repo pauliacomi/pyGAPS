@@ -2,6 +2,7 @@
 import re
 
 import dateutil.parser
+
 from pygaps.parsing.unit_parsing import parse_temperature_unit
 
 _META_DICT = {
