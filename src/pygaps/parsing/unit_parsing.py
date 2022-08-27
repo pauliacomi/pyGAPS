@@ -33,11 +33,11 @@ ALIAS_BASIS = {
 }
 ALIAS_PRESSURE_UNIT = {
     "torr": ('mmhg', 'torr', 'mm hg'),
-    "Pa": ('pa', ),
-    "kPa": ('kpa', ),
-    "MPa": ('mpa', ),
+    "Pa": ('pa', 'pascal'),
+    "kPa": ('kpa', 'kilopascal'),
+    "MPa": ('mpa', 'megapascal'),
     "bar": ('bar', ),
-    "mbar": ('mbar', ),
+    "mbar": ('mbar', 'millibar'),
     "atm": ('atm', 'atmosphere'),
 }
 ALIAS_VOLUME_UNIT = {
@@ -49,7 +49,7 @@ ALIAS_VOLUME_UNIT = {
 }
 
 
-def standard_temperature(text: str) -> str:
+def parse_temperature_unit(text: str) -> str:
     """Ensure celsius is correctly written."""
     lower_text = text.lower()
     if "c" in lower_text:
@@ -65,7 +65,7 @@ def parse_temperature_string(temperature_string: str) -> str:
     # first clean the string
     temperature_string_clean = clean_string(temperature_string, pre_proc_sub)
     # then correctly format degC/degK
-    temperature_string_clean = standard_temperature(temperature_string_clean)
+    temperature_string_clean = parse_temperature_unit(temperature_string_clean)
 
     return temperature_string_clean
 

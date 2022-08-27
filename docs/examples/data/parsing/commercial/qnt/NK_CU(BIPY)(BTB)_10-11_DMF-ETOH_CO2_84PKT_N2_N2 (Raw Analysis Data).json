@@ -1,0 +1,672 @@
+{
+    "adsorbate": "nitrogen",
+    "adsorbate_molecular_weight": "0 g",
+    "adsorbate_non_ideality": "0 1/Torr",
+    "apparatus": "Autosorb Station 1",
+    "comment": "",
+    "date": "2010-06-10T09:47:00",
+    "equilibration_time_unit": null,
+    "file_version": "3.0",
+    "filename": "NK_CU(BIPY)(BTB)_10-11_DMF-ETOH_CO2_84PKT_N2_N2.drf",
+    "isotherm_data": [
+        {
+            "equilibration_time": 2.0,
+            "loading": 132.18136200716845,
+            "measurement_time": 277.8,
+            "pressure": 0.00100923198733175,
+            "pressure_saturation": 757.8,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 2.0,
+            "loading": 219.8247311827957,
+            "measurement_time": 454.2,
+            "pressure": 0.002000554594551769,
+            "pressure_saturation": 757.31,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 2.0,
+            "loading": 366.31182795698925,
+            "measurement_time": 630.6,
+            "pressure": 0.00300890239070136,
+            "pressure_saturation": 757.1,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 2.0,
+            "loading": 490.50896057347666,
+            "measurement_time": 774.3,
+            "pressure": 0.00400727969348659,
+            "pressure_saturation": 756.9,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 571.2150537634408,
+            "measurement_time": 876.8,
+            "pressure": 0.005003871052979258,
+            "pressure_saturation": 756.9,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 3.0,
+            "loading": 622.3978494623656,
+            "measurement_time": 956.4,
+            "pressure": 0.006018647494944956,
+            "pressure_saturation": 756.67,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 3.0,
+            "loading": 656.1290322580645,
+            "measurement_time": 1012.8,
+            "pressure": 0.0070506483035726085,
+            "pressure_saturation": 756.59,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 3.0,
+            "loading": 682.9068100358423,
+            "measurement_time": 1062.8,
+            "pressure": 0.008054556513460624,
+            "pressure_saturation": 756.28,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 3.0,
+            "loading": 701.7992831541219,
+            "measurement_time": 1096.2,
+            "pressure": 0.009030059271803557,
+            "pressure_saturation": 755.84,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 718.9605734767025,
+            "measurement_time": 1127.5,
+            "pressure": 0.010052858484203288,
+            "pressure_saturation": 756.17,
+            "pressure_tolerance": 4.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 747.9426523297491,
+            "measurement_time": 1135.0,
+            "pressure": 0.012059769385380302,
+            "pressure_saturation": 756.24,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 846.9390681003584,
+            "measurement_time": 1145.0,
+            "pressure": 0.021651690597498843,
+            "pressure_saturation": 755.65,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 962.9426523297491,
+            "measurement_time": 1153.5,
+            "pressure": 0.033098179797872905,
+            "pressure_saturation": 755.96,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1095.5340501792114,
+            "measurement_time": 1163.5,
+            "pressure": 0.05001468584205442,
+            "pressure_saturation": 755.83,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1148.5698924731182,
+            "measurement_time": 1171.6,
+            "pressure": 0.06548713539255242,
+            "pressure_saturation": 755.95,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1165.2222222222222,
+            "measurement_time": 1178.5,
+            "pressure": 0.0757700449854459,
+            "pressure_saturation": 755.8,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1183.573476702509,
+            "measurement_time": 1185.3,
+            "pressure": 0.0930970406056435,
+            "pressure_saturation": 755.56,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1193.189964157706,
+            "measurement_time": 1191.9,
+            "pressure": 0.10542564876202576,
+            "pressure_saturation": 755.67,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1206.663082437276,
+            "measurement_time": 1198.7,
+            "pressure": 0.12776031252069125,
+            "pressure_saturation": 755.15,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1220.6021505376343,
+            "measurement_time": 1206.8,
+            "pressure": 0.1521273919088923,
+            "pressure_saturation": 755.15,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 5.0,
+            "loading": 1231.179211469534,
+            "measurement_time": 1213.5,
+            "pressure": 0.17958243416784717,
+            "pressure_saturation": 755.33,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1239.4551971326166,
+            "measurement_time": 1219.1,
+            "pressure": 0.2061034354983855,
+            "pressure_saturation": 755.64,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1246.3405017921145,
+            "measurement_time": 1224.4,
+            "pressure": 0.23208643184163866,
+            "pressure_saturation": 755.74,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1252.2616487455196,
+            "measurement_time": 1229.8,
+            "pressure": 0.2576451121847905,
+            "pressure_saturation": 755.45,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1257.405017921147,
+            "measurement_time": 1235.0,
+            "pressure": 0.2831420363530455,
+            "pressure_saturation": 755.37,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1261.967741935484,
+            "measurement_time": 1240.3,
+            "pressure": 0.30850711903879746,
+            "pressure_saturation": 755.72,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1266.111111111111,
+            "measurement_time": 1245.5,
+            "pressure": 0.3340044238996543,
+            "pressure_saturation": 754.99,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1269.7921146953404,
+            "measurement_time": 1250.6,
+            "pressure": 0.35914466974822196,
+            "pressure_saturation": 755.03,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1273.1720430107528,
+            "measurement_time": 1255.6,
+            "pressure": 0.3843467320045031,
+            "pressure_saturation": 755.05,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1276.2437275985662,
+            "measurement_time": 1260.7,
+            "pressure": 0.40943196409896615,
+            "pressure_saturation": 755.41,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1279.0967741935483,
+            "measurement_time": 1265.8,
+            "pressure": 0.43470495558115213,
+            "pressure_saturation": 755.31,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1281.7562724014338,
+            "measurement_time": 1270.9,
+            "pressure": 0.45998092942563135,
+            "pressure_saturation": 755.09,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1284.143369175627,
+            "measurement_time": 1276.0,
+            "pressure": 0.48483139373237477,
+            "pressure_saturation": 755.31,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1286.4551971326164,
+            "measurement_time": 1281.1,
+            "pressure": 0.5102711792590239,
+            "pressure_saturation": 755.22,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1290.516129032258,
+            "measurement_time": 1286.3,
+            "pressure": 0.5582902000238281,
+            "pressure_saturation": 755.41,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1294.3906810035842,
+            "measurement_time": 1291.5,
+            "pressure": 0.607862151078185,
+            "pressure_saturation": 755.9,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1297.9999999999998,
+            "measurement_time": 1296.7,
+            "pressure": 0.6583954260908693,
+            "pressure_saturation": 755.59,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1301.3405017921148,
+            "measurement_time": 1301.9,
+            "pressure": 0.7080549162764861,
+            "pressure_saturation": 756.06,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1304.4193548387098,
+            "measurement_time": 1307.1,
+            "pressure": 0.7586667195851193,
+            "pressure_saturation": 755.88,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1307.1541218637992,
+            "measurement_time": 1312.3,
+            "pressure": 0.8088985349972869,
+            "pressure_saturation": 755.63,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1309.6308243727597,
+            "measurement_time": 1317.6,
+            "pressure": 0.8579955550851943,
+            "pressure_saturation": 755.92,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1312.1720430107525,
+            "measurement_time": 1322.9,
+            "pressure": 0.9081018518518518,
+            "pressure_saturation": 756.0,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1315.0430107526881,
+            "measurement_time": 1328.2,
+            "pressure": 0.9575620468857491,
+            "pressure_saturation": 755.88,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1317.888888888889,
+            "measurement_time": 1333.5,
+            "pressure": 0.9847206959100719,
+            "pressure_saturation": 755.27,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "equilibration_time": 4.0,
+            "loading": 1322.7455197132617,
+            "measurement_time": 1339.5,
+            "pressure": 0.9954881147757955,
+            "pressure_saturation": 755.56,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1314.0716845878135,
+            "measurement_time": 1346.5,
+            "pressure": 0.9409314633500926,
+            "pressure_saturation": 755.8,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1311.2437275985662,
+            "measurement_time": 1353.3,
+            "pressure": 0.8907427269958552,
+            "pressure_saturation": 755.19,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1308.6774193548385,
+            "measurement_time": 1360.1,
+            "pressure": 0.8395679167604347,
+            "pressure_saturation": 755.41,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1306.0824372759857,
+            "measurement_time": 1366.9,
+            "pressure": 0.7896560398241804,
+            "pressure_saturation": 755.32,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1303.2186379928314,
+            "measurement_time": 1373.7,
+            "pressure": 0.7398254350878122,
+            "pressure_saturation": 755.02,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1300.0609318996417,
+            "measurement_time": 1380.4,
+            "pressure": 0.689545105515397,
+            "pressure_saturation": 755.34,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1296.6451612903224,
+            "measurement_time": 1387.0,
+            "pressure": 0.6391557977724278,
+            "pressure_saturation": 755.98,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1292.9820788530465,
+            "measurement_time": 1393.7,
+            "pressure": 0.5902346336166945,
+            "pressure_saturation": 755.22,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1290.437275985663,
+            "measurement_time": 1402.7,
+            "pressure": 0.5362092697000979,
+            "pressure_saturation": 755.58,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1286.0035842293905,
+            "measurement_time": 1409.3,
+            "pressure": 0.4892955919912131,
+            "pressure_saturation": 755.67,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1283.1326164874552,
+            "measurement_time": 1414.8,
+            "pressure": 0.4654383063182269,
+            "pressure_saturation": 755.75,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1276.9641577060931,
+            "measurement_time": 1421.4,
+            "pressure": 0.41494041556998684,
+            "pressure_saturation": 756.07,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1273.9784946236557,
+            "measurement_time": 1426.9,
+            "pressure": 0.3905320668853847,
+            "pressure_saturation": 755.92,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1270.7060931899641,
+            "measurement_time": 1432.4,
+            "pressure": 0.3656569666653433,
+            "pressure_saturation": 755.67,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1267.15770609319,
+            "measurement_time": 1437.9,
+            "pressure": 0.3408344470762594,
+            "pressure_saturation": 755.71,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1263.2043010752689,
+            "measurement_time": 1443.3,
+            "pressure": 0.3158937594243539,
+            "pressure_saturation": 756.02,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1258.8745519713261,
+            "measurement_time": 1448.8,
+            "pressure": 0.2908689618714069,
+            "pressure_saturation": 756.65,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1254.1075268817206,
+            "measurement_time": 1454.3,
+            "pressure": 0.2664573362595521,
+            "pressure_saturation": 756.38,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1248.6594982078852,
+            "measurement_time": 1459.7,
+            "pressure": 0.24181217368316704,
+            "pressure_saturation": 756.55,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1235.3118279569892,
+            "measurement_time": 1466.3,
+            "pressure": 0.19267547514184818,
+            "pressure_saturation": 756.09,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1227.0537634408602,
+            "measurement_time": 1471.8,
+            "pressure": 0.16852529630167937,
+            "pressure_saturation": 756.83,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1216.551971326165,
+            "measurement_time": 1477.3,
+            "pressure": 0.14480889488226972,
+            "pressure_saturation": 756.39,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1188.4193548387095,
+            "measurement_time": 1484.2,
+            "pressure": 0.09858706428203196,
+            "pressure_saturation": 756.51,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1178.921146953405,
+            "measurement_time": 1495.4,
+            "pressure": 0.08804938304224905,
+            "pressure_saturation": 756.94,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1157.8853046594982,
+            "measurement_time": 1507.9,
+            "pressure": 0.07100157322087228,
+            "pressure_saturation": 756.41,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1148.7240143369174,
+            "measurement_time": 1516.9,
+            "pressure": 0.06548568183018967,
+            "pressure_saturation": 757.08,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1105.2114695340501,
+            "measurement_time": 1540.1,
+            "pressure": 0.05189410848003803,
+            "pressure_saturation": 757.19,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 1042.1505376344085,
+            "measurement_time": 1568.9,
+            "pressure": 0.0427403033185373,
+            "pressure_saturation": 756.96,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 918.2186379928315,
+            "measurement_time": 1636.7,
+            "pressure": 0.02838462756691126,
+            "pressure_saturation": 757.72,
+            "pressure_tolerance": 3.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 814.6379928315412,
+            "measurement_time": 1719.8,
+            "pressure": 0.018469778623130977,
+            "pressure_saturation": 757.08,
+            "pressure_tolerance": 5.0
+        },
+        {
+            "branch": "des",
+            "equilibration_time": 4.0,
+            "loading": 718.0537634408602,
+            "measurement_time": 1854.7,
+            "pressure": 0.009851150739619547,
+            "pressure_saturation": 756.47,
+            "pressure_tolerance": 4.0
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "cc(STP)",
+    "material": "nk_Cu(bipy)(btb)_10-11_DMF-EtOH_CO2_84Pkt_N2",
+    "material_basis": "mass",
+    "material_description": "nk_Cu(bipy)(btb)_10-11_DMF-EtOH_CO2_84Pkt",
+    "material_mass": 0.0279,
+    "material_unit": "g",
+    "measurement_duration": "n/a",
+    "measurement_time_unit": "min",
+    "operator": "",
+    "outgas_temperature": "100.0 \u00b0C",
+    "outgas_time": "1.0 hrs",
+    "pressure_mode": "relative",
+    "pressure_saturation_unit": "Torr",
+    "pressure_tolerance_unit": null,
+    "pressure_unit": null,
+    "report_date": "2020/05/06",
+    "report_operator": "ir",
+    "temperature": 77.35,
+    "temperature_unit": "K"
+}
