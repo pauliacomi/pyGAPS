@@ -8,7 +8,7 @@ _MOLAR_UNITS = {
     "kmol": 1000,
     "cm3(STP)": 4.461e-5,
     "mL(STP)": 4.461e-5,
-    "cc(STP)": 4.461e-2,
+    "cc(STP)": 4.461e-5,
     "L(STP)": 4.461e-2,
 }
 _MASS_UNITS = {
