@@ -135,6 +135,22 @@ To learn more, look at the
 simply call ``help()`` from a python interpreter (for example
 ``help(pygaps.PointIsotherm)``.
 
+Support and sponsorship
+=======================
+
+This project is graciously sponsored by
+`Surface Measurement Systems <https://surfacemeasurementsystems.com/>`__, by
+employing Paul Iacomi, the core maintainer. The work would not be possible
+without their contribution, keeping this open source project alive.
+
+.. image:: https://raw.githubusercontent.com/pauliacomi/pyGAPS/master/docs/figures/SMS-Logo.jpg
+   :width: 200px
+   :align: left
+
+If you are interested in implementing a particular feature,
+or obtaining professional level support, contact us here
+`Bugs or questions?`_.
+
 Citing
 ======
 
