@@ -1,11 +1,11 @@
 """Parse 3P xls output files."""
 
-from datetime import datetime
-
+import dateutil.parser
 import openpyxl
 
 from pygaps import logger
 
+from . import unit_parsing
 from . import utils as util
 
 _META_DICT = {
@@ -54,39 +54,44 @@ def parse(path):
     meta = {}
     data = {}
 
+    # open the workbook
+    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
+
     # local for efficiency
     meta_dict = _META_DICT.copy()
-
-    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
 
     # Metadata
     info_sheet = workbook['Info']
     # we know data is left-aligned
     # so we only iterate rows
     for row in info_sheet.rows:
-        first_cell = row[0]
+
         # if first cell is not filled -> blank row
+        first_cell = row[0]
         if not first_cell.value:
             continue
 
-        key = first_cell.value.lower()
+        cell_value = first_cell.value.lower()
         val = row[1].value
         try:
-            key = util._search_key_in_def_dict(key, meta_dict)
+            key = util.search_key_in_def_dict(cell_value, meta_dict)
         except StopIteration:
             if val:
+                key = cell_value.replace(" ", "_")
                 meta[key] = val
             continue
 
         tp = meta_dict[key]['type']
         del meta_dict[key]  # delete for efficiency
 
-        if tp == 'numeric':
+        if val is None:
+            meta[key] = None
+        elif tp == 'numeric':
             meta[key] = val
         elif tp == 'date':
-            meta[key] = _handle_date(val)
+            meta[key] = _handle_3p_date(val)
         elif tp == 'string':
-            meta[key] = util._handle_excel_string(val)
+            meta[key] = util.handle_excel_string(val)
 
     # Data
     data_sheet = workbook['Isotherm']
@@ -102,23 +107,10 @@ def parse(path):
 
     # Set extra metadata
     meta['apparatus'] = '3P'
-    meta['temperature'] = 77.4  # TODO where is this stored?
+    meta['temperature'] = 77.3  # TODO where is this stored?
     meta['temperature_unit'] = "K"  # TODO where is this stored?
-    meta['pressure_mode'] = 'absolute'
-    meta['loading_basis'] = 'molar'
-    meta['material_basis'] = 'mass'
 
     return meta, data
-
-
-def _handle_date(val):
-    """
-    Convert date to string.
-
-    Input is a cell of type 'date'.
-    """
-    if val:
-        return datetime.strptime(val, r'%Y-%m-%d %H:%M:%S').isoformat()
 
 
 def _parse_header(header_list):
@@ -131,31 +123,14 @@ def _parse_header(header_list):
         headers.append(txt)
 
         if txt == 'loading':
-            units['loading_basis'] = 'molar'
-            for (u, c) in (
-                ('mmol', 'mmol'),
-                ('mol', 'mol'),
-                ('(cm³/g STP)', 'cm3(STP)'),
-            ):
-                if u in h:
-                    units['loading_unit'] = c
-            units['material_basis'] = 'mass'
-            for (u, c) in (
-                ('/g', 'g'),
-                ('/kg', 'kg'),
-            ):
-                if u in h:
-                    units['material_unit'] = c
+            unit_string = util.RE_BETWEEN_BRACKETS.search(h).group().strip()
+            unit_dict = unit_parsing.parse_loading_string(unit_string)
+            units.update(unit_dict)
 
         if txt == 'pressure':
-            units['pressure_mode'] = 'absolute'
-            for (u, c) in (
-                ('torr', 'torr'),
-                ('kPa', 'kPa'),
-                ('bar', 'bar'),
-            ):
-                if u in h:
-                    units['pressure_unit'] = c
+            unit_string = util.RE_BETWEEN_BRACKETS.search(h).group().strip()
+            unit_dict = unit_parsing.parse_pressure_string(unit_string)
+            units.update(unit_dict)
 
     return headers, units
 
@@ -184,3 +159,13 @@ def _check(meta, data, path):
             logger.info(f"No data collected for {empty} in file {path}.")
     if 'errors' in meta:
         logger.warning('\n'.join(meta['errors']))
+
+
+def _handle_3p_date(text):
+    """
+    Convert date to string.
+
+    Input is a cell of type 'date'.
+    """
+    return dateutil.parser.parse(text).isoformat()
+    # return datetime.strptime(val, r'%Y-%m-%d %H:%M:%S').isoformat()

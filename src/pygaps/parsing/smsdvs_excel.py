@@ -1,5 +1,5 @@
 """Parse SMS DVS xlsx output files."""
-
+import dateutil.parser
 import openpyxl
 
 from . import utils as util
@@ -31,6 +31,16 @@ _META_DICT = {
         'type': 'numeric',
         "xl_ref": (0, 1)
     },
+    'operator': {
+        'text': ('user name:', ),
+        'type': 'string',
+        "xl_ref": (0, 1)
+    },
+    'date': {
+        'text': ('raw data file created:', ),
+        'type': 'date',
+        "xl_ref": (0, 1)
+    },
     'dvs_file_version': {
         'text': ('file version:', ),
         'type': 'string',
@@ -43,7 +53,7 @@ _META_DICT = {
     },
     'dvs_sequence_creation_date': {
         'text': ('sequence created:', ),
-        'type': 'numeric',
+        'type': 'date',
         "xl_ref": (0, 1)
     },
     'dvs_method_name': {
@@ -53,7 +63,7 @@ _META_DICT = {
     },
     'dvs_method_creation_date': {
         'text': ('method created:', ),
-        'type': 'string',
+        'type': 'date',
         "xl_ref": (0, 1)
     },
     'dvs_method_modified': {
@@ -68,11 +78,6 @@ _META_DICT = {
     },
     'dvs_sample_description': {
         'text': ('sample description:', ),
-        'type': 'string',
-        "xl_ref": (0, 1)
-    },
-    'dvs_username': {
-        'text': ('user name:', ),
         'type': 'string',
         "xl_ref": (0, 1)
     },
@@ -130,18 +135,19 @@ def parse(path):
     # we know data is left-aligned
     # so we only iterate rows
     for row in rawdata_sheet.rows:
-        first_cell = row[0]
+
         # if first cell is not filled -> blank row
-        if not first_cell.value:
+        cell_value = row[0]
+        if not cell_value.value:
             continue
 
         # We do not take kinetics for the moment
-        if first_cell.value == "Time [minutes]":  # If "kinetic data" section
+        if cell_value.value == "Time [minutes]":  # If "kinetic data" section
             break
 
-        key = first_cell.value.lower()
+        key = cell_value.value.lower()
         try:
-            key = util._search_key_in_def_dict(key, meta_dict)
+            key = util.search_key_in_def_dict(key, meta_dict)
         except StopIteration:
             continue
 
@@ -150,15 +156,15 @@ def parse(path):
         del meta_dict[key]  # delete for efficiency
 
         # handle different data types
-        val = rawdata_sheet.cell(first_cell.row + ref[0], first_cell.column + ref[1]).value
-        if tp == 'numeric':
+        val = rawdata_sheet.cell(cell_value.row + ref[0], cell_value.column + ref[1]).value
+        if val == '':
+            meta[key] = None
+        elif tp == 'numeric':
             meta[key] = val
-        elif tp == 'date':
-            meta[key] = util._handle_xlrd_date(sheet, val)  # TODO handle this
-        elif tp == 'time':
-            meta[key] = util._handle_xlrd_time(sheet, val)
         elif tp == 'string':
-            meta[key] = util._handle_excel_string(val)
+            meta[key] = util.handle_excel_string(val)
+        elif tp == 'date':
+            meta[key] = _handle_dvs_date(val)
 
     # Then get data and some remaining metadata
     book = None
@@ -194,12 +200,9 @@ def parse(path):
                 # Finished for now
                 break
 
-    # _check(meta, data, path)
-
     # Set extra metadata
-    unit["material_basis"] = "mass"
-    unit["material_unit"] = None
-    # meta['date'] = dateutil.parser.parse(meta['date']).isoformat()  # TODO common?
+    meta["material_basis"] = "mass"
+    meta["material_unit"] = None
 
     return meta, data
 
@@ -212,35 +215,35 @@ def _parse_header(sheet, row, col):
 
     """
 
-    head = {}
-    unit = {}
+    headers = {}
+    units = {}
 
     # determine pressure mode
     pressure_mode = sheet.cell(row + 1, col).value
     if pressure_mode == "% P/Po":
-        unit["pressure_mode"] = "relative%"
-        unit["pressure_unit"] = None
+        units["pressure_mode"] = "relative%"
+        units["pressure_unit"] = None
     elif pressure_mode == "Pres.":
-        unit["pressure_mode"] = "absolute"
-        unit["pressure_unit"] = "torr"
-    head["pressure_target"] = col
+        units["pressure_mode"] = "absolute"
+        units["pressure_unit"] = "torr"
+    headers["pressure_target"] = col
 
     # determine target/actual display
     pressure_output = sheet.cell(row, col + 1).value
     if pressure_output == "Actual":
-        head["pressure_actual_ads"] = col + 1
-        head["loading_ads"] = col + 2
-        head["pressure_actual_des"] = col + 3
-        head["loading_des"] = col + 4
+        headers["pressure_actual_ads"] = col + 1
+        headers["loading_ads"] = col + 2
+        headers["pressure_actual_des"] = col + 3
+        headers["loading_des"] = col + 4
     else:
-        head["loading_ads"] = col + 1
-        head["loading_des"] = col + 2
+        headers["loading_ads"] = col + 1
+        headers["loading_des"] = col + 2
 
     # TODO does this change?
-    unit["loading_basis"] = "percent"
-    unit["loading_unit"] = None
+    units["loading_basis"] = "percent"
+    units["loading_unit"] = None
 
-    return head, unit
+    return headers, units
 
 
 def _parse_data(sheet, row, head):
@@ -285,3 +288,9 @@ def _sort_data(data, head):
             del v[index]
 
     return ds
+
+
+def _handle_dvs_date(text):
+    if text == "N/A":
+        return None
+    return dateutil.parser.parse(text.replace(" UTC ", "")).isoformat()

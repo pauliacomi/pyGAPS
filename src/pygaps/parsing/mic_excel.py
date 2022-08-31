@@ -4,19 +4,15 @@
 @modified Paul Iacomi
 """
 
-import re
 from itertools import product
 
 import dateutil.parser
 import xlrd
 
 from pygaps import logger
-from pygaps.utilities.exceptions import ParsingError
 
+from . import unit_parsing
 from . import utils as util
-
-_NUMBER_REGEX = re.compile(r"^(-)?\d+(.|,)?\d+")
-_BRACKET_REGEX = re.compile(r"(?<=\().+?(?=\))")
 
 _META_DICT = {
     'material': {
@@ -41,6 +37,16 @@ _META_DICT = {
     },
     'date': {
         'text': ('started', ),
+        'type': 'string',
+        "xl_ref": (0, 1),
+    },
+    'date_finished': {
+        'text': ('completed', ),
+        'type': 'string',
+        "xl_ref": (0, 1),
+    },
+    'date_report': {
+        'text': ('report time', ),
         'type': 'string',
         "xl_ref": (0, 1),
     },
@@ -74,23 +80,6 @@ _DATA_DICT = {
     'elapsed': 'time',
 }
 
-_UNITS_DICT = {
-    "p": {
-        "torr": ('mmHg', 'torr'),
-        "kPa": ('kPa'),
-        "bar": ('bar'),
-        "mbar": ('mbar'),
-    },
-    "l": {
-        "mmol": ("mmol"),
-        "mol": ("mol"),
-        "cm3(STP)": ("ml(STP)", "cm3(STP)", "cm^3(STP)", "cm³"),
-    },
-    "m": {
-        "g": ("g", "g-1", "g STP", "kg STP", "g^-1"),
-    },
-}
-
 
 def parse(path):
     """
@@ -118,16 +107,19 @@ def parse(path):
     # local for efficiency
     meta_dict = _META_DICT.copy()
 
-    # Iterate over all cells in the notebook
+    # iterate over all cells in the notebook
     for row, col in product(range(sheet.nrows), range(sheet.ncols)):
+
+        # check if empty
         cell_value = sheet.cell(row, col).value
-        if cell_value == '':
+        if not isinstance(cell_value, str) or cell_value == '':
             continue
 
-        cell_value = cell_value.lower()
-        if cell_value not in ["isotherm tabular report"]:
+        # check if we are in the data section
+        if cell_value not in ["Isotherm Tabular Report"]:
+            cell_value = cell_value.strip().lower()
             try:
-                key = util._search_key_starts_def_dict(cell_value, meta_dict)
+                key = util.search_key_starts_def_dict(cell_value, meta_dict)
             except StopIteration:
                 continue
 
@@ -136,24 +128,36 @@ def parse(path):
             del meta_dict[key]  # delete for efficiency
 
             val = sheet.cell(row + ref[0], col + ref[1]).value
-            if tp == 'numeric':
-                meta[key] = _handle_numbers(val, key)
+            if val == '':
+                meta[key] = None
+            elif tp == 'numeric':
+                nb, unit = unit_parsing.parse_number_unit_string(val)
+                meta[key] = nb
+                meta[f"{key}_unit"] = unit
             elif tp == 'string':
-                meta[key] = util._handle_excel_string(val)
+                meta[key] = util.handle_excel_string(val)
+            elif tp == 'datetime':
+                meta[key] = util.handle_xlrd_datetime(sheet, val)
+            elif tp == 'date':
+                meta[key] = util.handle_xlrd_date(sheet, val)
+            elif tp == 'time':
+                meta[key] = util.handle_xlrd_time(sheet, val)
+            elif tp == 'timedelta':
+                meta[key] = val
             elif tp == 'error':
-                errors += _get_errors(sheet, row, col)
+                errors += _parse_errors(sheet, row, col)
 
         else:  # If "data" section
 
-            header_list = _get_data_labels(sheet, row, col)
+            header_list = _get_header(sheet, row, col)
             head, units = _parse_header(header_list)  # header
             meta.update(units)
 
             for i, h in enumerate(head[1:]):
-                points = _get_datapoints(sheet, row, col + i)
+                points = _parse_data(sheet, row, col + i)
 
                 if h == 'time':
-                    data[h] = _convert_time(points)[1:]
+                    data[h] = list(map(util.handle_string_time_minutes, points[1:]))
                 elif h == 'pressure_saturation':
                     data[h] = [float(x) for x in points[1:]]
                 elif h.startswith("pressure") or h.startswith("loading"):
@@ -180,30 +184,7 @@ def parse(path):
     return meta, data
 
 
-def _handle_numbers(val, name):
-    """
-    Remove any extra information (such as units) to return only the number as a float.
-
-    Input is a cell of type 'numeric'.
-    """
-    if val:
-        ret = float(_NUMBER_REGEX.search(val.replace(',', '')).group())
-        if name == 'temperature':
-            if '°C' in val:
-                ret = ret + 273.15
-        return ret
-
-
-def _convert_time(points):
-    """Convert time points from HH:MM format to minutes."""
-    minutes = []
-    for point in points:
-        hours, mins = str(point).split(':')
-        minutes.append(int(hours) * 60 + int(mins))
-    return minutes
-
-
-def _get_data_labels(sheet, row, col):
+def _get_header(sheet, row, col):
     """Locate all column labels for data collected during the experiment."""
     final_column = col
     header_row = 2
@@ -228,7 +209,34 @@ def _get_data_labels(sheet, row, col):
     return [sheet.cell(row + header_row, i).value for i in range(col, final_column)]
 
 
-def _get_datapoints(sheet, row, col):
+def _parse_header(header_split):
+    """Parse an adsorption/desorption header to get columns and units."""
+    headers = ['branch']
+    units = {}
+
+    for h in header_split:
+        header = next((_DATA_DICT[a] for a in _DATA_DICT if h.lower().startswith(a)), h)
+        headers.append(header)
+
+        if header in 'loading':
+            unit_string = util.RE_BETWEEN_BRACKETS.search(h).group().strip()
+            unit_dict = unit_parsing.parse_loading_string(unit_string)
+            units.update(unit_dict)
+
+        elif header == 'pressure':
+            unit_string = util.RE_BETWEEN_BRACKETS.search(h).group().strip()
+            unit_dict = unit_parsing.parse_pressure_string(unit_string)
+            units.update(unit_dict)
+
+    if 'pressure' not in headers:
+        if 'pressure_relative' in headers:
+            headers[headers.index('pressure_relative')] = 'pressure'
+            units['pressure_mode'] = 'relative'
+
+    return headers, units
+
+
+def _parse_data(sheet, row, col):
     """Return all collected data points for a given column."""
     rowc = 3
     # Data can start on two different rows. Try first option and then next row.
@@ -251,47 +259,7 @@ def _get_datapoints(sheet, row, col):
     ]
 
 
-def _parse_header(header_split):
-    """Parse an adsorption/desorption header to get columns and units."""
-    headers = ['branch']
-    units = {}
-
-    for h in header_split:
-        header = next((_DATA_DICT[a] for a in _DATA_DICT if h.lower().startswith(a)), h)
-        headers.append(header)
-
-        if header in 'loading':
-            unit = _BRACKET_REGEX.search(h).group().strip()
-            unit_l, unit_m = unit.split('/')
-
-            units['loading_basis'] = 'molar'
-            units['loading_unit'] = _parse_unit(unit_l, 'l')
-
-            units['material_basis'] = 'mass'
-            units['material_unit'] = _parse_unit(unit_m, 'm')
-
-        elif header == 'pressure':
-            unit = _BRACKET_REGEX.search(h).group().strip()
-
-            units['pressure_mode'] = 'absolute'
-            units['pressure_unit'] = _parse_unit(unit, 'p')
-
-    if 'pressure' not in headers:
-        if 'pressure_relative' in headers:
-            headers[headers.index('pressure_relative')] = 'pressure'
-            units['pressure_mode'] = 'relative'
-
-    return headers, units
-
-
-def _parse_unit(unit, unit_type):
-    for (k, v) in _UNITS_DICT[unit_type].items():
-        if unit in v:
-            return k
-    raise ParsingError(f"Could not parse unit '{unit}'.")
-
-
-def _get_errors(sheet, row, col):
+def _parse_errors(sheet, row, col):
     """
     Look for all cells that contain errors.
     (are below a cell labelled primary data).

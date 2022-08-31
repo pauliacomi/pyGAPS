@@ -1,7 +1,8 @@
 {
     "adsorbate": "water",
     "apparatus": "BEL 1.0",
-    "comments": null,
+    "comment3": null,
+    "comment4": "degas at 150C for 720 minLeak amount : 4.636E-2Pa/Min, Vacuum degree before measurement:1.287E-8Pa",
     "date": "2017-09-06T00:00:00",
     "file_version": "3.0",
     "isotherm_data": [
@@ -920,11 +921,12 @@
         }
     ],
     "loading_basis": "molar",
-    "loading_unit": "mmol",
+    "loading_unit": "mol",
     "material": "Sample_D",
     "material_basis": "mass",
     "material_mass": 0.0543,
     "material_unit": "g",
+    "measurement_duration": 6.324849537037037,
     "operator": "User",
     "pressure_mode": "relative",
     "pressure_unit": null,

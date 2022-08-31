@@ -116,29 +116,6 @@ _DATA_DICT = {
 }
 
 
-def find_key_vals_from_position(line, keys, poss):
-    """Find keys of successive key-val pairs, knowing the key position"""
-    vals = []
-    for i, (key, pos) in enumerate(zip(keys, poss)):
-        try:
-            vals.append(line[pos + len(key):poss[i + 1]].strip())
-        except IndexError:
-            vals.append(line[pos + len(key):].strip())
-    return vals
-
-
-def find_key_vals_from_keys(line, keys):
-    """Find keys of successive key-val pairs, not knowing the key position"""
-    vals = []
-    for key in keys:
-        start = line.find(key)
-        if start != 0:
-            vals.append(line[:start].strip())
-        line = line[start + len(key):]
-    vals.append(line.strip())
-    return vals
-
-
 def parse(path):
     """
     Get the isotherm and sample data from a Quantachrome .txt file.
@@ -272,3 +249,26 @@ def parse(path):
     data['loading'] = [ld / mass for ld in data["loading"]]
 
     return meta, data
+
+
+def find_key_vals_from_position(line, keys, poss):
+    """Find keys of successive key-val pairs, knowing the key position"""
+    vals = []
+    for i, (key, pos) in enumerate(zip(keys, poss)):
+        try:
+            vals.append(line[pos + len(key):poss[i + 1]].strip())
+        except IndexError:
+            vals.append(line[pos + len(key):].strip())
+    return vals
+
+
+def find_key_vals_from_keys(line, keys):
+    """Find keys of successive key-val pairs, not knowing the key position"""
+    vals = []
+    for key in keys:
+        start = line.find(key)
+        if start != 0:
+            vals.append(line[:start].strip())
+        line = line[start + len(key):]
+    vals.append(line.strip())
+    return vals

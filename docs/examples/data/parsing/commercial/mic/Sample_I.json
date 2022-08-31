@@ -1,6 +1,8 @@
 {
     "adsorbate": "nitrogen",
     "date": "2019-12-14T12:00:05",
+    "date_finished": "12/15/2019 8:36:55 AM",
+    "date_report": "7/15/2021 2:58:59 PM",
     "file_version": "3.0",
     "isotherm_data": [
         {
@@ -627,8 +629,9 @@
     "material": "SD 687-scale up",
     "material_basis": "mass",
     "material_mass": 0.1226,
+    "material_mass_unit": "g",
     "material_unit": "g",
-    "operator": "shan",
+    "operator": "XXXX",
     "pressure_mode": "relative",
     "pressure_unit": null,
     "temperature": 77.3,

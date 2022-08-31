@@ -1,6 +1,8 @@
 {
     "adsorbate": "nitrogen",
     "date": "1970-01-01T00:00:00",
+    "date_finished": null,
+    "date_report": "15/04/2021 15:06:14",
     "file_version": "3.0",
     "isotherm_data": [
         {
@@ -292,8 +294,9 @@
     "material": "default",
     "material_basis": "mass",
     "material_mass": 1.0,
+    "material_mass_unit": "g",
     "material_unit": "g",
-    "operator": null,
+    "operator": "Scott",
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
     "temperature": 77.3,

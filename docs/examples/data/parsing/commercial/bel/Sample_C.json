@@ -1,7 +1,8 @@
 {
     "adsorbate": "propane",
     "apparatus": "BEL 1.0",
-    "comments": "Comment number 1",
+    "comment3": "Comment number 1",
+    "comment4": "Leak amount 1.177Pa/min",
     "date": "2018-06-11T00:00:00",
     "file_version": "3.0",
     "isotherm_data": [
@@ -201,6 +202,7 @@
     "material_basis": "mass",
     "material_mass": 0.074,
     "material_unit": "g",
+    "measurement_duration": 0.8211458333333334,
     "operator": "User",
     "pressure_mode": "relative",
     "pressure_unit": null,

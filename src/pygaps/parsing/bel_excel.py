@@ -28,56 +28,62 @@ def parse(path):
     """
     meta = {}
     data = {}
-    errors = []
 
+    # open the workbook
     workbook = xlrd.open_workbook(path, encoding_override='latin-1')
     sheet = workbook.sheet_by_name('AdsDes')
 
-    for row, col in product(range(sheet.nrows), range(sheet.ncols)):
-        cell_value = str(sheet.cell(row, col).value).strip()
+    # local for efficiency
+    meta_dict = _META_DICT.copy()
 
+    # iterate over all cells in the notebook
+    for row, col in product(range(sheet.nrows), range(sheet.ncols)):
+
+        # check if empty
+        cell_value = sheet.cell(row, col).value
+        if not isinstance(cell_value, str) or cell_value == '':
+            continue
+
+        # check if we are in the data section
         if cell_value != "No":
-            cell_search = cell_value.lower()
+            cell_value = cell_value.strip().lower()
             try:
-                name = next(
-                    k for k, v in _META_DICT.items()
-                    if any(cell_search == n for n in v.get('text', []))
-                )
+                key = util.search_key_in_def_dict(cell_value, meta_dict)
             except StopIteration:
                 continue
 
-            ref = _META_DICT[name]['xl_ref']
-            tp = _META_DICT[name]['type']
-            val = sheet.cell(row + ref[0], col + ref[1]).value
+            ref = meta_dict[key]['xl_ref']
+            tp = meta_dict[key]['type']
+            del meta_dict[key]  # delete for efficiency
 
-            if tp == 'numeric':
-                meta[name] = val
-            elif tp == 'date':
-                meta[name] = util._handle_xlrd_date(sheet, val)
-            elif tp == 'time':
-                meta[name] = util._handle_xlrd_time(sheet, val)
+            val = sheet.cell(row + ref[0], col + ref[1]).value
+            if val == '':
+                meta[key] = None
+            elif tp == 'numeric':
+                meta[key] = val
             elif tp == 'string':
-                meta[name] = util._handle_excel_string(val)
+                meta[key] = util.handle_excel_string(val)
+            elif tp == 'datetime':
+                meta[key] = util.handle_xlrd_datetime(sheet, val)
+            elif tp == 'date':
+                meta[key] = util.handle_xlrd_date(sheet, val)
+            elif tp == 'time':
+                meta[key] = util.handle_xlrd_time(sheet, val)
+            elif tp == 'timedelta':
+                meta[key] = val
 
         else:  # If "data" section
 
-            header_list = [
-                sheet.cell(row, rcol).value.strip()
-                for rcol in range(sheet.ncols)
-                if sheet.cell(row, rcol).value.strip() != ''
-            ]
+            header_list = _get_header(sheet, row)
             head, units = _parse_header(header_list)  # header
             meta.update(units)
 
-            (ads_start, ads_end, des_start, des_end) = _find_datapoints(sheet, row, col)
+            (ads_start, ads_end, des_start, des_end) = _parse_data(sheet, row, col)
             data["branch"] = [0] * (ads_end - ads_start) + [1] * (des_end - des_start)
             for i, item in enumerate(head[1:]):
                 ads_points = [sheet.cell(r, i).value for r in range(ads_start, ads_end)]
                 des_points = [sheet.cell(r, i).value for r in range(des_start, des_end)]
                 data[item] = ads_points + des_points
-
-    if errors:
-        meta['errors'] = errors
 
     _check(meta, data, path)
 
@@ -88,7 +94,16 @@ def parse(path):
     return meta, data
 
 
-def _find_datapoints(sheet, row, col):
+def _get_header(sheet, row):
+    """Return list of data headers."""
+    return [
+        sheet.cell(row, rcol).value.strip()
+        for rcol in range(sheet.ncols)
+        if sheet.cell(row, rcol).value.strip() != ''
+    ]
+
+
+def _parse_data(sheet, row, col):
     """Return start and stop points for adsorption and desorption."""
     rowc = 1
 

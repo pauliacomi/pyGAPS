@@ -1,6 +1,8 @@
 {
     "adsorbate": "nitrogen",
-    "date": null,
+    "date": "2020-08-20T15:25:51",
+    "date_finished": "23/08/2020 08:11:14",
+    "date_report": "01/09/2020 13:47:56",
     "file_version": "3.0",
     "isotherm_data": [
         {
@@ -702,6 +704,7 @@
     "material": "ZnK-BDC@120C",
     "material_basis": "mass",
     "material_mass": 0.0455,
+    "material_mass_unit": "g",
     "material_unit": "g",
     "operator": "Scott",
     "pressure_mode": "relative",

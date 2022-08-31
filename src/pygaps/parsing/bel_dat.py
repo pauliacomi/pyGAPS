@@ -6,6 +6,9 @@ from pygaps.parsing.bel_common import _META_DICT
 from pygaps.parsing.bel_common import _parse_header
 from pygaps.utilities.exceptions import ParsingError
 
+from . import unit_parsing
+from . import utils as util
+
 
 def parse(path):
     """
@@ -26,28 +29,34 @@ def parse(path):
     head = []
     data = []
 
+    # local for efficiency
+    meta_dict = _META_DICT.copy()
+
     with open(path, 'r', encoding='utf-8') as file:
         for line in file:
             values = line.strip().split(sep='\t')
             nvalues = len(values)
 
             if nvalues == 2:  # If value pair
-                key, val = [v.strip('"').replace(',', ' ') for v in values]
-                key = key.lower()
-                try:  # find the standard name in the _META_DICT dictionary
-                    name = next(
-                        k for k, v in _META_DICT.items()
-                        if any(key.startswith(n) for n in v.get('text', []))
-                    )
+                text, val = [v.strip('"').replace(',', ' ') for v in values]
+                text = text.lower()
+                try:  # find the standard name in the metadata dictionary
+                    key = util.search_key_starts_def_dict(text, meta_dict)
                 except StopIteration:  # Store unknown as is
-                    key = key.lower().replace(" ", "_")
+                    key = text.replace(" ", "_")
+                    key_units = key.split("/")
+                    if key_units == 2:
+                        key = key_units[0]
+                        val = val + " " + key_units[1]
                     meta[key] = val
                     continue
-                meta[name] = val
 
-                if name == "temperature":
-                    if "/k" in key:
-                        meta['temperature_unit'] = 'K'  # TODO, find a better way to handle units
+                meta[key] = val
+                del meta_dict[key]  # delete for efficiency
+
+                if text == "temperature":
+                    text, unit = key.split("/")
+                    meta['temperature_unit'] = unit_parsing.parse_temperature_unit(unit)
 
             elif nvalues < 2:  # If "section title"
                 title = values[0].strip().lower()
