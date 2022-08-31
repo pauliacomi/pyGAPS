@@ -7,6 +7,7 @@ JSON_PATH = DATA_PATH / 'json'
 CSV_PATH = DATA_PATH / 'csv'
 AIF_PATH = DATA_PATH / 'aif'
 
+SMSDVS_PATH = DATA_PATH / 'commercial' / 'smsdvs'
 BEL_PATH = DATA_PATH / 'commercial' / 'bel'
 MIC_PATH = DATA_PATH / 'commercial' / 'mic'
 TP_PATH = DATA_PATH / 'commercial' / '3p'
@@ -19,6 +20,7 @@ DATA_CSV = tuple(CSV_PATH.glob("*.csv"))
 DATA_AIF = tuple(AIF_PATH.glob("*.aif"))
 DATA_JSON_NIST = tuple(NIST_PATH.glob("*.json"))
 
+DATA_SMSDVS_XL = tuple(SMSDVS_PATH.glob("*.xlsx"))
 DATA_MIC_XL = tuple(MIC_PATH.glob("*.xls"))
 DATA_BEL = tuple(BEL_PATH.glob("*.DAT"))
 DATA_BEL_XL = tuple(BEL_PATH.glob("*.xls"))

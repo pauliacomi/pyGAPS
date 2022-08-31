@@ -1,4 +1,4 @@
-"""Tests bel file read."""
+"""Tests various BEL file read."""
 
 import pytest
 
@@ -18,7 +18,9 @@ class TestBEL():
         isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='dat')
         json_path = path.with_suffix('.json')
         # pgp.isotherm_to_json(isotherm, json_path, indent=4)
-        assert isotherm == pgp.isotherm_from_json(json_path)
+        isotherm2 = pgp.isotherm_from_json(json_path)
+        assert isotherm.to_dict() == isotherm2.to_dict()
+        assert isotherm == isotherm2
 
     @pytest.mark.parametrize("path", DATA_BEL_CSV)
     def test_read_bel_csv(self, path):
@@ -29,12 +31,16 @@ class TestBEL():
         isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='csv', lang=lang)
         json_path = path.with_suffix('.json')
         # pgp.isotherm_to_json(isotherm, json_path, indent=4)
-        assert isotherm == pgp.isotherm_from_json(json_path)
+        isotherm2 = pgp.isotherm_from_json(json_path)
+        assert isotherm.to_dict() == isotherm2.to_dict()
+        assert isotherm == isotherm2
 
     @pytest.mark.parametrize("path", DATA_BEL_XL)
     def test_read_bel_excel(self, path):
         """Test reading of BEL report files."""
         isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='bel', fmt='xl')
         json_path = path.with_suffix('.json')
-        pgp.isotherm_to_json(isotherm, json_path, indent=4)
-        assert isotherm == pgp.isotherm_from_json(json_path)
+        # pgp.isotherm_to_json(isotherm, json_path, indent=4)
+        isotherm2 = pgp.isotherm_from_json(json_path)
+        assert isotherm.to_dict() == isotherm2.to_dict()
+        assert isotherm == isotherm2

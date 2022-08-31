@@ -1,8 +1,8 @@
 {
     "adsorbate": "nitrogen",
     "apparatus": "3P",
-    "average pore diameter (4v/a)": 2.121,
-    "bet surface area": 1534.746,
+    "average_pore_diameter_(4v/a)": 2.121,
+    "bet_surface_area": 1534.746,
     "date": "2021-09-01T13:28:14",
     "file_version": "3.0",
     "isotherm_data": [
@@ -859,9 +859,9 @@
     "pressure_mode": "relative",
     "pressure_unit": null,
     "project": "CO2 Ads MOF",
-    "single point bet surface area at p/p0=0.20000": 1647.117,
-    "stoped time": "2021-09-02 13:44:10",
-    "temperature": 77.4,
+    "single_point_bet_surface_area_at_p/p0=0.20000": 1647.117,
+    "stoped_time": "2021-09-02 13:44:10",
+    "temperature": 77.3,
     "temperature_unit": "K",
-    "total pore volume at p/p0 = 0.99000": 0.814
+    "total_pore_volume_at_p/p0_=_0.99000": 0.814
 }

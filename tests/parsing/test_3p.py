@@ -1,4 +1,4 @@
-"""Tests excel parsing."""
+"""Tests 3P excel parsing."""
 
 import pytest
 
@@ -16,4 +16,6 @@ class Test3P():
         isotherm = pgp.isotherm_from_commercial(path=path, manufacturer='3p', fmt='xl')
         json_path = path.with_suffix('.json')
         # pgp.isotherm_to_json(isotherm, json_path, indent=4)
-        assert isotherm == pgp.isotherm_from_json(json_path)
+        isotherm2 = pgp.isotherm_from_json(json_path)
+        assert isotherm.to_dict() == isotherm2.to_dict()
+        assert isotherm == isotherm2

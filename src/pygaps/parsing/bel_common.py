@@ -1,5 +1,6 @@
 from pygaps import logger
-from pygaps.utilities.exceptions import ParsingError
+
+from . import unit_parsing
 
 _META_DICT = {
     'material': {
@@ -41,7 +42,7 @@ _META_DICT = {
     },
     'measurement_duration': {
         "text": ('time of measurement', '測定時間'),
-        "type": 'datetime',
+        "type": 'timedelta',
         "xl_ref": (0, 2),
     },
     'serialnumber': {
@@ -54,9 +55,13 @@ _META_DICT = {
         "type": 'error',
         "xl_ref": (0, 2),
     },
-    'comments': {
+    'comment3': {
         "text": ('comment3', ),
-        'name': 'comment',
+        "type": 'string',
+        "xl_ref": (0, 2),
+    },
+    'comment4': {
+        "text": ('comment4', ),
         "type": 'string',
         "xl_ref": (0, 2),
     },
@@ -76,22 +81,6 @@ _DATA_DICT = {
     'na/': 'loading',
 }
 
-_UNITS_DICT = {
-    "p": {
-        "torr": ('mmHg', 'torr'),
-        "kPa": ('kPa'),
-        "bar": ('bar'),
-    },
-    "l": {
-        "mmol": ("mmol"),
-        "mol": ("mol"),
-        "cm3(STP)": ("ml(STP)", "cm3(STP)", "cm^3(STP)"),
-    },
-    "m": {
-        "g": ("g-1", "g^-1"),
-    },
-}
-
 
 def _parse_header(header_split):
     """Parse an adsorption/desorption header to get columns and units."""
@@ -103,29 +92,16 @@ def _parse_header(header_split):
         headers.append(header)
 
         if header in 'loading':
-            unit = h.split('/')[1].strip()
-            unit_l, unit_m = unit.split(' ')
-
-            units['loading_basis'] = 'molar'
-            units['loading_unit'] = _parse_unit(unit_l, 'l')
-
-            units['material_basis'] = 'mass'
-            units['material_unit'] = _parse_unit(unit_m, 'm')
+            unit_string = h.split('/')[1].strip()
+            unit_dict = unit_parsing.parse_loading_string(unit_string)
+            units.update(unit_dict)
 
         elif header == 'pressure':
-            unit = h.split('/')[1].strip()
-
-            units['pressure_mode'] = 'absolute'
-            units['pressure_unit'] = _parse_unit(unit, 'p')
+            unit_string = h.split('/')[1].strip()
+            unit_dict = unit_parsing.parse_pressure_string(unit_string)
+            units.update(unit_dict)
 
     return headers, units
-
-
-def _parse_unit(unit, unit_type):
-    for (k, v) in _UNITS_DICT[unit_type].items():
-        if unit in v:
-            return k
-    raise ParsingError(f"Could not parse unit '{unit}'.")
 
 
 def _check(meta, data, path):

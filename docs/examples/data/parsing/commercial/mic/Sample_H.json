@@ -1,10 +1,11 @@
 {
     "adsorbate": "nitrogen",
     "comment": "Comments:",
-    "date": "",
+    "date": "2019-06-17T15:59:45",
+    "date_finished": "18/06/2019 16:36:00",
+    "date_report": "06/09/2019 10:57:41",
     "errors": [
-        "At least two points must be selected for this calculation.",
-        "4070-  Unable to load deconvolution model DFT - Argon on Carbon."
+        "At least two points must be selected for this calculation."
     ],
     "file_version": "3.0",
     "isotherm_data": [
@@ -325,6 +326,7 @@
     "material": "Ryan_p56-b3",
     "material_basis": "mass",
     "material_mass": 0.9813,
+    "material_mass_unit": "g",
     "material_unit": "g",
     "operator": "Troy",
     "pressure_mode": "relative",

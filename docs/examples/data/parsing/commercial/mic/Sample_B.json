@@ -3,15 +3,15 @@
     "apparatus": "TriStar II 3020 3.02",
     "comment": "Sample that was stopped during collection.",
     "date": "2017-06-13T07:56:30",
+    "date_finished": "6/13/2017 11:32:24 AM",
+    "date_report": "6/13/2017 11:32:24 AM",
     "errors": [
         "BET Calculation: At least 2 Points must be supplied for the BET Calculation's Least Squares Fit",
         "1023-  Preparations failed in primary data.",
         "BET Calculation: At least 2 Points must be supplied for the BET Calculation's Least Squares Fit",
         "1023-  Preparations failed in primary data.",
         "BET Calculation: At least 2 Points must be supplied for the BET Calculation's Least Squares Fit",
-        "1023-  Preparations failed in primary data.",
-        "1043-  Fewer than 2 points available for BJH Adsorption calculations.",
-        "1043-  Fewer than 2 points available for BJH Desorption calculations."
+        "1023-  Preparations failed in primary data."
     ],
     "file_version": "3.0",
     "isotherm_data": [
@@ -27,8 +27,9 @@
     "material": "Sample B",
     "material_basis": "mass",
     "material_mass": 0.288,
+    "material_mass_unit": "g",
     "material_unit": "g",
-    "operator": "",
+    "operator": null,
     "pressure_mode": "relative",
     "pressure_unit": null,
     "temperature": 77.3,

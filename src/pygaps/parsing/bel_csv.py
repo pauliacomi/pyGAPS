@@ -10,6 +10,8 @@ import dateutil.parser
 from pygaps.parsing.bel_common import _META_DICT
 from pygaps.parsing.bel_common import _parse_header
 
+from . import utils as util
+
 
 def parse(path, separator=",", lang="ENG"):
     """
@@ -33,28 +35,30 @@ def parse(path, separator=",", lang="ENG"):
     head = []
     data = []
 
+    # local for efficiency
+    meta_dict = _META_DICT.copy()
+
     with open(path, 'r', encoding=encoding) as file:
         for line in file:
             values = line.strip().split(sep=separator)
             nvalues = len(values)
 
             if not line.startswith('No,') and nvalues > 1:  # key value section
-                key, val = values[0], values[1]
-                key = key.strip().lower()
-                try:  # find the standard name in the _META_DICT dictionary
-                    name = next(
-                        k for k, v in _META_DICT.items()
-                        if any(key == n for n in v.get('text', []))
-                    )
+                text, val = values[0], values[1]
+                text = text.strip().lower()
+                try:  # find the standard name in the metadata dictionary
+                    key = util.search_key_in_def_dict(text, meta_dict)
                 except StopIteration:  # Store unknown as is
-                    key = key.replace(" ", "_")
-                    meta[key] = val
+                    key = text.replace(" ", "_")
                     if nvalues > 2:
-                        meta[f"{key}_unit"] = values[2].strip('[]')
+                        val = val + " " + values[2].strip("[]")
+                    meta[key] = val
                     continue
-                meta[name] = val
-                if nvalues > 2:
-                    meta[_META_DICT[name]['unit']] = values[2].strip('[]')
+
+                meta[key] = val
+                if nvalues > 2 and meta_dict[key].get("unit"):
+                    meta[meta_dict[key]['unit']] = values[2].strip('[]')
+                del meta_dict[key]  # delete for efficiency
 
             elif line.startswith('No,'):  # If "data" section
 

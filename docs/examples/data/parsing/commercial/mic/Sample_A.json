@@ -3,6 +3,8 @@
     "apparatus": "TriStar II 3020 3.02",
     "comment": "A completed sample",
     "date": "2017-06-17T12:27:21",
+    "date_finished": "6/17/2017 8:07:48 PM",
+    "date_report": "6/17/2017 8:07:48 PM",
     "file_version": "3.0",
     "isotherm_data": [
         {
@@ -551,8 +553,9 @@
     "material": "Sample A",
     "material_basis": "mass",
     "material_mass": 0.1013,
+    "material_mass_unit": "g",
     "material_unit": "g",
-    "operator": "",
+    "operator": null,
     "pressure_mode": "relative",
     "pressure_unit": null,
     "temperature": 77.3,

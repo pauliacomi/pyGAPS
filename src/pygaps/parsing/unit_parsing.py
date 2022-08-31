@@ -6,19 +6,19 @@ from pygaps.units.converter_unit import _MOLAR_UNITS
 from pygaps.units.converter_unit import _VOLUME_UNITS
 from pygaps.utilities.exceptions import ParsingError
 
+from . import utils as u
+
 # [pattern, substitution value]
 pre_proc_sub = [
     # quotes, underscores, commas
-    [r"['\"_,]", ""],
+    [u.RE_PUNCTUATION, ""],
     # single spaces/tabs
-    [r"\s+", " "],
+    [u.RE_SPACES, " "],
     # unicode superscripts
-    ["²", "2"],
-    ["³", "3"],
-    # remove power
-    [r"\^", ""],
+    [u.RE_SUPERSCRIPT2, "2"],
+    [u.RE_SUPERSCRIPT3, "3"],
     # remove all brackets
-    [r"[\{\[\(\)\]\}]", ""],
+    [u.RE_BRACKETS, ""],
 ]
 
 # the string can be a single descriptor like "wt%" or "fraction volume"
@@ -47,6 +47,13 @@ ALIAS_VOLUME_UNIT = {
     'L': ('l', ),
     'm3': ('m3', ),
 }
+
+
+def parse_number_unit_string(string):
+    """Split a string """
+    number, unit = string.strip().split()
+    number = float(u.RE_ONLY_NUMBERS.search(string.replace(',', '')).group())
+    return number, unit
 
 
 def parse_temperature_unit(text: str) -> str:
@@ -81,7 +88,7 @@ def parse_pressure_string(pressure_string: str) -> str:
     # first clean the string
     pressure_string_clean = clean_string(pressure_string, pre_proc_sub)
 
-    if pressure_string_clean == 'relative':
+    if pressure_string_clean in ['relative', 'p/p0']:
         final_units['pressure_mode'] = 'relative'
     elif pressure_string_clean == 'relative%':
         final_units['pressure_mode'] = 'relative%'
