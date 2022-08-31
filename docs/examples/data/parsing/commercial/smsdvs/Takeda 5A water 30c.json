@@ -151,6 +151,8 @@
     "material": "Takeda 5A",
     "material_basis": "mass",
     "material_mass": 28.2279,
+    "material_mass_initial": 34.2528,
+    "material_mass_unit": "mg",
     "material_unit": null,
     "operator": "User",
     "pressure_mode": "relative%",

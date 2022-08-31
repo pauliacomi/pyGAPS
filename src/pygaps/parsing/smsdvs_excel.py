@@ -17,7 +17,7 @@ _META_DICT = {
         "xl_ref": (0, 1)
     },
     'material_mass_initial': {
-        'text': ('initial mass [mg]', ),  # TODO not only mg?
+        'text': ('initial mass [mg]:', ),  # TODO not only mg?
         'type': 'numeric',
         "xl_ref": (0, 1)
     },
@@ -201,6 +201,7 @@ def parse(path):
                 break
 
     # Set extra metadata
+    meta["material_mass_unit"] = "mg"
     meta["material_basis"] = "mass"
     meta["material_unit"] = None
 

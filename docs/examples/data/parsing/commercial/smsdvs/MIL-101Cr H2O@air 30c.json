@@ -131,6 +131,8 @@
     "material": "MIL-101Cr",
     "material_basis": "mass",
     "material_mass": 8.3332,
+    "material_mass_initial": 4.3045,
+    "material_mass_unit": "mg",
     "material_unit": null,
     "operator": "User",
     "pressure_mode": "absolute",

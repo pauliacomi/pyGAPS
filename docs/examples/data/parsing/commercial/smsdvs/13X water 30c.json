@@ -181,6 +181,8 @@
     "material": "13X",
     "material_basis": "mass",
     "material_mass": 31.7852,
+    "material_mass_initial": 32.6372,
+    "material_mass_unit": "mg",
     "material_unit": null,
     "operator": "User",
     "pressure_mode": "relative%",
