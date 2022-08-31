@@ -13,6 +13,8 @@ import xlrd
 from pygaps import logger
 from pygaps.utilities.exceptions import ParsingError
 
+from . import utils as util
+
 _NUMBER_REGEX = re.compile(r"^(-)?\d+(.|,)?\d+")
 _BRACKET_REGEX = re.compile(r"(?<=\().+?(?=\))")
 
@@ -29,7 +31,7 @@ _META_DICT = {
     },
     'temperature': {
         'text': ('analysis bath', ),
-        'type': 'number',
+        'type': 'numeric',
         "xl_ref": (0, 1),
     },
     'operator': {
@@ -44,7 +46,7 @@ _META_DICT = {
     },
     'material_mass': {
         'text': ('sample mass', ),
-        'type': 'number',
+        'type': 'numeric',
         "xl_ref": (0, 1),
     },
     'apparatus': {
@@ -109,29 +111,35 @@ def parse(path):
     data = {}
     errors = []
 
+    # open the workbook
     workbook = xlrd.open_workbook(path, encoding_override='latin-1')
     sheet = workbook.sheet_by_index(0)
 
-    for row, col in product(range(sheet.nrows), range(sheet.ncols)):
-        cell_value = str(sheet.cell(row, col).value).lower()
+    # local for efficiency
+    meta_dict = _META_DICT.copy()
 
+    # Iterate over all cells in the notebook
+    for row, col in product(range(sheet.nrows), range(sheet.ncols)):
+        cell_value = sheet.cell(row, col).value
+        if cell_value == '':
+            continue
+
+        cell_value = cell_value.lower()
         if cell_value not in ["isotherm tabular report"]:
             try:
-                name = next(
-                    k for k, v in _META_DICT.items()
-                    if any(cell_value.startswith(n) for n in v.get('text', []))
-                )
+                key = util._search_key_starts_def_dict(cell_value, meta_dict)
             except StopIteration:
                 continue
 
-            ref = _META_DICT[name]['xl_ref']
-            tp = _META_DICT[name]['type']
-            val = sheet.cell(row + ref[0], col + ref[1]).value
+            ref = meta_dict[key]['xl_ref']
+            tp = meta_dict[key]['type']
+            del meta_dict[key]  # delete for efficiency
 
-            if tp == 'number':
-                meta[name] = _handle_numbers(val, name)
+            val = sheet.cell(row + ref[0], col + ref[1]).value
+            if tp == 'numeric':
+                meta[key] = _handle_numbers(val, key)
             elif tp == 'string':
-                meta[name] = _handle_string(val)
+                meta[key] = util._handle_excel_string(val)
             elif tp == 'error':
                 errors += _get_errors(sheet, row, col)
 
@@ -163,6 +171,8 @@ def parse(path):
         meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
     except BaseException:
         logger.warning("Could not convert date.")
+    if meta.get("comment"):
+        meta["comment"] = meta["comment"].replace('Comments: ', '')
     meta['pressure_mode'] = 'absolute'
     meta['loading_basis'] = 'molar'
     meta['material_basis'] = 'mass'
@@ -174,7 +184,7 @@ def _handle_numbers(val, name):
     """
     Remove any extra information (such as units) to return only the number as a float.
 
-    Input is a cell of type 'number'.
+    Input is a cell of type 'numeric'.
     """
     if val:
         ret = float(_NUMBER_REGEX.search(val.replace(',', '')).group())
@@ -182,15 +192,6 @@ def _handle_numbers(val, name):
             if '°C' in val:
                 ret = ret + 273.15
         return ret
-
-
-def _handle_string(val):
-    """
-    Replace Comments: and any newline found.
-
-    Input is a cell of type 'string'.
-    """
-    return val.replace('Comments: ', '').replace('\r\n', ' ')
 
 
 def _convert_time(points):

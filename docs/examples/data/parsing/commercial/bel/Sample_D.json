@@ -1,7 +1,7 @@
 {
     "adsorbate": "water",
     "apparatus": "BEL 1.0",
-    "comments": "",
+    "comments": null,
     "date": "2017-09-06T00:00:00",
     "file_version": "3.0",
     "isotherm_data": [

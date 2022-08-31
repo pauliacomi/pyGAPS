@@ -1,7 +1,7 @@
 {
     "adsorbate": "nitrogen",
     "comment": "Comments:",
-    "date": "",
+    "date": null,
     "errors": [
         "At least two points must be selected for this calculation.",
         "4070-  Unable to load deconvolution model DFT - Argon on Carbon."

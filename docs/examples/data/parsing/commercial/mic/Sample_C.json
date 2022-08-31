@@ -293,7 +293,7 @@
     "material_basis": "mass",
     "material_mass": 1.0,
     "material_unit": "g",
-    "operator": "",
+    "operator": null,
     "pressure_mode": "absolute",
     "pressure_unit": "bar",
     "temperature": 77.3,

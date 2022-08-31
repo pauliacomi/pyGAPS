@@ -9,6 +9,8 @@ from pygaps.parsing.bel_common import _META_DICT
 from pygaps.parsing.bel_common import _check
 from pygaps.parsing.bel_common import _parse_header
 
+from . import utils as util
+
 
 def parse(path):
     """
@@ -51,11 +53,11 @@ def parse(path):
             if tp == 'numeric':
                 meta[name] = val
             elif tp == 'date':
-                meta[name] = _handle_date(sheet, val)
+                meta[name] = util._handle_xlrd_date(sheet, val)
             elif tp == 'time':
-                meta[name] = _handle_time(sheet, val)
+                meta[name] = util._handle_xlrd_time(sheet, val)
             elif tp == 'string':
-                meta[name] = _handle_string(val)
+                meta[name] = util._handle_excel_string(val)
 
         else:  # If "data" section
 
@@ -84,37 +86,6 @@ def parse(path):
     meta['date'] = dateutil.parser.parse(meta['date']).isoformat()
 
     return meta, data
-
-
-def _handle_date(sheet, val):
-    """
-    Convert date to string.
-
-    Input is a cell of type 'date'.
-    """
-    if val:
-        from xlrd.xldate import xldate_as_datetime
-        return xldate_as_datetime(val, sheet.book.datemode).strftime("%Y-%m-%d")
-
-
-def _handle_time(sheet, val):
-    """
-    Convert date to string.
-
-    Input is a cell of type 'date'.
-    """
-    if val:
-        from xlrd.xldate import xldate_as_datetime
-        return xldate_as_datetime(val, sheet.book.datemode).strftime("%H-%M-%S")
-
-
-def _handle_string(val):
-    """
-    Replace Comments: and any newline found.
-
-    Input is a cell of type 'string'.
-    """
-    return str(val).replace('Comments: ', '').replace('\r\n', ' ')
 
 
 def _find_datapoints(sheet, row, col):

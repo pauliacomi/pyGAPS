@@ -81,6 +81,7 @@ def parse_pressure_string(pressure_string: str) -> str:
     # first clean the string
     pressure_string_clean = clean_string(pressure_string, pre_proc_sub)
 
+    # TODO: centralize this correctly (parse p/p0 etc)
     if pressure_string_clean == 'relative':
         final_units['pressure_mode'] = 'relative'
     elif pressure_string_clean == 'relative%':

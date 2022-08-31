@@ -319,7 +319,7 @@
     "material_basis": "mass",
     "material_mass": 0.0898,
     "material_unit": "g",
-    "operator": "",
+    "operator": null,
     "pressure_mode": "relative",
     "pressure_unit": null,
     "temperature": 77.50999999999999,

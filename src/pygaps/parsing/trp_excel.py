@@ -6,6 +6,8 @@ import openpyxl
 
 from pygaps import logger
 
+from . import utils as util
+
 _META_DICT = {
     'material': {
         'text': ['charge name'],
@@ -21,7 +23,7 @@ _META_DICT = {
     },
     'material_mass': {
         'text': ['sample weight'],
-        'type': 'number'
+        'type': 'numeric'
     },
 }
 
@@ -52,33 +54,39 @@ def parse(path):
     meta = {}
     data = {}
 
+    # local for efficiency
+    meta_dict = _META_DICT.copy()
+
     workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
 
     # Metadata
     info_sheet = workbook['Info']
-    for row in info_sheet.values:
-        if not row[0]:
+    # we know data is left-aligned
+    # so we only iterate rows
+    for row in info_sheet.rows:
+        first_cell = row[0]
+        # if first cell is not filled -> blank row
+        if not first_cell.value:
             continue
-        key = row[0].lower()
-        val = row[1]
+
+        key = first_cell.value.lower()
+        val = row[1].value
         try:
-            name = next(
-                k for k, v in _META_DICT.items()
-                if any(key.startswith(n) for n in v.get('text', []))
-            )
+            key = util._search_key_in_def_dict(key, meta_dict)
         except StopIteration:
             if val:
                 meta[key] = val
             continue
 
-        tp = _META_DICT[name]['type']
+        tp = meta_dict[key]['type']
+        del meta_dict[key]  # delete for efficiency
 
-        if tp == 'number':
-            meta[name] = val
+        if tp == 'numeric':
+            meta[key] = val
         elif tp == 'date':
-            meta[name] = _handle_date(val)
+            meta[key] = _handle_date(val)
         elif tp == 'string':
-            meta[name] = _handle_string(val)
+            meta[key] = util._handle_excel_string(val)
 
     # Data
     data_sheet = workbook['Isotherm']
@@ -86,16 +94,8 @@ def parse(path):
     data_val = data_sheet.values
     head, units = _parse_header(list(next(data_val)))
     meta.update(units)
-    # Prepare data
-    data = []
-    branch = 0
-    for row in list(data_val):
-        # If we reached the desorption branch we change
-        if row[0] == "---":
-            branch = 1
-            continue
-        data.append([branch] + list(row))
-
+    # Parse and pack data
+    data = _parse_data(data_val)
     data = dict(zip(head, map(lambda *x: list(x), *data)))
 
     _check(meta, data, path)
@@ -119,15 +119,6 @@ def _handle_date(val):
     """
     if val:
         return datetime.strptime(val, r'%Y-%m-%d %H:%M:%S').isoformat()
-
-
-def _handle_string(val):
-    """
-    Replace any newline found.
-
-    Input is a cell of type 'string'.
-    """
-    return val.replace('\r\n', ' ')
 
 
 def _parse_header(header_list):
@@ -167,6 +158,18 @@ def _parse_header(header_list):
                     units['pressure_unit'] = c
 
     return headers, units
+
+
+def _parse_data(data_rows):
+    data = []
+    branch = 0
+    for row in list(data_rows):
+        # If we reached the desorption branch we change
+        if row[0] == "---":
+            branch = 1
+            continue
+        data.append([branch] + list(row))
+    return data
 
 
 def _check(meta, data, path):

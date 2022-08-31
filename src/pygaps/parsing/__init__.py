@@ -25,10 +25,11 @@ from .sqlite import material_delete_db
 from .sqlite import material_to_db
 
 _COMMERCIAL_FORMATS = {
+    'smsdvs': ('xlsx', ),
     'bel': ('csv', 'xl', 'dat'),
-    'mic': ('xl'),
-    '3p': ('xl'),
-    'qnt': ('txt-raw'),
+    'mic': ('xl', ),
+    '3p': ('xl', ),
+    'qnt': ('txt-raw', ),
 }
 
 
@@ -50,7 +51,7 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
     PointIsotherm
     """
 
-    if manufacturer not in _COMMERCIAL_FORMATS.keys():
+    if manufacturer not in _COMMERCIAL_FORMATS:
         raise ParsingError(
             f"Currently available manufacturers are {list(_COMMERCIAL_FORMATS.keys())})"
         )
@@ -58,7 +59,9 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
     if fmt not in _COMMERCIAL_FORMATS[manufacturer]:
         raise ParsingError(f"Currently available formats are {_COMMERCIAL_FORMATS[manufacturer]}")
 
-    if manufacturer == 'mic' and fmt == 'xl':
+    if manufacturer == 'smsdvs' and fmt == 'xlsx':
+        from .smsdvs_excel import parse
+    elif manufacturer == 'mic' and fmt == 'xl':
         from .mic_excel import parse
     elif manufacturer == 'bel':
         if fmt == 'xl':
