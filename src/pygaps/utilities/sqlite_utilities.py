@@ -26,9 +26,7 @@ def db_execute_general(
     """
     # Attempt to connect
     try:
-        # TODO deprecate 3.6: switch below
-        # with sqlite3.connect(pth) as db:
-        with sqlite3.connect(str(pth)) as db:
+        with sqlite3.connect(pth) as db:
 
             # Get a cursor object
             cursor = db.cursor()

@@ -2,7 +2,7 @@
 Installation
 ============
 
-pyGAPS is made for modern versions of Python, currently requiring at least Python 3.6.
+pyGAPS is made for modern versions of Python, currently requiring at least Python 3.7.
 
 Command line
 ============
