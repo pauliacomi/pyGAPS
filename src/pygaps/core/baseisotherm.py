@@ -138,7 +138,7 @@ class BaseIsotherm():
         #
         for uparam, udefault in self._unit_params.items():
             if uparam not in properties:
-                logger.warning(f"WARNING: '{uparam}' was not specified , assumed as '{udefault}'")
+                logger.warning(f"WARNING: '{uparam}' was not specified, assumed as '{udefault}'")
                 properties[uparam] = udefault
 
         # TODO deprecation
