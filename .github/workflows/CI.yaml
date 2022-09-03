@@ -41,6 +41,7 @@ jobs:
           docs/conf.py
     - name: Install dependencies
       run: |
+        sudo apt-get install pandoc
         python -m pip install --upgrade setuptools
         pip --version
     - name: Install package
@@ -94,9 +95,9 @@ jobs:
     - name: Report coverage
       run: |
         coverage xml --ignore-errors
-        codecov []
         coverage report
         coverage html
+        codecov
 
 
   build-publish:
