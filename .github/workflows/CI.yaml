@@ -23,9 +23,9 @@ jobs:
         pip install .[dev]
     - name: Run checks
       run: |
-        isort --verbose --check-only --diff src tests setup.py
-        flake8 src tests setup.py
-        pylint src tests setup.py
+        isort --verbose --check-only --diff src tests
+        flake8 src tests
+        pylint src tests
 
   docs-build:
     runs-on: ubuntu-latest
@@ -37,8 +37,8 @@ jobs:
         python-version: 3.8
         cache: 'pip'
         cache-dependency-path: |
-          '**/setup.cfg'
-          '**/docs/conf.py'
+          setup.cfg
+          docs/conf.py
     - name: Install dependencies
       run: |
         python -m pip install --upgrade setuptools
@@ -114,11 +114,12 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python -m pip install build
           python -m pip install --upgrade setuptools wheel
           pip --version
 
       - name: Build wheels
-        run: python setup.py sdist bdist_wheel
+        run: python -m build
 
       - name: Publish 📦 to Test PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
