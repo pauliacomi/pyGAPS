@@ -50,37 +50,11 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
     -------
     PointIsotherm
     """
-
-    if manufacturer not in _COMMERCIAL_FORMATS:
-        raise ParsingError(
-            f"Currently available manufacturers are {list(_COMMERCIAL_FORMATS.keys())})"
-        )
-
-    if fmt not in _COMMERCIAL_FORMATS[manufacturer]:
-        raise ParsingError(f"Currently available formats are {_COMMERCIAL_FORMATS[manufacturer]}")
-
-    if manufacturer == 'smsdvs' and fmt == 'xlsx':
-        from .smsdvs_excel import parse
-    elif manufacturer == 'mic' and fmt == 'xl':
-        from .mic_excel import parse
-    elif manufacturer == 'bel':
-        if fmt == 'xl':
-            from .bel_excel import parse
-        elif fmt == 'csv':
-            from .bel_csv import parse
-        elif fmt == 'dat':
-            from .bel_dat import parse
-    elif manufacturer == '3p' and fmt == 'xl':
-        from .trp_excel import parse
-    elif manufacturer == 'qnt' and fmt == 'txt-raw':
-        from .qnt_txt import parse
-    else:
-        raise ParsingError("Something went wrong.")
-
     import pandas
     from pygaps.core.pointisotherm import PointIsotherm
+    from adsorption_file_parser import read
 
-    meta, data = parse(path, **options)
+    meta, data = read(path, manufacturer, fmt, **options)
     data = pandas.DataFrame(data)
 
     meta['loading_key'] = 'loading'
