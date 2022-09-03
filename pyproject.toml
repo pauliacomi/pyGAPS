@@ -126,6 +126,7 @@ exclude_lines = [
 [tool.tox]
 legacy_tox_ini = """
 [tox]
+isolated_build = True
 envlist =
     clean,
     check,
