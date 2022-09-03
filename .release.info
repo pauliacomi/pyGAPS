@@ -2,20 +2,14 @@
 # perform a release of pygaps (mostly for me).
 
 # Create new branch for release (we use git flow)
+# Versioning is provided automatically
+# by setuptools_scm
 # Respect semantic versioning for the releases
 git flow release start x.y.z
 
 # Ensure all tests are passing
 # or use CI provider to run them automatically
 pytest --cov --cov-report xml:coverage.xml
-
-# Run bumpversion to change any version strings
-# scattered throughout the source code
-bumpversion major/minor/patch
-
-# Currently there is an issue with versioning
-# which means that setup.cfg metadata must be
-# updated manually
 
 # Finish branch
 git flow release finish x.y.z
@@ -25,7 +19,18 @@ git push --tags
 
 # Check CI if project has been successfully pushed to pypi
 
-# Update conda recipe
 
-# Get latest hash
-grayskull pypi pygaps
+# Useful for VSCode debugging
+
+Configuration for debugging
+:
+    {
+        "name": "Python: Debug Tests",
+        "type": "python",
+        "request": "launch",
+        "program": "${file}",
+        "purpose": ["debug-test"],
+        "console": "integratedTerminal",
+        "env": {"PYTEST_ADDOPTS": "--no-cov"}
+    }
+
