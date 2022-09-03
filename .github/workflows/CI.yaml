@@ -83,6 +83,7 @@ jobs:
         conda info
         conda env list
         pip --version
+        conda list
 
     - name: Install package
       run: |
