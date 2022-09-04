@@ -46,7 +46,7 @@ jobs:
         pip --version
     - name: Install package
       run: |
-        pip install .[docs]
+        pip install -e .[docs]
     - name: Test build docs
       run: |
         sphinx-build -E -j auto -b doctest docs dist/docs
@@ -86,7 +86,7 @@ jobs:
 
     - name: Install package
       run: |
-        pip install .[dev]
+        pip install -e .[dev]
         conda list
 
     - name: Run tests
@@ -95,9 +95,7 @@ jobs:
 
     - name: Report coverage
       run: |
-        coverage xml --ignore-errors
-        coverage report
-        coverage html
+        # coverage report xml html --ignore-errors
         codecov
 
 
