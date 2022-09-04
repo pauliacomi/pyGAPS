@@ -4,6 +4,8 @@ Changelog
 
 4.4.0 (2022-09-03)
 ------------------
+
+* Drop python 3.6
 * Parsing of instrument files is now spun off into
   a separate package for ease of maintenance.
   See: https://github.com/AIF-development-team/adsorption-file-parser

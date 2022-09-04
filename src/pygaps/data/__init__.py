@@ -12,7 +12,7 @@ try:
     import importlib.resources as importlib_resources
     from importlib.resources import files as importlib_resources_files
 except ImportError:
-    # TODO Deprecation after PY<39
+    # TODO Deprecation after PY<3.9
     # Use backported `importlib_resources`.
     import importlib_resources as importlib_resources
     from importlib_resources import files as importlib_resources_files

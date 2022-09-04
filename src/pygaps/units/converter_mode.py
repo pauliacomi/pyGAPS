@@ -251,7 +251,7 @@ def c_loading(
                 sign = 1
             elif _basis_to == 'volume_liquid':
                 constant = adsorbate.gas_molar_density(temp=temp) /\
-                     adsorbate.liquid_molar_density(temp=temp)
+                    adsorbate.liquid_molar_density(temp=temp)
                 sign = 1
         elif _basis_from == 'volume_liquid':
             if _basis_to == 'mass':
@@ -262,7 +262,7 @@ def c_loading(
                 sign = 1
             elif _basis_to == 'volume_gas':
                 constant = adsorbate.gas_molar_density(temp=temp) /\
-                     adsorbate.liquid_molar_density(temp=temp)
+                    adsorbate.liquid_molar_density(temp=temp)
                 sign = -1
         elif _basis_from == 'molar':
             if _basis_to == 'mass':
