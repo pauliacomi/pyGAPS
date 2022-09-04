@@ -325,6 +325,10 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
+    def pressure_saturation(self, temp, unit=None, calculate: bool = True) -> float:
+        """Alias for saturation_pressure"""
+        return self.saturation_pressure(temp, unit, calculate)
+
     def saturation_pressure(self, temp, unit=None, calculate: bool = True) -> float:
         """
         Get the saturation pressure at a particular temperature.

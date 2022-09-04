@@ -54,7 +54,7 @@ def label_lgd(isotherm, lbl_components: list, branch: str = None, key_def: str =
         elif selected == 'adsorbate':
             text.append(convert_chemformula_ltx(isotherm.adsorbate))
         elif selected == 'temperature':
-            text.append(f"{isotherm._temperature} {isotherm.temperature_unit}")
+            text.append(f"{isotherm._temperature:.2f} {isotherm.temperature_unit}")
         elif selected == 'type':
             isotype = "points"
             if hasattr(isotherm, 'model'):

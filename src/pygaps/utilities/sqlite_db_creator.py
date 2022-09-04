@@ -24,11 +24,7 @@ def db_create(path: str, verbose: bool = False):
         db_execute_general(pragma, path, verbose=verbose)
 
     # Get json files
-    try:
-        import importlib.resources as importlib_resources
-    # TODO Deprecation after PY>3.6
-    except ImportError:
-        import importlib_resources as importlib_resources
+    import importlib.resources as importlib_resources
 
     # Get and upload adsorbate property types
     ads_props_json = importlib_resources.read_text('pygaps.data', 'adsorbate_props.json')

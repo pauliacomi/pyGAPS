@@ -223,12 +223,13 @@ Most commercial adsorption apparatus can output the recorded isotherm as an Exce
 
 Currently pyGAPS includes functionality to import:
 
-- Microtrac BEL .dat files: ``iso = isotherm_from_commercial(path, "bel", "dat")``
-- Microtrac BEL .xls files: ``iso = isotherm_from_commercial(path, "bel", "xl")``
-- Microtrac BEL .csv files: ``iso = isotherm_from_commercial(path, "bel", "csv")``
-- Micromeritics .xls files: ``iso = isotherm_from_commercial(path, "mic", "xl")``
-- 3P .xlsx files: ``iso = isotherm_from_commercial(path, "3p", "xl")``
-- Quantachrome .txt files: ``iso = isotherm_from_commercial(path, "qnt", "txt")``
+- SMS DVS `.xlsx` files: ``iso = isotherm_from_commercial(path, "smsdvs", "xlsx")``
+- Microtrac BEL `.dat` files: ``iso = isotherm_from_commercial(path, "bel", "dat")``
+- Microtrac BEL `.xls` files: ``iso = isotherm_from_commercial(path, "bel", "xl")``
+- Microtrac BEL `.csv` files: ``iso = isotherm_from_commercial(path, "bel", "csv")``
+- Micromeritics `.xls` files: ``iso = isotherm_from_commercial(path, "mic", "xl")``
+- 3P `.xlsx` report files: ``iso = isotherm_from_commercial(path, "3p", "xl")``
+- Quantachrome Raw Isotherm `.txt` files: ``iso = isotherm_from_commercial(path, "qnt", "txt-raw")``
 
 
 .. _parsing-manual-isodb:

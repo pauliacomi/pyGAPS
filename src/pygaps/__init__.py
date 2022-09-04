@@ -1,15 +1,9 @@
-# pylint: disable=W0614,W0611,W0622
+# pylint: disable=W0614,W0611,W0622,C0411
 # flake8: noqa
 # isort:skip_file
 
 __author__ = 'Paul Iacomi'
 __docformat__ = 'restructuredtext'
-
-try:
-    from ._version import version
-    __version__ = version
-except ImportError:
-    __version__ = '4.3.0'
 
 import sys
 from .logging import logger

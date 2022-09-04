@@ -138,8 +138,10 @@ def isotherm_to_xl(isotherm, path):
         data = isotherm.data_raw.copy()
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
+        columns = [isotherm.pressure_key, isotherm.loading_key, 'branch'] + isotherm.other_keys
+
         # Write all data
-        for col_index, heading in enumerate(data.columns):
+        for col_index, heading in enumerate(columns):
             sht.write(data_row, col_index, heading)
             for row_index, datapoint in enumerate(data[heading]):
                 sht.write(data_row + row_index + 1, col_index, datapoint)

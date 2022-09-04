@@ -2,7 +2,7 @@
 requires = [
     "setuptools>=46.4.0",
     "wheel",
-    "setuptools_scm>=6.2",
+    "setuptools_scm[toml]>=6.2",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -126,6 +126,7 @@ exclude_lines = [
 [tool.tox]
 legacy_tox_ini = """
 [tox]
+isolated_build = True
 envlist =
     clean,
     check,

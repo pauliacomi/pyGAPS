@@ -30,6 +30,7 @@ class IsothermInterpolator():
         to determine what to do outside data bounds.
 
     """
+
     def __init__(
         self,
         known_data,

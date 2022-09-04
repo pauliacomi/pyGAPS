@@ -12,6 +12,9 @@ import os
 import pathlib
 
 import pandas
+from adsorption_file_parser.utils.unit_parsing import parse_loading_string
+from adsorption_file_parser.utils.unit_parsing import parse_pressure_string
+from adsorption_file_parser.utils.unit_parsing import parse_temperature_string
 from gemmi import cif
 
 from pygaps import logger
@@ -20,9 +23,6 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
 from pygaps.parsing import _PARSER_PRECISION
-from pygaps.parsing.unit_parsing import parse_loading_string
-from pygaps.parsing.unit_parsing import parse_pressure_string
-from pygaps.parsing.unit_parsing import parse_temperature_string
 from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.string_utilities import cast_string
 
@@ -72,7 +72,7 @@ _META_DICT = {
 }
 _DATA_DICT = {
     'pressure': 'pressure',
-    'p0': 'saturation_pressure',
+    'p0': 'pressure_saturation',
     'amount': 'loading',
     'enthalpy': 'enthalpy',
 }

@@ -161,6 +161,6 @@
     "pressure_unit": "atm",
     "project": null,
     "temperature": 29.850000000000023,
-    "temperature_unit": "°C",
+    "temperature_unit": "\u00b0C",
     "user": "ADW"
 }
