@@ -25,7 +25,7 @@ jobs:
       run: |
         isort --verbose --check-only --diff src tests
         flake8 src tests
-        pylint src tests
+        # pylint src tests
 
   docs-build:
     runs-on: ubuntu-latest
