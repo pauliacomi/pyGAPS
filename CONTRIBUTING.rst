@@ -57,16 +57,8 @@ To set up `pyGAPS` for local development:
 
    Now you can make your changes locally.
 
-4. When you're done making changes, run all the checks, doc builder and
-   spell checker with `tox <https://tox.readthedocs.io/en/latest/install.html>`_
-   one command::
+4. When you're done making changes, run all the tests::
 
-    tox
-
-   Or you could run the tests with only your own environment by running::
-
-    python setup.py test
-    # or pytest directly
     pytest
 
 5. Commit your changes and push your branch to GitHub::
@@ -86,7 +78,7 @@ make the pull request.
 
 For merging, you should:
 
-1. Include passing tests (run ``tox``) [1]_.
+1. Include passing tests (run ``pytest``) [1]_.
 2. Update documentation when there's new API, functionality etc.
 3. Add a note to ``CHANGELOG.rst`` about the changes.
 4. Add yourself to ``AUTHORS.rst``.
@@ -96,14 +88,3 @@ For merging, you should:
        `run the tests <https://github.com/pauliacomi/pyGAPS/actions>`_
        for each change you add in the pull request.
 
-
-Tips
-----
-
-To run a subset of tests::
-
-    tox -e envname -- pytest -k test_myfeature
-
-To run all the test environments in *parallel* (you need to ``pip install detox``)::
-
-    detox
