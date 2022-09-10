@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  [create, push, pull_request, workflow_dispatch]
+  [push, pull_request, workflow_dispatch]
 
 jobs:
   linting-checks:
