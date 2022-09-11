@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  [create, push, pull_request, workflow_dispatch]
+  [push, pull_request, workflow_dispatch]
 
 jobs:
   linting-checks:
@@ -53,7 +53,7 @@ jobs:
         sphinx-build -E -j auto -b html docs dist/docs
         sphinx-build -j auto -b linkcheck docs dist/docs
 
-  unittests:
+  unit-tests:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -101,7 +101,7 @@ jobs:
 
   build-publish:
       runs-on: ubuntu-latest
-      needs: [linting-checks, docs-build, unittests]
+      needs: [linting-checks, docs-build, unit-tests]
       if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
 
       steps:
