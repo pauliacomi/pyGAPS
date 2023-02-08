@@ -20,3 +20,4 @@ from .psd_meso import psd_mesoporous
 from .psd_micro import psd_microporous
 from .t_plots import t_plot
 from .t_plots import t_plot_raw
+from .whittaker import whittaker_enthalpy
