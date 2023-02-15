@@ -629,6 +629,9 @@ def dra_plot(
     if ax is None:
         _, ax = plt.subplots()
 
+    if exp != 2:
+        exp = 'n'
+
     with mpl.rc_context(POINTS_MUTED):
         ax.plot(
             log_n_p0p,
@@ -649,8 +652,8 @@ def dra_plot(
             label='model fit',
         )
 
-    ax.set_xlabel('log $p^0/p$')
-    ax.set_ylabel('log $V/V_0$')
+    ax.set_xlabel(f'$ln^{exp}\ p^0/p$')
+    ax.set_ylabel('$ln\ V/V_0$')
     ax.legend()
 
     return ax
