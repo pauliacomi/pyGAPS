@@ -11,7 +11,7 @@ from .conftest import DATA_WHITTAKER
 from .conftest import DATA_WHITTAKER_PATH
 
 loading = np.linspace(0.1, 20, 100)
-ref_enth = 1  # add ref enth here
+ref_enth = 10.382283558571492
 
 
 @pytest.mark.characterisation
@@ -26,7 +26,7 @@ class TestWhittakerEnthalpy():
             model='Toth',
             verbose=True,
         )
-        loading = [1]  # add loading point here
+        loading = [1]
         res = we.whittaker_enthalpy(model_isotherm, loading)
         res_enth = res['enthalpy_sorption']
         assert np.isclose(res_enth, ref_enth)
