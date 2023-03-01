@@ -127,8 +127,13 @@ def enthalpy_sorption_whittaker(
     for n in loading:
         p = isotherm.pressure_at(n, pressure_unit='Pa')
 
+        if p < p_t:
+            # TODO should this give a warning?
+            # Only works well for Toth, otherwise second bracket = 1.
+            p = p_t
+
         # check that it is possible to calculate lambda_p
-        if p > p_c or p < p_t or np.isnan(p):
+        if p > p_c or np.isnan(p):
             continue
 
         # equation requires enthalpies in J
