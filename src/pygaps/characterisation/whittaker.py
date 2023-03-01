@@ -118,15 +118,20 @@ def whittaker_enthalpy(
     p_sat = p_sat / 1000  # equation requires p_sat in kPa
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
-        p = isotherm.pressure_at(n,
-                                 pressure_unit='Pa')
+        p = isotherm.pressure_at(
+            n,
+            pressure_unit='Pa'
+        )
 
         # check that it is possible to calculate lambda_p
         if p > p_c or p < p_t or np.isnan(p):
             continue
 
         # equation requires enthalpies in J
-        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,) * 1000
+        try:
+            lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,) * 1000
+        except CalculationError:
+            continue
 
         theta = n / n_m  # second bracket of d_lambda
         theta_t = theta**t
