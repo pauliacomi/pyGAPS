@@ -27,7 +27,7 @@ class TestWhittakerEnthalpy():
             verbose=True,
         )
         loading = [1]
-        res = we.whittaker_enthalpy(model_isotherm, loading)
+        res = we.enthalpy_sorption_whittaker(model_isotherm, loading)
         res_enth = res['enthalpy_sorption']
         assert np.isclose(res_enth, ref_enth)
 
@@ -46,7 +46,7 @@ class TestWhittakerEnthalpy():
             model_isotherms[model] = model_isotherm
 
         with pytest.raises(pgEx.ParameterError):
-            we.whittaker_enthalpy(model_isotherms['Henry'], loading)
+            we.enthalpy_sorption_whittaker(model_isotherms['Henry'], loading)
 
-        we.whittaker_enthalpy(model_isotherms['Langmuir'], loading)
-        we.whittaker_enthalpy(model_isotherms['Toth'], loading)
+        we.enthalpy_sorption_whittaker(model_isotherms['Langmuir'], loading)
+        we.enthalpy_sorption_whittaker(model_isotherms['Toth'], loading)
