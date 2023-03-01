@@ -14,6 +14,5 @@ Material characterisation
    characterisation/psd_micro
    characterisation/psd_kernel
    characterisation/thickness_models
-   characterisation/isosteric_enth
+   characterisation/enthalpy_sorption
    characterisation/initial_hk
-   characterisation/initial_enth
