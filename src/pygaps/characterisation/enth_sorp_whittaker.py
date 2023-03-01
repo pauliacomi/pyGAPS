@@ -125,28 +125,14 @@ def enthalpy_sorption_whittaker(
     p_sat = p_sat / 1000  # equation requires p_sat in kPa
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
-<<<<<<< HEAD:src/pygaps/characterisation/whittaker.py
-        p = isotherm.pressure_at(
-            n,
-            pressure_unit='Pa'
-        )
-=======
         p = isotherm.pressure_at(n, pressure_unit='Pa')
->>>>>>> 9bb9d9432983aa66d16b2a33a0d65df73afacc83:src/pygaps/characterisation/enth_sorp_whittaker.py
 
         # check that it is possible to calculate lambda_p
         if p > p_c or p < p_t or np.isnan(p):
             continue
 
         # equation requires enthalpies in J
-<<<<<<< HEAD:src/pygaps/characterisation/whittaker.py
-        try:
-            lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p,) * 1000
-        except CalculationError:
-            continue
-=======
         lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p, ) * 1000
->>>>>>> 9bb9d9432983aa66d16b2a33a0d65df73afacc83:src/pygaps/characterisation/enth_sorp_whittaker.py
 
         theta = n / n_m  # second bracket of d_lambda
         theta_t = theta**t
