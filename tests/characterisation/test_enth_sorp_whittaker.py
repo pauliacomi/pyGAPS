@@ -10,14 +10,14 @@ from .conftest import DATA_WHITTAKER
 from .conftest import DATA_WHITTAKER_PATH
 
 loading = np.linspace(0.1, 20, 100)
-ref_enth = 10.382283558571492
 
 
 @pytest.mark.characterisation
 class TestWhittakerEnthalpy():
-    def test_whittaker(self):
+    @pytest.mark.parametrize('testdata', [ex for ex in DATA_WHITTAKER.values()])
+    def test_whittaker(self, testdata):
         isotherm = pgp.isotherm_from_aif(
-            DATA_WHITTAKER_PATH / [ex['file'] for ex in DATA_WHITTAKER.values()][0]
+            DATA_WHITTAKER_PATH / testdata['file']
         )
         model_isotherm = pgm.model_iso(
             isotherm,
@@ -28,6 +28,7 @@ class TestWhittakerEnthalpy():
         loading = [1]
         res = we.enthalpy_sorption_whittaker(model_isotherm, loading)
         res_enth = res['enthalpy_sorption']
+        ref_enth  = testdata['ref_enth']
         assert np.isclose(res_enth, ref_enth)
 
     @pytest.mark.parametrize('filepath', [ex['file'] for ex in DATA_WHITTAKER.values()])
