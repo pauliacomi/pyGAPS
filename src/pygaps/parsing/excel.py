@@ -138,8 +138,10 @@ def isotherm_to_xl(isotherm, path):
         data = isotherm.data_raw.copy()
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
+        columns = [isotherm.pressure_key, isotherm.loading_key, 'branch'] + isotherm.other_keys
+
         # Write all data
-        for col_index, heading in enumerate(data.columns):
+        for col_index, heading in enumerate(columns):
             sht.write(data_row, col_index, heading)
             for row_index, datapoint in enumerate(data[heading]):
                 sht.write(data_row + row_index + 1, col_index, datapoint)
@@ -218,7 +220,12 @@ def isotherm_from_xl(path, *isotherm_parameters):
 
     # read the main isotherm parameters
     for field in _META_DICT.values():
-        raw_dict[field['name']] = sht.cell(field['row'], field['column'] + 1).value
+        valc = sht.cell(field['row'], field['column'] + 1)
+        if valc.ctype == xlrd.XL_CELL_EMPTY:
+            val = None
+        else:
+            val = valc.value
+        raw_dict[field['name']] = val
 
     # find data/model limits
     type_row = _META_DICT['isotherm_data']['row']
@@ -251,7 +258,7 @@ def isotherm_from_xl(path, *isotherm_parameters):
                 sht.cell(i, header_col).value for i in range(start_row, final_row)
             ]
             header_col += 1
-        data = pandas.DataFrame(experiment_data)
+        data = pandas.DataFrame(experiment_data).convert_dtypes()
 
         raw_dict['pressure_key'] = headers[0]
         raw_dict['loading_key'] = headers[1]

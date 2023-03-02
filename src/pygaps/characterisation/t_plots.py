@@ -10,16 +10,14 @@ from pygaps.characterisation.models_thickness import get_thickness_model
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
-from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
 from pygaps.utilities.math_utilities import find_linear_sections
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 
 def t_plot(
     isotherm: "PointIsotherm | ModelIsotherm",
-    thickness_model:
-    "str | PointIsotherm | ModelIsotherm | t.Callable[[float], float]" = 'Harkins/Jura',
+    thickness_model: "str | t.Callable[[float], float]" = 'Harkins/Jura',
     branch: str = 'ads',
     t_limits: "tuple[float, float]" = None,
     verbose: bool = False,
@@ -82,6 +80,7 @@ def t_plot(
     curve which describes the thickness of the adsorbed layer on a surface. A plot is
     constructed, where the isotherm loading data is plotted versus thickness values obtained
     through the model.
+
     It stands to reason that, in the case that the experimental adsorption curve follows
     the model, a straight line will be obtained with its intercept through the origin.
     However, since in most cases there are differences between adsorption in the pores
@@ -114,13 +113,18 @@ def t_plot(
 
     *Limitations*
 
-    Since the t-plot method is taking the differences between the isotherm and a model,
-    care must be taken to ensure that the model actually describes the thickness of a
-    layer of adsorbate on the surface of the adsorbent. This is more difficult than it
-    appears as no universal thickness curve exists. When selecting a thickness model,
-    make sure that it is applicable to both the material and the adsorbate.
-    Interactions at loadings that occur on the t-plot lower than the monolayer
-    thickness do not have any physical meaning.
+    Since the t-plot method is observing the differences between the isotherm
+    and an ideal adsorption curve, care must be taken to ensure that the model
+    actually describes the thickness of a layer of adsorbate on the surface of
+    the adsorbent. This is more difficult than it appears as no universal
+    thickness curve exists. When selecting a thickness model, make sure that it
+    is applicable to both the material and the adsorbate. Interactions at
+    loadings that occur on the t-plot lower than the monolayer thickness do not
+    have any physical meaning.
+
+    A second notable caveat is that the geometry of the pore will change the
+    packing of the molecules, therefore the total thickness. Therefore, at
+    smaller pores (<10 x the size of the guest molecule)
 
     References
     ----------
@@ -145,26 +149,12 @@ def t_plot(
     liquid_density = adsorbate.liquid_density(isotherm.temperature)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_unit='mol',
-        loading_basis='molar',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mmol"
+        }, {"pressure_mode": "relative"}
     )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        )
-
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
 
     # Get thickness model
     t_model = get_thickness_model(thickness_model)
@@ -196,7 +186,9 @@ def t_plot(
                 )
 
             from pygaps.graphing.calc_graphs import tp_plot
-            tp_plot(t_curve, loading, results)
+            units = isotherm.units
+            units.update({"loading_basis": "molar", "loading_unit": "mmol"})
+            tp_plot(t_curve, loading, results, units)
 
     return {
         't_curve': t_curve,
@@ -222,7 +214,7 @@ def t_plot_raw(
     Parameters
     ----------
     loading : list[float]
-        Amount adsorbed at the surface, mol/material.
+        Amount adsorbed at the surface, mmol/material.
     pressure : list[float]
         Relative pressure corresponding to the loading.
     thickness_model : callable[[float], float]
@@ -322,8 +314,8 @@ def t_plot_parameters(
     # Check if slope is good
 
     if slope * (max(thickness_curve) / max(loading)) < 3:
-        adsorbed_volume = intercept * molar_mass / liquid_density
-        area = slope * molar_mass / liquid_density * 1000
+        adsorbed_volume = intercept * molar_mass / liquid_density / 1000
+        area = slope * molar_mass / liquid_density
 
         return {
             'section': section,

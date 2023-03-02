@@ -1,5 +1,3 @@
-# TODO saturation_pressure for each point
-# TODO isotherm excess / absolute
 # TODO osmotic ensemble
 # TODO double check all model solvers
 # TODO universal adsorption isotherm model (UAIM)
@@ -8,4 +6,5 @@
 # TODO tplot psd
 # TODO dr surface area
 # TODO General Adsorbent Library and Evaluation (GALE)
-# TODO: does the langmuir area require relative pressure?
+# TODO does the langmuir area require relative pressure?
+# TODO better units for t-plot analysis, should follow isotherm units

@@ -85,7 +85,11 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
 
 
 def isotherm_from_json(
-    str_or_path, fmt=None, loading_key='loading', pressure_key='pressure', **isotherm_parameters
+    str_or_path,
+    fmt=None,
+    loading_key='loading',
+    pressure_key='pressure',
+    **isotherm_parameters,
 ):
     """
     Read a pyGAPS isotherm from a file or from a string.
@@ -123,11 +127,11 @@ def isotherm_from_json(
     except OSError:
         try:
             raw_dict = json.loads(str_or_path)
-        except Exception:
+        except Exception as err:
             raise ParsingError(
                 "Could not parse JSON isotherm. "
                 "The `str_or_path` is invalid or does not exist. "
-            )
+            ) from err
 
     # version check
     version = raw_dict.pop("file_version", None)

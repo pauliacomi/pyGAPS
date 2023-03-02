@@ -50,7 +50,7 @@ class BaseIsotherm():
         Unit of pressure, if applicable.
     loading_basis : str, optional
         Whether the adsorbed amount is in terms of either 'volume_gas'
-        'volume_liquid', 'molar', 'mass', or a fractional/percent basis.
+        'volume_liquid', 'molar', 'mass', or a fraction/percent basis.
     loading_unit : str, optional
         Unit in which the loading basis is expressed.
     material_basis : str, optional
@@ -138,7 +138,7 @@ class BaseIsotherm():
         #
         for uparam, udefault in self._unit_params.items():
             if uparam not in properties:
-                logger.warning(f"WARNING: '{uparam}' was not specified , assumed as '{udefault}'")
+                logger.warning(f"WARNING: '{uparam}' was not specified, assumed as '{udefault}'")
                 properties[uparam] = udefault
 
         # TODO deprecation
@@ -185,13 +185,17 @@ class BaseIsotherm():
                 f"See viable values: {_PRESSURE_UNITS.keys()}"
             )
 
-        if self.loading_unit not in _LOADING_MODE[self.loading_basis]:
+        if self.loading_basis not in [
+            "percent", "fraction"
+        ] and self.loading_unit not in _LOADING_MODE[self.loading_basis]:
             raise ParameterError(
                 f"Unit selected for loading ({self.loading_unit}) is not an option. "
                 f"See viable values: {_LOADING_MODE[self.loading_basis].keys()}"
             )
 
-        if self.material_unit not in _MATERIAL_MODE[self.material_basis]:
+        if self.loading_basis not in [
+            "percent", "fraction"
+        ] and self.material_unit not in _MATERIAL_MODE[self.material_basis]:
             raise ParameterError(
                 f"Unit selected for material ({self.material_unit}) is not an option. "
                 f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
@@ -250,7 +254,7 @@ class BaseIsotherm():
             logger.warning(
                 "Specified adsorbate is not in internal list "
                 "(or name cannot be resolved to an existing one). "
-                "CoolProp backend disabled for this gas/vapour."
+                "Thermodynamic backend disabled for this gas/vapour."
             )
 
     @property
@@ -263,6 +267,11 @@ class BaseIsotherm():
     @temperature.setter
     def temperature(self, value: t.Union[float, str]):
         self._temperature = float(value)
+
+    @property
+    def units(self) -> dict:
+        """Return a dictionary of all isotherm units"""
+        return {unit: getattr(self, unit) for unit in self._unit_params}
 
     def __eq__(self, other_isotherm) -> bool:
         """

@@ -2,6 +2,36 @@
 Changelog
 =========
 
+4.5.0 (2023-XX-XX)
+
+* Docs updating to fix issue #42
+* Refactor DR/DA calculations
+
+4.4.0 (2022-09-03)
+------------------
+
+* Drop python 3.6
+* Parsing of instrument files is now spun off into
+  a separate package for ease of maintenance.
+  See: https://github.com/AIF-development-team/adsorption-file-parser
+* Completely switched to `setuptools_scm` for versioning (no public-facing
+  changes)
+
+4.3.0 (2022-08-27)
+------------------
+
+* AIF can read/write all isotherm types (models/points).
+  Also further improved parsing of units and metadata.
+* Quantachrome `txt` files are now fully parseable
+* Isotherm data can now be other things beside numbers.
+* Added two standard isotherms (silica+carbon black). Can be used in thickness calculations.
+
+4.2.0 (2022-06-29)
+------------------
+
+* Better error handling of nonphysical mesoporous PSD models
+* CLI now prints package version with `--version` argument
+
 4.1.1 (2022-03-10)
 ------------------
 

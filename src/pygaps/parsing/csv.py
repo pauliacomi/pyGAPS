@@ -15,13 +15,11 @@ from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.modelling import model_from_dict
+from pygaps.parsing import _PARSER_PRECISION
 from pygaps.utilities.exceptions import ParsingError
-from pygaps.utilities.string_utilities import _from_bool
 from pygaps.utilities.string_utilities import _from_list
-from pygaps.utilities.string_utilities import _is_bool
-from pygaps.utilities.string_utilities import _is_float
-from pygaps.utilities.string_utilities import _is_list
 from pygaps.utilities.string_utilities import _to_string
+from pygaps.utilities.string_utilities import cast_string
 
 _parser_version = "3.0"
 
@@ -68,7 +66,7 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
 
         output.write('data:[pressure,loading,branch,(otherdata)]\n')
-        data.to_csv(output, sep=separator, index=False, header=True)
+        data.round(_PARSER_PRECISION).to_csv(output, sep=separator, index=False, header=True)
 
     elif isinstance(isotherm, ModelIsotherm):
 
@@ -135,16 +133,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             if len(values) > 2:
                 raise ParsingError(f"The isotherm metadata {values} contains more than two values.")
             key, val = values
-            if not val:
-                val = None
-            elif _is_bool(val):
-                val = _from_bool(val)
-            elif val.isnumeric():
-                val = int(val)
-            elif _is_float(val):
-                val = float(val)
-            elif _is_list(val):
-                val = _from_list(val)
+            val = cast_string(val)
 
             raw_dict[key] = val
             line = raw_csv.readline().rstrip()

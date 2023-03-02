@@ -9,13 +9,13 @@ import pandas
 from scipy import interpolate
 from scipy import optimize
 
-from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.data import KERNELS
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.math_utilities import bspline
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 _LOADED = {}  # We will keep loaded kernels here
 
@@ -136,8 +136,6 @@ def psd_dft(
         raise ParameterError(
             "An existing kernel name or a path to a user kernel to be used must be specified."
         )
-    if not isinstance(isotherm.adsorbate, Adsorbate):
-        raise ParameterError("Isotherm adsorbate is not known, cannot calculate PSD.")
 
     # Get an internal kernel, otherwise assume it is a path
     kernel_path = KERNELS.get(kernel, kernel)
@@ -154,27 +152,17 @@ def psd_dft(
     pressure_unit = kernel_units.get('pressure_unit', None)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_basis=loading_basis,
-        loading_unit=loading_unit,
-        material_basis=material_basis,
-        material_unit=material_unit,
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": loading_basis,
+            "loading_unit": loading_unit,
+            "material_basis": material_basis,
+            "material_unit": material_unit,
+        }, {
+            "pressure_mode": pressure_mode,
+            "pressure_unit": pressure_unit,
+        }
     )
-    pressure = isotherm.pressure(
-        branch=branch,
-        pressure_mode=pressure_mode,
-        pressure_unit=pressure_unit,
-    )
-    if loading is None:
-        raise ParameterError(
-            "The isotherm does not have the required branch "
-            "for this calculation"
-        )
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
 
     # select the maximum and minimum of the points and the pressure associated
     minimum = 0
@@ -299,11 +287,11 @@ def psd_dft_kernel_fit(
     # generate the numpy arrays
     try:
         kernel_points = numpy.asarray([kernel[size](pressure) for size in kernel])
-    except ValueError:
+    except ValueError as err:
         raise CalculationError(
             "Could not get kernel values at isotherm points. "
             "Does your kernel pressure range apply to this isotherm?"
-        )
+        ) from err
     pore_widths = numpy.asarray(list(kernel.keys()), dtype='float64')
 
     # define the minimization function

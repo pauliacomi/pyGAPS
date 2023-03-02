@@ -6,7 +6,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
-from pygaps.graphing.labels import label_units_iso
+from pygaps.graphing.labels import label_units_dict
 from pygaps.graphing.mpl_styles import BASE_STYLE
 from pygaps.graphing.mpl_styles import LINE_ERROR
 from pygaps.graphing.mpl_styles import LINE_FIT
@@ -246,6 +246,7 @@ def tp_plot(
     thickness_curve: t.Iterable[float],
     loading: t.Iterable[float],
     results: dict,
+    units: dict,
     alpha_s: bool = False,
     alpha_reducing_p: float = None,
     ax=None,
@@ -271,6 +272,8 @@ def tp_plot(
         - ``slope`` (float) : slope of the straight trendline fixed through the region
         - ``intercept`` (float) : intercept of the straight trendline through the region
         - ``corr_coef`` (float) : correlation coefficient of the linear region
+    units : dict
+        A unit dictionary to fill in labels.
 
     alpha_s : bool
         Whether the function is used for alpha_s display.
@@ -334,7 +337,7 @@ def tp_plot(
     ax.set_xlim(left=0)
     ax.set_ylim(bottom=0)
     ax.set_xlabel(label_x)
-    ax.set_ylabel('Loading')
+    ax.set_ylabel(label_units_dict('loading', units))
     ax.legend(loc='best')
 
     return ax
@@ -428,9 +431,9 @@ def psd_plot(
 
     ax.set_title("PSD plot " + str(method))
     ax.set_xlabel('Pore width [nm]')
-    ax.set_ylabel('Distribution [dV/dw]')
+    ax.set_ylabel('Distribution, dV/dw [$cm^3 g^{-1} nm^{-1}$]')
     if labelcum:
-        ax2.set_ylabel('Cumulative Vol [$cm^3 g^{-1}$]')
+        ax2.set_ylabel('Cumulative volume [$cm^3 g^{-1}$]')
 
     lns = l1
     if labelcum:
@@ -449,7 +452,7 @@ def isosteric_enthalpy_plot(
     loading: t.Iterable[float],
     isosteric_enthalpy: t.Iterable[float],
     std_err: t.Iterable[float],
-    isotherm,
+    units: dict,
     log: bool = False,
     ax=None,
 ):
@@ -464,8 +467,8 @@ def isosteric_enthalpy_plot(
         The isosteric enthalpy corresponding to each loading.
     std_err : array
         Standard error for each point.
-    isotherm : PointIsotherm, ModelIsotherm
-        An isotherm to determine graph units.
+    units : dict
+        A unit dictionary to fill in labels.
     log : int
         Whether to display a logarithmic graph.
     ax : matplotlib axes object, default None
@@ -494,7 +497,7 @@ def isosteric_enthalpy_plot(
     if log:
         ax.set_xscale('log')
         ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
-    ax.set_xlabel(label_units_iso(isotherm, 'loading'))
+    ax.set_xlabel(label_units_dict('loading', units))
     ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]')
     ax.legend(loc='best')
     ax.tick_params(axis='both', which='major')
@@ -626,6 +629,9 @@ def dra_plot(
     if ax is None:
         _, ax = plt.subplots()
 
+    if exp != 2:
+        exp = 'n'
+
     with mpl.rc_context(POINTS_MUTED):
         ax.plot(
             log_n_p0p,
@@ -646,8 +652,8 @@ def dra_plot(
             label='model fit',
         )
 
-    ax.set_xlabel('log $p^0/p$')
-    ax.set_ylabel('log $V/V_0$')
+    ax.set_xlabel(f'$ln^{exp}\ p^0/p$')
+    ax.set_ylabel('$ln\ V/V_0$')
     ax.legend()
 
     return ax

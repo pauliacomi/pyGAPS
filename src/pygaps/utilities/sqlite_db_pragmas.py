@@ -120,6 +120,7 @@ PRAGMA_ISOTHERM_DATA = """
         `id`            INTEGER     NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
         `iso_id`        INTEGER     NOT NULL,
         `type`          TEXT        NOT NULL,
+        `dtype`         TEXT        NOT NULL,
         `data`          BLOB        NOT NULL,
 
         FOREIGN KEY(`iso_id`)       REFERENCES `isotherms`(`id`)

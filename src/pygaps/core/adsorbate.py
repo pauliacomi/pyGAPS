@@ -476,6 +476,43 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
+    def pressure_saturation(
+        self,
+        temp: float,
+        unit: str = None,
+        calculate: bool = True,
+    ) -> float:
+        """
+        Get the saturation pressure at a particular temperature, in desired unit (default Pa).
+        
+        Alias for 'saturation_pressure'
+        
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the pressure is desired in K.
+        unit : str
+            Unit in which to return the saturation pressure.
+            If not specifies defaults to Pascal.
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Pressure in unit requested.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+        """
+        return self.saturation_pressure(temp, unit, calculate)
+
     def saturation_pressure(
         self,
         temp: float,
@@ -845,12 +882,12 @@ class Adsorbate():
 
 def _warn_reading_params(err):
     logger.warning(
-        f"Thermodynamic backend failed with error {err}. "
+        f"Thermodynamic backend failed with error: {err}. "
         "Attempting to read parameters dictionary..."
     )
 
 
 def _raise_calculation_error(err):
     raise CalculationError(
-        f"Thermodynamic backend failed (see traceback for error). Also, {err}"
+        f"Thermodynamic backend failed (see traceback for error): {err}"
     ) from err

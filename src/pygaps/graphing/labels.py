@@ -1,7 +1,7 @@
 """Utilities for creating various axis labels."""
 
 from pygaps import logger
-from pygaps.utilities.string_utilities import convert_chemformula
+from pygaps.utilities.string_utilities import convert_chemformula_ltx
 from pygaps.utilities.string_utilities import convert_unit_ltx
 
 
@@ -52,9 +52,9 @@ def label_lgd(isotherm, lbl_components: list, branch: str = None, key_def: str =
         if selected == 'branch':
             text.append(branch)
         elif selected == 'adsorbate':
-            text.append(convert_chemformula(isotherm.adsorbate))
+            text.append(convert_chemformula_ltx(isotherm.adsorbate))
         elif selected == 'temperature':
-            text.append(f"{isotherm.temperature} {isotherm.temperature_unit}")
+            text.append(f"{isotherm._temperature:.2f} {isotherm.temperature_unit}")
         elif selected == 'type':
             isotype = "points"
             if hasattr(isotherm, 'model'):

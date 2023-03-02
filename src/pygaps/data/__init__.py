@@ -12,7 +12,7 @@ try:
     import importlib.resources as importlib_resources
     from importlib.resources import files as importlib_resources_files
 except ImportError:
-    # TODO Deprecation after PY<39
+    # TODO Deprecation after PY<3.9
     # Use backported `importlib_resources`.
     import importlib_resources as importlib_resources
     from importlib_resources import files as importlib_resources_files
@@ -44,7 +44,20 @@ def load_data():
     ADSORBATE_LIST.extend(adsorbates_from_db(verbose=False))
 
 
-_kernel_res = importlib_resources_files('pygaps.data.kernels')
+# TODO These methods actually WILL not work if there's a Zip file or
+# any other package
+# The reasoning is that we are using importlib_resources correctly, then
+# switching back to a path based approach with the dictionary.
+
+# Locations for fitting kernels
+_kernel_res = importlib_resources_files('pygaps.data') / "kernels"
 KERNELS = {
     'DFT-N2-77K-carbon-slit': _kernel_res / 'DFT-N2-77K-carbon-slit.csv',
+}
+
+# Locations for standard isotherms
+_stdiso_res = importlib_resources_files('pygaps.data') / "stdiso"
+STANDARD_ISOTHERMS = {
+    "SiO2_JKO": _stdiso_res / "LiChrospher Si-1000 silica.csv",
+    "CB_KJG": _stdiso_res / "Cabot BP280 carbon black.csv",
 }

@@ -20,7 +20,7 @@ def get_meniscus_geometry(branch: str, pore_geometry: str):
     ----------
     branch : {'ads', 'des'}
         Branch of the isotherm used.
-    geometry : {'slit', 'cylinder', 'cylinder'}
+    geometry : {'slit', 'cylinder', 'halfopen-cylinder', 'sphere'}
         Geometry of the pore.
 
     Returns
@@ -30,23 +30,31 @@ def get_meniscus_geometry(branch: str, pore_geometry: str):
 
     """
     if branch == 'ads':
-        if pore_geometry == 'cylinder':
+        if pore_geometry == 'slit':
+            m_geometry = 'hemicylindrical'
+        elif pore_geometry == 'cylinder':
             m_geometry = 'cylindrical'
+        elif pore_geometry == 'halfopen-cylinder':
+            m_geometry = 'hemispherical'
         elif pore_geometry == 'sphere':
             m_geometry = 'hemispherical'
-        elif pore_geometry == 'slit':
-            m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
+            raise ParameterError(
+                "Pore geometry must be either 'slit', 'cylinder', 'halfopen-cylinder', or 'sphere'"
+            )
     elif branch == 'des':
-        if pore_geometry == 'cylinder':
+        if pore_geometry == 'slit':
+            m_geometry = 'hemicylindrical'
+        elif pore_geometry == 'cylinder':
+            m_geometry = 'hemispherical'
+        elif pore_geometry == 'halfopen-cylinder':
             m_geometry = 'hemispherical'
         elif pore_geometry == 'sphere':
             m_geometry = 'hemispherical'
-        elif pore_geometry == 'slit':
-            m_geometry = 'hemicylindrical'
         else:
-            raise ParameterError("Pore geometry must be either 'cylinder', 'sphere' or 'slit'.")
+            raise ParameterError(
+                "Pore geometry must be either 'slit', 'cylinder', 'halfopen-cylinder', or 'sphere'"
+            )
     else:
         raise ParameterError("Adsorption branch must be either 'ads' or 'des'.")
 

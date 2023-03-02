@@ -12,7 +12,7 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 
 def area_BET(
@@ -142,26 +142,12 @@ def area_BET(
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_unit='mol',
-        loading_basis='molar',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mol"
+        }, {"pressure_mode": "relative"}
     )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError as err:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        ) from err
-
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
 
     # use the bet function
     (
@@ -343,7 +329,7 @@ def area_BET_raw(
         logger.warning("The C constant is negative.")
     if corr_coef < 0.99:
         logger.warning("The correlation is not linear.")
-    if not (loading[0] < n_monolayer < loading[-1]):
+    if not loading[0] < n_monolayer < loading[-1]:
         logger.warning("The monolayer point is not within the BET region")
 
     return (

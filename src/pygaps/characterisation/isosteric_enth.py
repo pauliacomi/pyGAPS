@@ -146,7 +146,7 @@ def isosteric_enthalpy(
             loading,
             iso_enthalpy,
             std_errs,
-            isotherms[0],
+            isotherms[0].units,
         )
 
     return {
@@ -223,6 +223,6 @@ def isosteric_enthalpy_raw(
         iso_enth.append(-constants.gas_constant * slope / 1000)
         slopes.append(slope)
         correlations.append(corr_coef)
-        stderrs.append(-constants.gas_constant * std_err / 1000)
+        stderrs.append(constants.gas_constant * std_err / 1000)
 
     return iso_enth, slopes, correlations, stderrs

@@ -11,12 +11,11 @@ from scipy import optimize
 
 from pygaps.characterisation.models_hk import HK_KEYS
 from pygaps.characterisation.models_hk import get_hk_model
-from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 _MICRO_PSD_MODELS = ['HK', 'HK-CY', 'RY', 'RY-CY']
 _PORE_GEOMETRIES = ['slit', 'cylinder', 'sphere']
@@ -163,49 +162,31 @@ def psd_microporous(
 
     # Get adsorbate properties
     if adsorbate_model is None:
-        if not isinstance(isotherm.adsorbate, Adsorbate):
+        try:
+            adsorbate_model = {
+                'molecular_diameter': isotherm.adsorbate.get_prop('molecular_diameter'),
+                'polarizability': isotherm.adsorbate.get_prop('polarizability'),
+                'magnetic_susceptibility': isotherm.adsorbate.get_prop('magnetic_susceptibility'),
+                'surface_density': isotherm.adsorbate.get_prop('surface_density'),
+                'liquid_density': isotherm.adsorbate.liquid_density(isotherm.temperature),
+                'adsorbate_molar_mass': isotherm.adsorbate.molar_mass(),
+            }
+        except ParameterError as err:
             raise ParameterError(
-                "Isotherm adsorbate is not known, cannot calculate PSD."
-                "Either use a recognised adsorbate (i.e. nitrogen) or "
-                "pass a dictionary with your adsorbate parameters."
-            )
-        adsorbate_model = {
-            'molecular_diameter': isotherm.adsorbate.get_prop('molecular_diameter'),
-            'polarizability': isotherm.adsorbate.get_prop('polarizability'),
-            'magnetic_susceptibility': isotherm.adsorbate.get_prop('magnetic_susceptibility'),
-            'surface_density': isotherm.adsorbate.get_prop('surface_density'),
-            'liquid_density': isotherm.adsorbate.liquid_density(isotherm.temperature),
-            'adsorbate_molar_mass': isotherm.adsorbate.molar_mass(),
-        }
+                "Isotherm adsorbate does not have all required HK properties."
+                "Pass a dictionary with your HK adsorbate parameters."
+            ) from err
 
     # Get material properties
     material_properties = get_hk_model(material_model)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_basis='molar',
-        loading_unit='mmol',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mmol"
+        }, {"pressure_mode": "relative"}
     )
-    if loading is None:
-        raise ParameterError(
-            "The isotherm does not have the required branch "
-            "for this calculation"
-        )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        )
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
 
     # select the maximum and minimum of the points and the pressure associated
     minimum = 0

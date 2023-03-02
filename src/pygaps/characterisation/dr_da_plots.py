@@ -11,7 +11,7 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.utilities.exceptions import pgError
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 
 def dr_plot(
@@ -71,22 +71,25 @@ def dr_plot(
 
     Here :math:`\Delta G` is the change in Gibbs free energy
     :math:`\Delta G = - RT \ln(p_0/p)` and :math:`\varepsilon`
-    is a characteristic energy of adsorption.
-
-    If an experimental isotherm is consistent with the DR model,
-    the equation can be used to obtain the total pore volume
-    and energy of adsorption. The DR equation is first linearised:
+    is a characteristic energy of adsorption. Substituting:
 
     .. math::
 
-        \log_{10}{V_{ads}} = \log_{10}{V_{t}} -
-        \ln10\Big(\frac{RT}{\varepsilon}\Big)^2 \Big[\log_{10}{\frac{p_0}{p}}\Big]^2
+        V_{ads} = V_{t} - e^{-\Big(\frac{RT}{\varepsilon}\Big)^2 \ln^2{\frac{p_0}{p}}} = V_{t} - e^{-D \ln^2{\frac{p_0}{p}}}
+
+    If an experimental isotherm is consistent with the DR model,
+    the equation can be used to obtain the total pore volume
+    and energy of adsorption. The DR equation is linearised:
+
+    .. math::
+
+        \ln{V_{ads}} = \ln{V_{t}} - \Big(\frac{RT}{\varepsilon}\Big)^2 \ln^2{\Big[\frac{p_0}{p}}\Big]
 
     Isotherm loading is converted to volume adsorbed by
     assuming that the density of the adsorbed phase is equal to
     bulk liquid density at the isotherm temperature.
-    Afterwards :math:`\log_{10}{V_{ads}}` is plotted
-    against :math:`\log^2_{10}{p_0/p}`,
+    Afterwards :math:`\ln{V_{ads}}` is plotted
+    against :math:`\ln^2{p_0/p}`,
     and fitted with a best-fit line. The intercept of this
     line can be used to calculate the total pore volume,
     while the slope is proportional to the characteristic
@@ -173,7 +176,11 @@ def da_plot(
     is a characteristic energy of adsorption.
     The exponent :math:`n` is a fitting coefficient, often taken between
     1 (described as surface adsorption) and 3 (micropore adsorption).
-    The exponent can also be related to surface heterogeneity.
+    The exponent can also be related to surface heterogeneity.  Substituting:
+
+    .. math::
+
+        V_{ads} = V_{t} - e^{-\Big(\frac{RT}{\varepsilon}\Big)^n \ln^n{\frac{p_0}{p}}} = V_{t} - e^{-D \ln^n{\frac{p_0}{p}}}
 
     If an experimental isotherm is consistent with the DA model,
     the equation can be used to obtain the total pore volume
@@ -181,14 +188,13 @@ def da_plot(
 
     .. math::
 
-        \log_{10}{V_{ads}} = \log_{10}{V_{t}} -
-        (\ln10)^{n-1}\Big(\frac{RT}{\varepsilon}\Big)^n \Big[\log_{10}{\frac{p_0}{p}}\Big]^n
+        \ln{V_{ads}} = \ln{V_{t}} - \Big(\frac{RT}{\varepsilon}\Big)^n \ln^n{\Big[\frac{p_0}{p}}\Big]
 
     Isotherm loading is converted to volume adsorbed by
     assuming that the density of the adsorbed phase is equal to
     bulk liquid density at the isotherm temperature.
-    Afterwards :math:`\log_{10}{V_{ads}}` is plotted
-    against :math:`\log^n_{10}{p_0/p}`,
+    Afterwards :math:`\ln{V_{ads}}` is plotted
+    against :math:`\ln^n{p_0/p}`,
     and fitted with a best-fit line. The intercept of this
     line can be used to calculate the total pore volume,
     while the slope is proportional to the characteristic
@@ -220,25 +226,12 @@ def da_plot(
     liquid_density = adsorbate.liquid_density(iso_temp)
 
     # Read data in
-    loading = isotherm.loading(
-        branch=branch,
-        loading_unit='mol',
-        loading_basis='molar',
+    pressure, loading = get_iso_loading_and_pressure_ordered(
+        isotherm, branch, {
+            "loading_basis": "molar",
+            "loading_unit": "mol"
+        }, {"pressure_mode": "relative"}
     )
-    try:
-        pressure = isotherm.pressure(
-            branch=branch,
-            pressure_mode='relative',
-        )
-    except pgError:
-        raise CalculationError(
-            "The isotherm cannot be converted to a relative basis. "
-            "Is your isotherm supercritical?"
-        )
-    # If on an desorption branch, data will be reversed
-    if branch == 'des':
-        loading = loading[::-1]
-        pressure = pressure[::-1]
 
     # Call the raw function
     (
@@ -397,9 +390,8 @@ def da_plot_raw(
     slope, intercept, corr_coef = dr_fit(exp, ret=True)
 
     # Calculate final result values
-    microp_volume = 10**intercept
-    potential = (-numpy.log(10)**(exp - 1) *
-                 (constants.gas_constant * iso_temp)**(exp) / slope)**(1 / exp) / 1000
+    microp_volume = numpy.exp(intercept)
+    potential = (constants.gas_constant * iso_temp) / (-slope)**(1 / exp) / 1000
 
     return (
         microp_volume,
@@ -414,10 +406,10 @@ def da_plot_raw(
 
 
 def log_v_adj(loading, molar_mass, liquid_density):
-    """Base 10 logarithm of volumetric uptake."""
-    return numpy.log10(loading * molar_mass / liquid_density)
+    """Log of volumetric uptake."""
+    return numpy.log(loading * molar_mass / liquid_density)
 
 
 def log_p_exp(pressure, exp):
-    """Base 10 logarithm of p_0/p raised to the DA exponent."""
-    return (-numpy.log10(pressure))**exp
+    """Log of p_0/p raised to the DA exponent."""
+    return (-numpy.log(pressure))**exp
