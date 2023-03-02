@@ -652,8 +652,8 @@ def dra_plot(
             label='model fit',
         )
 
-    ax.set_xlabel(f'$ln^{exp}\ p^0/p$')
-    ax.set_ylabel('$ln\ V/V_0$')
+    ax.set_xlabel(fr'$ln^{exp}\ p^0/p$')
+    ax.set_ylabel(r'$ln\ V/V_0$')
     ax.legend()
 
     return ax

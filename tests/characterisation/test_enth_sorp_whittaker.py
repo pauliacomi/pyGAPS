@@ -16,9 +16,7 @@ loading = np.linspace(0.1, 20, 100)
 class TestWhittakerEnthalpy():
     @pytest.mark.parametrize('testdata', [ex for ex in DATA_WHITTAKER.values()])
     def test_whittaker(self, testdata):
-        isotherm = pgp.isotherm_from_aif(
-            DATA_WHITTAKER_PATH / testdata['file']
-        )
+        isotherm = pgp.isotherm_from_aif(DATA_WHITTAKER_PATH / testdata['file'])
         model_isotherm = pgm.model_iso(
             isotherm,
             branch='ads',
@@ -28,7 +26,7 @@ class TestWhittakerEnthalpy():
         loading = [1]
         res = we.enthalpy_sorption_whittaker(model_isotherm, loading)
         res_enth = res['enthalpy_sorption']
-        ref_enth  = testdata['ref_enth']
+        ref_enth = testdata['ref_enth']
         assert np.isclose(res_enth, ref_enth)
 
     @pytest.mark.parametrize('filepath', [ex['file'] for ex in DATA_WHITTAKER.values()])

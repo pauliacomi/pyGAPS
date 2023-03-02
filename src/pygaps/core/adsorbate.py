@@ -484,9 +484,9 @@ class Adsorbate():
     ) -> float:
         """
         Get the saturation pressure at a particular temperature, in desired unit (default Pa).
-        
+
         Alias for 'saturation_pressure'
-        
+
         Parameters
         ----------
         temp : float
