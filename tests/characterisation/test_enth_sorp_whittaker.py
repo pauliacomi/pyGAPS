@@ -1,10 +1,9 @@
+import numpy as np
 import pytest
 
-import numpy as np
-
 import pygaps.characterisation.enth_sorp_whittaker as we
-import pygaps.parsing as pgp
 import pygaps.modelling as pgm
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from .conftest import DATA_WHITTAKER
