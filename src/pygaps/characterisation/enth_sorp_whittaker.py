@@ -1,9 +1,15 @@
 """Module implementing the Whittaker method for isosteric enthalpy calculations."""
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import scipy.constants
 
 from pygaps import logger
+
+if TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
@@ -93,9 +99,8 @@ def enthalpy_sorption_whittaker(
         loading = np.linspace(isotherm.model.loading_range[0], isotherm.model.loading_range[1], 100)
 
     # Local constants and model parameters
-    R = scipy.constants.R
     T = isotherm.temperature
-    RT = R * T
+    RT = scipy.constants.R * T
     n_m = isotherm.model.params['n_m']
     K = isotherm.model.params['K']
     if isotherm.model.name == 'Langmuir':
@@ -110,7 +115,6 @@ def enthalpy_sorption_whittaker(
     try:
         p_sat = isotherm.adsorbate.saturation_pressure(temp=isotherm.temperature)
     except CalculationError:
-        # TODO should this be in adsorbate.saturation_pressure?
         logger.warning(
             f"{isotherm.adsorbate} does not have a saturation pressure "
             f"at {isotherm.temperature} K. Calculating pseudo-saturation "
@@ -125,26 +129,25 @@ def enthalpy_sorption_whittaker(
     p_sat = p_sat / 1000  # equation requires p_sat in kPa
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
+
         p = isotherm.pressure_at(n, pressure_unit='Pa')
 
-        if p < p_t:
-            # TODO should this give a warning?
-            # Only works well for Toth, otherwise second bracket = 1.
-            p = p_t
-
-        # check that it is possible to calculate lambda_p
-        if p > p_c or np.isnan(p):
+        # check that it is possible to calculate h_vap
+        if np.isnan(p) or p < 0 or p > p_c or p > p_sat * 1000:
             continue
 
+        # Cap pressure for h_vap determination to the triple point pressure
+        p = max(p, p_t)
+
         # equation requires enthalpies in J
-        lambda_p = isotherm.adsorbate.enthalpy_vaporisation(press=p, ) * 1000
+        h_vap = isotherm.adsorbate.enthalpy_vaporisation(press=p, ) * 1000
 
         theta = n / n_m  # second bracket of d_lambda
         theta_t = theta**t
         second_bracket = (theta_t / (1 - theta_t))**((t - 1) / t)
         d_lambda = RT * np.log(first_bracket * second_bracket)
 
-        h_st = d_lambda + lambda_p + RT
+        h_st = d_lambda + h_vap + RT
 
         loading_final.append(n)
         whittaker_enth.append(h_st / 1000)  # return enthalpies to kJ
@@ -155,7 +158,7 @@ def enthalpy_sorption_whittaker(
             loading_final,
             whittaker_enth,
             [0 for n in loading_final],
-            isotherm,
+            isotherm.units,
         )
 
     return {
