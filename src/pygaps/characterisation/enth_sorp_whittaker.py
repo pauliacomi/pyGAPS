@@ -6,6 +6,7 @@ import numpy as np
 import scipy.constants
 
 from pygaps import logger
+import pygaps.modelling as pgm
 
 if TYPE_CHECKING:
     from pygaps.core.modelisotherm import ModelIsotherm
@@ -15,19 +16,25 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 def enthalpy_sorption_whittaker(
-    isotherm: "ModelIsotherm",
+    isotherm: "PointIsotherm",
+    model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
 ):
     r"""
 
-    Calculate the isosteric heat of adsorption using a single isotherm via the
+    Calculate the isosteric heat of adsorption, `\Delta H_{st}` using a single isotherm via the
     Whittaker method.
+    Starts by modelling the isotherm with a Toth or Langmuir isotherm.
+    Parameters of the model fit are then used to determine :math:`\Delta
+    H_{st}`. 
 
     Parameters
     ----------
-    isotherm : ModelIsotherm
-        The model isotherm used. Must be either Toth or Langmuir.
+    isotherm : PointIsotherm
+        The point isotherm to be used.
+    model : str
+        The model to use, must be eiter 'Langmuir' or 'Toth'.
     loading : list[float]
         The loadings for which to calculate the isosteric heat of adsorption.
     verbose : bool
@@ -63,6 +70,9 @@ def enthalpy_sorption_whittaker(
     :math:`\H_{vap}` is the latent heat of the liquid-vapour change at
     equilibrium pressure.
 
+    For loadings below the triple point pressure, :math:`\H_{vap}` is meaningless.
+    In this case, :math:`\H_{vap}` is estimated as that at the triple point.
+
     Whittaker determined :math:`\Delta \lambda` as:
 
     .. math::
@@ -91,10 +101,19 @@ def enthalpy_sorption_whittaker(
 
     """
 
-    if isotherm.model.name not in ['Langmuir', 'Toth']:
+    if model not in ['Langmuir', 'Toth']:
         raise ParameterError(
-            '''Whittaker method requires either a Langmuir or Toth model isotherm'''
+            '''Whittaker method requires modelling with either Langmuir or Toth'''
         )
+
+    isotherm.convert_pressure(unit_to='Pa')
+    isotherm = pgm.model_iso(
+        isotherm,
+        branch='ads',
+        model=model,
+        verbose=verbose,
+    )
+
     if loading is None:
         loading = np.linspace(isotherm.model.loading_range[0], isotherm.model.loading_range[1], 100)
 
@@ -126,14 +145,14 @@ def enthalpy_sorption_whittaker(
     loading_final = []
     whittaker_enth = []
 
-    p_sat = p_sat / 1000  # equation requires p_sat in kPa
     first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
     for n in loading:
+        if n == 0:
+            continue
 
         p = isotherm.pressure_at(n, pressure_unit='Pa')
-
         # check that it is possible to calculate h_vap
-        if np.isnan(p) or p < 0 or p > p_c or p > p_sat * 1000:
+        if np.isnan(p) or p < 0 or p > p_c or p > p_sat:
             continue
 
         # Cap pressure for h_vap determination to the triple point pressure
@@ -164,6 +183,7 @@ def enthalpy_sorption_whittaker(
     return {
         'loading': loading_final,
         'enthalpy_sorption': whittaker_enth,
+        'model_params': isotherm.model.params,
     }
 
 
