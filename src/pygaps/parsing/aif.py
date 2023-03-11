@@ -238,12 +238,14 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
     raw_dict = {}
 
     # read version
-    version = block.find_value('_audit_aif_version').strip("'")
+    version = block.find_value('_audit_aif_version')
     if not version or float(version.strip("'")) < float(_parser_version):
         logger.warning(
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."
         )
+    else:
+        version = version.strip("'")
 
     # creation method (excluded if created in pygaps)
     cmethod = block.find_value('_audit_creation_method')
@@ -264,7 +266,12 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
             val = val.strip("'")
 
             if key in _META_DICT:
-                raw_dict[_META_DICT[key]['text']] = _META_DICT[key]['type'](val)
+                try:
+                    raw_dict[_META_DICT[key]['text']] = _META_DICT[key]['type'](val)
+                except ValueError:
+                    logger.warning(
+                        f"""Could not parse parameter {_META_DICT[key]['text']}, currently {val}"""
+                    )
             elif key.startswith('_pygaps_'):
                 raw_dict[key[8:]] = cast_string(val)
             elif key not in excluded:

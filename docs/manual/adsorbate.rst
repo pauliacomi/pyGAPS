@@ -121,12 +121,17 @@ REFPROP backend or retrieved as a string from the internal dictionary. The
 properties which can be calculated are:
 
 - Molar mass: :meth:`~pygaps.core.adsorbate.Adsorbate.molar_mass`.
+- Triple point pressure: :meth:`~pygaps.core.adsorbate.Adsorbate.p_triple`.
+- Triple point temperature: :meth:`~pygaps.core.adsorbate.Adsorbate.t_triple`.
+- Critical point pressure: :meth:`~pygaps.core.adsorbate.Adsorbate.p_critical`.
+- Critical point temperature: :meth:`~pygaps.core.adsorbate.Adsorbate.t_critical`.
 - Saturation pressure: :meth:`~pygaps.core.adsorbate.Adsorbate.saturation_pressure`.
 - Surface tension: :meth:`~pygaps.core.adsorbate.Adsorbate.surface_tension`.
 - Liquid density: :meth:`~pygaps.core.adsorbate.Adsorbate.liquid_density`.
 - Molar liquid density: :meth:`~pygaps.core.adsorbate.Adsorbate.liquid_molar_density`.
 - Gas density: :meth:`~pygaps.core.adsorbate.Adsorbate.gas_density`.
 - Molar gas density: :meth:`~pygaps.core.adsorbate.Adsorbate.gas_molar_density`.
+- Enthalpy of vaporisation: :meth:`~pygaps.core.adsorbate.Adsorbate.enthalpy_vaporisation`.
 - Enthalpy of liquefaction: :meth:`~pygaps.core.adsorbate.Adsorbate.enthalpy_liquefaction`.
 
 For example, for the :class:`~pygaps.core.adsorbate.Adsorbate` created above, to
@@ -157,11 +162,11 @@ without a thermodynamic backend.
 For calculations of other properties, the
 `CoolProp backend <https://www.coolprop.org/coolprop/wrappers/Python/index.html>`__
 can be accessed directly using the ``backend`` property. To calculate the
-critical temperature for example.
+reducing temperature for example.
 
 .. code:: python
 
-    my_adsorbate.backend.T_critical()
+    my_adsorbate.backend.T_reducing()
 
 
 .. _adsorbate-manual-manage:

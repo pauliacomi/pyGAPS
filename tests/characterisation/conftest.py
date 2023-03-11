@@ -37,6 +37,7 @@ from pathlib import Path
 DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
 DATA_N77_PATH = DATA_PATH / 'characterisation'
 DATA_ISOSTERIC_PATH = DATA_PATH / 'isosteric'
+DATA_WHITTAKER_PATH = DATA_PATH / 'whittaker'
 DATA_CALO_PATH = DATA_PATH / 'calorimetry'
 
 DATA = {
@@ -125,4 +126,11 @@ DATA_CALO = {
         'file': 'Takeda 5A Test CO2.json',
         'ienth': 35,
     },
+}
+
+DATA_WHITTAKER = {
+    'example1': {
+        'file': 'whittaker_iso_1.aiff',
+        'ref_enth': 16.08745,
+    }
 }
