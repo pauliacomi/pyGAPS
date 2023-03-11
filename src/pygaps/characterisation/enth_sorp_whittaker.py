@@ -1,40 +1,36 @@
 """Module implementing the Whittaker method for isosteric enthalpy calculations."""
 
-from typing import TYPE_CHECKING
-
 import numpy as np
 import scipy.constants
 
-from pygaps import logger
 import pygaps.modelling as pgm
-
-if TYPE_CHECKING:
-    from pygaps.core.modelisotherm import ModelIsotherm
-
+from pygaps import logger
+from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
 
 def enthalpy_sorption_whittaker(
-    isotherm: "PointIsotherm",
+    isotherm: "BaseIsotherm",
     model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
 ):
     r"""
 
-    Calculate the isosteric heat of adsorption, `\Delta H_{st}` using a single isotherm via the
-    Whittaker method.
-    Starts by modelling the isotherm with a Toth or Langmuir isotherm.
-    Parameters of the model fit are then used to determine :math:`\Delta
-    H_{st}`. 
+    Calculate the isosteric heat of adsorption, `\Delta H_{st}` using a single
+    isotherm via the Whittaker method. Pass either a ModelIsotherm of a suitable
+    model (Toth or Langmuir) or the model itself. Parameters of the model fit
+    are then used to determine :math:`\Delta H_{st}`.
 
     Parameters
     ----------
-    isotherm : PointIsotherm
-        The point isotherm to be used.
+    isotherm : BaseIsotherm
+        The PointIsotherm or ModelIsotherm to be used. If ModelIsotherm, units must be in Pascal
     model : str
-        The model to use, must be eiter 'Langmuir' or 'Toth'.
+        The model to use to fit the PointIsotherm, must be either 'Langmuir' or 'Toth'.
     loading : list[float]
         The loadings for which to calculate the isosteric heat of adsorption.
     verbose : bool
@@ -57,7 +53,7 @@ def enthalpy_sorption_whittaker(
     Notes
     -----
 
-    The Whittaker method, [#]_ sometimes known as the Toth potential uses
+    The Whittaker method, [#]_ sometimes known as a modified Tóth potential uses
     variables derived from fitting of a model isotherm (Langmuir or Toth) to
     derive the isosteric enthalpy of adsorption :math:`\Delta H_{st}`. The general form
     of the equation is;
@@ -101,18 +97,21 @@ def enthalpy_sorption_whittaker(
 
     """
 
-    if model not in ['Langmuir', 'Toth']:
-        raise ParameterError(
-            '''Whittaker method requires modelling with either Langmuir or Toth'''
+    if isinstance(isotherm, ModelIsotherm):
+        if isotherm.units['pressure_unit'] != 'Pa':
+            raise ParameterError('''Model isotherms should be in Pa.''')
+        model = isotherm.model.name
+    elif isinstance(isotherm, PointIsotherm):
+        isotherm.convert_pressure(unit_to='Pa')
+        isotherm = pgm.model_iso(
+            isotherm,
+            branch='ads',
+            model=model,
+            verbose=verbose,
         )
 
-    isotherm.convert_pressure(unit_to='Pa')
-    isotherm = pgm.model_iso(
-        isotherm,
-        branch='ads',
-        model=model,
-        verbose=verbose,
-    )
+    if model.lower() not in ['langmuir', 'toth']:
+        raise ParameterError('''Whittaker method requires modelling with either Langmuir or Toth''')
 
     if loading is None:
         loading = np.linspace(isotherm.model.loading_range[0], isotherm.model.loading_range[1], 100)

@@ -131,6 +131,6 @@ DATA_CALO = {
 DATA_WHITTAKER = {
     'example1': {
         'file': 'whittaker_iso_1.aiff',
-        'ref_enth': 10.382283558571492,
+        'ref_enth': 16.08745,
     }
 }
