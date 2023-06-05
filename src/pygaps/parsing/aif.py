@@ -26,7 +26,7 @@ from pygaps.parsing import _PARSER_PRECISION
 from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.string_utilities import cast_string
 
-_parser_version = "1.0"
+_parser_version = "d546195"
 
 _META_DICT = {
     '_exptl_temperature': {
@@ -37,7 +37,7 @@ _META_DICT = {
         'text': 'adsorbate',
         'type': str
     },
-    '_sample_material_id': {
+    '_adsnt_material_id': {
         'text': 'material',
         'type': str
     },
@@ -53,7 +53,7 @@ _META_DICT = {
         'text': 'instrument',
         'type': str
     },
-    '_exptl_sample_mass': {
+    '_adsnt_sample_mass': {
         'text': 'material_mass',
         'type': float
     },
@@ -61,11 +61,11 @@ _META_DICT = {
         'text': 'material_mass_unit',
         'type': str
     },
-    '_exptl_activation_temperature': {
+    '_adsnt_degas_temperature': {
         'text': 'activation_temperature',
         'type': float
     },
-    '_sample_id': {
+    '_adsnt_sample_id': {
         'text': 'material_batch',
         'type': str
     },
@@ -132,7 +132,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
     # required pygaps data
     block.set_pair('_exptl_adsorptive', f"\'{iso_dict.pop('adsorbate')}\'")
     block.set_pair('_exptl_temperature', f"{iso_dict.pop('temperature')}")
-    block.set_pair('_sample_material_id', f"\'{iso_dict.pop('material')}\'")
+    block.set_pair('_adsnt_material_id', f"\'{iso_dict.pop('material')}\'")
 
     # other possible specs
     for key, val in _META_DICT.items():
@@ -239,7 +239,7 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
 
     # read version
     version = block.find_value('_audit_aif_version').strip("'")
-    if not version or float(version.strip("'")) < float(_parser_version):
+    if not version or version.strip("'") == (_parser_version):
         logger.warning(
             f"The file version is {version} while the parser uses version {_parser_version}. "
             "Strange things might happen, so double check your data."

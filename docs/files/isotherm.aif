@@ -1,14 +1,14 @@
 data_830a707e2c95c8db400979a9cba7c92d
-_audit_aif_version 1.0
+_audit_aif_version 'd546195'
 _audit_creation_method pyGAPS
 _exptl_adsorptive 'carbon dioxide'
 _exptl_temperature 303.0
-_sample_material_id 'HKUST-1(Cu)'
+_adsnt_material_id 'HKUST-1(Cu)'
 _exptl_operator 'PI'
 _exptl_date '2010-05-21 00:00:00'
 _exptl_instrument 'device1'
-_exptl_activation_temperature '150.0'
-_sample_id 'KRICT'
+_adsnt_degas_temperature '150.0'
+_adsnt_sample_id 'KRICT'
 _units_temperature K
 _units_pressure bar
 _units_loading mmol/g

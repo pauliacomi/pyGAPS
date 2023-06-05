@@ -1,13 +1,13 @@
 data_data_raw2aifv005
-_audit_aif_version 1.0
+_audit_aif_version 'd546195'
 _exptl_operator 'Volodymyr'
 _exptl_date 2020-06-03T00:00:00
 _exptl_instrument 'BEL 00218'
 _exptl_adsorptive Ar
 _exptl_temperature 87.00
-_exptl_sample_mass 0.14320
-_sample_id 'aus der BOX'
-_sample_material_id 'unknown'
+_adsnt_sample_mass 0.14320
+_adsnt_sample_id 'aus der BOX'
+_adsnt_material_id 'unknown'
 _units_temperature K
 _units_pressure kPa
 _units_mass g
