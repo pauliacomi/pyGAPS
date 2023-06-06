@@ -60,7 +60,7 @@ def isotherm_from_commercial(path, manufacturer, fmt, **options):
     meta['loading_key'] = 'loading'
     meta['pressure_key'] = 'pressure'
 
-    # Quantachrome files are parsed in cc, must convert per gram
+    # Quantachrome files are parsed in cc, must convert per unit mass
     if manufacturer == 'qnt' and fmt == 'txt-raw':
         mass = meta['material_mass']
         data['loading'] = [ld / mass for ld in data['loading']]
