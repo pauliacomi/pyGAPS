@@ -16,7 +16,7 @@ function parameters can be found in the
     alphas
     psd
     dr_da_plots
-    isosteric_enthalpy
+    enthalpy_sorption
     initial_henryc
     initial_enthalpy
 

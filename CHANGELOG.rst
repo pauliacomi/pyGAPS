@@ -2,6 +2,11 @@
 Changelog
 =========
 
+4.5.0 (2023-XX-XX)
+
+* Docs updating to fix issue #42
+* Refactor DR/DA calculations
+
 4.4.0 (2022-09-03)
 ------------------
 

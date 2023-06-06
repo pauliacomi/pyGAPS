@@ -9,6 +9,8 @@ from pygaps.utilities.coolprop_utilities import thermodynamic_backend
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
+# TODO: units in the prop dictionary and from coolprop do not always match (e.g. p_critical)
+
 
 class Adsorbate():
     """
@@ -42,6 +44,14 @@ class Adsorbate():
         <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
     molar_mass : float
         Custom value for molar mass (otherwise obtained through CoolProp).
+    p_triple : float
+        Custom value for triple point pressure (otherwise obtained through CoolProp).
+    t_triple : float
+        Custom value for triple point temperature (otherwise obtained through CoolProp).
+    p_critical : float
+        Custom value for critical point pressure (otherwise obtained through CoolProp).
+    t_critical : float
+        Custom value for critical point temperature (otherwise obtained through CoolProp).
     saturation_pressure : float
         Custom value for saturation pressure (otherwise obtained through CoolProp).
     surface_tension : float
@@ -54,8 +64,10 @@ class Adsorbate():
         Custom value for gas density (otherwise obtained through CoolProp).
     gas_molar_density : float
         Custom value for gas molar density (otherwise obtained through CoolProp).
+    enthalpy_vaporisation : float
+        Custom value for enthalpy of vaporisation/liquefaction (otherwise obtained through CoolProp).
     enthalpy_liquefaction : float
-        Custom value for enthalpy of liquefaction (otherwise obtained through CoolProp).
+        Custom value for enthalpy of vaporisation/liquefaction (otherwise obtained through CoolProp).
 
     Notes
     -----
@@ -325,13 +337,190 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def pressure_saturation(self, temp, unit=None, calculate: bool = True) -> float:
-        """Alias for saturation_pressure"""
+    def p_triple(self, calculate: bool = True) -> float:
+        """
+        Return the triple point pressure, in Pa.
+
+        Parameters
+        ----------
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Triple point pressure in Pa.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+        """
+        if calculate:
+            try:
+                # For some reason coolprop does not implement a python
+                # wrapper for P_triple, so we are directly calling the propsSI function
+                # TODO: this will not work for REFPROP
+                return CP.CoolProp.PropsSI('PTRIPLE', self.backend_name)
+            except BaseException as err:
+                _warn_reading_params(err)
+                return self.p_triple(calculate=False)
+        try:
+            return self.get_prop("p_triple") * 1e5
+        except ParameterError as err:
+            _raise_calculation_error(err)
+
+    def t_triple(self, calculate: bool = True) -> float:
+        """
+        Return the triple point temperature, in K.
+
+        Parameters
+        ----------
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Triple point temperature in K.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+        """
+        if calculate:
+            try:
+                return self.backend.Ttriple()
+            except BaseException as err:
+                _warn_reading_params(err)
+                return self.t_triple(calculate=False)
+        try:
+            return self.get_prop("t_triple")
+        except ParameterError as err:
+            _raise_calculation_error(err)
+
+    def p_critical(self, calculate: bool = True) -> float:
+        """
+        Return the critical point pressure, in Pa.
+
+        Parameters
+        ----------
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Critical point pressure in Pa.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+        """
+        if calculate:
+            try:
+                return self.backend.p_critical()
+            except BaseException as err:
+                _warn_reading_params(err)
+                return self.p_critical(calculate=False)
+        try:
+            return self.get_prop("p_critical") * 1e5
+        except ParameterError as err:
+            _raise_calculation_error(err)
+
+    def t_critical(self, calculate: bool = True) -> float:
+        """
+        Return the critical point temperature, in K.
+
+        Parameters
+        ----------
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Critical point temperature in K.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+        """
+        if calculate:
+            try:
+                return self.backend.T_critical()
+            except BaseException as err:
+                _warn_reading_params(err)
+                return self.t_critical(calculate=False)
+        try:
+            return self.get_prop("t_critical")
+        except ParameterError as err:
+            _raise_calculation_error(err)
+
+    def pressure_saturation(
+        self,
+        temp: float,
+        unit: str = None,
+        calculate: bool = True,
+    ) -> float:
+        """
+        Get the saturation pressure at a particular temperature, in desired unit (default Pa).
+
+        Alias for 'saturation_pressure'
+
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the pressure is desired in K.
+        unit : str
+            Unit in which to return the saturation pressure.
+            If not specifies defaults to Pascal.
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Pressure in unit requested.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+        """
         return self.saturation_pressure(temp, unit, calculate)
 
-    def saturation_pressure(self, temp, unit=None, calculate: bool = True) -> float:
+    def saturation_pressure(
+        self,
+        temp: float,
+        unit: str = None,
+        calculate: bool = True,
+    ) -> float:
         """
-        Get the saturation pressure at a particular temperature.
+        Get the saturation pressure at a particular temperature, in desired unit (default Pa).
 
         Parameters
         ----------
@@ -376,9 +565,13 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def surface_tension(self, temp, calculate: bool = True) -> float:
+    def surface_tension(
+        self,
+        temp: float,
+        calculate: bool = True,
+    ) -> float:
         """
-        Get the surface tension at a particular temperature.
+        Get the surface tension at a particular temperature, in mN/m.
 
         Parameters
         ----------
@@ -417,9 +610,13 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def liquid_density(self, temp, calculate: bool = True) -> float:
+    def liquid_density(
+        self,
+        temp: float,
+        calculate: bool = True,
+    ) -> float:
         """
-        Get the liquid density at a particular temperature.
+        Get the liquid density at a particular temperature, in g/cm3.
 
         Parameters
         ----------
@@ -457,9 +654,13 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def liquid_molar_density(self, temp, calculate: bool = True) -> float:
+    def liquid_molar_density(
+        self,
+        temp: float,
+        calculate: bool = True,
+    ) -> float:
         """
-        Get the liquid molar density at a particular temperature.
+        Get the liquid molar density at a particular temperature, in mol/cm3.
 
         Parameters
         ----------
@@ -497,9 +698,13 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def gas_density(self, temp, calculate: bool = True) -> float:
+    def gas_density(
+        self,
+        temp: float,
+        calculate: bool = True,
+    ) -> float:
         """
-        Get the gas molar density at a particular temperature.
+        Get the gas molar density at a particular temperature, in g/cm3.
 
         Parameters
         ----------
@@ -537,9 +742,13 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def gas_molar_density(self, temp, calculate: bool = True) -> float:
+    def gas_molar_density(
+        self,
+        temp: float,
+        calculate: bool = True,
+    ) -> float:
         """
-        Get the gas density at a particular temperature.
+        Get the gas density at a particular temperature, in mol/cm3.
 
         Parameters
         ----------
@@ -577,9 +786,47 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def enthalpy_liquefaction(self, temp, calculate: bool = True) -> float:
+    def enthalpy_vaporisation(
+        self,
+        temp: float = None,
+        press: float = None,
+        calculate: bool = True,
+    ) -> float:
         """
-        Get the enthalpy of liquefaction at a particular temperature.
+        Get the enthalpy of vaporisation at a particular temperature, in kJ/mol.
+
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the enthalpy of vaporisation is desired, in K.
+        calculate : bool, optional
+            Whether to calculate the property or look it up in the properties
+            dictionary, default - True.
+
+        Returns
+        -------
+        float
+            Enthalpy of vaporisation in kJ/mol.
+
+        Raises
+        ------
+        ``ParameterError``
+            If the calculation is not requested and the property does not exist
+            in the class dictionary.
+        ``CalculationError``
+            If it cannot be calculated, due to a physical reason.
+
+        """
+        return self.enthalpy_liquefaction(temp, press, calculate)
+
+    def enthalpy_liquefaction(
+        self,
+        temp: float = None,
+        press: float = None,
+        calculate: bool = True,
+    ) -> float:
+        """
+        Get the enthalpy of liquefaction at a particular temperature, in kJ/mol.
 
         Parameters
         ----------
@@ -604,12 +851,24 @@ class Adsorbate():
 
         """
         if calculate:
+            if temp and press:
+                raise CalculationError(
+                    "Can only specify one intensive variable, either temperature or pressure."
+                )
             try:
                 state = self.backend
-                state.update(CP.QT_INPUTS, 0.0, temp)
-                h_liq = state.hmolar()
-                state.update(CP.QT_INPUTS, 1.0, temp)
-                h_vap = state.hmolar()
+                if temp:
+                    state.update(CP.QT_INPUTS, 0.0, temp)
+                    h_liq = state.hmolar()
+                    state.update(CP.QT_INPUTS, 1.0, temp)
+                    h_vap = state.hmolar()
+                elif press:
+                    state.update(CP.PQ_INPUTS, press, 0.0)
+                    h_liq = state.hmolar()
+                    state.update(CP.PQ_INPUTS, press, 1.0)
+                    h_vap = state.hmolar()
+                else:
+                    raise CalculationError("Neither pressure nor temperature specified.")
                 return (h_vap - h_liq) / 1000
             except BaseException as err:
                 _warn_reading_params(err)
