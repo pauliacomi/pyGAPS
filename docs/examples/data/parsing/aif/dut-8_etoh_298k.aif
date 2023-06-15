@@ -1,13 +1,13 @@
 data_data_raw2aifv005
-_audit_aif_version 1.0
+_audit_aif_version 'd546195'
 _exptl_operator 'Leila'
 _exptl_date 2020-10-19T00:00:00
 _exptl_instrument 'BEL 00348'
 _exptl_adsorptive C2H5OH
 _exptl_temperature 298.00
-_exptl_sample_mass 0.02460
-_sample_id 'LA-133_DUT-8(Zn)_isp_cp_EtOH_298K'
-_sample_material_id 'DUT-8'
+_adsnt_sample_mass 0.02460
+_adsnt_sample_id 'LA-133_DUT-8(Zn)_isp_cp_EtOH_298K'
+_adsnt_material_id 'DUT-8'
 _units_temperature K
 _units_pressure kPa
 _units_mass g
