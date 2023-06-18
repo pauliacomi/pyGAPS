@@ -2,6 +2,7 @@
 
 from pygaps import logger
 from pygaps.parsing.json import isotherm_from_json
+from pygaps.utilities.exceptions import ParsingError
 
 _ISODB_API = "https://adsorption.nist.gov/isodb/api"
 
@@ -36,4 +37,10 @@ def isotherm_from_isodb(filename):
         logger.warning('Connection error')
         return None
 
-    return isotherm_from_json(resp.text, fmt="NIST")
+    try:
+        return isotherm_from_json(resp.text, fmt="NIST")
+
+    except ParsingError:
+        logger.warning('Could not parse isotherm. Check if the service is up.')
+        return None
+
