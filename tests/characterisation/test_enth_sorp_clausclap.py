@@ -12,7 +12,6 @@ All pre-calculated data for characterisation can be found in the
 """
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 from numpy import average
 from numpy import isclose
 
@@ -20,6 +19,7 @@ import pygaps.characterisation.isosteric_enth as ie
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA_ISOSTERIC
 from .conftest import DATA_ISOSTERIC_PATH
 
@@ -65,7 +65,7 @@ class TestIsostericEnthalpy():
 
         assert isclose(average(result_dict['isosteric_enthalpy']), 29, 0.5)
 
-    @cleanup
+    @mpl_cleanup
     def test_iso_enthalpy_output(self):
         """Test verbosity."""
         isotherms = []

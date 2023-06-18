@@ -12,13 +12,13 @@ All pre-calculated data for characterisation can be found in the
 """
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps.characterisation.initial_henry as ih
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
@@ -41,9 +41,7 @@ class TestInitialHenry():
             err_relative = 0.1  # 10 percent
             err_absolute = 10  #
 
-            assert isclose(
-                ihenry_slope, sample['Khi_slope'], err_relative, err_absolute
-            )
+            assert isclose(ihenry_slope, sample['Khi_slope'], err_relative, err_absolute)
 
     def test_ihenry_slope_limits(self):
         """Test introducing limits in the initial slope method."""
@@ -55,11 +53,9 @@ class TestInitialHenry():
         ih.initial_henry_slope(isotherm, max_adjrms=0.01, l_limits=[5, None])
 
         with pytest.raises(pgEx.ParameterError):
-            ih.initial_henry_slope(
-                isotherm, max_adjrms=0.01, l_limits=[25, None]
-            )
+            ih.initial_henry_slope(isotherm, max_adjrms=0.01, l_limits=[25, None])
 
-    @cleanup
+    @mpl_cleanup
     def test_ihenry_slope_verbose(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
@@ -82,11 +78,9 @@ class TestInitialHenry():
             err_relative = 0.1  # 10 percent
             err_absolute = 10  #
 
-            assert isclose(
-                ihenry_virial, sample['Khi_virial'], err_relative, err_absolute
-            )
+            assert isclose(ihenry_virial, sample['Khi_virial'], err_relative, err_absolute)
 
-    @cleanup
+    @mpl_cleanup
     def test_ihenry_virial_verbose(self):
         """Test verbosity."""
         sample = DATA['SiO2']

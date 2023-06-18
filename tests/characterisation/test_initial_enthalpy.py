@@ -13,13 +13,13 @@ All pre-calculated data for characterisation can be found in the
 """
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps.characterisation.initial_enth as ie
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA_CALO
 from .conftest import DATA_CALO_PATH
 
@@ -41,15 +41,14 @@ class TestInitialEnthalpyPoint():
         filepath = DATA_CALO_PATH / sample['file']
         isotherm = pgp.isotherm_from_json(filepath)
 
-        ienth_poly = ie.initial_enthalpy_point(isotherm, 'enthalpy'
-                                               ).get('initial_enthalpy')
+        ienth_poly = ie.initial_enthalpy_point(isotherm, 'enthalpy').get('initial_enthalpy')
 
         err_relative = 0.1  # 10 percent
         err_absolute = 1  #
 
         assert isclose(ienth_poly, sample['ienth'], err_relative, err_absolute)
 
-    @cleanup
+    @mpl_cleanup
     def test_ienthalpy_point_output(self):
         """Test verbosity."""
         sample = DATA_CALO['Takeda 5A']
@@ -75,15 +74,14 @@ class TestInitialEnthalpyFit():
         filepath = DATA_CALO_PATH / sample['file']
         isotherm = pgp.isotherm_from_json(filepath)
 
-        ienth_poly = ie.initial_enthalpy_comp(isotherm, 'enthalpy'
-                                              ).get('initial_enthalpy')
+        ienth_poly = ie.initial_enthalpy_comp(isotherm, 'enthalpy').get('initial_enthalpy')
 
         err_relative = 0.1  # 10 percent
         err_absolute = 1  #
 
         assert isclose(ienth_poly, sample['ienth'], err_relative, err_absolute)
 
-    @cleanup
+    @mpl_cleanup
     def test_ienthalpy_comb_output(self):
         """Test verbosity."""
         sample = DATA_CALO['Takeda 5A']

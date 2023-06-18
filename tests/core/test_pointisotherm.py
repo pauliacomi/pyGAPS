@@ -2,12 +2,12 @@
 
 import pandas
 import pytest
-from matplotlib.testing.decorators import cleanup
 from pandas.testing import assert_series_equal
 
 import pygaps
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import LOADING_AT_PARAM
 from .conftest import LOADING_PARAM
 from .conftest import PRESSURE_AT_PARAM
@@ -616,7 +616,7 @@ class TestPointIsotherm():
 
     ##########################
 
-    @cleanup
+    @mpl_cleanup
     def test_isotherm_print_parameters(self, basic_pointisotherm):
         """Check isotherm can print its own info."""
 

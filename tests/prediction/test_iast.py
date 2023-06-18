@@ -18,13 +18,13 @@ import logging
 
 import numpy
 import pytest
-from matplotlib.testing.decorators import cleanup
 
 import pygaps
 import pygaps.iast.pgiast as pgi
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA_IAST
 from .conftest import DATA_IAST_PATH
 
@@ -94,7 +94,7 @@ class TestIAST():
 
         assert numpy.isclose(adsorbed_fractions[0], loadings[0], 0.001)
 
-    @cleanup
+    @mpl_cleanup
     def test_iast_verbose(self, load_iast):
         """Test verbosity."""
         pgi.iast_point_fraction(load_iast, [0.5, 0.5], 1, verbose=True)
@@ -156,7 +156,7 @@ class TestReverseIAST():
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
         assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
 
-    @cleanup
+    @mpl_cleanup
     def test_reverse_iast_verbose(self, load_iast):
         """Test verbosity."""
         pgi.reverse_iast(load_iast, [0.23064, 0.76936], 1, verbose=True)
@@ -200,7 +200,7 @@ class TestIASTVLE():
 
         assert numpy.isclose(dev, expected_dev, atol=0.1)
 
-    @cleanup
+    @mpl_cleanup
     def test_iast_vle_verbose(self, load_iast):
         """Test verbosity."""
         pgi.iast_binary_vle(load_iast, 1, verbose=True)
@@ -246,7 +246,7 @@ class TestIASTSVP():
 
         assert numpy.isclose(avg, expected_avg, atol=0.01)
 
-    @cleanup
+    @mpl_cleanup
     def test_iast_vle_verbose(self, load_iast):
         """Test verbosity."""
         rng = numpy.linspace(0.01, 10, 30)

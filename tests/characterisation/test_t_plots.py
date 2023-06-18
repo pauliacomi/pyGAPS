@@ -13,13 +13,13 @@ All pre-calculated data for characterisation can be found in the
 """
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps.characterisation.t_plots as pt
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
@@ -81,7 +81,7 @@ class TestTPlot():
             results[-1].get('area'), sample['s_t_area'], err_relative, err_absolute_volume
         )
 
-    @cleanup
+    @mpl_cleanup
     def test_t_plot_output(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
