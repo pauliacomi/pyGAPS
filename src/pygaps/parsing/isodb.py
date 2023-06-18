@@ -43,4 +43,3 @@ def isotherm_from_isodb(filename):
     except ParsingError:
         logger.warning('Could not parse isotherm. Check if the service is up.')
         return None
-
