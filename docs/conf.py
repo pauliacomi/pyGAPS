@@ -114,6 +114,7 @@ linkcheck_ignore = [
     r'https://requires.io/.+',
     r'https://twitter.com/.+',
     r'https://www.coolprop.org/.+',
+    r'https://doi.org/.+',
 ]
 
 # Checking for internal links
