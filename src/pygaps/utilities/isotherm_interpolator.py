@@ -30,7 +30,6 @@ class IsothermInterpolator():
         to determine what to do outside data bounds.
 
     """
-
     def __init__(
         self,
         known_data,
@@ -54,7 +53,9 @@ class IsothermInterpolator():
 
         if interp_fill is None:
             self.interp_fun = interp1d(
-                known_data, interp_data, kind=interp_kind
+                known_data,
+                interp_data,
+                kind=interp_kind,
             )
         else:
             self.interp_fun = interp1d(
