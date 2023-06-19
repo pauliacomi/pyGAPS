@@ -131,6 +131,7 @@ envlist =
     clean,
     check,
     docs,
+    py311-cover,
     py310-cover,
     py36-cover,
     py37-cover,
@@ -142,6 +143,7 @@ envlist =
 wheel = true
 basepython =
     bootstrap: python
+    py311: {env:TOXPYTHON:python3.11-cover}
     py310: {env:TOXPYTHON:python3.10-cover}
     py36: {env:TOXPYTHON:python3.6-cover}
     py37: {env:TOXPYTHON:python3.7-cover}
