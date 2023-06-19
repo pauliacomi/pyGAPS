@@ -140,6 +140,10 @@ def isotherm_to_xl(isotherm, path):
 
         columns = [isotherm.pressure_key, isotherm.loading_key, 'branch'] + isotherm.other_keys
 
+        # Write data types
+        for col_index, heading in enumerate(isotherm.other_keys):
+            sht.write(data_row - 1, col_index + 3, data[heading].dtype.name)
+
         # Write all data
         for col_index, heading in enumerate(columns):
             sht.write(data_row, col_index, heading)
@@ -248,17 +252,26 @@ def isotherm_from_xl(path, *isotherm_parameters):
         # read the data in
         header_col = 0
         headers = []
+        dtypes = {}
         experiment_data = {}
         while header_col < sht.ncols:
             header = sht.cell(header_row, header_col).value
             if header == '':
                 break
+            # read header, data, and dtype
             headers.append(header)
             experiment_data[header] = [
                 sht.cell(i, header_col).value for i in range(start_row, final_row)
             ]
+            # read the data type
+            # only read the data type if it is not a pressure, loading or branch
+            if header_col > 2:
+                dtype = sht.cell(header_row - 1, header_col).value
+                if dtype != '':
+                    dtypes[header] = dtype
             header_col += 1
-        data = pandas.DataFrame(experiment_data).convert_dtypes()
+        data = pandas.DataFrame(experiment_data)
+        data = data.astype(dtypes)
 
         raw_dict['pressure_key'] = headers[0]
         raw_dict['loading_key'] = headers[1]
