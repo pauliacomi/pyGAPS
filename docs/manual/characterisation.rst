@@ -18,7 +18,7 @@ characterisation:
 - Langmuir surface area :mod:`~pygaps.characterisation.area_lang`
 - The t-plot method :mod:`~pygaps.characterisation.t_plots`
 - The :math:`\alpha_s` method :mod:`~pygaps.characterisation.alphas_plots`
-- Pore size distribution (PSD) calculations
+- Pore size distribution (PSD):
 
   - Mesoporous PSD calculations function
     :meth:`~pygaps.characterisation.psd_meso.psd_mesoporous` with the module
@@ -33,15 +33,18 @@ characterisation:
     containing the individual model references:
     :mod:`~pygaps.characterisation.psd_kernel`
 
-- Isosteric enthalpy of adsorption calculations
-  :meth:`~pygaps.characterisation.isosteric_enth`
+- Enthalpy of adsorption determination:
+
+  - Isosteric enthalpy through the Clausius-Clapeyron method (multiple isotherms
+    at different temperatures): :meth:`~pygaps.characterisation.isosteric_enth`
+  - Isosteric enthalpy through the Whittaker method (from a model fit to an
+    isotherm): :meth:`~pygaps.characterisation.enth_sorp_whittaker`
+
 - Dubinin-Radushevitch and Dubinin-Astakov plots
   (:meth:`~pygaps.characterisation.dr_da_plots.dr_plot`,
   :meth:`~pygaps.characterisation.dr_da_plots.da_plot`)
 - Initial Henry constant calculation
   :mod:`~pygaps.characterisation.initial_henry`
-- Initial enthalpy of adsorption calculation (from isotherms with enthalpy data)
-  :mod:`~pygaps.characterisation.initial_enth`
 
 More info about each function and its usage can be found on their respective
 page.

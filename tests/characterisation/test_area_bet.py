@@ -14,7 +14,6 @@ All pre-calculated data for characterisation can be found in the
 import logging
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 from numpy import linspace
 
@@ -22,6 +21,7 @@ import pygaps.characterisation.area_bet as ab
 import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
@@ -107,7 +107,7 @@ class TestAreaBET():
         err_absolute = 0.1  # 0.1 m2
         assert isclose(area, sample['bet_area_des'], err_relative, err_absolute)
 
-    @cleanup
+    @mpl_cleanup
     def test_area_BET_output(self):
         """Test verbosity."""
         sample = DATA['MCM-41']

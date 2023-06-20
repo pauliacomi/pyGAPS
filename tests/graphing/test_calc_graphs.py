@@ -3,15 +3,16 @@ Tests calculation graphs such as PSD/t_plot/BET etc
 """
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 
 import pygaps.graphing.calc_graphs as graphing
+
+from ..test_utils import mpl_cleanup
 
 
 @pytest.mark.graphing
 class TestCalcGraphs():
     """Tests all calculation graphs"""
-    @cleanup
+    @mpl_cleanup
     def test_bet_graph(self):
         """Test BET graph"""
 
@@ -24,12 +25,9 @@ class TestCalcGraphs():
         mono_p = 0.33
         mono_bet = 0.23
 
-        graphing.bet_plot(
-            pressure, bet_points, min_p, max_p, slope, intercept, mono_p,
-            mono_bet
-        )
+        graphing.bet_plot(pressure, bet_points, min_p, max_p, slope, intercept, mono_p, mono_bet)
 
-    @cleanup
+    @mpl_cleanup
     def test_roq_graph(self):
         """Test Rouquerol graph"""
 

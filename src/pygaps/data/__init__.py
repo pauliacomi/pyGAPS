@@ -50,13 +50,13 @@ def load_data():
 # switching back to a path based approach with the dictionary.
 
 # Locations for fitting kernels
-_kernel_res = importlib_resources_files('pygaps.data.kernels')
+_kernel_res = importlib_resources_files('pygaps.data') / "kernels"
 KERNELS = {
     'DFT-N2-77K-carbon-slit': _kernel_res / 'DFT-N2-77K-carbon-slit.csv',
 }
 
 # Locations for standard isotherms
-_stdiso_res = importlib_resources_files('pygaps.data.stdiso')
+_stdiso_res = importlib_resources_files('pygaps.data') / "stdiso"
 STANDARD_ISOTHERMS = {
     "SiO2_JKO": _stdiso_res / "LiChrospher Si-1000 silica.csv",
     "CB_KJG": _stdiso_res / "Cabot BP280 carbon black.csv",

@@ -23,11 +23,10 @@ class Quadratic(IsothermBaseModel):
     additional adsorbate molecules [#]_.
 
     The parameter :math:`K_a` can be interpreted as the Langmuir constant; the
-    strength of the adsorbate-adsorbate attractive forces is embedded in :math:`K_b`.
-    It is often useful in systems where the
-    energy of guest-guest interactions is actually higher than
-    the energy of adsorption, such as when adsorbing water
-    on a hydrophobic surface.
+    strength of the adsorbate-adsorbate attractive forces is embedded in
+    :math:`K_b`. It is often useful in systems where the energy of guest-guest
+    interactions is actually higher than the energy of adsorption, such as when
+    adsorbing water on a hydrophobic surface.
 
     References
     ----------

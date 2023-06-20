@@ -236,10 +236,10 @@ class IsothermBaseModel():
                   [self.param_bounds[p][1] for p in param_names]]
 
         if self.calculates == "loading":
-            fit_func_base = lambda p, l: self.loading(p) - l
+            fit_func_base = lambda pr, ld: self.loading(pr) - ld
             model_range = self.loading_range[1] - self.loading_range[0]
         elif self.calculates == "pressure":
-            fit_func_base = lambda p, l: self.pressure(l) - p
+            fit_func_base = lambda pr, ld: self.pressure(ld) - pr
             model_range = self.pressure_range[1] - self.pressure_range[0]
 
         def fit_func(x, pressure, loading):

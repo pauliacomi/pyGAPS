@@ -74,6 +74,7 @@ class TestAdsorbate():
         assert ads == 'Nitrogen'
 
     def test_adsorbate_formula(self):
+        """Check that formula is correctly latexed."""
         ads = pygaps.Adsorbate.find('N2')
         assert ads.formula == 'N_{2}'
         ads = pygaps.Adsorbate.find('D4')
@@ -91,15 +92,28 @@ class TestAdsorbate():
         basic_adsorbate.properties['backend_name'] = name
 
     def test_adsorbate_fallback(self):
+        """Check if fallback to properties dictionary works."""
         ads = pygaps.Adsorbate("test")
         ads.properties["molar_mass"] = 142
         assert ads.molar_mass() == 142
 
     @pytest.mark.parametrize('calculated', [True, False])
     def test_adsorbate_named_props(self, adsorbate_data, basic_adsorbate, calculated):
+        """Test all named properties, both calculated and not."""
         temp = 77.355
         assert basic_adsorbate.molar_mass(calculated) == pytest.approx(
             adsorbate_data.get('molar_mass'), 0.001
+        )
+        assert basic_adsorbate.t_triple(calculated
+                                        ) == pytest.approx(adsorbate_data.get('t_triple'), 0.001)
+        assert basic_adsorbate.p_triple(calculated) == pytest.approx(
+            adsorbate_data.get('p_triple') * 1e5, 0.001
+        )
+        assert basic_adsorbate.t_critical(calculated) == pytest.approx(
+            adsorbate_data.get('t_critical'), 0.001
+        )
+        assert basic_adsorbate.p_critical(calculated) == pytest.approx(
+            adsorbate_data.get('p_critical') * 1e5, 0.001
         )
         assert basic_adsorbate.saturation_pressure(temp, calculate=calculated) == pytest.approx(
             adsorbate_data.get('saturation_pressure'), 0.001
@@ -118,6 +132,7 @@ class TestAdsorbate():
         )
 
     def test_adsorbate_miss_named_props(self):
+        """Test warning/error if properties cannot be calculated + are missing."""
         temp = 77.355
         ads = pygaps.Adsorbate(name='temp')
         with warnings.catch_warnings():

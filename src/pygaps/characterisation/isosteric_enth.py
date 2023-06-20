@@ -16,9 +16,10 @@ def isosteric_enthalpy(
     verbose: bool = False,
 ):
     r"""
-    Calculate the isosteric enthalpy of adsorption using several isotherms
-    recorded at different temperatures on the same material and the
-    Clausius-Clapeyron equation.
+
+    Calculate the isosteric enthalpy of adsorption (in kJ/mol) by applying
+    Clausius-Clapeyron equation to several isotherms recorded at different
+    temperatures on the same material.
 
     Parameters
     ----------
@@ -40,7 +41,7 @@ def isosteric_enthalpy(
     result_dict : dict
         A dictionary with the isosteric enthalpies per loading, with the form:
 
-        - ``isosteric_enthalpy`` (array) : the isosteric enthalpy of adsorption in kj/mmol
+        - ``isosteric_enthalpy`` (array) : the isosteric enthalpy of adsorption in kJ/mol
         - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol
         - ``slopes`` (array) : the exact log(p) vs 1/T slope for each point
         - ``correlation`` (array) : correlation coefficient for each point

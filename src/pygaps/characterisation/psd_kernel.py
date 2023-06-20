@@ -365,13 +365,14 @@ def _load_kernel(path: str):
         raw_kernel = pandas.read_csv(fp, index_col=0)
 
     # add a 0 in the dataframe for interpolation between lowest values
-    raw_kernel = raw_kernel.append(
+    raw_kernel = pandas.concat([
         pandas.DataFrame(
-            [0 for col in raw_kernel.columns],
-            index=raw_kernel.columns,
-            columns=[0],
-        ).transpose()
-    )
+            [[0 for col in raw_kernel.columns]],
+            index=[0],
+            columns=raw_kernel.columns,
+        ),
+        raw_kernel,
+    ])
 
     kernel = {}
     for pore_size in raw_kernel:
