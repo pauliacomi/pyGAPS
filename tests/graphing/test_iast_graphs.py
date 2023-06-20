@@ -1,15 +1,16 @@
 """Tests IAST graphs."""
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 
 import pygaps.graphing.iast_graphs as graphing
+
+from ..test_utils import mpl_cleanup
 
 
 @pytest.mark.graphing
 class TestIASTGraphs():
     """Test all IAST graphs."""
-    @cleanup
+    @mpl_cleanup
     def test_svp_graph(self):
         """Test svp graph."""
 
@@ -17,11 +18,9 @@ class TestIASTGraphs():
         selectivity = [0.5, 0.5, 0.6, 0.6, 0.7, 0.8, 1.0]
         fraction = 0.3
 
-        graphing.plot_iast_svp(
-            pressure, selectivity, 'CO2', 'CH4', fraction, 'bar'
-        )
+        graphing.plot_iast_svp(pressure, selectivity, 'CO2', 'CH4', fraction, 'bar')
 
-    @cleanup
+    @mpl_cleanup
     def test_vle_graph(self):
         """Test vle graph."""
 

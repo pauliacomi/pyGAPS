@@ -280,7 +280,7 @@ def c_loading(
             _LOADING_MODE[_basis_to][_unit_to]
         )
 
-    elif unit_to and unit_from != unit_to:
+    if unit_to and unit_from != unit_to:
         return c_unit(_LOADING_MODE[basis_from], value, unit_from, unit_to)
 
     return value
@@ -332,8 +332,9 @@ def c_material(
     if basis_from != basis_to:
 
         if (basis_from in ['percent', 'fraction'] or basis_to in ['percent', 'fraction']):
-            ParameterError(
-                "If you want to convert to/from fraction/percent, convert using loading, not adsorbate."
+            raise ParameterError(
+                "If you want to convert to/from fraction/percent,"
+                " convert using loading, not adsorbate."
             )
 
         _check_unit(unit_to, _MATERIAL_MODE[basis_to], 'material')
@@ -369,7 +370,7 @@ def c_material(
             _MATERIAL_MODE[basis_to][unit_to]
         )
 
-    elif unit_to and unit_from != unit_to:
+    if unit_to and unit_from != unit_to:
         return c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to, sign=-1)
 
     return value

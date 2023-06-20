@@ -17,12 +17,12 @@ the /.conftest file together with the other isotherm parameters.
 
 import numpy as np
 import pytest
-from matplotlib.testing.decorators import cleanup
 
 import pygaps.characterisation.psd_meso as pmes
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
@@ -78,7 +78,7 @@ class TestPSDMeso():
                 principal_peak, sample['psd_meso_pore_size'], err_relative, err_absolute
             )
 
-    @cleanup
+    @mpl_cleanup
     def test_psd_meso_verbose(self):
         """Test verbosity."""
         sample = DATA['MCM-41']

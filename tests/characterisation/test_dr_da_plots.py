@@ -13,13 +13,13 @@ All pre-calculated data for characterisation can be found in the
 """
 
 import pytest
-from matplotlib.testing.decorators import cleanup
 from numpy import isclose
 
 import pygaps.characterisation.dr_da_plots as drda
 import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
@@ -86,7 +86,7 @@ class TestDAPlot():
             assert isclose(da_vol, sample['da_volume'], err_relative, err_absolute)
             assert isclose(da_pot, sample['da_potential'], err_relative, err_absolute)
 
-    @cleanup
+    @mpl_cleanup
     def test_da_output(self):
         """Test verbosity."""
         sample = DATA['Takeda 5A']

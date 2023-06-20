@@ -17,12 +17,12 @@ All pre-calculated data for characterisation can be found in the
 
 import numpy as np
 import pytest
-from matplotlib.testing.decorators import cleanup
 
 import pygaps.characterisation.psd_kernel as psdk
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
@@ -67,7 +67,7 @@ class TestPSDKernel():
                 principal_peak, sample['psd_micro_pore_size'], err_relative, err_absolute
             )
 
-    @cleanup
+    @mpl_cleanup
     def test_psd_dft_verbose(self):
         """Test verbosity."""
         sample = DATA['MCM-41']

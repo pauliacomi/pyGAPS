@@ -1,13 +1,13 @@
 data_data_raw2aifv005
-_audit_aif_version 1.0
+_audit_aif_version 'd546195'
 _exptl_operator 'single gas'
 _exptl_date 2019-08-19T00:00:00
 _exptl_instrument 'BEL VC-05'
 _exptl_adsorptive C2H6
 _exptl_temperature 298.15
-_exptl_sample_mass 0.817
-_sample_id '[Zn2(tm-bdc)2(dabco)]'
-_sample_material_id 'DMOF'
+_adsnt_sample_mass 0.817
+_adsnt_sample_id '[Zn2(tm-bdc)2(dabco)]'
+_adsnt_material_id 'DMOF'
 _units_temperature K
 _units_pressure kPa
 _units_mass g

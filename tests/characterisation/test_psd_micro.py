@@ -17,13 +17,13 @@ All pre-calculated data for characterisation can be found in the
 
 import numpy as np
 import pytest
-from matplotlib.testing.decorators import cleanup
 
 import pygaps.characterisation.psd_micro as pmic
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 from pygaps.characterisation.models_hk import PROPERTIES_CARBON
 
+from ..test_utils import mpl_cleanup
 from .conftest import DATA
 from .conftest import DATA_N77_PATH
 
@@ -67,9 +67,7 @@ class TestPSDMicro():
         km_mat = 4.91E-13
 
         assert np.isclose(pmic._kirkwood_muller_dispersion_ads(1, 1), km_ads)
-        assert np.isclose(
-            pmic._kirkwood_muller_dispersion_mat(1, 1, 2, 2), km_mat
-        )
+        assert np.isclose(pmic._kirkwood_muller_dispersion_mat(1, 1, 2, 2), km_mat)
         {'polarizability': 1, 'magnetic_susceptibility': 1}
 
         disp_dict = pmic._dispersion_from_dict({
@@ -85,13 +83,11 @@ class TestPSDMicro():
     def test_psd_micro_solvers(self):
         """Check the HK and HK-CY solvers"""
 
-        assert np.isclose(
-            pmic._solve_hk([1], lambda x: np.log(x), 0.5, 1)[0], 1
-        )
+        assert np.isclose(pmic._solve_hk([1], lambda x: np.log(x), 0.5, 1)[0], 1)
 
         assert np.isclose(
-            pmic._solve_hk_cy([1.463017], np.array([0.5, 1]),
-                              lambda x: np.log(x), 0.5, 1)[0], 1, 0.001
+            pmic._solve_hk_cy([1.463017], np.array([0.5, 1]), lambda x: np.log(x), 0.5, 1)[0], 1,
+            0.001
         )
 
     def test_psd_micro_hk(self):
@@ -101,15 +97,9 @@ class TestPSDMicro():
         y = [1, 2]
 
         pmic.psd_horvath_kawazoe(x, y, 77, 'slit', N2_PROPS, PROPERTIES_CARBON)
-        pmic.psd_horvath_kawazoe(
-            x, x, 77, 'cylinder', N2_PROPS, PROPERTIES_CARBON
-        )
-        pmic.psd_horvath_kawazoe(
-            x, x, 77, 'sphere', N2_PROPS, PROPERTIES_CARBON
-        )
-        pmic.psd_horvath_kawazoe(
-            x, x, 77, 'slit', N2_PROPS, PROPERTIES_CARBON, use_cy=True
-        )
+        pmic.psd_horvath_kawazoe(x, x, 77, 'cylinder', N2_PROPS, PROPERTIES_CARBON)
+        pmic.psd_horvath_kawazoe(x, x, 77, 'sphere', N2_PROPS, PROPERTIES_CARBON)
+        pmic.psd_horvath_kawazoe(x, x, 77, 'slit', N2_PROPS, PROPERTIES_CARBON, use_cy=True)
 
     def test_psd_micro_ry(self):
         """Test H-K psd model with blank arrays"""
@@ -117,20 +107,12 @@ class TestPSDMicro():
         x = [0.001, 0.002]
         y = [1, 2]
 
-        pmic.psd_horvath_kawazoe_ry(
-            x, y, 77, 'slit', N2_PROPS, PROPERTIES_CARBON
-        )
-        pmic.psd_horvath_kawazoe_ry(
-            x, x, 77, 'cylinder', N2_PROPS, PROPERTIES_CARBON
-        )
+        pmic.psd_horvath_kawazoe_ry(x, y, 77, 'slit', N2_PROPS, PROPERTIES_CARBON)
+        pmic.psd_horvath_kawazoe_ry(x, x, 77, 'cylinder', N2_PROPS, PROPERTIES_CARBON)
 
-        pmic.psd_horvath_kawazoe_ry(
-            x, x, 77, 'sphere', N2_PROPS, PROPERTIES_CARBON
-        )
+        pmic.psd_horvath_kawazoe_ry(x, x, 77, 'sphere', N2_PROPS, PROPERTIES_CARBON)
 
-        pmic.psd_horvath_kawazoe_ry(
-            x, x, 77, 'slit', N2_PROPS, PROPERTIES_CARBON, use_cy=True
-        )
+        pmic.psd_horvath_kawazoe_ry(x, x, 77, 'slit', N2_PROPS, PROPERTIES_CARBON, use_cy=True)
 
     @pytest.mark.parametrize('sample', [sample for sample in DATA])
     def test_psd_micro(self, sample):
@@ -142,13 +124,10 @@ class TestPSDMicro():
             filepath = DATA_N77_PATH / sample['file']
             isotherm = pgp.isotherm_from_json(filepath)
 
-            result_dict = pmic.psd_microporous(
-                isotherm, psd_model='HK', pore_geometry='slit'
-            )
+            result_dict = pmic.psd_microporous(isotherm, psd_model='HK', pore_geometry='slit')
 
             loc = np.where(
-                result_dict['pore_distribution'] ==
-                max(result_dict['pore_distribution'])
+                result_dict['pore_distribution'] == max(result_dict['pore_distribution'])
             )
             principal_peak = result_dict['pore_widths'][loc]
 
@@ -156,11 +135,10 @@ class TestPSDMicro():
             err_absolute = 0.01  # 0.01
 
             assert np.isclose(
-                principal_peak, sample['psd_micro_pore_size'], err_relative,
-                err_absolute
+                principal_peak, sample['psd_micro_pore_size'], err_relative, err_absolute
             )
 
-    @cleanup
+    @mpl_cleanup
     def test_psd_micro_verbose(self):
         """Test verbosity."""
         sample = DATA['MCM-41']
