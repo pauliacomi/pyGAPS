@@ -2,10 +2,18 @@
 Changelog
 =========
 
-4.5.0 (2023-XX-XX)
+4.5.0 (2023-06-20)
 
+* Added a new function that calculates the enthalpy of adsorption using a method
+  proposed by Whittaker et al in `pygaps.characterisation.enth_sorp_whittaker`.
+  Thanks to L Scott Blankenship for contribution!
+* Updated AIF parser to latest version. Thanks to Jack Evans for contribution.
+* Refactored DR/DA calculations.
 * Docs updating to fix issue #42
-* Refactor DR/DA calculations
+* Added data types to excel output parsing to fix edge cases where these were not
+  correctly parsed.
+* Testing correctly on Python 3.11.
+* Fixed various accumulating issues and bugs and deprecations.
 
 4.4.0 (2022-09-03)
 ------------------

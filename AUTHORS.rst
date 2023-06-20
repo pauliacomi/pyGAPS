@@ -7,6 +7,7 @@ Authors
 - Bastien Aillet - BET surface area functionality
 - Chris Murdock - originally coded Micromeritics report import functionality
 - L\. Scott Blankenship - implementing Whittaker method for isosteric enthalpy of adsorption
+- Jack Evans - contributions towards AIF parsing
 
 Contributors
 ============
