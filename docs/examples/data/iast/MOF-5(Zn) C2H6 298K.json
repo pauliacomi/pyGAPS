@@ -1,0 +1,96 @@
+{
+    "file_version": "3.0",
+    "adsorbate": "ethane",
+    "material_basis": "mass",
+    "material_unit": "g",
+    "iso_type": "Isotherm",
+    "isotherm_data": [
+        {
+            "loading": 0.000176173692101,
+            "pressure": 0.0001
+        },
+        {
+            "loading": 0.00180283372211,
+            "pressure": 0.001
+        },
+        {
+            "loading": 0.0176802507036,
+            "pressure": 0.01
+        },
+        {
+            "loading": 0.180894607699,
+            "pressure": 0.1
+        },
+        {
+            "loading": 0.372260480758,
+            "pressure": 0.2
+        },
+        {
+            "loading": 0.562033846454,
+            "pressure": 0.3
+        },
+        {
+            "loading": 0.768816271847,
+            "pressure": 0.4
+        },
+        {
+            "loading": 0.976064911567,
+            "pressure": 0.5
+        },
+        {
+            "loading": 1.54230166145,
+            "pressure": 0.75
+        },
+        {
+            "loading": 2.16626474485,
+            "pressure": 1.0
+        },
+        {
+            "loading": 8.78564731563,
+            "pressure": 3.0
+        },
+        {
+            "loading": 13.0828059096,
+            "pressure": 5.0
+        },
+        {
+            "loading": 14.9247011914,
+            "pressure": 7.0
+        },
+        {
+            "loading": 16.273309735,
+            "pressure": 10.0
+        },
+        {
+            "loading": 17.4436405299,
+            "pressure": 15.0
+        },
+        {
+            "loading": 18.1453141011,
+            "pressure": 20.0
+        },
+        {
+            "loading": 19.0177650568,
+            "pressure": 30.0
+        },
+        {
+            "loading": 19.4477205374,
+            "pressure": 40.0
+        },
+        {
+            "loading": 19.8850632905,
+            "pressure": 50.0
+        }
+    ],
+    "lab": "MADIREL",
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
+    "material": "MOF-5(Zn)",
+    "material_batch": "Test",
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "activation_temperature": 150.0,
+    "temperature": 298.0,
+    "temperature_unit": "K",
+    "user": "PI"
+}

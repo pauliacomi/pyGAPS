@@ -4,13 +4,17 @@ kernel. Please note that calculation of DFT/NLDFT/QSDFT kernels is outside the
 scope of this program.
 """
 
+from typing import TYPE_CHECKING
+
 import numpy
 import pandas
 from scipy import interpolate
 from scipy import optimize
 
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.core.pointisotherm import PointIsotherm
+if TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+    from pygaps.core.pointisotherm import PointIsotherm
+
 from pygaps.data import KERNELS
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError

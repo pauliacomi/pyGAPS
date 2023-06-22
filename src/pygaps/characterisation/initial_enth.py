@@ -1,12 +1,16 @@
 """Module calculating the initial enthalpy of adsorption."""
 
+from typing import TYPE_CHECKING
+
 import numpy
 from scipy import optimize
 
+if TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+    from pygaps.core.pointisotherm import PointIsotherm
+
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 

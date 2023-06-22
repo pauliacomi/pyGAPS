@@ -112,7 +112,7 @@ def iast_binary_vle(
             ax=ax
         )
 
-    return dict(x=x_data, y=y_data)
+    return {"x": x_data, "y": y_data}
 
 
 def iast_binary_svp(
@@ -207,10 +207,10 @@ def iast_binary_svp(
             ax=ax
         )
 
-    return dict(
-        pressure=pressures,
-        selectivity=selectivities,
-    )
+    return {
+        "pressure": pressures,
+        "selectivity": selectivities,
+    }
 
 
 def iast_point_fraction(

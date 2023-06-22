@@ -197,4 +197,3 @@ def enthalpy_sorption_whittaker_raw(
     not using yet, placeholder for function that may be helpful for DSLangmuir
     version.
     """
-    pass

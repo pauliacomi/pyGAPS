@@ -624,15 +624,15 @@ class PointIsotherm(BaseIsotherm):
         axes : matplotlib.axes.Axes or numpy.ndarray of them
 
         """
-        plot_dict = dict(
-            y2_data=self.other_keys[0] if self.other_keys else None,
-            material_basis=self.material_basis,
-            material_unit=self.material_unit,
-            loading_basis=self.loading_basis,
-            loading_unit=self.loading_unit,
-            pressure_unit=self.pressure_unit,
-            pressure_mode=self.pressure_mode,
-        )
+        plot_dict = {
+            "y2_data": self.other_keys[0] if self.other_keys else None,
+            "material_basis": self.material_basis,
+            "material_unit": self.material_unit,
+            "loading_basis": self.loading_basis,
+            "loading_unit": self.loading_unit,
+            "pressure_unit": self.pressure_unit,
+            "pressure_mode": self.pressure_mode,
+        }
         plot_dict.update(plot_iso_args)
 
         from pygaps.graphing.isotherm_graphs import plot_iso

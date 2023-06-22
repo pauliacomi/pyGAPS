@@ -169,7 +169,7 @@ class Virial(IsothermBaseModel):
             logger.info(f"Attempting to model using {self.name}")
 
         # parameter names (cannot rely on order in Dict)
-        param_names = [param for param in self.params]
+        param_names = list(self.params)
         guess = numpy.array([param_guess[param] for param in param_names])
         bounds = [[self.param_bounds[param][0] for param in param_names],
                   [self.param_bounds[param][1] for param in param_names]]
@@ -214,14 +214,14 @@ class Virial(IsothermBaseModel):
             return self.params['C'] * L**3 + self.params['B'] * L**2 \
                 + self.params['A'] * L - numpy.log(self.params['K']) - ln_p_over_n
 
-        kwargs = dict(
-            fun=fit_func,  # fitting function
-            x0=guess,  # initial guess
-            bounds=bounds,  # bounds of the parameters
-            args=(loading, ln_p_over_n),  # extra arguments to the fit function
-            # loss='huber',                     # use a loss function against outliers
-            # f_scale=0.1,                      # scale of outliers
-        )
+        kwargs = {
+            "fun": fit_func,  # fitting function
+            "x0": guess,  # initial guess
+            "bounds": bounds,  # bounds of the parameters
+            "args": (loading, ln_p_over_n),  # extra arguments to the fit function
+            # "loss": 'huber',                     # use a loss function against outliers
+            # "f_scale": 0.1,                      # scale of outliers
+        }
         if optimization_params:
             kwargs.update(optimization_params)
 

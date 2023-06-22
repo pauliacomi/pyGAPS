@@ -49,25 +49,30 @@ To set up `pyGAPS` for local development:
 
 2. Clone your fork locally::
 
-    git clone git@github.com:your_name_here/pygaps.git
+    git clone https://github.com/YOURNAMEHERE/pyGAPS
 
-3. Create a branch for local development::
+3. Install the package in editable mode with its dev requirements::
+
+    pip install -e .[dev,docs]
+
+4. Create a branch for local development. This project uses the
+   `GIT FLOW <https://www.gitkraken.com/learn/git/git-flow>`_ model::
 
     git checkout -b name-of-your-bugfix-or-feature
 
    Now you can make your changes locally.
 
-4. When you're done making changes, run all the tests::
+5. When you're done making changes, run all the tests::
 
     pytest
 
-5. Commit your changes and push your branch to GitHub::
+6. Commit your changes and push your branch to GitHub::
 
     git add .
     git commit -m "Your detailed description of your changes."
     git push origin name-of-your-bugfix-or-feature
 
-6. Submit a pull request through the GitHub website. Testing on all environments
+7. Submit a pull request through the GitHub website. Testing on all environments
    will be automatically performed.
 
 Pull Request Guidelines

@@ -19,7 +19,6 @@ git push --tags
 
 # Check CI if project has been successfully pushed to pypi
 
-
 # Useful for VSCode debugging
 
 Configuration for debugging

@@ -91,8 +91,8 @@ def initial_henry_slope(
         if henry.rmse > max_adjrms and rows_taken != 2:
             rows_taken = rows_taken - 1
             continue
-        else:
-            break
+
+        break
 
     if verbose:
         logger.info(f"Calculated K = {henry.params['K']:.4g}")
