@@ -26,48 +26,48 @@ from pygaps.parsing import _PARSER_PRECISION
 from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.string_utilities import cast_string
 
-_parser_version = "d546195"
+_aif_version = "d546195"
 
 _META_DICT = {
     '_exptl_temperature': {
         'text': 'temperature',
-        'type': float
+        'type': float,
     },
     '_exptl_adsorptive': {
         'text': 'adsorbate',
-        'type': str
-    },
-    '_adsnt_material_id': {
-        'text': 'material',
-        'type': str
+        'type': str,
     },
     '_exptl_operator': {
         'text': 'user',
-        'type': str
+        'type': str,
     },
     '_exptl_date': {
         'text': 'date',
-        'type': str
+        'type': str,
     },
     '_exptl_instrument': {
         'text': 'instrument',
-        'type': str
+        'type': str,
     },
     '_adsnt_sample_mass': {
         'text': 'material_mass',
-        'type': float
+        'type': float,
     },
     '_units_mass': {
         'text': 'material_mass_unit',
-        'type': str
+        'type': str,
+    },
+    '_adsnt_material_id': {
+        'text': 'material',
+        'type': str,
     },
     '_adsnt_degas_temperature': {
         'text': 'activation_temperature',
-        'type': float
+        'type': float,
     },
     '_adsnt_sample_id': {
         'text': 'material_batch',
-        'type': str
+        'type': str,
     },
 }
 _DATA_DICT = {
@@ -146,7 +146,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
     block = aif.sole_block()
 
     # write metadata
-    block.set_pair('_audit_aif_version', _parser_version)
+    block.set_pair('_audit_aif_version', _aif_version)
     block.set_pair('_audit_creation_method', 'pyGAPS')
 
     # required pygaps data
@@ -260,9 +260,9 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
     # read version
     version = block.find_value('_audit_aif_version')
     try_other_version = False
-    if not version or version.strip("'") != (_parser_version):
+    if not version or version.strip("'") != _aif_version:
         logger.warning(
-            f"The file version is {version} while the parser uses version {_parser_version}. "
+            f"The file aif version is {version} while the parser uses version {_aif_version}. "
             "Strange things might happen, so double check your data."
         )
         try_other_version = True
