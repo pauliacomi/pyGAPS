@@ -37,6 +37,10 @@ disable = [
 convention = "numpy"
 match-dir = "src\\/.*"
 
+# analysis: pyright
+[tool.pyright]
+
+
 # formatting: yapf
 [tool.yapf]
 based_on_style = "pep8"
