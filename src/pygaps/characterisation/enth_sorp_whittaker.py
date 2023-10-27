@@ -60,25 +60,25 @@ def enthalpy_sorption_whittaker(
 
     .. math::
 
-        \Delta H_{st} = \Delta \lambda + \H_{vap} + RT
+        \Delta H_{st} = \Delta \lambda + \Delta H_{vap} + RT
 
     Where :math:`\Delta \lambda` is the adsorption potential, and
-    :math:`\H_{vap}` is the latent heat of the liquid-vapour change at
+    :math:`\Delta H_{vap}` is the latent heat of the liquid-vapour change at
     equilibrium pressure.
 
-    For loadings below the triple point pressure, :math:`\H_{vap}` is meaningless.
-    In this case, :math:`\H_{vap}` is estimated as that at the triple point.
+    For loadings below the triple point pressure, :math:`\Delta H_{vap}` is meaningless.
+    In this case, :math:`\Delta H_{vap}` is estimated as that at the triple point.
 
     Whittaker determined :math:`\Delta \lambda` as:
 
     .. math::
 
-        \Delta \lambda = RT \ln{\left[\left(\frac{p^0}{b^{1/t}}\right)\left(\frac{\Theta^{t}}{1-\Theta^{t}}\right) \right]}
+        \Delta \lambda = RT \ln{\left[\left(\frac{p^0}{b^{1/t}}\right)\left(\frac{\theta^{t}}{1-\theta^{t}}\right) \right]}
 
-    Where :math:`p^0` is the saturation pressure, :math:`\Theta` is the
+    Where :math:`p^0` is the saturation pressure, :math:`\theta` is the
     fractional coverage, and :math:`b` is derived from the equilibrium constant,
     :math:`K` as :math:`b = \frac{1}{K^t}`. In the case that the adsorptive is
-    above is supercritical, the pseudo saturation pressure is used;
+    supercritical, the pseudo saturation pressure is used;
     :math:`p^0 = p_c \left(\frac{T}{T_c}\right)^2`.
 
     The exponent :math:`t` is only relevant to the Toth version of the method,
@@ -182,7 +182,7 @@ def enthalpy_sorption_whittaker(
     return {
         'loading': loading_final,
         'enthalpy_sorption': whittaker_enth,
-        'model_params': isotherm.model.params,
+        'model_isotherm': isotherm,
     }
 
 
