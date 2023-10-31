@@ -11,6 +11,9 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
+# need CP model
+models = ['toth', 'langmuir', 'dslangmuir', 'tslangmuir']
+
 
 def enthalpy_sorption_whittaker(
     isotherm: "BaseIsotherm",
@@ -73,7 +76,8 @@ def enthalpy_sorption_whittaker(
 
     .. math::
 
-        \Delta \lambda = RT \ln{\left[\left(\frac{p^0}{b^{1/t}}\right)\left(\frac{\theta^{t}}{1-\theta^{t}}\right) \right]}
+        \Delta \lambda = RT
+        \ln{\left[\left(\frac{p^0}{b^{1/t}}\right)\left(\frac{\theta^{t}}{1-\theta^{t}}\right)^{\frac{1-t}{t}} \right]}
 
     Where :math:`p^0` is the saturation pressure, :math:`\theta` is the
     fractional coverage, and :math:`b` is derived from the equilibrium constant,
@@ -110,22 +114,25 @@ def enthalpy_sorption_whittaker(
             verbose=verbose,
         )
 
-    if model.lower() not in ['langmuir', 'toth']:
-        raise ParameterError('''Whittaker method requires modelling with either Langmuir or Toth''')
+    if model.lower() not in models:
+        raise ParameterError(
+            '''Whittaker method requires modelling with either Langmuir or Toth'''
+        )
 
     if loading is None:
-        loading = np.linspace(isotherm.model.loading_range[0], isotherm.model.loading_range[1], 100)
+        loading = np.linspace(
+            isotherm.model.loading_range[0], isotherm.model.loading_range[1],
+            100
+        )
 
     # Local constants and model parameters
     T = isotherm.temperature
-    RT = scipy.constants.R * T
-    n_m = isotherm.model.params['n_m']
-    K = isotherm.model.params['K']
-    if isotherm.model.name == 'Langmuir':
-        t = 1
+    n_m_list = [v for k, v in isotherm.model.params.items() if 'n_m' in k]
+    K_list = [v for k, v in isotherm.model.params.items() if 'K' in k]
+    if isotherm.model.name == 'Toth':
+        t_list = [v for k, v in isotherm.model.params.items() if 't' in k]
     else:
-        t = isotherm.model.params['t']  # equivalent to m in Whittaker
-    b = 1 / (K**t)
+        t_list = [1 for i in range(len(K_list))]
 
     # Critical, triple and saturation pressure
     p_c = isotherm.adsorbate.p_critical()
@@ -141,60 +148,74 @@ def enthalpy_sorption_whittaker(
         T_c = isotherm.adsorbate.t_critical()
         p_sat = p_c * ((T / T_c)**2)
 
-    loading_final = []
-    whittaker_enth = []
-
-    first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
-    for n in loading:
-        if n == 0:
-            continue
-
-        p = isotherm.pressure_at(n, pressure_unit='Pa')
-        # check that it is possible to calculate h_vap
-        if np.isnan(p) or p < 0 or p > p_c or p > p_sat:
-            continue
-
-        # Cap pressure for h_vap determination to the triple point pressure
-        p = max(p, p_t)
-
-        # equation requires enthalpies in J
-        h_vap = isotherm.adsorbate.enthalpy_vaporisation(press=p, ) * 1000
-
-        theta = n / n_m  # second bracket of d_lambda
-        theta_t = theta**t
-        second_bracket = (theta_t / (1 - theta_t))**((t - 1) / t)
-        d_lambda = RT * np.log(first_bracket * second_bracket)
-
-        h_st = d_lambda + h_vap + RT
-
-        loading_final.append(n)
-        whittaker_enth.append(h_st / 1000)  # return enthalpies to kJ
+    pressure = [isotherm.pressure_at(n) for n in loading]
+    whitt = enthalpy_sorption_whittaker_raw(
+        pressure, loading,
+        p_sat, p_c, p_t,
+        K_list, n_m_list, t_list,
+        isotherm.temperature, isotherm.adsorbate,
+    )
 
     if verbose:
         from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
         isosteric_enthalpy_plot(
-            loading_final,
-            whittaker_enth,
-            [0 for n in loading_final],
+            whitt['loading'],
+            whitt['enthalpy'],
+            [0 for n in whitt['loading']],
             isotherm.units,
         )
 
     return {
-        'loading': loading_final,
-        'enthalpy_sorption': whittaker_enth,
+        'loading': whitt['loading'],
+        'enthalpy_sorption': whitt['enthalpy'],
         'model_isotherm': isotherm,
     }
 
 
 def enthalpy_sorption_whittaker_raw(
-    p: float = None,
+    pressure: list[float] = None,
+    loading: list[float] = None,
     p_sat: float = None,
-    K: float = None,
-    n: float = None,
-    n_m: float = None,
+    p_c: float = None,
+    p_t: float = None,
+    K_list: list[float] = None,
+    n_m_list: list[float] = None,
+    t_list: list[float] = None,
+    T: float = None,
+    adsorbate = None,
 ):
     """
     not using yet, placeholder for function that may be helpful for DSLangmuir
     version.
     """
-    pass
+    if not (
+        len(K_list) == len(n_m_list) == len(t_list)
+    ):
+        raise ParameterError('''Different length parameter lists''')
+
+    RT = scipy.constants.R * T
+    # calculation not yet correct.
+    log_bracket = []
+    for K, t, n_m in zip(K_list, t_list, n_m_list):
+        theta_t = [(n/n_m)**t for n in loading]
+        theta_bracket = [
+            np.log(
+                p_sat * K * ((tt)/ (1-tt))**((t-1)/t)
+            ) for tt in theta_t
+        ]
+        log_bracket.append(theta_bracket)
+    d_lambda = [RT * sum(x) for x in zip(*log_bracket)]
+
+    h_vap = []
+    for p in pressure:
+        if np.isnan(p) or p < 0 or p > p_c or p > p_sat:
+            h_vap.append(np.NAN)
+            continue
+        p = max(p, p_t)
+        h_vap.append(adsorbate.enthalpy_vaporisation(press=p, ) * 1000)
+
+    enthalpy = [(x + y + RT) / 1000 for x, y in zip(d_lambda, h_vap)]
+    return {
+        'loading': loading,
+        'enthalpy': enthalpy
+    }
