@@ -11,7 +11,7 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
-models = [
+_WHITTAKER_MODELS = [
     'toth', 'langmuir', 'dslangmuir', 'tslangmuir',
     'dstoth', 'chemiphysisorption',
 ]
@@ -116,9 +116,10 @@ def enthalpy_sorption_whittaker(
             verbose=verbose,
         )
 
-    if model.lower() not in models:
+    if model.lower() not in _WHITTAKER_MODELS:
         raise ParameterError(
-            f'''Whittaker method requires modelling with one of {models}.'''
+            f'''Whittaker method requires modelling with one of ''',
+            *_WHITTAKER_MODELS
         )
 
     if loading is None:
@@ -131,8 +132,11 @@ def enthalpy_sorption_whittaker(
     T = isotherm.temperature
     n_m_list = [v for k, v in isotherm.model.params.items() if 'n_m' in k]
     K_list = [v for k, v in isotherm.model.params.items() if 'K' in k]
-    if any('t' in k for k in isotherm.model.params.keys()):
+    #if any('t' in k for k in isotherm.model.params.keys()):
+    if model in ['dstoth', 'toth', 'chemiphysisorption']:
         t_list = [v for k, v in isotherm.model.params.items() if 't' in k]
+        if model == 'chemiphysisorption':
+            t_list.append(1)
     else:
         t_list = [1 for i in range(len(K_list))]
 
@@ -144,7 +148,7 @@ def enthalpy_sorption_whittaker(
     except CalculationError:
         logger.warning(
             f"{isotherm.adsorbate} does not have a saturation pressure "
-            f"at {isotherm.temperature} K. Calculating pseudo-saturation "
+            f"at {T} K. Calculating pseudo-saturation "
             f"pressure..."
         )
         T_c = isotherm.adsorbate.t_critical()
@@ -155,7 +159,7 @@ def enthalpy_sorption_whittaker(
         pressure, loading,
         p_sat, p_c, p_t,
         K_list, n_m_list, t_list,
-        isotherm.temperature, isotherm.adsorbate,
+        T, isotherm.adsorbate,
     )
 
     if verbose:
@@ -193,6 +197,9 @@ def enthalpy_sorption_whittaker_raw(
     if not (
         len(K_list) == len(n_m_list) == len(t_list)
     ):
+        print(K_list)
+        print(n_m_list)
+        print(t_list)
         raise ParameterError('''Different length parameter lists''')
 
     RT = scipy.constants.R * T

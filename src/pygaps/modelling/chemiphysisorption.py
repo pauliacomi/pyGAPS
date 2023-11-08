@@ -55,7 +55,7 @@ class ChemiPhysisorption(IsothermBaseModel):
     calculates = 'loading'
     param_names = (
         "n_m1", "K1", "t1",
-        "n_m2", "K2", "eta",
+        "n_m2", "K2", "kin",
     )
     param_default_bounds = (
         (0., numpy.inf),
@@ -85,10 +85,10 @@ class ChemiPhysisorption(IsothermBaseModel):
         K1p = self.params["K1"] * pressure
         K2p = self.params["K2"] * pressure
         t1 = self.params["t1"]
-        eta = self.params["eta"]
+        kin = self.params["kin"]
         return (
             (n_m1 * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
-            ((n_m2 * K2p / (1.0 + K2p))*eta)
+            ((n_m2 * K2p / (1.0 + K2p))*kin)
         )
 
     def pressure(self, loading):
@@ -167,7 +167,7 @@ class ChemiPhysisorption(IsothermBaseModel):
             "n_m2": 0.5 * saturation_loading,
             "K2": 0.6 * langmuir_k,
             "t1": 1,
-            "eta": 1,
+            "kin": 1,
         }
         guess = self.initial_guess_bounds(guess)
         return guess
