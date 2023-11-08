@@ -11,7 +11,10 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
-models = ['toth', 'langmuir', 'dslangmuir', 'tslangmuir', 'dstoth']
+models = [
+    'toth', 'langmuir', 'dslangmuir', 'tslangmuir',
+    'dstoth', 'chemiphysisorption',
+]
 
 
 def enthalpy_sorption_whittaker(
@@ -128,7 +131,7 @@ def enthalpy_sorption_whittaker(
     T = isotherm.temperature
     n_m_list = [v for k, v in isotherm.model.params.items() if 'n_m' in k]
     K_list = [v for k, v in isotherm.model.params.items() if 'K' in k]
-    if isotherm.model.name == 'Toth':
+    if any('t' in k for k in isotherm.model.params.keys()):
         t_list = [v for k, v in isotherm.model.params.items() if 't' in k]
     else:
         t_list = [1 for i in range(len(K_list))]

@@ -28,6 +28,7 @@ _MODELS = [
     "Virial",
     "Toth",
     "DSToth",
+    "ChemiPhysisorption",
     "JensenSeaton",
     "FHVST",
     "WVST",

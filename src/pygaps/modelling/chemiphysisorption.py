@@ -1,58 +1,61 @@
-"""Double Site Toth isotherm model."""
+"""ChemiPhysisorption (CP) isotherm model."""
 
 import numpy
-from scipy import optimize, integrate
+from scipy import optimize, integrate, constants
 
 from pygaps.modelling.base_model import IsothermBaseModel
 from pygaps.utilities.exceptions import CalculationError
 
+R = constants.gas_constant
 
-class DSToth(IsothermBaseModel):
+
+class ChemiPhysisorption(IsothermBaseModel):
     r"""
-    Dual-site Toth adsorption isotherm.
+    ChemiPhysisorption isotherm model.
 
     .. math::
 
-        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}
+        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
+        \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})
 
     Notes
     -----
-    An extension to the Toth model to consider two adsorption sites, with
-    different monolayer capacities, affinities, and exponents[#]_. This was
-    first proposed by Serna-Guerrero, Balmabkhout, and Sayari to model ambient
-    temperature CO_2 isotherms up to 20 bar, with the two sites representing
-    chemical and physical adsorption, respectively[#]_.
+    A recently (2023) proposed model by the Petit group. It is an adaptation of
+    the Dual-Site Toth model, and can be distinguished by the fact that the
+    exponent (t) is 1 for the chemisorption portion (i.e. it is a Langmuir
+    isotherm)[#]_. Further, the model assumes that at a given activation
+    energy, E_a, molecules will have sufficient energy to take part in
+    chemisorption, thus the chemisorption term is multiplied by a term
+    including E_a.
 
     .. math::
+        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
+        \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})
 
-        n(p) = \sum_i n_{m_i} \frac{K_i p}{\sqrt[t_i]{1+(K_i p)**{t_i}}}
-
-    In practice, thus far only two adsorption sites (chemical and physical
-    adsorption) are considered.
+    This final teerm is simplified for ease;
 
     .. math::
-        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}
+        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
+        \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \eta
 
-    In Serna-Guerrero et al.'s original work, the physical part of the
-    equation is determined by measurement of a CO_2 isotherm on an adsorbent
-    which should be expected to have no chemical adsorption component. It
-    nonetheless appears to give a good fit to CO_2 isotherms when each of the
-    sites are determined independently.
+    This, of course has the additional advantage of allowing the calculation of
+    the activation energy, E_a.
 
     References
     ----------
-    .. [#] Serna-Guerrero, R., Belmabkhout, Y., & Sayari, A. (2010). Modeling
-    CO2 adsorption on amine-functionalized mesoporous silica: 1. A
-    semi-empirical equilibrium model. Chemical Engineering Journal, 161(1-2), 173-181. 
+    .. [#] Low, M-Y A.; Danaci, D.; Azzan, H.; Woodward, R. T.; Petit, C.
+    (2023). Measurement of Physicochemical Properties and CO2, N2, Ar, O2 and
+    H2O Unary Adsorption Isotherms of Purolite A110 and Lewatit VP OC 1065 for
+    Application in Direct Air Capture. J. Chem. Eng. Data.
     """
 
     # Model parameters
-    name = 'DSToth'
-    formula = r"n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}"
+    name = 'ChemiPhysisorption'
+    formula = r"n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \eta"
     calculates = 'loading'
     param_names = (
         "n_m1", "K1", "t1",
-        "n_m2", "K2", "t2"
+        "n_m2", "K2", "eta",
     )
     param_default_bounds = (
         (0., numpy.inf),
@@ -81,11 +84,11 @@ class DSToth(IsothermBaseModel):
         n_m2 = self.params['n_m2']
         K1p = self.params["K1"] * pressure
         K2p = self.params["K2"] * pressure
-        t1 = self.params['t1']
-        t2 = self.params['t2']
+        t1 = self.params["t1"]
+        eta = self.params["eta"]
         return (
             (n_m1 * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
-            (n_m2 * K2p / (1.0 + (K2p)**t2)**(1 / t2))
+            ((n_m2 * K2p / (1.0 + K2p))*eta)
         )
 
     def pressure(self, loading):
@@ -164,7 +167,7 @@ class DSToth(IsothermBaseModel):
             "n_m2": 0.5 * saturation_loading,
             "K2": 0.6 * langmuir_k,
             "t1": 1,
-            "t2": 1,
+            "eta": 1,
         }
         guess = self.initial_guess_bounds(guess)
         return guess
