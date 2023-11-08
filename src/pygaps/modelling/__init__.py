@@ -27,6 +27,7 @@ _MODELS = [
     "TemkinApprox",
     "Virial",
     "Toth",
+    "DSToth",
     "JensenSeaton",
     "FHVST",
     "WVST",

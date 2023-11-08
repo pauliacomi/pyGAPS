@@ -19,7 +19,7 @@ class DSToth(IsothermBaseModel):
     -----
     An extension to the Toth model to consider two adsorption sites, with
     different monolayer capacities, affinities, and exponents[#]_. This was
-    first proposed by Serna-Guerroero, Balmabkhout, and Sayari to model ambient
+    first proposed by Serna-Guerrero, Balmabkhout, and Sayari to model ambient
     temperature CO_2 isotherms up to 20 bar, with the two sites representing
     chemical and physical adsorption, respectively[#]_.
 
@@ -33,9 +33,11 @@ class DSToth(IsothermBaseModel):
     .. math::
         n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}
 
-    In Serna-Guerroero et al.'s original work, the physical part of the
+    In Serna-Guerrero et al.'s original work, the physical part of the
     equation is determined by measurement of a CO_2 isotherm on an adsorbent
-    which should be expected to have no chemical adsorption component.
+    which should be expected to have no chemical adsorption component. It
+    nonetheless appears to give an good fit to CO_2 isotherms when each of the
+    sites are determined independently.
 
     References
     ----------
@@ -49,7 +51,7 @@ class DSToth(IsothermBaseModel):
     formula = r"n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}"
     calculates = 'loading'
     param_names = (
-        "n_m1", "K1" "t1",
+        "n_m1", "K1", "t1",
         "n_m2", "K2", "t2"
     )
     param_default_bounds = (
@@ -110,7 +112,7 @@ class DSToth(IsothermBaseModel):
 
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {loading} failed.")
-        return opt_res
+        return opt_res.x
 
     def spreading_pressure(self, pressure):
         r"""

@@ -11,8 +11,7 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
-# need CP model
-models = ['toth', 'langmuir', 'dslangmuir', 'tslangmuir']
+models = ['toth', 'langmuir', 'dslangmuir', 'tslangmuir', 'dstoth']
 
 
 def enthalpy_sorption_whittaker(
@@ -116,7 +115,7 @@ def enthalpy_sorption_whittaker(
 
     if model.lower() not in models:
         raise ParameterError(
-            '''Whittaker method requires modelling with either Langmuir or Toth'''
+            f'''Whittaker method requires modelling with one of {models}.'''
         )
 
     if loading is None:
