@@ -6,8 +6,6 @@ from scipy import optimize, integrate, constants
 from pygaps.modelling.base_model import IsothermBaseModel
 from pygaps.utilities.exceptions import CalculationError
 
-R = constants.gas_constant
-
 
 class ChemiPhysisorption(IsothermBaseModel):
     r"""
@@ -55,7 +53,7 @@ class ChemiPhysisorption(IsothermBaseModel):
     calculates = 'loading'
     param_names = (
         "n_m1", "K1", "t1",
-        "n_m2", "K2", "kin",
+        "n_m2", "K2", "Ea",
     )
     param_default_bounds = (
         (0., numpy.inf),
@@ -65,6 +63,11 @@ class ChemiPhysisorption(IsothermBaseModel):
         (0., numpy.inf),
         (0., numpy.inf),
     )
+    rt = 1000
+
+    def __init_parameters__(self, params):
+        "Initialise model parameters from isotherm data"
+        self.rt = constants.gas_constant * params['temperature']
 
     def loading(self, pressure):
         """
@@ -85,10 +88,10 @@ class ChemiPhysisorption(IsothermBaseModel):
         K1p = self.params["K1"] * pressure
         K2p = self.params["K2"] * pressure
         t1 = self.params["t1"]
-        kin = self.params["kin"]
+        Ea = self.params["Ea"]
         return (
             (n_m1 * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
-            ((n_m2 * K2p / (1.0 + K2p))*kin)
+            ((n_m2 * K2p / (1.0 + K2p))*(numpy.exp(-Ea/self.rt)))
         )
 
     def pressure(self, loading):
@@ -167,7 +170,7 @@ class ChemiPhysisorption(IsothermBaseModel):
             "n_m2": 0.5 * saturation_loading,
             "K2": 0.6 * langmuir_k,
             "t1": 1,
-            "kin": 1,
+            "Ea": self.rt * numpy.exp(1),
         }
         guess = self.initial_guess_bounds(guess)
         return guess

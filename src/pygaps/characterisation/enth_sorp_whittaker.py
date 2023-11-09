@@ -135,10 +135,11 @@ def enthalpy_sorption_whittaker(
 
     # Local constants and model parameters
     T = isotherm.temperature
-    n_m_list = [v for k, v in isotherm.model.params.items() if 'n_m' in k]
-    K_list = [v for k, v in isotherm.model.params.items() if 'K' in k]
+    params = isotherm.model.params
+    n_m_list = [v for k, v in params.items() if 'n_m' in k]
+    K_list = [v for k, v in params.items() if 'K' in k]
     if model in ['dstoth', 'toth', 'chemiphysisorption']:
-        t_list = [v for k, v in isotherm.model.params.items() if 't' in k]
+        t_list = [v for k, v in params.items() if 't' in k]
         if model == 'chemiphysisorption':
             t_list.append(1)
     else:
@@ -204,7 +205,7 @@ def enthalpy_sorption_whittaker_raw(
 
     RT = scipy.constants.R * T
     log_bracket = []
-    for K, t, n_m in zip(K_list, t_list, n_m_list):
+    for K, t, n_m, in zip(K_list, t_list, n_m_list,):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             theta_t = [(n / n_m)**t for n in loading]
