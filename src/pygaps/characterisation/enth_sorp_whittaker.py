@@ -19,6 +19,13 @@ _WHITTAKER_MODELS = [
 ]
 
 
+def pressure_at(isotherm, n):
+    try:
+        return isotherm.pressure_at(n)
+    except CalculationError as e:
+        return np.NAN
+
+
 def enthalpy_sorption_whittaker(
     isotherm: "BaseIsotherm",
     model: str = 'Toth',
@@ -159,7 +166,7 @@ def enthalpy_sorption_whittaker(
         T_c = isotherm.adsorbate.t_critical()
         p_sat = p_c * ((T / T_c)**2)
 
-    pressure = [isotherm.pressure_at(n) for n in loading]
+    pressure = [pressure_at(isotherm, n) for n in loading]
     whitt = enthalpy_sorption_whittaker_raw(
         pressure, loading,
         p_sat, p_c, p_t,
