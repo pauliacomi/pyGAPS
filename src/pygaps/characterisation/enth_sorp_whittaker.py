@@ -2,6 +2,7 @@
 
 import numpy as np
 import scipy.constants
+import warnings
 
 import pygaps.modelling as pgm
 from pygaps import logger
@@ -10,6 +11,7 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
+from pygaps.core.adsorbate import Adsorbate
 
 _WHITTAKER_MODELS = [
     'toth', 'langmuir', 'dslangmuir', 'tslangmuir',
@@ -22,6 +24,7 @@ def enthalpy_sorption_whittaker(
     model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
+    **kwargs,
 ):
     r"""
 
@@ -109,16 +112,18 @@ def enthalpy_sorption_whittaker(
         model = isotherm.model.name
     elif isinstance(isotherm, PointIsotherm):
         isotherm.convert_pressure(unit_to='Pa')
+        max_nfev = kwargs.get('max_nfev', None)
         isotherm = pgm.model_iso(
             isotherm,
             branch='ads',
             model=model,
             verbose=verbose,
+            optimization_params=dict(max_nfev=max_nfev)
         )
 
     if model.lower() not in _WHITTAKER_MODELS:
         raise ParameterError(
-            f'''Whittaker method requires modelling with one of ''',
+            '''Whittaker method requires modelling with one of ''',
             *_WHITTAKER_MODELS
         )
 
@@ -132,7 +137,6 @@ def enthalpy_sorption_whittaker(
     T = isotherm.temperature
     n_m_list = [v for k, v in isotherm.model.params.items() if 'n_m' in k]
     K_list = [v for k, v in isotherm.model.params.items() if 'K' in k]
-    #if any('t' in k for k in isotherm.model.params.keys()):
     if model in ['dstoth', 'toth', 'chemiphysisorption']:
         t_list = [v for k, v in isotherm.model.params.items() if 't' in k]
         if model == 'chemiphysisorption':
@@ -188,31 +192,27 @@ def enthalpy_sorption_whittaker_raw(
     n_m_list: list[float] = None,
     t_list: list[float] = None,
     T: float = None,
-    adsorbate = None,
+    adsorbate: Adsorbate = None,
 ):
     """
-    not using yet, placeholder for function that may be helpful for DSLangmuir
-    version.
     """
+
     if not (
         len(K_list) == len(n_m_list) == len(t_list)
     ):
-        print(K_list)
-        print(n_m_list)
-        print(t_list)
         raise ParameterError('''Different length parameter lists''')
 
     RT = scipy.constants.R * T
-    # calculation not yet correct.
     log_bracket = []
     for K, t, n_m in zip(K_list, t_list, n_m_list):
-        theta_t = [(n/n_m)**t for n in loading]
-        theta_bracket = [
-            np.log(
-                p_sat * K * ((tt)/ (1-tt))**((t-1)/t)
-            ) for tt in theta_t
-        ]
-        log_bracket.append(theta_bracket)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            theta_t = [(n / n_m)**t for n in loading]
+            theta_bracket = [
+                np.log(p_sat * K * ((tt) / (1-tt))**((t-1)/t))
+                for tt in theta_t
+            ]
+            log_bracket.append(theta_bracket)
     d_lambda = [RT * sum(x) for x in zip(*log_bracket)]
 
     h_vap = []
