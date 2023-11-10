@@ -18,11 +18,39 @@ _WHITTAKER_MODELS = [
     'dstoth', 'chemiphysisorption',
 ]
 
+_ANTOINE_PARAMETERS = {
+    'carbon dioxide': {
+        'B': 10.085,
+        'C': 1647.77,
+        'D': -21.62,
+    },
+    'methane': {
+        'B': 8.784,
+        'C': 933.51,
+        'D': -5.37,
+    },
+    'ethane': {
+        'B': 9.091,
+        'C': 1528.28,
+        'D': -16.47,
+    },
+    'ethene': {
+        'B': 8.896,
+        'C': 1370.03,
+        'D': -16.99,
+    },
+    'nitrogen': {
+        'B': 8.321,
+        'C': 588.73,
+        'D': -6.61,
+    },
+}
+
 
 def pressure_at(isotherm, n):
     try:
         return isotherm.pressure_at(n)
-    except CalculationError as e:
+    except CalculationError:
         return np.NAN
 
 
@@ -166,26 +194,38 @@ def enthalpy_sorption_whittaker(
         T_c = isotherm.adsorbate.t_critical()
         p_sat = p_c * ((T / T_c)**2)
 
+    psat_mode = kwargs.get('psat_mode', 'dubinin')
+    if (
+        psat_mode.lower() == 'antoine' and
+        str(isotherm.adsorbate) in _ANTOINE_PARAMETERS
+    ):
+        antoine_params = _ANTOINE_PARAMETERS[str(isotherm.adsorbate)]
+        B = antoine_params['B']
+        C = antoine_params['C']
+        D = antoine_params['D']
+        p_sat = 101325 * np.exp(B - (C/(D+T)))
+
     pressure = [pressure_at(isotherm, n) for n in loading]
-    whitt = enthalpy_sorption_whittaker_raw(
+    loading, enthalpy = enthalpy_sorption_whittaker_raw(
         pressure, loading,
         p_sat, p_c, p_t,
         K_list, n_m_list, t_list,
-        T, isotherm.adsorbate,
+        T,
+        isotherm.adsorbate,
     )
 
     if verbose:
         from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
         isosteric_enthalpy_plot(
-            whitt['loading'],
-            whitt['enthalpy'],
-            [0 for n in whitt['loading']],
+            loading,
+            enthalpy,
+            [0 for n in loading],
             isotherm.units,
         )
 
     return {
-        'loading': whitt['loading'],
-        'enthalpy_sorption': whitt['enthalpy'],
+        'loading': loading,
+        'enthalpy_sorption': enthalpy,
         'model_isotherm': isotherm,
     }
 
@@ -213,7 +253,7 @@ def enthalpy_sorption_whittaker_raw(
     RT = scipy.constants.R * T
     log_bracket = []
     for K, t, n_m, in zip(K_list, t_list, n_m_list,):
-        with warnings.catch_warnings():
+        with warnings.catch_warnings(): # need to log warnings
             warnings.simplefilter("ignore")
             theta_t = [(n / n_m)**t for n in loading]
             theta_bracket = [
@@ -232,7 +272,4 @@ def enthalpy_sorption_whittaker_raw(
         h_vap.append(adsorbate.enthalpy_vaporisation(press=p, ) * 1000)
 
     enthalpy = [(x + y + RT) / 1000 for x, y in zip(d_lambda, h_vap)]
-    return {
-        'loading': loading,
-        'enthalpy': enthalpy
-    }
+    return loading, enthalpy

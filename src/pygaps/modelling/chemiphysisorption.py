@@ -23,21 +23,15 @@ class ChemiPhysisorption(IsothermBaseModel):
     exponent (t) is 1 for the chemisorption portion (i.e. it is a Langmuir
     isotherm)[#]_. Further, the model assumes that at a given activation
     energy, E_a, molecules will have sufficient energy to take part in
-    chemisorption, thus the chemisorption term is multiplied by a term
-    including E_a.
+    chemisorption, thus the chemisorption term is multiplied by an Arrhenius
+    term;
 
     .. math::
         n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
         \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})
 
-    This final teerm is simplified for ease;
-
-    .. math::
-        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
-        \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \eta
-
-    This, of course has the additional advantage of allowing the calculation of
-    the activation energy, E_a.
+    This was applied by the Petit group to CO_2 isotherms measured at
+    temperatures in the range 288-393 K, and pressures up to 1 bar.
 
     References
     ----------
@@ -49,7 +43,7 @@ class ChemiPhysisorption(IsothermBaseModel):
 
     # Model parameters
     name = 'ChemiPhysisorption'
-    formula = r"n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \eta"
+    formula = r"n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + \right[n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})"
     calculates = 'loading'
     param_names = (
         "n_m1", "K1", "t1",
