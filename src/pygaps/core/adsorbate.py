@@ -218,7 +218,10 @@ class Adsorbate():
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
-        if (not self._backend_mode or self._backend_mode != thermodynamic_backend()):
+        if (
+            not self._backend_mode or
+            self._backend_mode != thermodynamic_backend()
+        ):
             self._backend_mode = thermodynamic_backend()
             self._state = CP.AbstractState(self._backend_mode, self.backend_name)
 
@@ -518,6 +521,7 @@ class Adsorbate():
         temp: float,
         unit: str = None,
         calculate: bool = True,
+        pseudo: bool = False,
     ) -> float:
         """
         Get the saturation pressure at a particular temperature, in desired unit (default Pa).
@@ -532,6 +536,9 @@ class Adsorbate():
         calculate : bool, optional
             Whether to calculate the property or look it up in the properties
             dictionary, default - True.
+        pseudo: bool, optional
+            Whether to calculate a pseudo-saturation pressure for a
+            supercritical adsorbate, default - False.
 
         Returns
         -------
@@ -547,6 +554,11 @@ class Adsorbate():
             If it cannot be calculated, due to a physical reason.
 
         """
+        #TODO add Antoine version
+        if (pseudo and temp > self.t_critical()):
+            logger.warning(f'Dubinin pseudo-saturation pressure calculated.')
+            return self.dubinin_pseudo_saturation_pressure(temp=temp, unit=unit)
+
         if calculate:
             try:
                 state = self.backend
@@ -564,6 +576,51 @@ class Adsorbate():
             return self.get_prop("saturation_pressure")
         except ParameterError as err:
             _raise_calculation_error(err)
+
+    def dubinin_pseudo_saturation_pressure(
+        self,
+        temp: float,
+        unit: str = None,
+        k: float = 2,
+    ) -> float:
+        """
+        Get the Dubinin pseudo-saturation pressure at a particular temperature
+        in desired unit (default Pa). Only works if adsorbate is supercritical
+        at selected temperature.
+
+        Parameters
+        ----------
+        temp : float
+            Temperature at which the pressure is desired in K.
+        unit : str
+            Unit in which to return the saturation pressure.
+            If not specifies defaults to Pascal.
+
+        Returns
+        -------
+        float
+            Pressure in unit requested.
+
+        """
+        if temp < self.t_critical():
+            logger.warning(
+                f'{self.name} is below critical temperature. '
+                f'Returning real saturation pressure.'
+            )
+            return self.saturation_pressure(temp=temp)
+
+        if k < 1:
+            logger.warning(
+                f'The value for the exponent, k, is too small ({k}).'
+            )
+            return
+
+        sat_p = self.p_critical() * ((temp / self.t_critical())**k)
+
+        if unit is not None:
+            sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
+
+        return sat_p
 
     def surface_tension(
         self,
