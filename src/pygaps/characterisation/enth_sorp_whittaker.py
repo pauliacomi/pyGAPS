@@ -188,22 +188,46 @@ def enthalpy_sorption_whittaker(
     except CalculationError:
         logger.warning(
             f"{isotherm.adsorbate} does not have a saturation pressure "
-            f"at {T} K. Calculating pseudo-saturation "
-            f"pressure..."
+            f"at {T} K."
         )
-        T_c = isotherm.adsorbate.t_critical()
-        p_sat = p_c * ((T / T_c)**2)
+        psat_defined = kwargs.get('psat', None)
+        if isinstance(psat, (int, float)):
+            p_sat = psat_defined
+            logger.warning(
+                f"Using user-defined pseudo-saturation pressure {p_sat} Pa"
+            )
 
-    psat_mode = kwargs.get('psat_mode', 'dubinin')
-    if (
-        psat_mode.lower() == 'antoine' and
-        str(isotherm.adsorbate) in _ANTOINE_PARAMETERS
-    ):
-        antoine_params = _ANTOINE_PARAMETERS[str(isotherm.adsorbate)]
-        B = antoine_params['B']
-        C = antoine_params['C']
-        D = antoine_params['D']
-        p_sat = 101325 * np.exp(B - (C/(D+T)))
+        psat_mode = kwargs.get('psat_mode', 'dubinin')
+        elif psat_mode.lower() == 'dubinin'
+            T_c = isotherm.adsorbate.t_critical()
+            p_sat = p_c * ((T / T_c)**2)
+            logger.warning(
+                f"Calculating Dubinin pseudo-saturation pressure {p_sat} Pa"
+            )
+
+        elif (
+            psat_mode.lower() == 'antoine' and
+            str(isotherm.adsorbate) in _ANTOINE_PARAMETERS
+        ):
+            antoine_params = _ANTOINE_PARAMETERS[str(isotherm.adsorbate)]
+            B = antoine_params['B']
+            C = antoine_params['C']
+            D = antoine_params['D']
+            p_sat = 101325 * np.exp(B - (C/(D+T)))
+            logger.warning(
+                f"Calculating Antoine pseudo-saturation pressure {p_sat} Pa"
+                f"Using following params at {T} K\n"
+                f"B:\t{B}"
+                f"C:\t{C}"
+                f"D:\t{D}"
+            )
+
+        else:
+            logger.warning(
+                f"No pseudo-saturation pressure available. Calculation cannot "
+                f"proceed. Please define one, or a way to calculate one"
+            )
+            return
 
     pressure = [pressure_at(isotherm, n) for n in loading]
     loading, enthalpy = enthalpy_sorption_whittaker_raw(
