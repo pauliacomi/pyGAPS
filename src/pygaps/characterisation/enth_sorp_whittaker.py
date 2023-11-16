@@ -145,16 +145,27 @@ def enthalpy_sorption_whittaker(
         if isotherm.units['pressure_unit'] != 'Pa':
             raise ParameterError('''Model isotherms should be in Pa.''')
         model = isotherm.model.name
+
     elif isinstance(isotherm, PointIsotherm):
         isotherm.convert_pressure(unit_to='Pa')
         max_nfev = kwargs.get('max_nfev', None)
-        isotherm = pgm.model_iso(
-            isotherm,
-            branch='ads',
-            model=model,
-            verbose=verbose,
-            optimization_params=dict(max_nfev=max_nfev)
-        )
+        if model == 'guess':
+            isotherm = pgm.model_iso(
+                isotherm,
+                branch='ads',
+                model=_WHITTAKER_MODELS,
+                verbose=verbose,
+                optimization_params=dict(max_nfev=max_nfev)
+            )
+            model = isotherm.model.name
+        else:
+            isotherm = pgm.model_iso(
+                isotherm,
+                branch='ads',
+                model=model,
+                verbose=verbose,
+                optimization_params=dict(max_nfev=max_nfev)
+            )
 
     if model.lower() not in _WHITTAKER_MODELS:
         raise ParameterError(
@@ -190,6 +201,12 @@ def enthalpy_sorption_whittaker(
             f"{isotherm.adsorbate} does not have a saturation pressure "
             f"at {T} K."
         )
+        T_c = isotherm.adsorbate.t_critical()
+        p_sat = p_c * ((T / T_c)**2)
+        logger.warning(
+            f"Calculating Dubinin pseudo-saturation pressure {p_sat} Pa"
+        )
+        """
         psat_defined = kwargs.get('psat', None)
         if isinstance(psat, (int, float)):
             p_sat = psat_defined
@@ -198,7 +215,8 @@ def enthalpy_sorption_whittaker(
             )
 
         psat_mode = kwargs.get('psat_mode', 'dubinin')
-        elif psat_mode.lower() == 'dubinin'
+
+        elif psat_mode.lower() == 'dubinin':
             T_c = isotherm.adsorbate.t_critical()
             p_sat = p_c * ((T / T_c)**2)
             logger.warning(
@@ -228,6 +246,7 @@ def enthalpy_sorption_whittaker(
                 f"proceed. Please define one, or a way to calculate one"
             )
             return
+        """
 
     pressure = [pressure_at(isotherm, n) for n in loading]
     loading, enthalpy = enthalpy_sorption_whittaker_raw(
