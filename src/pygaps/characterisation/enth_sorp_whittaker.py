@@ -14,8 +14,8 @@ from pygaps.utilities.exceptions import ParameterError
 from pygaps.core.adsorbate import Adsorbate
 
 _WHITTAKER_MODELS = [
-    'toth', 'langmuir', 'dslangmuir', 'tslangmuir',
-    'dstoth', 'chemiphysisorption',
+    'langmuir', 'dslangmuir', 'tslangmuir',
+    'toth', 'dstoth', 'chemiphysisorption',
 ]
 
 
