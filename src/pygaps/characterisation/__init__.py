@@ -10,6 +10,7 @@ from .area_lang import area_langmuir_raw
 from .dr_da_plots import da_plot
 from .dr_da_plots import dr_plot
 from .enth_sorp_whittaker import enthalpy_sorption_whittaker
+from .enth_sorp_whittaker import enthalpy_sorption_whittaker_raw
 from .initial_enth import initial_enthalpy_comp
 from .initial_enth import initial_enthalpy_point
 from .initial_henry import initial_henry_slope

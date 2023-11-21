@@ -45,7 +45,8 @@ def enthalpy_sorption_whittaker(
     isotherm : BaseIsotherm
         The PointIsotherm or ModelIsotherm to be used. If ModelIsotherm, units must be in Pascal
     model : str
-        The model to use to fit the PointIsotherm, must be either 'Langmuir' or 'Toth'.
+        The model to use to fit the PointIsotherm, must be either one of
+        _WHITTAKER_MODELS.
     loading : list[float]
         The loadings for which to calculate the isosteric heat of adsorption.
     verbose : bool
@@ -69,9 +70,16 @@ def enthalpy_sorption_whittaker(
     -----
 
     The Whittaker method, [#]_ sometimes known as a modified Tóth potential uses
-    variables derived from fitting of a model isotherm (Langmuir or Toth) to
-    derive the isosteric enthalpy of adsorption :math:`\Delta H_{st}`. The general form
-    of the equation is;
+    variables derived from fitting of a Toth-like model isotherm to
+    derive the isosteric enthalpy of adsorption :math:`\Delta H_{st}`.
+    Toth-like isotherms take the general form;
+
+    n(P) = \sum_{i} n_{m_i} \frac{K_i P}{\sqrt[t_i]{1+(K_i P)^{t_i}}}
+
+    And apart from Toth, include the multi- and single site Langmuir model
+    (where all t_i are 1), and the chemiphysisorption model.
+
+    The general form of the Whittaker potential is;
 
     .. math::
 
@@ -81,29 +89,29 @@ def enthalpy_sorption_whittaker(
     :math:`\Delta H_{vap}` is the latent heat of the liquid-vapour change at
     equilibrium pressure.
 
-    For loadings below the triple point pressure, :math:`\Delta H_{vap}` is meaningless.
-    In this case, :math:`\Delta H_{vap}` is estimated as that at the triple point.
+    For loadings below the triple point pressure, :math:`\Delta H_{vap}`  is meaningless. In this case, :math:`\Delta H_{vap}` is estimated as that at the triple point.
 
-    Whittaker determined :math:`\Delta \lambda` as:
+    :math:`\Delta \lambda` is determined from the model isotherm parameters as :
 
     .. math::
 
-        \Delta \lambda = RT
-        \ln{\left[\left(\frac{p^0}{b^{1/t}}\right)\left(\frac{\theta^{t}}{1-\theta^{t}}\right)^{\frac{1-t}{t}} \right]}
+        \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}{1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
 
-    Where :math:`p^0` is the saturation pressure, :math:`\theta` is the
-    fractional coverage, and :math:`b` is derived from the equilibrium constant,
-    :math:`K` as :math:`b = \frac{1}{K^t}`. In the case that the adsorptive is
-    supercritical, the pseudo saturation pressure is used;
-    :math:`p^0 = p_c \left(\frac{T}{T_c}\right)^2`.
+    Where :math:`P_0` is the saturation pressure, :math:`\theta` is the
+    fractional coverage, and :math:`K` is the equilibrium constant. In the case
+    that the adsorptive is supercritical, the Dubinin pseudo-saturation pressure is used;
+    ..math::
+        `p^0 = p_c \left(\frac{T}{T_c}\right)^2`.
 
-    The exponent :math:`t` is only relevant to the Toth version of the method,
-    as for the Langmuir model it reduces to 1. Thus, :math:`\Delta \lambda`
+    The exponent :math:`t` is not relevent for Langmuir models it reduces to 1. Thus, :math:`\Delta \lambda`
     becomes
 
     .. math::
 
-        \Delta \lambda = RT \ln{ \left( \frac{p^0}{b} \right) }
+        \Delta \lambda = RT \sum_{i} \ln{ \left( \frac{P_0}{K_i} \right) }
+
+    As such, the Whittaker method predicts constant isosteric enthalpies of
+    adsorption when Langmuir models are used.
 
     References
     ----------
@@ -209,12 +217,59 @@ def enthalpy_sorption_whittaker_raw(
     adsorbate: Adsorbate = None,
 ):
     """
+    Calculate the isosteric enthalpy of adsorption using model parameters from
+    fitting a Toth-like model isotherm via the Whittaker method.
+
+    This is a 'bare-bones' function to calculate isosteric enthalpy which is
+    designed as a low-level alternative to the main function.
+    Designed for advanced use, its parameters have to be manually specified.
+
+    Parameters
+    ----------
+    pressure: list[float]
+        A list of pressures. Must be in Pa.
+    loading: list[float] = None,
+        Loadings corresponding to above pressures. Units are irrelevant as long
+        as they are the same as `n_m`
+    p_sat: float = None,
+        Saturation pressure of adsorbate at isotherm temperature, `T`. Must be
+        in Pa. Tip: if adsorbate is above its critical temperature, you can
+        calculate a Dubinin psuedo-saturation pressure using the convenience
+        function in the adsorbate class.
+    p_c: float = None,
+        Critical pressure of adsorbate. Units must be Pa.
+    p_t: float = None,
+        Triple-point pressure of adsorbate. Units must be Pa.
+    K_list: list[float] = None,
+        List of equilibrium constants, K from model fitting. Must be derived
+        from fitting to model with pressure units of Pa.
+    n_m_list: list[float] = None,
+        List of monolayer loadings, K from model fitting. Must be derived
+        from fitting to model with pressure units of Pa. Must have same units
+        as loading.
+    t_list: list[float] = None,
+        List of exponents, t from model fitting. Must be derived
+        from fitting to model with pressure units of Pa.
+    T: float = None,
+        Temperature of isotherm. Units must be K.
+    adsorbate: Adsorbate = None,
+        Adsorbate used.
+
+    Returns
+    -------
+    loading: list[float]
+        Loadings as input in function arguments.
+    enthalpy: list[float]
+        Isosteric enthalpies of adsorption, in kJ/mol.
     """
 
     if not (
         len(K_list) == len(n_m_list) == len(t_list)
     ):
-        raise ParameterError('''Different length parameter lists''')
+        raise ParameterError('''Different length model parameter lists''')
+
+    if len(pressure) != len(loading):
+        raise ParameterError('''Loading and pressure lists must be same length!''')
 
     RT = scipy.constants.R * T
     log_bracket = []
