@@ -53,7 +53,7 @@ def predict_isotherm(
     isosteric_enthalpy_dictionary: dict, optional
         You can input the output of `enthalpy_sorption_whittaker()` or
         `isosteric_enthalpy` here. The function will then use the loading and
-        isosteric_enthalpy (assumes J/mol) keys. Any dictionary with loading
+        isosteric_enthalpy (assumes kJ/mol) keys. Any dictionary with loading
         and enthalpy keys should work.  Only used if enthalpy is not defined
         in original_isotherm.other_data.
     branch: {'ads', 'des', None}, optional
@@ -214,7 +214,7 @@ def predict_pressure_raw(
     T_predicted: float
         Temperature at which to predict an isotherm. Units must be K.
     enthalpy: list[float]
-        Molar isosteric enthalpies of adsorption. Units must be J/mol.
+        Molar isosteric enthalpies of adsorption. Units must be kJ/mol.
     P_predicted: list[float]
         Pressures associated with isosteric enthalpies of adsorption. Units
         should be Pa.
@@ -240,7 +240,7 @@ def predict_pressure_raw(
         )
 
     P_predict = [
-        numpy.exp(((H*T_difference)/RTT) + numpy.log(P)) for
+        numpy.exp(((1e3*H*T_difference)/RTT) + numpy.log(P)) for
         H, P in zip(enthalpy, P_experiment)
     ]
 
