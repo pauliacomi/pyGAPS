@@ -14,7 +14,7 @@ class JensenSeaton(IsothermBaseModel):
 
     .. math::
 
-        n(p) = K p \Big[1 + \Big(\frac{K p}{(a (1 + b p)}\Big)^c\Big]^{-1/c}
+        n(p) = K p \Big[1 + \Big(\frac{K p}{(n_m (1 + k p)}\Big)^t\Big]^{-1/t}
 
     Notes
     -----
@@ -28,8 +28,8 @@ class JensenSeaton(IsothermBaseModel):
     at low pressure and an asymptote reflecting the compressibility of the
     adsorbate at high pressure.
 
-    Here :math:`K` is the Henry constant, :math:`b` is the compressibility of the
-    adsorbed phase and :math:`c` an empirical constant.
+    Here :math:`K` is the Henry constant, :math:`k` is the compressibility of the
+    adsorbed phase and :math:`t` an empirical constant.
 
     The equation can be used to model both absolute and excess adsorption as
     the pore volume can be incorporated into the definition of :math:`b`,
@@ -43,21 +43,20 @@ class JensenSeaton(IsothermBaseModel):
     References
     ----------
     .. [#] Jensen, C. R. C.; Seaton, N. A., An Isotherm Equation for Adsorption to High
-       Pressures in Microporous Adsorbents. Langmuir 1996, 12, (Copyright (C) 2012
-       American Chemical Society (ACS). All Rights Reserved.), 2866-2867.
+       Pressures in Microporous Adsorbents. Langmuir 1996, 12, 2866-2867.
 
     """
 
     # Model parameters
     name = 'JensenSeaton'
-    formula = r"n(p) = K p [1 + (\frac{K p}{(a (1 + b p)})^c]^{-1/c}"
+    formula = r"n(p) = K p [1 + (\frac{K p}{(n_m (1 + k p)})^t]^{-1/t}"
     calculates = 'loading'
-    param_names = ("K", "a", "b", "c")
+    param_names = ("K", "n_m", "k", "t")
     param_default_bounds = (
         (0., numpy.inf),
         (0., numpy.inf),
         (0., numpy.inf),
-        (0., numpy.inf),
+        (1e-3, numpy.inf),
     )
 
     def loading(self, pressure):
@@ -75,10 +74,10 @@ class JensenSeaton(IsothermBaseModel):
             Loading at specified pressure.
         """
         Kp = self.params["K"] * pressure
-        a = self.params["a"]
-        b = self.params["b"]
-        c = self.params["c"]
-        return Kp / (1 + (Kp / (a * (1 + b * pressure)))**c)**(1 / c)
+        n_m = self.params["n_m"]
+        k = self.params["k"]
+        t = self.params["t"]
+        return Kp / (1 + (Kp / (n_m * (1 + k * pressure)))**t)**(1 / t)
 
     def pressure(self, loading):
         """
@@ -150,6 +149,7 @@ class JensenSeaton(IsothermBaseModel):
             Dictionary of initial guesses for the parameters.
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
-        guess = {"K": saturation_loading * langmuir_k, "a": 1, "b": 1, "c": 1}
+        guess = {"K": langmuir_k, "n_m": saturation_loading, "k": 0.1, "t": 1}
         guess = self.initial_guess_bounds(guess)
+        print(guess)
         return guess
