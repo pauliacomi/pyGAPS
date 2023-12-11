@@ -66,6 +66,15 @@ _IAST_MODELS = [
 ]
 
 
+_WHITTAKER_MODELS = [
+    "Langmuir",
+    "DSLangmuir",
+    "TSLangmuir",
+    "Toth",
+    "DSToth",
+    "ChemiPhysisorption",
+]
+
 def is_model(model_name: str) -> bool:
     """
     Check whether specified model is in pyGAPS.
@@ -119,6 +128,24 @@ def is_model_iast(model_name: str) -> bool:
     """
     return model_name.lower() in map(str.lower, _IAST_MODELS)
 
+
+def is_model_whittaker(model_name: str) -> bool:
+    """
+    Check whether specified model can be used to calculate whittaker enthalpy
+    of adsorption.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model
+
+    Returns
+    -------
+    bool
+        Whether it is applicable or not.
+
+    """
+    return model_name.lower() in map(str.lower, _WHITTAKER_MODELS)
 
 def is_model_class(model):
     """

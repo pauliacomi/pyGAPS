@@ -215,13 +215,13 @@ def predict_pressure_raw(
         Temperature at which to predict an isotherm. Units must be K.
     enthalpy: list[float]
         Molar isosteric enthalpies of adsorption. Units must be kJ/mol.
-    P_predicted: list[float]
+    P_experiment: list[float]
         Pressures associated with isosteric enthalpies of adsorption. Units
         should be Pa.
 
     Returns
     -------
-    P_predicted: list[float]
+    P_predict: list[float]
         Predicted pressures, in Pa if you've done everything else correctly.
 
     """

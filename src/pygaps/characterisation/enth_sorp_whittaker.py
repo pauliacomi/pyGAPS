@@ -13,11 +13,6 @@ from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.core.adsorbate import Adsorbate
 
-_WHITTAKER_MODELS = [
-    'langmuir', 'dslangmuir', 'tslangmuir',
-    'toth', 'dstoth', 'chemiphysisorption',
-]
-
 
 def pressure_at(isotherm, n):
     try:
@@ -147,10 +142,10 @@ def enthalpy_sorption_whittaker(
                 optimization_params=dict(max_nfev=max_nfev)
             )
 
-    if model.lower() not in _WHITTAKER_MODELS:
+    if not pgm.is_model_whittaker(model):
         raise ParameterError(
             '''Whittaker method requires modelling with one of ''',
-            *_WHITTAKER_MODELS
+            *pgm._WHITTAKER_MODELS
         )
 
     if loading is None:
