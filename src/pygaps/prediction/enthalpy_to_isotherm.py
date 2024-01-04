@@ -3,14 +3,12 @@ A module for predicting isotherms at different pressures given a measured
 isotherm and calulated isosteric heats of adsorption
 """
 
-import numpy
+import numpy as np
 from scipy import constants
+import pandas as pd
 
-import pygaps.graphing as pgg
-
-from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
-
+import pygaps.graphing as pgg
 from pygaps import logger
 from pygaps.utilities.exceptions import ParameterError
 
@@ -21,7 +19,7 @@ def predict_isotherm(
     T_predict: float = None,
     original_isotherm: PointIsotherm = None,
     isosteric_enthalpy_dictionary: dict() = None,
-    branch: str ='ads',
+    branch: str = 'ads',
     verbose: bool = False,
 ):
     r"""
@@ -70,7 +68,7 @@ def predict_isotherm(
     """
     if original_isotherm is None:
         raise ParameterError(
-            f'''
+            '''
             No original isotherm specified, cannot continue.
             '''
         )
@@ -101,7 +99,7 @@ def predict_isotherm(
         loading = original_isotherm.loading()
         if verbose:
             logger.info(
-                f"""
+                """
                 Enthalpy retrieved from original_isotherm.other_keys.
                 """
             )
@@ -112,7 +110,7 @@ def predict_isotherm(
             for key in ['loading', 'enthalpy_sorption']
         ):
             raise ParameterError(
-                f'''
+                '''
                 You have specified a isosteric_enthalpy_dictionary as input,
                 but it doesn't contain the right data.
                 '''
@@ -123,7 +121,7 @@ def predict_isotherm(
 
         if verbose:
             logger.info(
-                f"""
+                """
                 Using enthalpy from isosteric_enthalpy_dictionary.
                 """
             )
@@ -182,14 +180,63 @@ def predict_isotherm(
             [original_isotherm, predicted_isotherm],
             ax=isos_ax
         )
+        enthalpy = 1e3 * enthalpy
         pgg.isosteric_enthalpy_plot(
-            loading, enthalpy/1000,
-            std_err = [0 for n in loading],
+            loading, enthalpy,
+            std_err=[0 for n in loading],
             units=predicted_isotherm.units,
             ax=enthalpy_ax,
         )
 
     return predicted_isotherm
+
+
+def predict_adsorption_grid(
+    original_isotherm: PointIsotherm = None,
+    isosteric_enthalpy_dictionary: dict = None,
+    temperatures: list[float] = None,
+    pressures: list[float] = None,
+    branch: str = 'ads',
+):
+    T_experiment = original_isotherm.temperature
+
+    if pressures is None:
+        pressures = original_isotherm.pressure(branch=branch)
+
+    if temperatures is None:
+        lower_limit = T_experiment - 50
+        if lower_limit < 0:
+            lower_limit = 0
+        temperatures = np.linspace(
+            lower_limit, T_experiment + 50,
+            num=len(pressures),
+        )
+
+    data = []
+    for T in temperatures:
+        predicted_isotherm = predict_isotherm(
+            T_predict=T,
+            original_isotherm=original_isotherm,
+            isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
+            branch=branch,
+        )
+        lims = [
+            min(predicted_isotherm.pressure()),
+            max(predicted_isotherm.pressure())
+        ]
+
+        loadings = [
+            float(predicted_isotherm.loading_at(p))
+            if lims[0] < p < lims[1]
+            else None
+            for p in pressures
+        ]
+        data.append(loadings)
+
+    return pd.DataFrame(
+        data=data,
+        index=temperatures, columns=pressures,
+    )
 
 
 def predict_pressure_raw(
@@ -240,7 +287,7 @@ def predict_pressure_raw(
         )
 
     P_predict = [
-        numpy.exp(((1e3*H*T_difference)/RTT) + numpy.log(P)) for
+        np.exp(((1e3*H*T_difference) / RTT) + np.log(P)) for
         H, P in zip(enthalpy, P_experiment)
     ]
 
