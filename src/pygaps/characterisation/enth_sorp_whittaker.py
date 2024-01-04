@@ -159,9 +159,9 @@ def enthalpy_sorption_whittaker(
     params = isotherm.model.params
     n_m_list = [v for k, v in params.items() if 'n_m' in k]
     K_list = [v for k, v in params.items() if 'K' in k]
-    if model in ['dstoth', 'toth', 'chemiphysisorption']:
+    if model.lower() in ['dstoth', 'toth', 'chemiphysisorption']:
         t_list = [v for k, v in params.items() if 't' in k]
-        if model == 'chemiphysisorption':
+        if model.lower() == 'chemiphysisorption':
             t_list.append(1)
     else:
         t_list = [1 for i in range(len(K_list))]
@@ -258,6 +258,7 @@ def enthalpy_sorption_whittaker_raw(
         Isosteric enthalpies of adsorption, in kJ/mol.
     """
 
+    print(K_list, n_m_list, t_list)
     if not (
         len(K_list) == len(n_m_list) == len(t_list)
     ):
