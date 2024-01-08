@@ -16,8 +16,8 @@ R = constants.gas_constant
 
 
 def predict_isotherm(
-    T_predict: float = None,
-    original_isotherm: PointIsotherm = None,
+    T_predict: float,
+    original_isotherm: PointIsotherm,
     isosteric_enthalpy_dictionary: dict() = None,
     branch: str = 'ads',
     verbose: bool = False,
@@ -31,10 +31,11 @@ def predict_isotherm(
     ..math::
         \ln{P_p} = \left[ \Delta H_{st} \frac{T_p - T_e}{R T_p T_e} + \ln{P_e} \right ]_n
 
-    Isosteric enthalpy, \Delta H_{st} can be input in the three ways. The order
-    is below;
+    Isosteric enthalpy, \Delta H_{st} can be input in two ways. The order
+    of preference is as below;
         1. Defined in the other_data dictionary the `original_isotherm` object
-        2. As the output of `enth_sorption_whittaker()` or `isosteric_enthalpy`.
+        2. As the output of `enth_sorption_whittaker()` or `isosteric_enthalpy`
+        using the `isosteric_enthalpy_dictionary` parameter.
 
     With options 1, it is important to ensure that the enthalpies
     actually correspond to loading points.
@@ -66,13 +67,6 @@ def predict_isotherm(
         The isotherm predicted from the above parameters. Pressure in Pa,
         loading in mol/kg.
     """
-    if original_isotherm is None:
-        raise ParameterError(
-            '''
-            No original isotherm specified, cannot continue.
-            '''
-        )
-
     if (
         isosteric_enthalpy_dictionary is None and
         'enthalpy' not in original_isotherm.other_keys
@@ -82,7 +76,6 @@ def predict_isotherm(
             There is no enthalpy specified. This can be specified by passing
             a dictionary of 'loading' and 'isosteric_enthalpy', or by passing
             an isotherm with enthalpy in its 'other_keys'
-
             '''
         )
 
@@ -174,41 +167,101 @@ def predict_isotherm(
     )
 
     if verbose:
-        import matplotlib.pyplots as plt
-        fig, (isos_ax, enthalpy_ax) = plt.subplots(1, 2)
-        pgg.plot_iso(
-            [original_isotherm, predicted_isotherm],
-            ax=isos_ax
-        )
-        enthalpy = 1e3 * enthalpy
-        pgg.isosteric_enthalpy_plot(
+        pgg.prediction_graphs.plot_enthalpy_prediction(
+            original_isotherm, predicted_isotherm,
             loading, enthalpy,
-            std_err=[0 for n in loading],
-            units=predicted_isotherm.units,
-            ax=enthalpy_ax,
+            branch=branch,
         )
 
     return predicted_isotherm
 
 
-def predict_adsorption_grid(
-    original_isotherm: PointIsotherm = None,
+def predict_adsorption_heatmap(
+    original_isotherm: PointIsotherm,
     isosteric_enthalpy_dictionary: dict = None,
     temperatures: list[float] = None,
     pressures: list[float] = None,
+    num: int = None,
+    T_range: tuple[float, float] = None,
     branch: str = 'ads',
+    verbose: bool = True,
 ):
+    r"""
+    Predicts loading as a function of pressure and temperature, from a single
+    isotherm and a heat of adsorption. Uses `predict_isotherm` function which
+    relies on the Clausius Clapeyron equation;
+
+    ..math::
+        \ln{P_p} = \left[ \Delta H_{st} \frac{T_p - T_e}{R T_p T_e} + \ln{P_e} \right ]_n
+
+
+    Parameters
+    ----------
+    original_isotherm: PointIsotherm
+        The experimental isotherm that has been measured.
+        If it has an 'enthalpy' key in other_data, this will be used as the
+        isosteric enthalpies with which to perform the calculation. Please
+        ensure that these actually correspond to the loadings in the isotherm.
+    isosteric_enthalpy_dictionary: dict, optional
+        You can input the output of `enthalpy_sorption_whittaker()` or
+        `isosteric_enthalpy` here. The function will then use the loading and
+        isosteric_enthalpy (assumes kJ/mol) keys. Any dictionary with loading
+        and enthalpy keys should work.  Only used if enthalpy is not defined
+        in original_isotherm.other_data.
+    temperatures: list[float], optional
+        The temperatures (x-axis) of the resultant grid. If None, will use an
+        array +/- 50 K from the temperature of `original_isotherm`. Number of
+        steps defaults to be that of `pressures` array.
+    pressures: list[float], optional
+        The pressures (y-axis) of the resultant grid. If None, will use
+        pressures in range of original isotherm, distributed linearly. Number
+        of steps is determined by `num` parameter.
+    num: int, optional
+        The number of steps to use when generating the grid.
+    branch: {'ads', 'des', None}, optional
+        Branch of the isotherm with which enthalpy is associated. Defaults to
+        adsorption.
+    verbose: bool, optional
+        Whether to be verbose. Defaults to False.
+
+    Returns
+    -------
+    grid: pandas DataFrame
+        Dataframe of predicted loadings as a function of temperature (index)
+        and pressure (columns)
+    """
+    original_isotherm.convert(
+        pressure_unit='Pa', pressure_mode='absolute',
+        loading_unit='mol', loading_basis='molar',
+        material_unit='kg', material_basis='mass',
+    )
     T_experiment = original_isotherm.temperature
 
+    if branch is None:
+        raise ParameterError(
+            """
+            Functionality for both branches not completed yet. Please use 'ads'
+            or 'des'.
+            """
+        )
+
+    if num is None:
+        num=100
+
     if pressures is None:
-        pressures = original_isotherm.pressure(branch=branch)
+        pressures = np.linspace(
+            min(original_isotherm.pressure(branch=branch)),
+            max(original_isotherm.pressure(branch=branch)),
+            num=num,
+        )
 
     if temperatures is None:
-        lower_limit = T_experiment - 50
-        if lower_limit < 0:
+        if T_range is None:
+            T_range = [T_experiment-50, T_experiment+50]
+        if T_range[0] < 0:
             lower_limit = 0
         temperatures = np.linspace(
-            lower_limit, T_experiment + 50,
+            T_range[0], T_range[1],
             num=len(pressures),
         )
 
@@ -219,6 +272,7 @@ def predict_adsorption_grid(
             original_isotherm=original_isotherm,
             isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
             branch=branch,
+            verbose=False,
         )
         lims = [
             min(predicted_isotherm.pressure()),
@@ -233,10 +287,27 @@ def predict_adsorption_grid(
         ]
         data.append(loadings)
 
-    return pd.DataFrame(
+    grid = pd.DataFrame(
         data=data,
-        index=temperatures, columns=pressures,
+        index=temperatures, columns=pressures/1000,
     )
+
+    if verbose:
+        import matplotlib.pyplot as plt
+        from pygaps.graphing import prediction_graphs
+        prediction_graphs.plot_adsorption_heatmap(
+            grid,
+            original_temperature=original_isotherm.temperature,
+            units = {
+                'pressure': 'kPa',
+                'temperature': original_isotherm.temperature_unit,
+                'loading': original_isotherm.loading_unit,
+                'material': original_isotherm.material_unit,
+            }
+        )
+        plt.show()
+
+    return grid
 
 
 def predict_pressure_raw(
