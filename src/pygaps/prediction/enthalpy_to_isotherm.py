@@ -7,8 +7,10 @@ import numpy as np
 from scipy import constants
 import pandas as pd
 
-from pygaps.core.pointisotherm import PointIsotherm
 import pygaps.graphing as pgg
+from pygaps.graphing.labels import label_units_dict
+
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps import logger
 from pygaps.utilities.exceptions import ParameterError
 
