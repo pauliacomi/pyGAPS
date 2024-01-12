@@ -15,12 +15,6 @@ from pygaps.core.adsorbate import Adsorbate
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 
 
-def pressure_at(isotherm, n):
-    try:
-        return isotherm.pressure_at(n)
-    except CalculationError:
-        return np.NAN
-
 
 def enthalpy_sorption_whittaker(
     isotherm: BaseIsotherm,
@@ -145,8 +139,10 @@ def enthalpy_sorption_whittaker(
 
     if not pgm.is_model_whittaker(model):
         raise ParameterError(
-            '''Whittaker method requires modelling with one of ''',
-            *pgm._WHITTAKER_MODELS
+            f'''
+            Whittaker method requires modelling with a Toth-type model, i.e.
+            {*pgm._WHITTAKER_MODELS,}
+            '''
         )
 
     if loading is None:
@@ -160,11 +156,10 @@ def enthalpy_sorption_whittaker(
     params = isotherm.model.params
     n_m_list = [v for k, v in params.items() if 'n_m' in k]
     K_list = [v for k, v in params.items() if 'K' in k]
-    if model.lower() in ['dstoth', 'toth', 'chemiphysisorption']:
-        t_list = [v for k, v in params.items() if 't' in k]
-        if model.lower() == 'chemiphysisorption':
-            t_list.append(1)
-    else:
+    t_list = [v for k, v in params.items() if 't' in k]
+    if model.lower() == 'chemiphysisorption':
+        t_list.append(1)
+    if len(t_list) == 0:
         t_list = [1 for i in range(len(K_list))]
 
     # Critical, triple and saturation pressure
@@ -184,9 +179,11 @@ def enthalpy_sorption_whittaker(
         isotherm.adsorbate,
     )
 
-    n_terms = len([term for term in [*n_m_list, *K_list, *t_list] if term != 1])
-    print(n_terms)
-    stderr = stderr_estimate(n_terms, isotherm.model.rmse, enthalpy)
+    stderr = stderr_estimate(
+        count_variables(n_m_list, K_list, t_list),
+        isotherm.model.rmse,
+        enthalpy
+    )
 
     if verbose and dographs:
         isosteric_enthalpy_plot(
@@ -200,8 +197,67 @@ def enthalpy_sorption_whittaker(
         'loading': loading,
         'enthalpy_sorption': enthalpy,
         'model_isotherm': isotherm,
-        'stderr': stderr,
+        'std_errs': stderr,
     }
+
+
+def pressure_at(
+    isotherm: BaseIsotherm,
+    n: list[float],
+):
+    """
+    Wrapper for `isotherm.pressure_at()` which returns NAN on a
+    `CalculationError`.
+
+    Parameters
+    ----------
+    isotherm: BaseIsotherm
+        isotherm to use
+    n: float
+        Loading from which to derive pressure
+
+    Returns
+    ------
+    pressure at `n` if possible
+    or `np.NAN` if not.
+    """
+    try:
+        return isotherm.pressure_at(n)
+    except CalculationError:
+        return np.NAN
+
+
+def count_variables(
+    n_m_list: list[float],
+    K_list: list[float],
+    t_list: list[float],
+):
+    r"""
+    Counts the number of appearances of each of the isotherm model parameters
+    in the Whittaker equation.
+    Per summation,  for every `i` in;
+
+    .. math::
+
+        \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}{1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
+
+    Thus, `n_m_i` is counted twice, K_i counted once and `t_i` counted four
+    times. t_i term is ignored if equal to 1 (as in the chemiphysisorption
+    model).
+
+    Parameters
+    ---------
+    n_m_list: list of floats
+    K_list: list of floats
+    t_list: list of floats
+
+    Returns
+    ------
+    Total number of instances of terms.
+    """
+    t_list = [term for term in t_list if term != 1]
+    total = (2 * len(n_m_list)) + len(K_list) + (4 * len(t_list))
+    return total
 
 
 def stderr_estimate(
