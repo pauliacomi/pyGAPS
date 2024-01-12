@@ -7,6 +7,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.graphing.mpl_styles import BASE_STYLE
 import pygaps.graphing as pgg
 
@@ -33,12 +34,65 @@ def same_orders_of_maximum(vals: list[list[float]]):
 
 
 @mpl.rc_context(BASE_STYLE)
+def plot_isothermfit_enthalpy_prediction(
+    original_isotherm: PointIsotherm,
+    model_isotherm: ModelIsotherm,
+    predicted_isotherm: PointIsotherm,
+    loading: list[float],
+    enthalpy: list[float],
+    branch: str ='ads',
+    enthalpy_stderr: list[float] = None,
+    axs: list[mpl.axes.Axes] = None,
+):
+    if axs is None:
+        fig = plt.figure(figsize=(12, 4), layout='tight')
+        isofit_ax = fig.add_subplot(131)
+        enthalpy_ax = fig.add_subplot(132)
+        isos_ax = fig.add_subplot(133)
+    else:
+        isofit_ax = axs[0]
+        enthalpy_ax = axs[1]
+        isos_ax = axs[2]
+
+    if enthalpy_stderr is None:
+        enthalpy_stderr = [0 for n in loading]
+
+    pgg.model_graphs.plot_model_guesses(
+        attempts=[model_isotherm],
+        pressure=original_isotherm.pressure(
+            branch=branch, pressure_unit='Pa',
+            pressure_mode='absolute'
+        ),
+        loading=original_isotherm.loading(
+            branch=branch,
+            loading_unit='mol', loading_basis='molar',
+            material_unit='kg', material_basis='mass',
+        ),
+        ax=isofit_ax
+    )
+
+    plot_enthalpy_prediction(
+        original_isotherm,
+        predicted_isotherm,
+        loading,
+        enthalpy,
+        branch=branch,
+        enthalpy_stderr=enthalpy_stderr,
+        axs=[enthalpy_ax, isos_ax]
+    )
+
+    logx=False
+    if isos_ax.xaxis.get_scale() == 'log':
+        logx=True
+
+
+@mpl.rc_context(BASE_STYLE)
 def plot_enthalpy_prediction(
     original_isotherm: PointIsotherm,
     predicted_isotherm: PointIsotherm,
-    branch: str,
     loading: list[float],
     enthalpy: list[float],
+    branch: str ='ads',
     enthalpy_stderr: list[float] = None,
     axs: list[mpl.axes.Axes] = None,
 ):
@@ -68,13 +122,11 @@ def plot_enthalpy_prediction(
         [original_isotherm.pressure(), predicted_isotherm.pressure()]
         ),
     )
-    isos_ax.legend(
-        [
-            f'Original at {original_isotherm.temperature} K',
-            f'Predicted at {predicted_isotherm.temperature} K',
-        ],
-        frameon=False
-    )
+    lgd_keys = [
+        f'Original at {original_isotherm.temperature} K',
+        f'Predicted at {predicted_isotherm.temperature} K'
+    ]
+    isos_ax.legend(lgd_keys, frameon=False)
 
     plt.show()
 

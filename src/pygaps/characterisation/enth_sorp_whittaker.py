@@ -12,6 +12,7 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.core.adsorbate import Adsorbate
+from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 
 
 def pressure_at(isotherm, n):
@@ -22,10 +23,11 @@ def pressure_at(isotherm, n):
 
 
 def enthalpy_sorption_whittaker(
-    isotherm: "BaseIsotherm",
+    isotherm: BaseIsotherm,
     model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
+    dographs: bool = True,
     **kwargs,
 ):
     r"""
@@ -55,6 +57,8 @@ def enthalpy_sorption_whittaker(
         - ``enthalpy_sorption`` (array) : the isosteric enthalpy of adsorption in kJ/mol
         - ``loading`` (array) : the loading for each point of the isosteric
           enthalpy, in mmol/g
+        - ``model_isotherm`` (ModelIsotherm): the model isotherm used to
+        calculate the enthalpies.
 
     Raises
     ------
@@ -122,25 +126,22 @@ def enthalpy_sorption_whittaker(
         model = isotherm.model.name
 
     elif isinstance(isotherm, PointIsotherm):
-        isotherm.convert_pressure(unit_to='Pa')
-        max_nfev = kwargs.get('max_nfev', None)
+        isotherm.convert_pressure(unit_to='Pa', mode_to='absolute',)
+        isotherm.convert_temperature(unit_to='K')
+
         if model == 'guess':
-            isotherm = pgm.model_iso(
-                isotherm,
-                branch='ads',
-                model=_WHITTAKER_MODELS,
-                verbose=verbose,
-                optimization_params=dict(max_nfev=max_nfev)
-            )
-            model = isotherm.model.name
-        else:
-            isotherm = pgm.model_iso(
-                isotherm,
-                branch='ads',
-                model=model,
-                verbose=verbose,
-                optimization_params=dict(max_nfev=max_nfev)
-            )
+            model = pgm._WHITTAKER_MODELS
+
+        max_nfev = kwargs.get('max_nfev', None)
+        isotherm = pgm.model_iso(
+            isotherm,
+            branch='ads',
+            model=model,
+            verbose=verbose,
+            optimization_params=dict(max_nfev=max_nfev)
+        )
+
+        model = isotherm.model.name
 
     if not pgm.is_model_whittaker(model):
         raise ParameterError(
@@ -183,8 +184,7 @@ def enthalpy_sorption_whittaker(
         isotherm.adsorbate,
     )
 
-    if verbose:
-        from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
+    if verbose and dographs:
         isosteric_enthalpy_plot(
             loading,
             enthalpy,
@@ -258,7 +258,6 @@ def enthalpy_sorption_whittaker_raw(
         Isosteric enthalpies of adsorption, in kJ/mol.
     """
 
-    print(K_list, n_m_list, t_list)
     if not (
         len(K_list) == len(n_m_list) == len(t_list)
     ):

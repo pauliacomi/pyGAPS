@@ -6,5 +6,4 @@ from .pgiast import iast_point_fraction
 from .pgiast import iast_binary_svp
 from .pgiast import iast_binary_vle
 from .pgiast import reverse_iast
-from .enthalpy_to_isotherm import predict_isotherm
-from .enthalpy_to_isotherm import predict_pressure_raw
+from .enthalpy_to_isotherm import *

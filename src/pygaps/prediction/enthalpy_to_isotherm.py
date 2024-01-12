@@ -10,19 +10,103 @@ import pandas as pd
 import pygaps.graphing as pgg
 from pygaps.graphing.labels import label_units_dict
 
+from pygaps.characterisation import enthalpy_sorption_whittaker
+
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps import logger
 from pygaps.utilities.exceptions import ParameterError
 
 R = constants.gas_constant
 
+#TODO decide if we need to change PointIsotherm object to include enthalpies
 
-def predict_isotherm(
+def direct_from_isotherm(
+    T_predict: list[float],
+    original_isotherm: PointIsotherm,
+    model: 'str',
+    loading: list[float] = None,
+    branch: str = 'ads',
+    verbose: bool = False,
+    **kwargs,
+):
+    """
+    Directly predicts an isotherm at a different temperature, based on
+    modelling with a whittaker-consistent (Toth-type) model. This is a wrapper
+    function that uses `characterisation.enthalpy_sorption_whittaker()` and
+    `from_whittaker_and_isotherm()` functions.
+
+    Parameters
+    ---------
+    T_predict: float
+        The temperature at which to predict the isotherm. Units are K.
+    original_isotherm: PointIsotherm
+        The experimental isotherm that has been measured.
+    model: 'str'
+        The model to use to fit the PointIsotherm, must be one of
+        `_WHITTAKER_MODELS`. If set to 'guess', will attempt fitting with all of
+        the `_WHITTAKER_MODELS`, and selects best fit.
+    loading: list[float], optional
+        The loadings for which to calculate the isosteric heat of adsorption
+        with the `enthalpy_sorption_whittaker()` function.
+    branch: str,  optional
+        Branch of the isotherm to use, and thus to generate predicted isotherm
+        with.
+        Defaults to adsorption.
+    verbose: bool, optional
+        Whether to print out extra information and generate a graph.
+    **kwargs
+
+    Returns
+    ------
+    predicted_isotherm: PointIsotherm
+        The isotherm predicted from the above parameters. Pressure in Pa,
+        loading in mol/kg.
+    whittaker_dictionary: dict
+        A dictionary with the isosteric enthalpies per loading, with the form:
+
+        - ``enthalpy_sorption`` (array) : the isosteric enthalpy of adsorption in kJ/mol
+        - ``loading`` (array) : the loading for each point of the isosteric
+          enthalpy, in mmol/g
+        - ``model_isotherm`` (ModelIsotherm): the model isotherm used to
+        calculate the enthalpies.
+    """
+    whittaker_dictionary = enthalpy_sorption_whittaker(
+        original_isotherm,
+        model=model,
+        loading=loading,
+        verbose=verbose,
+        dographs=False,
+        **kwargs,
+    )
+
+    predicted_isotherm = from_whittaker_and_isotherm(
+        T_predict, original_isotherm,
+        isosteric_enthalpy_dictionary = whittaker_dictionary,
+        branch=branch,
+        verbose=verbose,
+        dographs=False,
+    )
+
+    if verbose:
+        pgg.prediction_graphs.plot_isothermfit_enthalpy_prediction(
+            original_isotherm,
+            whittaker_dictionary['model_isotherm'],
+            predicted_isotherm,
+            loading,
+            enthalpy=whittaker_dictionary['enthalpy_sorption'],
+            branch=branch,
+        )
+
+    return predicted_isotherm, whittaker_dictionary
+
+
+def from_whittaker_and_isotherm(
     T_predict: float,
     original_isotherm: PointIsotherm,
     isosteric_enthalpy_dictionary: dict() = None,
     branch: str = 'ads',
     verbose: bool = False,
+    dographs: bool = True,
 ):
     r"""
     Predicts isotherm at a given temperature :math:`T_p`, from isosteric
@@ -168,7 +252,7 @@ def predict_isotherm(
         apparatus='predicted from pygaps',
     )
 
-    if verbose:
+    if verbose and dographs:
         pgg.prediction_graphs.plot_enthalpy_prediction(
             original_isotherm, predicted_isotherm,
             loading, enthalpy,
@@ -269,7 +353,7 @@ def predict_adsorption_heatmap(
 
     data = []
     for T in temperatures:
-        predicted_isotherm = predict_isotherm(
+        predicted_isotherm = from_whittaker_and_isotherm(
             T_predict=T,
             original_isotherm=original_isotherm,
             isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
