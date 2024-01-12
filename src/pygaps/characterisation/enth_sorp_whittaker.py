@@ -184,11 +184,15 @@ def enthalpy_sorption_whittaker(
         isotherm.adsorbate,
     )
 
+    n_terms = len([term for term in [*n_m_list, *K_list, *t_list] if term != 1])
+    print(n_terms)
+    stderr = stderr_estimate(n_terms, isotherm.model.rmse, enthalpy)
+
     if verbose and dographs:
         isosteric_enthalpy_plot(
             loading,
             enthalpy,
-            [0 for n in loading],
+            stderr,
             isotherm.units,
         )
 
@@ -196,20 +200,30 @@ def enthalpy_sorption_whittaker(
         'loading': loading,
         'enthalpy_sorption': enthalpy,
         'model_isotherm': isotherm,
+        'stderr': stderr,
     }
 
 
+def stderr_estimate(
+    n_terms: int,
+    rmse: float,
+    enthalpy: list[float],
+):
+    absolute_uncertainty = 0.434 * (np.sqrt(n_terms * (rmse**2)))
+    return [absolute_uncertainty * H for H in enthalpy]
+
+
 def enthalpy_sorption_whittaker_raw(
-    pressure: list[float] = None,
-    loading: list[float] = None,
-    p_sat: float = None,
-    p_c: float = None,
-    p_t: float = None,
-    K_list: list[float] = None,
-    n_m_list: list[float] = None,
-    t_list: list[float] = None,
-    T: float = None,
-    adsorbate: Adsorbate = None,
+    pressure: list[float],
+    loading: list[float],
+    p_sat: float,
+    p_c: float,
+    p_t: float,
+    K_list: list[float],
+    n_m_list: list[float],
+    t_list: list[float],
+    T: float,
+    adsorbate: Adsorbate,
 ):
     """
     Calculate the isosteric enthalpy of adsorption using model parameters from
