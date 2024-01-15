@@ -217,7 +217,7 @@ def aerosil_MCM(pressure: float) -> float:
             t = (pm["D1"]/(pm['D2']-numpy.log10(p)))**pm['D3']
         else:
             t = pm['E1']*p**pm['E2'] + pm['E3']*p**pm['E4']
-            return t
+        return t
     calc_t_v = numpy.vectorize(calc_t)
     thickness_array = calc_t_v(pressure, pm)
     return thickness_array
