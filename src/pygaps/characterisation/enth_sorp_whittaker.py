@@ -170,7 +170,7 @@ def enthalpy_sorption_whittaker(
     )
 
     pressure = [pressure_at(isotherm, n) for n in loading]
-    loading, enthalpy = enthalpy_sorption_whittaker_raw(
+    enthalpy = enthalpy_sorption_whittaker_raw(
         pressure, loading,
         p_sat, p_c, p_t,
         K_list, n_m_list, t_list,
@@ -331,19 +331,25 @@ def enthalpy_sorption_whittaker_raw(
         raise ParameterError('''Different length model parameter lists''')
 
     if len(pressure) != len(loading):
-        raise ParameterError('''Loading and pressure lists must be same length!''')
+        raise ParameterError(
+            '''Loading and pressure lists must be same length!'''
+        )
 
     RT = scipy.constants.R * T
     log_bracket = []
     for K, t, n_m, in zip(K_list, t_list, n_m_list,):
-        with warnings.catch_warnings(): # need to log warnings
+        exponent = (t - 1) / t
+        with warnings.catch_warnings(record=True) as w:  # need to log warnings
             warnings.simplefilter("ignore")
             theta_t = [(n / n_m)**t for n in loading]
             theta_bracket = [
-                np.log(p_sat * K * ((tt) / (1-tt))**((t-1)/t))
+                np.log(p_sat * K * (tt / (1 - tt))**exponent)
                 for tt in theta_t
             ]
             log_bracket.append(theta_bracket)
+            if len(w) > 0:
+                print(w)
+
     d_lambda = [RT * sum(x) for x in zip(*log_bracket)]
 
     h_vap = []
@@ -355,4 +361,4 @@ def enthalpy_sorption_whittaker_raw(
         h_vap.append(adsorbate.enthalpy_vaporisation(press=p, ) * 1000)
 
     enthalpy = [(x + y + RT) / 1000 for x, y in zip(d_lambda, h_vap)]
-    return loading, enthalpy
+    return enthalpy

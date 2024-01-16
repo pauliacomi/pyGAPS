@@ -202,17 +202,10 @@ def from_whittaker_and_isotherm(
 
         if verbose:
             logger.info(
-                """
+                '''
                 Using enthalpy from isosteric_enthalpy_dictionary.
-                """
+                '''
             )
-
-    if verbose:
-        logger.info(
-            f"""
-            Min={min(enthalpy)}\tmax={max(enthalpy)}\tlength={len(enthalpy)}
-            """
-        )
 
     P_experiment = original_isotherm.pressure_at(
         loading,
@@ -438,16 +431,17 @@ def predict_pressure_raw(
     T_difference = T_predict - T_experiment
     if T_difference > 50:
         logger.warning(
-            f'''
-            Difference in experimental and prediction temperatures is more than
-            50 K ({T_difference} K). This method may not be reliable for
-            predicting a new isotherm.
+            rf'''
+            Difference in experimental and prediction temperatures is more
+            than 50 K ({T_difference} K). This method may not be reliabl
+            for predicting a new isotherm.
             '''
         )
 
     P_predict = [
-        np.exp(((1e3*H*T_difference) / RTT) + np.log(P)) for
-        H, P in zip(enthalpy, P_experiment)
+        np.exp(((1e3 * H * T_difference) / RTT)
+               + np.log(P))
+        for H, P in zip(enthalpy, P_experiment)
     ]
 
     return P_predict
