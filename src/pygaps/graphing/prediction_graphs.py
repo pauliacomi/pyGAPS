@@ -54,6 +54,9 @@ def plot_isothermfit_enthalpy_prediction(
         enthalpy_ax = axs[1]
         isos_ax = axs[2]
 
+    if loading is None:
+        loading = original_isotherm.loading(branch=branch)
+
     if enthalpy_stderr is None:
         enthalpy_stderr = [0 for n in loading]
 

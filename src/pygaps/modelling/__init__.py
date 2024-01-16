@@ -47,6 +47,8 @@ _GUESS_MODELS = [
     "BET",
     "TemkinApprox",
     "Toth",
+    "DSToth",
+    "ChemiPhysisorption",
     "JensenSeaton",
 ]
 
@@ -66,6 +68,8 @@ _IAST_MODELS = [
 ]
 
 
+# This list has all the models which are consistent with Whittaker method.
+# List may be updated as Whittaker theory is improved.
 _WHITTAKER_MODELS = [
     "Langmuir",
     "DSLangmuir",
@@ -73,6 +77,13 @@ _WHITTAKER_MODELS = [
     "Toth",
     "DSToth",
     "ChemiPhysisorption",
+]
+
+# This list has all Toth-derived models
+_TOTH_DERIVATIVE_MODELS = [
+    "Toth",
+    "DSToth",
+    "ChemiPhysisorption"
 ]
 
 def is_model(model_name: str) -> bool:
@@ -146,6 +157,42 @@ def is_model_whittaker(model_name: str) -> bool:
 
     """
     return model_name.lower() in map(str.lower, _WHITTAKER_MODELS)
+
+
+def is_model_langmuir_derivative(model_name: str) -> bool:
+    """
+    Check whether specified model is in Langmuir family.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model
+
+    Returns
+    -------
+    bool
+        Whether it is Langmuir-type or not.
+
+    """
+    return 'langmuir' in model_name.lower()
+
+
+def is_model_toth_derivative(model_name: str) -> bool:
+    """
+    Check whether specified model is in Toth family.
+
+    Parameters
+    ----------
+    model_name : str
+        The name of the model
+
+    Returns
+    -------
+    bool
+        Whether it is Toth-derivative or not.
+
+    """
+    return model_name.lower() in map(str.lower, _TOTH_DERIVATIVE_MODELS)
 
 def is_model_class(model):
     """

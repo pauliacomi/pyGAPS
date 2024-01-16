@@ -8,6 +8,7 @@ from scipy import constants
 import pandas as pd
 
 import pygaps.graphing as pgg
+import pygaps.graphing.prediction_graphs
 from pygaps.graphing.labels import label_units_dict
 
 from pygaps.characterisation import enthalpy_sorption_whittaker
@@ -19,6 +20,7 @@ from pygaps.utilities.exceptions import ParameterError
 R = constants.gas_constant
 
 #TODO decide if we need to change PointIsotherm object to include enthalpies
+
 
 def direct_from_isotherm(
     T_predict: list[float],
@@ -81,7 +83,7 @@ def direct_from_isotherm(
 
     predicted_isotherm = from_whittaker_and_isotherm(
         T_predict, original_isotherm,
-        isosteric_enthalpy_dictionary = whittaker_dictionary,
+        isosteric_enthalpy_dictionary=whittaker_dictionary,
         branch=branch,
         verbose=verbose,
         dographs=False,

@@ -15,7 +15,6 @@ from pygaps.core.adsorbate import Adsorbate
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 
 
-
 def enthalpy_sorption_whittaker(
     isotherm: BaseIsotherm,
     model: str = 'Toth',
@@ -328,9 +327,7 @@ def enthalpy_sorption_whittaker_raw(
         Isosteric enthalpies of adsorption, in kJ/mol.
     """
 
-    if not (
-        len(K_list) == len(n_m_list) == len(t_list)
-    ):
+    if not (len(K_list) == len(n_m_list) == len(t_list)):
         raise ParameterError('''Different length model parameter lists''')
 
     if len(pressure) != len(loading):
