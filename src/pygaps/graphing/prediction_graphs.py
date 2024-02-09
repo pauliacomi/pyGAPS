@@ -40,7 +40,7 @@ def plot_isothermfit_enthalpy_prediction(
     predicted_isotherm: PointIsotherm,
     loading: list[float],
     enthalpy: list[float],
-    branch: str ='ads',
+    branch: str = 'ads',
     enthalpy_stderr: list[float] = None,
     axs: list[mpl.axes.Axes] = None,
 ):
@@ -84,10 +84,6 @@ def plot_isothermfit_enthalpy_prediction(
         axs=[enthalpy_ax, isos_ax]
     )
 
-    logx=False
-    if isos_ax.xaxis.get_scale() == 'log':
-        logx=True
-
 
 @mpl.rc_context(BASE_STYLE)
 def plot_enthalpy_prediction(
@@ -95,7 +91,7 @@ def plot_enthalpy_prediction(
     predicted_isotherm: PointIsotherm,
     loading: list[float],
     enthalpy: list[float],
-    branch: str ='ads',
+    branch: str = 'ads',
     enthalpy_stderr: list[float] = None,
     axs: list[mpl.axes.Axes] = None,
 ):

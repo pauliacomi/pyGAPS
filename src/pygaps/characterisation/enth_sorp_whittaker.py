@@ -17,6 +17,7 @@ from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 
 def enthalpy_sorption_whittaker(
     isotherm: BaseIsotherm,
+    branch: str = 'ads',
     model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
@@ -116,10 +117,9 @@ def enthalpy_sorption_whittaker(
     if isinstance(isotherm, ModelIsotherm):
         if isotherm.units['pressure_unit'] != 'Pa':
             raise ParameterError('''Model isotherms should be in Pa.''')
-        model = isotherm.model.name
 
     elif isinstance(isotherm, PointIsotherm):
-        isotherm.convert_pressure(unit_to='Pa', mode_to='absolute',)
+        isotherm.convert_pressure(unit_to='Pa', mode_to='absolute', pseudo=True)
         isotherm.convert_temperature(unit_to='K')
 
         if model == 'guess':
@@ -128,13 +128,21 @@ def enthalpy_sorption_whittaker(
         max_nfev = kwargs.get('max_nfev', None)
         isotherm = pgm.model_iso(
             isotherm,
-            branch='ads',
+            branch=branch,
             model=model,
             verbose=verbose,
             optimization_params=dict(max_nfev=max_nfev)
         )
 
-        model = isotherm.model.name
+    else:
+        raise ParameterError(
+            f'''
+            Isotherm must be ModelIsotherm or BasIsotherm.
+            You have input a {type(isotherm)}.
+            '''
+        )
+
+    model = isotherm.model.name
 
     if not pgm.is_model_whittaker(model):
         raise ParameterError(
@@ -265,7 +273,7 @@ def stderr_estimate(
     enthalpy: list[float],
 ):
     absolute_uncertainty = 0.434 * (np.sqrt(n_terms * (rmse**2)))
-    return [absolute_uncertainty * H for H in enthalpy]
+    return [abs(absolute_uncertainty) * H for H in enthalpy]
 
 
 def enthalpy_sorption_whittaker_raw(
@@ -343,7 +351,7 @@ def enthalpy_sorption_whittaker_raw(
             warnings.simplefilter("ignore")
             theta_t = [(n / n_m)**t for n in loading]
             theta_bracket = [
-                np.log(p_sat * K * (tt / (1 - tt))**exponent)
+                np.log(p_sat * K * ((tt) / (1 - tt))**exponent)
                 for tt in theta_t
             ]
             log_bracket.append(theta_bracket)

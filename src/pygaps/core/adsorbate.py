@@ -522,6 +522,7 @@ class Adsorbate():
         unit: str = None,
         calculate: bool = True,
         pseudo: bool = False,
+        verbose: bool = False,
     ) -> float:
         """
         Get the saturation pressure at a particular temperature, in desired unit (default Pa).
@@ -554,9 +555,10 @@ class Adsorbate():
             If it cannot be calculated, due to a physical reason.
 
         """
-        #TODO add Antoine version
+        # TODO add Antoine version
         if (pseudo and temp > self.t_critical()):
-            logger.warning(f'Dubinin pseudo-saturation pressure calculated.')
+            if verbose:
+                logger.warning('Dubinin pseudo-saturation pressure calculated.')
             return self.dubinin_pseudo_saturation_pressure(temp=temp, unit=unit)
 
         if calculate:
@@ -566,7 +568,10 @@ class Adsorbate():
                 sat_p = state.p()
             except BaseException as err:
                 _warn_reading_params(err)
-                sat_p = self.saturation_pressure(temp, unit=unit, calculate=False)
+                sat_p = self.saturation_pressure(
+                    temp,
+                    unit=unit, calculate=False
+                )
 
             if unit is not None:
                 sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)

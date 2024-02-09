@@ -19,7 +19,7 @@ from pygaps.utilities.exceptions import ParameterError
 
 R = constants.gas_constant
 
-#TODO decide if we need to change PointIsotherm object to include enthalpies
+# TODO decide if we need to change PointIsotherm object to include enthalpies
 
 
 def direct_from_isotherm(
@@ -72,6 +72,9 @@ def direct_from_isotherm(
         - ``model_isotherm`` (ModelIsotherm): the model isotherm used to
         calculate the enthalpies.
     """
+    if loading is None:
+        loading = original_isotherm.loading(branch=branch)
+
     whittaker_dictionary = enthalpy_sorption_whittaker(
         original_isotherm,
         model=model,
@@ -433,7 +436,7 @@ def predict_pressure_raw(
         logger.warning(
             rf'''
             Difference in experimental and prediction temperatures is more
-            than 50 K ({T_difference} K). This method may not be reliabl
+            than 50 K ({T_difference} K). This method may not be reliable
             for predicting a new isotherm.
             '''
         )
