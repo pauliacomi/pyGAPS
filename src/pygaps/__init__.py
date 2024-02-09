@@ -30,7 +30,7 @@ hard_dependencies = ("numpy", "pandas", "scipy")
 soft_dependencies = {"CoolProp": "Used for many thermodynamic backend calculations."}
 missing_dependencies = []
 
-import importlib
+import importlib.util
 for dependency in hard_dependencies:
     if not importlib.util.find_spec(dependency):
         missing_dependencies.append(dependency)
