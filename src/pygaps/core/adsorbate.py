@@ -941,6 +941,18 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
+    def compressibility(
+        self,
+        temp: float = None,
+        pressure: float = None,
+    ) -> float:
+        adsorbate = self.backend_name
+        return CP.CoolProp.PropsSI(
+            'Z',
+            'T', temp,
+            'P', pressure,
+            adsorbate
+        )
 
 def _warn_reading_params(err):
     logger.warning(
