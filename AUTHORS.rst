@@ -14,3 +14,4 @@ Contributors
 
 - Anne Galarneau (ICGM) - scientific discussion for appropriate standard isotherms
 - Thomas B. Cooper - feedback for BET/Langmuir area improvements
+- Sebastian Rejman - additional t_curve
