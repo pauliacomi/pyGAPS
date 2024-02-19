@@ -4,8 +4,9 @@ import numpy as np
 import scipy.constants
 import warnings
 
+from CoolProp.CoolProp import PropsSI
+
 import pygaps.modelling as pgm
-from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
@@ -357,16 +358,26 @@ def enthalpy_sorption_whittaker_raw(
             log_bracket.append(theta_bracket)
             if len(w) > 0:
                 print(w)
+    adsorption_potential = [RT * sum(x) for x in zip(*log_bracket)]
 
-    d_lambda = [RT * sum(x) for x in zip(*log_bracket)]
-
-    h_vap = []
+    vaporisation_enthalpy = []
+    compressibility = []
     for p in pressure:
-        if np.isnan(p) or p < 0 or p > p_c or p > p_sat:
-            h_vap.append(np.NAN)
+        if np.isnan(p) or p <= 0 or p > p_c or p > p_sat:
+            vaporisation_enthalpy.append(np.NAN)
+            compressibility.append(np.NAN)
             continue
-        p = max(p, p_t)
-        h_vap.append(adsorbate.enthalpy_vaporisation(press=p, ) * 1000)
 
-    enthalpy = [(x + y + RT) / 1000 for x, y in zip(d_lambda, h_vap)]
+        compressibility.append(adsorbate.compressibility(T, p))
+
+        vaporisation_enthalpy.append(
+            adsorbate.enthalpy_vaporisation(press=(max(p, p_t))) * 1000
+        )
+
+    enthalpy = [
+        (epsilon + dH + (Z * RT)) / 1000
+        for epsilon, dH, Z
+        in zip(adsorption_potential, vaporisation_enthalpy, compressibility)
+    ]
+
     return enthalpy

@@ -943,9 +943,20 @@ class Adsorbate():
 
     def compressibility(
         self,
-        temp: float = None,
-        pressure: float = None,
+        temp: float,
+        pressure: float,
     ) -> float:
+        """
+        Calculate compressibility of adsorbate at given temperature and
+        pressure using CoolProp backend.
+
+        Parameters
+        ---------
+        temp: float
+            Temperature in K
+        pressure: float
+            pressure, in Pa
+        """
         adsorbate = self.backend_name
         return CP.CoolProp.PropsSI(
             'Z',
