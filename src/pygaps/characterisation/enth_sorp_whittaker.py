@@ -4,8 +4,6 @@ import numpy as np
 import scipy.constants
 import warnings
 
-from CoolProp.CoolProp import PropsSI
-
 import pygaps.modelling as pgm
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
@@ -165,9 +163,9 @@ def enthalpy_sorption_whittaker(
     n_m_list = [v for k, v in params.items() if 'n_m' in k]
     K_list = [v for k, v in params.items() if 'K' in k]
     t_list = [v for k, v in params.items() if 't' in k]
-    if model.lower() == 'chemiphysisorption':
+    if model.lower() == 'chemiphysisorption':  # so list lengths match
         t_list.append(1)
-    if len(t_list) == 0:
+    if len(t_list) == 0:  # so list lengths match
         t_list = [1 for i in range(len(K_list))]
 
     # Critical, triple and saturation pressure
@@ -345,10 +343,12 @@ def enthalpy_sorption_whittaker_raw(
         )
 
     RT = scipy.constants.R * T
+
+    # Calculate adsorption potential
     log_bracket = []
     for K, t, n_m, in zip(K_list, t_list, n_m_list,):
         exponent = (t - 1) / t
-        with warnings.catch_warnings(record=True) as w:  # need to log warnings
+        with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("ignore")
             theta_t = [(n / n_m)**t for n in loading]
             theta_bracket = [
@@ -360,10 +360,13 @@ def enthalpy_sorption_whittaker_raw(
                 print(w)
     adsorption_potential = [RT * sum(x) for x in zip(*log_bracket)]
 
+    # Calculate vaporisation enthalpy and compresssibility for
+    # T, p
     vaporisation_enthalpy = []
     compressibility = []
     for p in pressure:
         if np.isnan(p) or p <= 0 or p > p_c or p > p_sat:
+            # remove pressures where values can't be calculated
             vaporisation_enthalpy.append(np.NAN)
             compressibility.append(np.NAN)
             continue
@@ -374,8 +377,9 @@ def enthalpy_sorption_whittaker_raw(
             adsorbate.enthalpy_vaporisation(press=(max(p, p_t))) * 1000
         )
 
+    # Sum adsorption potential, vaporisation enthalpy, ZRT
     enthalpy = [
-        (epsilon + dH + (Z * RT)) / 1000
+        (epsilon + dH + (Z * RT)) / 1000  # return in J/mol
         for epsilon, dH, Z
         in zip(adsorption_potential, vaporisation_enthalpy, compressibility)
     ]
