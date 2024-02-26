@@ -272,7 +272,7 @@ def stderr_estimate(
     enthalpy: list[float],
 ):
     absolute_uncertainty = 0.434 * (np.sqrt(n_terms * (rmse**2)))
-    return [abs(absolute_uncertainty) * H for H in enthalpy]
+    return [abs(absolute_uncertainty * H) for H in enthalpy]
 
 
 def enthalpy_sorption_whittaker_raw(
