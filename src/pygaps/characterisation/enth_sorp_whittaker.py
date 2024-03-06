@@ -12,6 +12,7 @@ from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
+from pygaps import logging
 
 
 def enthalpy_sorption_whittaker(
@@ -113,30 +114,58 @@ def enthalpy_sorption_whittaker(
 
     """
 
+    p_sat = isotherm.adsorbate.saturation_pressure(
+        temp=isotherm.temperature,
+        pseudo=True,
+    )
+
     if isinstance(isotherm, ModelIsotherm):
         if isotherm.units['pressure_unit'] != 'Pa':
             raise ParameterError('''Model isotherms should be in Pa.''')
 
     elif isinstance(isotherm, PointIsotherm):
-        isotherm.convert_pressure(unit_to='Pa', mode_to='absolute', pseudo=True)
-        isotherm.convert_temperature(unit_to='K')
 
         if model == 'guess':
             model = pgm._WHITTAKER_MODELS
 
+        isotherm.convert_pressure(unit_to='Pa', mode_to='absolute', pseudo=True)
+        isotherm.convert_temperature(unit_to='K')
+
+        K_lower_limit = 1e2 / p_sat
+        param_bounds = {  # default to prevent tiny K
+                    'K': [K_lower_limit, np.inf],
+                    'K1': [K_lower_limit, np.inf],
+                    'K2': [K_lower_limit, np.inf],
+                    'K3': [K_lower_limit, np.inf],
+                    'n_m': [0., np.inf],
+                    'n_m1': [0., np.inf],
+                    'n_m2': [0., np.inf],
+                    'n_m3': [0., np.inf],
+                    't': [0., np.inf],
+                    't1': [0., np.inf],
+                    't2': [0., np.inf],
+                    'Ea': [0., np.inf],
+                }
+        param_bounds = kwargs.get('param_bounds', param_bounds)
+
         max_nfev = kwargs.get('max_nfev', None)
+
+        original_log_level = logging.logger.getEffectiveLevel()
+        logging.logger.setLevel(40)  # Prevents warning of bad parameters
         isotherm = pgm.model_iso(
             isotherm,
             branch=branch,
             model=model,
             verbose=verbose,
-            optimization_params=dict(max_nfev=max_nfev)
+            optimization_params=dict(max_nfev=max_nfev),
+            param_bounds=param_bounds,
         )
+        logging.logger.setLevel(original_log_level)  # Turn warnings back on
 
     else:
         raise ParameterError(
             f'''
-            Isotherm must be ModelIsotherm or BasIsotherm.
+            Isotherm must be ModelIsotherm or BaseIsotherm.
             You have input a {type(isotherm)}.
             '''
         )
@@ -160,9 +189,9 @@ def enthalpy_sorption_whittaker(
     # Local constants and model parameters
     T = isotherm.temperature
     params = isotherm.model.params
-    n_m_list = [v for k, v in params.items() if 'n_m' in k]
-    K_list = [v for k, v in params.items() if 'K' in k]
-    t_list = [v for k, v in params.items() if 't' in k]
+    n_m_list = [val for param, val in params.items() if 'n_m' in param]
+    K_list = [val for param, val in params.items() if 'K' in param]
+    t_list = [val for param, val in params.items() if 't' in param]
     if model.lower() == 'chemiphysisorption':  # so list lengths match
         t_list.append(1)
     if len(t_list) == 0:  # so list lengths match
@@ -379,7 +408,7 @@ def enthalpy_sorption_whittaker_raw(
 
     # Sum adsorption potential, vaporisation enthalpy, ZRT
     enthalpy = [
-        (epsilon + dH + (Z * RT)) / 1000  # return in J/mol
+        (epsilon + dH + (Z * RT)) / 1000  # return in kJ/mol
         for epsilon, dH, Z
         in zip(adsorption_potential, vaporisation_enthalpy, compressibility)
     ]
