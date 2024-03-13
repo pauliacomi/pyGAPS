@@ -114,24 +114,37 @@ def enthalpy_sorption_whittaker(
 
     """
 
+    # Critical, triple and saturation pressure
+    p_c = isotherm.adsorbate.p_critical()
+    p_t = isotherm.adsorbate.p_triple()
     p_sat = isotherm.adsorbate.saturation_pressure(
         temp=isotherm.temperature,
         pseudo=True,
     )
 
-    if isinstance(isotherm, ModelIsotherm):
-        if isotherm.units['pressure_unit'] != 'Pa':
-            raise ParameterError('''Model isotherms should be in Pa.''')
+    if not isinstance(isotherm, (PointIsotherm, ModelIsotherm)):
+        raise ParameterError(
+            f'''
+            Isotherm must be ModelIsotherm or PointIsotherm.
+            You have input a {type(isotherm)}.
+            '''
+        )
 
-    elif isinstance(isotherm, PointIsotherm):
+    if (
+        isinstance(isotherm, ModelIsotherm) and
+        isotherm.units['pressure_unit'] != 'Pa'
+    ):
+        raise ParameterError('''Model isotherms should be in Pa.''')
 
+    if isinstance(isotherm, PointIsotherm):
         if model == 'guess':
             model = pgm._WHITTAKER_MODELS
 
         isotherm.convert_pressure(unit_to='Pa', mode_to='absolute', pseudo=True)
         isotherm.convert_temperature(unit_to='K')
 
-        K_lower_limit = 1e2 / p_sat
+        K_factor = kwargs.get('K_factor', 1e2)
+        K_lower_limit = K_factor / p_sat
         param_bounds = {  # default to prevent tiny K
                     'K': [K_lower_limit, np.inf],
                     'K1': [K_lower_limit, np.inf],
@@ -162,14 +175,6 @@ def enthalpy_sorption_whittaker(
         )
         logging.logger.setLevel(original_log_level)  # Turn warnings back on
 
-    else:
-        raise ParameterError(
-            f'''
-            Isotherm must be ModelIsotherm or BaseIsotherm.
-            You have input a {type(isotherm)}.
-            '''
-        )
-
     model = isotherm.model.name
 
     if not pgm.is_model_whittaker(model):
@@ -196,14 +201,6 @@ def enthalpy_sorption_whittaker(
         t_list.append(1)
     if len(t_list) == 0:  # so list lengths match
         t_list = [1 for i in range(len(K_list))]
-
-    # Critical, triple and saturation pressure
-    p_c = isotherm.adsorbate.p_critical()
-    p_t = isotherm.adsorbate.p_triple()
-    p_sat = isotherm.adsorbate.saturation_pressure(
-        temp=isotherm.temperature,
-        pseudo=True,
-    )
 
     pressure = [pressure_at(isotherm, n) for n in loading]
     enthalpy = enthalpy_sorption_whittaker_raw(
@@ -412,5 +409,16 @@ def enthalpy_sorption_whittaker_raw(
         for epsilon, dH, Z
         in zip(adsorption_potential, vaporisation_enthalpy, compressibility)
     ]
+
+    if any(h < 0 for h in enthalpy):
+        raise CalculationError(
+            f'''
+            Whittaker calculation returned negative enthalpy values
+            This is usually because of very small K_i parameters
+            ({K_list})
+            relative to saturation pressure ({p_sat}).
+            Apply a different model or change the parameter bounds.
+            '''
+        )
 
     return enthalpy
