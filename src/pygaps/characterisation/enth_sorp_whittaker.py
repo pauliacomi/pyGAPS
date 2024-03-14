@@ -150,10 +150,10 @@ def enthalpy_sorption_whittaker(
                     'K1': [K_lower_limit, np.inf],
                     'K2': [K_lower_limit, np.inf],
                     'K3': [K_lower_limit, np.inf],
-                    'n_m': [0., np.inf],
-                    'n_m1': [0., np.inf],
-                    'n_m2': [0., np.inf],
-                    'n_m3': [0., np.inf],
+                    'n_m': [min(isotherm.loading()), np.inf],
+                    'n_m1': [min(isotherm.loading()), np.inf],
+                    'n_m2': [min(isotherm.loading()), np.inf],
+                    'n_m3': [min(isotherm.loading()), np.inf],
                     't': [0., np.inf],
                     't1': [0., np.inf],
                     't2': [0., np.inf],
@@ -301,6 +301,65 @@ def stderr_estimate(
     return [abs(absolute_uncertainty * H) for H in enthalpy]
 
 
+def adsorption_potential_raw(
+    n: float,
+    p_sat: float,
+    K_list: list[float],
+    n_m_list: list[float],
+    t_list: list[float],
+    RT: float,
+):
+    r"""
+    Calculate the adsorption potential from isotherm model parameters and
+    adsorbate saturation pressure, according to multisite Whittaker
+    approximation.
+
+    This is a bare-bones function intended for use from
+    `enthalpy_sorption_whittaker_raw`
+
+    Parameters
+    ----------
+    n: float = None,
+        loading at which to calculate adsorption potential
+    p_sat: float = None,
+        Saturation pressure of adsorbate at isotherm temperature, `T`. Must be
+        in Pa. Tip: if adsorbate is above its critical temperature, you can
+        calculate a Dubinin psuedo-saturation pressure using the convenience
+        function in the adsorbate class.
+    K_list: list[float] = None,
+        List of equilibrium constants, K from model fitting. Must be derived
+        from fitting to model with pressure units of Pa.
+    n_m_list: list[float] = None,
+        List of monolayer loadings, K from model fitting. Must be derived
+        from fitting to model with pressure units of Pa. Must have same units
+        as loading.
+    t_list: list[float] = None,
+        List of exponents, t from model fitting. Must be derived
+        from fitting to model with pressure units of Pa.
+    RT: float = None,
+        product of gas constant, `R` and isotherm temperature. Calculated in
+        `enthalpy_sorption_whittaker_raw`
+
+    Returns
+    ---------
+    adsorption_potential: float
+
+    Notes
+    ----
+    Calculated as 
+    ..math::
+        \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}{1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
+    """
+    log_bracket = 0
+    for K, t, n_m, in zip(K_list, t_list, n_m_list,):
+        theta = n / n_m
+        theta_t = theta**t
+        theta_function = ((theta_t) / (1 - theta_t))**((t - 1) / t)
+        log_bracket += np.log(p_sat * K * theta_function)
+
+    return RT * log_bracket
+
+
 def enthalpy_sorption_whittaker_raw(
     pressure: list[float],
     loading: list[float],
@@ -371,20 +430,13 @@ def enthalpy_sorption_whittaker_raw(
     RT = scipy.constants.R * T
 
     # Calculate adsorption potential
-    log_bracket = []
-    for K, t, n_m, in zip(K_list, t_list, n_m_list,):
-        exponent = (t - 1) / t
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("ignore")
-            theta_t = [(n / n_m)**t for n in loading]
-            theta_bracket = [
-                np.log(p_sat * K * ((tt) / (1 - tt))**exponent)
-                for tt in theta_t
-            ]
-            log_bracket.append(theta_bracket)
-            if len(w) > 0:
-                print(w)
-    adsorption_potential = [RT * sum(x) for x in zip(*log_bracket)]
+    adsorption_potential = [
+        adsorption_potential_raw(
+            n, p_sat,
+            K_list, n_m_list, t_list,
+            RT
+        ) for n in loading
+    ]
 
     # Calculate vaporisation enthalpy and compresssibility for
     # T, p
