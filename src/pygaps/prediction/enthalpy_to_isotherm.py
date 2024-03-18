@@ -22,7 +22,7 @@ R = constants.gas_constant
 # TODO decide if we need to change PointIsotherm object to include enthalpies
 
 
-def direct_from_isotherm(
+def isotherm_to_predicted(
     T_predict: list[float],
     original_isotherm: PointIsotherm,
     model: 'str',
@@ -84,7 +84,7 @@ def direct_from_isotherm(
         **kwargs,
     )
 
-    predicted_isotherm = from_whittaker_and_isotherm(
+    predicted_isotherm = enthalpy_and_isotherm_to_predicted(
         T_predict, original_isotherm,
         isosteric_enthalpy_dictionary=whittaker_dictionary,
         branch=branch,
@@ -105,7 +105,7 @@ def direct_from_isotherm(
     return predicted_isotherm, whittaker_dictionary
 
 
-def from_whittaker_and_isotherm(
+def enthalpy_and_isotherm_to_predicted(
     T_predict: float,
     original_isotherm: PointIsotherm,
     isosteric_enthalpy_dictionary: dict() = None,
@@ -260,7 +260,7 @@ def from_whittaker_and_isotherm(
     return predicted_isotherm
 
 
-def predict_adsorption_heatmap(
+def predict_adsorption_surface(
     original_isotherm: PointIsotherm,
     isosteric_enthalpy_dictionary: dict = None,
     temperatures: list[float] = None,
@@ -330,7 +330,7 @@ def predict_adsorption_heatmap(
         )
 
     if num is None:
-        num=100
+        num = 100
 
     if pressures is None:
         pressures = np.linspace(
@@ -341,9 +341,9 @@ def predict_adsorption_heatmap(
 
     if temperatures is None:
         if T_range is None:
-            T_range = [T_experiment-50, T_experiment+50]
+            T_range = [T_experiment - 50, T_experiment + 50]
         if T_range[0] < 0:
-            lower_limit = 0
+            T_range[0] = 0
         temperatures = np.linspace(
             T_range[0], T_range[1],
             num=len(pressures),
@@ -351,7 +351,7 @@ def predict_adsorption_heatmap(
 
     data = []
     for T in temperatures:
-        predicted_isotherm = from_whittaker_and_isotherm(
+        predicted_isotherm = enthalpy_and_isotherm_to_predicted(
             T_predict=T,
             original_isotherm=original_isotherm,
             isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
@@ -373,7 +373,7 @@ def predict_adsorption_heatmap(
 
     grid = pd.DataFrame(
         data=data,
-        index=temperatures, columns=pressures/1000,
+        index=temperatures, columns=pressures / 1000,
     )
 
     if verbose:
@@ -382,7 +382,7 @@ def predict_adsorption_heatmap(
         prediction_graphs.plot_adsorption_heatmap(
             grid,
             original_temperature=original_isotherm.temperature,
-            units = {
+            units={
                 'pressure': 'kPa',
                 'temperature': original_isotherm.temperature_unit,
                 'loading': original_isotherm.loading_unit,
