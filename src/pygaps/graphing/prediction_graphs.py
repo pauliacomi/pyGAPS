@@ -140,7 +140,7 @@ def plot_adsorption_heatmap(
     units: dict = {
         'pressure': 'kPa',
         'temperature': 'K',
-        'loading': 'mmol',
+        'loading': 'mol',
         'material': 'kg',
     },
     ax=None,
@@ -172,15 +172,24 @@ def plot_adsorption_heatmap(
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
+    pressures = grid.columns
+    unit_pressure = iter(['kPa, MPa', 'GPa', 'TPa'])
+    while np.log10(max(pressures)) > 4:
+        pressures = [p / 1000 for p in pressures]
+        units['pressure'] = next(unit_pressure)
+    grid.columns = pressures
+
+    aspect = max(grid.columns) / max(grid.index)
     im = ax.imshow(
         grid,
+        aspect=aspect,
         cmap=cmap,
         extent=[
             min(grid.columns), max(grid.columns),
             min(grid.index), max(grid.index),
         ],
     )
-    if not original_temperature is None:
+    if original_temperature is not None:
         ax.axhline(y=original_temperature, color='r', linestyle='-')
 
     ax.set_xlabel(f"P [{units['pressure']}]")

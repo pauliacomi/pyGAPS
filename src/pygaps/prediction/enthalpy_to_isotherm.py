@@ -314,11 +314,7 @@ def predict_adsorption_surface(
         Dataframe of predicted loadings as a function of temperature (index)
         and pressure (columns)
     """
-    original_isotherm.convert(
-        pressure_unit='Pa', pressure_mode='absolute',
-        loading_unit='mol', loading_basis='molar',
-        material_unit='kg', material_basis='mass',
-    )
+    original_isotherm.convert(pressure_unit='Pa', pressure_mode='absolute',)
     T_experiment = original_isotherm.temperature
 
     if branch is None:
@@ -373,7 +369,7 @@ def predict_adsorption_surface(
 
     grid = pd.DataFrame(
         data=data,
-        index=temperatures, columns=pressures / 1000,
+        index=temperatures, columns=pressures,
     )
 
     if verbose:
@@ -383,7 +379,6 @@ def predict_adsorption_surface(
             grid,
             original_temperature=original_isotherm.temperature,
             units={
-                'pressure': 'kPa',
                 'temperature': original_isotherm.temperature_unit,
                 'loading': original_isotherm.loading_unit,
                 'material': original_isotherm.material_unit,
