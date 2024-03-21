@@ -159,12 +159,17 @@ def enthalpy_sorption_whittaker(
                     't2': [0., np.inf],
                     'Ea': [0., np.inf],
                 }
+
         param_bounds = kwargs.get('param_bounds', param_bounds)
+        if type(model) == str:  # remove invalid parameters
+            params = pgm.get_isotherm_model(model).params.keys()
+            param_bounds = {
+                key: param_bounds[key] for key in param_bounds
+                if key in params
+            }
 
         max_nfev = kwargs.get('max_nfev', None)
 
-        original_log_level = logging.logger.getEffectiveLevel()
-        logging.logger.setLevel(40)  # Prevents warning of bad parameters
         isotherm = pgm.model_iso(
             isotherm,
             branch=branch,
@@ -173,7 +178,6 @@ def enthalpy_sorption_whittaker(
             optimization_params=dict(max_nfev=max_nfev),
             param_bounds=param_bounds,
         )
-        logging.logger.setLevel(original_log_level)  # Turn warnings back on
 
     model = isotherm.model.name
 
