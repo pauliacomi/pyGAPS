@@ -372,6 +372,7 @@ class PointIsotherm(BaseIsotherm):
         mode_to: str = None,
         unit_to: str = None,
         verbose: bool = False,
+        pseudo: bool = False,
     ):
         """
         Convert isotherm pressure from one unit to another
@@ -389,6 +390,9 @@ class PointIsotherm(BaseIsotherm):
             Only makes sense if converting to absolute pressure.
         verbose : bool
             Print out steps taken.
+        pseudo: bool, optional
+            Whether to use a pseudo-saturation pressure, in the case that the
+            adsorbate is supercritical
 
         """
         if not mode_to:
@@ -407,7 +411,8 @@ class PointIsotherm(BaseIsotherm):
                 unit_from=self.pressure_unit,
                 unit_to=unit_to,
                 adsorbate=self.adsorbate,
-                temp=self.temperature
+                temp=self.temperature,
+                pseudo=pseudo,
             )
         except pgError as err:
             raise CalculationError(

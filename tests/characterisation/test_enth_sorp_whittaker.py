@@ -1,3 +1,7 @@
+"""
+Test enth_sorp_whittaker module
+"""
+
 import numpy as np
 import pytest
 
@@ -14,12 +18,16 @@ loading = np.linspace(0.1, 20, 100)
 
 @pytest.mark.characterisation
 class TestWhittakerEnthalpy():
+
     @pytest.mark.parametrize('testdata', [ex for ex in DATA_WHITTAKER.values()])
     def test_whittaker_point(self, testdata):
         """Whittaker method with PointIsotherm"""
         isotherm = pgp.isotherm_from_aif(DATA_WHITTAKER_PATH / testdata['file'])
         local_loading = [1]
-        res = we.enthalpy_sorption_whittaker(isotherm, model="Toth", loading=local_loading)
+        res = we.enthalpy_sorption_whittaker(
+            isotherm,
+            model="Toth", loading=local_loading
+        )
         res_enth = res['enthalpy_sorption']
         ref_enth = testdata['ref_enth']
         assert np.isclose(res_enth, ref_enth)
@@ -36,7 +44,10 @@ class TestWhittakerEnthalpy():
             verbose=True,
         )
         local_loading = [1]
-        res = we.enthalpy_sorption_whittaker(model_isotherm, loading=local_loading)
+        res = we.enthalpy_sorption_whittaker(
+            model_isotherm,
+            loading=local_loading
+        )
         res_enth = res['enthalpy_sorption']
         ref_enth = testdata['ref_enth']
         assert np.isclose(res_enth, ref_enth)
@@ -48,7 +59,7 @@ class TestWhittakerEnthalpy():
         isotherm.convert_pressure(mode_to="absolute", unit_to="Pa")
 
         model_isotherms = {}
-        for model in ['Henry', 'Langmuir', 'Toth']:
+        for model in pgm._WHITTAKER_MODELS:
             model_isotherm = pgm.model_iso(
                 isotherm,
                 branch='ads',
@@ -60,5 +71,5 @@ class TestWhittakerEnthalpy():
         with pytest.raises(pgEx.ParameterError):
             we.enthalpy_sorption_whittaker(model_isotherms['Henry'], loading)
 
-        we.enthalpy_sorption_whittaker(model_isotherms['Langmuir'], loading)
-        we.enthalpy_sorption_whittaker(model_isotherms['Toth'], loading)
+        for model in pgm._WHITTAKER_MODELS:
+            we.enthalpy_sorption_whittaker(model_isotherms[model], loading)

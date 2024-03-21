@@ -20,3 +20,13 @@ DATA_IAST = {
         'file': 'MOF-5(Zn) - IAST - C2H6.json',
     },
 }
+
+DATA_ETI = {
+    'predict_presssure_raw_single_point': {
+        'T_experiment': 298,
+        'T_predict': 330,
+        'enthalpy': [20],
+        'P_experiment': [1],
+        'P_predict': [2.187450035680577],
+    },
+}

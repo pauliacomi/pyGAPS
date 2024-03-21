@@ -6,9 +6,13 @@ from pygaps.graphing.mpl_styles import POINTS_MUTED
 
 
 @mpl.rc_context(BASE_STYLE)
-def plot_model_guesses(attempts, pressure, loading):
+def plot_model_guesses(
+    attempts,
+    pressure,
+    loading,
+    ax = None,
+):
     """Plot one or more isotherm model fits."""
-    ax = None
     for attempt in attempts:
         if attempt.model.calculates == 'pressure':
             pts = {'y1_points': loading}
