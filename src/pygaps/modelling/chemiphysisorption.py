@@ -36,9 +36,9 @@ class ChemiPhysisorption(IsothermBaseModel):
     References
     ----------
     .. [#] Low, M-Y A.; Danaci, D.; Azzan, H.; Woodward, R. T.; Petit, C.
-    (2023). Measurement of Physicochemical Properties and CO2, N2, Ar, O2 and
-    H2O Unary Adsorption Isotherms of Purolite A110 and Lewatit VP OC 1065 for
-    Application in Direct Air Capture. J. Chem. Eng. Data.
+       (2023). Measurement of Physicochemical Properties and CO2, N2, Ar, O2 and
+       H2O Unary Adsorption Isotherms of Purolite A110 and Lewatit VP OC 1065 for
+       Application in Direct Air Capture. J. Chem. Eng. Data.
     """
 
     # Model parameters

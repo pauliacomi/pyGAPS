@@ -42,8 +42,8 @@ class DSToth(IsothermBaseModel):
     References
     ----------
     .. [#] Serna-Guerrero, R., Belmabkhout, Y., & Sayari, A. (2010). Modeling
-    CO2 adsorption on amine-functionalized mesoporous silica: 1. A
-    semi-empirical equilibrium model. Chemical Engineering Journal, 161(1-2), 173-181. 
+       CO2 adsorption on amine-functionalized mesoporous silica: 1. A
+       semi-empirical equilibrium model. Chemical Engineering Journal, 161(1-2), 173-181.
     """
 
     # Model parameters

@@ -12,7 +12,7 @@ from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
-from pygaps import logging
+from pygaps import logger
 
 
 def enthalpy_sorption_whittaker(
@@ -82,7 +82,9 @@ def enthalpy_sorption_whittaker(
     :math:`\Delta H_{vap}` is the latent heat of the liquid-vapour change at
     equilibrium pressure.
 
-    For loadings below the triple point pressure, :math:`\Delta H_{vap}`  is meaningless. In this case, :math:`\Delta H_{vap}` is estimated as that at the triple point.
+    For loadings below the triple point pressure, :math:`\Delta H_{vap}` is
+    meaningless. In this case, :math:`\Delta H_{vap}` is estimated as that at
+    the triple point.
 
     :math:`\Delta \lambda` is determined from the model isotherm parameters as :
 
@@ -92,12 +94,14 @@ def enthalpy_sorption_whittaker(
 
     Where :math:`P_0` is the saturation pressure, :math:`\theta` is the
     fractional coverage, and :math:`K` is the equilibrium constant. In the case
-    that the adsorptive is supercritical, the Dubinin pseudo-saturation pressure is used;
+    that the adsorptive is supercritical, the Dubinin pseudo-saturation pressure
+    is used;
+
     ..math::
         `p^0 = p_c \left(\frac{T}{T_c}\right)^2`.
 
-    The exponent :math:`t` is not relevent for Langmuir models it reduces to 1. Thus, :math:`\Delta \lambda`
-    becomes
+    The exponent :math:`t` is not relevant for Langmuir models it reduces to 1.
+    Thus, :math:`\Delta \lambda` becomes
 
     .. math::
 
@@ -130,10 +134,7 @@ def enthalpy_sorption_whittaker(
             '''
         )
 
-    if (
-        isinstance(isotherm, ModelIsotherm) and
-        isotherm.units['pressure_unit'] != 'Pa'
-    ):
+    if (isinstance(isotherm, ModelIsotherm) and isotherm.units['pressure_unit'] != 'Pa'):
         raise ParameterError('''Model isotherms should be in Pa.''')
 
     if isinstance(isotherm, PointIsotherm):
@@ -163,10 +164,7 @@ def enthalpy_sorption_whittaker(
         param_bounds = kwargs.get('param_bounds', param_bounds)
         if type(model) == str:  # remove invalid parameters
             params = pgm.get_isotherm_model(model).params.keys()
-            param_bounds = {
-                key: param_bounds[key] for key in param_bounds
-                if key in params
-            }
+            param_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
 
         max_nfev = kwargs.get('max_nfev', None)
 
@@ -190,10 +188,7 @@ def enthalpy_sorption_whittaker(
         )
 
     if loading is None:
-        loading = np.linspace(
-            isotherm.model.loading_range[0], isotherm.model.loading_range[1],
-            100
-        )
+        loading = np.linspace(isotherm.model.loading_range[0], isotherm.model.loading_range[1], 100)
 
     # Local constants and model parameters
     T = isotherm.temperature
@@ -208,17 +203,20 @@ def enthalpy_sorption_whittaker(
 
     pressure = [pressure_at(isotherm, n) for n in loading]
     enthalpy = enthalpy_sorption_whittaker_raw(
-        pressure, loading,
-        p_sat, p_c, p_t,
-        K_list, n_m_list, t_list,
+        pressure,
+        loading,
+        p_sat,
+        p_c,
+        p_t,
+        K_list,
+        n_m_list,
+        t_list,
         T,
         isotherm.adsorbate,
     )
 
     stderr = stderr_estimate(
-        count_variables(n_m_list, K_list, t_list),
-        isotherm.model.rmse,
-        enthalpy
+        count_variables(n_m_list, K_list, t_list), isotherm.model.rmse, enthalpy
     )
 
     if verbose and dographs:
@@ -350,7 +348,7 @@ def adsorption_potential_raw(
 
     Notes
     ----
-    Calculated as 
+    Calculated as
     ..math::
         \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}{1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
     """

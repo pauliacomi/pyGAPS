@@ -15,7 +15,7 @@ import pytest
 from numpy import average
 from numpy import isclose
 
-import pygaps.characterisation.isosteric_enth as ie
+import pygaps.characterisation.enth_sorp_clausclap as ie
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 

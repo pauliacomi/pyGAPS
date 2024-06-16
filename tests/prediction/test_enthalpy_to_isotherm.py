@@ -1,10 +1,7 @@
-
 import numpy as np
 import pytest
 
-import pygaps.characterisation.enth_sorp_whittaker as we
 import pygaps.prediction.enthalpy_to_isotherm as eti
-import pygaps.modelling as pgm
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
