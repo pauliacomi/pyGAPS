@@ -21,7 +21,6 @@ def enthalpy_sorption_whittaker(
     model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
-    dographs: bool = True,
     **kwargs,
 ):
     r"""
@@ -221,7 +220,7 @@ def enthalpy_sorption_whittaker(
         enthalpy
     )
 
-    if verbose and dographs:
+    if verbose:
         isosteric_enthalpy_plot(
             loading,
             enthalpy,
