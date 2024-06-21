@@ -59,11 +59,10 @@ class IsothermBaseModel():
             self.param_bounds = {}
             for param, bound in parameter_bounds.items():
                 if param not in self.param_names:
-                    logger.warning(
+                    raise ParameterError(
                         f"'{param}' is not a valid parameter"
                         f" in the '{self.name}' model."
                     )
-                    continue
                 self.param_bounds[param] = bound
         else:
             self.param_bounds = dict(zip(self.param_names, self.param_default_bounds))

@@ -369,6 +369,7 @@ class ModelIsotherm(BaseIsotherm):
         branch: str = 'ads',
         models='guess',
         optimization_params: dict = None,
+        param_bounds: dict = None,
         verbose: bool = False,
         **other_properties
     ):
@@ -423,6 +424,12 @@ class ModelIsotherm(BaseIsotherm):
                 raise ParameterError('Not all models correspond to internal models.')
 
         for model in guess_models:
+            if param_bounds is not None:
+                params = get_isotherm_model(model).params.keys()
+                param_bounds = {
+                    key: param_bounds[key] for key in param_bounds
+                    if key in params
+                }
             try:
                 isotherm = cls(
                     pressure=pressure,
@@ -432,7 +439,7 @@ class ModelIsotherm(BaseIsotherm):
                     loading_key=loading_key,
                     model=model,
                     param_guess=None,
-                    param_bounds=None,
+                    param_bounds=param_bounds,
                     optimization_params=optimization_params,
                     branch=branch,
                     verbose=verbose,
