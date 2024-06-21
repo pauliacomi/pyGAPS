@@ -47,8 +47,6 @@ _GUESS_MODELS = [
     "BET",
     "TemkinApprox",
     "Toth",
-    "DSToth",
-    "ChemiPhysisorption",
     "JensenSeaton",
 ]
 
