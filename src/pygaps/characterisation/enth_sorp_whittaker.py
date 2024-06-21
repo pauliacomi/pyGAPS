@@ -2,7 +2,6 @@
 
 import numpy as np
 import scipy.constants
-import warnings
 
 import pygaps.modelling as pgm
 from pygaps.core.baseisotherm import BaseIsotherm
@@ -10,9 +9,9 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
+from pygaps.units.converter_mode import c_temperature
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
-from pygaps import logging
 
 
 def enthalpy_sorption_whittaker(
@@ -138,9 +137,8 @@ def enthalpy_sorption_whittaker(
     if isinstance(isotherm, PointIsotherm):
         if model == 'guess':
             model = pgm._WHITTAKER_MODELS
-
-        isotherm.convert_pressure(unit_to='Pa', mode_to='absolute', pseudo=True)
-        isotherm.convert_temperature(unit_to='K')
+ 
+        isotherm = convert_isotherm_safely(isotherm)
 
         K_factor = kwargs.get('K_factor', 1e2)
         K_lower_limit = K_factor / p_sat
@@ -235,6 +233,49 @@ def enthalpy_sorption_whittaker(
         'std_errs': stderr,
     }
 
+
+def convert_isotherm_safely(isotherm: PointIsotherm):
+    """
+    Makes a copy of the isotherm, but with pressure converted to
+    absoulte and Pa, and temperature converted to K.
+    For use in `enthalpy_sorption_whittaker`, so as not to modify the original
+    input.
+
+    Parameters
+    ---------
+    isotherm: PointIsotherm
+        The isotherm to convert
+
+    Returns
+    ------
+    converted isotherm: PointIsotherm
+        New isotherm with all parameters the same as `isotherm` except with
+        pressure converted to absolute and Pa, and temperature converted to K.
+    """
+    temperature = c_temperature(
+        value=isotherm.temperature,
+        unit_from=isotherm.units['temperature_unit'],
+        unit_to='K',
+    )
+    return PointIsotherm(
+        pressure=isotherm.pressure(
+            pressure_unit='Pa',
+            pressure_mode='absolute'
+        ),
+        loading=isotherm.loading(),
+
+        material=isotherm.material,
+        adsorbate=str(isotherm.adsorbate),
+        temperature=temperature,
+
+        temperature_unit='K',
+        pressure_mode='absolute',
+        pressure_unit='Pa',
+        loading_basis=isotherm.units['loading_basis'],
+        loading_unit=isotherm.units['loading_unit'],
+        material_basis=isotherm.units['material_basis'],
+        material_unit='g',
+    )
 
 def pressure_at(
     isotherm: BaseIsotherm,
