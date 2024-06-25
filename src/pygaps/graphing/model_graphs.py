@@ -10,7 +10,7 @@ def plot_model_guesses(
     attempts,
     pressure,
     loading,
-    ax = None,
+    ax=None,
 ):
     """Plot one or more isotherm model fits."""
     for attempt in attempts:

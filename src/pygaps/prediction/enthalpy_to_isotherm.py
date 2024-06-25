@@ -1,20 +1,16 @@
 """
 A module for predicting isotherms at different pressures given a measured
-isotherm and calulated isosteric heats of adsorption
+isotherm and calculated isosteric heats of adsorption
 """
 
 import numpy as np
-from scipy import constants
 import pandas as pd
+from scipy import constants
 
 import pygaps.graphing as pgg
-import pygaps.graphing.prediction_graphs
-from pygaps.graphing.labels import label_units_dict
-
-from pygaps.characterisation import enthalpy_sorption_whittaker
-
-from pygaps.core.pointisotherm import PointIsotherm
 from pygaps import logger
+from pygaps.characterisation import enthalpy_sorption_whittaker
+from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import ParameterError
 
 R = constants.gas_constant
@@ -33,7 +29,7 @@ def isotherm_to_predicted(
 ):
     """
     Directly predicts an isotherm at a different temperature, based on
-    modelling with a whittaker-consistent (Toth-type) model. This is a wrapper
+    modelling with a Whittaker-consistent (Toth-type) model. This is a wrapper
     function that uses `characterisation.enthalpy_sorption_whittaker()` and
     `from_whittaker_and_isotherm()` functions.
 
@@ -85,7 +81,8 @@ def isotherm_to_predicted(
     )
 
     predicted_isotherm = enthalpy_and_isotherm_to_predicted(
-        T_predict, original_isotherm,
+        T_predict,
+        original_isotherm,
         isosteric_enthalpy_dictionary=whittaker_dictionary,
         branch=branch,
         verbose=verbose,
@@ -158,10 +155,7 @@ def enthalpy_and_isotherm_to_predicted(
         The isotherm predicted from the above parameters. Pressure in Pa,
         loading in mol/kg.
     """
-    if (
-        isosteric_enthalpy_dictionary is None and
-        'enthalpy' not in original_isotherm.other_keys
-    ):
+    if (isosteric_enthalpy_dictionary is None and 'enthalpy' not in original_isotherm.other_keys):
         raise ParameterError(
             '''
             There is no enthalpy specified. This can be specified by passing
@@ -171,9 +165,12 @@ def enthalpy_and_isotherm_to_predicted(
         )
 
     original_isotherm.convert(
-        pressure_unit='Pa', pressure_mode='absolute',
-        loading_unit='mol', loading_basis='molar',
-        material_unit='kg', material_basis='mass',
+        pressure_unit='Pa',
+        pressure_mode='absolute',
+        loading_unit='mol',
+        loading_basis='molar',
+        material_unit='kg',
+        material_basis='mass',
     )
     original_isotherm.convert_temperature(unit_to='K')
     T_experiment = original_isotherm.temperature
@@ -190,8 +187,7 @@ def enthalpy_and_isotherm_to_predicted(
 
     elif isosteric_enthalpy_dictionary is not None:
         if not all(
-            key in isosteric_enthalpy_dictionary
-            for key in ['loading', 'enthalpy_sorption']
+            key in isosteric_enthalpy_dictionary for key in ['loading', 'enthalpy_sorption']
         ):
             raise ParameterError(
                 '''
@@ -225,20 +221,14 @@ def enthalpy_and_isotherm_to_predicted(
             '''
         )
 
-    P_predict = predict_pressure_raw(
-        T_experiment, T_predict,
-        enthalpy,
-        P_experiment
-    )
+    P_predict = predict_pressure_raw(T_experiment, T_predict, enthalpy, P_experiment)
 
     predicted_isotherm = PointIsotherm(
         pressure=P_predict,
         loading=loading,
-
         material=original_isotherm.material,
         adsorbate=str(original_isotherm.adsorbate),
         temperature=T_predict,
-
         pressure_mode='absolute',
         pressure_unit='Pa',
         loading_basis='molar',
@@ -246,14 +236,15 @@ def enthalpy_and_isotherm_to_predicted(
         material_basis='mass',
         material_unit='kg',
         temperature_unit='K',
-
         apparatus='predicted from pygaps',
     )
 
     if verbose and dographs:
         pgg.prediction_graphs.plot_enthalpy_prediction(
-            original_isotherm, predicted_isotherm,
-            loading, enthalpy,
+            original_isotherm,
+            predicted_isotherm,
+            loading,
+            enthalpy,
             branch=branch,
         )
 
@@ -314,7 +305,10 @@ def predict_adsorption_surface(
         Dataframe of predicted loadings as a function of temperature (index)
         and pressure (columns)
     """
-    original_isotherm.convert(pressure_unit='Pa', pressure_mode='absolute',)
+    original_isotherm.convert(
+        pressure_unit='Pa',
+        pressure_mode='absolute',
+    )
     T_experiment = original_isotherm.temperature
 
     if branch is None:
@@ -341,7 +335,8 @@ def predict_adsorption_surface(
         if T_range[0] < 0:
             T_range[0] = 0
         temperatures = np.linspace(
-            T_range[0], T_range[1],
+            T_range[0],
+            T_range[1],
             num=len(pressures),
         )
 
@@ -354,26 +349,23 @@ def predict_adsorption_surface(
             branch=branch,
             verbose=False,
         )
-        lims = [
-            min(predicted_isotherm.pressure()),
-            max(predicted_isotherm.pressure())
-        ]
+        lims = [min(predicted_isotherm.pressure()), max(predicted_isotherm.pressure())]
 
         loadings = [
-            float(predicted_isotherm.loading_at(p))
-            if lims[0] < p < lims[1]
-            else None
+            float(predicted_isotherm.loading_at(p)) if lims[0] < p < lims[1] else None
             for p in pressures
         ]
         data.append(loadings)
 
     grid = pd.DataFrame(
         data=data,
-        index=temperatures, columns=pressures,
+        index=temperatures,
+        columns=pressures,
     )
 
     if verbose:
         import matplotlib.pyplot as plt
+
         from pygaps.graphing import prediction_graphs
         prediction_graphs.plot_adsorption_heatmap(
             grid,

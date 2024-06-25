@@ -75,12 +75,11 @@ _LOADED = {}  # we keep loaded interpolators here
 
 
 def convert_to_thickness(loading, monolayer):
-    """
-    Conversion to a thickness is done by obtaining the number
-    of adsorbed layers through dividing amount adsorbed by the
-    amount adsorbed in a monolayer (as obtained by BET), then
-    multiplying by the average thickness of a single layer.
-    Mathematically:
+    r"""
+    Conversion to a thickness is done by obtaining the number of adsorbed layers
+    through dividing amount adsorbed by the amount adsorbed in a monolayer (as
+    obtained by BET), then multiplying by the average thickness of a single
+    layer. Mathematically:
 
     .. math::
 

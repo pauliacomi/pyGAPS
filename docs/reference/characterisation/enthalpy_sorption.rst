@@ -6,7 +6,7 @@ Methods for determining isosteric enthalpy of adsorption.
 Clausius-Clapeyron Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. automodule:: pygaps.characterisation.isosteric_enth
+.. automodule:: pygaps.characterisation.enthalpy_sorption_clausclap
     :members:
 
 

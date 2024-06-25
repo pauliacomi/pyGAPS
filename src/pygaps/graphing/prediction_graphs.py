@@ -1,15 +1,15 @@
 """functions for plotting graphs of isotherm prediction"""
 
-import pandas as pd
-import numpy as np
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
-from pygaps.core.pointisotherm import PointIsotherm
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.graphing.mpl_styles import BASE_STYLE
 import pygaps.graphing as pgg
+from pygaps.core.modelisotherm import ModelIsotherm
+from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.graphing.mpl_styles import BASE_STYLE
+
 
 def same_orders_of_maximum(vals: list[list[float]]):
     """

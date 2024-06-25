@@ -559,7 +559,7 @@ class Adsorbate():
         if (pseudo and temp > self.t_critical()):
             if verbose:
                 logger.warning('Dubinin pseudo-saturation pressure calculated.')
-            return self.dubinin_pseudo_saturation_pressure(temp=temp, unit=unit)
+            return self.pseudo_saturation_pressure_dubinin(temp=temp, unit=unit)
 
         if calculate:
             try:
@@ -568,10 +568,7 @@ class Adsorbate():
                 sat_p = state.p()
             except BaseException as err:
                 _warn_reading_params(err)
-                sat_p = self.saturation_pressure(
-                    temp,
-                    unit=unit, calculate=False
-                )
+                sat_p = self.saturation_pressure(temp, unit=unit, calculate=False)
 
             if unit is not None:
                 sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
@@ -582,7 +579,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def dubinin_pseudo_saturation_pressure(
+    def pseudo_saturation_pressure_dubinin(
         self,
         temp: float,
         unit: str = None,
@@ -615,9 +612,7 @@ class Adsorbate():
             return self.saturation_pressure(temp=temp)
 
         if k < 1:
-            logger.warning(
-                f'The value for the exponent, k, is too small ({k}).'
-            )
+            logger.warning(f'The value for the exponent, k, is too small ({k}).')
             return
 
         sat_p = self.p_critical() * ((temp / self.t_critical())**k)
@@ -957,13 +952,7 @@ class Adsorbate():
         pressure: float
             pressure, in Pa
         """
-        adsorbate = self.backend_name
-        return CP.CoolProp.PropsSI(
-            'Z',
-            'T', temp,
-            'P', pressure,
-            adsorbate
-        )
+        return CP.CoolProp.PropsSI('Z', 'T', temp, 'P', pressure, self.backend_name)
 
 def _warn_reading_params(err):
     logger.warning(

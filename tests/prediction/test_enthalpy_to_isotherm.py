@@ -1,13 +1,13 @@
 import numpy as np
 import pytest
 
-import pygaps.prediction.enthalpy_to_isotherm as eti
 import pygaps.parsing as pgp
+import pygaps.prediction.enthalpy_to_isotherm as eti
 import pygaps.utilities.exceptions as pgEx
 
+from .conftest import DATA_ETI
 from .conftest import DATA_WHITTAKER
 from .conftest import DATA_WHITTAKER_PATH
-from .conftest import DATA_ETI
 
 
 @pytest.mark.prediction

@@ -1,7 +1,9 @@
 """ChemiPhysisorption (CP) isotherm model."""
 
 import numpy
-from scipy import optimize, integrate, constants
+from scipy import constants
+from scipy import integrate
+from scipy import optimize
 
 from pygaps.modelling.base_model import IsothermBaseModel
 from pygaps.utilities.exceptions import CalculationError
@@ -46,8 +48,12 @@ class ChemiPhysisorption(IsothermBaseModel):
     formula = r"n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + \right[n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})"
     calculates = 'loading'
     param_names = (
-        "n_m1", "K1", "t1",
-        "n_m2", "K2", "Ea",
+        "n_m1",
+        "K1",
+        "t1",
+        "n_m2",
+        "K2",
+        "Ea",
     )
     param_default_bounds = (
         (0., numpy.inf),
@@ -77,23 +83,19 @@ class ChemiPhysisorption(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        n_m1 = self.params['n_m1']
-        n_m2 = self.params['n_m2']
         K1p = self.params["K1"] * pressure
         K2p = self.params["K2"] * pressure
         t1 = self.params["t1"]
         Ea = self.params["Ea"]
-        return (
-            (n_m1 * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
-            ((n_m2 * K2p / (1.0 + K2p))*(numpy.exp(-Ea/self.rt)))
-        )
+        return ((self.params['n_m1'] * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
+                ((self.params['n_m2'] * K2p / (1.0 + K2p)) * (numpy.exp(-Ea / self.rt))))
 
     def pressure(self, loading):
         """
         Calculate pressure at specified loading.
 
         For the Dual Site Toth model, the pressure will be computed numerically
-        as I don't know how to do an analytical inversion of this equation.
+        An analytical inversion of this equation may be possible.
 
         Parameters
         ----------

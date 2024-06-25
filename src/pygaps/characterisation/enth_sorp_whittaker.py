@@ -1,12 +1,17 @@
 """Module implementing the Whittaker method for isosteric enthalpy calculations."""
 
+import warnings
+
 import numpy as np
 import scipy.constants
 
 import pygaps.modelling as pgm
+from pygaps import logger
+from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.units.converter_mode import c_temperature
@@ -47,10 +52,8 @@ def enthalpy_sorption_whittaker(
         A dictionary with the isosteric enthalpies per loading, with the form:
 
         - ``enthalpy_sorption`` (array) : the isosteric enthalpy of adsorption in kJ/mol
-        - ``loading`` (array) : the loading for each point of the isosteric
-          enthalpy, in mmol/g
-        - ``model_isotherm`` (ModelIsotherm): the model isotherm used to
-        calculate the enthalpies.
+        - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol/g
+        - ``model_isotherm`` (ModelIsotherm): the model isotherm used to calculate the enthalpies.
 
     Raises
     ------
@@ -61,9 +64,9 @@ def enthalpy_sorption_whittaker(
     -----
 
     The Whittaker method, [#]_ sometimes known as a modified Tóth potential uses
-    variables derived from fitting of a Toth-like model isotherm to
-    derive the isosteric enthalpy of adsorption :math:`\Delta H_{st}`.
-    Toth-like isotherms take the general form;
+    variables derived from fitting of a Toth-like model isotherm to derive the
+    isosteric enthalpy of adsorption :math:`\Delta H_{st}`. Toth-like isotherms
+    take the general form;
 
     n(P) = \sum_{i} n_{m_i} \frac{K_i P}{\sqrt[t_i]{1+(K_i P)^{t_i}}}
 
@@ -88,7 +91,8 @@ def enthalpy_sorption_whittaker(
 
     .. math::
 
-        \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}{1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
+        \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}
+            {1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
 
     Where :math:`P_0` is the saturation pressure, :math:`\theta` is the
     fractional coverage, and :math:`K` is the equilibrium constant. In the case
@@ -116,14 +120,7 @@ def enthalpy_sorption_whittaker(
 
     """
 
-    # Critical, triple and saturation pressure
-    p_c = isotherm.adsorbate.p_critical()
-    p_t = isotherm.adsorbate.p_triple()
-    p_sat = isotherm.adsorbate.saturation_pressure(
-        temp=isotherm.temperature,
-        pseudo=True,
-    )
-
+    # Check if isotherm is correct
     if not isinstance(isotherm, (PointIsotherm, ModelIsotherm)):
         raise ParameterError(
             f'''
@@ -132,8 +129,16 @@ def enthalpy_sorption_whittaker(
             '''
         )
 
+    # Critical, triple and saturation pressure
+    p_c = isotherm.adsorbate.p_critical()
+    p_t = isotherm.adsorbate.p_triple()
+    p_sat = isotherm.adsorbate.saturation_pressure(
+        temp=isotherm.temperature,
+        pseudo=True,
+    )
+
     if (isinstance(isotherm, ModelIsotherm) and isotherm.units['pressure_unit'] != 'Pa'):
-        raise ParameterError('''Model isotherms should be in Pa.''')
+        raise ParameterError('''Model isotherms should use pressure in Pascal.''')
 
     if isinstance(isotherm, PointIsotherm):
         if model == 'guess':
@@ -159,7 +164,7 @@ def enthalpy_sorption_whittaker(
                 }
 
         param_bounds = kwargs.get('param_bounds', param_bounds)
-        if type(model) == str:  # remove invalid parameters
+        if isinstance(model, str):  # remove invalid parameters
             params = pgm.get_isotherm_model(model).params.keys()
             param_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
 
@@ -362,7 +367,7 @@ def adsorption_potential_raw(
     p_sat: float = None,
         Saturation pressure of adsorbate at isotherm temperature, `T`. Must be
         in Pa. Tip: if adsorbate is above its critical temperature, you can
-        calculate a Dubinin psuedo-saturation pressure using the convenience
+        calculate a Dubinin pseudo-saturation pressure using the convenience
         function in the adsorbate class.
     K_list: list[float] = None,
         List of equilibrium constants, K from model fitting. Must be derived
@@ -380,13 +385,15 @@ def adsorption_potential_raw(
 
     Returns
     ---------
-    adsorption_potential: float
+    adsorption_potential : float
 
     Notes
     ----
     Calculated as
     ..math::
+
         \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}{1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
+
     """
     log_bracket = 0
     for K, t, n_m, in zip(
@@ -432,7 +439,7 @@ def enthalpy_sorption_whittaker_raw(
     p_sat: float = None,
         Saturation pressure of adsorbate at isotherm temperature, `T`. Must be
         in Pa. Tip: if adsorbate is above its critical temperature, you can
-        calculate a Dubinin psuedo-saturation pressure using the convenience
+        calculate a Dubinin pseudo-saturation pressure using the convenience
         function in the adsorbate class.
     p_c: float = None,
         Critical pressure of adsorbate. Units must be Pa.

@@ -36,7 +36,7 @@ characterisation:
 - Enthalpy of adsorption determination:
 
   - Isosteric enthalpy through the Clausius-Clapeyron method (multiple isotherms
-    at different temperatures): :meth:`~pygaps.characterisation.isosteric_enth`
+    at different temperatures): :meth:`~pygaps.characterisation.enth_sorp_clausclap`
   - Isosteric enthalpy through the Whittaker method (from a model fit to an
     isotherm): :meth:`~pygaps.characterisation.enth_sorp_whittaker`
 

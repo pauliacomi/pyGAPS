@@ -135,7 +135,7 @@ def c_pressure(
         return value * factor**sign
 
     # convert just units in absolute mode
-    elif unit_to and mode_from == 'absolute':
+    if unit_to and mode_from == 'absolute':
         return c_unit(_PRESSURE_MODE[mode_from], value, unit_from, unit_to)
 
     # otherwise no change

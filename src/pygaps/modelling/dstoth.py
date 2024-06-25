@@ -1,7 +1,8 @@
 """Double Site Toth isotherm model."""
 
 import numpy
-from scipy import optimize, integrate
+from scipy import integrate
+from scipy import optimize
 
 from pygaps.modelling.base_model import IsothermBaseModel
 from pygaps.utilities.exceptions import CalculationError
@@ -13,14 +14,15 @@ class DSToth(IsothermBaseModel):
 
     .. math::
 
-        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}
+        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1 + (K_1 p)^{t_1}}} +
+        n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}
 
     Notes
     -----
     An extension to the Toth model to consider two adsorption sites, with
     different monolayer capacities, affinities, and exponents[#]_. This was
     first proposed by Serna-Guerrero, Balmabkhout, and Sayari to model ambient
-    temperature CO_2 isotherms up to 20 bar, with the two sites representing
+    temperature CO2 isotherms up to 20 bar, with the two sites representing
     chemical and physical adsorption, respectively[#]_.
 
     .. math::
@@ -31,13 +33,14 @@ class DSToth(IsothermBaseModel):
     adsorption) are considered.
 
     .. math::
-        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}
+        n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
+        n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}
 
-    In Serna-Guerrero et al.'s original work, the physical part of the
-    equation is determined by measurement of a CO_2 isotherm on an adsorbent
-    which should be expected to have no chemical adsorption component. It
-    nonetheless appears to give a good fit to CO_2 isotherms when each of the
-    sites are determined independently.
+    In Serna-Guerrero et al.'s original work, the physical part of the equation
+    is determined by measurement of a CO_2 isotherm on an adsorbent which should
+    be expected to have no chemical adsorption component. It nonetheless appears
+    to give a good fit to CO_2 isotherms when each of the sites are determined
+    independently.
 
     References
     ----------
@@ -50,10 +53,7 @@ class DSToth(IsothermBaseModel):
     name = 'DSToth'
     formula = r"n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + n_{m_2}\frac{K_2 p}{\sqrt[t_2]{1+(K_2 p)^{t_2}}}"
     calculates = 'loading'
-    param_names = (
-        "n_m1", "K1", "t1",
-        "n_m2", "K2", "t2"
-    )
+    param_names = ("n_m1", "K1", "t1", "n_m2", "K2", "t2")
     param_default_bounds = (
         (0., numpy.inf),
         (0., numpy.inf),
@@ -77,23 +77,20 @@ class DSToth(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        n_m1 = self.params['n_m1']
-        n_m2 = self.params['n_m2']
         K1p = self.params["K1"] * pressure
         K2p = self.params["K2"] * pressure
         t1 = self.params['t1']
         t2 = self.params['t2']
-        return (
-            (n_m1 * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
-            (n_m2 * K2p / (1.0 + (K2p)**t2)**(1 / t2))
-        )
+        return ((self.params['n_m1'] * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
+                (self.params['n_m2'] * K2p / (1.0 + (K2p)**t2)**(1 / t2)))
 
     def pressure(self, loading):
         """
         Calculate pressure at specified loading.
 
-        For the Dual Site Toth model, the pressure will be computed numerically
-        as I don't know how to do an analytical inversion of this equation.
+        For the Dual Site Toth model, the pressure will be computed numerically.
+        An analytical inversion of this equation may be possible.
+
 
         Parameters
         ----------
