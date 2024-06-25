@@ -2,7 +2,6 @@
 
 import numpy as np
 import scipy.constants
-import warnings
 
 import pygaps.modelling as pgm
 from pygaps.core.baseisotherm import BaseIsotherm
@@ -10,9 +9,9 @@ from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
+from pygaps.units.converter_mode import c_temperature
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
-from pygaps import logger
 
 
 def enthalpy_sorption_whittaker(
@@ -21,7 +20,6 @@ def enthalpy_sorption_whittaker(
     model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
-    dographs: bool = True,
     **kwargs,
 ):
     r"""
@@ -141,8 +139,7 @@ def enthalpy_sorption_whittaker(
         if model == 'guess':
             model = pgm._WHITTAKER_MODELS
 
-        isotherm.convert_pressure(unit_to='Pa', mode_to='absolute', pseudo=True)
-        isotherm.convert_temperature(unit_to='K')
+        isotherm = convert_isotherm_safely(isotherm)
 
         K_factor = kwargs.get('K_factor', 1e2)
         K_lower_limit = K_factor / p_sat
@@ -219,7 +216,7 @@ def enthalpy_sorption_whittaker(
         count_variables(n_m_list, K_list, t_list), isotherm.model.rmse, enthalpy
     )
 
-    if verbose and dographs:
+    if verbose:
         isosteric_enthalpy_plot(
             loading,
             enthalpy,
@@ -233,6 +230,45 @@ def enthalpy_sorption_whittaker(
         'model_isotherm': isotherm,
         'std_errs': stderr,
     }
+
+
+def convert_isotherm_safely(isotherm: PointIsotherm):
+    """
+    Makes a copy of the isotherm, but with pressure converted to
+    absoulte and Pa, and temperature converted to K.
+    For use in `enthalpy_sorption_whittaker`, so as not to modify the original
+    input.
+
+    Parameters
+    ---------
+    isotherm: PointIsotherm
+        The isotherm to convert
+
+    Returns
+    ------
+    converted isotherm: PointIsotherm
+        New isotherm with all parameters the same as `isotherm` except with
+        pressure converted to absolute and Pa, and temperature converted to K.
+    """
+    temperature = c_temperature(
+        value=isotherm.temperature,
+        unit_from=isotherm.units['temperature_unit'],
+        unit_to='K',
+    )
+    return PointIsotherm(
+        pressure=isotherm.pressure(pressure_unit='Pa', pressure_mode='absolute'),
+        loading=isotherm.loading(),
+        material=isotherm.material,
+        adsorbate=str(isotherm.adsorbate),
+        temperature=temperature,
+        temperature_unit='K',
+        pressure_mode='absolute',
+        pressure_unit='Pa',
+        loading_basis=isotherm.units['loading_basis'],
+        loading_unit=isotherm.units['loading_unit'],
+        material_basis=isotherm.units['material_basis'],
+        material_unit='g',
+    )
 
 
 def pressure_at(
@@ -353,7 +389,11 @@ def adsorption_potential_raw(
         \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}{1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
     """
     log_bracket = 0
-    for K, t, n_m, in zip(K_list, t_list, n_m_list,):
+    for K, t, n_m, in zip(
+        K_list,
+        t_list,
+        n_m_list,
+    ):
         theta = n / n_m
         theta_t = theta**t
         theta_function = ((theta_t) / (1 - theta_t))**((t - 1) / t)
@@ -425,19 +465,13 @@ def enthalpy_sorption_whittaker_raw(
         raise ParameterError('''Different length model parameter lists''')
 
     if len(pressure) != len(loading):
-        raise ParameterError(
-            '''Loading and pressure lists must be same length!'''
-        )
+        raise ParameterError('''Loading and pressure lists must be same length!''')
 
     RT = scipy.constants.R * T
 
     # Calculate adsorption potential
     adsorption_potential = [
-        adsorption_potential_raw(
-            n, p_sat,
-            K_list, n_m_list, t_list,
-            RT
-        ) for n in loading
+        adsorption_potential_raw(n, p_sat, K_list, n_m_list, t_list, RT) for n in loading
     ]
 
     # Calculate vaporisation enthalpy and compresssibility for
@@ -453,15 +487,12 @@ def enthalpy_sorption_whittaker_raw(
 
         compressibility.append(adsorbate.compressibility(T, p))
 
-        vaporisation_enthalpy.append(
-            adsorbate.enthalpy_vaporisation(press=(max(p, p_t))) * 1000
-        )
+        vaporisation_enthalpy.append(adsorbate.enthalpy_vaporisation(press=(max(p, p_t))) * 1000)
 
     # Sum adsorption potential, vaporisation enthalpy, ZRT
     enthalpy = [
         (epsilon + dH + (Z * RT)) / 1000  # return in kJ/mol
-        for epsilon, dH, Z
-        in zip(adsorption_potential, vaporisation_enthalpy, compressibility)
+        for epsilon, dH, Z in zip(adsorption_potential, vaporisation_enthalpy, compressibility)
     ]
 
     if any(h < 0 for h in enthalpy):
