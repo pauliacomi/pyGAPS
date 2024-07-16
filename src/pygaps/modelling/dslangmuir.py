@@ -100,6 +100,43 @@ class DSLangmuir(IsothermBaseModel):
 
         return res
 
+    def toth_correction(self, pressure):
+        r"""
+        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
+        potential, $\varepsilon_{ads}$ at specified pressure.
+
+        .. math::
+            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
+            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+
+        For Multi-Site Langmuir models;
+            .. math::
+                \Psi = \left[ \sum_i{\frac{n_{m_i}K_i}{1 + K_i P}} \right] \left[ \sum_i{\frac{n_{m_i} K_i}{(1 + K_i P)^2}} \right]^{-1} - 1
+
+        Model parameters must be derived from isotherm with pressure in Pa.
+
+        Parameters
+        ---------
+        pressure : float
+            The pressure at which to calculate the T\'oth correction
+
+        Returns
+        ------
+            The T\'oth correction, $\Psi$
+        """
+
+        def dn_dP_singlesite(n_m, K):
+            return (
+                (n_m * K) / (1 + (K * pressure))**2
+            )
+
+        dP_dn = 1 / (
+            dn_dP_singlesite(self.params["n_m1"], self.params["K1"]) +
+            dn_dP_singlesite(self.params["n_m2"], self.params["K2"])
+        )
+
+        return ((self.loading(pressure) / pressure) * dP_dn) - 1
+
     def spreading_pressure(self, pressure):
         r"""
         Calculate spreading pressure at specified gas pressure.

@@ -155,6 +155,29 @@ class IsothermBaseModel():
         """
         return
 
+    @abc.abstractmethod
+    def toth_correction(self, pressure: float) -> float:
+        r"""
+        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
+        potential, $\varepsilon_{ads}$ at specified pressure.
+
+        .. math::
+            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
+            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+
+        Model parameters must be derived from isotherm with pressure in Pa.
+
+        Parameters
+        ---------
+        pressure : float
+            The pressure at which to calculate the T\'oth correction
+
+        Returns
+        ------
+            The T\'oth correction, $\Psi$
+        """
+        return
+
     def initial_guess(self, pressure: "list[float]", loading: "list[float]"):
         """
         Return initial guess for fitting.
@@ -286,3 +309,4 @@ class IsothermBaseModel():
                 f"\n{leastsq_args['x0']}\n"
             )
         return opt_res
+

@@ -142,6 +142,73 @@ class ChemiPhysisorption(IsothermBaseModel):
         """
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
+    def toth_correction(self, pressure):
+        r"""
+        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
+        potential, $\varepsilon_{ads}$ at specified pressure.
+
+        .. math::
+            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
+            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+
+        For the Multi-Site T\'oth model;
+            .. math::
+                \Psi &= \left[\frac{
+                \sum_i{\frac{n_{m_i} K_i }{\left(1+(K_i P)^{t_i}\right)^{\frac{1}{t}}}}}
+                {\sum_i{
+                \frac{n_{m_i} K_i}{ \left(1+(K_i P)^{t_i}\right)^{\frac{t-1}{t}} }   }
+                }
+                    \right] - 1
+
+        For the ChemiPhysisorption model, this inclues an extra term, $\gamma =
+        \exp{\frac{-E_a}{RT}}$, so the expression becomes
+
+            ..math::
+                \Psi = \left[
+                \frac{
+                \frac{n_{m_1}K_1}{\left(1+(K_1 P)^t\right)^{\frac{1}{t}}}
+                + \frac{\gamma n_{m_2} K_2}{1+KP}
+                }{
+                \frac{n_{m_1 K_1}}{\left(1 + (K_1 P)^t \right)^{\frac{t+1}{t}}} +  \frac{\gamma n_{m_2} K_2}{\left(1+KP\right)^2}
+                }
+                \right] - 1
+
+        Model parameters must be derived from isotherm with pressure in Pa.
+
+        Parameters
+        ---------
+        pressure : float
+            The pressure at which to calculate the T\'oth correction
+
+        Returns
+        ------
+            The T\'oth correction, $\Psi$
+        """
+
+        def dn_dP_singlesite(gamma, nm, K, t):
+            Kpt = (K * pressure)**t
+            gammanmK = gamma * nm * K
+            return gammanmK / ((1 + Kpt))**((t + 1) / t)
+
+        gamma = numpy.exp(- self.params["Ea"] / self.rt)
+
+        dP_dn = 1 / (
+            dn_dP_singlesite(
+                1,
+                self.params["n_m1"],
+                self.params["K1"],
+                self.params["t"]
+            ) +
+            dn_dP_singlesite(
+                gamma,
+                self.params["n_m2"],
+                self.params["K2"],
+                1
+            )
+        )
+
+        return ((self.loading(pressure) / pressure) / dP_dn) - 1
+
     def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.

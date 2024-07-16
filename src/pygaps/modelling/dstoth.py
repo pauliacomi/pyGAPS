@@ -137,6 +137,55 @@ class DSToth(IsothermBaseModel):
         """
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
+    def toth_correction(self, pressure):
+        r"""
+        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
+        potential, $\varepsilon_{ads}$ at specified pressure.
+
+        .. math::
+            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
+            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+
+        For the Multi-Site T\'oth model;
+            .. math::
+                \Psi &= \left[\frac{
+                \sum_i{\frac{n_{m_i} K_i }{\left(1+(K_i P)^{t_i}\right)^{\frac{1}{t}}}}}
+                {\sum_i{
+                \frac{n_{m_i} K_i}{ \left(1+(K_i P)^{t_i}\right)^{\frac{t-1}{t}} }   }
+                }
+                    \right]
+        Model parameters must be derived from isotherm with pressure in Pa.
+
+        Parameters
+        ---------
+        pressure : float
+            The pressure at which to calculate the T\'oth correction
+
+        Returns
+        ------
+            The T\'oth correction, $\Psi$
+        """
+
+        def dn_dP_singlesite(nm, K, t):
+            Kpt = (K * pressure)**t
+            nmK = nm * K
+            return nmK / ((1 + Kpt))**((t + 1) / t)
+
+        dP_dn = 1 / (
+            dn_dP_singlesite(
+                self.params["n_m1"],
+                self.params["K1"],
+                self.params["t1"]
+            ) +
+            dn_dP_singlesite(
+                self.params["n_m2"],
+                self.params["K2"],
+                self.params["t2"]
+            )
+        )
+
+        return ((self.loading(pressure) / pressure) / dP_dn) - 1
+
     def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.
