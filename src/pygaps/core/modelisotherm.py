@@ -1080,3 +1080,9 @@ class ModelIsotherm(BaseIsotherm):
 
         # calculate based on model
         return self.model.spreading_pressure(pressure)
+
+    def toth_correction_at(
+        self,
+        pressure: t.Union[float, t.List[float]],
+    ):
+        return self.model.toth_correction(pressure)

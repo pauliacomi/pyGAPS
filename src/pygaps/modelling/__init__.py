@@ -192,6 +192,7 @@ def is_model_toth_derivative(model_name: str) -> bool:
     """
     return model_name.lower() in map(str.lower, _TOTH_DERIVATIVE_MODELS)
 
+
 def is_model_class(model):
     """
     Check whether the input is derived from the base model.
