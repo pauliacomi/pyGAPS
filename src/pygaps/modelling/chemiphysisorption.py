@@ -127,7 +127,7 @@ class ChemiPhysisorption(IsothermBaseModel):
 
             \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
-        The integral for the DSToth model cannot be solved analytically
+        The integral for the ChemiPhysisorption model cannot be solved analytically
         and must be calculated numerically.
 
         Parameters
