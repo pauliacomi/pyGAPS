@@ -1,12 +1,10 @@
 """Module implementing the Whittaker method for isosteric enthalpy calculations."""
 
-import warnings
 
 import numpy as np
 import scipy.constants
 
 import pygaps.modelling as pgm
-from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
@@ -15,8 +13,6 @@ from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.units.converter_mode import c_temperature
-from pygaps.core.adsorbate import Adsorbate
-from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 
 
 def enthalpy_sorption_whittaker(
@@ -179,10 +175,8 @@ def enthalpy_sorption_whittaker(
         p_sat, p_c, p_t,
         T,
     )
-    
+
     stderr = stderr_estimate(len(model.params), model.rmse, enthalpy)
-    print('enthalpy: ', enthalpy)
-    print('stderr: ', stderr)
 
     if verbose:
         isosteric_enthalpy_plot(
@@ -242,7 +236,7 @@ def convert_isotherm_safely(isotherm: PointIsotherm):
 
 def pressure_at(
     isotherm: BaseIsotherm,
-    n: list[float],
+    n: float,
 ):
     """
     Wrapper for `isotherm.pressure_at()` which returns NAN on a
@@ -262,18 +256,70 @@ def pressure_at(
     """
     try:
         return float(isotherm.pressure_at(n))
-    except CalculationError:
+    except CalculationError as e:
+        print(e)
         return np.NAN
 
 
-def vaporisation_enthalpy(adsorbate, pressure, p_c, p_sat):
+def vaporisation_enthalpy(
+    adsorbate: Adsorbate,
+    pressure: float,
+    p_c: float,
+    p_sat: float,
+):
+    """
+    Wrapper for `adsorbate.enthalpy_vaporisation()` which returns NAN on a
+    if it is impossible to calculate vaporisation enthalpy.
+
+    Parameters
+    ----------
+    adsorbate: Adsorbate,
+        Adsorbate for which to determine the vaporisiation enthalpy
+    pressure: float,
+        Pressure, in Pa at which to determine vaporisation enthalpy
+    p_c: float,
+        Critical pressure of the adsorbate, in Pa.
+    p_sat: float,
+        Saturation pressure of the adsorbate at the isotherm temperature.
+
+    Returns
+    ------
+    adsorbate.enthalpy_vaporisation() in J/mol if possible, np.NAN if not
+    """
     if np.isnan(pressure) or pressure <= 0 or pressure > p_c or pressure > p_sat:
         return np.NAN
     # return in J/mol
     return adsorbate.enthalpy_vaporisation(press=pressure) * 1000
 
 
-def compressibility(adsorbate, pressure, temperature, p_c, p_sat):
+def compressibility(
+    adsorbate: Adsorbate,
+    pressure: float,
+    temperature: float,
+    p_c: float,
+    p_sat: float,
+):
+    """
+    Wrapper for `adsorbate.compressibility()` which returns NAN on a
+    if it is impossible to calculate compressibility.
+
+    Parameters
+    ----------
+    adsorbate: Adsorbate,
+        Adsorbate for which to determine the compressibility.
+    pressure: float,
+        Pressure, in Pa at which to determine compressibility.
+    temperature: float,
+        Isotherm temperature in K.
+    p_c: float,
+        Critical pressure of the adsorbate, in Pa.
+    p_sat: float,
+        Saturation pressure of the adsorbate at the isotherm temperature.
+
+    Returns
+    ------
+    `adsorbate.compressibility()` if possible, np.NAN if not
+    """
     if np.isnan(pressure) or pressure <= 0 or pressure > p_c or pressure > p_sat:
         return np.NAN
     return adsorbate.compressibility(temp=temperature, pressure=pressure)
@@ -284,6 +330,27 @@ def stderr_estimate(
     rmse: float,
     enthalpy: list[float],
 ):
+    r"""
+    An estimation of the standard error of the isosteric enthalpy of adsorption
+    calculation, based on the RMSE of the model fitting and the number of terms
+    in the model.
+
+    ..math::
+        \sigma = 0.434 * \sqrt{n cdot RMSE^2}
+
+    Parameters
+    ----------
+    n_terms: int,
+        Number of terms in the model used to fit the isotherm
+    rmse: float,
+        root mean square error of model fit
+    enthalpy: list[float],
+        Isosteric enthalpy of adsorption
+
+    Returns
+    ------
+    An estimate of standard error for each enthalpy, as a list[float]
+    """
     absolute_uncertainty = 0.434 * (np.sqrt(n_terms * (rmse**2)))
     return [abs(absolute_uncertainty * h) for h in enthalpy]
 
@@ -294,6 +361,28 @@ def toth_adsorption_potential(
     p_sat: float,
     RT: float,
 ):
+    r"""
+    Calculates the T\'oth-corrected Polanyi adsorption potential,
+    $\varepsilon_{ads}$
+    ..math::
+        \Psi = RT \ln{\Psi \frac{P_{sat}}{P}}
+
+    Parameters
+    ---------
+    model_isotherm: ModelIsotherm,
+        Model isotherm containing the parameters for calculation of $\Psi$.
+    pressure: float,
+        Pressure at which to calculate the adsorption potential, in Pa.
+    p_sat: float,
+        Saturation pressure of the adsorbate at the isotherm temperature, in Pa.
+    RT: float,
+        The product of the gas constant, $R$ and the isotherm temperature, $T$
+
+    Returns
+    -------
+    The Adsorption potential, $\varepsilon_{ads}$ in J/mol
+
+    """
     Psi = model_isotherm.toth_correction_at(pressure)
     return RT * np.log(Psi * (p_sat / pressure))
 
@@ -309,18 +398,15 @@ def enthalpy_sorption_whittaker_raw(
     RT = scipy.constants.R * T
     adsorbate = model_isotherm.adsorbate
 
-    try:
-        pressure = [pressure_at(model_isotherm, n) for n in loading]
-        epsilon = [toth_adsorption_potential(model_isotherm, p, p_sat, RT) for p in pressure]
-        hvap = [vaporisation_enthalpy(adsorbate, max(p, p_t), p_c, p_sat) for p in pressure]
-        Zfactor = [compressibility(adsorbate, p, T, p_c, p_sat) for p in pressure]
+    pressure = [pressure_at(model_isotherm, n) for n in loading]
 
-        # Sum adsorption potential, vaporisation enthalpy, ZRT
-        return [
-            (e + h + (Z * RT)) / 1000  # return in kJ/mol
-            for e, h, Z
-            in zip(epsilon, hvap, Zfactor)
-        ]
-    except TypeError:
-        print('loading: ', loading)
-        print('pressure: ', pressure)
+    epsilon = [toth_adsorption_potential(model_isotherm, p, p_sat, RT) for p in pressure]
+    hvap = [vaporisation_enthalpy(adsorbate, max(p, p_t), p_c, p_sat) for p in pressure]
+    Zfactor = [compressibility(adsorbate, p, T, p_c, p_sat) for p in pressure]
+
+    # Sum adsorption potential, vaporisation enthalpy, ZRT
+    return [
+        (e + h + (Z * RT)) / 1000  # return in kJ/mol
+        for e, h, Z
+        in zip(epsilon, hvap, Zfactor)
+    ]
