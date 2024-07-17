@@ -94,8 +94,8 @@ class ChemiPhysisorption(IsothermBaseModel):
         """
         Calculate pressure at specified loading.
 
-        For the Dual Site Toth model, the pressure will be computed numerically
-        An analytical inversion of this equation may be possible.
+        For the ChemiPhysisorption model, an analytical inversion of this
+        equation is be possible; see code.
 
         Parameters
         ----------
@@ -107,14 +107,26 @@ class ChemiPhysisorption(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
+        def single_site(loading, gamma, n_m, K, t):
+            theta = loading / n_m
+            return theta / (K * gamma * ((1 - (theta**t))**(1 / t)))
 
-        opt_res = optimize.root(fun, numpy.zeros_like(loading), method='hybr')
+        return (
+            single_site(
+                loading, 1,
+                self.params["n_m1"],
+                self.params["K1"],
+                self.params["t1"],
+            ) +
+            single_site(
+                loading, numpy.exp(-self.params["Ea"] / self.rt),
+                self.params["n_m2"],
+                self.params["K2"],
+                1
+            )
+        )
 
-        if not opt_res.success:
-            raise CalculationError(f"Root finding for value {loading} failed.")
-        return opt_res.x
+
 
     def spreading_pressure(self, pressure):
         r"""
@@ -190,24 +202,22 @@ class ChemiPhysisorption(IsothermBaseModel):
             gammanmK = gamma * nm * K
             return gammanmK / ((1 + Kpt))**((t + 1) / t)
 
-        gamma = numpy.exp(- self.params["Ea"] / self.rt)
-
         dP_dn = 1 / (
             dn_dP_singlesite(
                 1,
                 self.params["n_m1"],
                 self.params["K1"],
-                self.params["t"]
+                self.params["t1"]
             ) +
             dn_dP_singlesite(
-                gamma,
+                numpy.exp(-self.params["Ea"] / self.rt),
                 self.params["n_m2"],
                 self.params["K2"],
                 1
             )
         )
 
-        return ((self.loading(pressure) / pressure) / dP_dn) - 1
+        return ((self.loading(pressure) / pressure) * dP_dn) - 1
 
     def initial_guess(self, pressure, loading):
         """

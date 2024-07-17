@@ -88,8 +88,8 @@ class DSToth(IsothermBaseModel):
         """
         Calculate pressure at specified loading.
 
-        For the Dual Site Toth model, the pressure will be computed numerically.
-        An analytical inversion of this equation may be possible.
+        For the Dual Site Toth model, an analytical inversion of this
+        equation is be possible; see code.
 
 
         Parameters
@@ -102,14 +102,21 @@ class DSToth(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def fun(x):
-            return self.loading(x) - loading
+        def single_site(loading, n_m, K, t):
+            theta = loading / n_m
+            return theta / (K * ((1 - (theta**t))**(1 / t)))
 
-        opt_res = optimize.root(fun, numpy.zeros_like(loading), method='hybr')
+        return (
+            single_site(
+                loading,
+                self.params["n_m1"], self.params["K1"], self.params["t1"]
+            ) +
+            single_site(
+                loading,
+                self.params["n_m2"], self.params["K2"], self.params["t2"]
+            )
+        )
 
-        if not opt_res.success:
-            raise CalculationError(f"Root finding for value {loading} failed.")
-        return opt_res.x
 
     def spreading_pressure(self, pressure):
         r"""
@@ -169,7 +176,7 @@ class DSToth(IsothermBaseModel):
         def dn_dP_singlesite(nm, K, t):
             Kpt = (K * pressure)**t
             nmK = nm * K
-            return nmK / ((1 + Kpt))**((t + 1) / t)
+            return nmK / ((1 + Kpt)**((t + 1) / t))
 
         dP_dn = 1 / (
             dn_dP_singlesite(
@@ -184,7 +191,7 @@ class DSToth(IsothermBaseModel):
             )
         )
 
-        return ((self.loading(pressure) / pressure) / dP_dn) - 1
+        return ((self.loading(pressure) / pressure) * dP_dn) - 1
 
     def initial_guess(self, pressure, loading):
         """
