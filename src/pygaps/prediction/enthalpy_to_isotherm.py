@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy import constants
 
-import pygaps.graphing as pgg
+import pygaps.graphing.prediction_graphs
 from pygaps import logger
 from pygaps.characterisation import enthalpy_sorption_whittaker
 from pygaps.core.pointisotherm import PointIsotherm
@@ -90,7 +90,7 @@ def isotherm_to_predicted(
     )
 
     if verbose:
-        pgg.prediction_graphs.plot_isothermfit_enthalpy_prediction(
+        pygaps.graphing.prediction_graphs.plot_isothermfit_enthalpy_prediction(
             original_isotherm,
             whittaker_dictionary['model_isotherm'],
             predicted_isotherm,
