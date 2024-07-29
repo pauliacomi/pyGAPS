@@ -159,6 +159,15 @@ class TSLangmuir(IsothermBaseModel):
             The T\'oth correction, $\Psi$
         """
 
+        nm1K1 = self.params["n_m1"] * self.params["K1"]
+        K1P = self.params["K1"] * pressure
+        nm2K2 = self.params["n_m2"] * self.params["K2"]
+        K2P = self.params["K2"] * pressure
+        nm3K3 = self.params["n_m3"] * self.params["K3"]
+        K3P = self.params["K3"] * pressure
+
+        n_P = (nm1K1 / (1 + K1P)) + (nm2K2 / (1 + K2P)) + (nm3K3 / (1 + K3P))
+
         def dn_dP_singlesite(n_m, K):
             return (
                 (n_m * K) / (1 + (K * pressure))**2
@@ -170,7 +179,7 @@ class TSLangmuir(IsothermBaseModel):
             dn_dP_singlesite(self.params["n_m3"], self.params["K3"])
         )
 
-        return ((self.loading(pressure) / pressure) * dP_dn) - 1
+        return (n_P * dP_dn) - 1
 
     def initial_guess(self, pressure, loading):
         """

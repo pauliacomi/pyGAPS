@@ -117,7 +117,6 @@ class DSToth(IsothermBaseModel):
             )
         )
 
-
     def spreading_pressure(self, pressure):
         r"""
         Calculate spreading pressure at specified gas pressure.
@@ -173,6 +172,16 @@ class DSToth(IsothermBaseModel):
             The T\'oth correction, $\Psi$
         """
 
+        nm1K1 = self.params["n_m1"] * self.params["K1"]
+        K1Pt1 = (self.params["K1"] * pressure)**self.params["t1"]
+        nm2K2 = self.params["n_m2"] * self.params["K2"]
+        K2Pt2 = (self.params["K2"] * pressure)**self.params["t2"]
+
+        n_P = (
+            (nm1K1 / ((1 + K1Pt1)**self.params["t1"])) +
+            (nm2K2 / ((1 + K2Pt2)**self.params["t2"]))
+        )
+
         def dn_dP_singlesite(nm, K, t):
             Kpt = (K * pressure)**t
             nmK = nm * K
@@ -191,7 +200,7 @@ class DSToth(IsothermBaseModel):
             )
         )
 
-        return ((self.loading(pressure) / pressure) * dP_dn) - 1
+        return (n_P * dP_dn) - 1
 
     def initial_guess(self, pressure, loading):
         """

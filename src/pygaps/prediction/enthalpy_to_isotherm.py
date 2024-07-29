@@ -15,8 +15,6 @@ from pygaps.utilities.exceptions import ParameterError
 
 R = constants.gas_constant
 
-# TODO decide if we need to change PointIsotherm object to include enthalpies
-
 
 def isotherm_to_predicted(
     T_predict: list[float],

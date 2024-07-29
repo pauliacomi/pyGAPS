@@ -125,17 +125,22 @@ class DSLangmuir(IsothermBaseModel):
             The T\'oth correction, $\Psi$
         """
 
+        nm1K1 = self.params["n_m1"] * self.params["K1"]
+        K1P = self.params["K1"] * pressure
+        nm2K2 = self.params["n_m2"] * self.params["K2"]
+        K2P = self.params["K2"] * pressure
+
+        n_P = (nm1K1 / (1 + K1P)) + (nm2K2 / (1 + K2P))
+
         def dn_dP_singlesite(n_m, K):
-            return (
-                (n_m * K) / (1 + (K * pressure))**2
-            )
+            return (n_m * K) / (1 + (K * pressure))**2
 
         dP_dn = 1 / (
             dn_dP_singlesite(self.params["n_m1"], self.params["K1"]) +
             dn_dP_singlesite(self.params["n_m2"], self.params["K2"])
         )
 
-        return ((self.loading(pressure) / pressure) * dP_dn) - 1
+        return (n_P * dP_dn) - 1
 
     def spreading_pressure(self, pressure):
         r"""
