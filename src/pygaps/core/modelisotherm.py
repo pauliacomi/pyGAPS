@@ -418,18 +418,19 @@ class ModelIsotherm(BaseIsotherm):
         else:
             try:
                 guess_models = [m for m in models if is_model(m)]
-            except TypeError:
-                raise ParameterError("Could not figure out the list of models. Is it a list?")
+            except TypeError as ex:
+                raise ParameterError(
+                    "Could not figure out the list of models. Is it a list?"
+                ) from ex
             if len(guess_models) != len(models):
-                raise ParameterError('Not all models correspond to internal models.')
+                raise ParameterError(
+                    f'Not all models correspond to internal models. Possible models are f{models}'
+                )
 
         for model in guess_models:
             if param_bounds is not None:
                 params = get_isotherm_model(model).params.keys()
-                param_bounds = {
-                    key: param_bounds[key] for key in param_bounds
-                    if key in params
-                }
+                param_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
             try:
                 isotherm = cls(
                     pressure=pressure,
@@ -1080,9 +1081,3 @@ class ModelIsotherm(BaseIsotherm):
 
         # calculate based on model
         return self.model.spreading_pressure(pressure)
-
-    def toth_correction_at(
-        self,
-        pressure: t.Union[float, t.List[float]],
-    ):
-        return self.model.toth_correction(pressure)

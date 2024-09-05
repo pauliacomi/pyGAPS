@@ -309,4 +309,3 @@ class IsothermBaseModel():
                 f"\n{leastsq_args['x0']}\n"
             )
         return opt_res
-

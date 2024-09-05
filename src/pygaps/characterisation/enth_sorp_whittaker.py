@@ -10,9 +10,9 @@ from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
+from pygaps.units.converter_mode import c_temperature
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
-from pygaps.units.converter_mode import c_temperature
 
 
 def enthalpy_sorption_whittaker(
@@ -125,39 +125,37 @@ def enthalpy_sorption_whittaker(
             '''
         )
 
-    if (
-        isinstance(isotherm, ModelIsotherm) and
-        isotherm.units['pressure_unit'] != 'Pa'
-    ):
-        raise ParameterError(
-            f'''
-            Model isotherms should use pressure in Pascal.
-            Current pressure unit is {isotherm.units['pressure_unit']}.
-            '''
-        )
+    # Checks for ModelIsotherms provided
+    if isinstance(isotherm, ModelIsotherm):
+        if isotherm.units['pressure_unit'] != 'Pa':
+            raise ParameterError(
+                f'''
+                Model isotherms should use pressure in Pascal.
+                Current pressure unit is {isotherm.units['pressure_unit']}.
+                '''
+            )
 
+        if not pgm.is_model_whittaker(isotherm.model.name):
+            raise ParameterError(
+                rf'''
+                Whittaker method requires modelling with a T\'oth-type model, i.e.
+                {*pgm._WHITTAKER_MODELS,}
+                '''
+            )
+
+    # Checks for PointIsotherms provided
     if isinstance(isotherm, PointIsotherm):
         if model == 'guess':
             model = pgm._WHITTAKER_MODELS
 
-        isotherm = convert_isotherm_safely(isotherm)
+        isotherm = copy_convert_isotherm(isotherm)
         max_nfev = kwargs.get('max_nfev', None)
         isotherm = pgm.model_iso(
             isotherm,
             branch=branch,
             model=model,
             verbose=verbose,
-            optimization_params=dict(max_nfev=max_nfev),
-        )
-
-    model = isotherm.model
-
-    if not pgm.is_model_whittaker(model.name):
-        raise ParameterError(
-            rf'''
-            Whittaker method requires modelling with a T\'oth-type model, i.e.
-            {*pgm._WHITTAKER_MODELS,}
-            '''
+            optimization_params={'max_nfev': max_nfev},
         )
 
     if loading is None:
@@ -171,8 +169,11 @@ def enthalpy_sorption_whittaker(
     p_sat = adsorbate.saturation_pressure(isotherm.temperature, pseudo=True)
 
     enthalpy = enthalpy_sorption_whittaker_raw(
-        isotherm, loading,
-        p_sat, p_c, p_t,
+        isotherm,
+        loading,
+        p_sat,
+        p_c,
+        p_t,
         T,
     )
 
@@ -188,13 +189,13 @@ def enthalpy_sorption_whittaker(
 
     return {
         'loading': loading,
-        'enthalpy_sorption': enthalpy,
+        'isosteric_enthalpy': enthalpy,
         'model_isotherm': isotherm,
         'std_errs': stderr,
     }
 
 
-def convert_isotherm_safely(isotherm: PointIsotherm):
+def copy_convert_isotherm(isotherm: PointIsotherm):
     """
     Makes a copy of the isotherm, but with pressure converted to
     absolute mode and units in Pa, and temperature converted to K.
@@ -383,7 +384,7 @@ def toth_adsorption_potential(
     The Adsorption potential, $\varepsilon_{ads}$ in J/mol
 
     """
-    Psi = model_isotherm.toth_correction_at(pressure)
+    Psi = model_isotherm.model.toth_correction_at(pressure)
     return RT * np.log(Psi * (p_sat / pressure))
 
 

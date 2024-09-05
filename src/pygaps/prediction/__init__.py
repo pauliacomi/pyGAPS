@@ -7,5 +7,5 @@ from .iast import iast_binary_svp
 from .iast import iast_binary_vle
 from .iast import reverse_iast
 from .enthalpy_to_isotherm import isotherm_to_predicted
-from .enthalpy_to_isotherm import enthalpy_and_isotherm_to_predicted
-from .enthalpy_to_isotherm import predict_adsorption_surface
+from .enthalpy_to_isotherm import predict_isotherm_from_enthalpy_clapeyron
+from .enthalpy_to_isotherm import predict_isosurface_from_enthalpy_clapeyron

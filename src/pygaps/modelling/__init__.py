@@ -66,7 +66,7 @@ _IAST_MODELS = [
 ]
 
 
-# This list has all the models which are consistent with Whittaker method.
+# This list has all the models which are consistent with the Whittaker method.
 # List may be updated as Whittaker theory is improved.
 _WHITTAKER_MODELS = [
     "Langmuir",

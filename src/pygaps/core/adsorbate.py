@@ -521,7 +521,7 @@ class Adsorbate():
         temp: float,
         unit: str = None,
         calculate: bool = True,
-        pseudo: bool = False,
+        pseudo: str = False,
         verbose: bool = False,
     ) -> float:
         """
@@ -537,7 +537,7 @@ class Adsorbate():
         calculate : bool, optional
             Whether to calculate the property or look it up in the properties
             dictionary, default - True.
-        pseudo: bool, optional
+        pseudo: str, optional
             Whether to calculate a pseudo-saturation pressure for a
             supercritical adsorbate, default - False.
 
@@ -555,11 +555,17 @@ class Adsorbate():
             If it cannot be calculated, due to a physical reason.
 
         """
-        # TODO add Antoine version
         if (pseudo and temp > self.t_critical()):
-            if verbose:
-                logger.warning('Dubinin pseudo-saturation pressure calculated.')
-            return self.pseudo_saturation_pressure_dubinin(temp=temp, unit=unit)
+            if pseudo == 'Dubinin':
+                if verbose:
+                    logger.warning('Dubinin pseudo-saturation pressure calculated.')
+                return self.saturation_pressure_pseudo_dubinin(temp=temp, unit=unit)
+            # TODO add Antoine version
+            # if pseudo == 'Antoine':
+                # return ...
+            raise ParameterError(
+                "No type of calculation specified for pseudosaturation pressure."
+            )
 
         if calculate:
             try:
@@ -579,7 +585,7 @@ class Adsorbate():
         except ParameterError as err:
             _raise_calculation_error(err)
 
-    def pseudo_saturation_pressure_dubinin(
+    def saturation_pressure_pseudo_dubinin(
         self,
         temp: float,
         unit: str = None,
@@ -610,10 +616,8 @@ class Adsorbate():
                 f'Returning real saturation pressure.'
             )
             return self.saturation_pressure(temp=temp)
-
         if k < 1:
-            logger.warning(f'The value for the exponent, k, is too small ({k}).')
-            return
+            raise ParameterError('The value for the exponent, k, is too small ({k}).')
 
         sat_p = self.p_critical() * ((temp / self.t_critical())**k)
 
