@@ -14,7 +14,7 @@ try:
 except ImportError:
     # TODO Deprecation after PY<3.9
     # Use backported `importlib_resources`.
-    import importlib_resources as importlib_resources
+    import importlib_resources
     from importlib_resources import files as importlib_resources_files
 
 from contextlib import ExitStack

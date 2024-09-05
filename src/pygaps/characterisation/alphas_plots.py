@@ -1,15 +1,19 @@
 """This module contains the alpha-s calculation."""
 
+from typing import TYPE_CHECKING
+
 import numpy
 from scipy import stats
+
+if TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+    from pygaps.core.pointisotherm import PointIsotherm
 
 from pygaps import logger
 from pygaps.characterisation.area_bet import area_BET
 from pygaps.characterisation.area_lang import area_langmuir
 from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.baseisotherm import BaseIsotherm
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.math_utilities import find_linear_sections

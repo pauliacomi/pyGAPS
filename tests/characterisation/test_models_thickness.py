@@ -48,6 +48,7 @@ class TestThicknessModels():
             ('zero thickness', [0, 0, 0]),
             ('SiO2 Jaroniec/Kruk/Olivier', [0.362, 0.538, 1.036]),
             ('carbon black Kruk/Jaroniec/Gadkaree', [0.374, 0.565, 1.257]),
+            ('aerosil_MCM', [0.362, 0.538, 1.038])
         ]
     )
     def test_models(self, modelname, thickness):

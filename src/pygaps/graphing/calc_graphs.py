@@ -4,7 +4,7 @@ import typing as t
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
+from matplotlib import ticker
 
 from pygaps.graphing.labels import label_units_dict
 from pygaps.graphing.mpl_styles import BASE_STYLE
@@ -571,7 +571,7 @@ def initial_enthalpy_plot(
                 )
     if log:
         ax.set_xscale('log')
-        ax.xaxis.set_major_locator(plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
+        ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
 
     ax.set_title(title + " initial enthalpy fit")
     ax.set_xlabel('Loading')

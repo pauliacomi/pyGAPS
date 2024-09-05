@@ -275,6 +275,7 @@ class IsothermBaseModel():
             "x0": guess,  # initial guess
             "bounds": bounds,  # supply the bounds of the parameters
             "args": (pressure, loading),  # extra arguments to the fit function
+            "x_scale": "jac",  # scale the problem using the jacobian
         }
         if optimization_params:
             fit_args.update(optimization_params)

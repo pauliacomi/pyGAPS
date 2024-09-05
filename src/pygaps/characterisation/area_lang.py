@@ -1,15 +1,18 @@
 """This module contains Langmuir area calculations."""
 
 import textwrap
+from typing import TYPE_CHECKING
 
 import numpy
 from scipy import constants
 from scipy import stats
 
+if TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+    from pygaps.core.pointisotherm import PointIsotherm
+
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered

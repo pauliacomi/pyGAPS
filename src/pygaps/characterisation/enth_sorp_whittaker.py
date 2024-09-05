@@ -1,6 +1,5 @@
 """Module implementing the Whittaker method for isosteric enthalpy calculations."""
 
-
 import numpy as np
 import scipy.constants
 
@@ -408,6 +407,5 @@ def enthalpy_sorption_whittaker_raw(
     # Sum adsorption potential, vaporisation enthalpy, ZRT
     return [
         (e + h + (Z * RT)) / 1000  # return in kJ/mol
-        for e, h, Z
-        in zip(epsilon, hvap, Zfactor)
+        for e, h, Z in zip(epsilon, hvap, Zfactor)
     ]

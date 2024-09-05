@@ -4,15 +4,18 @@ pores in the micropore range (<2 nm). These are derived from the Horvath-Kawazoe
 """
 
 import math
+from typing import TYPE_CHECKING
 
 import numpy
 from scipy import constants
 from scipy import optimize
 
+if TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+    from pygaps.core.pointisotherm import PointIsotherm
+
 from pygaps.characterisation.models_hk import HK_KEYS
 from pygaps.characterisation.models_hk import get_hk_model
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered

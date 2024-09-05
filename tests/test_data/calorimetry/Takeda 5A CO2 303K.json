@@ -1,0 +1,198 @@
+{
+    "file_version": "3.0",
+    "adsorbate": "carbon dioxide",
+    "material_basis": "mass",
+    "material_unit": "g",
+    "iso_type": "Calorimetrie",
+    "isotherm_data": [
+        {
+            "enthalpy": 34.7296854523,
+            "loading": 0.426869211537,
+            "pressure": 0.0887380952381
+        },
+        {
+            "enthalpy": 31.6622584471,
+            "loading": 0.7710306387,
+            "pressure": 0.199538095238
+        },
+        {
+            "enthalpy": 30.1584718139,
+            "loading": 1.1972215639,
+            "pressure": 0.378538095238
+        },
+        {
+            "enthalpy": 29.1937101349,
+            "loading": 1.55310440983,
+            "pressure": 0.563238095238
+        },
+        {
+            "enthalpy": 28.5165485957,
+            "loading": 1.85059130607,
+            "pressure": 0.741438095238
+        },
+        {
+            "enthalpy": 28.0029854801,
+            "loading": 2.17371966797,
+            "pressure": 0.960638095238
+        },
+        {
+            "enthalpy": 27.3787621775,
+            "loading": 2.84695278641,
+            "pressure": 1.50423809524
+        },
+        {
+            "enthalpy": 26.6900503433,
+            "loading": 3.30775740194,
+            "pressure": 1.94833809524
+        },
+        {
+            "enthalpy": 26.5136200476,
+            "loading": 3.9264398659,
+            "pressure": 2.65223809524
+        },
+        {
+            "enthalpy": 26.2379671792,
+            "loading": 4.31114292029,
+            "pressure": 3.15973809524
+        },
+        {
+            "enthalpy": 26.0273755772,
+            "loading": 4.62303268428,
+            "pressure": 3.61573809524
+        },
+        {
+            "enthalpy": 26.2163336918,
+            "loading": 5.16373493924,
+            "pressure": 4.52173809524
+        },
+        {
+            "enthalpy": 26.2821771068,
+            "loading": 5.94639348359,
+            "pressure": 6.14943809524
+        },
+        {
+            "enthalpy": 26.6960027172,
+            "loading": 6.57760107681,
+            "pressure": 7.83153809524
+        },
+        {
+            "enthalpy": 26.977902201,
+            "loading": 7.35690009812,
+            "pressure": 10.4989380952
+        },
+        {
+            "enthalpy": 27.3208370176,
+            "loading": 7.78122236306,
+            "pressure": 12.3211380952
+        },
+        {
+            "enthalpy": 27.3692858884,
+            "loading": 8.15026997525,
+            "pressure": 14.1692380952
+        },
+        {
+            "enthalpy": 27.881121497,
+            "loading": 8.80581801123,
+            "pressure": 18.2112380952
+        },
+        {
+            "enthalpy": 26.7273248655,
+            "loading": 9.12368504251,
+            "pressure": 20.4955380952
+        },
+        {
+            "enthalpy": 29.9428309167,
+            "loading": 9.35332009445,
+            "pressure": 22.5723380952
+        },
+        {
+            "enthalpy": 31.1003805311,
+            "loading": 9.60612828493,
+            "pressure": 25.2094380952
+        },
+        {
+            "branch": "des",
+            "enthalpy": 39.6173386609,
+            "loading": 9.42396435656,
+            "pressure": 22.7751380952
+        },
+        {
+            "branch": "des",
+            "enthalpy": 36.6867211455,
+            "loading": 9.22350877652,
+            "pressure": 20.5445380952
+        },
+        {
+            "branch": "des",
+            "enthalpy": 30.8645690394,
+            "loading": 8.98225953969,
+            "pressure": 18.5241380952
+        },
+        {
+            "branch": "des",
+            "enthalpy": 29.1966789237,
+            "loading": 8.52097500507,
+            "pressure": 15.3625380952
+        },
+        {
+            "branch": "des",
+            "enthalpy": 28.1123997951,
+            "loading": 8.03881823567,
+            "pressure": 12.7320380952
+        },
+        {
+            "branch": "des",
+            "enthalpy": 26.9447113762,
+            "loading": 7.53724858497,
+            "pressure": 10.5609380952
+        },
+        {
+            "branch": "des",
+            "enthalpy": 26.871795842,
+            "loading": 7.04372418779,
+            "pressure": 8.77253809524
+        },
+        {
+            "branch": "des",
+            "enthalpy": 26.5779367654,
+            "loading": 6.40146779293,
+            "pressure": 6.87613809524
+        },
+        {
+            "branch": "des",
+            "enthalpy": 26.4797241519,
+            "loading": 5.68294263159,
+            "pressure": 5.19333809524
+        },
+        {
+            "branch": "des",
+            "enthalpy": 26.6153497011,
+            "loading": 4.8124341827,
+            "pressure": 3.61363809524
+        },
+        {
+            "branch": "des",
+            "enthalpy": 26.7611319434,
+            "loading": 4.06186992077,
+            "pressure": 2.56093809524
+        },
+        {
+            "branch": "des",
+            "enthalpy": 27.0518013985,
+            "loading": 3.42648076702,
+            "pressure": 1.84143809524
+        }
+    ],
+    "lab": "MADIREL",
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
+    "instrument": "CV",
+    "material": "Takeda 5A",
+    "material_batch": "Test",
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "activation_temperature": 150.0,
+    "temperature": 303.0,
+    "temperature_unit": "K",
+    "user": "ADW"
+}

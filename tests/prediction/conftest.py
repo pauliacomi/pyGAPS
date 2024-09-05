@@ -3,18 +3,16 @@ This configuration file contains data required for testing
 scientific pygaps functions on real or model data.
 """
 
-from pathlib import Path
-
 DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
 DATA_IAST_PATH = DATA_PATH / 'iast'
 DATA_WHITTAKER_PATH = DATA_PATH / 'whittaker'
 
 DATA_IAST = {
     'CH4': {
-        'file': 'MOF-5(Zn) - IAST - CH4.json',
+        'file': 'MOF-5(Zn) CH4 298K.json',
     },
     'C2H6': {
-        'file': 'MOF-5(Zn) - IAST - C2H6.json',
+        'file': 'MOF-5(Zn) C2H6 298K.json',
     },
 }
 

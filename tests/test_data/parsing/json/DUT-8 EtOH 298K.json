@@ -1,0 +1,326 @@
+{
+    "adsorbate": "ethanol",
+    "date": "2020-10-19T00:00:00",
+    "file_version": "3.0",
+    "instrument": "BEL 00348",
+    "isotherm_data": [
+        {
+            "loading": -0.0078034,
+            "pressure": 0.025512124267185677,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 1.1631,
+            "pressure": 3.0444425654714777,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 1.871,
+            "pressure": 7.634706247859169,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 2.5434,
+            "pressure": 13.630343253503662,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 3.5961,
+            "pressure": 24.821397413122988,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 4.7,
+            "pressure": 38.00404733528972,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 6.3256,
+            "pressure": 54.88464417429947,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 9.4354,
+            "pressure": 72.95098877945014,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 39.44,
+            "pressure": 77.96387496661991,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 69.495,
+            "pressure": 79.04089720943615,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 98.08,
+            "pressure": 80.31490451804068,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 125.39,
+            "pressure": 81.77054740678759,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 151.08,
+            "pressure": 83.2837508667064,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 175.23,
+            "pressure": 84.86474788822765,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 203.45,
+            "pressure": 86.9816977835494,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 229.77,
+            "pressure": 89.21248969741112,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 253.96,
+            "pressure": 91.18873597431268,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 276.27,
+            "pressure": 92.80043196712562,
+            "saturation_pressure": 7.7
+        },
+        {
+            "loading": 296.53,
+            "pressure": 95.10413393780506,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 293.6,
+            "pressure": 88.40152520578938,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 286.96,
+            "pressure": 75.20736316938826,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 279.73,
+            "pressure": 63.05952440451173,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 271.25,
+            "pressure": 53.366324219165385,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 262.46,
+            "pressure": 43.698706509895416,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 255.44,
+            "pressure": 36.293858809582666,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 247.89,
+            "pressure": 29.85986607636913,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 240.05,
+            "pressure": 24.722904880228864,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 233.55,
+            "pressure": 20.593893241498588,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 227.95,
+            "pressure": 16.80257028697674,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 218.16,
+            "pressure": 13.693020319890831,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 213.9,
+            "pressure": 12.561251578271083,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 206.13,
+            "pressure": 11.183379416796406,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 195.96,
+            "pressure": 9.509006357596302,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 184.21,
+            "pressure": 9.118361947909742,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 172.98,
+            "pressure": 8.23474322423103,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 162.96,
+            "pressure": 7.436314145886719,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 151.59,
+            "pressure": 7.082252676989402,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 140.46,
+            "pressure": 6.691736179683221,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 130.4,
+            "pressure": 6.203366711384826,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 118.87,
+            "pressure": 5.587724424606362,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 111.96,
+            "pressure": 5.09116856396352,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 108.85,
+            "pressure": 4.705128999970708,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 106.01,
+            "pressure": 4.290692887533097,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 96.902,
+            "pressure": 3.82483599818193,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 85.95,
+            "pressure": 3.546754483231509,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 81.422,
+            "pressure": 3.379956739213408,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 74.2,
+            "pressure": 3.0196275636773735,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 68.737,
+            "pressure": 2.6947301175071474,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 63.949,
+            "pressure": 2.379170275104806,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 60.421,
+            "pressure": 2.135369278096754,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 56.705,
+            "pressure": 1.8731488983136975,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 53.981,
+            "pressure": 1.6817919772622574,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 51.563,
+            "pressure": 1.514994233244157,
+            "saturation_pressure": 7.7
+        },
+        {
+            "branch": "des",
+            "loading": 49.002,
+            "pressure": 1.3393705349796998,
+            "saturation_pressure": 7.7
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "mL(STP)",
+    "material": "DUT-8",
+    "material_basis": "mass",
+    "material_batch": "LA-133_DUT-8(Zn)_isp_cp_EtOH_298K",
+    "material_mass": 0.0246,
+    "material_mass_unit": "g",
+    "material_unit": "g",
+    "pressure_mode": "relative%",
+    "pressure_unit": null,
+    "temperature": 298.0,
+    "temperature_unit": "K",
+    "user": "Leila"
+}

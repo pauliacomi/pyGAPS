@@ -194,7 +194,7 @@ def isotherm_from_json(
 def _from_json_nist(raw_dict):
     """Convert a NIST dictionary format to an internal format."""
 
-    nist_dict = dict()
+    nist_dict = {}
 
     # Get regular isotherm parameters
     nist_dict['material'] = raw_dict['adsorbent']['name']
