@@ -179,7 +179,7 @@ def same_orders_of_maximum(vals: list[list[float]]):
     False:
         If not
     """
-    orders = [np.log10(max(v)) for v in vals]
+    orders = [numpy.log10(max(v)) for v in vals]
     if abs(orders[0] - orders[1]) > 1:
         return True
     return False

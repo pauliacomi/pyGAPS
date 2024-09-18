@@ -158,14 +158,14 @@ def enthalpy_sorption_whittaker(
         )
 
     if loading is None:
-        loading = np.linspace(model.loading_range[0], model.loading_range[1], 100)
+        loading = np.linspace(isotherm.model.loading_range[0], isotherm.model.loading_range[1], 100)
 
     #  Define constants
     adsorbate = isotherm.adsorbate
     T = isotherm.temperature
     p_c = adsorbate.p_critical()
     p_t = adsorbate.p_triple()
-    p_sat = adsorbate.saturation_pressure(isotherm.temperature, pseudo=True)
+    p_sat = adsorbate.saturation_pressure(isotherm.temperature, pseudo='Dubinin')
 
     enthalpy = enthalpy_sorption_whittaker_raw(
         isotherm,
@@ -176,7 +176,7 @@ def enthalpy_sorption_whittaker(
         T,
     )
 
-    stderr = stderr_estimate(len(model.params), model.rmse, enthalpy)
+    stderr = stderr_estimate(len(isotherm.model.params), isotherm.model.rmse, enthalpy)
 
     if verbose:
         isosteric_enthalpy_plot(
@@ -188,7 +188,7 @@ def enthalpy_sorption_whittaker(
 
     return {
         'loading': loading,
-        'isosteric_enthalpy': enthalpy,
+        'enthalpy_sorption': enthalpy,
         'model_isotherm': isotherm,
         'std_errs': stderr,
     }
@@ -383,7 +383,7 @@ def toth_adsorption_potential(
     The Adsorption potential, $\varepsilon_{ads}$ in J/mol
 
     """
-    Psi = model_isotherm.model.toth_correction_at(pressure)
+    Psi = model_isotherm.model.toth_correction(pressure)
     return RT * np.log(Psi * (p_sat / pressure))
 
 
