@@ -9,8 +9,8 @@ from scipy import constants
 
 from pygaps import logger
 from pygaps.core.pointisotherm import PointIsotherm
-from pygaps.utilities.exceptions import ParameterError
 from pygaps.graphing import prediction_graphs
+from pygaps.utilities.exceptions import ParameterError
 
 R = constants.gas_constant
 

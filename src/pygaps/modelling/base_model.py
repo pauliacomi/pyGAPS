@@ -153,7 +153,7 @@ class IsothermBaseModel():
         float
             Spreading pressure at specified pressure.
         """
-        return
+        raise NotImplementedError("""This model does not implement spreading pressure.""")
 
     @abc.abstractmethod
     def toth_correction(self, pressure: float) -> float:
@@ -176,7 +176,7 @@ class IsothermBaseModel():
         ------
             The T\'oth correction, $\Psi$
         """
-        return
+        raise NotImplementedError("""This model does not implement T\'oth correction.""")
 
     def initial_guess(self, pressure: "list[float]", loading: "list[float]"):
         """
