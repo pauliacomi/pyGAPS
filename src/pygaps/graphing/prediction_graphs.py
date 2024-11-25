@@ -41,13 +41,15 @@ def plot_predict_isotherm_from_enthalpy(
         ax=enthalpy_ax,
     )
 
+    logx = same_orders_of_maximum(
+        [original_isotherm.pressure(), predicted_isotherm.pressure()]
+    )
+
     pgg.plot_iso(
         [original_isotherm, predicted_isotherm],
         branch=branch,
         ax=isos_ax,
-        logx=same_orders_of_maximum( # uses log axis if needed
-        [original_isotherm.pressure(), predicted_isotherm.pressure()]
-        ),
+        logx=logx,
     )
     lgd_keys = [
         f'Original at {original_isotherm.temperature} K',
