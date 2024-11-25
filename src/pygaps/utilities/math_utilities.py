@@ -163,7 +163,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     )
 
 
-def same_orders_of_maximum(vals: list[list[float]]):
+def same_orders_of_maximum(vals: list[list, list]):
     """
     Determines if the maximum of two lists are within one order of magnitude.
 
