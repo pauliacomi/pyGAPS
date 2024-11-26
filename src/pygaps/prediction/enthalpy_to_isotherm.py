@@ -6,6 +6,7 @@ isotherm and calculated isosteric heats of adsorption
 import numpy as np
 import pandas as pd
 from scipy import constants
+import warnings
 
 from pygaps import logger
 from pygaps.core.pointisotherm import PointIsotherm
@@ -326,13 +327,14 @@ def predict_pressure_raw(
 
     RTT = R * temperature_current * temperature_prediction
     T_difference = temperature_prediction - temperature_current
-    if T_difference > 50:
-        logger.warning(
+    if abs(T_difference) > 50:
+        warnings.warn(UserWarning(
             rf'''
             Difference in experimental and prediction temperatures is more
             than 50 K ({T_difference} K). This method may not be reliable
             for predicting a new isotherm.
             '''
+        )
         )
 
     pressure_prediction = [

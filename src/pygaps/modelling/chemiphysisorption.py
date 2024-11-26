@@ -1,10 +1,12 @@
 """ChemiPhysisorption (CP) isotherm model."""
 
 import numpy
-from scipy import constants
 from scipy import integrate
+from scipy import optimize
+from scipy import constants
 
 from pygaps.modelling.base_model import IsothermBaseModel
+from pygaps.utilities.exceptions import CalculationError
 
 
 class ChemiPhysisorption(IsothermBaseModel):
@@ -92,8 +94,8 @@ class ChemiPhysisorption(IsothermBaseModel):
         """
         Calculate pressure at specified loading.
 
-        For the ChemiPhysisorption model, an analytical inversion of this
-        equation is be possible; see code.
+        For the ChemiPhysisorption model, the pressure will
+        be computed numerically as no analytical inversion is possible.
 
         Parameters
         ----------
@@ -105,24 +107,15 @@ class ChemiPhysisorption(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
-        def single_site(loading, gamma, n_m, K, t):
-            theta = loading / n_m
-            return theta / (K * gamma * ((1 - (theta**t))**(1 / t)))
+        def fun(x):
+            return self.loading(x) - loading
 
-        return (
-            single_site(
-                loading, 1,
-                self.params["n_m1"],
-                self.params["K1"],
-                self.params["t1"],
-            ) +
-            single_site(
-                loading, numpy.exp(-self.params["Ea"] / self.rt),
-                self.params["n_m2"],
-                self.params["K2"],
-                1
-            )
-        )
+        opt_res = optimize.root(fun, numpy.zeros_like(loading), method='hybr')
+
+        if not opt_res.success:
+            raise CalculationError(f"Root finding for value {loading} failed.")
+
+        return opt_res.x
 
     def spreading_pressure(self, pressure):
         r"""
@@ -193,17 +186,18 @@ class ChemiPhysisorption(IsothermBaseModel):
             The T\'oth correction, $\Psi$
         """
 
+        t2 = 1
         nm1K1 = self.params["n_m1"] * self.params["K1"]
         K1Pt1 = (self.params["K1"] * pressure)**self.params["t1"]
         gammanm2K2 = (
             numpy.exp(-self.params["Ea"] / self.rt) * self.params["n_m2"]
             * self.params["K2"]
         )
-        K2Pt2 = (self.params["K2"] * pressure)**self.params["t2"]
+        K2Pt2 = (self.params["K2"] * pressure)**t2
 
         n_P = (
             (nm1K1 / ((1 + K1Pt1)**self.params["t1"])) +
-            (gammanm2K2 / ((1 + K2Pt2)**self.params["t2"]))
+            (gammanm2K2 / ((1 + K2Pt2)**t2))
         )
 
         def dn_dP_singlesite(gamma, nm, K, t):

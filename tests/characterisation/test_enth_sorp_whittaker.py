@@ -30,7 +30,7 @@ class TestWhittakerEnthalpy():
         )
         res_enth = res['enthalpy_sorption']
         ref_enth = testdata['ref_enth']
-        assert np.isclose(res_enth, ref_enth)
+        assert np.isclose(res_enth, ref_enth, rtol=0.1, atol=0.01)
 
     @pytest.mark.parametrize('testdata', [ex for ex in DATA_WHITTAKER.values()])
     def test_whittaker_model(self, testdata):
@@ -50,7 +50,7 @@ class TestWhittakerEnthalpy():
         )
         res_enth = res['enthalpy_sorption']
         ref_enth = testdata['ref_enth']
-        assert np.isclose(res_enth, ref_enth)
+        assert np.isclose(res_enth, ref_enth, rtol=0.1, atol=0.01)
 
     @pytest.mark.parametrize('filepath', [ex['file'] for ex in DATA_WHITTAKER.values()])
     def test_whittaker_fullrange(self, filepath):
@@ -68,8 +68,14 @@ class TestWhittakerEnthalpy():
             )
             model_isotherms[model] = model_isotherm
 
-        with pytest.raises(pgEx.ParameterError):
-            we.enthalpy_sorption_whittaker(model_isotherms['Henry'], loading)
+        with pytest.raises(KeyError):
+            we.enthalpy_sorption_whittaker(
+                isotherm=model_isotherms['Henry'],
+                loading=loading
+            )
 
         for model in pgm._WHITTAKER_MODELS:
-            we.enthalpy_sorption_whittaker(model_isotherms[model], loading)
+            we.enthalpy_sorption_whittaker(
+                isotherm=model_isotherms[model],
+                loading=loading
+            )

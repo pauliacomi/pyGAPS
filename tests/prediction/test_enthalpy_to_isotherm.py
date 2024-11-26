@@ -21,15 +21,18 @@ class TestETI():
 
         # Raises 'no enthalpy error'
         with pytest.raises(pgEx.ParameterError):
-            eti.from_whittaker_and_isotherm(300, isotherm)
+            eti.predict_isotherm_from_enthalpy_clapeyron(
+                isotherm=isotherm, temperature_prediction=300
+            )
 
         # Raises 'incomplete isosteric enthalpy dictionary'
-        for necessary_key in ['loading', 'enthalpy']:
+        for necessary_key in ['loading', 'isosteric_enthalpy']:
             isosteric_enthalpy_dictionary = {necessary_key: [], }
             with pytest.raises(pgEx.ParameterError):
-                eti.from_whittaker_and_isotherm(
-                    300, isotherm,
-                    isosteric_enthalpy_dictionary,
+                eti.predict_isotherm_from_enthalpy_clapeyron(
+                    isotherm=isotherm,
+                    temperature_prediction=300,
+                    isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
                 )
 
         # Raises 'vectors are different lengths'
@@ -38,37 +41,60 @@ class TestETI():
             enthalpy = [1 for n in loading[:-1]]
             isosteric_enthalpy_dictionary = {
                 'loading': loading,
-                'enthalpy': enthalpy
+                'isosteric_enthalpy': enthalpy
             }
-            eti.from_whittaker_and_isotherm(
-                300, isotherm,
-                isosteric_enthalpy_dictionary
+            eti.predict_isotherm_from_enthalpy_clapeyron(
+                isotherm=isotherm,
+                temperature_prediction=300,
+                isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
             )
 
         # Raises 'feature doesn't exist yet'
         with pytest.raises(pgEx.ParameterError):
-            eti.predict_adsorption_heatmap(isotherm, branch=None)
+            loading = isotherm.loading()
+            enthalpy = [1 for n in loading]
+            isosteric_enthalpy_dictionary = {
+                'loading': loading,
+                'isosteric_enthalpy': enthalpy
+            }
+            eti.predict_isosurface_from_enthalpy_clapeyron(
+                isotherm=isotherm,
+                isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
+                branch=None
+            )
 
         pressure = np.linspace(1, 1000, 5)
         enthalpy = [1 for n in pressure]
 
         # Raises 'vectors different length'
         with pytest.raises(pgEx.ParameterError):
-            eti.predict_pressure_raw(298, 300, enthalpy[:-1], pressure)
+            eti.predict_pressure_raw(
+                isosteric_enthalpy=enthalpy[:-1],
+                temperature_prediction=298,
+                temperature_current=300,
+                pressure_current=pressure,
+            )
 
         # Warns about temperature difference > 50 K
         with pytest.warns():
-            eti.predict_pressure_raw(298, 398, enthalpy, pressure)
+            assert eti.predict_pressure_raw(
+                isosteric_enthalpy=enthalpy,
+                temperature_prediction=298,
+                temperature_current=398,
+                pressure_current=pressure,
+            )
 
     @pytest.mark.parametrize('testdata', [ex for ex in DATA_ETI.values()])
     def test_predict_pressure_raw(self, testdata):
         """Predict single pressure point"""
-        dat = testdata['predict_presssure_raw_single_point']
+        #dat = testdata['predict_presssure_raw_single_point']
         res_pressure = eti.predict_pressure_raw(
-            dat['T_experiment'], dat['T_predict'],
-            dat['enthalpy'], dat['P_experiment']
+            isosteric_enthalpy=testdata['enthalpy'],
+            temperature_prediction=testdata['T_predict'],
+            temperature_current=testdata['T_experiment'],
+            pressure_current=testdata['P_experiment']
         )
-        ref_pressure = dat['P_predict']
+        ref_pressure = testdata['P_predict']
         assert np.isclose(res_pressure, ref_pressure)
 
     @pytest.mark.parametrize('testdata', [ex for ex in DATA_WHITTAKER.values()])
@@ -77,15 +103,15 @@ class TestETI():
         Check if predicting at original temperature returns same isotherm
         """
         isotherm = pgp.isotherm_from_aif(DATA_WHITTAKER_PATH / testdata['file'])
-        loading = isotherm.loading(branch='ads')
+        loading = list(isotherm.loading(branch='ads'))
         enthalpy = [abs(np.random.randn()) for n in loading]
         isosteric_enthalpy_dictionary = {
             'loading': loading,
-            'enthalpy': enthalpy,
+            'enthalpy_sorption': enthalpy,
         }
-        predicted_isotherm = eti.from_whittaker_and_isotherm(
-            T_predict=isotherm.temperature,
-            original_isotherm=isotherm,
+        predicted_isotherm = eti.predict_isotherm_from_enthalpy_clapeyron(
+            isotherm=isotherm,
+            temperature_prediction=isotherm.temperature,
             isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
         )
         for p_original, p_predict in zip(

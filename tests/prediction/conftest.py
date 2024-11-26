@@ -6,8 +6,8 @@ scientific pygaps functions on real or model data.
 from pathlib import Path
 
 DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
+DATA_WHITTAKER_PATH = DATA_PATH / 'enth_whittaker'
 DATA_IAST_PATH = DATA_PATH / 'iast'
-DATA_WHITTAKER_PATH = DATA_PATH / 'whittaker'
 
 DATA_IAST = {
     'CH4': {
@@ -22,9 +22,9 @@ DATA_ETI = {
     'predict_presssure_raw_single_point': {
         'T_experiment': 298,
         'T_predict': 330,
-        'enthalpy': [20],
-        'P_experiment': [1],
-        'P_predict': [2.187450035680577],
+        'enthalpy': [20,],
+        'P_experiment': [1,],
+        'P_predict': [2.187450035680577,],
     },
 }
 
