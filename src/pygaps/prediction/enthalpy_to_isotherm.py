@@ -3,10 +3,11 @@ A module for predicting isotherms at different pressures given a measured
 isotherm and calculated isosteric heats of adsorption
 """
 
+import warnings
+
 import numpy as np
 import pandas as pd
 from scipy import constants
-import warnings
 
 from pygaps import logger
 from pygaps.core.pointisotherm import PointIsotherm

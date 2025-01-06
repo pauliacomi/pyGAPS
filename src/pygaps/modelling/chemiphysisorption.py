@@ -1,9 +1,9 @@
 """ChemiPhysisorption (CP) isotherm model."""
 
 import numpy
+from scipy import constants
 from scipy import integrate
 from scipy import optimize
-from scipy import constants
 
 from pygaps.modelling.base_model import IsothermBaseModel
 from pygaps.utilities.exceptions import CalculationError
