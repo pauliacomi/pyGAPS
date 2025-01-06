@@ -30,7 +30,7 @@ class TestIsothermModels():
         model = models.base_model.IsothermBaseModel()
         model.loading(1)
         model.pressure(1)
-        with pytest.raises(NotImplementedError): # This should be the case, no?
+        with pytest.raises(NotImplementedError):  # This should be the case, no?
             model.spreading_pressure(1)
 
     def test_check_functions(self):

@@ -87,7 +87,7 @@ class TestETI():
                 pressure_current=pressure,
             )
 
-    @pytest.mark.parametrize('testdata', list(DATA_ETI.values())
+    @pytest.mark.parametrize('testdata', list(DATA_ETI.values()))
     def test_predict_pressure_raw(self, testdata):
         """Predict single pressure point"""
         # dat = testdata['predict_presssure_raw_single_point']
