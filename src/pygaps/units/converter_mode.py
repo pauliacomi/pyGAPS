@@ -52,6 +52,7 @@ def c_pressure(
     unit_to: str,
     adsorbate=None,
     temp: float = None,
+    pseudo: bool = False,
 ):
     """
     Convert pressure units and modes.
@@ -77,6 +78,10 @@ def c_pressure(
     temp : float, optional
         Temperature at which the pressure is measured, in K.
         Required for mode changes to relative pressure.
+    pseudo: bool, optional
+        Whether to calculate pseudo-saturation pressure (i.e. if adsorbate is
+        supercritical).
+        Defaults to false
 
     Returns
     -------
@@ -112,7 +117,10 @@ def c_pressure(
             if not temp:
                 raise ParameterError("A temperature is required for this conversion.")
 
-            factor = adsorbate.saturation_pressure(temp, unit=unit)
+            factor = adsorbate.saturation_pressure(
+                temp, unit=unit,
+                pseudo=pseudo,
+            )
 
             if "relative%" in [mode_to, mode_from]:
                 factor = factor / 100
@@ -127,7 +135,7 @@ def c_pressure(
         return value * factor**sign
 
     # convert just units in absolute mode
-    elif unit_to and mode_from == 'absolute':
+    if unit_to and mode_from == 'absolute':
         return c_unit(_PRESSURE_MODE[mode_from], value, unit_from, unit_to)
 
     # otherwise no change

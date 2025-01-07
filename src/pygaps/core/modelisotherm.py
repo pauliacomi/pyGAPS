@@ -369,6 +369,7 @@ class ModelIsotherm(BaseIsotherm):
         branch: str = 'ads',
         models='guess',
         optimization_params: dict = None,
+        param_bounds: dict = None,
         verbose: bool = False,
         **other_properties
     ):
@@ -417,12 +418,19 @@ class ModelIsotherm(BaseIsotherm):
         else:
             try:
                 guess_models = [m for m in models if is_model(m)]
-            except TypeError:
-                raise ParameterError("Could not figure out the list of models. Is it a list?")
+            except TypeError as ex:
+                raise ParameterError(
+                    "Could not figure out the list of models. Is it a list?"
+                ) from ex
             if len(guess_models) != len(models):
-                raise ParameterError('Not all models correspond to internal models.')
+                raise ParameterError(
+                    f'Not all models correspond to internal models. Possible models are f{models}'
+                )
 
         for model in guess_models:
+            if param_bounds is not None:
+                params = get_isotherm_model(model).params.keys()
+                param_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
             try:
                 isotherm = cls(
                     pressure=pressure,
@@ -432,7 +440,7 @@ class ModelIsotherm(BaseIsotherm):
                     loading_key=loading_key,
                     model=model,
                     param_guess=None,
-                    param_bounds=None,
+                    param_bounds=param_bounds,
                     optimization_params=optimization_params,
                     branch=branch,
                     verbose=verbose,
@@ -1073,3 +1081,21 @@ class ModelIsotherm(BaseIsotherm):
 
         # calculate based on model
         return self.model.spreading_pressure(pressure)
+
+    def toth_correction_at(
+        self,
+        pressure: t.Union[float, t.List[float]],
+    ):
+        """
+        Calculate the Toth correction factor at a given pressure.
+        Parameters:
+        -----------
+        pressure : float
+            The pressure at which to calculate the Toth correction factor.
+        Returns:
+        --------
+        float
+            The Toth correction factor at the given pressure.
+        """
+
+        return self.model.toth_correction(pressure)

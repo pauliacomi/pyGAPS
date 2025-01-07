@@ -75,12 +75,11 @@ _LOADED = {}  # we keep loaded interpolators here
 
 
 def convert_to_thickness(loading, monolayer):
-    """
-    Conversion to a thickness is done by obtaining the number
-    of adsorbed layers through dividing amount adsorbed by the
-    amount adsorbed in a monolayer (as obtained by BET), then
-    multiplying by the average thickness of a single layer.
-    Mathematically:
+    r"""
+    Conversion to a thickness is done by obtaining the number of adsorbed layers
+    through dividing amount adsorbed by the amount adsorbed in a monolayer (as
+    obtained by BET), then multiplying by the average thickness of a single
+    layer. Mathematically:
 
     .. math::
 
@@ -181,14 +180,15 @@ def CB_KJG(pressure: float) -> float:
     interp = load_std_isotherm("CB_KJG")
     return interp(pressure)
 
+
 def aerosil_MCM(pressure: float) -> float:
     """
     Hybrid curve using aerosil data at low pressure and MCM data at higher pressure
-    Taken from: https://doi.org/10.1021/la5026679, based on https://doi.org/10.1016/j.micromeso.2010.10.006 and https://doi.org/10.1021/la0105477
+    Taken from: https://doi.org/10.1021/la5026679, based on
+    https://doi.org/10.1016/j.micromeso.2010.10.006 and https://doi.org/10.1021/la0105477
 
-    
 
-    Applicable for nitrogen at 77K, used for mesoporous zeolites. 
+    Applicable for nitrogen at 77K, used for mesoporous zeolites.
     Be aware that this method still needs an additional empirical correction to get a more accurate micro/mosopore volume.
 
     Parameters
@@ -201,28 +201,29 @@ def aerosil_MCM(pressure: float) -> float:
     float
         Thickness of layer in nm.
     """
-    pm = {"A1":0.1887299, "A2":481.3*-1, "A3":0.182099, "A4": -1*23.78,
-             "B1": 0.5675647, "B2":0.199735,"B3":0.4116168,"B4":2.00834,
-             "C1": 0.1423566,"C2": 0.1078,"C3":0.4888,
-             "D1": 0.08309076,"D2":0.02995,"D3":0.369,
-             "E1":1.268066,"E2":1.931,"E3":0.76934,"E4":51.09}
+    pm = {
+        "A1": 0.1887299, "A2": 481.3 * -1, "A3": 0.182099, "A4": -1 * 23.78,
+        "B1": 0.5675647, "B2": 0.199735, "B3": 0.4116168, "B4": 2.00834,
+        "C1": 0.1423566, "C2": 0.1078, "C3": 0.4888,
+        "D1": 0.08309076, "D2": 0.02995, "D3": 0.369,
+        "E1": 1.268066, "E2": 1.931, "E3": 0.76934, "E4": 51.09,
+    }
+
     def calc_t(p, pm):
         if p < 0.03:
-            t = pm['A1']*(1-numpy.exp(pm['A2']*p)) + pm["A3"]*(1-numpy.exp(pm['A4']*p))
+            t = pm['A1'] * (1 - numpy.exp(pm['A2'] * p)) + pm["A3"] * (1 - numpy.exp(pm['A4'] * p))
         elif p >= 0.03 and p < 0.25:
-            t = pm['B1']*p**pm['B2'] + pm['B3']*p**pm['B4']
+            t = pm['B1'] * p**pm['B2'] + pm['B3'] * p**pm['B4']
         elif p >= 0.25 and p < 0.6:
-            t = (pm["C1"]/(pm['C2']-numpy.log10(p)))**pm['C3']
+            t = (pm["C1"] / (pm['C2'] - numpy.log10(p)))**pm['C3']
         elif p >= 0.6 and p < 0.9:
-            t = (pm["D1"]/(pm['D2']-numpy.log10(p)))**pm['D3']
+            t = (pm["D1"] / (pm['D2'] - numpy.log10(p)))**pm['D3']
         else:
-            t = pm['E1']*p**pm['E2'] + pm['E3']*p**pm['E4']
+            t = pm['E1'] * p**pm['E2'] + pm['E3'] * p**pm['E4']
         return t
     calc_t_v = numpy.vectorize(calc_t)
     thickness_array = calc_t_v(pressure, pm)
     return thickness_array
-
-
 
 
 _THICKNESS_MODELS = {

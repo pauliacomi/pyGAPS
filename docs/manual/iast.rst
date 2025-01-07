@@ -39,8 +39,8 @@ isotherms can be either:
   pressure calculation will use interpolated data.
 
 The original pyIAST functions still exist, as
-:func:`~pygaps.iast.pgiast.iast_point` and
-:func:`~pygaps.iast.pgiast.reverse_iast`. They can be used to
+:func:`~pygaps.prediction.iast.iast_point` and
+:func:`~pygaps.prediction.iast.reverse_iast`. They can be used to
 determine the adsorbed fraction of each adsorbate given their partial pressures,
 or vice-versa.
 
@@ -58,7 +58,7 @@ Since IAST is often used for binary mixture adsorption prediction, several new
 functions have been introduced which make it easier to do common calculations
 and generate graphs:
 
-- :func:`~pygaps.iast.pgiast.iast_point_fraction` is a version of IAST requiring
+- :func:`~pygaps.prediction.iast.iast_point_fraction` is a version of IAST requiring
   bulk fluid fractions and total pressure instead of partial pressures for each
   component.
 
@@ -72,7 +72,7 @@ and generate graphs:
           total_pressure=2,
       )
 
-- :func:`~pygaps.iast.pgiast.iast_binary_svp` is a function to calculate the
+- :func:`~pygaps.prediction.iast.iast_binary_svp` is a function to calculate the
   selectivity of a known composition mixture as a function of pressure. This
   example will plot selectivities over a pressure range of 0.01 to 10 of an
   equimolar mixture of methane and ethane:
@@ -88,7 +88,7 @@ and generate graphs:
           pressures=numpy.linspace(0.01, 10, 30),
       )
 
-- :func:`~pygaps.iast.pgiast.iast_binary_vle` is a function to calculate the
+- :func:`~pygaps.prediction.iast.iast_binary_vle` is a function to calculate the
   gas-adsorbed equilibrium at a constant pressure, over the entire range of
   molar fractions. This example will plot the gas-adsorbed equilibrium for all
   molar fractions of methane in ethane at a pressure of 2 bar:

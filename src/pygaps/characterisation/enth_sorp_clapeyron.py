@@ -9,7 +9,7 @@ from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import ParameterError
 
 
-def isosteric_enthalpy(
+def enthalpy_sorption_clapeyron(
     isotherms: "list[PointIsotherm | ModelIsotherm]",
     loading_points: list = None,
     branch: str = 'ads',
@@ -17,7 +17,7 @@ def isosteric_enthalpy(
 ):
     r"""
 
-    Calculate the isosteric enthalpy of adsorption (in kJ/mol) by applying
+    Calculate the isosteric enthalpy of adsorption (in kJ/mol) by applying the
     Clausius-Clapeyron equation to several isotherms recorded at different
     temperatures on the same material.
 
@@ -94,7 +94,7 @@ def isosteric_enthalpy(
 
     See Also
     --------
-    pygaps.characterisation.isosteric_enth.isosteric_enthalpy_raw : low level method
+    pygaps.characterisation.enthalpy_sorption_clausclap.isosteric_enthalpy_raw : low level method
 
     """
     # Check more than one isotherm

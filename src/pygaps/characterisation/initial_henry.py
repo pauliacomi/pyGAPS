@@ -1,4 +1,4 @@
-"""Module calculating the initial henry constant."""
+"""Module calculating the initial Henry coefficient."""
 
 import numpy
 
@@ -19,7 +19,7 @@ def initial_henry_slope(
     **plot_parameters,
 ):
     """
-    Calculate a henry constant based on the initial slope.
+    Calculate a Henry coefficient based on the initial slope.
 
     Parameters
     ----------

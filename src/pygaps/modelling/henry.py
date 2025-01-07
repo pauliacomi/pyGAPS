@@ -114,6 +114,34 @@ class Henry(IsothermBaseModel):
         """
         return self.params["K"] * pressure
 
+    def toth_correction(self, pressure: float) -> float:
+        r"""
+        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
+        potential, $\varepsilon_{ads}$ at specified pressure.
+
+        .. math::
+            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
+            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+
+        For the Henry model,
+        ..math::
+            \Psi = 0
+
+        As a result $\varepsilon_{ads}$ is undefined.
+
+        Model parameters must be derived from isotherm with pressure in Pa.
+
+        Parameters
+        ---------
+        pressure : float
+            The pressure at which to calculate the T\'oth correction
+
+        Returns
+        ------
+            The T\'oth correction, $\Psi$
+        """
+        return 0
+
     def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.

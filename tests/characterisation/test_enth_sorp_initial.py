@@ -15,7 +15,7 @@ All pre-calculated data for characterisation can be found in the
 import pytest
 from numpy import isclose
 
-import pygaps.characterisation.initial_enth as ie
+import pygaps.characterisation.enth_sorp_initial as ie
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 

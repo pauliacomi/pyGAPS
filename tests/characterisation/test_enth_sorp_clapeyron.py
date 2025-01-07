@@ -15,7 +15,7 @@ import pytest
 from numpy import average
 from numpy import isclose
 
-import pygaps.characterisation.isosteric_enth as ie
+import pygaps.characterisation.enth_sorp_clapeyron as ie
 import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
@@ -25,8 +25,9 @@ from .conftest import DATA_ISOSTERIC_PATH
 
 
 @pytest.mark.characterisation
-class TestIsostericEnthalpy():
+class TestEnthalpySorptionClapeyron():
     """Tests isosteric enthalpy calculations."""
+
     def test_iso_enthalpy_checks(self, use_material):
         """Checks for built-in safeguards."""
         isotherms = []
@@ -39,18 +40,18 @@ class TestIsostericEnthalpy():
 
         # Will raise a "requires more than one isotherm error"
         with pytest.raises(pgEx.ParameterError):
-            ie.isosteric_enthalpy([isotherms[0]])
+            ie.enthalpy_sorption_clapeyron([isotherms[0]])
 
         # Will raise a "requires isotherms on the same material error"
         isotherms[0].material = 'Test'
         with pytest.raises(pgEx.ParameterError):
-            ie.isosteric_enthalpy(isotherms)
+            ie.enthalpy_sorption_clapeyron(isotherms)
         isotherms[0].material = isotherms[1].material
 
         # Will raise a "requires isotherm on the same basis error"
         isotherms[0].convert_material(basis_to='volume', unit_to='cm3')
         with pytest.raises(pgEx.ParameterError):
-            ie.isosteric_enthalpy(isotherms)
+            ie.enthalpy_sorption_clapeyron(isotherms)
 
     def test_iso_enthalpy(self):
         """Test calculation with several model isotherms."""
@@ -61,7 +62,7 @@ class TestIsostericEnthalpy():
             isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
-        result_dict = ie.isosteric_enthalpy(isotherms)
+        result_dict = ie.enthalpy_sorption_clapeyron(isotherms)
 
         assert isclose(average(result_dict['isosteric_enthalpy']), 29, 0.5)
 
@@ -75,4 +76,4 @@ class TestIsostericEnthalpy():
             isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
-        ie.isosteric_enthalpy(isotherms, verbose=True)
+        ie.enthalpy_sorption_clapeyron(isotherms, verbose=True)

@@ -247,6 +247,54 @@ MODEL_DATA = {
             'spreading_pressure_mark': pytest.mark.okay,
         }
     },
+    'DSToth': {
+        'initial_guess': {
+            'n_m1': 0.55,
+            'K1': 4,
+            't1': 1,
+            'n_m2': 0.55,
+            'K2': 6,
+            't2': 1,
+        },
+        'test_parameters': {
+            'n_m1': 5,
+            'K1': 3,
+            't1': 2,
+            'n_m2': 6,
+            'K2': 2,
+            't2': 3,
+        },
+        'test_values': {
+            'pressure': [0.1, 1.0, 10.0],
+            'loading': [2.633556389008878, 10.512414771482202, 10.996974555727082],
+            'spreading_pressure': [2.6775676653472438, 18.440821585294383, 43.557224323075594],
+            'spreading_pressure_mark': pytest.mark.okay,
+        }
+    },
+    'ChemiPhysisorption': {
+        'initial_guess': {
+            'n_m1': 0.55,
+            'K1': 4,
+            't1': 1,
+            'n_m2': 0.55,
+            'K2': 6,
+            'Ea': 2718.282,
+        },
+        'test_parameters': {
+            'n_m1': 5,
+            'K1': 3,
+            't1': 2,
+            'n_m2': 6,
+            'K2': 2,
+            'Ea': 4000,
+        },
+        'test_values': {
+            'pressure': [0.1, 1.0, 10.0],
+            'loading': [1.4550550667204611, 4.816679045807506, 5.101885328545681],
+            'spreading_pressure': [1.498401252592332, 9.212963011908176, 20.807685363000594],
+            'spreading_pressure_mark': pytest.mark.okay,
+        }
+    },
     'JensenSeaton': {
         'initial_guess': {
             'K': 10,
@@ -281,15 +329,10 @@ MODEL_DATA = {
             'C': 0.0001,
         },
         'test_values': {
-            'pressure': [
-                0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144,
-                0.40128205
-            ],
+            'pressure': [0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144, 0.40128205],
             'loading': [0.0, 0.2, 0.4, 0.6, 1.0, 2.0],
-            'spreading_pressure':
-            [0.0, 15.77393361, 18.77393361, 20.77393361, 25.0, 30.62232981],
-            'spreading_pressure_mark':
-            pytest.mark.xfail,
+            'spreading_pressure': [0.0, 15.77393361, 18.77393361, 20.77393361, 25.0, 30.62232981],
+            'spreading_pressure_mark': pytest.mark.xfail,
         }
     },
     'FHVST': {
