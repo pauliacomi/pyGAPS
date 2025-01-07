@@ -255,13 +255,13 @@ def pressure_at(
     Returns
     ------
     pressure at `n` if possible
-    or `np.NAN` if not.
+    or `np.nan` if not.
     """
     try:
         return float(isotherm.pressure_at(n))
     except CalculationError as e:
         print(e)
-        return np.NAN
+        return np.nan
 
 
 def vaporisation_enthalpy(
@@ -287,10 +287,10 @@ def vaporisation_enthalpy(
 
     Returns
     ------
-    adsorbate.enthalpy_vaporisation() in J/mol if possible, np.NAN if not
+    adsorbate.enthalpy_vaporisation() in J/mol if possible, np.nan if not
     """
     if np.isnan(pressure) or pressure <= 0 or pressure > p_c or pressure > p_sat:
-        return np.NAN
+        return np.nan
     # return in J/mol
     return adsorbate.enthalpy_vaporisation(press=pressure) * 1000
 
@@ -321,10 +321,10 @@ def compressibility(
 
     Returns
     ------
-    `adsorbate.compressibility()` if possible, np.NAN if not
+    `adsorbate.compressibility()` if possible, np.nan if not
     """
     if np.isnan(pressure) or pressure <= 0 or pressure > p_c or pressure > p_sat:
-        return np.NAN
+        return np.nan
     return adsorbate.compressibility(temp=temperature, pressure=pressure)
 
 
