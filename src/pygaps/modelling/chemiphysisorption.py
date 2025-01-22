@@ -186,18 +186,19 @@ class ChemiPhysisorption(IsothermBaseModel):
             The T\'oth correction, $\Psi$
         """
 
-        t2 = 1
         nm1K1 = self.params["n_m1"] * self.params["K1"]
         K1Pt1 = (self.params["K1"] * pressure)**self.params["t1"]
+        invt1 = 1 / self.params["t1"]
+
         gammanm2K2 = (
             numpy.exp(-self.params["Ea"] / self.rt) * self.params["n_m2"]
             * self.params["K2"]
         )
-        K2Pt2 = (self.params["K2"] * pressure)**t2
+        K2P = (self.params["K2"] * pressure)
 
         n_P = (
-            (nm1K1 / ((1 + K1Pt1)**self.params["t1"])) +
-            (gammanm2K2 / ((1 + K2Pt2)**t2))
+            (nm1K1 / ((1 + K1Pt1)**invt1)) +
+            (gammanm2K2 / ((1 + K2P)))
         )
 
         def dn_dP_singlesite(gamma, nm, K, t):

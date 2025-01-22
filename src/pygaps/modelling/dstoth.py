@@ -170,10 +170,12 @@ class DSToth(IsothermBaseModel):
         K1Pt1 = (self.params["K1"] * pressure)**self.params["t1"]
         nm2K2 = self.params["n_m2"] * self.params["K2"]
         K2Pt2 = (self.params["K2"] * pressure)**self.params["t2"]
+        invt1 = 1 / self.params["t1"]
+        invt2 = 1 / self.params["t2"]
 
         n_P = (
-            (nm1K1 / ((1 + K1Pt1)**self.params["t1"])) +
-            (nm2K2 / ((1 + K2Pt2)**self.params["t2"]))
+            (nm1K1 / ((1 + K1Pt1)**invt1)) +
+            (nm2K2 / ((1 + K2Pt2)**invt2))
         )
 
         def dn_dP_singlesite(nm, K, t):
