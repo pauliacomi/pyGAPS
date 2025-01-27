@@ -166,7 +166,10 @@ def isotherm_from_json(
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
-            data['branch'] = data['branch'].fillna(0).replace('des', 1)
+            data['branch'] = data['branch'].fillna('0').replace({
+                'ads': '0',
+                'des': '1'
+            }).astype(int)
         else:
             raw_dict['branch'] = 'guess'
 
