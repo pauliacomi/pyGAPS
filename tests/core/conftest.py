@@ -2,6 +2,15 @@
 This configuration file contains common data for
 parametrizing various tests such as isotherms.
 """
+import pytest
+
+
+@pytest.fixture
+def data_char_path(request):
+    """Fixture for providing the path to characterisation data."""
+    return request.config.DATA_PATH / 'characterisation'
+
+
 PRESSURE_PARAM = [
     (1, {}),  # Standard return
     (100000, {

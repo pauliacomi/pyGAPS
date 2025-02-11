@@ -23,12 +23,12 @@ import pygaps.utilities.exceptions as pgEx
 
 from ..test_utils import mpl_cleanup
 from .conftest import DATA
-from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
 class TestAreaBET():
     """Tests BET surface area calculations."""
+
     def test_basic_functions(self):
         """Test basic functionality."""
         P = linspace(0, 1)
@@ -61,28 +61,28 @@ class TestAreaBET():
         with pytest.raises(pgEx.CalculationError):
             ab.area_BET_raw(P[4:], L[4:], 1)
 
-    @pytest.mark.parametrize('sample', [sample for sample in DATA])
-    def test_area_bet(self, sample):
+    @pytest.mark.parametrize('sample', DATA.values())
+    def test_area_bet(self, sample, data_char_path):
         """Test calculation with several model isotherms."""
-        sample = DATA[sample]
         # exclude datasets where it is not applicable
-        if sample.get('bet_area', None):
+        if 'bet_area' not in sample:
+            return
 
-            filepath = DATA_N77_PATH / sample['file']
-            isotherm = pgpj.isotherm_from_json(filepath)
+        filepath = data_char_path / sample['file']
+        isotherm = pgpj.isotherm_from_json(filepath)
 
-            area = ab.area_BET(isotherm).get("area")
+        area = ab.area_BET(isotherm).get("area")
 
-            err_relative = 0.1  # 10 percent
-            err_absolute = 0.1  # 0.1 m2
+        err_relative = 0.1  # 10 percent
+        err_absolute = 0.1  # 0.1 m2
 
-            assert isclose(area, sample['bet_area'], err_relative, err_absolute)
+        assert isclose(area, sample['bet_area'], err_relative, err_absolute)
 
-    def test_area_BET_choice(self):
+    def test_area_BET_choice(self, data_char_path):
         """Test choice of points."""
 
         sample = DATA['MCM-41']
-        filepath = DATA_N77_PATH / sample['file']
+        filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
         area = ab.area_BET(isotherm, p_limits=[0.05, 0.30]).get("area")
@@ -92,11 +92,11 @@ class TestAreaBET():
 
         assert isclose(area, sample['bet_area_s'], err_relative, err_absolute)
 
-    def test_area_BET_branch(self, caplog):
+    def test_area_BET_branch(self, data_char_path, caplog):
         """Test branch to use."""
 
         sample = DATA['SiO2']
-        filepath = DATA_N77_PATH / sample['file']
+        filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
         with caplog.at_level(logging.WARNING):  # warns about the monolayer value
@@ -108,9 +108,9 @@ class TestAreaBET():
         assert isclose(area, sample['bet_area_des'], err_relative, err_absolute)
 
     @mpl_cleanup
-    def test_area_BET_output(self):
+    def test_area_BET_output(self, data_char_path):
         """Test verbosity."""
         sample = DATA['MCM-41']
-        filepath = DATA_N77_PATH / sample['file']
+        filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
         ab.area_BET(isotherm, verbose=True)

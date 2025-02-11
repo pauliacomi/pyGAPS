@@ -25,7 +25,6 @@ from pygaps.characterisation.models_hk import PROPERTIES_CARBON
 
 from ..test_utils import mpl_cleanup
 from .conftest import DATA
-from .conftest import DATA_N77_PATH
 
 N2_PROPS = {
     'molecular_diameter': 0.3,
@@ -40,6 +39,7 @@ N2_PROPS = {
 @pytest.mark.characterisation
 class TestPSDMicro():
     """Test pore size distribution calculation."""
+
     def test_psd_micro_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
         # Will raise a "no model exception"
@@ -114,34 +114,30 @@ class TestPSDMicro():
 
         pmic.psd_horvath_kawazoe_ry(x, x, 77, 'slit', N2_PROPS, PROPERTIES_CARBON, use_cy=True)
 
-    @pytest.mark.parametrize('sample', [sample for sample in DATA])
-    def test_psd_micro(self, sample):
+    @pytest.mark.parametrize('sample', DATA.values())
+    def test_psd_micro(self, sample, data_char_path):
         """Test psd calculation with several model isotherms"""
-        sample = DATA[sample]
         # exclude datasets where it is not applicable
-        if sample.get('psd_micro_pore_size', None):
+        if 'psd_micro_pore_size' not in sample:
+            return
 
-            filepath = DATA_N77_PATH / sample['file']
-            isotherm = pgp.isotherm_from_json(filepath)
+        filepath = data_char_path / sample['file']
+        isotherm = pgp.isotherm_from_json(filepath)
 
-            result_dict = pmic.psd_microporous(isotherm, psd_model='HK', pore_geometry='slit')
+        result_dict = pmic.psd_microporous(isotherm, psd_model='HK', pore_geometry='slit')
 
-            loc = np.where(
-                result_dict['pore_distribution'] == max(result_dict['pore_distribution'])
-            )
-            principal_peak = result_dict['pore_widths'][loc]
+        loc = np.where(result_dict['pore_distribution'] == max(result_dict['pore_distribution']))
+        principal_peak = result_dict['pore_widths'][loc]
 
-            err_relative = 0.05  # 5 percent
-            err_absolute = 0.01  # 0.01
+        err_relative = 0.05  # 5 percent
+        err_absolute = 0.01  # 0.01
 
-            assert np.isclose(
-                principal_peak, sample['psd_micro_pore_size'], err_relative, err_absolute
-            )
+        assert np.isclose(principal_peak, sample['psd_micro_pore_size'], err_relative, err_absolute)
 
     @mpl_cleanup
-    def test_psd_micro_verbose(self):
+    def test_psd_micro_verbose(self, data_char_path):
         """Test verbosity."""
         sample = DATA['MCM-41']
-        filepath = DATA_N77_PATH / sample['file']
+        filepath = data_char_path / sample['file']
         isotherm = pgp.isotherm_from_json(filepath)
         pmic.psd_microporous(isotherm, verbose=True)
