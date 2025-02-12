@@ -1,6 +1,6 @@
 """functions for plotting graphs of isotherm prediction"""
 
-# TODO Remove after this program no longer support Python 3.8.*
+# TODO Remove after this program no longer supports Python 3.8.*
 from __future__ import annotations
 
 import matplotlib as mpl

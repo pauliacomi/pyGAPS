@@ -3,7 +3,7 @@ A module for predicting isotherms at different pressures given a measured
 isotherm and calculated isosteric heats of adsorption
 """
 
-# TODO Remove after this program no longer support Python 3.8.*
+# TODO Remove after this program no longer supports Python 3.8.*
 from __future__ import annotations
 
 import warnings
