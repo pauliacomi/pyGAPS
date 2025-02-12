@@ -1,6 +1,8 @@
-import pytest
+"""This module provides fixtures and paths for parsing tests."""
 
-PARSING_PATH = pytest.DATA_PATH / 'parsing'
+from ..conftest import DATA_PATH
+
+PARSING_PATH = DATA_PATH / 'parsing'
 
 DATA_XL = tuple((PARSING_PATH / 'excel').glob("*.xls"))
 DATA_JSON = tuple((PARSING_PATH / 'json').glob("*.json"))

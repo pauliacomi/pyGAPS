@@ -3,9 +3,8 @@ This configuration file contains data required for testing
 scientific pygaps functions on real or model data.
 """
 
-from pathlib import Path
+from ..conftest import DATA_PATH
 
-DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
 DATA_WHITTAKER_PATH = DATA_PATH / 'enth_whittaker'
 DATA_IAST_PATH = DATA_PATH / 'iast'
 

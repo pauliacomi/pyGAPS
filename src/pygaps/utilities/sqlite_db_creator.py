@@ -27,7 +27,7 @@ def db_create(path: str, verbose: bool = False):
     try:
         from importlib.resources import files as ir_files
     except ImportError:
-        # TODO Deprecation after PY<3.9
+        # TODO Deprecation after supported Python > 3.8
         # Use backported `importlib_resources`.
         from importlib_resources import files as ir_files
 

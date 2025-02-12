@@ -26,9 +26,12 @@ def pytest_runtest_setup(item):
             pytest.xfail("previous test failed (%s)" % previousfailed.name)
 
 
-def pytest_configure():
+DATA_PATH = Path(__file__).parent / 'test_data'
+
+
+def pytest_configure(config):
     """Set global variables for pytest."""
-    pytest.DATA_PATH = Path(__file__).parent / 'test_data'
+    config.DATA_PATH = DATA_PATH
 
 
 # Global fixtures

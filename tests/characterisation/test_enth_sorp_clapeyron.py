@@ -21,20 +21,19 @@ import pygaps.utilities.exceptions as pgEx
 
 from ..test_utils import mpl_cleanup
 from .conftest import DATA_ISOSTERIC
-from .conftest import DATA_ISOSTERIC_PATH
 
 
 @pytest.mark.characterisation
 class TestEnthalpySorptionClapeyron():
     """Tests isosteric enthalpy calculations."""
 
-    def test_iso_enthalpy_checks(self, use_material):
+    def test_iso_enthalpy_checks(self, use_material, data_isosteric_path):
         """Checks for built-in safeguards."""
         isotherms = []
 
         # load test data
-        for sample in DATA_ISOSTERIC:
-            filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
+        for sample in DATA_ISOSTERIC.values():
+            filepath = data_isosteric_path / sample['file']
             isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
@@ -53,12 +52,12 @@ class TestEnthalpySorptionClapeyron():
         with pytest.raises(pgEx.ParameterError):
             ie.enthalpy_sorption_clapeyron(isotherms)
 
-    def test_iso_enthalpy(self):
+    def test_iso_enthalpy(self, data_isosteric_path):
         """Test calculation with several model isotherms."""
         isotherms = []
 
-        for sample in DATA_ISOSTERIC:
-            filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
+        for sample in DATA_ISOSTERIC.values():
+            filepath = data_isosteric_path / sample['file']
             isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 
@@ -67,12 +66,12 @@ class TestEnthalpySorptionClapeyron():
         assert isclose(average(result_dict['isosteric_enthalpy']), 29, 0.5)
 
     @mpl_cleanup
-    def test_iso_enthalpy_output(self):
+    def test_iso_enthalpy_output(self, data_isosteric_path):
         """Test verbosity."""
         isotherms = []
 
-        for sample in DATA_ISOSTERIC:
-            filepath = DATA_ISOSTERIC_PATH / DATA_ISOSTERIC[sample]['file']
+        for sample in DATA_ISOSTERIC.values():
+            filepath = data_isosteric_path / sample['file']
             isotherm = pgp.isotherm_from_json(filepath)
             isotherms.append(isotherm)
 

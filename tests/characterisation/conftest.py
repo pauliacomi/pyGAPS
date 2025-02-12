@@ -34,10 +34,30 @@ Explanation of parameters:
 
 import pytest
 
-DATA_N77_PATH = pytest.DATA_PATH / 'characterisation'
-DATA_ISOSTERIC_PATH = pytest.DATA_PATH / 'enth_isosteric'
-DATA_WHITTAKER_PATH = pytest.DATA_PATH / 'enth_whittaker'
-DATA_CALO_PATH = pytest.DATA_PATH / 'calorimetry'
+
+@pytest.fixture
+def data_char_path(request):
+    """Fixture for providing the path to characterisation data."""
+    return request.config.DATA_PATH / 'characterisation'
+
+
+@pytest.fixture
+def data_isosteric_path(request):
+    """Fixture for providing the path to isosteric data."""
+    return request.config.DATA_PATH / 'enth_isosteric'
+
+
+@pytest.fixture
+def data_whittaker_path(request):
+    """Fixture for providing the path to Whittaker data."""
+    return request.config.DATA_PATH / 'enth_whittaker'
+
+
+@pytest.fixture
+def data_calo_path(request):
+    """Fixture for providing the path to calorimetry data."""
+    return request.config.DATA_PATH / 'calorimetry'
+
 
 DATA = {
     'MCM-41': {

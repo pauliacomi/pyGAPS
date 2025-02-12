@@ -24,12 +24,12 @@ import pygaps.utilities.exceptions as pgEx
 
 from ..test_utils import mpl_cleanup
 from .conftest import DATA
-from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
 class TestPSDMeso():
     """Test mesopore size distribution calculation."""
+
     def test_psd_meso_checks(self, basic_pointisotherm):
         """Checks for built-in safeguards."""
 
@@ -54,34 +54,30 @@ class TestPSDMeso():
         'BJH',
         'DH',
     ])
-    @pytest.mark.parametrize('sample', list(DATA))
-    def test_psd_meso(self, sample, method):
+    @pytest.mark.parametrize('sample', DATA.values())
+    def test_psd_meso(self, sample, method, data_char_path):
         """Test psd calculation with several model isotherms."""
-        sample = DATA[sample]
         # exclude datasets where it is not applicable
-        if sample.get('psd_meso_pore_size', None):
+        if 'psd_meso_pore_size' not in sample:
+            return
 
-            filepath = DATA_N77_PATH / sample['file']
-            isotherm = pgp.isotherm_from_json(filepath)
+        filepath = data_char_path / sample['file']
+        isotherm = pgp.isotherm_from_json(filepath)
 
-            result_dict = pmes.psd_mesoporous(isotherm, psd_model=method, branch='des')
+        result_dict = pmes.psd_mesoporous(isotherm, psd_model=method, branch='des')
 
-            loc = np.where(
-                result_dict['pore_distribution'] == max(result_dict['pore_distribution'])
-            )
-            principal_peak = result_dict['pore_widths'][loc]
+        loc = np.where(result_dict['pore_distribution'] == max(result_dict['pore_distribution']))
+        principal_peak = result_dict['pore_widths'][loc]
 
-            err_relative = 0.05  # 5 percent
-            err_absolute = 0.01  # 0.01
+        err_relative = 0.05  # 5 percent
+        err_absolute = 0.01  # 0.01
 
-            assert np.isclose(
-                principal_peak, sample['psd_meso_pore_size'], err_relative, err_absolute
-            )
+        assert np.isclose(principal_peak, sample['psd_meso_pore_size'], err_relative, err_absolute)
 
     @mpl_cleanup
-    def test_psd_meso_verbose(self):
+    def test_psd_meso_verbose(self, data_char_path):
         """Test verbosity."""
         sample = DATA['MCM-41']
-        filepath = DATA_N77_PATH / sample['file']
+        filepath = data_char_path / sample['file']
         isotherm = pgp.isotherm_from_json(filepath)
         pmes.psd_mesoporous(isotherm, verbose=True)
