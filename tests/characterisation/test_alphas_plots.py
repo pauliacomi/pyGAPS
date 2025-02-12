@@ -21,7 +21,6 @@ import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
 
 from ..test_utils import mpl_cleanup
-
 from .conftest import DATA
 
 
