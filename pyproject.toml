@@ -5,7 +5,7 @@ dynamic = ["version"]
 description = "Framework for processing gas adsorption isotherms"
 readme = "README.rst"
 keywords = ["adsorption", "isotherm", "characterization", "processing", "material"]
-requires-python = ">=3.8"
+requires-python = ">=3.7"
 license = {file = "LICENSE"}
 authors = [
     {name = "Paul Iacomi", email = "mail@pauliacomi.com"}
