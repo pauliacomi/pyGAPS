@@ -38,6 +38,7 @@ dependencies = [
     "gemmi",
     "requests",
     "importlib_resources; python_version < '3.9'",
+    "packaging; python_version <= '3.7'",
 ]
 
 [project.optional-dependencies]
