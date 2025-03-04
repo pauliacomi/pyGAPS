@@ -1251,7 +1251,7 @@ class PointIsotherm(BaseIsotherm):
             material_basis=material_basis
         )
 
-        # throw exception if interpolating outside the range.
+        # Check if we need to extrapolate beyond available data
         if (self.l_interpolator is not None and self.l_interpolator.interp_fill is None) & \
                 (pressure > pressures.max() or pressure < pressures.min()):
             raise CalculationError(
@@ -1278,48 +1278,50 @@ class PointIsotherm(BaseIsotherm):
                 )
             )
 
-        # approximate loading up to first pressure point with Henry's law
-        # loading = henry_const * P
-        # henry_const is the initial slope in the adsorption isotherm
+        # Step 1: Approximate loading up to first pressure point with Henry's law
+        # loading = henry_const * P where henry_const is the initial slope
         henry_const = loadings[0] / pressures[0]
 
-        # get how many of the points are less than pressure P
+        # Step 2: Find how many points are less than target pressure P
         n_points = numpy.sum(pressures < pressure)
 
         if n_points == 0:
-            # if this pressure is between 0 and first pressure point...
-            # \int_0^P henry_const P /P dP = henry_const * P ...
+            # Step 3a: If P is between 0 and first pressure point
+            # The integral simplifies to henry_const * P
             return henry_const * pressure
 
-        # P > first pressure point
-        area = loadings[0]  # area of first segment \int_0^P_1 n(P)/P dP
+        # Step 3b: P > first pressure point - calculate the total area
+        # Area of first segment from 0 to P_1
+        area = loadings[0]
 
-        # get area between P_1 and P_k, where P_k < P < P_{k+1}
+        # Step 4: Calculate area between P_1 and P_k where P_k < P < P_{k+1}
+        # using linear interpolation of isotherm data
         for i in range(n_points - 1):
-            # linear interpolation of isotherm data
             slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] - pressures[i])
             intercept = loadings[i] - slope * pressures[i]
-            # add area of this segment
+            # Add area of this segment
             area += slope * (pressures[i + 1] - pressures[i]) + intercept * \
                 numpy.log(pressures[i + 1] / pressures[i])
 
-        # finally, area of last segment
-        slope = (
-            self.loading_at(
-                pressure,
-                branch=branch,
-                pressure_unit=pressure_unit,
-                pressure_mode=pressure_mode,
-                loading_unit=loading_unit,
-                loading_basis=loading_basis,
-                material_unit=material_unit,
-                material_basis=material_basis,
-                interp_fill=interp_fill
-            ) - loadings[n_points - 1]
-        ) / (pressure - pressures[n_points - 1])
+        # Step 5: Calculate area of final segment from P_k to P
+        # Get the loading at pressure P using interpolation
+        loading_at_p = self.loading_at(
+            pressure,
+            branch=branch,
+            pressure_unit=pressure_unit,
+            pressure_mode=pressure_mode,
+            loading_unit=loading_unit,
+            loading_basis=loading_basis,
+            material_unit=material_unit,
+            material_basis=material_basis,
+            interp_fill=interp_fill
+        )
 
-        intercept = loadings[n_points - 1] - \
-            slope * pressures[n_points - 1]
+        # Calculate the slope of the final segment
+        slope = (loading_at_p - loadings[n_points - 1]) / (pressure - pressures[n_points - 1])
+        intercept = loadings[n_points - 1] - slope * pressures[n_points - 1]
+
+        # Add the area of the final segment
         area += slope * (pressure - pressures[n_points - 1]) + intercept * \
             numpy.log(pressure / pressures[n_points - 1])
 
