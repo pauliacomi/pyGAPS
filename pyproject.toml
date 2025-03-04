@@ -5,7 +5,7 @@ dynamic = ["version"]
 description = "Framework for processing gas adsorption isotherms"
 readme = "README.rst"
 keywords = ["adsorption", "isotherm", "characterization", "processing", "material"]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {file = "LICENSE"}
 authors = [
     {name = "Paul Iacomi", email = "mail@pauliacomi.com"}
@@ -38,7 +38,6 @@ dependencies = [
     "gemmi",
     "requests",
     "importlib_resources; python_version < '3.9'",
-    "packaging; python_version <= '3.7'",
 ]
 
 [project.optional-dependencies]
