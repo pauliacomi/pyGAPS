@@ -1,6 +1,6 @@
 """Module implementing the Whittaker method for isosteric enthalpy calculations."""
 
-# TODO Remove after this program no longer support Python 3.8.*
+# TODO Remove after this program no longer supports Python 3.8.*
 from __future__ import annotations
 
 import numpy as np
@@ -258,7 +258,7 @@ def pressure_at(
     or `np.nan` if not.
     """
     try:
-        return float(isotherm.pressure_at(n))
+        return isotherm.pressure_at(n)
     except CalculationError as e:
         print(e)
         return np.nan
@@ -271,7 +271,7 @@ def vaporisation_enthalpy(
     p_sat: float,
 ):
     """
-    Wrapper for `adsorbate.enthalpy_vaporisation()` which returns NAN on a
+    Wrapper for `adsorbate.enthalpy_vaporisation()` which returns NAN
     if it is impossible to calculate vaporisation enthalpy.
 
     Parameters
