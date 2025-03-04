@@ -4,7 +4,7 @@
 # Create new branch for release (we use git flow)
 # Versioning is provided automatically
 # by setuptools_scm
-# Respect semantic versioning for the releases - NO v prefix needed
+# Respect semantic versioning for the releases - NO 'v' prefix needed
 git flow release start x.y.z
 
 # Ensure all tests are passing
