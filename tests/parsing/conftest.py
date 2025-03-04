@@ -1,15 +1,11 @@
-from pathlib import Path
+"""This module provides fixtures and paths for parsing tests."""
 
-DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data' / 'parsing'
+from ..conftest import DATA_PATH
 
-XL_PATH = DATA_PATH / 'excel'
-JSON_PATH = DATA_PATH / 'json'
-CSV_PATH = DATA_PATH / 'csv'
-AIF_PATH = DATA_PATH / 'aif'
-NIST_PATH = DATA_PATH / 'nist'
+PARSING_PATH = DATA_PATH / 'parsing'
 
-DATA_XL = tuple(XL_PATH.glob("*.xls"))
-DATA_JSON = tuple(JSON_PATH.glob("*.json"))
-DATA_CSV = tuple(CSV_PATH.glob("*.csv"))
-DATA_AIF = tuple(AIF_PATH.glob("*.aif"))
-DATA_JSON_NIST = tuple(NIST_PATH.glob("*.json"))
+DATA_XL = tuple((PARSING_PATH / 'excel').glob("*.xls"))
+DATA_JSON = tuple((PARSING_PATH / 'json').glob("*.json"))
+DATA_CSV = tuple((PARSING_PATH / 'csv').glob("*.csv"))
+DATA_AIF = tuple((PARSING_PATH / 'aif').glob("*.aif"))
+DATA_JSON_NIST = tuple((PARSING_PATH / 'nist').glob("*.json"))

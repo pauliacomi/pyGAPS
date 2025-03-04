@@ -1,0 +1,464 @@
+{
+    "file_version": "3.0",
+    "adsorbate": "nitrogen",
+    "material_basis": "mass",
+    "material_unit": "g",
+    "iso_type": "Isotherme",
+    "isotherm_data": [
+        {
+            "loading": 0.248454,
+            "pressure": 1.35041659341e-07
+        },
+        {
+            "loading": 0.757042,
+            "pressure": 3.39061432446e-07
+        },
+        {
+            "loading": 1.26158,
+            "pressure": 6.4897718302e-07
+        },
+        {
+            "loading": 1.76742,
+            "pressure": 1.05895977469e-06
+        },
+        {
+            "loading": 2.2684,
+            "pressure": 1.61272773026e-06
+        },
+        {
+            "loading": 2.77015,
+            "pressure": 2.35108500435e-06
+        },
+        {
+            "loading": 3.25454,
+            "pressure": 3.44890568821e-06
+        },
+        {
+            "loading": 3.75567,
+            "pressure": 5.01305728201e-06
+        },
+        {
+            "loading": 4.25357,
+            "pressure": 7.94705592381e-06
+        },
+        {
+            "loading": 4.71782,
+            "pressure": 1.34070136612e-05
+        },
+        {
+            "loading": 5.16289,
+            "pressure": 2.67168750495e-05
+        },
+        {
+            "loading": 5.6635,
+            "pressure": 6.46062614833e-05
+        },
+        {
+            "loading": 6.16373,
+            "pressure": 0.000145101777201
+        },
+        {
+            "loading": 6.63837,
+            "pressure": 0.000552534121705
+        },
+        {
+            "loading": 6.98279,
+            "pressure": 0.00370106441254
+        },
+        {
+            "loading": 7.15572,
+            "pressure": 0.0101630021166
+        },
+        {
+            "loading": 7.26231,
+            "pressure": 0.0179253715696
+        },
+        {
+            "loading": 7.34198,
+            "pressure": 0.0263401185352
+        },
+        {
+            "loading": 7.41077,
+            "pressure": 0.0350548717195
+        },
+        {
+            "loading": 7.47244,
+            "pressure": 0.0440949878658
+        },
+        {
+            "loading": 7.52827,
+            "pressure": 0.0532348793963
+        },
+        {
+            "loading": 7.58101,
+            "pressure": 0.0625072866271
+        },
+        {
+            "loading": 7.63144,
+            "pressure": 0.07188792149
+        },
+        {
+            "loading": 7.68139,
+            "pressure": 0.0813303451984
+        },
+        {
+            "loading": 7.72918,
+            "pressure": 0.090988932714
+        },
+        {
+            "loading": 7.77513,
+            "pressure": 0.100617694482
+        },
+        {
+            "loading": 7.82231,
+            "pressure": 0.110305719136
+        },
+        {
+            "loading": 7.86846,
+            "pressure": 0.120113241086
+        },
+        {
+            "loading": 7.91497,
+            "pressure": 0.130282169491
+        },
+        {
+            "loading": 7.95987,
+            "pressure": 0.140260679442
+        },
+        {
+            "loading": 8.00475,
+            "pressure": 0.150401433688
+        },
+        {
+            "loading": 8.04874,
+            "pressure": 0.160413946933
+        },
+        {
+            "loading": 8.0921,
+            "pressure": 0.170272959588
+        },
+        {
+            "loading": 8.13483,
+            "pressure": 0.180006645811
+        },
+        {
+            "loading": 8.17825,
+            "pressure": 0.190040532557
+        },
+        {
+            "loading": 8.28404,
+            "pressure": 0.214894027012
+        },
+        {
+            "loading": 8.40051,
+            "pressure": 0.24268929229
+        },
+        {
+            "loading": 8.50429,
+            "pressure": 0.267435919245
+        },
+        {
+            "loading": 8.60569,
+            "pressure": 0.291866801313
+        },
+        {
+            "loading": 8.70639,
+            "pressure": 0.316414266109
+        },
+        {
+            "loading": 8.79946,
+            "pressure": 0.338814665673
+        },
+        {
+            "loading": 8.90086,
+            "pressure": 0.36332715565
+        },
+        {
+            "loading": 9.00342,
+            "pressure": 0.387632711286
+        },
+        {
+            "loading": 9.10505,
+            "pressure": 0.411843057695
+        },
+        {
+            "loading": 9.21001,
+            "pressure": 0.436521678059
+        },
+        {
+            "loading": 9.31096,
+            "pressure": 0.460425994807
+        },
+        {
+            "loading": 9.41108,
+            "pressure": 0.484380830738
+        },
+        {
+            "loading": 9.51508,
+            "pressure": 0.509143973579
+        },
+        {
+            "loading": 9.61567,
+            "pressure": 0.533289227965
+        },
+        {
+            "loading": 9.71768,
+            "pressure": 0.557333443987
+        },
+        {
+            "loading": 9.82203,
+            "pressure": 0.5815739076
+        },
+        {
+            "loading": 9.91077,
+            "pressure": 0.602541311139
+        },
+        {
+            "loading": 10.0339,
+            "pressure": 0.630324918145
+        },
+        {
+            "loading": 10.143,
+            "pressure": 0.654346789144
+        },
+        {
+            "loading": 10.2599,
+            "pressure": 0.67987354885
+        },
+        {
+            "loading": 10.3711,
+            "pressure": 0.703327079053
+        },
+        {
+            "loading": 10.4921,
+            "pressure": 0.728158228485
+        },
+        {
+            "loading": 10.6129,
+            "pressure": 0.752141238575
+        },
+        {
+            "loading": 10.7396,
+            "pressure": 0.776270948597
+        },
+        {
+            "loading": 10.8691,
+            "pressure": 0.799683674845
+        },
+        {
+            "loading": 11.0222,
+            "pressure": 0.825177402778
+        },
+        {
+            "loading": 11.1847,
+            "pressure": 0.849153612209
+        },
+        {
+            "loading": 11.3814,
+            "pressure": 0.873661244573
+        },
+        {
+            "loading": 11.6286,
+            "pressure": 0.89748686798
+        },
+        {
+            "loading": 12.0025,
+            "pressure": 0.92124545632
+        },
+        {
+            "loading": 12.6402,
+            "pressure": 0.942837548974
+        },
+        {
+            "loading": 13.5635,
+            "pressure": 0.956508816817
+        },
+        {
+            "branch": "des",
+            "loading": 12.8448,
+            "pressure": 0.941925289131
+        },
+        {
+            "branch": "des",
+            "loading": 12.0292,
+            "pressure": 0.912829154918
+        },
+        {
+            "branch": "des",
+            "loading": 11.5739,
+            "pressure": 0.881348903928
+        },
+        {
+            "branch": "des",
+            "loading": 11.3059,
+            "pressure": 0.853263153353
+        },
+        {
+            "branch": "des",
+            "loading": 11.1124,
+            "pressure": 0.827393446123
+        },
+        {
+            "branch": "des",
+            "loading": 10.9531,
+            "pressure": 0.802270839872
+        },
+        {
+            "branch": "des",
+            "loading": 10.8052,
+            "pressure": 0.77680237153
+        },
+        {
+            "branch": "des",
+            "loading": 10.6667,
+            "pressure": 0.751396080642
+        },
+        {
+            "branch": "des",
+            "loading": 10.5487,
+            "pressure": 0.728447742258
+        },
+        {
+            "branch": "des",
+            "loading": 10.4254,
+            "pressure": 0.703320278394
+        },
+        {
+            "branch": "des",
+            "loading": 10.3072,
+            "pressure": 0.67867371828
+        },
+        {
+            "branch": "des",
+            "loading": 10.1888,
+            "pressure": 0.65315278771
+        },
+        {
+            "branch": "des",
+            "loading": 10.0878,
+            "pressure": 0.630521165736
+        },
+        {
+            "branch": "des",
+            "loading": 9.9849,
+            "pressure": 0.607071521624
+        },
+        {
+            "branch": "des",
+            "loading": 9.87562,
+            "pressure": 0.581554477145
+        },
+        {
+            "branch": "des",
+            "loading": 9.77292,
+            "pressure": 0.557892069556
+        },
+        {
+            "branch": "des",
+            "loading": 9.66792,
+            "pressure": 0.533944034284
+        },
+        {
+            "branch": "des",
+            "loading": 9.55744,
+            "pressure": 0.508514426851
+        },
+        {
+            "branch": "des",
+            "loading": 9.45288,
+            "pressure": 0.484311852624
+        },
+        {
+            "branch": "des",
+            "loading": 9.34489,
+            "pressure": 0.460703850308
+        },
+        {
+            "branch": "des",
+            "loading": 9.23519,
+            "pressure": 0.436523621104
+        },
+        {
+            "branch": "des",
+            "loading": 9.13029,
+            "pressure": 0.411916893422
+        },
+        {
+            "branch": "des",
+            "loading": 9.03193,
+            "pressure": 0.388301118924
+        },
+        {
+            "branch": "des",
+            "loading": 8.92742,
+            "pressure": 0.363586552219
+        },
+        {
+            "branch": "des",
+            "loading": 8.8259,
+            "pressure": 0.339391750174
+        },
+        {
+            "branch": "des",
+            "loading": 8.72403,
+            "pressure": 0.315195005084
+        },
+        {
+            "branch": "des",
+            "loading": 8.62604,
+            "pressure": 0.291917320495
+        },
+        {
+            "branch": "des",
+            "loading": 8.52417,
+            "pressure": 0.267741948905
+        },
+        {
+            "branch": "des",
+            "loading": 8.42225,
+            "pressure": 0.243511200519
+        },
+        {
+            "branch": "des",
+            "loading": 8.31993,
+            "pressure": 0.219767185021
+        },
+        {
+            "branch": "des",
+            "loading": 8.21421,
+            "pressure": 0.195355733407
+        },
+        {
+            "branch": "des",
+            "loading": 8.10796,
+            "pressure": 0.171086124112
+        },
+        {
+            "branch": "des",
+            "loading": 8.00354,
+            "pressure": 0.147439260887
+        },
+        {
+            "branch": "des",
+            "loading": 7.89472,
+            "pressure": 0.123546602411
+        },
+        {
+            "branch": "des",
+            "loading": 7.79021,
+            "pressure": 0.101746603893
+        }
+    ],
+    "lab": "MADIREL",
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
+    "instrument": "Triflex",
+    "material": "NaY",
+    "material_batch": "Test",
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "activation_temperature": 200.0,
+    "temperature": 77.355,
+    "temperature_unit": "K",
+    "user": "PI"
+}

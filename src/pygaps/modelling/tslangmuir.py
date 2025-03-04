@@ -134,6 +134,53 @@ class TSLangmuir(IsothermBaseModel):
             self.params["n_m2"] * numpy.log(1.0 + self.params["K2"] * pressure) +\
             self.params["n_m3"] * numpy.log(1.0 + self.params["K3"] * pressure)
 
+    def toth_correction(self, pressure):
+        r"""
+        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
+        potential, $\varepsilon_{ads}$ at specified pressure.
+
+        .. math::
+            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
+            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+
+        For Multi-Site Langmuir models;
+            .. math::
+                \Psi = \left[ \sum_i{\frac{n_{m_i}K_i}{1 + K_i P}} \right] \left[ \sum_i{\frac{n_{m_i} K_i}{(1 + K_i P)^2}} \right]^{-1} - 1
+
+        Model parameters must be derived from isotherm with pressure in Pa.
+
+        Parameters
+        ---------
+        pressure : float
+            The pressure at which to calculate the T\'oth correction
+
+        Returns
+        ------
+            The T\'oth correction, $\Psi$
+        """
+
+        nm1K1 = self.params["n_m1"] * self.params["K1"]
+        K1P = self.params["K1"] * pressure
+        nm2K2 = self.params["n_m2"] * self.params["K2"]
+        K2P = self.params["K2"] * pressure
+        nm3K3 = self.params["n_m3"] * self.params["K3"]
+        K3P = self.params["K3"] * pressure
+
+        n_P = (nm1K1 / (1 + K1P)) + (nm2K2 / (1 + K2P)) + (nm3K3 / (1 + K3P))
+
+        def dn_dP_singlesite(n_m, K):
+            return (
+                (n_m * K) / (1 + (K * pressure))**2
+            )
+
+        dP_dn = 1 / (
+            dn_dP_singlesite(self.params["n_m1"], self.params["K1"]) +
+            dn_dP_singlesite(self.params["n_m2"], self.params["K2"]) +
+            dn_dP_singlesite(self.params["n_m3"], self.params["K3"])
+        )
+
+        return (n_P * dP_dn) - 1
+
     def initial_guess(self, pressure, loading):
         """
         Return initial guess for fitting.

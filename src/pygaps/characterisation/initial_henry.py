@@ -1,4 +1,4 @@
-"""Module calculating the initial henry constant."""
+"""Module calculating the initial Henry coefficient."""
 
 import numpy
 
@@ -19,7 +19,7 @@ def initial_henry_slope(
     **plot_parameters,
 ):
     """
-    Calculate a henry constant based on the initial slope.
+    Calculate a Henry coefficient based on the initial slope.
 
     Parameters
     ----------
@@ -91,8 +91,8 @@ def initial_henry_slope(
         if henry.rmse > max_adjrms and rows_taken != 2:
             rows_taken = rows_taken - 1
             continue
-        else:
-            break
+
+        break
 
     if verbose:
         logger.info(f"Calculated K = {henry.params['K']:.4g}")

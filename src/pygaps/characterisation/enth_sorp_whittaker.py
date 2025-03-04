@@ -1,22 +1,29 @@
 """Module implementing the Whittaker method for isosteric enthalpy calculations."""
 
+# TODO Remove after this program no longer supports Python 3.8.*
+from __future__ import annotations
+
 import numpy as np
 import scipy.constants
 
 import pygaps.modelling as pgm
-from pygaps import logger
+from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
+from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
+from pygaps.units.converter_mode import c_temperature
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
 
 def enthalpy_sorption_whittaker(
-    isotherm: "BaseIsotherm",
+    isotherm: BaseIsotherm,
+    branch: str = 'ads',
     model: str = 'Toth',
     loading: list = None,
     verbose: bool = False,
+    **kwargs,
 ):
     r"""
 
@@ -30,7 +37,8 @@ def enthalpy_sorption_whittaker(
     isotherm : BaseIsotherm
         The PointIsotherm or ModelIsotherm to be used. If ModelIsotherm, units must be in Pascal
     model : str
-        The model to use to fit the PointIsotherm, must be either 'Langmuir' or 'Toth'.
+        The model to use to fit the PointIsotherm, must be either one of
+        _WHITTAKER_MODELS.
     loading : list[float]
         The loadings for which to calculate the isosteric heat of adsorption.
     verbose : bool
@@ -42,8 +50,8 @@ def enthalpy_sorption_whittaker(
         A dictionary with the isosteric enthalpies per loading, with the form:
 
         - ``enthalpy_sorption`` (array) : the isosteric enthalpy of adsorption in kJ/mol
-        - ``loading`` (array) : the loading for each point of the isosteric
-          enthalpy, in mmol/g
+        - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol/g
+        - ``model_isotherm`` (ModelIsotherm): the model isotherm used to calculate the enthalpies.
 
     Raises
     ------
@@ -54,40 +62,53 @@ def enthalpy_sorption_whittaker(
     -----
 
     The Whittaker method, [#]_ sometimes known as a modified Tóth potential uses
-    variables derived from fitting of a model isotherm (Langmuir or Toth) to
-    derive the isosteric enthalpy of adsorption :math:`\Delta H_{st}`. The general form
-    of the equation is;
+    variables derived from fitting of a Toth-like model isotherm to derive the
+    isosteric enthalpy of adsorption :math:`\Delta H_{st}`. Toth-like isotherms
+    take the general form;
+
+    n(P) = \sum_{i} n_{m_i} \frac{K_i P}{\sqrt[t_i]{1+(K_i P)^{t_i}}}
+
+    And apart from Toth, include the multi- and single site Langmuir model
+    (where all t_i are 1), and the chemiphysisorption model.
+
+    The general form of the Whittaker potential is;
 
     .. math::
 
-        \Delta H_{st} = \Delta \lambda + \H_{vap} + RT
+        \Delta H_{st} = \Delta \lambda + \Delta H_{vap} + RT
 
     Where :math:`\Delta \lambda` is the adsorption potential, and
-    :math:`\H_{vap}` is the latent heat of the liquid-vapour change at
+    :math:`\Delta H_{vap}` is the latent heat of the liquid-vapour change at
     equilibrium pressure.
 
-    For loadings below the triple point pressure, :math:`\H_{vap}` is meaningless.
-    In this case, :math:`\H_{vap}` is estimated as that at the triple point.
+    For loadings below the triple point pressure, :math:`\Delta H_{vap}` is
+    meaningless. In this case, :math:`\Delta H_{vap}` is estimated as that at
+    the triple point.
 
-    Whittaker determined :math:`\Delta \lambda` as:
-
-    .. math::
-
-        \Delta \lambda = RT \ln{\left[\left(\frac{p^0}{b^{1/t}}\right)\left(\frac{\Theta^{t}}{1-\Theta^{t}}\right) \right]}
-
-    Where :math:`p^0` is the saturation pressure, :math:`\Theta` is the
-    fractional coverage, and :math:`b` is derived from the equilibrium constant,
-    :math:`K` as :math:`b = \frac{1}{K^t}`. In the case that the adsorptive is
-    above is supercritical, the pseudo saturation pressure is used;
-    :math:`p^0 = p_c \left(\frac{T}{T_c}\right)^2`.
-
-    The exponent :math:`t` is only relevant to the Toth version of the method,
-    as for the Langmuir model it reduces to 1. Thus, :math:`\Delta \lambda`
-    becomes
+    :math:`\Delta \lambda` is determined from the model isotherm parameters as :
 
     .. math::
 
-        \Delta \lambda = RT \ln{ \left( \frac{p^0}{b} \right) }
+        \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}
+            {1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
+
+    Where :math:`P_0` is the saturation pressure, :math:`\theta` is the
+    fractional coverage, and :math:`K` is the equilibrium constant. In the case
+    that the adsorptive is supercritical, the Dubinin pseudo-saturation pressure
+    is used;
+
+    ..math::
+        `p^0 = p_c \left(\frac{T}{T_c}\right)^2`.
+
+    The exponent :math:`t` is not relevant for Langmuir models it reduces to 1.
+    Thus, :math:`\Delta \lambda` becomes
+
+    .. math::
+
+        \Delta \lambda = RT \sum_{i} \ln{ \left( \frac{P_0}{K_i} \right) }
+
+    As such, the Whittaker method predicts constant isosteric enthalpies of
+    adsorption when Langmuir models are used.
 
     References
     ----------
@@ -97,104 +118,297 @@ def enthalpy_sorption_whittaker(
 
     """
 
-    if isinstance(isotherm, ModelIsotherm):
-        if isotherm.units['pressure_unit'] != 'Pa':
-            raise ParameterError('''Model isotherms should be in Pa.''')
-        model = isotherm.model.name
-    elif isinstance(isotherm, PointIsotherm):
-        isotherm.convert_pressure(unit_to='Pa')
-        isotherm = pgm.model_iso(
-            isotherm,
-            branch='ads',
-            model=model,
-            verbose=verbose,
+    # Check if isotherm is correct
+    if not isinstance(isotherm, (PointIsotherm, ModelIsotherm)):
+        raise ParameterError(
+            f'''
+            Isotherm must be ModelIsotherm or PointIsotherm.
+            You have input a {type(isotherm)}.
+            '''
         )
 
-    if model.lower() not in ['langmuir', 'toth']:
-        raise ParameterError('''Whittaker method requires modelling with either Langmuir or Toth''')
+    # Checks for ModelIsotherms provided
+    if isinstance(isotherm, ModelIsotherm):
+        if isotherm.units['pressure_unit'] != 'Pa':
+            raise ParameterError(
+                f'''
+                Model isotherms should use pressure in Pascal.
+                Current pressure unit is {isotherm.units['pressure_unit']}.
+                '''
+            )
+
+        if not pgm.is_model_whittaker(isotherm.model.name):
+            raise ParameterError(
+                rf'''
+                Whittaker method requires modelling with a T\'oth-type model, i.e.
+                {*pgm._WHITTAKER_MODELS,}
+                '''
+            )
+
+    # Checks for PointIsotherms provided
+    if isinstance(isotherm, PointIsotherm):
+        if model == 'guess':
+            model = pgm._WHITTAKER_MODELS
+
+        isotherm = copy_convert_isotherm(isotherm)
+        max_nfev = kwargs.get('max_nfev', None)
+        isotherm = pgm.model_iso(
+            isotherm,
+            branch=branch,
+            model=model,
+            verbose=verbose,
+            optimization_params={'max_nfev': max_nfev},
+        )
 
     if loading is None:
         loading = np.linspace(isotherm.model.loading_range[0], isotherm.model.loading_range[1], 100)
 
-    # Local constants and model parameters
+    #  Define constants
+    adsorbate = isotherm.adsorbate
     T = isotherm.temperature
-    RT = scipy.constants.R * T
-    n_m = isotherm.model.params['n_m']
-    K = isotherm.model.params['K']
-    if isotherm.model.name == 'Langmuir':
-        t = 1
-    else:
-        t = isotherm.model.params['t']  # equivalent to m in Whittaker
-    b = 1 / (K**t)
+    p_c = adsorbate.p_critical()
+    p_t = adsorbate.p_triple()
+    p_sat = adsorbate.saturation_pressure(isotherm.temperature, pseudo='Dubinin')
 
-    # Critical, triple and saturation pressure
-    p_c = isotherm.adsorbate.p_critical()
-    p_t = isotherm.adsorbate.p_triple()
-    try:
-        p_sat = isotherm.adsorbate.saturation_pressure(temp=isotherm.temperature)
-    except CalculationError:
-        logger.warning(
-            f"{isotherm.adsorbate} does not have a saturation pressure "
-            f"at {isotherm.temperature} K. Calculating pseudo-saturation "
-            f"pressure..."
-        )
-        T_c = isotherm.adsorbate.t_critical()
-        p_sat = p_c * ((T / T_c)**2)
+    enthalpy = enthalpy_sorption_whittaker_raw(
+        isotherm,
+        loading,
+        p_sat,
+        p_c,
+        p_t,
+        T,
+    )
 
-    loading_final = []
-    whittaker_enth = []
-
-    first_bracket = p_sat / (b**(1 / t))  # don't need to calculate every time
-    for n in loading:
-        if n == 0:
-            continue
-
-        p = isotherm.pressure_at(n, pressure_unit='Pa')
-        # check that it is possible to calculate h_vap
-        if np.isnan(p) or p < 0 or p > p_c or p > p_sat:
-            continue
-
-        # Cap pressure for h_vap determination to the triple point pressure
-        p = max(p, p_t)
-
-        # equation requires enthalpies in J
-        h_vap = isotherm.adsorbate.enthalpy_vaporisation(press=p, ) * 1000
-
-        theta = n / n_m  # second bracket of d_lambda
-        theta_t = theta**t
-        second_bracket = (theta_t / (1 - theta_t))**((t - 1) / t)
-        d_lambda = RT * np.log(first_bracket * second_bracket)
-
-        h_st = d_lambda + h_vap + RT
-
-        loading_final.append(n)
-        whittaker_enth.append(h_st / 1000)  # return enthalpies to kJ
+    stderr = stderr_estimate(len(isotherm.model.params), isotherm.model.rmse, enthalpy)
 
     if verbose:
-        from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
         isosteric_enthalpy_plot(
-            loading_final,
-            whittaker_enth,
-            [0 for n in loading_final],
+            loading,
+            enthalpy,
+            stderr,
             isotherm.units,
         )
 
     return {
-        'loading': loading_final,
-        'enthalpy_sorption': whittaker_enth,
-        'model_params': isotherm.model.params,
+        'loading': loading,
+        'enthalpy_sorption': enthalpy,
+        'model_isotherm': isotherm,
+        'std_errs': stderr,
     }
 
 
-def enthalpy_sorption_whittaker_raw(
-    p: float = None,
-    p_sat: float = None,
-    K: float = None,
-    n: float = None,
-    n_m: float = None,
+def copy_convert_isotherm(isotherm: PointIsotherm):
+    """
+    Makes a copy of the isotherm, but with pressure converted to
+    absolute mode and units in Pa, and temperature converted to K.
+    For use in `enthalpy_sorption_whittaker`, so as not to modify the original
+    input.
+
+    Parameters
+    ---------
+    isotherm: PointIsotherm
+        The isotherm to convert
+
+    Returns
+    ------
+    converted isotherm: PointIsotherm
+        New isotherm with all parameters the same as `isotherm` except with
+        pressure converted to absolute and Pa, and temperature converted to K.
+    """
+    temperature = c_temperature(
+        value=isotherm.temperature,
+        unit_from=isotherm.units['temperature_unit'],
+        unit_to='K',
+    )
+
+    return PointIsotherm(
+        pressure=isotherm.pressure(pressure_unit='Pa', pressure_mode='absolute'),
+        loading=isotherm.loading(),
+        material=isotherm.material,
+        adsorbate=str(isotherm.adsorbate),
+        temperature=temperature,
+        temperature_unit='K',
+        pressure_mode='absolute',
+        pressure_unit='Pa',
+        loading_basis=isotherm.units['loading_basis'],
+        loading_unit=isotherm.units['loading_unit'],
+        material_basis=isotherm.units['material_basis'],
+        material_unit='g',
+    )
+
+
+def pressure_at(
+    isotherm: BaseIsotherm,
+    n: float,
 ):
     """
-    not using yet, placeholder for function that may be helpful for DSLangmuir
-    version.
+    Wrapper for `isotherm.pressure_at()` which returns NAN on a
+    `CalculationError`.
+
+    Parameters
+    ----------
+    isotherm: BaseIsotherm
+        isotherm to use
+    n: float
+        Loading from which to derive pressure
+
+    Returns
+    ------
+    pressure at `n` if possible
+    or `np.nan` if not.
     """
-    pass
+    try:
+        return isotherm.pressure_at(n)
+    except CalculationError as e:
+        print(e)
+        return np.nan
+
+
+def vaporisation_enthalpy(
+    adsorbate: Adsorbate,
+    pressure: float,
+    p_c: float,
+    p_sat: float,
+):
+    """
+    Wrapper for `adsorbate.enthalpy_vaporisation()` which returns NAN
+    if it is impossible to calculate vaporisation enthalpy.
+
+    Parameters
+    ----------
+    adsorbate: Adsorbate,
+        Adsorbate for which to determine the vaporisiation enthalpy
+    pressure: float,
+        Pressure, in Pa at which to determine vaporisation enthalpy
+    p_c: float,
+        Critical pressure of the adsorbate, in Pa.
+    p_sat: float,
+        Saturation pressure of the adsorbate at the isotherm temperature.
+
+    Returns
+    ------
+    adsorbate.enthalpy_vaporisation() in J/mol if possible, np.nan if not
+    """
+    if np.isnan(pressure) or pressure <= 0 or pressure > p_c or pressure > p_sat:
+        return np.nan
+    # return in J/mol
+    return adsorbate.enthalpy_vaporisation(press=pressure) * 1000
+
+
+def compressibility(
+    adsorbate: Adsorbate,
+    pressure: float,
+    temperature: float,
+    p_c: float,
+    p_sat: float,
+):
+    """
+    Wrapper for `adsorbate.compressibility()` which returns NAN on a
+    if it is impossible to calculate compressibility.
+
+    Parameters
+    ----------
+    adsorbate: Adsorbate,
+        Adsorbate for which to determine the compressibility.
+    pressure: float,
+        Pressure, in Pa at which to determine compressibility.
+    temperature: float,
+        Isotherm temperature in K.
+    p_c: float,
+        Critical pressure of the adsorbate, in Pa.
+    p_sat: float,
+        Saturation pressure of the adsorbate at the isotherm temperature.
+
+    Returns
+    ------
+    `adsorbate.compressibility()` if possible, np.nan if not
+    """
+    if np.isnan(pressure) or pressure <= 0 or pressure > p_c or pressure > p_sat:
+        return np.nan
+    return adsorbate.compressibility(temp=temperature, pressure=pressure)
+
+
+def stderr_estimate(
+    n_terms: int,
+    rmse: float,
+    enthalpy: list[float],
+):
+    r"""
+    An estimation of the standard error of the isosteric enthalpy of adsorption
+    calculation, based on the RMSE of the model fitting and the number of terms
+    in the model.
+
+    ..math::
+        \sigma = 0.434 * \sqrt{n cdot RMSE^2}
+
+    Parameters
+    ----------
+    n_terms: int,
+        Number of terms in the model used to fit the isotherm
+    rmse: float,
+        root mean square error of model fit
+    enthalpy: list[float],
+        Isosteric enthalpy of adsorption
+
+    Returns
+    ------
+    An estimate of standard error for each enthalpy, as a list[float]
+    """
+    absolute_uncertainty = 0.434 * (np.sqrt(n_terms * (rmse**2)))
+    return [abs(absolute_uncertainty * h) for h in enthalpy]
+
+
+def toth_adsorption_potential(
+    model_isotherm: ModelIsotherm,
+    pressure: float,
+    p_sat: float,
+    RT: float,
+):
+    r"""
+    Calculates the T\'oth-corrected Polanyi adsorption potential,
+    $\varepsilon_{ads}$
+    ..math::
+        \Psi = RT \ln{\Psi \frac{P_{sat}}{P}}
+
+    Parameters
+    ---------
+    model_isotherm: ModelIsotherm,
+        Model isotherm containing the parameters for calculation of $\Psi$.
+    pressure: float,
+        Pressure at which to calculate the adsorption potential, in Pa.
+    p_sat: float,
+        Saturation pressure of the adsorbate at the isotherm temperature, in Pa.
+    RT: float,
+        The product of the gas constant, $R$ and the isotherm temperature, $T$
+
+    Returns
+    -------
+    The Adsorption potential, $\varepsilon_{ads}$ in J/mol
+
+    """
+    Psi = model_isotherm.model.toth_correction(pressure)
+    return RT * np.log(Psi * (p_sat / pressure))
+
+
+def enthalpy_sorption_whittaker_raw(
+    model_isotherm: ModelIsotherm,
+    loading: list[float],
+    p_sat: float,
+    p_c: float,
+    p_t: float,
+    T: float,
+):
+    RT = scipy.constants.R * T
+    adsorbate = model_isotherm.adsorbate
+
+    pressure = [pressure_at(model_isotherm, n) for n in loading]
+
+    epsilon = [toth_adsorption_potential(model_isotherm, p, p_sat, RT) for p in pressure]
+    hvap = [vaporisation_enthalpy(adsorbate, max(p, p_t), p_c, p_sat) for p in pressure]
+    Zfactor = [compressibility(adsorbate, p, T, p_c, p_sat) for p in pressure]
+
+    # Sum adsorption potential, vaporisation enthalpy, ZRT
+    return [
+        (e + h + (Z * RT)) / 1000  # return in kJ/mol
+        for e, h, Z in zip(epsilon, hvap, Zfactor)
+    ]

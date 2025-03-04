@@ -20,8 +20,8 @@ import numpy
 import pytest
 
 import pygaps
-import pygaps.iast.pgiast as pgi
 import pygaps.parsing as pgp
+import pygaps.prediction.iast as pgi
 import pygaps.utilities.exceptions as pgEx
 
 from ..test_utils import mpl_cleanup

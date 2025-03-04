@@ -164,9 +164,15 @@ def isotherm_to_xl(isotherm, path):
         sht.write(model_row + 2, 0, 'RMSE')
         sht.write(model_row + 2, 1, isotherm.model.rmse)
         sht.write(model_row + 3, 0, 'Pressure range')
-        sht.write(model_row + 3, 1, str(isotherm.model.pressure_range))
+        sht.write(
+            model_row + 3, 1,
+            f'({isotherm.model.pressure_range[0]}, {isotherm.model.pressure_range[1]})'
+        )
         sht.write(model_row + 4, 0, 'Loading range')
-        sht.write(model_row + 4, 1, str(isotherm.model.loading_range))
+        sht.write(
+            model_row + 4, 1,
+            f'({isotherm.model.loading_range[0]}, {isotherm.model.loading_range[1]})'
+        )
         sht.write(model_row + 5, 0, 'Model parameters')
         model_row = model_row + 5
         for row_index, param in enumerate(isotherm.model.params):
@@ -338,7 +344,7 @@ def isotherm_from_xl(path, *isotherm_parameters):
         if key.startswith("_material_"):
             material[key.replace("_material_", "")] = val
     if material:
-        for key in material.keys():
+        for key in material:
             raw_dict.pop("_material_" + key)
         material['name'] = raw_dict['material']
         raw_dict['material'] = material

@@ -183,8 +183,7 @@ def plot_iso(
 
     # Store which branches will be displayed
     if not branch:
-        raise ParameterError("Specify a branch to display"
-                             " e.g. branch=\'ads\'")
+        raise ParameterError("Specify a branch to display" " e.g. branch=\'ads\'")
     if branch not in _BRANCH_TYPES:
         raise GraphingError(
             "The supplied branch type is not valid."
@@ -198,33 +197,33 @@ def plot_iso(
     lgd_keys = lgd_keys if lgd_keys else []
 
     # Pack other parameters
-    data_params = dict(
-        x_data=x_data,
-        y1_data=y1_data,
-        y2_data=y2_data,
-        x_points=x_points,
-        y1_points=y1_points,
-    )
-    unit_params = dict(
-        pressure_mode=pressure_mode if pressure_mode else isotherms[0].pressure_mode,
-        pressure_unit=pressure_unit if pressure_unit else isotherms[0].pressure_unit,
-        loading_basis=loading_basis if loading_basis else isotherms[0].loading_basis,
-        loading_unit=loading_unit if loading_unit else isotherms[0].loading_unit,
-        material_basis=material_basis if material_basis else isotherms[0].material_basis,
-        material_unit=material_unit if material_unit else isotherms[0].material_unit,
-    )
-    range_params = dict(
-        x_range=x_range,
-        y1_range=y1_range,
-        y2_range=y2_range,
-        x_points=x_points,
-        y1_points=y1_points
-    )
-    log_params = dict(
-        logx=logx,
-        logy1=logy1,
-        logy2=logy2,
-    )
+    data_params = {
+        "x_data": x_data,
+        "y1_data": y1_data,
+        "y2_data": y2_data,
+        "x_points": x_points,
+        "y1_points": y1_points,
+    }
+    unit_params = {
+        "pressure_mode": pressure_mode if pressure_mode else isotherms[0].pressure_mode,
+        "pressure_unit": pressure_unit if pressure_unit else isotherms[0].pressure_unit,
+        "loading_basis": loading_basis if loading_basis else isotherms[0].loading_basis,
+        "loading_unit": loading_unit if loading_unit else isotherms[0].loading_unit,
+        "material_basis": material_basis if material_basis else isotherms[0].material_basis,
+        "material_unit": material_unit if material_unit else isotherms[0].material_unit,
+    }
+    range_params = {
+        "x_range": x_range,
+        "y1_range": y1_range,
+        "y2_range": y2_range,
+        "x_points": x_points,
+        "y1_points": y1_points
+    }
+    log_params = {
+        "logx": logx,
+        "logy1": logy1,
+        "logy2": logy2,
+    }
 
     #######################################
     #

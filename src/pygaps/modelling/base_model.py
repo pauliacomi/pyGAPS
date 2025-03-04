@@ -153,7 +153,30 @@ class IsothermBaseModel():
         float
             Spreading pressure at specified pressure.
         """
-        return
+        raise NotImplementedError("""This model does not implement spreading pressure.""")
+
+    @abc.abstractmethod
+    def toth_correction(self, pressure: float) -> float:
+        r"""
+        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
+        potential, $\varepsilon_{ads}$ at specified pressure.
+
+        .. math::
+            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
+            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+
+        Model parameters must be derived from isotherm with pressure in Pa.
+
+        Parameters
+        ---------
+        pressure : float
+            The pressure at which to calculate the T\'oth correction
+
+        Returns
+        ------
+            The T\'oth correction, $\Psi$
+        """
+        raise NotImplementedError("""This model does not implement T\'oth correction.""")
 
     def initial_guess(self, pressure: "list[float]", loading: "list[float]"):
         """
@@ -252,6 +275,7 @@ class IsothermBaseModel():
             "x0": guess,  # initial guess
             "bounds": bounds,  # supply the bounds of the parameters
             "args": (pressure, loading),  # extra arguments to the fit function
+            "x_scale": "jac",  # scale the problem using the jacobian
         }
         if optimization_params:
             fit_args.update(optimization_params)

@@ -157,7 +157,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
         if key.startswith("_material_"):
             material[key.replace("_material_", "")] = val
     if material:
-        for key in material.keys():
+        for key in material:
             raw_dict.pop("_material_" + key)
         material['name'] = raw_dict['material']
         raw_dict['material'] = material

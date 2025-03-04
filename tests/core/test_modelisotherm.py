@@ -10,7 +10,6 @@ import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 
 from ..characterisation.conftest import DATA
-from ..characterisation.conftest import DATA_N77_PATH
 from ..test_utils import mpl_cleanup
 from .conftest import LOADING_AT_PARAM
 from .conftest import LOADING_PARAM
@@ -21,6 +20,7 @@ from .conftest import PRESSURE_PARAM
 @pytest.mark.core
 class TestModelConvenience():
     """Test the convenience model function."""
+
     def test_model_isotherm(self, basic_pointisotherm):
         pgm.model_iso(basic_pointisotherm, model="Henry")
 
@@ -28,6 +28,7 @@ class TestModelConvenience():
 @pytest.mark.core
 class TestModelIsotherm():
     """Test the ModelIsotherm class."""
+
     def test_isotherm_create(self):
         """Check isotherm can be created from basic data."""
         isotherm_param = {
@@ -126,10 +127,10 @@ class TestModelIsotherm():
 
     @mpl_cleanup
     @pytest.mark.parametrize('file, ', [(data['file']) for data in list(DATA.values())])
-    def test_isotherm_create_guess(self, file):
+    def test_isotherm_create_guess(self, file, data_char_path):
         """Check isotherm can be guessed from PointIsotherm."""
 
-        filepath = DATA_N77_PATH / file
+        filepath = data_char_path / file
         isotherm = pgp.isotherm_from_json(filepath)
 
         pygaps.ModelIsotherm.from_pointisotherm(isotherm, model='guess', verbose=True)

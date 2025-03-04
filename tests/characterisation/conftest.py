@@ -32,17 +32,36 @@ Explanation of parameters:
 'psd_dft_pore_size':    Primary pore size peak, DFT range
 """
 
-from pathlib import Path
+import pytest
 
-DATA_PATH = Path(__file__).parent.parent.parent / 'docs' / 'examples' / 'data'
-DATA_N77_PATH = DATA_PATH / 'characterisation'
-DATA_ISOSTERIC_PATH = DATA_PATH / 'isosteric'
-DATA_WHITTAKER_PATH = DATA_PATH / 'whittaker'
-DATA_CALO_PATH = DATA_PATH / 'calorimetry'
+
+@pytest.fixture
+def data_char_path(request):
+    """Fixture for providing the path to characterisation data."""
+    return request.config.DATA_PATH / 'characterisation'
+
+
+@pytest.fixture
+def data_isosteric_path(request):
+    """Fixture for providing the path to isosteric data."""
+    return request.config.DATA_PATH / 'enth_isosteric'
+
+
+@pytest.fixture
+def data_whittaker_path(request):
+    """Fixture for providing the path to Whittaker data."""
+    return request.config.DATA_PATH / 'enth_whittaker'
+
+
+@pytest.fixture
+def data_calo_path(request):
+    """Fixture for providing the path to calorimetry data."""
+    return request.config.DATA_PATH / 'calorimetry'
+
 
 DATA = {
     'MCM-41': {
-        'file': 'MCM-41 N2 77.355.json',
+        'file': 'MCM-41 N2 77K.json',
         'bet_area': 350.0,
         'bet_area_s': 350.0,
         'langmuir_area': 1450.0,
@@ -60,7 +79,7 @@ DATA = {
         'psd_dft_pore_size': 3.4,
     },
     'NaY': {
-        'file': 'NaY N2 77.355.json',
+        'file': 'NaY N2 77K.json',
         'bet_area': 700.0,
         'langmuir_area': 1100.0,
         't_area': 160.0,
@@ -69,7 +88,7 @@ DATA = {
         'Khi_virial': 1260000,
     },
     'SiO2': {
-        'file': 'SiO2 N2 77.355.json',
+        'file': 'SiO2 N2 77K.json',
         'bet_area': 200.0,
         'bet_area_des': 190.0,
         'langmuir_area': 800,
@@ -79,7 +98,7 @@ DATA = {
         'Khi_virial': 249,
     },
     'Takeda 5A': {
-        'file': 'Takeda 5A N2 77.355.json',
+        'file': 'Takeda 5A N2 77K.json',
         'bet_area': 1075.0,
         'langmuir_area': 1600.0,
         't_area': 1100.0,
@@ -94,7 +113,7 @@ DATA = {
         'psd_dft_pore_size': 0.5,
     },
     'UiO-66(Zr)': {
-        'file': 'UiO-66(Zr) N2 77.355.json',
+        'file': 'UiO-66(Zr) N2 77K.json',
         'bet_area': 1250.0,
         'langmuir_area': 1350.0,
         't_pore_volume': 0.48,
@@ -107,23 +126,23 @@ DATA = {
 
 DATA_ISOSTERIC = {
     't1': {
-        'file': 'BAX 1500 - Isosteric Heat - 298.json',
+        'file': 'BAX 1500 C4H10 298K.json',
     },
     't2': {
-        'file': 'BAX 1500 - Isosteric Heat - 323.json',
+        'file': 'BAX 1500 C4H10 323K.json',
     },
     't3': {
-        'file': 'BAX 1500 - Isosteric Heat - 348.json',
+        'file': 'BAX 1500 C4H10 348K.json',
     },
 }
 
 DATA_CALO = {
     'HKUST-1': {
-        'file': 'HKUST-1(Cu) KRICT.json',
+        'file': 'HKUST-1(Cu) CO2 303K.json',
         'ienth': 27,
     },
     'Takeda 5A': {
-        'file': 'Takeda 5A Test CO2.json',
+        'file': 'Takeda 5A CO2 303K.json',
         'ienth': 35,
     },
 }

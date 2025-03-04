@@ -1,0 +1,166 @@
+{
+    "activation_temperature": 150.0,
+    "adsorbate": "carbon dioxide",
+    "comment": null,
+    "date": "2010-05-21 00:00:00",
+    "file_version": "3.0",
+    "instrument": "CV",
+    "iso_type": "Calorimetrie",
+    "isotherm_data": [
+        {
+            "Enthalpy(kJ/mol)": 28.7879686051,
+            "loading": 3.3549913246262943,
+            "pressure": 0.15380084843523317
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.7609392637,
+            "loading": 6.748238299007783,
+            "pressure": 0.3216764961036269
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.749976751,
+            "loading": 10.991767303245908,
+            "pressure": 0.5471884625482359
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.8481697142,
+            "loading": 15.271933263020163,
+            "pressure": 0.7966826643740439
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.9629352,
+            "loading": 18.72839711974812,
+            "pressure": 1.0204181689415246
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.8488689145,
+            "loading": 21.720455003285085,
+            "pressure": 1.235172671778929
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.7363563209,
+            "loading": 25.140920435403498,
+            "pressure": 1.5103268785393535
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.5766309989,
+            "loading": 28.153103229340747,
+            "pressure": 1.7860732392598075
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.5366503282,
+            "loading": 30.69199388393618,
+            "pressure": 2.049581751472983
+        },
+        {
+            "Enthalpy(kJ/mol)": 28.970042714,
+            "loading": 40.144595280730556,
+            "pressure": 3.412226705827782
+        },
+        {
+            "Enthalpy(kJ/mol)": 29.791154046,
+            "loading": 47.51487187338015,
+            "pressure": 5.291229913328399
+        },
+        {
+            "Enthalpy(kJ/mol)": 31.492626289,
+            "loading": 50.727627862738494,
+            "pressure": 6.659204253323464
+        },
+        {
+            "Enthalpy(kJ/mol)": 32.9810363992,
+            "loading": 54.38049589606412,
+            "pressure": 9.05466440629657
+        },
+        {
+            "Enthalpy(kJ/mol)": 39.6552951515,
+            "loading": 55.70451758421705,
+            "pressure": 10.521528457636318
+        },
+        {
+            "Enthalpy(kJ/mol)": 35.1655813292,
+            "loading": 56.909180114230004,
+            "pressure": 11.951086809474463
+        },
+        {
+            "Enthalpy(kJ/mol)": 30.4872904337,
+            "loading": 59.28810513160506,
+            "pressure": 14.943635538810758
+        },
+        {
+            "Enthalpy(kJ/mol)": 25.0111492948,
+            "loading": 60.639898268839744,
+            "pressure": 16.653184021416234
+        },
+        {
+            "Enthalpy(kJ/mol)": 22.0622888263,
+            "loading": 61.87347590684175,
+            "pressure": 18.17807916081915
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "loading": 63.31431170688969,
+            "pressure": 19.92365034265976
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "loading": 66.02840970844602,
+            "pressure": 24.356909656748087
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "branch": "des",
+            "loading": 65.7418997750398,
+            "pressure": 21.906971339452255
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "branch": "des",
+            "loading": 64.75442199790295,
+            "pressure": 18.032606671305206
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "branch": "des",
+            "loading": 63.39324883282546,
+            "pressure": 14.778720660942511
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "branch": "des",
+            "loading": 61.71660169141598,
+            "pressure": 12.075537833407353
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "branch": "des",
+            "loading": 58.99052485912145,
+            "pressure": 9.18770166264989
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "branch": "des",
+            "loading": 55.14915825469203,
+            "pressure": 6.63798540308907
+        },
+        {
+            "Enthalpy(kJ/mol)": 20.1857518911,
+            "branch": "des",
+            "loading": 49.287865858240856,
+            "pressure": 4.440107288112509
+        }
+    ],
+    "lab": "MADIREL",
+    "loading_basis": "percent",
+    "loading_unit": null,
+    "material": "HKUST-1(Cu)",
+    "material_basis": "mass",
+    "material_batch": "Test",
+    "material_unit": null,
+    "pressure_mode": "absolute",
+    "pressure_unit": "atm",
+    "project": null,
+    "temperature": 29.850000000000023,
+    "temperature_unit": "\u00b0C",
+    "user": "ADW"
+}

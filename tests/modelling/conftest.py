@@ -35,10 +35,10 @@ import pytest
 MODEL_DATA = {
     'Henry': {
         'initial_guess': {
-            'K': 11
+            'K': 11,
         },
         'test_parameters': {
-            'K': 2
+            'K': 2,
         },
         'test_values': {
             'pressure': [0.0, 1.0, 3.0],
@@ -50,11 +50,11 @@ MODEL_DATA = {
     'Langmuir': {
         'initial_guess': {
             'K': 10,
-            'n_m': 1.1
+            'n_m': 1.1,
         },
         'test_parameters': {
             'K': 3,
-            'n_m': 5
+            'n_m': 5,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -68,13 +68,13 @@ MODEL_DATA = {
             'K1': 4,
             'n_m1': 0.55,
             'K2': 6,
-            'n_m2': 0.55
+            'n_m2': 0.55,
         },
         'test_parameters': {
             'K1': 3,
             'n_m1': 5,
             'K2': 10,
-            'n_m2': 1
+            'n_m2': 1,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -90,7 +90,7 @@ MODEL_DATA = {
             'K2': 4,
             'n_m2': 0.44,
             'K3': 4,
-            'n_m3': 0.22
+            'n_m3': 0.22,
         },
         'test_parameters': {
             'K1': 3,
@@ -98,7 +98,7 @@ MODEL_DATA = {
             'K2': 10,
             'n_m2': 1,
             'K3': 0.1,
-            'n_m3': 10
+            'n_m3': 10,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -111,12 +111,12 @@ MODEL_DATA = {
         'initial_guess': {
             'C': 10,
             'N': 0.01,
-            'n_m': 1.1
+            'n_m': 1.1,
         },
         'test_parameters': {
             'C': 5,
             'N': 0.05,
-            'n_m': 10
+            'n_m': 10,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -129,12 +129,12 @@ MODEL_DATA = {
         'initial_guess': {
             'C': 100,
             'K': 0.01,
-            'n_m': 1.1
+            'n_m': 1.1,
         },
         'test_parameters': {
             'C': 50,
             'K': 0.01,
-            'n_m': 10
+            'n_m': 10,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -146,11 +146,11 @@ MODEL_DATA = {
     'Freundlich': {
         'initial_guess': {
             'K': 11,
-            'm': 1
+            'm': 1,
         },
         'test_parameters': {
             'K': 5,
-            'm': 5
+            'm': 5,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -163,12 +163,12 @@ MODEL_DATA = {
         'initial_guess': {
             'e': 1000,
             'n_m': 1.1,
-            'm': 1
+            'm': 1,
         },
         'test_parameters': {
             'e': 3000,
             'n_m': 10,
-            'm': 3
+            'm': 3,
         },
         'test_values': {
             'pressure': [0.1, 0.5, 1.0],
@@ -180,11 +180,11 @@ MODEL_DATA = {
     'DR': {
         'initial_guess': {
             'e': 1000,
-            'n_m': 1.1
+            'n_m': 1.1,
         },
         'test_parameters': {
             'e': 2000,
-            'n_m': 10
+            'n_m': 10,
         },
         'test_values': {
             'pressure': [0.1, 0.5, 1.0],
@@ -197,12 +197,12 @@ MODEL_DATA = {
         'initial_guess': {
             'n_m': 0.55,
             'Ka': 10,
-            'Kb': 100
+            'Kb': 100,
         },
         'test_parameters': {
             'n_m': 10,
             'Ka': 0.1,
-            'Kb': 1
+            'Kb': 1,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -215,12 +215,12 @@ MODEL_DATA = {
         'initial_guess': {
             'n_m': 1.1,
             'K': 10,
-            'tht': 0
+            'tht': 0,
         },
         'test_parameters': {
             'n_m': 5,
             'K': 5,
-            'tht': 1
+            'tht': 1,
         },
         'test_values': {
             'pressure': [0.0, 0.1, 1.0, 10.0],
@@ -233,12 +233,12 @@ MODEL_DATA = {
         'initial_guess': {
             'n_m': 1.1,
             'K': 10,
-            't': 1
+            't': 1,
         },
         'test_parameters': {
             'n_m': 5,
             'K': 3,
-            't': 2
+            't': 2,
         },
         'test_values': {
             'pressure': [0.1, 1.0, 10.0],
@@ -247,18 +247,66 @@ MODEL_DATA = {
             'spreading_pressure_mark': pytest.mark.okay,
         }
     },
+    'DSToth': {
+        'initial_guess': {
+            'n_m1': 0.55,
+            'K1': 4,
+            't1': 1,
+            'n_m2': 0.55,
+            'K2': 6,
+            't2': 1,
+        },
+        'test_parameters': {
+            'n_m1': 5,
+            'K1': 3,
+            't1': 2,
+            'n_m2': 6,
+            'K2': 2,
+            't2': 3,
+        },
+        'test_values': {
+            'pressure': [0.1, 1.0, 10.0],
+            'loading': [2.633556389008878, 10.512414771482202, 10.996974555727082],
+            'spreading_pressure': [2.6775676653472438, 18.440821585294383, 43.557224323075594],
+            'spreading_pressure_mark': pytest.mark.okay,
+        }
+    },
+    'ChemiPhysisorption': {
+        'initial_guess': {
+            'n_m1': 0.55,
+            'K1': 4,
+            't1': 1,
+            'n_m2': 0.55,
+            'K2': 6,
+            'Ea': 2718.282,
+        },
+        'test_parameters': {
+            'n_m1': 5,
+            'K1': 3,
+            't1': 2,
+            'n_m2': 6,
+            'K2': 2,
+            'Ea': 4000,
+        },
+        'test_values': {
+            'pressure': [0.1, 1.0, 10.0],
+            'loading': [1.4550550667204611, 4.816679045807506, 5.101885328545681],
+            'spreading_pressure': [1.498401252592332, 9.212963011908176, 20.807685363000594],
+            'spreading_pressure_mark': pytest.mark.okay,
+        }
+    },
     'JensenSeaton': {
         'initial_guess': {
-            'K': 11,
-            'a': 1,
-            'b': 1,
-            'c': 1
+            'K': 10,
+            'n_m': 1.1,
+            'k': 0.1,
+            't': 1,
         },
         'test_parameters': {
             'K': 10,
-            'a': 3,
-            'b': 0.1,
-            'c': 1
+            'n_m': 3,
+            'k': 0.1,
+            't': 1,
         },
         'test_values': {
             'pressure': [0.1, 1.0, 10.0],
@@ -272,36 +320,31 @@ MODEL_DATA = {
             'K': 11,
             'A': 0.0,
             'B': 0.0,
-            'C': 0.0
+            'C': 0.0,
         },
         'test_parameters': {
             'K': 5,
             'A': 0.001,
             'B': 0.0001,
-            'C': 0.0001
+            'C': 0.0001,
         },
         'test_values': {
-            'pressure': [
-                0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144,
-                0.40128205
-            ],
+            'pressure': [0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144, 0.40128205],
             'loading': [0.0, 0.2, 0.4, 0.6, 1.0, 2.0],
-            'spreading_pressure':
-            [0.0, 15.77393361, 18.77393361, 20.77393361, 25.0, 30.62232981],
-            'spreading_pressure_mark':
-            pytest.mark.xfail,
+            'spreading_pressure': [0.0, 15.77393361, 18.77393361, 20.77393361, 25.0, 30.62232981],
+            'spreading_pressure_mark': pytest.mark.xfail,
         }
     },
     'FHVST': {
         'initial_guess': {
             'n_m': 1.1,
             'K': 10,
-            'a1v': 0
+            'a1v': 0,
         },
         'test_parameters': {
             'n_m': 30,
             'K': 2,
-            'a1v': 1
+            'a1v': 1,
         },
         'test_values': {
             'pressure': [0.0, 0.10134005, 0.534198619, 44.75474093],
@@ -315,13 +358,13 @@ MODEL_DATA = {
             'n_m': 1.1,
             'K': 10,
             'L1v': 1,
-            'Lv1': 1
+            'Lv1': 1,
         },
         'test_parameters': {
             'n_m': 30,
             'K': 2,
             'L1v': 2,
-            'Lv1': 1
+            'Lv1': 1,
         },
         'test_values': {
             'pressure': [0.0, 0.101346218, 0.534999558],

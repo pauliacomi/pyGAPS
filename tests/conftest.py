@@ -1,15 +1,17 @@
 """
 Configuration file for pytest and commonly used fixtures
 """
+from pathlib import Path
+
 import pandas
 import pytest
 
 import pygaps
 
+
 # Incremental tests
-
-
 def pytest_runtest_makereport(item, call):
+    """Store failed incremental tests."""
     if "incremental" in item.keywords:
         if call.excinfo is not None:
             parent = item.parent
@@ -17,15 +19,22 @@ def pytest_runtest_makereport(item, call):
 
 
 def pytest_runtest_setup(item):
+    """Skip incremental tests if previous test failed."""
     if "incremental" in item.keywords:
         previousfailed = getattr(item.parent, "_previousfailed", None)
         if previousfailed is not None:
             pytest.xfail("previous test failed (%s)" % previousfailed.name)
 
 
+DATA_PATH = Path(__file__).parent / 'test_data'
+
+
+def pytest_configure(config):
+    """Set global variables for pytest."""
+    config.DATA_PATH = DATA_PATH
+
+
 # Global fixtures
-
-
 @pytest.fixture(scope='function')
 def isotherm_parameters():
     """Create a dictionary with all parameters for an isotherm."""

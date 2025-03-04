@@ -1,0 +1,826 @@
+{
+    "adsorbate": "argon",
+    "date": "2020-06-03T00:00:00",
+    "file_version": "3.0",
+    "instrument": "BEL 00218",
+    "isotherm_data": [
+        {
+            "loading": 8.206399999999999e-05,
+            "pressure": 0.00012621,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 0.10216,
+            "pressure": 0.00036169,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 0.20588,
+            "pressure": 0.00051271,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 0.307848,
+            "pressure": 0.00065335,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 0.409088,
+            "pressure": 0.00079512,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 0.510312,
+            "pressure": 0.00093801,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 0.61184,
+            "pressure": 0.0010922,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 1.13488,
+            "pressure": 0.0020781,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 2.3456,
+            "pressure": 0.0047582,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 3.5580800000000004,
+            "pressure": 0.0076859,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 4.76448,
+            "pressure": 0.010666,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 12.8192,
+            "pressure": 0.030263,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 20.8488,
+            "pressure": 0.048555,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 28.8704,
+            "pressure": 0.065348,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 34.556,
+            "pressure": 0.075344,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 40.2336,
+            "pressure": 0.084489,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 45.9336,
+            "pressure": 0.093028,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 51.664,
+            "pressure": 0.10088,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 57.48,
+            "pressure": 0.10869,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 71.7512,
+            "pressure": 0.12649,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 85.784,
+            "pressure": 0.14131,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 99.784,
+            "pressure": 0.1545,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 113.816,
+            "pressure": 0.16773,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 127.864,
+            "pressure": 0.18149,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 141.92000000000002,
+            "pressure": 0.19707,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 155.95999999999998,
+            "pressure": 0.21556,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 169.91199999999998,
+            "pressure": 0.24065,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 183.92000000000002,
+            "pressure": 0.27723,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 197.84,
+            "pressure": 0.33717,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 208.92800000000003,
+            "pressure": 0.41575,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 217.248,
+            "pressure": 0.51024,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 222.904,
+            "pressure": 0.6002,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 228.536,
+            "pressure": 0.71768,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 231.456,
+            "pressure": 0.79372,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 234.368,
+            "pressure": 0.87704,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 237.26399999999998,
+            "pressure": 0.96878,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 240.152,
+            "pressure": 1.069,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 243.02399999999997,
+            "pressure": 1.1801,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 245.94400000000002,
+            "pressure": 1.2814,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 248.83200000000002,
+            "pressure": 1.4076,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 251.73600000000002,
+            "pressure": 1.5501,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 254.536,
+            "pressure": 1.7007,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 257.368,
+            "pressure": 1.8513,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 260.152,
+            "pressure": 2.0426,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 262.96,
+            "pressure": 2.2421,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 265.712,
+            "pressure": 2.4863,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 268.44,
+            "pressure": 2.759,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 271.088,
+            "pressure": 3.0684,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 273.568,
+            "pressure": 3.4388,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 276.056,
+            "pressure": 3.8866,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 278.32800000000003,
+            "pressure": 4.3873,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 280.512,
+            "pressure": 4.9816,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 282.576,
+            "pressure": 5.6736,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 284.464,
+            "pressure": 6.4837,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 286.17600000000004,
+            "pressure": 7.3955,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 287.752,
+            "pressure": 8.405,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 289.192,
+            "pressure": 9.5529,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 290.536,
+            "pressure": 10.811,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 291.544,
+            "pressure": 11.885,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 292.264,
+            "pressure": 12.789,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 293.15999999999997,
+            "pressure": 13.953,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 293.848,
+            "pressure": 14.955,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 294.496,
+            "pressure": 15.94,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 295.12,
+            "pressure": 16.966,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 295.728,
+            "pressure": 18.073,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 296.352,
+            "pressure": 19.241,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 296.96,
+            "pressure": 20.495,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 297.616,
+            "pressure": 21.875,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 298.24,
+            "pressure": 23.242,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 298.832,
+            "pressure": 24.777,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 299.464,
+            "pressure": 26.389,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 300.12800000000004,
+            "pressure": 28.111,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 300.784,
+            "pressure": 29.971,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 301.456,
+            "pressure": 31.941,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 302.2,
+            "pressure": 34.156,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 302.98400000000004,
+            "pressure": 36.7,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 303.816,
+            "pressure": 39.448,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 304.664,
+            "pressure": 42.419,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 305.616,
+            "pressure": 45.602,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 306.696,
+            "pressure": 49.058,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 307.776,
+            "pressure": 52.807,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 308.952,
+            "pressure": 56.833,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 309.704,
+            "pressure": 59.129,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 310.368,
+            "pressure": 61.388,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 311.104,
+            "pressure": 63.692,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 311.896,
+            "pressure": 66.082,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 312.712,
+            "pressure": 68.561,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 313.568,
+            "pressure": 71.166,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 314.528,
+            "pressure": 73.812,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 315.56,
+            "pressure": 76.612,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 316.784,
+            "pressure": 79.466,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 318.12800000000004,
+            "pressure": 82.437,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 319.67199999999997,
+            "pressure": 85.499,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 321.464,
+            "pressure": 88.649,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 323.64,
+            "pressure": 91.918,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 326.264,
+            "pressure": 95.252,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 329.528,
+            "pressure": 98.643,
+            "pressure_saturation": 101.3
+        },
+        {
+            "loading": 332.144,
+            "pressure": 100.63,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 329.904,
+            "pressure": 97.678,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 328.304,
+            "pressure": 95.533,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 326.256,
+            "pressure": 92.048,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 324.424,
+            "pressure": 88.421,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 322.864,
+            "pressure": 84.916,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 321.552,
+            "pressure": 81.546,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 320.352,
+            "pressure": 78.359,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 319.37600000000003,
+            "pressure": 75.289,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 318.464,
+            "pressure": 72.326,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 317.568,
+            "pressure": 69.513,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 316.84000000000003,
+            "pressure": 66.782,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 316.136,
+            "pressure": 64.156,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 315.464,
+            "pressure": 61.645,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 314.848,
+            "pressure": 59.235,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 313.76,
+            "pressure": 54.867,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 312.67199999999997,
+            "pressure": 50.662,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 310.136,
+            "pressure": 47.495,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 307.88,
+            "pressure": 45.517,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 306.744,
+            "pressure": 43.225,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 305.608,
+            "pressure": 39.875,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 304.608,
+            "pressure": 36.72,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 303.71999999999997,
+            "pressure": 33.814,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 302.864,
+            "pressure": 31.152,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 302.056,
+            "pressure": 28.685,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 301.256,
+            "pressure": 26.405,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 300.136,
+            "pressure": 23.462,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 298.992,
+            "pressure": 20.735,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 297.856,
+            "pressure": 18.284,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 296.67199999999997,
+            "pressure": 16.115,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 295.488,
+            "pressure": 14.185,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 293.976,
+            "pressure": 12.081,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 292.32,
+            "pressure": 10.229,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 290.544,
+            "pressure": 8.6452,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 288.98400000000004,
+            "pressure": 7.4973,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 287.408,
+            "pressure": 6.5854,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 285.512,
+            "pressure": 5.7184,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 283.64,
+            "pressure": 5.0142,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 281.456,
+            "pressure": 4.3792,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 279.288,
+            "pressure": 3.8663,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 277.20799999999997,
+            "pressure": 3.4714,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 275.272,
+            "pressure": 3.162,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 273.44,
+            "pressure": 2.9137,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 271.704,
+            "pressure": 2.7102,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 267.11199999999997,
+            "pressure": 2.2543,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 262.008,
+            "pressure": 1.8676,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 249.512,
+            "pressure": 1.249,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 237.144,
+            "pressure": 0.82888,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 225.12800000000001,
+            "pressure": 0.56022,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 212.936,
+            "pressure": 0.40394,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 200.848,
+            "pressure": 0.31697,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 188.768,
+            "pressure": 0.26509,
+            "pressure_saturation": 101.3
+        },
+        {
+            "branch": "des",
+            "loading": 176.64000000000001,
+            "pressure": 0.23163,
+            "pressure_saturation": 101.3
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "mL(STP)",
+    "material": {
+        "density": 0.8,
+        "name": "AC"
+    },
+    "material_basis": "volume",
+    "material_batch": "aus der BOX",
+    "material_mass": 0.1432,
+    "material_mass_unit": "g",
+    "material_unit": "cm3",
+    "pressure_mode": "absolute",
+    "pressure_unit": "kPa",
+    "temperature": 87.0,
+    "temperature_unit": "K",
+    "user": "Volodymyr"
+}

@@ -4,7 +4,7 @@ import typing as t
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
+from matplotlib import ticker
 
 from pygaps.graphing.labels import label_units_dict
 from pygaps.graphing.mpl_styles import BASE_STYLE
@@ -419,7 +419,7 @@ def psd_plot(
         ax.set_xscale('log')
         ax.xaxis.set_minor_formatter(ticker.FuncFormatter(formatter))
         ax.xaxis.set_major_formatter(ticker.FuncFormatter(formatter))
-        ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
+        ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15))
         ax.tick_params(axis='x', which='minor', width=0.75, length=2.5)
         ax.tick_params(axis='x', which='major', width=2, length=10)
         ax.set_xlim(left=left, right=right)
@@ -496,7 +496,7 @@ def isosteric_enthalpy_plot(
         )
     if log:
         ax.set_xscale('log')
-        ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
+        ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15))
     ax.set_xlabel(label_units_dict('loading', units))
     ax.set_ylabel(r'Isosteric enthalpy [$kJ\/mol^{-1}$]')
     ax.legend(loc='best')
@@ -571,7 +571,7 @@ def initial_enthalpy_plot(
                 )
     if log:
         ax.set_xscale('log')
-        ax.xaxis.set_major_locator(plt.ticker.LogLocator(base=10.0, numticks=15, numdecs=20))
+        ax.xaxis.set_major_locator(ticker.LogLocator(base=10.0, numticks=15))
 
     ax.set_title(title + " initial enthalpy fit")
     ax.set_xlabel('Loading')

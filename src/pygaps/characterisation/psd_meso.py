@@ -6,12 +6,14 @@ import typing as t
 
 import numpy
 
+if t.TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+    from pygaps.core.pointisotherm import PointIsotherm
+
 from pygaps import logger
 from pygaps.characterisation.models_kelvin import get_kelvin_model
 from pygaps.characterisation.models_kelvin import get_meniscus_geometry
 from pygaps.characterisation.models_thickness import get_thickness_model
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered

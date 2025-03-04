@@ -21,20 +21,20 @@ import pygaps.utilities.exceptions as pgEx
 
 from ..test_utils import mpl_cleanup
 from .conftest import DATA
-from .conftest import DATA_N77_PATH
 
 
 @pytest.mark.characterisation
 class TestDAPlot():
     """Tests DA and DR plots."""
-    def test_dr_checks(self, basic_pointisotherm):
+
+    def test_dr_checks(self, basic_pointisotherm, data_char_path):
         """Checks for built-in safeguards."""
 
         # Will raise a "negative exponent" error.
         with pytest.raises(pgEx.ParameterError):
             drda.da_plot(basic_pointisotherm, exp=-2)
 
-        filepath = DATA_N77_PATH / DATA['Takeda 5A']['file']
+        filepath = data_char_path / DATA['Takeda 5A']['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
         # Will raise "bad limits" error.
@@ -44,52 +44,52 @@ class TestDAPlot():
         # These limits work
         drda.dr_plot(isotherm, p_limits=[0, 0.2])
 
-    @pytest.mark.parametrize('sample', [sample for sample in DATA])
-    def test_dr_plot(self, sample):
+    @pytest.mark.parametrize('sample', DATA.values())
+    def test_dr_plot(self, sample, data_char_path):
         """Test calculation with several model isotherms."""
-        sample = DATA[sample]
         # Exclude datasets where it is not applicable.
-        if sample.get('dr_volume', None):
+        if 'dr_volume' not in sample:
+            return
 
-            filepath = DATA_N77_PATH / sample['file']
-            isotherm = pgpj.isotherm_from_json(filepath)
+        filepath = data_char_path / sample['file']
+        isotherm = pgpj.isotherm_from_json(filepath)
 
-            res = drda.dr_plot(isotherm)
+        res = drda.dr_plot(isotherm)
 
-            dr_vol = res.get("pore_volume")
-            dr_pot = res.get("adsorption_potential")
+        dr_vol = res.get("pore_volume")
+        dr_pot = res.get("adsorption_potential")
 
-            err_relative = 0.05  # 5 percent
-            err_absolute = 0.01  # 0.01 cm3/g
+        err_relative = 0.05  # 5 percent
+        err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(dr_vol, sample['dr_volume'], err_relative, err_absolute)
-            assert isclose(dr_pot, sample['dr_potential'], err_relative, err_absolute)
+        assert isclose(dr_vol, sample['dr_volume'], err_relative, err_absolute)
+        assert isclose(dr_pot, sample['dr_potential'], err_relative, err_absolute)
 
-    @pytest.mark.parametrize('sample', [sample for sample in DATA])
-    def test_da_plot(self, sample):
+    @pytest.mark.parametrize('sample', DATA.values())
+    def test_da_plot(self, sample, data_char_path):
         """Test calculation with several model isotherms."""
-        sample = DATA[sample]
         # exclude datasets where it is not applicable
-        if sample.get('da_volume', None):
+        if 'da_volume' not in sample:
+            return
 
-            filepath = DATA_N77_PATH / sample['file']
-            isotherm = pgpj.isotherm_from_json(filepath)
+        filepath = data_char_path / sample['file']
+        isotherm = pgpj.isotherm_from_json(filepath)
 
-            res = drda.da_plot(isotherm, p_limits=[0, 0.01])
+        res = drda.da_plot(isotherm, p_limits=[0, 0.01])
 
-            da_vol = res.get("pore_volume")
-            da_pot = res.get("adsorption_potential")
+        da_vol = res.get("pore_volume")
+        da_pot = res.get("adsorption_potential")
 
-            err_relative = 0.05  # 5 percent
-            err_absolute = 0.01  # 0.01 cm3/g
+        err_relative = 0.05  # 5 percent
+        err_absolute = 0.01  # 0.01 cm3/g
 
-            assert isclose(da_vol, sample['da_volume'], err_relative, err_absolute)
-            assert isclose(da_pot, sample['da_potential'], err_relative, err_absolute)
+        assert isclose(da_vol, sample['da_volume'], err_relative, err_absolute)
+        assert isclose(da_pot, sample['da_potential'], err_relative, err_absolute)
 
     @mpl_cleanup
-    def test_da_output(self):
+    def test_da_output(self, data_char_path):
         """Test verbosity."""
         sample = DATA['Takeda 5A']
-        filepath = DATA_N77_PATH / sample['file']
+        filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
         drda.da_plot(isotherm, verbose=True)

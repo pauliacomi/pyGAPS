@@ -85,7 +85,7 @@ class GAB(IsothermBaseModel):
         res = (-y - numpy.sqrt(y**2 - 4 * x * loading)) / (2 * x)
 
         if numpy.isnan(res).any():
-            res = numpy.nan_to_num(res, copy=False)
+            res = numpy.nan_to_num(res)
 
         return res
 

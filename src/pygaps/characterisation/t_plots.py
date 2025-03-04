@@ -5,11 +5,13 @@ import typing as t
 import numpy
 from scipy import stats
 
+if t.TYPE_CHECKING:
+    from pygaps.core.modelisotherm import ModelIsotherm
+    from pygaps.core.pointisotherm import PointIsotherm
+
 from pygaps import logger
 from pygaps.characterisation.models_thickness import get_thickness_model
 from pygaps.core.adsorbate import Adsorbate
-from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.math_utilities import find_linear_sections
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered

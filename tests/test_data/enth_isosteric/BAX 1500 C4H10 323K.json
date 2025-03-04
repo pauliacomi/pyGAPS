@@ -1,0 +1,209 @@
+{
+    "file_version": "3.0",
+    "adsorbate": "n-butane",
+    "material_basis": "mass",
+    "material_unit": "g",
+    "iso_type": "isotherm",
+    "isotherm_data": [
+        {
+            "loading": 0.441,
+            "pressure": 0.0051
+        },
+        {
+            "loading": 0.815,
+            "pressure": 0.0095
+        },
+        {
+            "loading": 1.181,
+            "pressure": 0.0143
+        },
+        {
+            "loading": 1.517,
+            "pressure": 0.0194
+        },
+        {
+            "loading": 1.823,
+            "pressure": 0.0247
+        },
+        {
+            "loading": 2.097,
+            "pressure": 0.0332
+        },
+        {
+            "loading": 2.354,
+            "pressure": 0.0392
+        },
+        {
+            "loading": 2.618,
+            "pressure": 0.0483
+        },
+        {
+            "loading": 2.855,
+            "pressure": 0.0577
+        },
+        {
+            "loading": 3.083,
+            "pressure": 0.0675
+        },
+        {
+            "loading": 3.299,
+            "pressure": 0.0775
+        },
+        {
+            "loading": 3.505,
+            "pressure": 0.0876
+        },
+        {
+            "loading": 3.698,
+            "pressure": 0.0995
+        },
+        {
+            "loading": 3.894,
+            "pressure": 0.1118
+        },
+        {
+            "loading": 4.398,
+            "pressure": 0.1508
+        },
+        {
+            "loading": 4.851,
+            "pressure": 0.1949
+        },
+        {
+            "loading": 5.272,
+            "pressure": 0.2438
+        },
+        {
+            "loading": 5.66,
+            "pressure": 0.2973
+        },
+        {
+            "loading": 6.005,
+            "pressure": 0.3517
+        },
+        {
+            "loading": 6.295,
+            "pressure": 0.4049
+        },
+        {
+            "loading": 6.581,
+            "pressure": 0.4616
+        },
+        {
+            "loading": 6.845,
+            "pressure": 0.5175
+        },
+        {
+            "loading": 7.068,
+            "pressure": 0.5756
+        },
+        {
+            "loading": 7.283,
+            "pressure": 0.6342
+        },
+        {
+            "loading": 7.501,
+            "pressure": 0.6942
+        },
+        {
+            "loading": 7.745,
+            "pressure": 0.7562
+        },
+        {
+            "loading": 7.94,
+            "pressure": 0.8177
+        },
+        {
+            "loading": 8.147,
+            "pressure": 0.8787
+        },
+        {
+            "loading": 8.337,
+            "pressure": 0.9421
+        },
+        {
+            "loading": 8.532,
+            "pressure": 1.0053
+        },
+        {
+            "loading": 8.721,
+            "pressure": 1.0691
+        },
+        {
+            "loading": 8.915,
+            "pressure": 1.1359
+        },
+        {
+            "loading": 9.097,
+            "pressure": 1.2001
+        },
+        {
+            "loading": 9.279,
+            "pressure": 1.2641
+        },
+        {
+            "loading": 9.461,
+            "pressure": 1.3279
+        },
+        {
+            "loading": 9.64,
+            "pressure": 1.3933
+        },
+        {
+            "loading": 9.807,
+            "pressure": 1.4588
+        },
+        {
+            "loading": 9.986,
+            "pressure": 1.5242
+        },
+        {
+            "loading": 10.151,
+            "pressure": 1.5909
+        },
+        {
+            "loading": 10.327,
+            "pressure": 1.6588
+        },
+        {
+            "loading": 10.527,
+            "pressure": 1.7329
+        },
+        {
+            "loading": 10.703,
+            "pressure": 1.7994
+        },
+        {
+            "loading": 10.901,
+            "pressure": 1.8697
+        },
+        {
+            "loading": 11.08,
+            "pressure": 1.9427
+        },
+        {
+            "loading": 11.259,
+            "pressure": 2.009
+        },
+        {
+            "loading": 11.47,
+            "pressure": 2.0842
+        },
+        {
+            "loading": 11.659,
+            "pressure": 2.147
+        },
+        {
+            "loading": 11.855,
+            "pressure": 2.2109
+        }
+    ],
+    "loading_basis": "molar",
+    "loading_unit": "mmol",
+    "material": "TEST",
+    "material_batch": "TB",
+    "pressure_mode": "absolute",
+    "pressure_unit": "bar",
+    "temperature": 323.15,
+    "temperature_unit": "K"
+}

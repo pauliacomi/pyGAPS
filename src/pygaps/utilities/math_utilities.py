@@ -161,3 +161,25 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
         numpy.array([x[0] for x in res]),
         numpy.array([y[1] for y in res]),
     )
+
+
+def same_orders_of_maximum(vals):
+    """
+    Determines if the maximum of two lists are within one order of magnitude.
+
+    Parameters
+    ----------
+    vals: list of list of floats
+        The lists to compare
+
+    Returns
+    ------
+    True:
+        If within one order of magnitude
+    False:
+        If not
+    """
+    orders = [numpy.log10(max(v)) for v in vals]
+    if abs(orders[0] - orders[1]) > 1:
+        return True
+    return False
