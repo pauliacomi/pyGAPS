@@ -218,7 +218,7 @@ def isotherm_to_aif(isotherm: PointIsotherm, path: str = None):
         return aif.as_string()
 
 
-def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
+def isotherm_from_aif(str_or_path: str, read_string=False, **isotherm_parameters: dict):
     """
     Parse an isotherm from an AIF format (file or raw string) [#]_.
 
@@ -243,7 +243,9 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
        acs.langmuir.1c00122. https://doi.org/10.1021/acs.langmuir.1c00122.
 
     """
-    if pathlib.Path(str_or_path).exists():
+    if read_string==True:
+        aif = cif.read_string(str_or_path)
+    elif pathlib.Path(str_or_path).exists():
         aif = cif.read_file(str(str_or_path))
     else:
         try:
