@@ -11,7 +11,6 @@ from pygaps.core.adsorbate import Adsorbate
 from pygaps.core.baseisotherm import BaseIsotherm
 from pygaps.core.modelisotherm import ModelIsotherm
 from pygaps.core.pointisotherm import PointIsotherm
-from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
 from pygaps.units.converter_mode import c_temperature
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
@@ -182,6 +181,7 @@ def enthalpy_sorption_whittaker(
     stderr = stderr_estimate(len(isotherm.model.params), isotherm.model.rmse, enthalpy)
 
     if verbose:
+        from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
         isosteric_enthalpy_plot(
             loading,
             enthalpy,

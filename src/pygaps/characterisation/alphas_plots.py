@@ -157,7 +157,9 @@ def alpha_s(
         raise ParameterError("The reducing pressure is outside the bounds of 0-1 p/p0.")
 
     # Deal with reference area
-    if reference_area.lower() in ['bet', None]:
+    if isinstance(reference_area, float):
+        pass
+    elif reference_area.lower() in ['bet', None]:
         try:
             reference_area = area_BET(reference_isotherm).get('area')
         except Exception as err:
@@ -175,7 +177,7 @@ def alpha_s(
                 "Either solve the issue or provide a value for reference_area. "
                 f"Langmuir area error is :\n{err}"
             ) from err
-    elif not isinstance(reference_area, float):
+    else:
         raise ParameterError(
             "The reference area should be either a numeric value, 'BET' or 'Langmuir'. "
             f"The value specified was {reference_area}."

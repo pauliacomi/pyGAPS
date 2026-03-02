@@ -6,6 +6,7 @@ isotherm and calculated isosteric heats of adsorption
 # TODO Remove after this program no longer supports Python 3.8.*
 from __future__ import annotations
 
+import copy
 import warnings
 
 import numpy as np
@@ -81,7 +82,8 @@ def predict_isotherm_from_enthalpy_clapeyron(
             '''
         )
 
-    isotherm.convert(
+    isotherm_local = copy.copy(isotherm)  # avoid mutating the original isotherm
+    isotherm_local.convert(
         pressure_unit='Pa',
         pressure_mode='absolute',
         loading_unit='mol',
@@ -89,12 +91,12 @@ def predict_isotherm_from_enthalpy_clapeyron(
         material_unit='kg',
         material_basis='mass',
     )
-    isotherm.convert_temperature(unit_to='K')
-    temperature_isotherm = isotherm.temperature
+    isotherm_local.convert_temperature(unit_to='K')
+    temperature_isotherm = isotherm_local.temperature
 
-    if 'enthalpy' in isotherm.other_keys:
-        enthalpy = isotherm.other_data(key='enthalpy', branch=branch)
-        loading = isotherm.loading()
+    if 'enthalpy' in isotherm_local.other_keys:
+        enthalpy = isotherm_local.other_data(key='enthalpy', branch=branch)
+        loading = isotherm_local.loading()
         if verbose:
             logger.info("Enthalpy retrieved from original_isotherm.other_keys.")
 
@@ -119,7 +121,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
                 '''
             )
 
-    pressure_current = isotherm.pressure_at(
+    pressure_current = isotherm_local.pressure_at(
         loading,
         pressure_unit='Pa',
         interp_fill='extrapolate',
@@ -141,8 +143,8 @@ def predict_isotherm_from_enthalpy_clapeyron(
     isotherm_prediction = PointIsotherm(
         pressure=pressure_prediction,
         loading=loading,
-        material=isotherm.material,
-        adsorbate=str(isotherm.adsorbate),
+        material=isotherm_local.material,
+        adsorbate=str(isotherm_local.adsorbate),
         temperature=temperature_prediction,
         pressure_mode='absolute',
         pressure_unit='Pa',
@@ -156,7 +158,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
 
     if verbose and dographs:
         prediction_graphs.plot_predict_isotherm_from_enthalpy(
-            isotherm,
+            isotherm_local,
             isotherm_prediction,
             loading,
             enthalpy,
@@ -218,11 +220,12 @@ def predict_isosurface_from_enthalpy_clapeyron(
         Dataframe of predicted loadings as a function of temperature (index)
         and pressure (columns)
     """
-    isotherm.convert(
+    isotherm_local = copy.copy(isotherm)  # avoid mutating the original isotherm
+    isotherm_local.convert(
         pressure_unit='Pa',
         pressure_mode='absolute',
     )
-    temperature_current = isotherm.temperature
+    temperature_current = isotherm_local.temperature
 
     if branch is None:
         raise ParameterError(
@@ -237,8 +240,8 @@ def predict_isosurface_from_enthalpy_clapeyron(
 
     if pressures_prediction is None:
         pressures_prediction = np.linspace(
-            min(isotherm.pressure(branch=branch)),
-            max(isotherm.pressure(branch=branch)),
+            min(isotherm_local.pressure(branch=branch)),
+            max(isotherm_local.pressure(branch=branch)),
             num=num,
         )
 
@@ -257,7 +260,7 @@ def predict_isosurface_from_enthalpy_clapeyron(
     for T in temperatures_prediction:
         isotherm_predicted = predict_isotherm_from_enthalpy_clapeyron(
             temperature_prediction=T,
-            isotherm=isotherm,
+            isotherm=isotherm_local,
             isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
             branch=branch,
             verbose=False,
@@ -281,11 +284,11 @@ def predict_isosurface_from_enthalpy_clapeyron(
 
         prediction_graphs.plot_predict_isosurface_from_enthalpy(
             grid,
-            original_temperature=isotherm.temperature,
+            original_temperature=isotherm_local.temperature,
             units={
-                'temperature': isotherm.temperature_unit,
-                'loading': isotherm.loading_unit,
-                'material': isotherm.material_unit,
+                'temperature': isotherm_local.temperature_unit,
+                'loading': isotherm_local.loading_unit,
+                'material': isotherm_local.material_unit,
             }
         )
         plt.show()

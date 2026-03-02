@@ -243,8 +243,9 @@ def get_isotherm_model(model_name: str, **params: dict):
     return model(**params)
 
 
-def model_from_dict(model_dict):
+def model_from_dict(model_dict: dict):
     """Obtain a model from a dictionary."""
+    model_dict = model_dict.copy()
     return get_isotherm_model(model_dict.pop('name'), **model_dict)
 
 

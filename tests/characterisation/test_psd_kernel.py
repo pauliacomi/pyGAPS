@@ -47,7 +47,7 @@ class TestPSDKernel():
     def test_psd_dft(self, sample, kernel, data_char_path):
         """Test psd calculation with several model isotherms"""
         # exclude datasets where it is not applicable
-        if 'psd_dft_pore_volume' not in sample:
+        if 'psd_dft_pore_size' not in sample:
             return
 
         filepath = data_char_path / sample['file']
@@ -61,7 +61,7 @@ class TestPSDKernel():
         err_relative = 0.05  # 5 percent
         err_absolute = 0.01  # 0.01
 
-        assert np.isclose(principal_peak, sample['psd_micro_pore_size'], err_relative, err_absolute)
+        assert np.isclose(principal_peak, sample['psd_dft_pore_size'], err_relative, err_absolute)
 
     @mpl_cleanup
     def test_psd_dft_verbose(self, data_char_path):

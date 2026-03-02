@@ -25,15 +25,9 @@ from .conftest import MODEL_DATA
 @pytest.mark.modelling
 class TestIsothermModels():
     """Test the isotherm models."""
-    def test_base_class(self):
-        """Test base class for model."""
-        model = models.base_model.IsothermBaseModel()
-        model.loading(1)
-        model.pressure(1)
-        with pytest.raises(NotImplementedError):  # This should be the case, no?
-            model.spreading_pressure(1)
 
     def test_check_functions(self):
+        """Test the model checking functions."""
         assert models.is_model("Henry")
         assert models.is_model("henry")
         assert models.is_model("henRY")

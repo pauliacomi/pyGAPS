@@ -83,7 +83,7 @@ DATA = {
         'bet_area': 700.0,
         'langmuir_area': 1100.0,
         't_area': 160.0,
-        't_pore_volume': 0.26,
+        't_pore_volume': 0.216,
         'Khi_slope': 1770000,
         'Khi_virial': 1260000,
     },
@@ -93,7 +93,7 @@ DATA = {
         'bet_area_des': 190.0,
         'langmuir_area': 800,
         't_area': 320.0,
-        't_pore_volume': 0.0,
+        't_pore_volume': -0.06,
         'Khi_slope': 780,
         'Khi_virial': 249,
     },
@@ -120,7 +120,7 @@ DATA = {
         'Khi_slope': 700000,
         'Khi_virial': 1350000,
         'psd_micro_pore_size': 0.7,
-        'psd_dft_pore_size': 0.6,
+        'psd_dft_pore_size': 0.54,
     },
 }
 

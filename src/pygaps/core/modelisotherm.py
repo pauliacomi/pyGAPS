@@ -428,9 +428,10 @@ class ModelIsotherm(BaseIsotherm):
                 )
 
         for model in guess_models:
+            model_bounds = None
             if param_bounds is not None:
                 params = get_isotherm_model(model).params.keys()
-                param_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
+                model_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
             try:
                 isotherm = cls(
                     pressure=pressure,
@@ -440,7 +441,7 @@ class ModelIsotherm(BaseIsotherm):
                     loading_key=loading_key,
                     model=model,
                     param_guess=None,
-                    param_bounds=param_bounds,
+                    param_bounds=model_bounds,
                     optimization_params=optimization_params,
                     branch=branch,
                     verbose=verbose,
@@ -472,7 +473,7 @@ class ModelIsotherm(BaseIsotherm):
         return best_fit
 
     ###########################################################
-    #   Info function
+    #   Info functions
 
     def __str__(self) -> str:
         """Print a short summary of all the isotherm parameters."""

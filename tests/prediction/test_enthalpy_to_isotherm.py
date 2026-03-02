@@ -103,6 +103,7 @@ class TestETI():
         Check if predicting at original temperature returns same isotherm
         """
         isotherm = pgp.isotherm_from_aif(DATA_WHITTAKER_PATH / testdata['file'])
+        isotherm.convert_pressure(unit_to='Pa')
         loading = list(isotherm.loading(branch='ads'))
         enthalpy = [abs(np.random.randn()) for n in loading]
         isosteric_enthalpy_dictionary = {

@@ -4,7 +4,6 @@ import numpy
 from scipy import optimize
 
 from pygaps import logger
-from pygaps.graphing.calc_graphs import virial_plot
 from pygaps.modelling.base_model import IsothermBaseModel
 from pygaps.utilities.exceptions import CalculationError
 
@@ -78,7 +77,10 @@ class Virial(IsothermBaseModel):
         if not opt_res.success:
             raise CalculationError(f"Root finding failed. Error: \n\t{opt_res.message}")
 
+        if opt_res.x.size == 1:
+            return opt_res.x.item()
         return opt_res.x
+
 
     def pressure(self, loading):
         """
@@ -234,6 +236,7 @@ class Virial(IsothermBaseModel):
         self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
 
         if verbose:
+            from pygaps.graphing.calc_graphs import virial_plot
             logger.info(f"Model {self.name} success, RMSE is {self.rmse:.4g}")
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
             virial_plot(

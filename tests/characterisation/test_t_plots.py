@@ -55,13 +55,13 @@ class TestTPlot():
             results[-1].get('adsorbed_volume'),
             sample['t_pore_volume'],
             err_relative,
-            err_absolute_area,
+            err_absolute_volume,
         )
         assert isclose(
             results[0].get('area'),
             sample['t_area'],
             err_relative,
-            err_absolute_volume,
+            err_absolute_area
         )
 
     def test_t_plot_choice(self, data_char_path):

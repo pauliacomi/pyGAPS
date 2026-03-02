@@ -100,7 +100,7 @@ class TestIAST():
         pgi.iast_point_fraction(load_iast, [0.5, 0.5], 1, verbose=True)
 
 
-@pytest.mark.modelling
+@pytest.mark.prediction
 class TestReverseIAST():
     """Test reverse IAST calculations."""
     def test_reverse_iast_checks(self, load_iast, load_iast_models, caplog):
@@ -162,7 +162,7 @@ class TestReverseIAST():
         pgi.reverse_iast(load_iast, [0.23064, 0.76936], 1, verbose=True)
 
 
-@pytest.mark.modelling
+@pytest.mark.prediction
 class TestIASTVLE():
     """Test IAST VLE function."""
     def test_iast_vle_checks(self, load_iast):
@@ -206,7 +206,7 @@ class TestIASTVLE():
         pgi.iast_binary_vle(load_iast, 1, verbose=True)
 
 
-@pytest.mark.modelling
+@pytest.mark.prediction
 class TestIASTSVP():
     """Test IAST SVP function."""
     def test_iast_svp_checks(self, load_iast):

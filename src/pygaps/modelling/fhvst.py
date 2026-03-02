@@ -109,7 +109,10 @@ class FHVST(IsothermBaseModel):
         if not opt_res.success:
             raise CalculationError(f"Root finding for value {pressure} failed.")
 
+        if opt_res.x.size == 1:
+            return opt_res.x.item()
         return opt_res.x
+
 
     def pressure(self, loading):
         """

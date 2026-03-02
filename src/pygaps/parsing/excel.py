@@ -198,7 +198,7 @@ def isotherm_to_xl(isotherm, path):
     wb.save(path)
 
 
-def isotherm_from_xl(path, *isotherm_parameters):
+def isotherm_from_xl(path, **isotherm_parameters):
     """
     Load an isotherm from a pyGAPS Excel file.
 

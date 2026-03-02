@@ -617,7 +617,7 @@ class Adsorbate():
             )
             return self.saturation_pressure(temp=temp)
         if k < 1:
-            raise ParameterError('The value for the exponent, k, is too small ({k}).')
+            raise ParameterError(f'The value for the exponent, k, is too small ({k}).')
 
         sat_p = self.p_critical() * ((temp / self.t_critical())**k)
 
@@ -933,7 +933,7 @@ class Adsorbate():
                 return (h_vap - h_liq) / 1000
             except BaseException as err:
                 _warn_reading_params(err)
-                return self.enthalpy_liquefaction(temp, calculate=False)
+                return self.enthalpy_liquefaction(temp, press, calculate=False)
 
         try:
             return self.get_prop("enthalpy_liquefaction")

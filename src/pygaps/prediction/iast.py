@@ -7,8 +7,6 @@ from scipy import optimize
 
 from pygaps import logger
 from pygaps.core.modelisotherm import ModelIsotherm
-from pygaps.graphing.iast_graphs import plot_iast_svp
-from pygaps.graphing.iast_graphs import plot_iast_vle
 from pygaps.modelling import is_model_iast
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
@@ -102,6 +100,7 @@ def iast_binary_vle(
 
     # Generate the array of partial pressures
     if verbose:
+        from pygaps.graphing.iast_graphs import plot_iast_vle
         plot_iast_vle(
             x_data,
             y_data,
@@ -171,7 +170,7 @@ def iast_binary_svp(
         raise ParameterError(
             "The selectivity calculation can only take two components as parameters."
         )
-    if sum(mole_fractions) != 1:
+    if not numpy.isclose(sum(mole_fractions), 1.0):
         raise ParameterError("Mole fractions do not add up to unity")
     if any(iso.pressure_mode.startswith("relative") for iso in isotherms):
         raise ParameterError("IAST only runs with isotherms on an absolute pressure basis.")
@@ -197,6 +196,7 @@ def iast_binary_svp(
                      for x in component_loadings]
 
     if verbose:
+        from pygaps.graphing.iast_graphs import plot_iast_svp
         plot_iast_svp(
             pressures,
             selectivities,

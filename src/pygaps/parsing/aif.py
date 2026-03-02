@@ -322,10 +322,17 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
 
             # data is often as strings
             # need to use to_numeric to convert what is appropriate
+            def try_numeric(s):
+                try:
+                    converted = pandas.to_numeric(s, errors='raise')
+                    return converted
+                except ValueError:
+                    return s
+
             data_df = pandas.DataFrame(
                 loop_data,
                 columns=columns,
-            ).apply(pandas.to_numeric, errors='ignore')
+            ).apply(try_numeric)
             data_df['branch'] = branch
             raw_dict[f"data{branch:d}"] = data_df
 
@@ -336,7 +343,7 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
         if unit_name not in raw_dict:
             parse_units = True
             break
-    if isotherm_parameters and isotherm_parameters.pop("_parse_units"):
+    if isotherm_parameters and isotherm_parameters.pop("_parse_units", False):
         parse_units = True
 
     if parse_units:

@@ -10,10 +10,8 @@ from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
 
-class IsothermBaseModel():
+class IsothermBaseModel(abc.ABC):
     """Base class for all isotherm models."""
-
-    __metaclass__ = abc.ABCMeta
 
     #
     # Class specific
@@ -155,7 +153,6 @@ class IsothermBaseModel():
         """
         raise NotImplementedError("""This model does not implement spreading pressure.""")
 
-    @abc.abstractmethod
     def toth_correction(self, pressure: float) -> float:
         r"""
         Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption

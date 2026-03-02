@@ -142,8 +142,8 @@ class BaseIsotherm():
                 properties[uparam] = udefault
 
         # TODO deprecation
-        if self._unit_params['loading_basis'] == 'volume':
-            self._unit_params['loading_basis'] = 'volume_gas'
+        if properties.get('loading_basis') == 'volume':
+            properties['loading_basis'] = 'volume_gas'
             logger.warning(
                 "Loading basis as 'volume' is unclear and deprecated. "
                 "Assumed as 'volume_gas'."
@@ -198,7 +198,7 @@ class BaseIsotherm():
         ] and self.material_unit not in _MATERIAL_MODE[self.material_basis]:
             raise ParameterError(
                 f"Unit selected for material ({self.material_unit}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE[self.loading_basis].keys()}"
+                f"See viable values: {_MATERIAL_MODE[self.material_basis].keys()}"
             )
 
         if self.temperature_unit not in _TEMPERATURE_UNITS:
@@ -231,6 +231,9 @@ class BaseIsotherm():
             name = value.pop('name', None)
             try:
                 self._material = Material.find(name)
+                logger.info(
+                    f"Material '{name}' found in internal list. "
+                    "Updating its properties with the provided dictionary.")
                 self._material.properties.update(**value)
             except ParameterError:
                 self._material = Material(name, **value)
@@ -273,6 +276,9 @@ class BaseIsotherm():
         """Return a dictionary of all isotherm units"""
         return {unit: getattr(self, unit) for unit in self._unit_params}
 
+    def __hash__(self):
+        return hash(self.iso_id)
+
     def __eq__(self, other_isotherm) -> bool:
         """
         Overload the equality operator of the isotherm.
@@ -281,6 +287,8 @@ class BaseIsotherm():
         data inside the isotherm, all we need to ensure equality
         is to compare the two hashes of the isotherms.
         """
+        if not isinstance(other_isotherm, BaseIsotherm):
+            return self.iso_id == other_isotherm
         return self.iso_id == other_isotherm.iso_id
 
     def __repr__(self) -> str:

@@ -311,6 +311,26 @@ class PointIsotherm(BaseIsotherm):
         )
 
     ##########################################################
+    #   Overloaded basic functions
+
+    def __copy__(self):
+        """Return a shallow copy of the isotherm with independent data."""
+        cls = self.__class__
+        new = cls.__new__(cls)
+
+        # Copy all attributes from self
+        new.__dict__.update(self.__dict__)
+
+        # Deep copy the DataFrame to avoid shared mutation
+        new.data_raw = self.data_raw.copy()
+
+        # Reset interpolators (they are lazy, will be rebuilt on demand)
+        new.l_interpolator = None
+        new.p_interpolator = None
+
+        return new
+
+    ##########################################################
     #   Conversion functions
 
     def convert(
@@ -1252,7 +1272,7 @@ class PointIsotherm(BaseIsotherm):
         )
 
         # Check if we need to extrapolate beyond available data
-        if (self.l_interpolator is not None and self.l_interpolator.interp_fill is None) & \
+        if (self.l_interpolator is not None and self.l_interpolator.interp_fill is None) and \
                 (pressure > pressures.max() or pressure < pressures.min()):
             raise CalculationError(
                 textwrap.dedent(

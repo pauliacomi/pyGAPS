@@ -69,25 +69,6 @@ class SimpleWarning():
 
     def __exit__(self, typ, value, traceback):
         warnings.formatwarning = self.old_formatter
-        return True
+        return False
 
 
-def _load_lazy(fullname):
-    """
-    This lazy load was used for non-critical modules to speed import time.
-    Examples: matplotlib, scipy.optimize.
-
-    However it tends to destroy the import system. Do not use.
-    """
-    try:
-        return sys.modules[fullname]
-    except KeyError as err:
-        spec = importlib.util.find_spec(fullname)
-        if not spec:
-            raise ModuleNotFoundError(f"Could not import {fullname}.") from err
-        loader = importlib.util.LazyLoader(spec.loader)
-        module = importlib.util.module_from_spec(spec)
-        # Make module with proper locking and get it inserted into sys.modules.
-        loader.exec_module(module)
-        sys.modules[fullname] = module
-        return module

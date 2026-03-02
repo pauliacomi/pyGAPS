@@ -146,7 +146,7 @@ class Material():
 
     @density.setter
     def density(self, val: float):
-        if val:
+        if val is not None:
             self.properties["density"] = float(val)
 
     @property
@@ -156,7 +156,7 @@ class Material():
 
     @molar_mass.setter
     def molar_mass(self, val: float):
-        if val:
+        if val is not None:
             self.properties["molar_mass"] = float(val)
 
     def get_prop(self, prop: str):

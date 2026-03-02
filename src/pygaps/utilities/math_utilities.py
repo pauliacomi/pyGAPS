@@ -181,5 +181,5 @@ def same_orders_of_maximum(vals):
     """
     orders = [numpy.log10(max(v)) for v in vals]
     if abs(orders[0] - orders[1]) > 1:
-        return True
-    return False
+        return False
+    return True
