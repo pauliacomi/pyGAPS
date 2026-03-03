@@ -114,12 +114,15 @@ class Toth(IsothermBaseModel):
         potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
+
             \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
             \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
 
         For the T\'oth model;
-            .. math::
-                \Psi = (KP)^t
+
+        .. math::
+
+            \Psi = (KP)^t
 
         Note that this can be expressed in terms of the fractional coverage
         $\theta = \frac{n}{n_m}$

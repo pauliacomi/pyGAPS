@@ -1089,14 +1089,17 @@ class ModelIsotherm(BaseIsotherm):
     ):
         """
         Calculate the Toth correction factor at a given pressure.
-        Parameters:
-        -----------
+
+        Parameters
+        ----------
         pressure : float
             The pressure at which to calculate the Toth correction factor.
-        Returns:
-        --------
+
+        Returns
+        -------
         float
             The Toth correction factor at the given pressure.
+
         """
 
         return self.model.toth_correction(pressure)

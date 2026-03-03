@@ -300,9 +300,9 @@ class BaseIsotherm():
         string = ""
 
         # Required
-        string += f"Material: { str(self.material) }\n"
-        string += f"Adsorbate: { str(self.adsorbate) }\n"
-        string += f"Temperature: { str(self.temperature) }K\n"
+        string += f"Material: {str(self.material)}\n"
+        string += f"Adsorbate: {str(self.adsorbate)}\n"
+        string += f"Temperature: {str(self.temperature)}K\n"
 
         # Units/basis
         string += "Units: \n"

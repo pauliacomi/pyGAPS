@@ -172,7 +172,7 @@ class Adsorbate():
     def print_info(self):
         """Print a short summary of all the adsorbate parameters."""
         string = f"pyGAPS Adsorbate: '{self.name}'\n"
-        string += f"Aliases: { *self.alias,}\n"
+        string += f"Aliases: {*self.alias, }\n"
 
         if self.properties:
             string += "Other properties: \n"

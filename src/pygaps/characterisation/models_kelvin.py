@@ -172,7 +172,7 @@ def kelvin_radius_kjs(
 
     The KJS correction to the kelvin equation equation is modified with a constant
     term of 0.3 nm. The authors arrived at this constant by using the adsorption
-    branch of the isotherm on several MCM-41 materials calibrated with XRD data.
+    branch of the isotherm on several MCM-41 materials calibrated with XRD data. [#]_
 
     .. math::
         \ln\Big(\frac{p}{p_0}\Big) = -\frac{2 \cos\theta M_m \gamma}{r_K\rho_l RT} + 0.3

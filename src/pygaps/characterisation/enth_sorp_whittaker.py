@@ -367,7 +367,9 @@ def toth_adsorption_potential(
     r"""
     Calculates the T\'oth-corrected Polanyi adsorption potential,
     $\varepsilon_{ads}$
+
     ..math::
+
         \Psi = RT \ln{\Psi \frac{P_{sat}}{P}}
 
     Parameters

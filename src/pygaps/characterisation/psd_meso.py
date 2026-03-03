@@ -492,7 +492,7 @@ def psd_bjh(
     the entire pore. The two variables, layer thickness and critical pore width
     where condensation takes place can be respectively modelled by a thickness
     model (such as Halsey, Harkins & Jura, etc.) and a model for
-    condensation/evaporation based on a form of the Kelvin equation.
+    condensation/evaporation based on a form of the Kelvin equation. [#]_
 
     .. math::
 

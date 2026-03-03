@@ -1,7 +1,5 @@
 """Collections of various python utilities."""
 
-import importlib
-import sys
 import warnings
 from collections import abc
 
@@ -70,5 +68,4 @@ class SimpleWarning():
     def __exit__(self, typ, value, traceback):
         warnings.formatwarning = self.old_formatter
         return False
-
 

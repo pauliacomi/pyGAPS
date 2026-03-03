@@ -131,11 +131,14 @@ class Freundlich(IsothermBaseModel):
         potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
+
             \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
             \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
 
         For the Henry model,
+
         ..math::
+
             \Psi = 0
 
         As a result $\varepsilon_{ads}$ is undefined.

@@ -379,7 +379,7 @@ New features:
 
 * Added an excel import which can take Micromeritics or
   Belsorp report (.xls) files. Micromeritics code was
-  taken from the `official python repo <https://github.com/Micromeritics/micromeritics>`_.
+  taken from the official, now defunct python repo (github.com/Micromeritics/micromeritics).
 * Added an import option which can read and import Belsorp
   data (.DAT) files.
 * Improved plotting functions to allow for more customisation
