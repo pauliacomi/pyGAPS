@@ -31,19 +31,19 @@ hard_dependencies = ("numpy", "pandas", "scipy")
 soft_dependencies = {"CoolProp": "Used for many thermodynamic backend calculations."}
 missing_dependencies = []
 
-import importlib.util
+import importlib.util as importlib_util
 for dependency in hard_dependencies:
-    if not importlib.util.find_spec(dependency):
+    if not importlib_util.find_spec(dependency):
         missing_dependencies.append(dependency)
 
 if missing_dependencies:
     raise ImportError(f"Missing required dependencies {missing_dependencies}")
 
 for dependency, reason in soft_dependencies.items():
-    if not importlib.util.find_spec(dependency):
+    if not importlib_util.find_spec(dependency):
         logger.warning(f"Missing important package {dependency}. {reason}")
 
-del importlib.util
+del importlib_util
 del dependency, hard_dependencies, soft_dependencies, missing_dependencies
 
 # Data
