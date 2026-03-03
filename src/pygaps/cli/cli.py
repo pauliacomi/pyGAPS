@@ -73,7 +73,7 @@ def main():
         help='increase verbosity',
     )
     prs.add_argument(
-        '--version',
+        '-V', '--version',
         action="store_true",
         help="Print current version.",
     )
@@ -87,6 +87,10 @@ def main():
         return
 
     # Read the isotherm
+    if not args.iso:
+        prs.print_help()
+        return
+
     if not args.iso.exists():
         raise FileNotFoundError("Path does not exist.")
 
