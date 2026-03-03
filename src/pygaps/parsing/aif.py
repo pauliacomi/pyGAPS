@@ -243,7 +243,14 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
        acs.langmuir.1c00122. https://doi.org/10.1021/acs.langmuir.1c00122.
 
     """
-    if pathlib.Path(str_or_path).exists():
+    isfile = False
+    try:
+        if pathlib.Path(str_or_path).exists():
+            isfile = True
+    except OSError as e:
+        pass
+
+    if isfile:
         aif = cif.read_file(str(str_or_path))
     else:
         try:
