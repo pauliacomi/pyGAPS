@@ -68,4 +68,3 @@ class SimpleWarning():
     def __exit__(self, typ, value, traceback):
         warnings.formatwarning = self.old_formatter
         return False
-

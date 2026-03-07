@@ -13,7 +13,6 @@ COOLPROP_BACKEND = 'HEOS'
 
 
 def thermodynamic_backend():
-    global COOLPROP_BACKEND
     return COOLPROP_BACKEND
 
 

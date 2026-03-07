@@ -247,7 +247,7 @@ def isotherm_from_aif(str_or_path: str, **isotherm_parameters: dict):
     try:
         if pathlib.Path(str_or_path).exists():
             isfile = True
-    except OSError as e:
+    except OSError:
         pass
 
     if isfile:

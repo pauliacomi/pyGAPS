@@ -108,7 +108,6 @@ class WVST(IsothermBaseModel):
             return opt_res.x.item()
         return opt_res.x
 
-
     def pressure(self, loading):
         """
         Calculate pressure at specified loading.
