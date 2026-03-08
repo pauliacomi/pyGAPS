@@ -95,13 +95,13 @@ class ModelIsotherm(BaseIsotherm):
 
     def __init__(
         self,
-        pressure: t.List[float] = None,
-        loading: t.List[float] = None,
+        pressure: list[float] = None,
+        loading: list[float] = None,
         isotherm_data: pandas.DataFrame = None,
         pressure_key: str = None,
         loading_key: str = None,
         branch: str = 'ads',
-        model: t.Union[str, t.List[str], t.Any] = None,
+        model: t.Union[str, list[str], t.Any] = None,
         param_guess: dict = None,
         param_bounds: dict = None,
         optimization_params: dict = None,
@@ -226,13 +226,13 @@ class ModelIsotherm(BaseIsotherm):
     def from_isotherm(
         cls,
         isotherm: BaseIsotherm,
-        pressure: t.List[float] = None,
-        loading: t.List[float] = None,
+        pressure: list[float] = None,
+        loading: list[float] = None,
         isotherm_data: pandas.DataFrame = None,
         pressure_key: str = None,
         loading_key: str = None,
         branch: str = 'ads',
-        model: t.Union[str, t.List[str], t.Any] = None,
+        model: t.Union[str, list[str], t.Any] = None,
         param_guess: dict = None,
         param_bounds: dict = None,
         optimization_params: dict = None,
@@ -298,7 +298,7 @@ class ModelIsotherm(BaseIsotherm):
         cls,
         isotherm,
         branch: str = 'ads',
-        model: t.Union[str, t.List[str], t.Any] = None,
+        model: t.Union[str, list[str], t.Any] = None,
         param_guess: dict = None,
         param_bounds: dict = None,
         optimization_params: dict = None,
@@ -361,8 +361,8 @@ class ModelIsotherm(BaseIsotherm):
     @classmethod
     def guess(
         cls,
-        pressure: t.List[float] = None,
-        loading: t.List[float] = None,
+        pressure: list[float] = None,
+        loading: list[float] = None,
         isotherm_data: pandas.DataFrame = None,
         pressure_key: str = None,
         loading_key: str = None,
@@ -559,7 +559,7 @@ class ModelIsotherm(BaseIsotherm):
         branch: str = None,
         pressure_unit: str = None,
         pressure_mode: str = None,
-        limits: t.Tuple[float, float] = None,
+        limits: tuple[float, float] = None,
         indexed: bool = False
     ):
         """
@@ -647,7 +647,7 @@ class ModelIsotherm(BaseIsotherm):
         loading_basis: str = None,
         material_unit: str = None,
         material_basis: str = None,
-        limits: t.Tuple[float, float] = None,
+        limits: tuple[float, float] = None,
         indexed: bool = False
     ):
         """
@@ -766,7 +766,7 @@ class ModelIsotherm(BaseIsotherm):
 
     def pressure_at(
         self,
-        loading: t.Union[float, t.List[float]],
+        loading: t.Union[float, list[float]],
         branch: str = None,
         pressure_unit: str = None,
         pressure_mode: str = None,
@@ -888,7 +888,7 @@ class ModelIsotherm(BaseIsotherm):
 
     def loading_at(
         self,
-        pressure: t.Union[float, t.List[float]],
+        pressure: t.Union[float, list[float]],
         branch: str = None,
         pressure_unit: str = None,
         pressure_mode: str = None,
@@ -1012,7 +1012,7 @@ class ModelIsotherm(BaseIsotherm):
 
     def spreading_pressure_at(
         self,
-        pressure: t.Union[float, t.List[float]],
+        pressure: t.Union[float, list[float]],
         branch: str = None,
         pressure_unit: str = None,
         pressure_mode: str = None,
@@ -1085,7 +1085,7 @@ class ModelIsotherm(BaseIsotherm):
 
     def toth_correction_at(
         self,
-        pressure: t.Union[float, t.List[float]],
+        pressure: t.Union[float, list[float]],
     ):
         """
         Calculate the Toth correction factor at a given pressure.

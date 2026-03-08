@@ -18,7 +18,7 @@ managing environments a breeze. To create a new environment with pyGAPS:
 
 .. code-block:: bash
 
-    conda create -n myenv python=3.8
+    conda create -n myenv python=3.14
     conda activate myenv
     conda install pygaps
 

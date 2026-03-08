@@ -5,7 +5,7 @@ dynamic = ["version"]
 description = "Framework for processing gas adsorption isotherms"
 readme = "README.rst"
 keywords = ["adsorption", "isotherm", "characterization", "processing", "material"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {file = "LICENSE"}
 authors = [
     {name = "Paul Iacomi", email = "mail@pauliacomi.com"}
@@ -15,12 +15,12 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: Physics",
 ]
@@ -37,7 +37,6 @@ dependencies = [
     "openpyxl",
     "gemmi",
     "requests",
-    "importlib_resources; python_version < '3.9'",
 ]
 
 [project.optional-dependencies]

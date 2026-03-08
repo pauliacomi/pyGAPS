@@ -252,7 +252,7 @@ def model_from_dict(model_dict: dict):
 def model_iso(
     isotherm,
     branch: str = 'ads',
-    model: t.Union[str, t.List[str], t.Any] = None,
+    model: t.Union[str, list[str], t.Any] = None,
     param_guess: dict = None,
     param_bounds: dict = None,
     optimization_params: dict = None,

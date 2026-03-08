@@ -104,12 +104,12 @@ class PointIsotherm(BaseIsotherm):
 
     def __init__(
         self,
-        pressure: t.List[float] = None,
-        loading: t.List[float] = None,
+        pressure: list[float] = None,
+        loading: list[float] = None,
         isotherm_data: pandas.DataFrame = None,
         pressure_key: str = None,
         loading_key: str = None,
-        branch: t.Union[str, t.List[bool]] = 'guess',
+        branch: str | list[bool] = 'guess',
         **other_properties
     ):
         """
@@ -205,8 +205,8 @@ class PointIsotherm(BaseIsotherm):
     def from_isotherm(
         cls,
         isotherm: BaseIsotherm,
-        pressure: t.List[float] = None,
-        loading: t.List[float] = None,
+        pressure: list[float] = None,
+        loading: list[float] = None,
         isotherm_data: pandas.DataFrame = None,
         pressure_key: str = None,
         loading_key: str = None,
@@ -247,8 +247,8 @@ class PointIsotherm(BaseIsotherm):
     def from_modelisotherm(
         cls,
         modelisotherm,
-        pressure_points: t.List[float] = None,
-        loading_points: t.List[float] = None,
+        pressure_points: list[float] = None,
+        loading_points: list[float] = None,
     ):
         """
         Construct a PointIsotherm from a ModelIsothem class.
@@ -695,7 +695,7 @@ class PointIsotherm(BaseIsotherm):
         branch: str = None,
         pressure_unit: str = None,
         pressure_mode: str = None,
-        limits: t.Tuple[float, float] = None,
+        limits: tuple[float, float] = None,
         indexed: bool = False,
     ) -> t.Union[numpy.ndarray, pandas.Series]:
         """
@@ -772,7 +772,7 @@ class PointIsotherm(BaseIsotherm):
         loading_basis: str = None,
         material_unit: str = None,
         material_basis: str = None,
-        limits: t.Tuple[float, float] = None,
+        limits: tuple[float, float] = None,
         indexed: bool = False
     ) -> t.Union[numpy.ndarray, pandas.Series]:
         """
@@ -876,7 +876,7 @@ class PointIsotherm(BaseIsotherm):
         self,
         key: str,
         branch: str = None,
-        limits: t.Tuple[float, float] = None,
+        limits: tuple[float, float] = None,
         indexed: bool = False,
     ) -> t.Union[numpy.ndarray, pandas.Series]:
         """
@@ -941,10 +941,10 @@ class PointIsotherm(BaseIsotherm):
 
     def pressure_at(
         self,
-        loading: t.List[float],
+        loading: list[float],
         branch: str = 'ads',
         interpolation_type: str = 'linear',
-        interp_fill: t.Union[float, t.Tuple[float, float], str] = None,
+        interp_fill: t.Union[float, tuple[float, float], str] = None,
         pressure_unit: str = None,
         pressure_mode: str = None,
         loading_unit: str = None,
@@ -1072,10 +1072,10 @@ class PointIsotherm(BaseIsotherm):
 
     def loading_at(
         self,
-        pressure: t.List[float],
+        pressure: list[float],
         branch: str = 'ads',
         interpolation_type: str = 'linear',
-        interp_fill: t.Union[float, t.Tuple[float, float], str] = None,
+        interp_fill: t.Union[float, tuple[float, float], str] = None,
         pressure_unit: str = None,
         pressure_mode: str = None,
         loading_unit: str = None,
@@ -1200,7 +1200,7 @@ class PointIsotherm(BaseIsotherm):
 
     def spreading_pressure_at(
         self,
-        pressure: t.List[float],
+        pressure: list[float],
         branch: str = 'ads',
         pressure_unit: str = None,
         pressure_mode: str = None,
@@ -1208,7 +1208,7 @@ class PointIsotherm(BaseIsotherm):
         loading_basis: str = None,
         material_unit: str = None,
         material_basis: str = None,
-        interp_fill: t.Union[float, t.Tuple[float, float], str] = None,
+        interp_fill: t.Union[float, tuple[float, float], str] = None,
     ) -> numpy.ndarray:
         r"""
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.

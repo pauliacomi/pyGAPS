@@ -2,13 +2,22 @@
 Changelog
 =========
 
+4.7.0 (2025-03-04)
+------------------
+
+* ⚠️🐍 Minimum python is now 3.9, maximum increased to 3.14.
+* Fixed various accumulating issues and bugs and deprecations.
+
 4.6.0 (2025-03-04)
+------------------
+
 * ⚠️🐍 Minimum python is now 3.8, maximum increased to 3.13.
 * Fixed various accumulating issues and bugs and deprecations.
 * Fully transitioned to 'pyproject.toml' build specifier.
 
 
 4.5.0 (2023-06-20)
+------------------
 
 * Added a new function that calculates the enthalpy of adsorption using a method
   proposed by Whittaker et al in `pygaps.characterisation.enth_sorp_whittaker`.

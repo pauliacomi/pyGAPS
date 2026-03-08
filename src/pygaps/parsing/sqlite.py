@@ -94,7 +94,7 @@ def _upload_one_all_columns(
     try:
         cursor.execute(sql_com, insert_dict)
     except sqlite3.Error as err:
-        raise type(err)(f"Error inserting dict {insert_dict}. Original error:\n {err}")
+        raise ParsingError(f"Error inserting dict {insert_dict}. Original error:\n {err}") from err
 
     if verbose:
         # Print success
@@ -113,7 +113,7 @@ def _get_all_no_id(
     try:
         cursor.execute("""SELECT * FROM """ + table_name)
     except sqlite3.Error as err:
-        raise type(err)(f"Error getting data from {table_name}. Original error:\n {err}")
+        raise ParsingError(f"Error getting data from {table_name}. Original error:\n {err}") from err
 
     values = []
     for row in cursor:
@@ -150,7 +150,7 @@ def _delete_by_id(
     try:
         cursor.execute(build_delete(table=table_name, where=[table_id]), {table_id: element_id})
     except sqlite3.Error as err:
-        raise type(err)(f"Error deleting {element_id} from {table_name}. Original error:\n {err}")
+        raise ParsingError(f"Error deleting {element_id} from {table_name}. Original error:\n {err}") from err
 
     if verbose:
         # Print success
@@ -257,10 +257,10 @@ def adsorbate_to_db(
                 try:
                     cursor.execute(sql_insert, {'ads_id': ads_id, 'type': prop, 'value': vl})
                 except sqlite3.InterfaceError as err:
-                    raise type(err)(
-                        f"Cannot process property {prop}: {vl}"
+                    raise ParsingError(
+                        f"Cannot process property {prop}: {vl}. "
                         f"Original error:\n{err}"
-                    )
+                    ) from err
 
     # Add to existing list
     if overwrite:
@@ -377,9 +377,9 @@ def adsorbate_delete_db(
         # Delete original name in adsorbates table
         cursor.execute(build_delete(table='adsorbates', where=['id']), {'id': ads_id})
     except sqlite3.Error as err:
-        raise type(err)(
+        raise ParsingError(
             "Could not delete adsorbate, are there still isotherms referencing it?"
-        ) from None
+        ) from err
 
     # Remove from existing list
     if adsorbate in ADSORBATE_LIST:
@@ -594,10 +594,10 @@ def material_to_db(
                 try:
                     cursor.execute(sql_insert, {'mat_id': mat_id, 'type': prop, 'value': vl})
                 except sqlite3.InterfaceError as err:
-                    raise type(err)(
-                        f"Cannot process property {prop}: {vl}"
+                    raise ParsingError(
+                        f"Cannot process property {prop}: {vl}. "
                         f"Original error:\n{err}"
-                    ) from None
+                    ) from err
 
     # Add to existing list
     if overwrite:
@@ -705,9 +705,9 @@ def material_delete_db(
         # Delete material info in materials table
         cursor.execute(build_delete(table='materials', where=['id']), {'id': mat_id})
     except sqlite3.Error as err:
-        raise type(err)(
+        raise ParsingError(
             "Could not delete material, are there still isotherms referencing it?"
-        ) from None
+        ) from err
 
     # Remove from existing list
     if material in MATERIAL_LIST:
@@ -897,11 +897,11 @@ def isotherm_to_db(
     try:
         cursor.execute(build_insert(table='isotherms', to_insert=db_columns), upload_dict)
     except sqlite3.Error as err:
-        raise type(err)(
+        raise ParsingError(
             f"""Error inserting isotherm "{upload_dict["id"]}" base properties. """
             f"""Ensure material "{upload_dict["material"]}", and adsorbate "{upload_dict["adsorbate"]}" """
             f"""exist in the database. Original error:\n {err}"""
-        ) from None
+        ) from err
 
     # TODO insert multiple
     # Upload the other isotherm parameters
