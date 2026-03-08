@@ -94,7 +94,7 @@ def enthalpy_sorption_clapeyron(
 
     See Also
     --------
-    pygaps.characterisation.enthalpy_sorption_clausclap.isosteric_enthalpy_raw : low level method
+    pygaps.characterisation.enthalpy_sorption_clapeyron.isosteric_enthalpy_raw : low level method
 
     """
     # Check more than one isotherm
