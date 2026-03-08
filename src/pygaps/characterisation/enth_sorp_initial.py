@@ -308,7 +308,7 @@ def initial_enthalpy_comp(
     for i, guess in enumerate(guesses):
         if verbose:
             logger.info('\n')
-            logger.info(f"Minimizing routine number {i +1}")
+            logger.info(f"Minimizing routine number {i + 1}")
             logger.info(f"Initial guess: \n\tconst = {guess[0]}")
             logger.info(f"\tpreexp = {guess[1]}, exp = {guess[2]}, exploc = {guess[3]}")
             logger.info(f"\tprepowa = {guess[4]}, powa = {guess[5]}")

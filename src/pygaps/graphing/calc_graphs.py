@@ -330,7 +330,7 @@ def tp_plot(
                 x_lim,
                 y_lim,
                 color=f"C{index}",
-                label=f'linear {index+1}',
+                label=f'linear {index + 1}',
             )
 
     ax.set_title(label_title)
