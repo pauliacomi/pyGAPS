@@ -126,8 +126,10 @@ class Toth(IsothermBaseModel):
 
         Note that this can be expressed in terms of the fractional coverage
         $\theta = \frac{n}{n_m}$
-            .. math::
-                \Psi = \frac{\theta^t}{1-\theta^t}
+
+        .. math::
+
+            \Psi = \frac{\theta^t}{1-\theta^t}
 
         However here we calculate from pressure, $P$.
 

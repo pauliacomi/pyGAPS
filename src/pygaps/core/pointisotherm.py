@@ -109,7 +109,7 @@ class PointIsotherm(BaseIsotherm):
         isotherm_data: pandas.DataFrame = None,
         pressure_key: str = None,
         loading_key: str = None,
-        branch: str | list[bool] = 'guess',
+        branch: t.Union[str, list[bool]] = 'guess',
         **other_properties
     ):
         """

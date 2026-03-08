@@ -105,7 +105,6 @@ class TSLangmuir(IsothermBaseModel):
             return opt_res.x.item()
         return opt_res.x
 
-
     def spreading_pressure(self, pressure):
         r"""
         Calculate spreading pressure at specified gas pressure.
