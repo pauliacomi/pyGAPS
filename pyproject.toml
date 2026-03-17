@@ -39,10 +39,28 @@ dependencies = [
     "requests",
 ]
 
-[project.optional-dependencies]
-all = ["pygaps[dev,docs,test]"]
+[dependency-groups]
+test = [
+    "pytest>=6.0.0",
+    "pytest-cov",
+    "coverage[toml]",
+    "nose",
+]
+docs = [
+    "pygments>=2.11",
+    "docutils>=0.11",
+    "doc8",
+    "pandoc",
+    "restructuredtext-lint",
+    "ipykernel",
+    "sphinx>=4.0",
+    "sphinx-copybutton",
+    "nbsphinx",
+    "furo",
+]
 dev = [
-    "pygaps[test,docs]",
+    {include-group = "test"},
+    {include-group = "docs"},
     "codecov",
     "yapf",
     "isort",
@@ -51,26 +69,6 @@ dev = [
     "flake8-pyproject",
     "autopep8",
     "pydocstyle",
-    "pygments",
-    "docutils",
-]
-docs = [
-    "pygments >= 2.11",
-    "docutils >= 0.11",
-    "doc8",
-    "pandoc",
-    "restructuredtext-lint",
-    "ipykernel",
-    "sphinx >= 4.0",
-    "sphinx-copybutton",
-    "nbsphinx",
-    "furo",
-]
-test = [
-    "pytest>=6.0.0",
-    "pytest-cov",
-    "coverage[toml]",
-    "nose",
 ]
 
 # Entry points for CLI

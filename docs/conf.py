@@ -76,12 +76,8 @@ project = 'pyGAPS'
 year = '2022'
 author = 'Paul Iacomi'
 copyright = f'{year}, {author}'
-try:
-    from importlib.metadata import version as imp_version
-    version = release = imp_version("pygaps")
-except ModuleNotFoundError:
-    from pkg_resources import get_distribution as imp_version
-    version = release = imp_version("pygaps").version
+from importlib.metadata import version as imp_version
+version = release = imp_version("pygaps")
 
 print(project, " version defined as ", version)
 

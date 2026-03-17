@@ -51,28 +51,36 @@ To set up `pyGAPS` for local development:
 
     git clone https://github.com/YOURNAMEHERE/pyGAPS
 
-3. Install the package in editable mode with its dev requirements::
+3. Install `uv <https://docs.astral.sh/uv/>`_ if you haven't already::
 
-    pip install -e .[dev,docs]
+    pip install uv
 
-4. Create a branch for local development. This project uses the
+   You can also use uv to manage your Python installation::
+
+    uv python install 3.12
+
+4. Install the package and all development dependencies::
+
+    uv sync --all-groups
+
+5. Create a branch for local development. This project uses the
    `GIT FLOW <https://www.gitkraken.com/learn/git/git-flow>`_ model::
 
     git checkout -b name-of-your-bugfix-or-feature
 
    Now you can make your changes locally.
 
-5. When you're done making changes, run all the tests::
+6. When you're done making changes, run all the tests::
 
-    pytest
+    uv run pytest
 
-6. Commit your changes and push your branch to GitHub::
+7. Commit your changes and push your branch to GitHub::
 
     git add .
     git commit -m "Your detailed description of your changes."
     git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website. Testing on all environments
+8. Submit a pull request through the GitHub website. Testing on all environments
    will be automatically performed.
 
 Pull Request Guidelines
@@ -83,7 +91,7 @@ make the pull request.
 
 For merging, you should:
 
-1. Include passing tests (run ``pytest``) [1]_.
+1. Include passing tests (run ``uv run pytest``) [1]_.
 2. Update documentation when there's new API, functionality etc.
 3. Add a note to ``CHANGELOG.rst`` about the changes.
 4. Add yourself to ``AUTHORS.rst``.
