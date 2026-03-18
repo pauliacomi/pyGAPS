@@ -1,5 +1,8 @@
 """Tests IAST graphs."""
 
+import matplotlib
+matplotlib.use('Agg')
+
 import pytest
 
 import pygaps.graphing.iast_graphs as graphing

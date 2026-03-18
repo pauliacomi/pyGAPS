@@ -1,6 +1,7 @@
-"""
-Tests for the isotherm graphs
-"""
+"""Tests for the isotherm graphs"""
+
+import matplotlib
+matplotlib.use('Agg')
 
 import pytest
 

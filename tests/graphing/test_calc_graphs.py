@@ -1,6 +1,7 @@
-"""
-Tests calculation graphs such as PSD/t_plot/BET etc
-"""
+"""Tests calculation graphs such as PSD/t_plot/BET etc."""
+
+import matplotlib
+matplotlib.use('Agg')
 
 import pytest
 
