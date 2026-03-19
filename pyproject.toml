@@ -44,7 +44,6 @@ test = [
     "pytest>=6.0.0",
     "pytest-cov",
     "coverage[toml]",
-    "nose",
 ]
 docs = [
     "pygments>=2.11",
@@ -105,7 +104,7 @@ pygaps = ["*.txt", "*.rst"]
 
 # versioning: setuptools_scm
 [tool.setuptools_scm]
-write_to = "src/pygaps/_version.py"
+version_file = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
 fallback_version = '4.3.0'
 
@@ -140,7 +139,7 @@ docstring_style = "numpy"
 # linting: pydocstyle
 [tool.pydocstyle]
 convention = "numpy"
-match-dir = "src\\/.*"
+match-dir = "src/.*"
 
 
 # analysis: pyright
@@ -187,7 +186,7 @@ addopts = [
     "-ra",
     "--cov",
     "--cov-report=xml",
-    "--doctest-glob=\\*.rst",
+    "--doctest-glob=*.rst",
     "--tb=short",
 ]
 markers = [
@@ -197,7 +196,7 @@ markers = [
     "modelling: model generation from isotherms.",
     "graphing: plotting functionality testing.",
     "parsing: parsing functionality testing.",
-    "okay: custom emtpy marker.",
+    "okay: custom empty marker.",
 ]
 filterwarnings = [
     "ignore::UserWarning",
