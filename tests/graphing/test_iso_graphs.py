@@ -1,5 +1,6 @@
 """Tests for the isotherm graphs"""
 
+# isort: skip_file
 import matplotlib
 matplotlib.use('Agg')
 

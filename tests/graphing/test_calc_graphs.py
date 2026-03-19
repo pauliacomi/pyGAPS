@@ -1,5 +1,6 @@
 """Tests calculation graphs such as PSD/t_plot/BET etc."""
 
+# isort: skip_file
 import matplotlib
 matplotlib.use('Agg')
 

@@ -1,5 +1,6 @@
 """Tests IAST graphs."""
 
+# isort: skip_file
 import matplotlib
 matplotlib.use('Agg')
 
