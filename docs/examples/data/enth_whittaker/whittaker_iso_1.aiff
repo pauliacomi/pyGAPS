@@ -4,9 +4,9 @@ _exptl_date 2021-02-17T08:47:41
 _exptl_instrument 'XEMIS'
 _exptl_adsorptive CH4
 _exptl_temperature 298
-_exptl_sample_mass 'unknown'
-_sample_id 'example'
-_sample_material_id 'unknown'
+_adsnt_sample_mass 'unknown'
+_adsnt_sample_id 'example'
+_adsnt_material_id 'unknown'
 _units_temperature K
 _units_pressure mbar
 _units_mass g

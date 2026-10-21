@@ -1,0 +1,106 @@
+# Full featured AIF - combines many features into one file
+
+data_full_featured_aif
+
+    _audit_aif_version                      "v1.0"
+
+    _exptl_operator                         "Nina Johansson"
+    _exptl_date                             2025-02-20T09:00:00Z
+    _exptl_temperature                      298.15
+    _exptl_method                           "volumetric"
+    _exptl_instrument                       "ASAP-2020-HD"
+    _exptl_isotherm_type                    "excess"
+
+    _adsnt_material_name                    "UiO-66-NH2"
+    _adsnt_sample_name                      "UiO66NH2-full-01"
+    _adsnt_sample_mass                      0.0567
+    _adsnt_sample_density                   1.67
+    _adsnt_structure_csd_refcode            "RUBTAK"
+    _adsnt_structure_topology               "fcu"
+    _adsnt_composition                      "Zr6O4(OH)4(BDC-NH2)6"
+    _adsnt_molar_mass                       1746.23
+    _adsnt_synthesis                        "solvothermal"
+    _adsnt_degas_summary                    "Degassed at 120C under vacuum for 16 hours"
+    _adsnt_degas_temperature                120.0
+    _adsnt_degas_time                       16.0
+
+    _adsorptive_name                        "Carbon Dioxide"
+    _adsorptive_info                        "CO2"
+    _adsorptive_cas                         "124-38-9"
+    _adsorptive_inchi                       "InChI=1S/CO2/c2-1-3"
+    _adsorptive_smiles                      "O=C=O"
+
+    _analysis_bet_area                      1045.0
+    _analysis_total_pore_volume             0.52
+    _analysis_total_pore_volume_pressure    100000.0
+
+    _citation_doi                          "10.1021/example.doi"
+    _citation_source                       "Journal of the American Chemical Society"
+
+    _units_temperature                      "K"
+    _units_pressure                         "Pa"
+    _units_mass                             "g"
+    _units_molecular_weight                 "g/mol"
+    _units_sorbed_amount                    "mmol/g"
+    _units_density                          "g/cm3"
+    _units_time                             "hours"
+    _units_enthalpy                         "kJ/mol"
+    _units_surface_area                     "m2/g"
+    _units_pore_volume                      "cm3/g"
+
+    loop_
+        _adsorp_index
+        _adsorp_pressure
+        _adsorp_p0
+        _adsorp_amount
+        _adsorp_amount_excess
+        _adsorp_enthalpy_differential
+        1 500.0      6427400.0   0.08   0.08   -35.2
+        2 1000.0     6427400.0   0.16   0.16   -34.8
+        3 2500.0     6427400.0   0.38   0.38   -33.5
+        4 5000.0     6427400.0   0.72   0.72   -31.2
+        5 10000.0    6427400.0   1.28   1.27   -28.9
+        6 25000.0    6427400.0   2.45   2.42   -26.1
+        7 50000.0    6427400.0   3.56   3.48   -24.5
+        8 75000.0    6427400.0   4.23   4.08   -23.2
+        9 100000.0   6427400.0   4.67   4.45   -22.5
+
+    loop_
+        _desorp_index
+        _desorp_pressure
+        _desorp_p0
+        _desorp_amount
+        1 100000.0   6427400.0   4.67
+        2 75000.0    6427400.0   4.24
+        3 50000.0    6427400.0   3.57
+        4 25000.0    6427400.0   2.46
+        5 10000.0    6427400.0   1.29
+        6 5000.0     6427400.0   0.73
+        7 2500.0     6427400.0   0.39
+        8 1000.0     6427400.0   0.17
+        9 500.0      6427400.0   0.09
+
+    loop_
+        _analysis_fit_index
+        _analysis_fit_model
+        _analysis_fit_r_squared
+        _analysis_fit_rmse
+        1  "Langmuir"  0.9987  0.045
+        2  "DSL"       0.9998  0.011
+        3  "Toth"      0.9996  0.015
+
+    loop_
+        _analysis_fit_param_index
+        _analysis_fit_param_name
+        _analysis_fit_param_value
+        _analysis_fit_param_uncertainty
+        _analysis_fit_param_unit
+        1  "q_max"   5.67    0.12    "mmol/g"
+        1  "K"       0.0023  0.0001  "1/Pa"
+        2  "q_max1"  3.12    0.08    "mmol/g"
+        2  "K1"      0.0089  0.0003  "1/Pa"
+        2  "q_max2"  2.68    0.10    "mmol/g"
+        2  "K2"      0.0004  0.00005 "1/Pa"
+        3  "q_max"   5.82    0.09    "mmol/g"
+        3  "K"       0.0021  0.0001  "1/Pa"
+        3  "t"       0.87    0.03    "dimensionless"

@@ -1,0 +1,61 @@
+# Water vapor isotherm on silica gel
+
+data_water_vapor_silica
+
+    _audit_aif_version                "v1.0"
+
+    _exptl_operator                   "David Park"
+    _exptl_date                       2024-04-22T11:15:00Z
+    _exptl_temperature                298.15
+    _exptl_method                     "gravimetric"
+    _exptl_instrument                 "DVS-Resolution"
+    _exptl_isotherm_type              "absolute"
+
+    _adsnt_material_name              "Silica-Gel-Type-A"
+    _adsnt_sample_name                "SGA-001"
+    _adsnt_sample_mass                0.0123
+
+    _adsorptive_name                  "Water"
+    _adsorptive_info                  "H2O"
+    _adsorptive_cas                   "7732-18-5"
+    _adsorptive_molecular_weight      18.015
+    _adsorptive_smiles                "O"
+    _adsorptive_inchi                 "InChI=1S/H2O/h1H2"
+
+    _units_temperature                "K"
+    _units_pressure                   "Pa"
+    _units_mass                       "g"
+    _units_sorbed_amount              "mmol/g"
+    _units_molecular_weight           "g/mol"
+
+    loop_
+        _adsorp_index
+        _adsorp_pressure
+        _adsorp_p0
+        _adsorp_amount
+        1 317.0     3169.0   0.56
+        2 634.0     3169.0   1.23
+        3 950.0     3169.0   2.15
+        4 1268.0    3169.0   3.42
+        5 1585.0    3169.0   5.67
+        6 1902.0    3169.0   8.90
+        7 2218.0    3169.0  12.34
+        8 2535.0    3169.0  15.67
+        9 2852.0    3169.0  17.89
+        10 3010.0    3169.0  18.92
+
+    loop_
+        _desorp_index
+        _desorp_pressure
+        _desorp_p0
+        _desorp_amount
+        1 3010.0    3169.0  18.92
+        2 2852.0    3169.0  18.56
+        3 2535.0    3169.0  17.23
+        4 2218.0    3169.0  14.56
+        5 1902.0    3169.0  10.78
+        6 1585.0    3169.0   7.23
+        7 1268.0    3169.0   4.56
+        8 950.0     3169.0   2.89
+        9 634.0     3169.0   1.67
+        10 317.0     3169.0   0.89

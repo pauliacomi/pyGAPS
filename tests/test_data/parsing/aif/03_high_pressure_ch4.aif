@@ -1,0 +1,46 @@
+# High pressure methane adsorption with excess and absolute amounts
+
+data_high_pressure_ch4
+
+    _audit_aif_version                "v1.0"
+
+    _exptl_operator                   "Karl Nguyen"
+    _exptl_date                       2024-03-28T14:45:00Z
+    _exptl_temperature                298.15
+    _exptl_method                     "volumetric"
+    _exptl_instrument                 "HPVA-II-100"
+    _exptl_isotherm_type              "excess"
+
+    _adsnt_material_name              "AX-21"
+    _adsnt_sample_name                "AX21-HP-03"
+    _adsnt_sample_mass                0.5123
+    _adsnt_sample_density             2.2
+
+    _adsorptive_name                  "Methane"
+    _adsorptive_info                  "CH4"
+    _adsorptive_cas                   "74-82-8"
+
+    _units_temperature                "K"
+    _units_pressure                   "Pa"
+    _units_mass                       "g"
+    _units_sorbed_amount              "mmol/g"
+    _units_density                    "g/cm3"
+
+    loop_
+        _adsorp_index
+        _adsorp_pressure
+        _adsorp_amount
+        _adsorp_amount_excess
+        _adsorp_amount_absolute
+        1 100000.0     0.45   0.45   0.46
+        2 500000.0     1.89   1.89   1.95
+        3 1000000.0    3.12   3.12   3.28
+        4 2000000.0    4.78   4.78   5.18
+        5 3000000.0    5.89   5.89   6.62
+        6 4000000.0    6.56   6.56   7.68
+        7 5000000.0    6.98   6.98   8.56
+        8 6000000.0    7.12   7.12   9.23
+        9 7000000.0    7.05   7.05   9.78
+        10 8000000.0    6.89   6.89  10.21
+        11 9000000.0    6.67   6.67  10.56
+        12 10000000.0   6.45   6.45  10.89

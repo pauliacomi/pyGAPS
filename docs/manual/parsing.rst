@@ -119,6 +119,24 @@ To parse an AIF file as an isotherm, use the *from* function.
     import pygaps.parsing as pgp
     my_isotherm = pgp.isotherm_from_aif(aif_string_or_path)
 
+The AIF document must contain exactly one data block. Empty or multi-block
+documents raise :class:`~pygaps.utilities.exceptions.ParsingError`.
+Point isotherms are recognised from adsorption/desorption data loops and models
+from their model-name tag; unrelated metadata such as ``dataset_id`` or
+``model_note`` does not select an isotherm type.
+
+When an experimental method is missing, AIF v1.0 exports use ``unspecified``.
+pyGAPS records that this value was generated, restoring the original metadata
+on re-import rather than adding a method to the isotherm. An explicitly supplied
+``unspecified`` method is preserved. Numerical data is written to eight
+significant figures, so round-trip identity is only retained when data and other
+metadata are unchanged by serialisation.
+
+AIF v1.0 exports also include supported adsorbate details such as CAS number,
+InChI, SMILES, formula and molecular weight. A quadrupole moment is written only
+when ``units_quadrupole_moment`` is specified; otherwise it is omitted with a
+warning because the value cannot be interpreted safely without its unit.
+
 For more info about AIF parsing, check out the :mod:`~pygaps.parsing.aif`
 module reference.
 

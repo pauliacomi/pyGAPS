@@ -1,0 +1,41 @@
+# Basic N2 isotherm at 77K - minimal example
+
+data_basic_n2_77K
+
+    _audit_aif_version                "v1.0"
+
+    _exptl_operator                   "Alice Chen"
+    _exptl_date                       2024-03-15T09:30:00Z
+    _exptl_temperature                77.35
+    _exptl_method                     "volumetric"
+    _exptl_instrument                 "ASAP-2020-001"
+    _exptl_isotherm_type              "absolute"
+
+    _adsnt_material_name              "Zeolite-13X"
+    _adsnt_sample_name                "Z13X-batch4-01"
+    _adsnt_sample_mass                0.1523
+
+    _adsorptive_name                 "Nitrogen"
+
+    _units_temperature                "K"
+    _units_pressure                   "Pa"
+    _units_mass                       "g"
+    _units_sorbed_amount              "mmol/g"
+
+    loop_
+        _adsorp_index
+        _adsorp_pressure
+        _adsorp_p0
+        _adsorp_amount
+        1 5.2       101325.0  0.45
+        2 15.8      101325.0  1.12
+        3 52.3      101325.0  2.34
+        4 158.0     101325.0  3.56
+        5 523.0     101325.0  4.89
+        6 1580.0    101325.0  5.67
+        7 5230.0    101325.0  6.23
+        8 15800.0   101325.0  6.78
+        9 30000.0   101325.0  7.12
+        10 50000.0   101325.0  7.45
+        11 75000.0   101325.0  7.68
+        12 95000.0   101325.0  7.82

@@ -125,7 +125,7 @@ class BaseIsotherm():
         # Must-have properties of the isotherm
         #
         # Basic checks
-        if None in [material, adsorbate, temperature]:
+        if any(param is None for param in (material, adsorbate, temperature)):
             raise ParameterError(
                 f"Isotherm MUST have the following properties: {self._required_params}"
             )
@@ -332,7 +332,8 @@ class BaseIsotherm():
         parameter_dict = vars(self).copy()
 
         # These line are here to ensure that material/adsorbate are copied as a string
-        parameter_dict['adsorbate'] = str(parameter_dict.pop('_adsorbate'))
+        adsorbate = parameter_dict.pop('_adsorbate')
+        parameter_dict['adsorbate'] = str(adsorbate)
         material = parameter_dict.pop('_material')
         if material.properties:
             parameter_dict['material'] = material.to_dict()

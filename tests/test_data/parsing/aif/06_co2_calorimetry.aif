@@ -1,0 +1,41 @@
+# CO2 adsorption with microcalorimetry data
+
+data_co2_calorimetry
+
+    _audit_aif_version                "v1.0"
+
+    _exptl_operator                   "Bob Martinez"
+    _exptl_date                       2024-06-20T14:00:00Z
+    _exptl_temperature                298.15
+    _exptl_method                     "gravimetric"
+    _exptl_instrument                 "TGA-DSC-001"
+    _exptl_isotherm_type              "excess"
+
+    _adsnt_material_name              "MIL-53(Al)"
+    _adsnt_sample_name                "MIL53Al-S03"
+    _adsnt_sample_mass                0.0456
+
+    _adsorptive_name                  "Carbon Dioxide"
+    _adsorptive_info                  "CO2"
+    _adsorptive_cas                   "124-38-9"
+
+    _units_temperature                "K"
+    _units_pressure                   "Pa"
+    _units_mass                       "g"
+    _units_sorbed_amount              "mmol/g"
+    _units_enthalpy                   "kJ/mol"
+
+    loop_
+        _adsorp_index
+        _adsorp_pressure
+        _adsorp_p0
+        _adsorp_amount
+        _adsorp_enthalpy_differential
+        _adsorp_enthalpy_integral
+        1 1000.0    7377300.0   0.15   -38.2   -5.73
+        2 5000.0    7377300.0   0.72   -36.5   -27.63
+        3 10000.0   7377300.0   1.35   -34.1   -50.74
+        4 25000.0   7377300.0   2.48   -30.8   -89.30
+        5 50000.0   7377300.0   3.65   -28.5   -135.20
+        6 75000.0   7377300.0   4.52   -26.2   -171.62
+        7 100000.0  7377300.0   5.12   -24.8   -200.50
