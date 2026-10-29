@@ -27,7 +27,6 @@ adsorption data analysis and fitting, written in Python 3.
       - | |license|
     * - tests
       - | |GHA| |codecov|
-        | |requires|
     * - package
       - | |version| |wheel|
         | |supported-versions| |supported-implementations|
@@ -51,10 +50,6 @@ adsorption data analysis and fitting, written in Python 3.
 .. |GHA| image:: https://github.com/pauliacomi/pyGAPS/workflows/CI/badge.svg
     :alt: GHA-CI Build Status
     :target: https://github.com/pauliacomi/pyGAPS/actions
-
-.. |requires| image:: https://requires.io/github/pauliacomi/pyGAPS/requirements.svg?branch=master
-    :alt: Requirements Status
-    :target: https://requires.io/github/pauliacomi/pyGAPS/requirements/?branch=master
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/pauliacomi/pygaps.svg
     :alt: Coverage Status
@@ -187,16 +182,14 @@ more details.
 Development
 ===========
 
-To install the development branch, clone the repository from GitHub.
-Then install the package with pip either in regular or developer mode.
+To install the development branch and its development dependencies, clone the
+repository and sync the dependency groups with ``uv``:
 
 .. code:: bash
 
     git clone https://github.com/pauliacomi/pyGAPS
-
-    # then install editable/develop mode
-    # adding [dev] will install the development dependencies
-    pip install -e ./pyGAPS[dev]
+    cd pyGAPS
+    uv sync --all-groups
 
 If you want to contribute to pyGAPS or develop your own code from the package,
 check out the detailed information in
