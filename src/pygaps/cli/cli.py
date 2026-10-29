@@ -27,7 +27,7 @@ def main():
     """
 
     # Create the parser
-    prs = argparse.ArgumentParser(description='Command-line interface to pyGAPS')
+    prs = argparse.ArgumentParser(prog='pygaps', description='Command-line interface to pyGAPS')
 
     # Add the arguments
     prs.add_argument(

@@ -1,7 +1,6 @@
 """Tests AIF interaction."""
 
 import json
-import pathlib
 import textwrap
 from copy import deepcopy
 
@@ -18,7 +17,7 @@ from .conftest import DATA_JSON
 from .conftest import PARSING_PATH
 
 DATA_AIF_PATH = PARSING_PATH / 'aif'
-AIF_DICTIONARY = pathlib.Path(pgp.__file__).parent / 'aif_dictionary.json'
+AIF_DICTIONARY = DATA_AIF_PATH / 'aif_dictionary.json'
 
 
 def _strip_serialized_aif_fields(data_dict):

@@ -1,19 +1,21 @@
 import os
 import subprocess
+import sys
 
 import pytest
 
 import pygaps
 import pygaps.parsing as pgp
 
+# Run through the current interpreter so tests don't depend on the
+# `pygaps` script being on PATH.
+PYGAPS_CLI = [sys.executable, "-m", "pygaps.cli"]
+
 
 def capture(command, **extra):
     """Run and capture the output of a subprocess."""
-    # TODO remove on python 3.7+
-    command = map(str, command)
-
     result = subprocess.run(
-        command,
+        [str(c) for c in command],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
@@ -28,7 +30,7 @@ class TestCLI():
         """
         Test the CLI call with the --help option.
         """
-        command = ["pygaps", "--help"]
+        command = [*PYGAPS_CLI, "--help"]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
@@ -42,7 +44,7 @@ class TestCLI():
         # Test with JSON file
         path = tempdir / 'isotherm.json'
         basic_pointisotherm.to_json(path)
-        command = ["pygaps", path]
+        command = [*PYGAPS_CLI, path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
@@ -50,7 +52,7 @@ class TestCLI():
         # Test with CSV file
         path = tempdir / 'isotherm.csv'
         basic_pointisotherm.to_csv(path)
-        command = ["pygaps", path]
+        command = [*PYGAPS_CLI, path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
@@ -58,7 +60,7 @@ class TestCLI():
         # Test with XLS file
         path = tempdir / 'isotherm.xls'
         basic_pointisotherm.to_xl(path)
-        command = ["pygaps", path]
+        command = [*PYGAPS_CLI, path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
@@ -73,7 +75,7 @@ class TestCLI():
         my_env = os.environ.copy()
         my_env["MPLBACKEND"] = "Agg"
 
-        command = ["pygaps", "--plot", path]
+        command = [*PYGAPS_CLI, "--plot", path]
         out, err, exitcode = capture(command, env=my_env)
         print(out, err)
         assert exitcode == 0
@@ -86,7 +88,7 @@ class TestCLI():
         basic_pointisotherm.adsorbate = 'N2'
         basic_pointisotherm.to_json(path)
 
-        command = ["pygaps", "-ch", "a_bet", path]
+        command = [*PYGAPS_CLI, "-ch", "a_bet", path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
@@ -99,13 +101,13 @@ class TestCLI():
         path = tempdir / 'isotherm.json'
         basic_pointisotherm.to_json(path)
 
-        command = ["pygaps", "-md", "guess", path]
+        command = [*PYGAPS_CLI, "-md", "guess", path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
 
         outpath = tempdir / 'model.json'
-        command = ["pygaps", "-md", "guess", "-o", outpath, path]
+        command = [*PYGAPS_CLI, "-md", "guess", "-o", outpath, path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0
@@ -122,7 +124,7 @@ class TestCLI():
         basic_pointisotherm.adsorbate = 'N2'
         basic_pointisotherm.to_json(path)
 
-        command = ["pygaps", "-cv", "pressure_mode=relative", "-o", outpath, path]
+        command = [*PYGAPS_CLI, "-cv", "pressure_mode=relative", "-o", outpath, path]
         out, err, exitcode = capture(command)
         print(out, err)
         assert exitcode == 0

@@ -195,6 +195,8 @@ markers = [
     "modelling: model generation from isotherms.",
     "graphing: plotting functionality testing.",
     "parsing: parsing functionality testing.",
+    "cli: command-line interface tests.",
+    "prediction: IAST and isotherm prediction tests.",
     "okay: custom empty marker.",
 ]
 filterwarnings = [
