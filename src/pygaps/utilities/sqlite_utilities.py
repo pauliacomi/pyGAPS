@@ -1,6 +1,7 @@
 """General functions for SQL query building."""
 
 import sqlite3
+from contextlib import closing
 
 from pygaps import logger
 from pygaps.utilities.exceptions import ParsingError
@@ -26,7 +27,7 @@ def db_execute_general(
     """
     # Attempt to connect
     try:
-        with sqlite3.connect(pth) as db:
+        with closing(sqlite3.connect(pth)) as db, db:
             # Get a cursor object
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
