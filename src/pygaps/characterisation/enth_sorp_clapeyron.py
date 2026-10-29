@@ -16,9 +16,9 @@ def enthalpy_sorption_clapeyron(
     verbose: bool = False,
 ):
     r"""
+    Calculate the isosteric enthalpy of adsorption (in kJ/mol) using the Clausius-Clapeyron equation.
 
-    Calculate the isosteric enthalpy of adsorption (in kJ/mol) by applying the
-    Clausius-Clapeyron equation to several isotherms recorded at different
+    The equation is applied to several isotherms recorded at different
     temperatures on the same material.
 
     Parameters
@@ -162,9 +162,7 @@ def isosteric_enthalpy_raw(
     pressures: list,
     temperatures: list,
 ):
-    """
-    Calculate the isosteric enthalpy of adsorption using several isotherms
-    recorded at different temperatures on the same material.
+    """Calculate the isosteric enthalpy of adsorption using several isotherms recorded at different temperatures on the same material.
 
     This is a 'bare-bones' function to calculate isosteric enthalpy which is
     designed as a low-level alternative to the main function.

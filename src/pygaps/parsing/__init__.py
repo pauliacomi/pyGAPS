@@ -1,6 +1,7 @@
 # pylint: disable=W0614,W0611,W0622
-# flake8: noqa
 # isort:skip_file
+"""Import and export of isotherms in various file formats and databases."""
+
 from pygaps.utilities.exceptions import ParsingError
 
 _PARSER_PRECISION = 8

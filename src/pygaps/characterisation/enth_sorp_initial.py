@@ -23,6 +23,8 @@ def initial_enthalpy_comp(
     **param_guess,
 ):
     r"""
+    Calculate the enthalpy of adsorption at zero loading by fitting differential enthalpy data.
+
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading with a fitting
     method with separate contributions:
@@ -392,6 +394,8 @@ def initial_enthalpy_point(
     verbose: bool = False,
 ):
     """
+    Calculate the enthalpy of adsorption at zero loading from the first point of the curve.
+
     Given an isotherm with previous differential adsorption enthalpy data,
     calculate the enthalpy of adsorption at zero loading by taking the
     first point of the curve.

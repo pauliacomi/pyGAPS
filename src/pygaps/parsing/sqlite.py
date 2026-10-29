@@ -1,6 +1,4 @@
-"""
-This module contains the sql interface for data manipulation.
-"""
+"""The sql interface for data manipulation."""
 
 import functools
 import json
@@ -134,7 +132,6 @@ def _delete_by_id(
     **kwargs: dict,
 ):
     """Delete elements in a table by using their ID."""
-
     # Check if exists
     ids = cursor.execute(
         build_select(table=table_name, to_select=[table_id], where=[table_id]), {
@@ -297,7 +294,6 @@ def adsorbates_from_db(
     list
         list of Adsorbates
     """
-
     cursor = kwargs['cursor']
 
     # Execute the query
@@ -355,7 +351,6 @@ def adsorbate_delete_db(
     verbose : bool
         Extra information printed to console.
     """
-
     cursor = kwargs['cursor']
 
     # Get id of adsorbate
@@ -399,7 +394,7 @@ def adsorbate_property_type_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads an adsorbate property type.
+    Upload an adsorbate property type.
 
     The type_dict takes the form of::
 
@@ -523,7 +518,6 @@ def material_to_db(
         Extra information printed to console.
 
     """
-
     cursor = kwargs['cursor']
 
     # If we need to overwrite, we find the id of existing adsorbate.
@@ -634,7 +628,6 @@ def materials_from_db(
     list
         list of Materials
     """
-
     cursor = kwargs['cursor']
 
     # Execute the query
@@ -685,7 +678,6 @@ def material_delete_db(
     verbose : bool
         Extra information printed to console.
     """
-
     cursor = kwargs['cursor']
 
     # Get id of material
@@ -729,7 +721,7 @@ def material_property_type_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads a material property type.
+    Upload a material property type.
 
     The type_dict takes the form of::
 
@@ -835,7 +827,7 @@ def isotherm_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads isotherm to the database.
+    Upload isotherm to the database.
 
     If overwrite is set to true, the isotherm is overwritten.
     Overwrite is done based on isotherm.iso_id
@@ -855,7 +847,6 @@ def isotherm_to_db(
     verbose : bool, True
         Extra information printed to console.
     """
-
     cursor = kwargs['cursor']
     # Checks
     if autoinsert_material:
@@ -1002,7 +993,6 @@ def isotherms_from_db(
     list
         list of Isotherms
     """
-
     cursor = kwargs['cursor']
 
     # Default value
@@ -1105,7 +1095,6 @@ def isotherm_delete_db(
     verbose : bool
         Extra information printed to console.
     """
-
     if isinstance(iso_id, BaseIsotherm):
         iso_id = iso_id.iso_id
 
@@ -1248,7 +1237,7 @@ def isotherm_property_type_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads a property type.
+    Upload a property type.
 
     The type_dict takes the form of::
 

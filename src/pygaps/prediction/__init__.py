@@ -1,6 +1,7 @@
 # pylint: disable=W0614,W0611,W0622
-# flake8: noqa
 # isort:skip_file
+"""Prediction of isotherms and adsorption equilibria (IAST, enthalpy-based)."""
+
 from .iast import iast_point
 from .iast import iast_point_fraction
 from .iast import iast_binary_svp

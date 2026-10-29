@@ -1,6 +1,4 @@
-"""
-Utilities for working with pandas dataframes.
-"""
+"""Utilities for working with pandas dataframes."""
 import pandas
 
 

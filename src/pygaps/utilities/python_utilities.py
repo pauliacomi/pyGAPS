@@ -51,12 +51,12 @@ def deep_merge(a, b, path=None, update=True):
 
 
 class SimpleWarning():
-    """
-    Context manager overrides warning formatter to remove unneeded info.
-    """
+    """Context manager overrides warning formatter to remove unneeded info."""
+
     old_formatter = None
 
     def __enter__(self):
+        """Override the warning formatter to only display the message."""
         # ignore everything except the message
         def custom_formatwarning(msg, *args, **kwargs):
             return str(msg) + '\n'
@@ -66,5 +66,6 @@ class SimpleWarning():
         return True
 
     def __exit__(self, typ, value, traceback):
+        """Restore the original warning formatter."""
         warnings.formatwarning = self.old_formatter
         return False

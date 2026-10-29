@@ -1,4 +1,4 @@
-"""This module contains the t-plot calculation."""
+"""T-plot calculation."""
 
 import typing as t
 
@@ -308,7 +308,6 @@ def t_plot_parameters(
     liquid_density: float,
 ):
     """Calculate the parameters from a linear section of the t-plot."""
-
     slope, intercept, corr_coef, p, stderr = stats.linregress(
         thickness_curve[section], loading[section]
     )

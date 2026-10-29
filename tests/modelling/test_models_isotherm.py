@@ -76,8 +76,8 @@ class TestIsothermModels():
         model.params = MODEL_DATA[m_name]['test_parameters']
         test_values = MODEL_DATA[m_name]['test_values']
 
-        for i, l in enumerate(test_values['loading']):
-            assert numpy.isclose(model.pressure(l), test_values['pressure'][i], 0.01)
+        for i, load in enumerate(test_values['loading']):
+            assert numpy.isclose(model.pressure(load), test_values['pressure'][i], 0.01)
 
     @pytest.mark.parametrize(
         "m_name", [

@@ -1,6 +1,4 @@
-"""
-This module contains the main class that describes an isotherm through discrete points.
-"""
+"""The main class that describes an isotherm through discrete points."""
 
 import textwrap
 import typing as t
@@ -113,6 +111,8 @@ class PointIsotherm(BaseIsotherm):
         **other_properties
     ):
         """
+        Instantiate a PointIsotherm from discrete data.
+
         Instantiation is done by passing the discrete data as a pandas
         DataFrame, the column keys as string as well as the parameters
         required by parent class.
@@ -211,9 +211,7 @@ class PointIsotherm(BaseIsotherm):
         pressure_key: str = None,
         loading_key: str = None,
     ):
-        """
-        Construct a point isotherm using a parent isotherm as the template for
-        all the parameters.
+        """Construct a point isotherm using a parent isotherm as the template for all the parameters.
 
         Parameters
         ----------
@@ -343,9 +341,7 @@ class PointIsotherm(BaseIsotherm):
         material_unit: str = None,
         verbose: bool = False,
     ):
-        """
-        Convenience function for permanently converting any isotherm
-        mode/basis/units.
+        """Permanently convert any isotherm mode/basis/units.
 
         Parameters
         ----------
@@ -394,9 +390,7 @@ class PointIsotherm(BaseIsotherm):
         verbose: bool = False,
         pseudo: bool = False,
     ):
-        """
-        Convert isotherm pressure from one unit to another
-        and the pressure mode from absolute to relative.
+        """Convert isotherm pressure from one unit to another and the pressure mode from absolute to relative.
 
         Only applicable in the case of isotherms taken below critical
         point of adsorbate.
@@ -462,6 +456,8 @@ class PointIsotherm(BaseIsotherm):
         verbose: bool = False,
     ):
         """
+        Convert isotherm loading unit and basis.
+
         Convert isotherm loading from one unit to another
         and the basis of the isotherm loading to be
         either 'mass', 'molar' or 'percent'/'fraction'.
@@ -524,6 +520,8 @@ class PointIsotherm(BaseIsotherm):
         verbose: bool = False,
     ):
         """
+        Convert the material unit and basis of the isotherm.
+
         Convert the material of the isotherm from one unit to another and the
         basis of the isotherm loading to be either 'per mass' or 'per volume' or
         'per mole' of material.
@@ -864,9 +862,7 @@ class PointIsotherm(BaseIsotherm):
 
     @property
     def other_keys(self):
-        """
-        Return column names of any supplementary data points.
-        """
+        """Return column names of any supplementary data points."""
         return [
             c for c in self.data_raw.columns
             if c not in (self.pressure_key, self.loading_key, 'branch')

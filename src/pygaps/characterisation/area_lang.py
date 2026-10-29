@@ -1,4 +1,4 @@
-"""This module contains Langmuir area calculations."""
+"""Langmuir area calculations."""
 
 import textwrap
 from typing import TYPE_CHECKING
@@ -325,5 +325,5 @@ def langmuir_parameters(slope, intercept, cross_section):
 
 
 def simple_lang(pressure, n_total, k_const):
-    """A simple Langmuir equation returning loading at a pressure."""
+    """Return loading at a pressure using a simple Langmuir equation."""
     return (n_total * k_const * pressure / (1 + k_const * pressure))

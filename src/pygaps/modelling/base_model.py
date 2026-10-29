@@ -36,7 +36,6 @@ class IsothermBaseModel(abc.ABC):
 
     def __init__(self, **params):
         """Populate instance-specific parameters."""
-
         # Model parameters
         parameters = params.pop('parameters', None)
         if parameters:
@@ -154,9 +153,7 @@ class IsothermBaseModel(abc.ABC):
         raise NotImplementedError("""This model does not implement spreading pressure.""")
 
     def toth_correction(self, pressure: float) -> float:
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
             \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
@@ -165,12 +162,12 @@ class IsothermBaseModel(abc.ABC):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
         raise NotImplementedError("""This model does not implement T\'oth correction.""")

@@ -21,14 +21,11 @@ jobs:
     - uses: actions/checkout@v7
     - name: Set up uv
       uses: astral-sh/setup-uv@v10.3.3
-      with:
-        python-version: "3.14"
-    - name: Install dependencies
-      run: uv sync --frozen --group dev
-    - name: Run checks
-      run: |
-        uv run isort --verbose --check-only --diff src tests
-        uv run flake8 src tests
+    - name: Lint
+      run: uvx ruff check --output-format=github src tests
+    - name: Check formatting
+      continue-on-error: true
+      run: uvx ruff format --check --diff src tests
 
   docs-build:
     runs-on: ubuntu-latest

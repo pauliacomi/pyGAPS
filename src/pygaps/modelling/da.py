@@ -48,6 +48,7 @@ class DA(IsothermBaseModel):
        in Progress in Surface and Membrane Science, vol. 9, Elsevier, 1975, pp. 1–70.
 
     """
+
     # Model parameters
     name = 'DA'
     formula = r"n(p) = n_t \exp[-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{m}]"

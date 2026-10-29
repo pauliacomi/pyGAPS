@@ -1,4 +1,4 @@
-"""This module contains BET area calculations."""
+"""BET area calculations."""
 
 import textwrap
 from typing import TYPE_CHECKING
@@ -374,5 +374,5 @@ def bet_parameters(slope, intercept, cross_section):
 
 
 def simple_bet(pressure, n_monolayer, c_const):
-    """A simple BET equation returning loading at a pressure."""
+    """Return loading at a pressure using a simple BET equation."""
     return (n_monolayer * c_const * pressure / (1 - pressure) / (1 - pressure + c_const * pressure))

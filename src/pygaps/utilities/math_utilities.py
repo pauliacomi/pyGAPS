@@ -10,7 +10,6 @@ from pygaps.utilities.exceptions import ParameterError
 
 def split_ads_data(data, pressure_key):
     """Find the inflection in an adsorption dataset with adsorption/desorption."""
-
     # Generate array
     split = numpy.zeros(data.shape[0], dtype=numpy.int8)
 
@@ -36,7 +35,7 @@ def find_limit_indices(
     limits: "tuple[float, float]" = None,
     smallest_selection: int = 3,
 ):
-    """Find the indices of an array limits"""
+    """Find the indices of an array limits."""
     # select the maximum and minimum of the points
     index_min = 0
     index_max = len(array) - 1  # As we want absolute position
@@ -112,7 +111,6 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
         True - Curve is closed
         False - Curve is open
     """
-
     # Check if arrays are equal in size
     count = len(xs)
     if len(ys) != count:
@@ -165,7 +163,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
 
 def same_orders_of_maximum(vals):
     """
-    Determines if the maximum of two lists are within one order of magnitude.
+    Determine if the maximum of two lists are within one order of magnitude.
 
     Parameters
     ----------
@@ -173,7 +171,7 @@ def same_orders_of_maximum(vals):
         The lists to compare
 
     Returns
-    ------
+    -------
     True:
         If within one order of magnitude
     False:

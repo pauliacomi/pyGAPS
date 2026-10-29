@@ -1,6 +1,7 @@
 """
-This module contains 'classical' methods of calculating a pore size distribution for
-pores in the micropore range (<2 nm). These are derived from the Horvath-Kawazoe models.
+Classical methods of calculating a pore size distribution for pores in the micropore range (<2 nm).
+
+These are derived from the Horvath-Kawazoe models.
 """
 
 import math
@@ -79,7 +80,6 @@ def psd_microporous(
 
     Notes
     -----
-
     Calculates the pore size distribution using a "classical" model, which
     describes adsorption in micropores as a sequential instant filling of
     increasingly wider pores. The pressure of filling for each pore is
@@ -263,6 +263,7 @@ def psd_horvath_kawazoe(
 ):
     r"""
     Calculate the pore size distribution using the Horvath-Kawazoe method.
+
     This function should not be used with isotherms (use instead
     :func:`pygaps.characterisation.psd_micro.psd_microporous`).
 
@@ -306,7 +307,6 @@ def psd_horvath_kawazoe(
 
     Notes
     -----
-
     *Description*
 
     The H-K method [#hk2]_ attempts to describe adsorption within pores by
@@ -630,6 +630,7 @@ def psd_horvath_kawazoe_ry(
 ):
     r"""
     Calculate the microporous size distribution using a Rege-Yang (R-Y) type model.
+
     This function should not be used with isotherms (use instead
     :func:`pygaps.characterisation.psd_micro.psd_microporous`).
 
@@ -1066,6 +1067,8 @@ def psd_horvath_kawazoe_ry(
 
 def _solve_hk(pressure, hk_fun, bound, geo):
     """
+    Solve the Horvath-Kawazoe equation for pore widths at each pressure point.
+
     I personally found that simple Brent minimization
     gives good results. There may be other, more efficient
     algorithms, like conjugate gradient, but optimization is a moot point
@@ -1073,7 +1076,6 @@ def _solve_hk(pressure, hk_fun, bound, geo):
     The minimisation runs with bounds of [d_eff < x < 50].
     Maximum determinable pore size is limited at ~2.5 nm anyway.
     """
-
     p_w = []
     p_w_max = 10 / geo
 
@@ -1094,10 +1096,11 @@ def _solve_hk(pressure, hk_fun, bound, geo):
 
 def _solve_hk_cy(pressure, loading, hk_fun, bound, geo):
     """
+    Solve the Horvath-Kawazoe equation with the Cheng-Yang correction for pore widths at each pressure point.
+
     In this case, the SF correction factor is subtracted
     from the original function.
     """
-
     p_w = []
     p_w_max = 10 / geo
     coverage = loading / (max(loading) * 1.01)

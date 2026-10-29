@@ -9,7 +9,7 @@ import pathlib
 
 def main():
     """
-    The main entrypoint for the cli.
+    Run the main entrypoint for the cli.
 
     Currently the CLI can read any pyGAPS format (JSON, CSV, Excel) and then:
 
@@ -25,7 +25,6 @@ def main():
       resulting isotherm model using the ``-o/--outfile`` path.
 
     """
-
     # Create the parser
     prs = argparse.ArgumentParser(prog='pygaps', description='Command-line interface to pyGAPS')
 

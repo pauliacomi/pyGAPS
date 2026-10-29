@@ -1,6 +1,7 @@
 """
-Module contains methods of calculating a pore size distribution starting from a DFT
-kernel. Please note that calculation of DFT/NLDFT/QSDFT kernels is outside the
+Methods of calculating a pore size distribution starting from a DFT kernel.
+
+Please note that calculation of DFT/NLDFT/QSDFT kernels is outside the
 scope of this program.
 """
 

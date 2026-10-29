@@ -24,9 +24,7 @@ def dr_plot(
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False,
 ):
-    r"""
-    Calculate pore volume and effective adsorption potential
-    through a Dubinin-Radushkevich (DR) plot.
+    r"""Calculate pore volume and effective adsorption potential through a Dubinin-Radushkevich (DR) plot.
 
     The optional ``p_limits`` parameter allows to specify the upper and lower
     pressure limits for the calculation, otherwise the entire range will be
@@ -128,8 +126,8 @@ def da_plot(
     verbose: bool = False,
 ):
     r"""
-    Calculate pore volume and effective adsorption potential
-    through a Dubinin-Astakov (DA) plot.
+    Calculate pore volume and effective adsorption potential through a Dubinin-Astakov (DA) plot.
+
     Optionally find a best exponent fit to the DA line.
 
     The function accepts a pyGAPS isotherm, with an ability
@@ -215,7 +213,6 @@ def da_plot(
     pygaps.characterisation.dr_da_plots.da_plot_raw : low level method
 
     """
-
     # Check consistency of exponent
     find_exp = False
     if not exp:

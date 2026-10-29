@@ -1,5 +1,4 @@
 # pylint: disable=W0614,W0401,W0611,W0622
-# flake8: noqa
 # isort:skip_file
 """
 Scaffolding and convenience functions for isotherm fitting.
@@ -139,9 +138,7 @@ def is_model_iast(model_name: str) -> bool:
 
 
 def is_model_whittaker(model_name: str) -> bool:
-    """
-    Check whether specified model can be used to calculate whittaker enthalpy
-    of adsorption.
+    """Check whether specified model can be used to calculate whittaker enthalpy of adsorption.
 
     Parameters
     ----------

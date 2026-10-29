@@ -232,6 +232,7 @@ class _Sheet:
 
     Empty cells are returned as ``None`` and booleans as ``bool``.
     """
+
     def __init__(self, values):
         self._values = values
         self.nrows = len(values)
@@ -302,7 +303,6 @@ def isotherm_from_xl(path, **isotherm_parameters):
         The isotherm contained in the excel file.
 
     """
-
     # isotherm type (point/model)
     isotype = 0
 

@@ -126,9 +126,7 @@ class Freundlich(IsothermBaseModel):
         return m * K * pressure**(1 / m)
 
     def toth_correction(self, pressure: float) -> float:
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
 
@@ -146,12 +144,12 @@ class Freundlich(IsothermBaseModel):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
         return self.params["m"] - 1

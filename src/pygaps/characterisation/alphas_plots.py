@@ -1,4 +1,4 @@
-"""This module contains the alpha-s calculation."""
+"""Alpha-s plot calculation."""
 
 from typing import TYPE_CHECKING
 
@@ -375,7 +375,6 @@ def alpha_s_plot_parameters(
     liquid_density: float,
 ):
     """Get the parameters for the linear region of the alpha-s plot."""
-
     slope, intercept, corr_coef, p, stderr = stats.linregress(
         alpha_curve[section], loading[section]
     )

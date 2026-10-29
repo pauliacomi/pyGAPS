@@ -60,9 +60,7 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
         isotherm_data_dict = isotherm.data_raw.to_dict(orient='index')
 
         def process_data(value):
-            """
-            Specifically mark only the desorption branch.
-            """
+            """Specifically mark only the desorption branch."""
             if value.get('branch', 0) == 0:
                 del value['branch']
             else:
@@ -196,7 +194,6 @@ def isotherm_from_json(
 
 def _from_json_nist(raw_dict):
     """Convert a NIST dictionary format to an internal format."""
-
     nist_dict = {}
 
     # Get regular isotherm parameters
@@ -266,7 +263,6 @@ def _from_json_nist(raw_dict):
 
 def _from_data_nist(data_raw):
     """Convert a NIST data format to an internal format."""
-
     for point in data_raw:
         point.pop('species_data')
 

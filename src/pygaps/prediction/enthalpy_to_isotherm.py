@@ -1,7 +1,4 @@
-"""
-A module for predicting isotherms at different pressures given a measured
-isotherm and calculated isosteric heats of adsorption
-"""
+"""Predict isotherms at different temperatures given a measured isotherm and isosteric heats of adsorption."""
 
 import copy
 import warnings
@@ -27,6 +24,8 @@ def predict_isotherm_from_enthalpy_clapeyron(
     dographs: bool = True,
 ) -> PointIsotherm:
     r"""
+    Predict an isotherm at a given temperature from isosteric heats of adsorption.
+
     Predicts isotherm at a given temperature :math:`T_p`, from isosteric
     heats of adsorption :math:`\Delta H_{st}`, and pressure :math:`P_e` and
     temperature :math:`T_e` of original experimental isotherm. Uses the
@@ -176,6 +175,8 @@ def predict_isosurface_from_enthalpy_clapeyron(
     verbose: bool = True,
 ):
     r"""
+    Predict loading as a function of pressure and temperature.
+
     Predicts loading as a function of pressure and temperature, from a single
     isotherm and a heat of adsorption. Uses `predict_isotherm` function which
     relies on the Clausius Clapeyron equation;
@@ -300,6 +301,8 @@ def predict_pressure_raw(
     pressure_current: list[float] = None,
 ) -> list[float]:
     r"""
+    Predict pressures at a given temperature from isosteric heats of adsorption.
+
     Utility function for predicting pressures at a given temperature :math:`T_p`,
     :math:`P_p` from isosteric heats of adsorption :math:`\Delta H_{st}`, and
     pressure :math:`P_e` and temperature :math:`T_e` of original experimental

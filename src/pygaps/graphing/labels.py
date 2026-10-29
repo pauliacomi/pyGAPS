@@ -43,7 +43,6 @@ def label_units_dict(key: str, unit_params: dict):
 
 def label_lgd(isotherm, lbl_components: list, branch: str = None, key_def: str = None):
     """Build a legend label."""
-
     if not lbl_components:
         lbl_components = ['material', 'adsorbate', 'temperature', 'key']
 

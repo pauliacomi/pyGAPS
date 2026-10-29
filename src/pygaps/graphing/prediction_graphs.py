@@ -1,4 +1,4 @@
-"""functions for plotting graphs of isotherm prediction"""
+"""Functions for plotting graphs of isotherm prediction."""
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -22,6 +22,7 @@ def plot_predict_isotherm_from_enthalpy(
     enthalpy_stderr: list[float] = None,
     axs: list[mpl.axes.Axes] = None,
 ):
+    """Plot the enthalpy curve and the original and predicted isotherms side by side."""
     if axs is None:
         fig = plt.figure(figsize=(8, 4), layout='tight')
         enthalpy_ax = fig.add_subplot(121)
@@ -71,12 +72,10 @@ def plot_predict_isosurface_from_enthalpy(
     ax=None,
     **kwargs,
 ):
-    """
-    Makes a 2D-heatmap with colorbar of loading as a function of pressure and
-    temperature.
+    """Make a 2D-heatmap with colorbar of loading as a function of pressure and temperature.
 
     Parameters
-    ---------
+    ----------
     grid: pd.DataFrame
         The data to use, loading are values. Index is temperature, columns are
         pressure. Values should be evenly spaced.
@@ -146,6 +145,7 @@ def plot_predict_isotherm_from_enthalpy_fit(
     enthalpy_stderr: list[float] = None,
     axs: list[mpl.axes.Axes] = None,
 ):
+    """Plot the model fit, the enthalpy curve and the original and predicted isotherms side by side."""
     if axs is None:
         fig = plt.figure(figsize=(12, 4), layout='tight')
         isofit_ax = fig.add_subplot(131)

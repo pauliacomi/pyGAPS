@@ -401,7 +401,6 @@ def _get_data(
     range_params,
 ):
     """Plot the y1 data and y2 data of each branch."""
-
     if data_params['x_points'] is None and data_params['y1_points'] is None:
 
         # Data X

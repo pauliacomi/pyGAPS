@@ -109,9 +109,7 @@ class Toth(IsothermBaseModel):
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def toth_correction(self, pressure):
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
 
@@ -136,12 +134,12 @@ class Toth(IsothermBaseModel):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
         return (self.params["K"] * pressure)**self.params["t"]

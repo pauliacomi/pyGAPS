@@ -96,6 +96,7 @@ class Adsorbate():
         adsorbate.backend.p_critical()
 
     """
+
     # special reserved parameters
     _reserved_params = [
         "name",
@@ -592,8 +593,9 @@ class Adsorbate():
         k: float = 2,
     ) -> float:
         """
-        Get the Dubinin pseudo-saturation pressure at a particular temperature
-        in desired unit (default Pa). Only works if adsorbate is supercritical
+        Get the Dubinin pseudo-saturation pressure at a particular temperature in desired unit (default Pa).
+
+        Only works if adsorbate is supercritical
         at selected temperature.
 
         Parameters
@@ -945,12 +947,10 @@ class Adsorbate():
         temp: float,
         pressure: float,
     ) -> float:
-        """
-        Calculate compressibility of adsorbate at given temperature and
-        pressure using CoolProp backend.
+        """Calculate compressibility of adsorbate at given temperature and pressure using CoolProp backend.
 
         Parameters
-        ---------
+        ----------
         temp: float
             Temperature in K
         pressure: float

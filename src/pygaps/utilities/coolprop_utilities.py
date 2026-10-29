@@ -13,6 +13,7 @@ COOLPROP_BACKEND = 'HEOS'
 
 
 def thermodynamic_backend():
+    """Return the equation of state backend currently used by CoolProp."""
     return COOLPROP_BACKEND
 
 

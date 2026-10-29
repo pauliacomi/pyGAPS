@@ -45,6 +45,7 @@ class DR(IsothermBaseModel):
        Journal of Colloid and Interface Science, vol. 21, no. 4, pp. 378–393, Apr. 1966.
 
     """
+
     # Model parameters
     name = 'DR'
     formula = r"n(p) = n_t \exp [-(\frac{-RT\ln(p/p_0)}{\varepsilon})^{2}]"

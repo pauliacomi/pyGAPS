@@ -1,8 +1,4 @@
-"""
-Module contains functions to calculate the critical
-evaporation/condensation pore radius the mesopore range,
-as a function of pressure.
-"""
+"""Functions to calculate the critical evaporation/condensation pore radius in the mesopore range, as a function of pressure."""
 import typing as t
 from functools import partial
 
@@ -69,9 +65,7 @@ def kelvin_radius(
     adsorbate_molar_mass: float,
     adsorbate_surface_tension: float,
 ):
-    r"""
-    Calculate the kelvin radius of the pore, using the standard
-    form of the kelvin equation.
+    r"""Calculate the kelvin radius of the pore, using the standard form of the kelvin equation.
 
     Parameters
     ----------
@@ -140,9 +134,7 @@ def kelvin_radius_kjs(
     adsorbate_molar_mass: float,
     adsorbate_surface_tension: float,
 ):
-    r"""
-    Calculate the kelvin radius of the pore, using the
-    Kruck-Jaroniec-Sayari correction.
+    r"""Calculate the kelvin radius of the pore, using the Kruck-Jaroniec-Sayari correction.
 
     Parameters
     ----------

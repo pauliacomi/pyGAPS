@@ -1,6 +1,7 @@
 """
-Methods of calculating a pore size distribution for pores in the mesopore range
-(2-100 nm), based on the Kelvin equation and pore condensation/evaporation.
+Methods of calculating a pore size distribution for pores in the mesopore range (2-100 nm).
+
+Methods are based on the Kelvin equation and pore condensation/evaporation.
 """
 import typing as t
 
@@ -275,6 +276,7 @@ def psd_pygapsdh(
 ):
     r"""
     Calculate a pore size distribution using an expanded Dollimore-Heal method.
+
     This function should not be used with isotherms (use instead
     :func:`pygaps.characterisation.psd_meso.psd_mesoporous`).
 
@@ -453,6 +455,7 @@ def psd_bjh(
 ):
     r"""
     Calculate a pore size distribution using the original BJH method.
+
     This function should not be used with isotherms (use instead
     :func:`pygaps.characterisation.psd_meso.psd_mesoporous`).
 
@@ -483,7 +486,6 @@ def psd_bjh(
 
     Notes
     -----
-
     The BJH or Barrett, Joyner and Halenda [#]_ method for calculation of pore
     size distribution is based on a classical description of the adsorbate
     behaviour in the adsorbent pores. Under this method, the adsorbate is
@@ -616,6 +618,7 @@ def psd_dollimore_heal(
 ):
     r"""
     Calculate a pore size distribution using the original Dollimore-Heal method.
+
     This function should not be used with isotherms (use instead
     :func:`pygaps.characterisation.psd_meso.psd_mesoporous`).
 

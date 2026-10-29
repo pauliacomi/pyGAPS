@@ -1,3 +1,5 @@
+"""Plotting functions for isotherm model fitting."""
+
 import matplotlib as mpl
 
 from pygaps.graphing.isotherm_graphs import plot_iso

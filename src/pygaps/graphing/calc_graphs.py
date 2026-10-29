@@ -412,7 +412,7 @@ def psd_plot(
         )
 
     def formatter(x, pos):
-        """Forces matplotlib to display whole numbers"""
+        """Force matplotlib to display whole numbers."""
         return f"{x:g}"
 
     if log:
@@ -668,9 +668,7 @@ def virial_plot(
     added_point: bool,
     ax=None,
 ):
-    """
-    Draw a Virial plot.
-    """
+    """Draw a Virial plot."""
     # Generate the figure if needed
     if ax is None:
         _, ax = plt.subplots()

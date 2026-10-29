@@ -11,7 +11,6 @@ acs.langmuir.1c00122. https://doi.org/10.1021/acs.langmuir.1c00122.
 import json
 import os
 import pathlib
-from typing import Any
 from typing import Optional
 from typing import cast
 

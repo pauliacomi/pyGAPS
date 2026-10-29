@@ -59,13 +59,8 @@ docs = [
 dev = [
     {include-group = "test"},
     {include-group = "docs"},
-    "yapf",
-    "isort",
+    "ruff",
     "pylint",
-    "flake8",
-    "flake8-pyproject",
-    "autopep8",
-    "pydocstyle",
 ]
 
 # Entry points for CLI
@@ -126,39 +121,31 @@ disable = [
     "invalid-name", # we don't need these
 ]
 
-# linting: flake8
-[tool.flake8]
-max-line-length = 140
-ignore = ["E402", "W503", "W504", "E126", "E731"]
-exclude = [".tox", ".eggs", "ci/templates", "build", "dist"]
-docstring_style = "numpy"
+# linting and formatting: ruff
+[tool.ruff]
+line-length = 140
+extend-exclude = ["src/pygaps/_version.py", "docs"]
 
-# linting: pydocstyle
-[tool.pydocstyle]
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "D"]
+ignore = [
+    "E402", # imports are often deferred for performance
+    "E731", # lambda assignments are used for short helpers
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"tests/**" = ["D"]
+
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
-match-dir = "src/.*"
 
+[tool.ruff.lint.isort]
+force-single-line = true
+known-first-party = ["pygaps"]
 
-# analysis: pyright
-[tool.pyright]
-
-
-# formatting: yapf
-[tool.yapf]
-based_on_style = "pep8"
-dedent_closing_brackets = true
-coalesce_brackets = true
-split_complex_comprehension = true
-split_before_dot = true
-
-# formatting: isort
-[tool.isort]
-force_single_line = true
-line_length = 120
-known_first_party = "pygaps"
-default_section = "THIRDPARTY"
-forced_separate = "test_pygaps"
-skip = [".tox", ".eggs", "ci/templates", "build", "dist", "src/pygaps/_version.py"]
+[tool.ruff.format]
+quote-style = "preserve"
 
 
 # testing: pytest.py

@@ -1,7 +1,4 @@
-"""
-Dictionaries or generators which provide properties
-for use in the Horvath-Kawazoe method.
-"""
+"""Dictionaries or generators which provide properties for use in the Horvath-Kawazoe method."""
 
 from pygaps.utilities.exceptions import ParameterError
 

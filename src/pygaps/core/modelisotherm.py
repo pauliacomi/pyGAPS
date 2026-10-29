@@ -19,9 +19,7 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 class ModelIsotherm(BaseIsotherm):
-    """
-    Class to characterize pure-component isotherm data with an analytical model.
-    Data fitting is done during instantiation.
+    """Class to characterize pure-component isotherm data with an analytical model. Data fitting is done during instantiation.
 
     A `ModelIsotherm` class is instantiated by passing it the
     pure-component adsorption isotherm in the form of a Pandas DataFrame.
@@ -109,11 +107,12 @@ class ModelIsotherm(BaseIsotherm):
         **other_properties
     ):
         """
+        Instantiate a ModelIsotherm by fitting a model to the provided data.
+
         Instantiation is done by passing the data to be fitted, model to be
         used and fitting method as well as the parameters required by parent
         class.
         """
-
         # Run base class constructor
         super().__init__(**other_properties)
 
@@ -238,13 +237,10 @@ class ModelIsotherm(BaseIsotherm):
         optimization_params: dict = None,
         verbose: bool = False,
     ):
-        """
-        Construct a ModelIsotherm using a parent isotherm as the template for
-        all the parameters.
+        """Construct a ModelIsotherm using a parent isotherm as the template for all the parameters.
 
         Parameters
         ----------
-
         isotherm : BaseIsotherm
             An instance of the BaseIsotherm parent class.
         pressure : list
@@ -304,9 +300,7 @@ class ModelIsotherm(BaseIsotherm):
         optimization_params: dict = None,
         verbose: bool = False
     ):
-        """
-        Constructs a ModelIsotherm using data from a PointIsotherm and all its
-        parameters.
+        """Construct a ModelIsotherm using data from a PointIsotherm and all its parameters.
 
         Parameters
         ----------
@@ -373,9 +367,7 @@ class ModelIsotherm(BaseIsotherm):
         verbose: bool = False,
         **other_properties
     ):
-        """
-        Attempt to model the data using supplied list of model names,
-        then return the one with the best RMS fit.
+        """Attempt to model the data using supplied list of model names, then return the one with the best RMS fit.
 
         May take a long time depending on the number of datapoints.
 
@@ -563,8 +555,9 @@ class ModelIsotherm(BaseIsotherm):
         indexed: bool = False
     ):
         """
-        Return a numpy.linspace generated array with
-        a fixed number of equidistant points within the
+        Return a numpy.linspace generated array of equidistant points within the model pressure range.
+
+        The array has a fixed number of equidistant points within the
         pressure range the model was created.
 
         Parameters
@@ -650,9 +643,7 @@ class ModelIsotherm(BaseIsotherm):
         limits: tuple[float, float] = None,
         indexed: bool = False
     ):
-        """
-        Return the loading calculated at equidistant pressure
-        points within the pressure range the model was created.
+        """Return the loading calculated at equidistant pressure points within the pressure range the model was created.
 
         Parameters
         ----------
@@ -756,9 +747,7 @@ class ModelIsotherm(BaseIsotherm):
 
     @property
     def other_keys(self):
-        """
-        Return column names of any supplementary data points.
-        """
+        """Return column names of any supplementary data points."""
         return []
 
     ##########################################################
@@ -1101,5 +1090,4 @@ class ModelIsotherm(BaseIsotherm):
             The Toth correction factor at the given pressure.
 
         """
-
         return self.model.toth_correction(pressure)

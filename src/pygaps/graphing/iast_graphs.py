@@ -40,7 +40,6 @@ def plot_iast(
     ax : matplotlib ax
         The ax object.
     """
-
     # Generate the figure if needed
     if ax is None:
         fig = plt.figure()
@@ -185,7 +184,6 @@ def plot_iast_svp(
     ax : matplotlib ax
         The ax object.
     """
-
     # Generate the figure if needed
     if ax is None:
         fig = plt.figure()

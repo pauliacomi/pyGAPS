@@ -1,7 +1,4 @@
-"""
-Functions calculating the thickness of an adsorbed layer
-as a function of pressure.
-"""
+"""Functions calculating the thickness of an adsorbed layer as a function of pressure."""
 import typing as t
 
 import numpy
@@ -54,7 +51,7 @@ def thickness_harkins_jura(pressure: float) -> float:
 
 def thickness_zero(pressure: float) -> float:
     """
-    A zero-thickness curve applicable for non-wetting adsorbates.
+    Return a zero-thickness curve applicable for non-wetting adsorbates.
 
     Parameters
     ----------
@@ -76,6 +73,8 @@ _LOADED = {}  # we keep loaded interpolators here
 
 def convert_to_thickness(loading, monolayer):
     r"""
+    Convert an amount adsorbed to an adsorbed layer thickness.
+
     Conversion to a thickness is done by obtaining the number of adsorbed layers
     through dividing amount adsorbed by the amount adsorbed in a monolayer (as
     obtained by BET), then multiplying by the average thickness of a single
@@ -90,9 +89,7 @@ def convert_to_thickness(loading, monolayer):
 
 
 def load_std_isotherm(name: str) -> t.Callable:
-    """
-    Load a standard isotherm, convert the loading to thickness,
-    then fit an interpolator and then store it in memory.
+    """Load a standard isotherm, convert the loading to thickness, then fit an interpolator and then store it in memory.
 
     Parameters
     ----------
@@ -103,11 +100,6 @@ def load_std_isotherm(name: str) -> t.Callable:
     -------
     float
         Thickness of layer in nm.
-
-    Notes
-    -----
-
-
     """
     if name in _LOADED:
         return _LOADED[name]
@@ -131,7 +123,7 @@ def load_std_isotherm(name: str) -> t.Callable:
 
 def SiO2_JKO(pressure: float) -> float:
     """
-    Applicable for nitrogen at 77K on silica surfaces down to low pressures. [#]_
+    Applicable for nitrogen at 77K on silica surfaces down to low pressures. [#]_.
 
     Parameters
     ----------
@@ -155,9 +147,7 @@ def SiO2_JKO(pressure: float) -> float:
 
 
 def CB_KJG(pressure: float) -> float:
-    """
-    Applicable for nitrogen at 77K on non-graphitized
-    carbon materials down to low pressures. [#]_
+    """Applicable for nitrogen at 77K on non-graphitized carbon materials down to low pressures. [#]_.
 
     Parameters
     ----------
@@ -183,9 +173,10 @@ def CB_KJG(pressure: float) -> float:
 
 def aerosil_MCM(pressure: float) -> float:
     """
-    Hybrid curve using aerosil data at low pressure and MCM data at higher pressure
+    Hybrid curve using aerosil data at low pressure and MCM data at higher pressure.
+
     Taken from: https://doi.org/10.1021/la5026679, based on
-    https://doi.org/10.1016/j.micromeso.2010.10.006 and https://doi.org/10.1021/la0105477
+    https://doi.org/10.1016/j.micromeso.2010.10.006 and https://doi.org/10.1021/la0105477.
 
 
     Applicable for nitrogen at 77K, used for mesoporous zeolites.

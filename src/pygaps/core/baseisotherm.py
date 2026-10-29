@@ -106,11 +106,7 @@ class BaseIsotherm():
         temperature: t.Union[float, str] = None,
         **properties: dict,
     ):
-        """
-        Instantiate is done by passing a dictionary with the parameters,
-        as well as the info about units, modes and data columns.
-
-        """
+        """Instantiate is done by passing a dictionary with the parameters, as well as the info about units, modes and data columns."""
         # commonly used shorthands
         for shorthand, prop in SHORTHANDS.items():
             data = properties.pop(shorthand, None)
@@ -273,10 +269,11 @@ class BaseIsotherm():
 
     @property
     def units(self) -> dict:
-        """Return a dictionary of all isotherm units"""
+        """Return a dictionary of all isotherm units."""
         return {unit: getattr(self, unit) for unit in self._unit_params}
 
     def __hash__(self):
+        """Return a hash of the isotherm, based on its unique ID."""
         return hash(self.iso_id)
 
     def __eq__(self, other_isotherm) -> bool:
@@ -320,8 +317,8 @@ class BaseIsotherm():
         return string
 
     def to_dict(self) -> dict:
-        """
-        Returns a dictionary of the isotherm class
+        """Return a dictionary of the isotherm class.
+
         Is the same dictionary that was used to create it.
 
         Returns
@@ -482,8 +479,9 @@ class BaseIsotherm():
     @staticmethod
     def _splitdata(data, pressure_key: bool):
         """
-        Split isotherm data into an adsorption and desorption part and
-        return a column which marks the transition between the two.
+        Split isotherm data into an adsorption and desorption part.
+
+        Return a column which marks the transition between the two.
         """
         from pygaps.utilities.math_utilities import split_ads_data
         return split_ads_data(data, pressure_key)

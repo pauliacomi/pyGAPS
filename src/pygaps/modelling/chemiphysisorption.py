@@ -66,7 +66,7 @@ class ChemiPhysisorption(IsothermBaseModel):
     rt = 1000
 
     def __init_parameters__(self, params):
-        "Initialise model parameters from isotherm data"
+        """Initialise model parameters from isotherm data."""
         self.rt = constants.gas_constant * params['temperature']
 
     def loading(self, pressure):
@@ -146,9 +146,7 @@ class ChemiPhysisorption(IsothermBaseModel):
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def toth_correction(self, pressure):
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
             \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
@@ -179,15 +177,14 @@ class ChemiPhysisorption(IsothermBaseModel):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
-
         nm1K1 = self.params["n_m1"] * self.params["K1"]
         K1Pt1 = (self.params["K1"] * pressure)**self.params["t1"]
         invt1 = 1 / self.params["t1"]

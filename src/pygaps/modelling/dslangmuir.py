@@ -101,9 +101,7 @@ class DSLangmuir(IsothermBaseModel):
         return res
 
     def toth_correction(self, pressure):
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
             \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
@@ -116,15 +114,14 @@ class DSLangmuir(IsothermBaseModel):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
-
         nm1K1 = self.params["n_m1"] * self.params["K1"]
         K1P = self.params["K1"] * pressure
         nm2K2 = self.params["n_m2"] * self.params["K2"]

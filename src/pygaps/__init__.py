@@ -1,6 +1,6 @@
 # pylint: disable=W0614,W0611,W0622,C0411
-# flake8: noqa
 # isort:skip_file
+"""pyGAPS: a framework for processing adsorption isotherms and material characterisation."""
 
 __author__ = 'Paul Iacomi'
 __docformat__ = 'restructuredtext'
