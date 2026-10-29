@@ -60,7 +60,6 @@ docs = [
 dev = [
     {include-group = "test"},
     {include-group = "docs"},
-    "codecov",
     "yapf",
     "isort",
     "pylint",
