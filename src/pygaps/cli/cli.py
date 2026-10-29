@@ -101,7 +101,7 @@ def main():
         iso = pgp.isotherm_from_json(args.iso)
     elif ext == '.csv':
         iso = pgp.isotherm_from_csv(args.iso)
-    elif ext == '.xls':
+    elif ext in ('.xls', '.xlsx'):
         iso = pgp.isotherm_from_xl(args.iso)
     elif ext == '.aif':
         iso = pgp.isotherm_from_aif(args.iso)
@@ -156,7 +156,7 @@ def main():
                 out_iso.to_json(args.outfile)
             elif ext == '.csv':
                 out_iso.to_csv(args.outfile)
-            elif ext == '.xls':
+            elif ext in ('.xls', '.xlsx'):
                 out_iso.to_xl(args.outfile)
             elif ext == '.aif':
                 out_iso.to_aif(args.outfile)

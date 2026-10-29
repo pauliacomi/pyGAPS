@@ -58,7 +58,7 @@ class TestCLI():
         assert exitcode == 0
 
         # Test with XLS file
-        path = tempdir / 'isotherm.xls'
+        path = tempdir / 'isotherm.xlsx'
         basic_pointisotherm.to_xl(path)
         command = [*PYGAPS_CLI, path]
         out, err, exitcode = capture(command)

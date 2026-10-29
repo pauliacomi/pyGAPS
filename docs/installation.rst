@@ -47,7 +47,8 @@ The main packages that pyGAPS depends on are
   properties calculation (can also be connected to
   `REFPROP <https://www.nist.gov/srd/refprop>`__ if locally available).
 - `gemmi` for parsing AIF files.
-- `xlrd`, `xlwt`, `openpyxl` for parsing to and from Excel files.
+- `openpyxl` for reading and writing Excel (``.xlsx``) files and `xlrd` for
+  reading legacy ``.xls`` files.
 - `requests`, for communicating with the NIST ISODB.
 
 The `pyIAST <https://github.com/CorySimon/pyIAST>`__ package used to be a
