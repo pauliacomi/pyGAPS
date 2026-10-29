@@ -4,10 +4,13 @@ import pygaps.utilities.string_utilities as str_util
 
 
 @pytest.mark.utilities
-@pytest.mark.parametrize("test, res", [
-    ("N2", "$N_{2}$"),
-    ("C4H10", "$C_{4}H_{10}$"),
-])
+@pytest.mark.parametrize(
+    "test, res",
+    [
+        ("N2", "$N_{2}$"),
+        ("C4H10", "$C_{4}H_{10}$"),
+    ],
+)
 def test_convert_chemformula(test, res):
     assert str_util.convert_chemformula_ltx(test) == res
 

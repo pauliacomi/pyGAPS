@@ -4,6 +4,7 @@ from pygaps import logger
 
 try:
     import CoolProp as CP
+
     logger.debug(f"CoolProp version is '{CP.__version__}'")
 except ImportError:
     CP = None

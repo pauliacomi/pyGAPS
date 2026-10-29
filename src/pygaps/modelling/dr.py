@@ -77,7 +77,7 @@ class DR(IsothermBaseModel):
         """
         nm = self.params['n_m']
         e = self.params['e']
-        return nm * numpy.exp(-(self.minus_rt * numpy.log(pressure) / e)**2)
+        return nm * numpy.exp(-((self.minus_rt * numpy.log(pressure) / e) ** 2))
 
     def pressure(self, loading):
         r"""

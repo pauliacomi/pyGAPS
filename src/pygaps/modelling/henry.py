@@ -43,8 +43,8 @@ class Henry(IsothermBaseModel):
     name = 'Henry'
     formula = r"n(p) = K_H p"
     calculates = 'loading'
-    param_names = ("K")
-    param_default_bounds = ((0., numpy.inf), )
+    param_names = "K"
+    param_default_bounds = ((0.0, numpy.inf),)
 
     def loading(self, pressure):
         """

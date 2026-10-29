@@ -96,6 +96,7 @@ class WVST(IsothermBaseModel):
             Loading at specified pressure.
 
         """
+
         def fun(x):
             return self.pressure(x) - pressure
 

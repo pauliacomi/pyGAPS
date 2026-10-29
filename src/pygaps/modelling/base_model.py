@@ -44,9 +44,7 @@ class IsothermBaseModel(abc.ABC):
                 try:
                     self.params[param] = parameters[param]
                 except KeyError as err:
-                    raise KeyError(
-                        f"""The isotherm model is missing parameter '{param}'."""
-                    ) from err
+                    raise KeyError(f"""The isotherm model is missing parameter '{param}'.""") from err
         else:
             self.params = {param: numpy.nan for param in self.param_names}
 
@@ -56,10 +54,7 @@ class IsothermBaseModel(abc.ABC):
             self.param_bounds = {}
             for param, bound in parameter_bounds.items():
                 if param not in self.param_names:
-                    raise ParameterError(
-                        f"'{param}' is not a valid parameter"
-                        f" in the '{self.name}' model."
-                    )
+                    raise ParameterError(f"'{param}' is not a valid parameter in the '{self.name}' model.")
                 self.param_bounds[param] = bound
         else:
             self.param_bounds = dict(zip(self.param_names, self.param_default_bounds))
@@ -78,16 +73,11 @@ class IsothermBaseModel(abc.ABC):
 
     def __str__(self):
         """Print model name and parameters."""
-        ret_string = (
-            f"{self.name} isotherm model.\n"
-            f"RMSE = {self.rmse:.4g}\n"
-            "Model parameters:\n"
-        )
+        ret_string = f"{self.name} isotherm model.\nRMSE = {self.rmse:.4g}\nModel parameters:\n"
         for param, val in self.params.items():
             ret_string += f"\t{param} = {val:.4g}\n"
         ret_string += (
-            "Model applicable range:\n" +
-            f"\tPressure range: {self.pressure_range[0]:.3g} - {self.pressure_range[1]:.3g}\n"
+            "Model applicable range:\n" + f"\tPressure range: {self.pressure_range[0]:.3g} - {self.pressure_range[1]:.3g}\n"
             f"\tLoading range: {self.loading_range[0]:.3g} - {self.loading_range[1]:.3g}\n"
         )
 
@@ -249,8 +239,7 @@ class IsothermBaseModel(abc.ABC):
 
         param_names = list(self.params)
         guess = numpy.array([param_guess[p] for p in param_names])
-        bounds = [[self.param_bounds[p][0] for p in param_names],
-                  [self.param_bounds[p][1] for p in param_names]]
+        bounds = [[self.param_bounds[p][0] for p in param_names], [self.param_bounds[p][1] for p in param_names]]
 
         if self.calculates == "loading":
             fit_func_base = lambda pr, ld: self.loading(pr) - ld
@@ -281,7 +270,7 @@ class IsothermBaseModel(abc.ABC):
             self.params[param_names[i]] = opt_res.x[i]
 
         # calculate RMSE
-        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading)) / model_range
+        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun) ** 2) / len(loading)) / model_range
 
         if verbose:
             logger.info(f"Model {self.name} success, RMSE is {self.rmse:.3g}")
@@ -291,9 +280,7 @@ class IsothermBaseModel(abc.ABC):
         try:
             opt_res = optimize.least_squares(**leastsq_args)
         except ValueError as err:
-            raise CalculationError(
-                f"Fitting routine for {self.name} failed with error:\n\t{err}"
-            ) from err
+            raise CalculationError(f"Fitting routine for {self.name} failed with error:\n\t{err}") from err
         if not opt_res.success:
             raise CalculationError(
                 f"Fitting routine for {self.name} failed with error:"

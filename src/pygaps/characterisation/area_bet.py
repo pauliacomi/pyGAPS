@@ -146,10 +146,7 @@ def area_BET(
 
     # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
-            "loading_basis": "molar",
-            "loading_unit": "mol"
-        }, {"pressure_mode": "relative"}
+        isotherm, branch, {"loading_basis": "molar", "loading_unit": "mol"}, {"pressure_mode": "relative"}
     )
 
     # use the bet function
@@ -186,6 +183,7 @@ def area_BET(
 
         # Generate plot of the BET points chosen
         from pygaps.graphing.calc_graphs import bet_plot
+
         bet_plot(
             pressure,
             bet_transform(pressure, loading),
@@ -199,6 +197,7 @@ def area_BET(
 
         # Generate plot of the Rouquerol points chosen
         from pygaps.graphing.calc_graphs import roq_plot
+
         roq_plot(
             pressure,
             roq_transform(pressure, loading),
@@ -303,12 +302,9 @@ def area_BET_raw(
             maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
 
     if maximum - minimum < 2:  # (for 3 point minimum)
-        raise CalculationError(
-            "The isotherm does not have enough points (at least 3) "
-            "in the BET region. Unable to calculate BET area."
-        )
-    pressure = pressure[minimum:maximum + 1]
-    loading = loading[minimum:maximum + 1]
+        raise CalculationError("The isotherm does not have enough points (at least 3) in the BET region. Unable to calculate BET area.")
+    pressure = pressure[minimum : maximum + 1]
+    loading = loading[minimum : maximum + 1]
 
     # calculate the BET transform, slope and intercept
     bet_t_array = bet_transform(
@@ -369,10 +365,10 @@ def bet_parameters(slope, intercept, cross_section):
     c_const = (slope / intercept) + 1
     n_monolayer = 1 / (intercept * c_const)
     p_monolayer = 1 / (numpy.sqrt(c_const) + 1)
-    bet_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
+    bet_area = n_monolayer * cross_section * (10 ** (-18)) * constants.Avogadro
     return n_monolayer, p_monolayer, c_const, bet_area
 
 
 def simple_bet(pressure, n_monolayer, c_const):
     """Return loading at a pressure using a simple BET equation."""
-    return (n_monolayer * c_const * pressure / (1 - pressure) / (1 - pressure + c_const * pressure))
+    return n_monolayer * c_const * pressure / (1 - pressure) / (1 - pressure + c_const * pressure)

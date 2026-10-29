@@ -18,8 +18,9 @@ import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.characterisation
-class TestThicknessModels():
+class TestThicknessModels:
     """Test the thickness models."""
+
     def test_get_thickness_model(self):
         """Get a regular model."""
         assert mt.get_thickness_model('Halsey') == mt._THICKNESS_MODELS['Halsey']
@@ -35,6 +36,7 @@ class TestThicknessModels():
 
     def test_get_thickness_callable(self):
         """When we pass a function, we receive it back."""
+
         def call_this():
             return 'called'
 
@@ -42,14 +44,15 @@ class TestThicknessModels():
         assert ret() == 'called'
 
     @pytest.mark.parametrize(
-        'modelname, thickness', [
+        'modelname, thickness',
+        [
             ('Halsey', [0.46, 0.62, 1.28]),
             ('Harkins/Jura', [0.37, 0.57, 1.32]),
             ('zero thickness', [0, 0, 0]),
             ('SiO2 Jaroniec/Kruk/Olivier', [0.362, 0.538, 1.036]),
             ('carbon black Kruk/Jaroniec/Gadkaree', [0.374, 0.565, 1.257]),
-            ('aerosil_MCM', [0.362, 0.538, 1.038])
-        ]
+            ('aerosil_MCM', [0.362, 0.538, 1.038]),
+        ],
     )
     def test_models(self, modelname, thickness):
         """Test each model against pre-calculated values."""

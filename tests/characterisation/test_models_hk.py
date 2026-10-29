@@ -15,8 +15,9 @@ import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.characterisation
-class TestHKModels():
+class TestHKModels:
     """Tests the HK models."""
+
     def test_get_hk_model_string(self):
         """Just gets stored models."""
         for model in hk._ADSORBENT_MODELS:
@@ -31,9 +32,9 @@ class TestHKModels():
         """When passing a dict, we check for consistency and return the same dict."""
         model_dict = dict(
             molecular_diameter=0.276,  # nm
-            polarizability=2.5E-3,  # nm3
-            magnetic_susceptibility=1.3E-7,  # nm3
-            surface_density=1.315E19,  # molecules/m2
+            polarizability=2.5e-3,  # nm3
+            magnetic_susceptibility=1.3e-7,  # nm3
+            surface_density=1.315e19,  # molecules/m2
         )
 
         assert hk.get_hk_model(model_dict) == model_dict

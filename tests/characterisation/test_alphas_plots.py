@@ -25,7 +25,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestAlphaSPlot():
+class TestAlphaSPlot:
     """Test alpha-s calculation."""
 
     def test_alphas_checks(self, use_adsorbate, basic_pointisotherm):
@@ -106,9 +106,7 @@ class TestAlphaSPlot():
         err_absolute_volume = 0.01  # units
 
         assert isclose(results[-1].get('adsorbed_volume'), 0, err_relative, err_absolute_area)
-        assert isclose(
-            results[-1].get('area'), sample['s_as_area'], err_relative, err_absolute_volume
-        )
+        assert isclose(results[-1].get('area'), sample['s_as_area'], err_relative, err_absolute_volume)
 
     @mpl_cleanup
     def test_alphas_output(self, data_char_path):

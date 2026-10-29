@@ -2,6 +2,7 @@
 
 # isort: skip_file
 import matplotlib
+
 matplotlib.use('Agg')
 
 import pytest
@@ -12,8 +13,9 @@ from ..test_utils import mpl_cleanup
 
 
 @pytest.mark.graphing
-class TestCalcGraphs():
+class TestCalcGraphs:
     """Tests all calculation graphs"""
+
     @mpl_cleanup
     def test_bet_graph(self):
         """Test BET graph"""

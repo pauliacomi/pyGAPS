@@ -84,6 +84,7 @@ class TemkinApprox(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
+
         def fun(x):
             return self.loading(x) - loading
 

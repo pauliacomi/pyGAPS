@@ -26,61 +26,61 @@ _parser_version = "3.0"
 
 _META_DICT = {
     'material': {
-        'text': ('Material name', ),
+        'text': ('Material name',),
         'name': 'material',
         'row': 0,
         'column': 0,
     },
     'temperature': {
-        'text': ('Experiment temperature (K)', ),
+        'text': ('Experiment temperature (K)',),
         'name': 'temperature',
         'row': 1,
         'column': 0,
     },
     'adsorbate': {
-        'text': ('Adsorbate used', ),
+        'text': ('Adsorbate used',),
         'name': 'adsorbate',
         'row': 2,
         'column': 0,
     },
     'pressure_mode': {
-        'text': ('Pressure mode', ),
+        'text': ('Pressure mode',),
         'name': 'pressure_mode',
         'row': 3,
         'column': 0,
     },
     'pressure_unit': {
-        'text': ('Pressure unit', ),
+        'text': ('Pressure unit',),
         'name': 'pressure_unit',
         'row': 4,
         'column': 0,
     },
     'loading_basis': {
-        'text': ('Loading basis', ),
+        'text': ('Loading basis',),
         'name': 'loading_basis',
         'row': 5,
         'column': 0,
     },
     'loading_unit': {
-        'text': ('Loading unit', ),
+        'text': ('Loading unit',),
         'name': 'loading_unit',
         'row': 6,
         'column': 0,
     },
     'material_basis': {
-        'text': ('Material basis', ),
+        'text': ('Material basis',),
         'name': 'material_basis',
         'row': 7,
         'column': 0,
     },
     'material_unit': {
-        'text': ('Material unit', ),
+        'text': ('Material unit',),
         'name': 'material_unit',
         'row': 8,
         'column': 0,
     },
     'isotherm_data': {
-        'text': ('Isotherm type', ),
+        'text': ('Isotherm type',),
         'name': 'isotherm_data',
         'row': 9,
         'column': 0,
@@ -159,7 +159,6 @@ def isotherm_to_xl(isotherm, path):
     sht.column_dimensions['B'].width = 25
 
     if isinstance(isotherm, PointIsotherm):
-
         # Write the type
         write(type_row, type_col + 1, 'data', styled=True)
 
@@ -183,7 +182,6 @@ def isotherm_to_xl(isotherm, path):
                 write(data_row + row_index + 1, col_index, datapoint)
 
     elif isinstance(isotherm, ModelIsotherm):
-
         # Write the type
         write(type_row, type_col + 1, 'model', styled=True)
 
@@ -196,15 +194,9 @@ def isotherm_to_xl(isotherm, path):
         write(model_row + 2, 0, 'RMSE')
         write(model_row + 2, 1, isotherm.model.rmse)
         write(model_row + 3, 0, 'Pressure range')
-        write(
-            model_row + 3, 1,
-            f'({isotherm.model.pressure_range[0]}, {isotherm.model.pressure_range[1]})'
-        )
+        write(model_row + 3, 1, f'({isotherm.model.pressure_range[0]}, {isotherm.model.pressure_range[1]})')
         write(model_row + 4, 0, 'Loading range')
-        write(
-            model_row + 4, 1,
-            f'({isotherm.model.loading_range[0]}, {isotherm.model.loading_range[1]})'
-        )
+        write(model_row + 4, 1, f'({isotherm.model.loading_range[0]}, {isotherm.model.loading_range[1]})')
         write(model_row + 5, 0, 'Model parameters')
         model_row = model_row + 5
         for row_index, param in enumerate(isotherm.model.params):
@@ -252,6 +244,7 @@ def _read_workbook(path):
 
     if path.suffix.lower() == '.xls':
         import xlrd
+
         wb = xlrd.open_workbook(path)
         for sht in wb.sheets():
             rows = []
@@ -268,6 +261,7 @@ def _read_workbook(path):
             sheets[sht.name] = _Sheet(rows)
     else:
         from openpyxl import load_workbook
+
         wb = load_workbook(path, read_only=True, data_only=True)
 
         # Excel has a single number type: return floats like xlrd does
@@ -278,8 +272,7 @@ def _read_workbook(path):
 
         try:
             for sht in wb.worksheets:
-                sheets[sht.title] = _Sheet([[normalise(v) for v in row]
-                                            for row in sht.iter_rows(values_only=True)])
+                sheets[sht.title] = _Sheet([[normalise(v) for v in row] for row in sht.iter_rows(values_only=True)])
         finally:
             wb.close()
 
@@ -327,7 +320,6 @@ def isotherm_from_xl(path, **isotherm_parameters):
     isotherm_type = str(sht.value(type_row, 1) or '').lower()
 
     if isotherm_type.startswith('data'):
-
         # Store isotherm type
         isotype = 1
 
@@ -351,9 +343,7 @@ def isotherm_from_xl(path, **isotherm_parameters):
                 break
             # read header, data, and dtype
             headers.append(header)
-            experiment_data[header] = [
-                sht.value(i, header_col) for i in range(start_row, final_row)
-            ]
+            experiment_data[header] = [sht.value(i, header_col) for i in range(start_row, final_row)]
             # read the data type
             # only read the data type if it is not a pressure, loading or branch
             if header_col > 2:
@@ -374,7 +364,6 @@ def isotherm_from_xl(path, **isotherm_parameters):
             raw_dict['branch'] = 'guess'
 
     if isotherm_type.startswith('model'):
-
         # Store isotherm type
         isotype = 2
         model = {

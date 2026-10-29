@@ -10,8 +10,9 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 @pytest.mark.core
-class TestAdsorbate():
+class TestAdsorbate:
     """Test the adsorbate class."""
+
     def test_adsorbate_basic(self):
         """Basic creation tests."""
         with pytest.raises(ParameterError):
@@ -101,32 +102,17 @@ class TestAdsorbate():
     def test_adsorbate_named_props(self, adsorbate_data, basic_adsorbate, calculated):
         """Test all named properties, both calculated and not."""
         temp = 77.355
-        assert basic_adsorbate.molar_mass(calculated) == pytest.approx(
-            adsorbate_data.get('molar_mass'), 0.001
-        )
-        assert basic_adsorbate.t_triple(calculated
-                                        ) == pytest.approx(adsorbate_data.get('t_triple'), 0.001)
-        assert basic_adsorbate.p_triple(calculated) == pytest.approx(
-            adsorbate_data.get('p_triple') * 1e5, 0.001
-        )
-        assert basic_adsorbate.t_critical(calculated) == pytest.approx(
-            adsorbate_data.get('t_critical'), 0.001
-        )
-        assert basic_adsorbate.p_critical(calculated) == pytest.approx(
-            adsorbate_data.get('p_critical') * 1e5, 0.001
-        )
+        assert basic_adsorbate.molar_mass(calculated) == pytest.approx(adsorbate_data.get('molar_mass'), 0.001)
+        assert basic_adsorbate.t_triple(calculated) == pytest.approx(adsorbate_data.get('t_triple'), 0.001)
+        assert basic_adsorbate.p_triple(calculated) == pytest.approx(adsorbate_data.get('p_triple') * 1e5, 0.001)
+        assert basic_adsorbate.t_critical(calculated) == pytest.approx(adsorbate_data.get('t_critical'), 0.001)
+        assert basic_adsorbate.p_critical(calculated) == pytest.approx(adsorbate_data.get('p_critical') * 1e5, 0.001)
         assert basic_adsorbate.saturation_pressure(temp, calculate=calculated) == pytest.approx(
             adsorbate_data.get('saturation_pressure'), 0.001
         )
-        assert basic_adsorbate.surface_tension(temp, calculate=calculated) == pytest.approx(
-            adsorbate_data.get('surface_tension'), 0.001
-        )
-        assert basic_adsorbate.liquid_density(temp, calculate=calculated) == pytest.approx(
-            adsorbate_data.get('liquid_density'), 0.001
-        )
-        assert basic_adsorbate.gas_density(temp, calculate=calculated) == pytest.approx(
-            adsorbate_data.get('gas_density'), 0.001
-        )
+        assert basic_adsorbate.surface_tension(temp, calculate=calculated) == pytest.approx(adsorbate_data.get('surface_tension'), 0.001)
+        assert basic_adsorbate.liquid_density(temp, calculate=calculated) == pytest.approx(adsorbate_data.get('liquid_density'), 0.001)
+        assert basic_adsorbate.gas_density(temp, calculate=calculated) == pytest.approx(adsorbate_data.get('gas_density'), 0.001)
         assert basic_adsorbate.enthalpy_liquefaction(temp, calculate=calculated) == pytest.approx(
             adsorbate_data.get('enthalpy_liquefaction'), 0.001
         )

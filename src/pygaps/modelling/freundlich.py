@@ -69,7 +69,7 @@ class Freundlich(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
-        return self.params["K"] * pressure**(1 / self.params["m"])
+        return self.params["K"] * pressure ** (1 / self.params["m"])
 
     def pressure(self, loading):
         r"""
@@ -92,7 +92,7 @@ class Freundlich(IsothermBaseModel):
             Pressure at specified loading.
 
         """
-        return (loading / self.params['K'])**self.params['m']
+        return (loading / self.params['K']) ** self.params['m']
 
     def spreading_pressure(self, pressure):
         r"""
@@ -123,7 +123,7 @@ class Freundlich(IsothermBaseModel):
         """
         K = self.params["K"]
         m = self.params["m"]
-        return m * K * pressure**(1 / m)
+        return m * K * pressure ** (1 / m)
 
     def toth_correction(self, pressure: float) -> float:
         r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.

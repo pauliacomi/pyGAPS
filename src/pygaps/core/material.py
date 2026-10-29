@@ -4,7 +4,7 @@ from pygaps.data import MATERIAL_LIST
 from pygaps.utilities.exceptions import ParameterError
 
 
-class Material():
+class Material:
     """
     An unified descriptor for an adsorbent material.
 
@@ -86,7 +86,7 @@ class Material():
         if self.properties:
             string += "Other properties: \n"
             for prop, val in self.properties.items():
-                string += (f"\t{prop}: {str(val)}\n")
+                string += f"\t{prop}: {str(val)}\n"
 
         print(string)
 
@@ -120,8 +120,7 @@ class Material():
             return next(mat for mat in MATERIAL_LIST if name == mat)
         except StopIteration as err:
             raise ParameterError(
-                f"Material {name} does not exist in list of materials. "
-                "First populate pygaps.MATERIAL_LIST with required material class"
+                f"Material {name} does not exist in list of materials. First populate pygaps.MATERIAL_LIST with required material class"
             ) from err
 
     def to_dict(self) -> dict:
@@ -185,8 +184,6 @@ class Material():
             try:
                 req_prop = getattr(self, prop)
             except AttributeError as exc:
-                raise ParameterError(
-                    f"Material '{self.name}' does not have a property named '{prop}'."
-                ) from exc
+                raise ParameterError(f"Material '{self.name}' does not have a property named '{prop}'.") from exc
 
         return req_prop

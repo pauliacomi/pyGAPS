@@ -26,7 +26,7 @@ ISO_STYLE: "dict[str, t.Any]" = {
     'lines.markersize': 5,
     'legend.handlelength': 2,
     'legend.fontsize': 11,
-    'image.aspect': 'equal'
+    'image.aspect': 'equal',
 }
 
 #: Style component to generate "muted/unselected" points.

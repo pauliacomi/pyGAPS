@@ -69,8 +69,9 @@ class Virial(IsothermBaseModel):
         float
             Loading at specified pressure.
         """
+
         def fun(x):
-            return (self.pressure(x) - pressure)**2
+            return (self.pressure(x) - pressure) ** 2
 
         opt_res = optimize.minimize(fun, pressure, method='Nelder-Mead')
 
@@ -98,8 +99,7 @@ class Virial(IsothermBaseModel):
             Pressure at specified loading.
         """
         return loading * numpy.exp(
-            -numpy.log(self.params['K']) + self.params['A'] * loading +
-            self.params['B'] * loading**2 + self.params['C'] * loading**3
+            -numpy.log(self.params['K']) + self.params['A'] * loading + self.params['B'] * loading**2 + self.params['C'] * loading**3
         )
 
     def spreading_pressure(self, pressure):
@@ -172,8 +172,7 @@ class Virial(IsothermBaseModel):
         # parameter names (cannot rely on order in Dict)
         param_names = list(self.params)
         guess = numpy.array([param_guess[param] for param in param_names])
-        bounds = [[self.param_bounds[param][0] for param in param_names],
-                  [self.param_bounds[param][1] for param in param_names]]
+        bounds = [[self.param_bounds[param][0] for param in param_names], [self.param_bounds[param][1] for param in param_names]]
 
         # remove invalid values in function
         zero_values = ~numpy.logical_and(pressure > 0, loading > 0)
@@ -212,8 +211,7 @@ class Virial(IsothermBaseModel):
         def fit_func(x, L, ln_p_over_n):
             for i, _ in enumerate(param_names):
                 self.params[param_names[i]] = x[i]
-            return self.params['C'] * L**3 + self.params['B'] * L**2 \
-                + self.params['A'] * L - numpy.log(self.params['K']) - ln_p_over_n
+            return self.params['C'] * L**3 + self.params['B'] * L**2 + self.params['A'] * L - numpy.log(self.params['K']) - ln_p_over_n
 
         kwargs = {
             "fun": fit_func,  # fitting function
@@ -232,13 +230,11 @@ class Virial(IsothermBaseModel):
         for index, _ in enumerate(param_names):
             self.params[param_names[index]] = opt_res.x[index]
 
-        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun)**2) / len(loading))
+        self.rmse = numpy.sqrt(numpy.sum((opt_res.fun) ** 2) / len(loading))
 
         if verbose:
             from pygaps.graphing.calc_graphs import virial_plot
+
             logger.info(f"Model {self.name} success, RMSE is {self.rmse:.4g}")
             n_load = numpy.linspace(1e-2, numpy.amax(loading), 100)
-            virial_plot(
-                loading, ln_p_over_n, n_load,
-                numpy.log(numpy.divide(self.pressure(n_load), n_load)), added_point
-            )
+            virial_plot(loading, ln_p_over_n, n_load, numpy.log(numpy.divide(self.pressure(n_load), n_load)), added_point)

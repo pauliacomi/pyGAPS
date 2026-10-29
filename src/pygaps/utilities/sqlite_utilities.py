@@ -27,7 +27,6 @@ def db_execute_general(
     # Attempt to connect
     try:
         with sqlite3.connect(pth) as db:
-
             # Get a cursor object
             cursor = db.cursor()
             cursor.execute('PRAGMA foreign_keys = ON')
@@ -68,8 +67,10 @@ def build_update(
 
     """
     return (
-        f"UPDATE \"{table}\" SET " + ", ".join(f"{w} = :{w}" for w in to_set) + " WHERE " +
-        " AND ".join(f"{w} = :{prefix or ''}{w}" for w in where)
+        f"UPDATE \"{table}\" SET "
+        + ", ".join(f"{w} = :{w}" for w in to_set)
+        + " WHERE "
+        + " AND ".join(f"{w} = :{prefix or ''}{w}" for w in where)
     )
 
 
@@ -90,10 +91,7 @@ def build_insert(table: str, to_insert: list):
         Built query string.
 
     """
-    return (
-        f"INSERT INTO \"{table}\" (" + ", ".join(f"{w}" for w in to_insert) + ") VALUES (" +
-        ", ".join(f":{w}" for w in to_insert) + ")"
-    )
+    return f"INSERT INTO \"{table}\" (" + ", ".join(f"{w}" for w in to_insert) + ") VALUES (" + ", ".join(f":{w}" for w in to_insert) + ")"
 
 
 def build_select(
@@ -120,11 +118,8 @@ def build_select(
 
     """
     if where:
-        return (
-            "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\" WHERE " +
-            " AND ".join(f"{w} = :{w}" for w in where)
-        )
-    return ("SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\"")
+        return "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\" WHERE " + " AND ".join(f"{w} = :{w}" for w in where)
+    return "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\""
 
 
 def build_select_unnamed(table: str, to_select: list, where: list, join: str = "AND"):
@@ -149,8 +144,7 @@ def build_select_unnamed(table: str, to_select: list, where: list, join: str = "
 
     """
     return (
-        "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\" WHERE " +
-        (" " + join + " ").join(f"{w} = ?" for w in where)
+        "SELECT " + ", ".join(f"{w}" for w in to_select) + f" FROM \"{table}\" WHERE " + (" " + join + " ").join(f"{w} = ?" for w in where)
     )
 
 

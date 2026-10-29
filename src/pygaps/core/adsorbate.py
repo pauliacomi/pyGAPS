@@ -12,7 +12,7 @@ from pygaps.utilities.exceptions import ParameterError
 # TODO: units in the prop dictionary and from coolprop do not always match (e.g. p_critical)
 
 
-class Adsorbate():
+class Adsorbate:
     """
     An unified class descriptor for an adsorbate.
 
@@ -173,12 +173,12 @@ class Adsorbate():
     def print_info(self):
         """Print a short summary of all the adsorbate parameters."""
         string = f"pyGAPS Adsorbate: '{self.name}'\n"
-        string += f"Aliases: {*self.alias, }\n"
+        string += f"Aliases: {(*self.alias,)}\n"
 
         if self.properties:
             string += "Other properties: \n"
             for prop, val in self.properties.items():
-                string += (f"\t{prop}: {str(val)}\n")
+                string += f"\t{prop}: {str(val)}\n"
 
         print(string)
 
@@ -219,10 +219,7 @@ class Adsorbate():
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
-        if (
-            not self._backend_mode or
-            self._backend_mode != thermodynamic_backend()
-        ):
+        if not self._backend_mode or self._backend_mode != thermodynamic_backend():
             self._backend_mode = thermodynamic_backend()
             self._state = CP.AbstractState(self._backend_mode, self.backend_name)
 
@@ -302,8 +299,7 @@ class Adsorbate():
         c_name = self.properties.get("backend_name")
         if c_name is None:
             raise ParameterError(
-                f"Adsorbate '{self.name}' does not have a property named "
-                "backend_name. This must be available for CoolProp interaction."
+                f"Adsorbate '{self.name}' does not have a property named backend_name. This must be available for CoolProp interaction."
             )
         return c_name
 
@@ -556,17 +552,15 @@ class Adsorbate():
             If it cannot be calculated, due to a physical reason.
 
         """
-        if (pseudo and temp > self.t_critical()):
+        if pseudo and temp > self.t_critical():
             if pseudo == 'Dubinin':
                 if verbose:
                     logger.warning('Dubinin pseudo-saturation pressure calculated.')
                 return self.saturation_pressure_pseudo_dubinin(temp=temp, unit=unit)
             # TODO add Antoine version
             # if pseudo == 'Antoine':
-                # return ...
-            raise ParameterError(
-                "No type of calculation specified for pseudosaturation pressure."
-            )
+            # return ...
+            raise ParameterError("No type of calculation specified for pseudosaturation pressure.")
 
         if calculate:
             try:
@@ -613,15 +607,12 @@ class Adsorbate():
 
         """
         if temp < self.t_critical():
-            logger.warning(
-                f'{self.name} is below critical temperature. '
-                f'Returning real saturation pressure.'
-            )
+            logger.warning(f'{self.name} is below critical temperature. Returning real saturation pressure.')
             return self.saturation_pressure(temp=temp)
         if k < 1:
             raise ParameterError(f'The value for the exponent, k, is too small ({k}).')
 
-        sat_p = self.p_critical() * ((temp / self.t_critical())**k)
+        sat_p = self.p_critical() * ((temp / self.t_critical()) ** k)
 
         if unit is not None:
             sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
@@ -915,9 +906,7 @@ class Adsorbate():
         """
         if calculate:
             if temp and press:
-                raise CalculationError(
-                    "Can only specify one intensive variable, either temperature or pressure."
-                )
+                raise CalculationError("Can only specify one intensive variable, either temperature or pressure.")
             try:
                 state = self.backend
                 if temp:
@@ -960,13 +949,8 @@ class Adsorbate():
 
 
 def _warn_reading_params(err):
-    logger.warning(
-        f"Thermodynamic backend failed with error: {err}. "
-        "Attempting to read parameters dictionary..."
-    )
+    logger.warning(f"Thermodynamic backend failed with error: {err}. Attempting to read parameters dictionary...")
 
 
 def _raise_calculation_error(err):
-    raise CalculationError(
-        f"Thermodynamic backend failed (see traceback for error): {err}"
-    ) from err
+    raise CalculationError(f"Thermodynamic backend failed (see traceback for error): {err}") from err

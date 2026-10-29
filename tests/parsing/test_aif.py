@@ -48,11 +48,7 @@ def _strip_serialized_aif_fields(data_dict):
 
     def remove_none_values(value):
         if isinstance(value, dict):
-            return {
-                key: remove_none_values(item)
-                for key, item in value.items()
-                if item is not None
-            }
+            return {key: remove_none_values(item) for key, item in value.items() if item is not None}
         if isinstance(value, list):
             return [remove_none_values(item) for item in value if item is not None]
         return value
@@ -62,8 +58,9 @@ def _strip_serialized_aif_fields(data_dict):
 
 
 @pytest.mark.parsing
-class TestAIF():
+class TestAIF:
     """Test AIF-related functionality."""
+
     def test_aif_writes_v1_fields(self, basic_pointisotherm):
         """Test that the writer emits v1.0 fields alongside pyGAPS extras."""
         aif_text = pgp.isotherm_to_aif(basic_pointisotherm)
@@ -94,9 +91,7 @@ class TestAIF():
         aif_text = pgp.isotherm_to_aif(basic_pointisotherm)
         restored = pgp.isotherm_from_aif(aif_text)
 
-        quadrupole_units = cif.read_string(aif_text).sole_block().find_value(
-            '_units_quadrupole_moment'
-        )
+        quadrupole_units = cif.read_string(aif_text).sole_block().find_value('_units_quadrupole_moment')
         assert quadrupole_units == "'Debye·Å'"
         for key, value in details.items():
             aif_key = 'molecular_weight' if key == 'molar_mass' else key
@@ -207,9 +202,16 @@ class TestAIF():
             pgp.isotherm_from_aif(source)
 
     @pytest.mark.parametrize("fixture_name", ["basic_isotherm", "basic_pointisotherm", "basic_modelisotherm"])
-    @pytest.mark.parametrize("method", [{}, {"experimental_method": "unspecified"},
-                                      {"experimental_method": "volumetric"},
-                                      {"experimental_method": None}, {"experimental_method": ""}])
+    @pytest.mark.parametrize(
+        "method",
+        [
+            {},
+            {"experimental_method": "unspecified"},
+            {"experimental_method": "volumetric"},
+            {"experimental_method": None},
+            {"experimental_method": ""},
+        ],
+    )
     def test_aif_method_roundtrip_identity(self, request, fixture_name, method):
         """A generated method must not alter metadata or identity on re-import."""
         isotherm = request.getfixturevalue(fixture_name)
@@ -282,17 +284,17 @@ class TestAIF():
         assert isotherm
 
     @pytest.mark.parametrize(
-        "name, material, adsorbate, temperature, columns", [
+        "name, material, adsorbate, temperature, columns",
+        [
             ("01_basic_n2_77K.aif", "Zeolite-13X", "nitrogen", 77.35, ["pressure_saturation"]),
-            ("02_full_featured.aif", "UiO-66-NH2", "carbon dioxide", 298.15,
-             ["pressure_saturation", "loading_excess", "enthalpy"]),
+            ("02_full_featured.aif", "UiO-66-NH2", "carbon dioxide", 298.15, ["pressure_saturation", "loading_excess", "enthalpy"]),
             ("03_high_pressure_ch4.aif", "AX-21", "methane", 298.15, ["loading_excess", "loading_absolute"]),
             ("04_water_vapor.aif", "Silica-Gel-Type-A", "water", 298.15, ["pressure_saturation"]),
             ("05_simulation_gcmc.aif", "MOF-5", "carbon dioxide", 298.15, []),
             ("06_co2_calorimetry.aif", "MIL-53(Al)", "carbon dioxide", 298.15, ["enthalpy", "enthalpy_integral"]),
             ("AC Ar 77K.aif", "unknown", "argon", 87.0, ["pressure_saturation"]),
             ("DMOF C2H6 298K.aif", "DMOF", "ethane", 298.15, ["pressure_saturation"]),
-        ]
+        ],
     )
     def test_aif_read_values(self, name, material, adsorbate, temperature, columns):
         """Test that v1.0 and legacy AIFs are read into the expected values."""
@@ -327,9 +329,7 @@ class TestAIF():
 
         # branches
         assert isotherm.has_branch('ads') and isotherm.has_branch('des')
-        assert list(isotherm.pressure(branch='ads', indexed=True)) == sorted(
-            isotherm.pressure(branch='ads', indexed=True)
-        )
+        assert list(isotherm.pressure(branch='ads', indexed=True)) == sorted(isotherm.pressure(branch='ads', indexed=True))
 
         # analysis loops are kept as rows
         fits = isotherm.properties['analysis_fit']
@@ -428,9 +428,7 @@ class TestAIF():
             'empty': [],
             'bracket_text': '[not a list',
         }
-        isotherm = pygaps.PointIsotherm(
-            pressure=[1, 2], loading=[1, 2], material='M', adsorbate='nitrogen', temperature=77, **properties
-        )
+        isotherm = pygaps.PointIsotherm(pressure=[1, 2], loading=[1, 2], material='M', adsorbate='nitrogen', temperature=77, **properties)
         round_tripped = pgp.isotherm_from_aif(pgp.isotherm_to_aif(isotherm))
 
         for key, value in properties.items():
@@ -467,9 +465,7 @@ class TestAIF():
     def test_aif_write_custom_row_loops(self):
         """Test that pyGAPS row lists are written as namespaced loops."""
         rows = [{'Step': 1, 'note': 'a b', 'value_1': 1.5}, {'Step': 2, 'note': None, 'value_1': 2.5}]
-        isotherm = pygaps.PointIsotherm(
-            pressure=[1, 2], loading=[1, 2], material='M', adsorbate='nitrogen', temperature=77, my_Rows=rows
-        )
+        isotherm = pygaps.PointIsotherm(pressure=[1, 2], loading=[1, 2], material='M', adsorbate='nitrogen', temperature=77, my_Rows=rows)
         aif_text = pgp.isotherm_to_aif(isotherm)
         assert "_pygaps_my_Rows.Step" in aif_text
 
@@ -479,11 +475,13 @@ class TestAIF():
     def test_aif_write_dependent_units(self):
         """Test that units required by dimensional values are written."""
         isotherm = pygaps.PointIsotherm(
-            isotherm_data=pandas.DataFrame({
-                'pressure': [1, 2],
-                'loading': [1, 2],
-                'enthalpy': [30, 25],
-            }),
+            isotherm_data=pandas.DataFrame(
+                {
+                    'pressure': [1, 2],
+                    'loading': [1, 2],
+                    'enthalpy': [30, 25],
+                }
+            ),
             pressure_key='pressure',
             loading_key='loading',
             material={'name': 'M', 'mass': 0.1, 'density': 1.2, 'molar_mass': 100, 'activation_time': 12},
@@ -547,16 +545,18 @@ class TestAIF():
         assert errors == []
 
     @pytest.mark.parametrize(
-        "loop, missing", [
+        "loop, missing",
+        [
             ("_adsorp_index\n_adsorp_fugacity\n_adsorp_amount\n1 1.0 1.0", "_adsorp_pressure"),
             ("_adsorp_index\n_adsorp_pressure\n_adsorp_amount_excess\n1 1.0 1.0", "_adsorp_amount"),
             ("_desorp_index\n_desorp_pressure\n_desorp_amount_component_1\n1 1.0 1.0", "_desorp_amount"),
-        ]
+        ],
     )
     def test_aif_read_unsupported_data(self, loop, missing):
         """Test that data loops without pressure or total amount raise a specific error."""
-        aif_text = textwrap.dedent(
-            """
+        aif_text = (
+            textwrap.dedent(
+                """
             data_example
             _audit_aif_version v1.0
             _exptl_method volumetric
@@ -568,7 +568,10 @@ class TestAIF():
             _units_sorbed_amount mmol/g
             loop_
             """
-        ).strip() + "\n" + loop
+            ).strip()
+            + "\n"
+            + loop
+        )
 
         with pytest.raises(ParsingError, match=f"missing the required column\\(s\\) {missing}"):
             pgp.isotherm_from_aif(aif_text)

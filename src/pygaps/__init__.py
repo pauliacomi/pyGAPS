@@ -10,6 +10,7 @@ try:
     from ._version import __version__
 except ImportError:
     from importlib.metadata import PackageNotFoundError, version as _version
+
     try:
         __version__ = _version("pygaps")
     except PackageNotFoundError:

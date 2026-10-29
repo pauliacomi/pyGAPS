@@ -3,6 +3,7 @@ Simple command-line interface for pyGAPS.
 
 The main() function is defined as the entrypoint in setuptools' console_scripts.
 """
+
 import argparse
 import pathlib
 
@@ -72,7 +73,8 @@ def main():
         help='increase verbosity',
     )
     prs.add_argument(
-        '-V', '--version',
+        '-V',
+        '--version',
         action="store_true",
         help="Print current version.",
     )
@@ -82,6 +84,7 @@ def main():
 
     if args.version:
         from importlib.metadata import version
+
         print(version("pygaps"))
         return
 
@@ -106,6 +109,7 @@ def main():
         iso = pgp.isotherm_from_aif(args.iso)
     else:
         from pygaps.utilities.exceptions import ParsingError
+
         raise ParsingError(f"Cannot read '{ext}' files")
 
     plot = False
@@ -114,6 +118,7 @@ def main():
     # pass to various characterization functions
     if args.characterize:
         import pygaps.characterisation as pgc
+
         plot = args.verbose
         if args.characterize == 'a_bet':
             res = pgc.area_BET(iso, verbose=args.verbose)
@@ -126,15 +131,13 @@ def main():
     # model isotherm using `model_iso`
     elif args.model:
         import pygaps.modelling as pgm
+
         plot = args.verbose
         out_iso = pgm.model_iso(iso, model=args.model, verbose=args.verbose)
 
     # convert an isotherm to a different basis/unit
     elif args.convert:
-        convert_args = {
-            keyval.split('=')[0]: keyval.split('=')[1]
-            for keyval in map(str.strip, args.convert.split(','))
-        }
+        convert_args = {keyval.split('=')[0]: keyval.split('=')[1] for keyval in map(str.strip, args.convert.split(','))}
         convert_args['verbose'] = args.verbose
         iso.convert(**convert_args)
         out_iso = iso
@@ -161,6 +164,7 @@ def main():
                 out_iso.to_aif(args.outfile)
             else:
                 from pygaps.utilities.exceptions import ParsingError
+
                 raise ParsingError(f"Cannot export as '{ext}' files")
 
         if args.verbose:
@@ -168,4 +172,5 @@ def main():
 
     if plot:
         import matplotlib.pyplot as plt
+
         plt.show()

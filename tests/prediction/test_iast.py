@@ -49,8 +49,9 @@ def load_iast_models(load_iast):
 
 
 @pytest.mark.prediction
-class TestIAST():
+class TestIAST:
     """Test IAST calculations."""
+
     def test_iast_checks(self, load_iast, load_iast_models, caplog):
         """Checks for built-in safeguards."""
 
@@ -101,8 +102,9 @@ class TestIAST():
 
 
 @pytest.mark.prediction
-class TestReverseIAST():
+class TestReverseIAST:
     """Test reverse IAST calculations."""
+
     def test_reverse_iast_checks(self, load_iast, load_iast_models, caplog):
         """Checks for built-in safeguards."""
 
@@ -163,8 +165,9 @@ class TestReverseIAST():
 
 
 @pytest.mark.prediction
-class TestIASTVLE():
+class TestIASTVLE:
     """Test IAST VLE function."""
+
     def test_iast_vle_checks(self, load_iast):
         """Checks for built-in safeguards."""
 
@@ -207,8 +210,9 @@ class TestIASTVLE():
 
 
 @pytest.mark.prediction
-class TestIASTSVP():
+class TestIASTSVP:
     """Test IAST SVP function."""
+
     def test_iast_svp_checks(self, load_iast):
         """Checks for built-in safeguards."""
 

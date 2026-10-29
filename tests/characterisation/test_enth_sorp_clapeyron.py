@@ -24,7 +24,7 @@ from .conftest import DATA_ISOSTERIC
 
 
 @pytest.mark.characterisation
-class TestEnthalpySorptionClapeyron():
+class TestEnthalpySorptionClapeyron:
     """Tests isosteric enthalpy calculations."""
 
     def test_iso_enthalpy_checks(self, use_material, data_isosteric_path):

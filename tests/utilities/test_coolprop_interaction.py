@@ -7,8 +7,9 @@ import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.utilities
-class TestCoolProp():
+class TestCoolProp:
     """Test CoolProp interaction."""
+
     def test_backend_change(self):
         """Test if backend can change."""
         previous_backend = pygaps.thermodynamic_backend()
@@ -28,6 +29,7 @@ class TestCoolProp():
     def test_backend_names_refprop(self):
         """Test if RERFPROP can be called for database adsorbates."""
         import CoolProp
+
         version = CoolProp.CoolProp.get_global_param_string("REFPROP_version")
         if version == 'n/a':
             pass

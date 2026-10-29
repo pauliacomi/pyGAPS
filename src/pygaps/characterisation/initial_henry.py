@@ -46,7 +46,6 @@ def initial_henry_slope(
     """
     # get the isotherm data on the adsorption branch
     if p_limits or l_limits:
-
         if not p_limits:
             p_limits = [-numpy.inf, numpy.inf]
         if not l_limits:
@@ -82,7 +81,6 @@ def initial_henry_slope(
     rows_taken = initial_rows
 
     while rows_taken != 1:
-
         param_guess = henry.initial_guess(pressure[:rows_taken], loading[:rows_taken])
         # fit model to isotherm data
         henry.fit(pressure[:rows_taken], loading[:rows_taken], param_guess)
@@ -111,6 +109,7 @@ def initial_henry_slope(
         )
         model_isotherm.material = "model"
         from pygaps.graphing.isotherm_graphs import plot_iso
+
         plot_iso([isotherm, model_isotherm], **params)
 
     # return the henry constant
@@ -140,7 +139,5 @@ def initial_henry_virial(
         Initial Henry's constant.
 
     """
-    model_isotherm = ModelIsotherm.from_pointisotherm(
-        isotherm, model='Virial', optimization_params=optimization_params, verbose=verbose
-    )
+    model_isotherm = ModelIsotherm.from_pointisotherm(isotherm, model='Virial', optimization_params=optimization_params, verbose=verbose)
     return model_isotherm.model.params['K']

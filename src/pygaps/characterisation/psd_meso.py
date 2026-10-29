@@ -3,6 +3,7 @@ Methods of calculating a pore size distribution for pores in the mesopore range 
 
 Methods are based on the Kelvin equation and pore condensation/evaporation.
 """
+
 import typing as t
 
 import numpy
@@ -30,11 +31,10 @@ def psd_mesoporous(
     pore_geometry: str = 'cylinder',
     meniscus_geometry: str = None,
     branch: str = 'des',
-    thickness_model:
-    "str | PointIsotherm | ModelIsotherm | t.Callable[[float], float]" = 'Harkins/Jura',
+    thickness_model: "str | PointIsotherm | ModelIsotherm | t.Callable[[float], float]" = 'Harkins/Jura',
     kelvin_model: "str | t.Callable[[float], float]" = 'Kelvin',
     p_limits: "tuple[float, float]" = None,
-    verbose: bool = False
+    verbose: bool = False,
 ):
     r"""
     Calculate the mesopore size distribution using a Kelvin-type model.
@@ -158,18 +158,12 @@ def psd_mesoporous(
     """
     # Function parameter checks
     if psd_model is None:
-        raise ParameterError(
-            "Specify a model to generate the pore size"
-            " distribution e.g. psd_model=\"BJH\""
-        )
+        raise ParameterError("Specify a model to generate the pore size distribution e.g. psd_model=\"BJH\"")
     if psd_model not in _MESO_PSD_MODELS:
-        raise ParameterError(
-            f"Model {psd_model} not an option for psd.", f" Available models are {_MESO_PSD_MODELS}"
-        )
+        raise ParameterError(f"Model {psd_model} not an option for psd.", f" Available models are {_MESO_PSD_MODELS}")
     if pore_geometry not in _PORE_GEOMETRIES:
         raise ParameterError(
-            f"Geometry {pore_geometry} not an option for pore size distribution. "
-            f"Available geometries are {_PORE_GEOMETRIES}"
+            f"Geometry {pore_geometry} not an option for pore size distribution. Available geometries are {_PORE_GEOMETRIES}"
         )
     if meniscus_geometry and meniscus_geometry not in _MENISCUS_GEOMETRIES:
         raise ParameterError(
@@ -177,9 +171,7 @@ def psd_mesoporous(
             f"Available geometries are {_MENISCUS_GEOMETRIES}"
         )
     if branch not in ['ads', 'des']:
-        raise ParameterError(
-            f"Branch '{branch}' not an option for PSD.", "Select either 'ads' or 'des'"
-        )
+        raise ParameterError(f"Branch '{branch}' not an option for PSD.", "Select either 'ads' or 'des'")
 
     # Get required adsorbate properties
     molar_mass = isotherm.adsorbate.molar_mass()
@@ -188,10 +180,7 @@ def psd_mesoporous(
 
     # Read data in, depending on branch requested
     pressure, volume_adsorbed = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
-            "loading_basis": "volume_liquid",
-            "loading_unit": "cm3"
-        }, {"pressure_mode": "relative"}
+        isotherm, branch, {"loading_basis": "volume_liquid", "loading_unit": "cm3"}, {"pressure_mode": "relative"}
     )
 
     # select the maximum and minimum of the points and the pressure associated
@@ -207,12 +196,9 @@ def psd_mesoporous(
     if p_limits[1]:
         maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
     if maximum - minimum < 2:  # (for 3 point minimum)
-        raise CalculationError(
-            "The isotherm does not have enough points (at least 3) "
-            "in the selected region."
-        )
-    pressure = pressure[minimum:maximum + 1]
-    volume_adsorbed = volume_adsorbed[minimum:maximum + 1]
+        raise CalculationError("The isotherm does not have enough points (at least 3) in the selected region.")
+    pressure = pressure[minimum : maximum + 1]
+    volume_adsorbed = volume_adsorbed[minimum : maximum + 1]
 
     # Thickness model
     t_model = get_thickness_model(thickness_model)
@@ -226,7 +212,7 @@ def psd_mesoporous(
         temperature=isotherm.temperature,
         liquid_density=liquid_density,
         adsorbate_molar_mass=molar_mass,
-        adsorbate_surface_tension=surface_tension
+        adsorbate_surface_tension=surface_tension,
     )
 
     # Call specified pore size distribution function
@@ -238,10 +224,7 @@ def psd_mesoporous(
         results = psd_dollimore_heal(volume_adsorbed, pressure, pore_geometry, t_model, k_model)
 
     results['pore_volume_cumulative'] = numpy.cumsum(results['pore_volumes'])
-    results['pore_volume_cumulative'] = (
-        results['pore_volume_cumulative'] - results['pore_volume_cumulative'][-1] +
-        volume_adsorbed[-1]
-    )
+    results['pore_volume_cumulative'] = results['pore_volume_cumulative'] - results['pore_volume_cumulative'][-1] + volume_adsorbed[-1]
     results['limits'] = (minimum, maximum)
     results['pore_area_total'] = sum(results['pore_areas'])
 
@@ -256,6 +239,7 @@ def psd_mesoporous(
     # Plot if verbose
     if verbose:
         from pygaps.graphing.calc_graphs import psd_plot
+
         psd_plot(
             results["pore_widths"],
             results["pore_distribution"],
@@ -414,7 +398,7 @@ def psd_pygapsdh(
     d_pore_widths = -numpy.diff(pore_widths)
 
     # Calculate the ratios of the pore to the evaporated capillary "core", [unitless]
-    ratio_factors = (avg_pore_widths / (avg_pore_widths - 2 * avg_thickness))**2
+    ratio_factors = (avg_pore_widths / (avg_pore_widths - 2 * avg_thickness)) ** 2
 
     # Now we can iteratively calculate the pore size distribution
     sum_area_correction = 0  # cm3/nm
@@ -422,7 +406,6 @@ def psd_pygapsdh(
     pore_volumes = numpy.zeros_like(avg_pore_widths)  # volume of pore populations, [cm3/mat]
 
     for i, avg_pore_width in enumerate(avg_pore_widths):
-
         # Volume desorbed from thinning of all pores previously emptied, [cm3]
         d_thickness_volume = d_thickness[i] * sum_area_correction
 
@@ -431,8 +414,7 @@ def psd_pygapsdh(
         pore_volumes[i] = pore_volume
 
         # Area of the newly emptied pore, [m2]
-        pore_geometry_correction = ((avg_pore_width - 2 * avg_thickness[i]) /
-                                    avg_pore_width)**(c_length - 1)
+        pore_geometry_correction = ((avg_pore_width - 2 * avg_thickness[i]) / avg_pore_width) ** (c_length - 1)
         pore_area = 2 * c_length * pore_volume / avg_pore_width  # cm3/nm
         pore_areas[i] = pore_area * 1e3  # cm3/nm = 1e-6 m3/ 1e-9m
 
@@ -575,14 +557,13 @@ def psd_bjh(
     d_pore_radii = -numpy.diff(pore_radii)
 
     # Calculate the ratio of the pore to the evaporated capillary "core", [unitless]
-    ratio_factors = (avg_pore_radii / (avg_k_radii + d_thickness))**2
+    ratio_factors = (avg_pore_radii / (avg_k_radii + d_thickness)) ** 2
 
     # Now we can iteratively calculate the pore size distribution
     pore_areas = numpy.zeros_like(avg_pore_radii)  # areas of pore populations [m2/mat]
     pore_volumes = numpy.zeros_like(avg_pore_radii)  # volume of pore populations, [cm3/mat]
 
     for i, avg_pore_rad in enumerate(avg_pore_radii):
-
         # Pore area correction
         sum_area_factor = 0  # [m2]
         for x in range(i):
@@ -736,7 +717,7 @@ def psd_dollimore_heal(
     d_pore_radii = -numpy.diff(pore_radii)
 
     # Calculate the ratios of the pore to the evaporated capillary "core", [unitless]
-    ratio_factors = (avg_pore_radii / (avg_k_radii + d_thickness))**2
+    ratio_factors = (avg_pore_radii / (avg_k_radii + d_thickness)) ** 2
 
     # Now we can iteratively calculate the pore size distribution
     sum_area_factor = 0  # cm3/nm
@@ -745,11 +726,9 @@ def psd_dollimore_heal(
     pore_volumes = numpy.zeros_like(avg_pore_radii)  # volume of pore populations, [cm3/mat]
 
     for i, avg_pore_radius in enumerate(avg_pore_radii):
-
         # Calculate the volume desorbed from thinning of all pores previously emptied
         # dt * \sum A - t * dt * 2 * \pi * \sum L
-        d_thickness_volume = d_thickness[i] * sum_area_factor - \
-            d_thickness[i] * avg_thickness[i] * sum_2pi_length_factor  # [cm3/mat]
+        d_thickness_volume = d_thickness[i] * sum_area_factor - d_thickness[i] * avg_thickness[i] * sum_2pi_length_factor  # [cm3/mat]
 
         # Pore volume, then store
         # dVp = (dV - dVt) * Rp

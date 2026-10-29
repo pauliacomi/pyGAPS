@@ -135,7 +135,7 @@ def enthalpy_sorption_whittaker(
             raise ParameterError(
                 rf'''
                 Whittaker method requires modelling with a T\'oth-type model, i.e.
-                {*pgm._WHITTAKER_MODELS, }
+                {(*pgm._WHITTAKER_MODELS,)}
                 '''
             )
 
@@ -177,6 +177,7 @@ def enthalpy_sorption_whittaker(
 
     if verbose:
         from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
+
         isosteric_enthalpy_plot(
             loading,
             enthalpy,

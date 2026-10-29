@@ -8,8 +8,9 @@ from pygaps.core.baseisotherm import BaseIsotherm
 
 
 @pytest.mark.core
-class TestBaseIsotherm():
+class TestBaseIsotherm:
     """Test the basic isotherm object."""
+
     def test_isotherm_create(self):
         """Check isotherm can be created from test data."""
         BaseIsotherm(
@@ -66,38 +67,21 @@ class TestBaseIsotherm():
         assert isotherm.temperature == 303.15
 
     @pytest.mark.parametrize(
-        'update', [
-            ({
-                'pressure_unit': 'Pa'
-            }),
-            ({
-                'pressure_mode': 'absolute',
-                'pressure_unit': 'Pa'
-            }),
-            ({
-                'pressure_mode': 'relative',
-                'pressure_unit': None
-            }),
-            ({
-                'loading_basis': 'molar',
-                'loading_unit': 'mol'
-            }),
-            ({
-                'loading_basis': 'mass',
-                'loading_unit': 'g'
-            }),
-            ({
-                'material_basis': 'mass',
-                'material_unit': 'kg'
-            }),
-            ({
-                'material_basis': 'volume',
-                'material_unit': 'cm3'
-            }),
-            ({
-                'temperature_unit': '°C',
-            }),
-        ]
+        'update',
+        [
+            ({'pressure_unit': 'Pa'}),
+            ({'pressure_mode': 'absolute', 'pressure_unit': 'Pa'}),
+            ({'pressure_mode': 'relative', 'pressure_unit': None}),
+            ({'loading_basis': 'molar', 'loading_unit': 'mol'}),
+            ({'loading_basis': 'mass', 'loading_unit': 'g'}),
+            ({'material_basis': 'mass', 'material_unit': 'kg'}),
+            ({'material_basis': 'volume', 'material_unit': 'cm3'}),
+            (
+                {
+                    'temperature_unit': '°C',
+                }
+            ),
+        ],
     )
     def test_isotherm_mode_and_units(self, isotherm_parameters, update):
         """Test unit specification."""
@@ -105,7 +89,8 @@ class TestBaseIsotherm():
         BaseIsotherm(**isotherm_parameters)
 
     @pytest.mark.parametrize(
-        'prop, set_to', [
+        'prop, set_to',
+        [
             ('pressure_unit', 'something'),
             ('pressure_mode', 'something'),
             ('loading_unit', 'something'),
@@ -113,7 +98,7 @@ class TestBaseIsotherm():
             ('material_unit', 'something'),
             ('material_basis', 'something'),
             ('temperature_unit', 'something'),
-        ]
+        ],
     )
     def test_isotherm_mode_and_units_bad(self, isotherm_parameters, prop, set_to):
         """Test exception throw for missing or wrong unit."""

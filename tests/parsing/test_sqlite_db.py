@@ -18,8 +18,9 @@ def db_file(tmp_path_factory):
 
 
 @pytest.mark.parsing
-class TestDatabase():
+class TestDatabase:
     """All testing of Database interface"""
+
     def test_db_create(self, db_file):
         """Test the database creation."""
         with pytest.raises(ParsingError):
@@ -66,10 +67,7 @@ class TestDatabase():
         # Overwrite upload
         basic_adsorbate.properties['formula'] = "newform"
         pgsql.adsorbate_to_db(basic_adsorbate, db_path=db_file, overwrite=True)
-        got_adsorbate = next(
-            ads for ads in pgsql.adsorbates_from_db(db_path=db_file)
-            if ads.name == basic_adsorbate.name
-        )
+        got_adsorbate = next(ads for ads in pgsql.adsorbates_from_db(db_path=db_file) if ads.name == basic_adsorbate.name)
         assert got_adsorbate.formula == basic_adsorbate.formula
 
         # Delete test
@@ -130,10 +128,7 @@ class TestDatabase():
         # Overwrite upload
         basic_material.properties['comment'] = 'New comment'
         pgsql.material_to_db(basic_material, overwrite=True, db_path=db_file)
-        got_material = next(
-            mat for mat in pgsql.materials_from_db(db_path=db_file)
-            if mat.name == basic_material.name
-        )
+        got_material = next(mat for mat in pgsql.materials_from_db(db_path=db_file) if mat.name == basic_material.name)
         assert got_material.properties['comment'] == basic_material.properties['comment']
 
         # Delete test

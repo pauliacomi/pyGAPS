@@ -18,7 +18,7 @@ from .conftest import PRESSURE_PARAM
 
 
 @pytest.mark.core
-class TestModelConvenience():
+class TestModelConvenience:
     """Test the convenience model function."""
 
     def test_model_isotherm(self, basic_pointisotherm):
@@ -26,7 +26,7 @@ class TestModelConvenience():
 
 
 @pytest.mark.core
-class TestModelIsotherm():
+class TestModelIsotherm:
     """Test the ModelIsotherm class."""
 
     def test_isotherm_create(self):
@@ -51,22 +51,14 @@ class TestModelIsotherm():
         pygaps.ModelIsotherm(isotherm_data=isotherm_data, model='Henry', **isotherm_param)
 
         # regular creation, desorption
-        pygaps.ModelIsotherm(
-            isotherm_data=isotherm_data, model='Henry', branch='des', **isotherm_param
-        )
+        pygaps.ModelIsotherm(isotherm_data=isotherm_data, model='Henry', branch='des', **isotherm_param)
 
         # regular creation, guessed parameters
-        pygaps.ModelIsotherm(
-            isotherm_data=isotherm_data, model='Henry', param_guess={'K': 1.0}, **isotherm_param
-        )
+        pygaps.ModelIsotherm(isotherm_data=isotherm_data, model='Henry', param_guess={'K': 1.0}, **isotherm_param)
 
         # regular creation, with bounds
         pygaps.ModelIsotherm(
-            isotherm_data=isotherm_data,
-            model='Henry',
-            param_guess={'K': 1.0},
-            param_bounds={'K': [0, 100]},
-            **isotherm_param
+            isotherm_data=isotherm_data, model='Henry', param_guess={'K': 1.0}, param_bounds={'K': [0, 100]}, **isotherm_param
         )
 
         # Missing pressure/loading
@@ -91,12 +83,7 @@ class TestModelIsotherm():
 
         # Wrong parameters
         with pytest.raises(pgEx.ParameterError):
-            pygaps.ModelIsotherm(
-                isotherm_data=isotherm_data,
-                model='Henry',
-                param_guess={'K9': 'woof'},
-                **isotherm_param
-            )
+            pygaps.ModelIsotherm(isotherm_data=isotherm_data, model='Henry', param_guess={'K9': 'woof'}, **isotherm_param)
 
     def test_isotherm_create_from_model(self, basic_isotherm):
         """Check isotherm can be created from a model."""
@@ -107,10 +94,7 @@ class TestModelIsotherm():
         """Check isotherm can be created from Isotherm."""
         pygaps.ModelIsotherm.from_isotherm(
             basic_isotherm,
-            isotherm_data=pandas.DataFrame({
-                'pressure': [1, 2, 3, 4, 5, 3, 2],
-                'loading': [1, 2, 3, 4, 5, 3, 2]
-            }),
+            isotherm_data=pandas.DataFrame({'pressure': [1, 2, 3, 4, 5, 3, 2], 'loading': [1, 2, 3, 4, 5, 3, 2]}),
             pressure_key='pressure',
             loading_key='loading',
             model='Henry',
@@ -138,9 +122,7 @@ class TestModelIsotherm():
         pygaps.ModelIsotherm.from_pointisotherm(isotherm, model=['Henry', 'Langmuir'], verbose=True)
 
         with pytest.raises(pgEx.ParameterError):
-            pygaps.ModelIsotherm.from_pointisotherm(
-                isotherm, model=['Henry', 'DummyModel'], verbose=True
-            )
+            pygaps.ModelIsotherm.from_pointisotherm(isotherm, model=['Henry', 'DummyModel'], verbose=True)
 
     ##########################
 
@@ -148,7 +130,8 @@ class TestModelIsotherm():
         'expected, parameters',
         [
             pytest.param(1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ] + PRESSURE_PARAM
+        ]
+        + PRESSURE_PARAM,
     )
     def test_isotherm_ret_pressure(
         self,
@@ -168,15 +151,14 @@ class TestModelIsotherm():
         basic_modelisotherm,
     ):
         """Indexed option specified."""
-        assert basic_modelisotherm.pressure(5, indexed=True).equals(
-            pandas.Series([1.0, 2.25, 3.5, 4.75, 6.0], name='loading')
-        )
+        assert basic_modelisotherm.pressure(5, indexed=True).equals(pandas.Series([1.0, 2.25, 3.5, 4.75, 6.0], name='loading'))
 
     @pytest.mark.parametrize(
         'expected, parameters',
         [
             pytest.param(1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ] + LOADING_PARAM
+        ]
+        + LOADING_PARAM,
     )
     def test_isotherm_ret_loading(
         self,
@@ -197,9 +179,7 @@ class TestModelIsotherm():
         basic_modelisotherm,
     ):
         """Indexed option specified."""
-        assert_series_equal(
-            basic_modelisotherm.loading(5, indexed=True), pandas.Series([1.0, 2.25, 3.5, 4.75, 6.0])
-        )
+        assert_series_equal(basic_modelisotherm.loading(5, indexed=True), pandas.Series([1.0, 2.25, 3.5, 4.75, 6.0]))
 
     ##########################
 
@@ -207,7 +187,8 @@ class TestModelIsotherm():
         'inp, expected, parameters',
         [
             pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ] + PRESSURE_AT_PARAM
+        ]
+        + PRESSURE_AT_PARAM,
     )
     def test_isotherm_ret_pressure_at(
         self,
@@ -228,7 +209,8 @@ class TestModelIsotherm():
         'inp, expected, parameters',
         [
             pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ] + LOADING_AT_PARAM
+        ]
+        + LOADING_AT_PARAM,
     )
     def test_isotherm_ret_loading_at(
         self,
@@ -252,7 +234,7 @@ class TestModelIsotherm():
             pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
             (100000, 1, dict(pressure_unit='Pa')),
             (0.5, 3.89137, dict(pressure_mode='relative')),
-        ]
+        ],
     )
     def test_isotherm_spreading_pressure_at(
         self,
@@ -263,8 +245,7 @@ class TestModelIsotherm():
         expected,
     ):
         """Check the ModelIsotherm spreading pressure calculation."""
-        assert basic_modelisotherm.spreading_pressure_at(inp, **parameters
-                                                         ) == pytest.approx(expected, 1e-5)
+        assert basic_modelisotherm.spreading_pressure_at(inp, **parameters) == pytest.approx(expected, 1e-5)
 
     @mpl_cleanup
     def test_isotherm_print_parameters(self, basic_modelisotherm):

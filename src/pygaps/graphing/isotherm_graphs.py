@@ -157,16 +157,13 @@ def plot_iso(
 
     # Make iterable if not already
     if not isinstance(isotherms, abc.Iterable):
-        isotherms = (isotherms, )
+        isotherms = (isotherms,)
     else:
         isotherms = list(isotherms)
 
     # Check for plot validity
     if None in [x_data, y1_data]:
-        raise ParameterError(
-            "Specify a plot type to graph"
-            " e.g. x_data=\'loading\', y1_data=\'pressure\'"
-        )
+        raise ParameterError("Specify a plot type to graph e.g. x_data='loading', y1_data='pressure'")
 
     # Check if required keys are present in isotherms
     if any(x_data not in _get_keys(isotherm) for isotherm in isotherms):
@@ -183,12 +180,9 @@ def plot_iso(
 
     # Store which branches will be displayed
     if not branch:
-        raise ParameterError("Specify a branch to display" " e.g. branch=\'ads\'")
+        raise ParameterError("Specify a branch to display e.g. branch='ads'")
     if branch not in _BRANCH_TYPES:
-        raise GraphingError(
-            "The supplied branch type is not valid."
-            f"Viable types are {_BRANCH_TYPES}"
-        )
+        raise GraphingError(f"The supplied branch type is not valid.Viable types are {_BRANCH_TYPES}")
     ads, des = _BRANCH_TYPES[branch]
 
     # Ensure iterable
@@ -212,13 +206,7 @@ def plot_iso(
         "material_basis": material_basis if material_basis else isotherms[0].material_basis,
         "material_unit": material_unit if material_unit else isotherms[0].material_unit,
     }
-    range_params = {
-        "x_range": x_range,
-        "y1_range": y1_range,
-        "y2_range": y2_range,
-        "x_points": x_points,
-        "y1_points": y1_points
-    }
+    range_params = {"x_range": x_range, "y1_range": y1_range, "y2_range": y2_range, "x_points": x_points, "y1_points": y1_points}
     log_params = {
         "logx": logx,
         "logy1": logy1,
@@ -271,7 +259,6 @@ def plot_iso(
     #
     # Plot the data
     for isotherm in isotherms:
-
         # Line styles for the current isotherm
         y1_ls = next(pc_y1)
         y2_ls = next(pc_y2)
@@ -402,7 +389,6 @@ def _get_data(
 ):
     """Plot the y1 data and y2 data of each branch."""
     if data_params['x_points'] is None and data_params['y1_points'] is None:
-
         # Data X
         x1_p = _get_data_column(
             isotherm=isotherm,
@@ -424,7 +410,6 @@ def _get_data(
         x2_p = None
         y2_p = None
         if data_params['y2_data'] and data_params['y2_data'] in _get_keys(isotherm):
-
             y2_p = _get_data_column(
                 isotherm,
                 data_name=data_params['y2_data'],

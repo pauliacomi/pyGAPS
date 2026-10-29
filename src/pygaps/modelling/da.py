@@ -82,7 +82,7 @@ class DA(IsothermBaseModel):
         nm = self.params['n_m']
         e = self.params['e']
         m = self.params['m']
-        return nm * numpy.exp(-(self.minus_rt * numpy.log(pressure) / e)**m)
+        return nm * numpy.exp(-((self.minus_rt * numpy.log(pressure) / e) ** m))
 
     def pressure(self, loading):
         r"""

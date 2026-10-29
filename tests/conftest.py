@@ -1,6 +1,7 @@
 """
 Configuration file for pytest and commonly used fixtures
 """
+
 from pathlib import Path
 
 import pandas
@@ -50,7 +51,6 @@ def isotherm_parameters():
         'project': 'TP',
         'machine': 'TM',
         'iso_type': 'calorimetry',
-
         # Units/bases
         'material_basis': 'mass',
         'material_unit': 'g',
@@ -59,7 +59,6 @@ def isotherm_parameters():
         'pressure_mode': 'absolute',
         'pressure_unit': 'bar',
         'temperature_unit': 'K',
-
         # other properties
         'DOI': 'dx.doi/10.0000',
         'origin': 'test',
@@ -70,12 +69,14 @@ def isotherm_parameters():
 @pytest.fixture(scope='function')
 def isotherm_data():
     """Create a dataframe with all data for an model isotherm."""
-    return pandas.DataFrame({
-        "pressure": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-        "loading": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
-        "enthalpy": [5.2, 5.1, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
-        "text_data": ["a", "b", "c", "d", "e", "f", "g", "h"],
-    })
+    return pandas.DataFrame(
+        {
+            "pressure": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            "loading": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 4.5, 2.5],
+            "enthalpy": [5.2, 5.1, 5.0, 5.0, 5.0, 5.0, 4.0, 4.0],
+            "text_data": ["a", "b", "c", "d", "e", "f", "g", "h"],
+        }
+    )
 
 
 @pytest.fixture(scope='function')
@@ -87,23 +88,14 @@ def basic_isotherm(isotherm_parameters):
 @pytest.fixture(scope='function')
 def basic_pointisotherm(isotherm_data, isotherm_parameters):
     """Create a point isotherm from basic data."""
-    return pygaps.PointIsotherm(
-        isotherm_data=isotherm_data,
-        loading_key="loading",
-        pressure_key="pressure",
-        **isotherm_parameters
-    )
+    return pygaps.PointIsotherm(isotherm_data=isotherm_data, loading_key="loading", pressure_key="pressure", **isotherm_parameters)
 
 
 @pytest.fixture()
 def basic_modelisotherm(isotherm_data, isotherm_parameters):
     """Creates a model isotherm from basic data."""
     return pygaps.ModelIsotherm(
-        isotherm_data=isotherm_data,
-        loading_key="loading",
-        pressure_key="pressure",
-        model="Henry",
-        **isotherm_parameters
+        isotherm_data=isotherm_data, loading_key="loading", pressure_key="pressure", model="Henry", **isotherm_parameters
     )
 
 
@@ -151,8 +143,8 @@ def adsorbate_data():
         'molar_mass': 28.01348,
         'cross_sectional_area': 0.162,
         'molecular_diameter': 0.3,
-        'polarizability': 1.76E-3,
-        'magnetic_susceptibility': 3.6E-8,
+        'polarizability': 1.76e-3,
+        'magnetic_susceptibility': 3.6e-8,
         'dipole_moment': 0.0,
         'quadrupole_moment': 1.52,
         't_critical': 126.2,

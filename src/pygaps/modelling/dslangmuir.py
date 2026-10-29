@@ -44,10 +44,10 @@ class DSLangmuir(IsothermBaseModel):
     calculates = 'loading'
     param_names = ("n_m1", "K1", "n_m2", "K2")
     param_default_bounds = (
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
     )
 
     def loading(self, pressure):
@@ -91,7 +91,7 @@ class DSLangmuir(IsothermBaseModel):
         K2 = self.params['K2']
 
         x = (nm1 + nm2 - loading) * K1 * K2
-        y = (nm1 * K1 + nm2 * K2 - loading * (K1 + K2))
+        y = nm1 * K1 + nm2 * K2 - loading * (K1 + K2)
 
         res = (-y + numpy.sqrt(y**2 - 4 * x * (-loading))) / (2 * x)
 
@@ -130,12 +130,9 @@ class DSLangmuir(IsothermBaseModel):
         n_P = (nm1K1 / (1 + K1P)) + (nm2K2 / (1 + K2P))
 
         def dn_dP_singlesite(n_m, K):
-            return (n_m * K) / (1 + (K * pressure))**2
+            return (n_m * K) / (1 + (K * pressure)) ** 2
 
-        dP_dn = 1 / (
-            dn_dP_singlesite(self.params["n_m1"], self.params["K1"]) +
-            dn_dP_singlesite(self.params["n_m2"], self.params["K2"])
-        )
+        dP_dn = 1 / (dn_dP_singlesite(self.params["n_m1"], self.params["K1"]) + dn_dP_singlesite(self.params["n_m2"], self.params["K2"]))
 
         return (n_P * dP_dn) - 1
 
@@ -166,8 +163,9 @@ class DSLangmuir(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m1"] * numpy.log(1.0 + self.params["K1"] * pressure) +\
-            self.params["n_m2"] * numpy.log(1.0 + self.params["K2"] * pressure)
+        return self.params["n_m1"] * numpy.log(1.0 + self.params["K1"] * pressure) + self.params["n_m2"] * numpy.log(
+            1.0 + self.params["K2"] * pressure
+        )
 
     def initial_guess(self, pressure, loading):
         """
@@ -187,11 +185,6 @@ class DSLangmuir(IsothermBaseModel):
         """
         saturation_loading, langmuir_k = super().initial_guess(pressure, loading)
 
-        guess = {
-            "n_m1": 0.5 * saturation_loading,
-            "K1": 0.4 * langmuir_k,
-            "n_m2": 0.5 * saturation_loading,
-            "K2": 0.6 * langmuir_k
-        }
+        guess = {"n_m1": 0.5 * saturation_loading, "K1": 0.4 * langmuir_k, "n_m2": 0.5 * saturation_loading, "K2": 0.6 * langmuir_k}
         guess = self.initial_guess_bounds(guess)
         return guess

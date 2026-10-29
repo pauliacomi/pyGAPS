@@ -3,7 +3,7 @@
 from scipy.interpolate import interp1d
 
 
-class IsothermInterpolator():
+class IsothermInterpolator:
     """
     Class used to interpolate between isotherm points.
 
@@ -62,13 +62,7 @@ class IsothermInterpolator():
         # If we want to extrapolate, we need to use a different
         # interpolator.
         else:
-            self.interp_fun = interp1d(
-                known_data,
-                interp_data,
-                kind=interp_kind,
-                fill_value=interp_fill,
-                bounds_error=False
-            )
+            self.interp_fun = interp1d(known_data, interp_data, kind=interp_kind, fill_value=interp_fill, bounds_error=False)
 
     def __call__(self, data):
         """Override direct call to return interpolated data."""

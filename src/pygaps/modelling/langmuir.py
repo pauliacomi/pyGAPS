@@ -81,8 +81,8 @@ class Langmuir(IsothermBaseModel):
     calculates = 'loading'
     param_names = ("K", "n_m")
     param_default_bounds = (
-        (0., numpy.inf),
-        (0., numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
     )
 
     def loading(self, pressure):

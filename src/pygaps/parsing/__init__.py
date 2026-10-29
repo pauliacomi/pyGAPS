@@ -26,11 +26,11 @@ from .sqlite import material_delete_db
 from .sqlite import material_to_db
 
 _COMMERCIAL_FORMATS = {
-    'smsdvs': ('xlsx', ),
+    'smsdvs': ('xlsx',),
     'bel': ('csv', 'xl', 'dat'),
-    'mic': ('xl', ),
-    '3p': ('xl', ),
-    'qnt': ('txt-raw', ),
+    'mic': ('xl',),
+    '3p': ('xl',),
+    'qnt': ('txt-raw',),
 }
 
 

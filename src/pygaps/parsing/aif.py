@@ -8,6 +8,7 @@ Evans, Jack D., Volodymyr Bon, Irena Senkovska, and Stefan Kaskel.
 acs.langmuir.1c00122. https://doi.org/10.1021/acs.langmuir.1c00122.
 
 """
+
 import json
 import os
 import pathlib
@@ -87,7 +88,6 @@ _METADATA_WRITE_EXCLUDE = {'audit_creation_method', 'audit_creation_software'}
 _METADATA_ALIASES_LEGACY = {
     # audit
     'audit_creation_method': {'tag': '_audit_creation_method', 'type': str},
-
     # exptl
     'experimental_operator': {'tag': '_exptl_operator', 'type': str},
     'experimental_date': {'tag': '_exptl_date', 'type': str},
@@ -100,7 +100,6 @@ _METADATA_ALIASES_LEGACY = {
     'experimental_isotherm_type': {'tag': '_exptl_isotherm_type', 'type': str},
     'experimental_p0': {'tag': '_exptl_p0', 'type': str},
     'experimental_digitizer': {'tag': '_exptl_digitizer', 'type': str},
-
     # adsorbent
     'material': {'tag': '_adsnt_material_id', 'type': str},
     'material_info': {'tag': '_adsnt_info', 'type': str},
@@ -111,7 +110,6 @@ _METADATA_ALIASES_LEGACY = {
     'material_activation_summary': {'tag': '_adsnt_degas_summary', 'type': str},
     'material_activation_temperature': {'tag': '_adsnt_degas_temperature', 'type': float},
     'material_activation_time': {'tag': '_adsnt_degas_time', 'type': str},
-
     # simulation
     'simulation_code': {'tag': '_simltn_code', 'type': str},
     'simulation_date': {'tag': '_simltn_date', 'type': str},
@@ -121,11 +119,9 @@ _METADATA_ALIASES_LEGACY = {
     'simulation_lot': {'tag': '_simltn_lot', 'type': str},
     'simulation_sampling': {'tag': '_simltn_sampling', 'type': str},
     'simulation_size': {'tag': '_simltn_size', 'type': str},
-
     # citation
     'citation_doi': {'tag': '_citation_doi', 'type': str},
     'citation_source': {'tag': '_citation_source', 'type': str},
-
     # units
     'units_pressure': {'tag': '_units_pressure', 'type': str},
     'units_temperature': {'tag': '_units_temperature', 'type': str},
@@ -152,7 +148,6 @@ _METADATA_ALIASES_v1p0p0 = {
     'audit_creation_date': {'tag': '_audit_creation_date', 'type': str},
     'audit_creation_method': {'tag': '_audit_creation_method', 'type': str},
     'audit_creation_software': {'tag': '_audit_creation_software', 'type': str},
-
     # experimental
     'experimental_operator': {'tag': '_exptl_operator', 'type': str},
     'experimental_date': {'tag': '_exptl_date', 'type': str},
@@ -160,7 +155,6 @@ _METADATA_ALIASES_v1p0p0 = {
     'temperature': {'tag': '_exptl_temperature', 'type': float},
     'experimental_method': {'tag': '_exptl_method', 'type': str},
     'experimental_isotherm_type': {'tag': '_exptl_isotherm_type', 'type': str},
-
     # adsorbent
     'material': {'tag': '_adsnt_material_name', 'type': str},
     'material_info': {'tag': '_adsnt_info', 'type': str},
@@ -177,7 +171,6 @@ _METADATA_ALIASES_v1p0p0 = {
     'material_activation_summary': {'tag': '_adsnt_degas_summary', 'type': str},
     'material_activation_temperature': {'tag': '_adsnt_degas_temperature', 'type': float},
     'material_activation_time': {'tag': '_adsnt_degas_time', 'type': float},
-
     # adsorptive
     'adsorbate': {'tag': '_adsorptive_name', 'type': str},
     'adsorbate_info': {'tag': '_adsorptive_info', 'type': str},
@@ -189,7 +182,6 @@ _METADATA_ALIASES_v1p0p0 = {
     'adsorbate_kinetic_diameter': {'tag': '_adsorptive_kinetic_diameter', 'type': float},
     'adsorbate_quadrupole_moment': {'tag': '_adsorptive_quadrupole_moment', 'type': float},
     # `_adsorptive_component_*` is a loop, kept as raw rows by `_read_other_loop`.
-
     # simulation
     'simulation_code': {'tag': '_simltn_code', 'type': str},
     'simulation_date': {'tag': '_simltn_date', 'type': str},
@@ -199,21 +191,18 @@ _METADATA_ALIASES_v1p0p0 = {
     'simulation_input_files': {'tag': '_simltn_input_files', 'type': str},
     'simulation_sampling': {'tag': '_simltn_sampling', 'type': str},
     'simulation_lot': {'tag': '_simltn_lot', 'type': str},
-
     # digitization
     'digitization_author': {'tag': '_digitization_author', 'type': str},
     'digitization_date': {'tag': '_digitization_date', 'type': str},
     'digitization_method': {'tag': '_digitization_method', 'type': str},
     'digitization_software': {'tag': '_digitization_software', 'type': str},
     'digitization_notes': {'tag': '_digitization_notes', 'type': str},
-
     # citation
     'citation_doi': {'tag': '_citation_doi', 'type': str},
     'citation_source': {'tag': '_citation_source', 'type': str},
     'citation_figure': {'tag': '_citation_figure', 'type': str},
     'citation_page': {'tag': '_citation_page', 'type': str},
     'citation_url': {'tag': '_citation_url', 'type': str},
-
     # analysis
     'analysis_method': {'tag': '_analysis_method', 'type': str},
     'analysis_bet_area': {'tag': '_analysis_bet_area', 'type': float},
@@ -230,7 +219,6 @@ _METADATA_ALIASES_v1p0p0 = {
     'analysis_psd_method_geometry': {'tag': '_analysis_psd_method_geometry', 'type': str},
     'analysis_psd_method_details': {'tag': '_analysis_psd_method_details', 'type': str},
     # `_analysis_psd_*`/`_analysis_fit_*`/`_analysis_fit_param_*` are loops, see `_LOOP_CATEGORIES_v1p0p0`.
-
     # units
     'units_temperature': {'tag': '_units_temperature', 'type': str},
     'units_pressure': {'tag': '_units_pressure', 'type': str},
@@ -315,23 +303,23 @@ _PYGAPS_LOOP_SEPARATOR = '.'
 # below is written. Data loop columns are matched by their suffix.
 
 _UNIT_DEPENDENCIES = {
-    '_adsnt_sample_mass': ('_units_mass', ),
-    '_adsnt_sample_density': ('_units_density', ),
-    '_adsnt_molar_mass': ('_units_molecular_weight', ),
-    '_adsnt_degas_time': ('_units_time', ),
-    '_adsorptive_molecular_weight': ('_units_molecular_weight', ),
-    '_adsorptive_kinetic_diameter': ('_units_kinetic_diameter', ),
-    '_adsorptive_quadrupole_moment': ('_units_quadrupole_moment', ),
-    '_analysis_bet_area': ('_units_surface_area', ),
-    '_analysis_langmuir_area': ('_units_surface_area', ),
-    '_analysis_total_pore_volume': ('_units_pore_volume', ),
-    '_analysis_psd_dimension': ('_units_pore_size', ),
+    '_adsnt_sample_mass': ('_units_mass',),
+    '_adsnt_sample_density': ('_units_density',),
+    '_adsnt_molar_mass': ('_units_molecular_weight',),
+    '_adsnt_degas_time': ('_units_time',),
+    '_adsorptive_molecular_weight': ('_units_molecular_weight',),
+    '_adsorptive_kinetic_diameter': ('_units_kinetic_diameter',),
+    '_adsorptive_quadrupole_moment': ('_units_quadrupole_moment',),
+    '_analysis_bet_area': ('_units_surface_area',),
+    '_analysis_langmuir_area': ('_units_surface_area',),
+    '_analysis_total_pore_volume': ('_units_pore_volume',),
+    '_analysis_psd_dimension': ('_units_pore_size',),
     '_analysis_psd_dv_dd': ('_units_pore_volume', '_units_pore_size'),
 }
 _UNIT_DEPENDENCIES_LOOP_SUFFIX = {
-    'enthalpy': ('_units_enthalpy', ),
-    'enthalpy_differential': ('_units_enthalpy', ),
-    'enthalpy_integral': ('_units_enthalpy', ),
+    'enthalpy': ('_units_enthalpy',),
+    'enthalpy_differential': ('_units_enthalpy',),
+    'enthalpy_integral': ('_units_enthalpy',),
 }
 _UNIT_DEFAULTS = {
     '_units_mass': 'g',
@@ -395,9 +383,7 @@ _SCHEMA_REGISTRY = {
         'metadata_read': _metadata_read_aliases(_METADATA_ALIASES_v1p0p0, _METADATA_READ_LEGACY),
         'loop_write': dict(_LOOP_COLUMNS_v1p0p0),
         'loop_read': _loop_read_aliases(_LOOP_COLUMNS_v1p0p0, _LOOP_READ_LEGACY),
-        'loop_read_prefixes': {
-            suffix: key for key, suffix in _LOOP_COLUMN_PREFIXES_v1p0p0.items()
-        },
+        'loop_read_prefixes': {suffix: key for key, suffix in _LOOP_COLUMN_PREFIXES_v1p0p0.items()},
         'loop_categories': _LOOP_CATEGORIES_v1p0p0,
         'required': ('_adsnt_material_name', '_exptl_method'),
     },
@@ -519,14 +505,14 @@ def _read_loop_column(name, schema):
     """Map an AIF data loop column (without `_adsorp_`/`_desorp_`) to a pyGAPS column."""
     for ending in _UNCERTAINTY_SUFFIXES:
         if name.endswith(ending) and len(name) > len(ending):
-            return _read_loop_column(name[:-len(ending)], schema) + ending
+            return _read_loop_column(name[: -len(ending)], schema) + ending
 
     if name in schema['loop_read']:
         return schema['loop_read'][name]
 
     for aif_prefix, key_prefix in schema['loop_read_prefixes'].items():
         if name.startswith(aif_prefix):
-            return key_prefix + name[len(aif_prefix):]
+            return key_prefix + name[len(aif_prefix) :]
 
     return name
 
@@ -538,12 +524,9 @@ def _read_loop_rows(block, loop):
 
 def _read_data_loop(block, loop, prefix, branch, schema):
     """Read an adsorption/desorption loop into a DataFrame."""
-    columns = [_read_loop_column(tag.lower()[len(prefix):], schema) for tag in loop.tags]
+    columns = [_read_loop_column(tag.lower()[len(prefix) :], schema) for tag in loop.tags]
 
-    missing = [
-        f"{prefix}{suffix}" for column, suffix in (('pressure', 'pressure'), ('loading', 'amount'))
-        if column not in columns
-    ]
+    missing = [f"{prefix}{suffix}" for column, suffix in (('pressure', 'pressure'), ('loading', 'amount')) if column not in columns]
     if missing:
         raise ParsingError(
             f"The AIF {'adsorption' if branch == 0 else 'desorption'} data loop is missing "
@@ -575,13 +558,13 @@ def _loop_category(tags):
             return prefix, False
 
     if all(tag.startswith(_PYGAPS_LOOP_PREFIX) and _PYGAPS_LOOP_SEPARATOR in tag for tag in tags):
-        prefix = tags[0][:tags[0].index(_PYGAPS_LOOP_SEPARATOR) + 1]
+        prefix = tags[0][: tags[0].index(_PYGAPS_LOOP_SEPARATOR) + 1]
         if all(tag.startswith(prefix) for tag in tags):
             return prefix, True
 
     prefix = os.path.commonprefix(ltags)
     if len(tags) == 1 or not prefix.endswith('_'):
-        prefix = prefix[:prefix.rfind('_') + 1]
+        prefix = prefix[: prefix.rfind('_') + 1]
     return prefix, False
 
 
@@ -593,15 +576,16 @@ def _read_other_loop(block, loop):
     prefix, is_pygaps = _loop_category(loop.tags)
     if is_pygaps:
         # pyGAPS loops keep the exact property and column names
-        name = prefix[len(_PYGAPS_LOOP_PREFIX):-len(_PYGAPS_LOOP_SEPARATOR)]
-        columns = [tag[len(prefix):] for tag in loop.tags]
+        name = prefix[len(_PYGAPS_LOOP_PREFIX) : -len(_PYGAPS_LOOP_SEPARATOR)]
+        columns = [tag[len(prefix) :] for tag in loop.tags]
     else:
         name = prefix.strip('_')
-        columns = [tag.lower()[len(prefix):] for tag in loop.tags]
+        columns = [tag.lower()[len(prefix) :] for tag in loop.tags]
 
-    rows = [{
-        column: (_from_text(value) if value is not None else None) for column, value in zip(columns, row)
-    } for row in _read_loop_rows(block, loop)]
+    rows = [
+        {column: (_from_text(value) if value is not None else None) for column, value in zip(columns, row)}
+        for row in _read_loop_rows(block, loop)
+    ]
 
     return name, rows
 
@@ -688,14 +672,14 @@ def _loop_suffix_for_write(key, schema):
     """Map a pyGAPS data column to its AIF loop suffix for the chosen schema."""
     for ending in _UNCERTAINTY_SUFFIXES:
         if key.endswith(ending) and len(key) > len(ending):
-            return _loop_suffix_for_write(key[:-len(ending)], schema) + ending
+            return _loop_suffix_for_write(key[: -len(ending)], schema) + ending
 
     if key in schema['loop_write']:
         return schema['loop_write'][key]
 
     for aif_prefix, pygaps_prefix in schema['loop_read_prefixes'].items():
         if key.startswith(pygaps_prefix):
-            return aif_prefix + key[len(pygaps_prefix):]
+            return aif_prefix + key[len(pygaps_prefix) :]
 
     return key
 
@@ -739,9 +723,7 @@ def _write_rows_loop(block, name, rows, schema):
         prefix = f"{_PYGAPS_LOOP_PREFIX}{name}{_PYGAPS_LOOP_SEPARATOR}"
 
     columns = list(dict.fromkeys(column for row in rows for column in row))
-    values = [[
-        '?' if row.get(column) is None else _quote(_to_text(row[column])) for row in rows
-    ] for column in columns]
+    values = [['?' if row.get(column) is None else _quote(_to_text(row[column])) for row in rows] for column in columns]
 
     loop = block.init_loop(prefix, [str(column) for column in columns])
     loop.set_all_values(values)
@@ -759,7 +741,7 @@ def _write_dependent_units(block, loop_tags, schema):
         needed.extend(_UNIT_DEPENDENCIES.get(tag, ()))
         for prefix in ('_adsorp_', '_desorp_'):
             if tag.startswith(prefix):
-                needed.extend(_UNIT_DEPENDENCIES_LOOP_SUFFIX.get(tag[len(prefix):], ()))
+                needed.extend(_UNIT_DEPENDENCIES_LOOP_SUFFIX.get(tag[len(prefix) :], ()))
 
     known_unit_tags = set(schema['metadata_write'].values())
     for unit_tag in dict.fromkeys(needed):
@@ -827,10 +809,7 @@ def isotherm_to_aif(isotherm: BaseIsotherm, path: Optional[str] = None, version:
 
     """
     if version not in _SCHEMA_REGISTRY:
-        raise ParameterError(
-            f"Unknown AIF schema version {version!r}. "
-            f"Known versions: {sorted(_SCHEMA_REGISTRY)}."
-        )
+        raise ParameterError(f"Unknown AIF schema version {version!r}. Known versions: {sorted(_SCHEMA_REGISTRY)}.")
     schema = _SCHEMA_REGISTRY[version]
     metadata_write = schema['metadata_write']
 
@@ -848,10 +827,7 @@ def isotherm_to_aif(isotherm: BaseIsotherm, path: Optional[str] = None, version:
             if f'adsorbate_{key}' not in metadata_write:
                 continue
             if key == 'quadrupole_moment' and not iso_dict.get('units_quadrupole_moment'):
-                logger.warning(
-                    "Adsorbate quadrupole_moment was not written because "
-                    "units_quadrupole_moment is not specified."
-                )
+                logger.warning("Adsorbate quadrupole_moment was not written because units_quadrupole_moment is not specified.")
                 continue
             adsorbate_properties[key] = value
         iso_dict['adsorbate'] = {
@@ -889,10 +865,7 @@ def isotherm_to_aif(isotherm: BaseIsotherm, path: Optional[str] = None, version:
 
     loop_tags = []
     if isinstance(isotherm, PointIsotherm):
-        loop_tags += [
-            f"_adsorp_{_loop_suffix_for_write(key, schema)}"
-            for key in ['pressure', 'loading', *isotherm.other_keys]
-        ]
+        loop_tags += [f"_adsorp_{_loop_suffix_for_write(key, schema)}" for key in ['pressure', 'loading', *isotherm.other_keys]]
     for name, rows in row_lists.items():
         if name.lower() in schema['loop_categories']:
             loop_tags += [f"_{name.lower()}_{column}" for row in rows for column in row]
@@ -913,7 +886,6 @@ def isotherm_to_aif(isotherm: BaseIsotherm, path: Optional[str] = None, version:
 
     # data
     if isinstance(isotherm, PointIsotherm):
-
         other_keys = isotherm.other_keys
 
         # write adsorption data
@@ -927,7 +899,6 @@ def isotherm_to_aif(isotherm: BaseIsotherm, path: Optional[str] = None, version:
             _write_loop(block, '_desorp_', df, isotherm.pressure_key, isotherm.loading_key, other_keys, schema)
 
     elif isinstance(isotherm, ModelIsotherm):
-
         _write_text_pair(block, "_pygaps_model_name", isotherm.model.name)
         _write_text_pair(block, "_pygaps_model_rmse", f"{isotherm.model.rmse}")
         _write_text_pair(block, "_pygaps_model_pressure_range_min", f"{isotherm.model.pressure_range[0]}")
@@ -992,10 +963,7 @@ def isotherm_from_aif(str_or_path: str, version: Optional[str] = None, **isother
         try:
             aif = cif.read_string(str_or_path)
         except (RuntimeError, ValueError) as ex:
-            raise ParsingError(
-                "Could not parse AIF isotherm. "
-                "The `path/string` is invalid or does not exist. "
-            ) from ex
+            raise ParsingError("Could not parse AIF isotherm. The `path/string` is invalid or does not exist. ") from ex
 
     if len(aif) != 1:
         raise ParsingError(f"The AIF file should have a single block; found {len(aif)}.")
@@ -1037,7 +1005,6 @@ def isotherm_from_aif(str_or_path: str, version: Optional[str] = None, **isother
 
     # Read STAR entries sequentially to preserve unknown keys and loop columns.
     for item in block:
-
         # Handle the metadata key-value pairs
         if item.pair is not None:
             key, val = item.pair
@@ -1057,8 +1024,9 @@ def isotherm_from_aif(str_or_path: str, version: Optional[str] = None, **isother
             if lkey == '_pygaps_original_experimental_method':
                 original_method = _from_text(val)
                 if not isinstance(original_method, dict) or set(original_method) - {'value'}:
-                    raise ParsingError("Invalid _pygaps_original_experimental_method marker: expected a JSON object "
-                                       "with an optional 'value' key.")
+                    raise ParsingError(
+                        "Invalid _pygaps_original_experimental_method marker: expected a JSON object with an optional 'value' key."
+                    )
                 continue
 
             # Handle known metadata keys
@@ -1110,13 +1078,8 @@ def isotherm_from_aif(str_or_path: str, version: Optional[str] = None, **isother
                 raw_dict.pop(unit_tag[1:])
 
     # Parse STAR unit fields if pyGAPS-specific unit hints are not all present.
-    missing_unit_hints = [
-        unit_name for unit_name in BaseIsotherm._unit_params if unit_name not in raw_dict
-    ]
-    if (
-        missing_unit_hints == ['pressure_unit']
-        and raw_dict.get('pressure_mode', '').startswith('relative')
-    ):
+    missing_unit_hints = [unit_name for unit_name in BaseIsotherm._unit_params if unit_name not in raw_dict]
+    if missing_unit_hints == ['pressure_unit'] and raw_dict.get('pressure_mode', '').startswith('relative'):
         missing_unit_hints = []
     parse_units = bool(missing_unit_hints)
     if isotherm_parameters and isotherm_parameters.pop("_parse_units", False):
@@ -1167,7 +1130,6 @@ def isotherm_from_aif(str_or_path: str, version: Optional[str] = None, **isother
 
     # ModelIsotherm
     if 'model_name' in raw_dict:
-
         model = {}
 
         model['name'] = raw_dict.pop("model_name")

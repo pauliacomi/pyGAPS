@@ -25,7 +25,7 @@ def capture(command, **extra):
 
 
 @pytest.mark.cli
-class TestCLI():
+class TestCLI:
     def test_call(self):
         """
         Test the CLI call with the --help option.

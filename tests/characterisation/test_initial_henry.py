@@ -23,7 +23,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestInitialHenry():
+class TestInitialHenry:
     """Test all initial henry methods."""
 
     @pytest.mark.parametrize('sample', DATA.values())

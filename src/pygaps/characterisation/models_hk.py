@@ -13,25 +13,25 @@ HK_KEYS = {
 #: List of parameters for the carbon model
 PROPERTIES_CARBON = {
     'molecular_diameter': 0.34,  # nm
-    'polarizability': 1.02E-3,  # nm3
-    'magnetic_susceptibility': 1.35E-7,  # nm3
-    'surface_density': 3.845E19,  # molecules/m2
+    'polarizability': 1.02e-3,  # nm3
+    'magnetic_susceptibility': 1.35e-7,  # nm3
+    'surface_density': 3.845e19,  # molecules/m2
 }
 
 #: List of parameters for the AlSi-Oxide model
 PROPERTIES_AlSi_OXIDE_ION = {
     'molecular_diameter': 0.276,  # nm
-    'polarizability': 2.5E-3,  # nm3
-    'magnetic_susceptibility': 1.3E-8,  # nm3
-    'surface_density': 1.315E19,  # molecules/m2
+    'polarizability': 2.5e-3,  # nm3
+    'magnetic_susceptibility': 1.3e-8,  # nm3
+    'surface_density': 1.315e19,  # molecules/m2
 }
 
 #: List of parameters for the AlPh-Oxide model
 PROPERTIES_AlPh_OXIDE_ION = {
     'molecular_diameter': 0.260,  # nm
-    'polarizability': 2.5E-3,  # nm3
-    'magnetic_susceptibility': 1.3E-8,  # nm3
-    'surface_density': 1.000E19,  # molecules/m2
+    'polarizability': 2.5e-3,  # nm3
+    'magnetic_susceptibility': 1.3e-8,  # nm3
+    'surface_density': 1.000e19,  # molecules/m2
 }
 
 #: List of adsorbent models
@@ -68,8 +68,7 @@ def get_hk_model(model: "str | dict"):
     if isinstance(model, str):
         if model not in _ADSORBENT_MODELS:
             raise ParameterError(
-                f"Model ({model}) is not an option for pore size distribution.",
-                f"Available models are {_ADSORBENT_MODELS.keys()}"
+                f"Model ({model}) is not an option for pore size distribution.", f"Available models are {_ADSORBENT_MODELS.keys()}"
             )
 
         return _ADSORBENT_MODELS[model]
@@ -78,16 +77,12 @@ def get_hk_model(model: "str | dict"):
     if isinstance(model, dict):
         for key in HK_KEYS.items():
             if key[0] not in model.keys():
-                raise ParameterError(
-                    f"The passed dictionary must contain the parameter {key[0]} "
-                    f"in the units of {key[1]}"
-                )
+                raise ParameterError(f"The passed dictionary must contain the parameter {key[0]} in the units of {key[1]}")
 
         return model
 
     # Raise error if anything else is passed
     raise ParameterError(
         f"Model parameters ({model}) not an option for pore size distribution. ",
-        f"Available models are {_ADSORBENT_MODELS.keys()}. "
-        "Or pass a dictionary with the required parameters"
+        f"Available models are {_ADSORBENT_MODELS.keys()}. Or pass a dictionary with the required parameters",
     )

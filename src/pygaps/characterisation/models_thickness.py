@@ -1,4 +1,5 @@
 """Functions calculating the thickness of an adsorbed layer as a function of pressure."""
+
 import typing as t
 
 import numpy
@@ -27,7 +28,7 @@ def thickness_halsey(pressure: float) -> float:
     float
         Thickness of layer in nm.
     """
-    return 0.354 * ((-5) / numpy.log(pressure))**0.333
+    return 0.354 * ((-5) / numpy.log(pressure)) ** 0.333
 
 
 def thickness_harkins_jura(pressure: float) -> float:
@@ -46,7 +47,7 @@ def thickness_harkins_jura(pressure: float) -> float:
     float
         Thickness of layer in nm.
     """
-    return (0.1399 / (0.034 - numpy.log10(pressure)))**0.5
+    return (0.1399 / (0.034 - numpy.log10(pressure))) ** 0.5
 
 
 def thickness_zero(pressure: float) -> float:
@@ -193,25 +194,39 @@ def aerosil_MCM(pressure: float) -> float:
         Thickness of layer in nm.
     """
     pm = {
-        "A1": 0.1887299, "A2": 481.3 * -1, "A3": 0.182099, "A4": -1 * 23.78,
-        "B1": 0.5675647, "B2": 0.199735, "B3": 0.4116168, "B4": 2.00834,
-        "C1": 0.1423566, "C2": 0.1078, "C3": 0.4888,
-        "D1": 0.08309076, "D2": 0.02995, "D3": 0.369,
-        "E1": 1.268066, "E2": 1.931, "E3": 0.76934, "E4": 51.09,
+        "A1": 0.1887299,
+        "A2": 481.3 * -1,
+        "A3": 0.182099,
+        "A4": -1 * 23.78,
+        "B1": 0.5675647,
+        "B2": 0.199735,
+        "B3": 0.4116168,
+        "B4": 2.00834,
+        "C1": 0.1423566,
+        "C2": 0.1078,
+        "C3": 0.4888,
+        "D1": 0.08309076,
+        "D2": 0.02995,
+        "D3": 0.369,
+        "E1": 1.268066,
+        "E2": 1.931,
+        "E3": 0.76934,
+        "E4": 51.09,
     }
 
     def calc_t(p, pm):
         if p < 0.03:
             t = pm['A1'] * (1 - numpy.exp(pm['A2'] * p)) + pm["A3"] * (1 - numpy.exp(pm['A4'] * p))
         elif p >= 0.03 and p < 0.25:
-            t = pm['B1'] * p**pm['B2'] + pm['B3'] * p**pm['B4']
+            t = pm['B1'] * p ** pm['B2'] + pm['B3'] * p ** pm['B4']
         elif p >= 0.25 and p < 0.6:
-            t = (pm["C1"] / (pm['C2'] - numpy.log10(p)))**pm['C3']
+            t = (pm["C1"] / (pm['C2'] - numpy.log10(p))) ** pm['C3']
         elif p >= 0.6 and p < 0.9:
-            t = (pm["D1"] / (pm['D2'] - numpy.log10(p)))**pm['D3']
+            t = (pm["D1"] / (pm['D2'] - numpy.log10(p))) ** pm['D3']
         else:
-            t = pm['E1'] * p**pm['E2'] + pm['E3'] * p**pm['E4']
+            t = pm['E1'] * p ** pm['E2'] + pm['E3'] * p ** pm['E4']
         return t
+
     calc_t_v = numpy.vectorize(calc_t)
     thickness_array = calc_t_v(pressure, pm)
     return thickness_array
@@ -257,8 +272,7 @@ def get_thickness_model(model: t.Union[str, t.Callable]) -> t.Callable:
     if isinstance(model, str):
         if model not in _THICKNESS_MODELS:
             raise ParameterError(
-                f"Model \"{model}\" not an implemented thickness function. ",
-                f"Available models are {_THICKNESS_MODELS.keys()}"
+                f"Model \"{model}\" not an implemented thickness function. ", f"Available models are {_THICKNESS_MODELS.keys()}"
             )
 
         return _THICKNESS_MODELS[model]

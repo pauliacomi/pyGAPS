@@ -24,7 +24,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestDAPlot():
+class TestDAPlot:
     """Tests DA and DR plots."""
 
     def test_dr_checks(self, basic_pointisotherm, data_char_path):

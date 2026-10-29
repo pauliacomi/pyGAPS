@@ -54,7 +54,7 @@ class Toth(IsothermBaseModel):
         n_m = self.params["n_m"]
         Kp = self.params["K"] * pressure
         t = self.params["t"]
-        return n_m * Kp / (1.0 + (Kp)**t)**(1 / t)
+        return n_m * Kp / (1.0 + (Kp) ** t) ** (1 / t)
 
     def pressure(self, loading):
         r"""
@@ -80,7 +80,7 @@ class Toth(IsothermBaseModel):
         n_m = self.params["n_m"]
         K = self.params["K"]
         t = self.params["t"]
-        return (loading / (n_m * K)) / (1 - (loading / n_m)**t)**(1 / t)
+        return (loading / (n_m * K)) / (1 - (loading / n_m) ** t) ** (1 / t)
 
     def spreading_pressure(self, pressure):
         r"""
@@ -142,7 +142,7 @@ class Toth(IsothermBaseModel):
         -------
             The T\'oth correction, $\Psi$
         """
-        return (self.params["K"] * pressure)**self.params["t"]
+        return (self.params["K"] * pressure) ** self.params["t"]
 
     def initial_guess(self, pressure, loading):
         """

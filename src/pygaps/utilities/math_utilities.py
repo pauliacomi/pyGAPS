@@ -18,7 +18,6 @@ def split_ads_data(data, pressure_key):
 
     # If the maximum is not the last point
     if inflexion != len(split):
-
         # If the first point is the maximum, then it is purely desorption
         if inflexion == data.index[0]:
             inflexion = 0
@@ -50,9 +49,7 @@ def find_limit_indices(
     if limits[1]:
         index_max = numpy.searchsorted(array, limits[1]) - 1
     if index_max - index_min < smallest_selection:
-        raise CalculationError(
-            f"Not enough points (at least {smallest_selection}) in the selected region."
-        )
+        raise CalculationError(f"Not enough points (at least {smallest_selection}) in the selected region.")
     # TODO figure out which is more efficient
     #     if limits:
     # ret = ret.loc[ret.between(
@@ -125,7 +122,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     # If periodic, extend the point array by count+degree+1
     if periodic:
         factor, fraction = divmod(count + degree + 1, count)
-        cv = numpy.concatenate((cv, ) * factor + (cv[:fraction], ))
+        cv = numpy.concatenate((cv,) * factor + (cv[:fraction],))
         count = len(cv)
         degree = numpy.clip(degree, 1, degree)
 
@@ -142,17 +139,20 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
             dtype='int',
         )
     else:
-        kv = numpy.concatenate((
-            [0] * degree,
-            numpy.arange(count - degree + 1),
-            [count - degree] * degree,
-        ))
+        kv = numpy.concatenate(
+            (
+                [0] * degree,
+                numpy.arange(count - degree + 1),
+                [count - degree] * degree,
+            )
+        )
 
     # Calculate query range
     rng = numpy.linspace(periodic, (count - degree), n)
 
     # Calculate result
     from scipy import interpolate
+
     res = numpy.array(interpolate.splev(rng, (kv, cv.T, degree))).T
 
     return (

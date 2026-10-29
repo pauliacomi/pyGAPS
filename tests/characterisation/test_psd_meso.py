@@ -27,7 +27,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestPSDMeso():
+class TestPSDMeso:
     """Test mesopore size distribution calculation."""
 
     def test_psd_meso_checks(self, basic_pointisotherm):
@@ -49,11 +49,14 @@ class TestPSDMeso():
         with pytest.raises(pgEx.ParameterError):
             pmes.psd_mesoporous(basic_pointisotherm, branch='test')
 
-    @pytest.mark.parametrize('method', [
-        'pygaps-DH',
-        'BJH',
-        'DH',
-    ])
+    @pytest.mark.parametrize(
+        'method',
+        [
+            'pygaps-DH',
+            'BJH',
+            'DH',
+        ],
+    )
     @pytest.mark.parametrize('sample', DATA.values())
     def test_psd_meso(self, sample, method, data_char_path):
         """Test psd calculation with several model isotherms."""

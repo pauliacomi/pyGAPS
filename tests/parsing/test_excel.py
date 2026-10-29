@@ -42,8 +42,9 @@ def assert_xlsx_roundtrip(original, restored):
 
 
 @pytest.mark.parsing
-class TestExcel():
+class TestExcel:
     """All testing of Excel interface"""
+
     def test_excel_isotherm(self, basic_isotherm, tmp_path_factory):
         """Test creation/read of point isotherm excel file."""
         path = tmp_path_factory.mktemp('excel') / 'baseisotherm.xlsx'
