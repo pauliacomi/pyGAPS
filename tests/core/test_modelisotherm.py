@@ -126,7 +126,7 @@ class TestModelIsotherm():
         )
 
     @mpl_cleanup
-    @pytest.mark.parametrize('file, ', [(data['file']) for data in list(DATA.values())])
+    @pytest.mark.parametrize('file', [data['file'] for data in DATA.values()])
     def test_isotherm_create_guess(self, file, data_char_path):
         """Check isotherm can be guessed from PointIsotherm."""
 

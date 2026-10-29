@@ -539,8 +539,8 @@ class TestAIF():
             if item.pair is not None:
                 document[item.pair[0]] = typed(*item.pair)
             elif item.loop is not None:
-                for column, tag in enumerate(item.loop.tags):
-                    document[tag] = typed(tag, item.loop[0, column])
+                for tag in item.loop.tags:
+                    document[tag] = typed(tag, block.find_values(tag)[0])
         document = {tag: value for tag, value in document.items() if value is not None}
 
         errors = [error.message for error in jsonschema.Draft201909Validator(schema).iter_errors(document)]
