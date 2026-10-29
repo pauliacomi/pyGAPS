@@ -63,6 +63,10 @@ To set up `pyGAPS` for local development:
 
     uv sync --all-groups
 
+   To build the documentation, also install the Pandoc executable and ensure
+   it is on your ``PATH``. The Python package named ``pandoc`` is not a
+   substitute for the executable.
+
 5. Create a branch for local development. This project uses the
    `GIT FLOW <https://www.gitkraken.com/learn/git/git-flow>`_ model::
 
@@ -100,4 +104,3 @@ For merging, you should:
        locally you can rely on GitHub - it will
        `run the tests <https://github.com/pauliacomi/pyGAPS/actions>`_
        for each change you add in the pull request.
-

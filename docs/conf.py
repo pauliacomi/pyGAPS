@@ -2,8 +2,7 @@
 # -- Init -----------------------------------------------------
 
 import os
-import sys
-from unittest.mock import MagicMock
+from datetime import datetime
 
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -11,35 +10,6 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 # if not on_rtd:  # only set the theme if we're building docs locally
 html_theme = "furo"
 
-
-# -- Mocking of modules -----------------------------------------------------
-# Need to mock most modules using MagicMock, as they won't be able to
-# be installed on ReadTheDocs
-class Mock(MagicMock):
-    """Simple mock class."""
-    @classmethod
-    def __getattr__(cls, name):
-        return MagicMock()
-
-
-MOCK_MODULES = [
-    #     'matplotlib',
-    #     'matplotlib.pyplot',
-    #     'matplotlib.ticker',
-    #     'matplotlib.cm',
-    #     'matplotlib.rc_context',
-    #     'numpy',
-    #     'pandas',
-    #     'pandas.util',
-    #     'scipy',
-    #     'scipy.constants',
-    #     'scipy.stats',
-    #     'scipy.optimize',
-    #     'scipy.interpolate',
-    #     'scipy.integrate',
-    'coolprop',
-]
-sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # -- General configuration -----------------------------------------------------
 
@@ -61,7 +31,7 @@ extensions = [
 ]
 # If currently spellchecking
 if os.getenv('SPELLCHECK'):
-    extensions += 'sphinxcontrib.spelling'
+    extensions.append('sphinxcontrib.spelling')
     spelling_show_suggestions = True
     spelling_lang = 'en_UK'
 
@@ -73,11 +43,12 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pyGAPS'
-year = '2022'
+year = str(datetime.now().year)
 author = 'Paul Iacomi'
 copyright = f'{year}, {author}'
 from importlib.metadata import version as imp_version
 version = release = imp_version("pygaps")
+release_ref = 'master' if '.dev' in release or '+' in release else f'v{release}'
 
 print(project, " version defined as ", version)
 
@@ -194,15 +165,15 @@ napoleon_use_admonition_for_references = False
 # allows parsing of Jupyter notebooks to docs
 
 nbsphinx_prolog = r"""
-{% set docname = 'docs/' + env.doc2path(env.docname, base=None) %}
+{% set docname = 'docs/' + env.doc2path(env.docname, base=None)|replace('\\', '/') %}
 
 .. raw:: html
 
     <div class="admonition note">
       This page was generated from
-      <a class="reference external" href="https://github.com/pauliacomi/pyGAPS/blob/v{{ env.config.release|e }}/{{ docname|e }}">{{ docname|e }}</a>.
+      <a class="reference external" href="https://github.com/pauliacomi/pyGAPS/blob/{{ env.config.release_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
       To start an interactive version:
-      <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/v{{ env.config.release|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span>
+      <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/{{ env.config.release_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span>
       <script>
         if (document.location.host) {
           $(document.currentScript).replaceWith(
@@ -221,3 +192,7 @@ nbsphinx_prolog = r"""
 # -- intersphinx configuration --------------------------------------------------
 # allows to link to other documentations
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
+
+
+def setup(app):
+    app.add_config_value('release_ref', release_ref, 'env')

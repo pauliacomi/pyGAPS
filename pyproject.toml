@@ -46,9 +46,8 @@ test = [
 ]
 docs = [
     "pygments>=2.11",
-    "docutils>=0.11",
+    "docutils>=0.18.1",
     "doc8",
-    "pandoc",
     "restructuredtext-lint",
     "ipykernel",
     "sphinx>=4.0",
@@ -168,9 +167,6 @@ python_files = [
 ]
 addopts = [
     "-ra",
-    "--cov",
-    "--cov-report=xml",
-    "--doctest-glob=*.rst",
     "--tb=short",
 ]
 markers = [
@@ -184,10 +180,6 @@ markers = [
     "prediction: IAST and isotherm prediction tests.",
     "okay: custom empty marker.",
 ]
-filterwarnings = [
-    "ignore::UserWarning",
-]
-
 # testing: coverage.py
 [tool.coverage.run]
 branch = false
