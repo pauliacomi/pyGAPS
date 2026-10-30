@@ -10,8 +10,14 @@ and is used to check for any deprecations.
 """
 
 import ast
+import math
+import os
 import pathlib
+import posixpath
+import tempfile
 import warnings
+import zipfile
+from xml.etree import ElementTree
 
 import pandas
 
@@ -23,6 +29,10 @@ from pygaps.modelling import model_from_dict
 from pygaps.utilities.exceptions import ParsingError
 
 _parser_version = "3.0"
+
+_MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+_DOCUMENT_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+_PACKAGE_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 
 _META_DICT = {
     'material': {
@@ -95,12 +105,72 @@ def _cell_value(val):
     return val
 
 
+def _preserve_float_precision(path, float_values):
+    """Write floats using their shortest round-trippable decimal representation."""
+    if not float_values:
+        return
+
+    with zipfile.ZipFile(path, 'r') as source:
+        workbook = ElementTree.fromstring(source.read('xl/workbook.xml'))
+        relationships = ElementTree.fromstring(source.read('xl/_rels/workbook.xml.rels'))
+        targets = {
+            relationship.attrib['Id']: relationship.attrib['Target']
+            for relationship in relationships.findall(f"{{{_PACKAGE_REL_NS}}}Relationship")
+        }
+        worksheets = {
+            sheet.attrib['name']: posixpath.normpath(
+                sheet_target if sheet_target.startswith('/') else posixpath.join('xl', sheet_target)
+            ).lstrip('/')
+            for sheet in workbook.findall(f".//{{{_MAIN_NS}}}sheet")
+            if (sheet_target := targets.get(sheet.attrib[f"{{{_DOCUMENT_REL_NS}}}id"]))
+        }
+
+        updated_sheets = {}
+        for sheet_name, cells in float_values.items():
+            worksheet_path = worksheets.get(sheet_name)
+            if worksheet_path is None:
+                raise ParsingError(f"Could not find worksheet '{sheet_name}' in saved Excel file")
+
+            worksheet = ElementTree.fromstring(source.read(worksheet_path))
+            found_cells = set()
+            for cell in worksheet.iter(f"{{{_MAIN_NS}}}c"):
+                coordinate = cell.attrib.get('r')
+                if coordinate not in cells:
+                    continue
+                value = cell.find(f"{{{_MAIN_NS}}}v")
+                if value is None:
+                    raise ParsingError(f"Could not update numeric value in cell {sheet_name}!{coordinate}")
+                value.text = cells[coordinate]
+                found_cells.add(coordinate)
+
+            if found_cells != cells.keys():
+                missing = ', '.join(sorted(cells.keys() - found_cells))
+                raise ParsingError(f"Could not find numeric cells in worksheet '{sheet_name}': {missing}")
+
+            updated_sheets[worksheet_path] = ElementTree.tostring(worksheet, encoding='utf-8', xml_declaration=True)
+
+    with tempfile.NamedTemporaryFile(dir=path.parent, suffix=path.suffix, delete=False) as temporary_file:
+        temporary_path = pathlib.Path(temporary_file.name)
+
+    try:
+        with zipfile.ZipFile(path, 'r') as source, zipfile.ZipFile(temporary_path, 'w') as destination:
+            destination.comment = source.comment
+            for entry in source.infolist():
+                data = updated_sheets.get(entry.filename)
+                if data is None:
+                    data = source.read(entry.filename)
+                destination.writestr(entry, data)
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
+
+
 def isotherm_to_xl(isotherm, path):
     """
     Save an isotherm to an excel (.xlsx) file.
 
-    Numbers are stored with 16 significant digits, so values may differ
-    from the original in the last digit when read back.
+    Numeric values are stored with enough precision to preserve their original
+    floating-point values when read back by pyGAPS.
 
     Parameters
     ----------
@@ -127,9 +197,13 @@ def isotherm_to_xl(isotherm, path):
     wb = Workbook()
     sht = wb.active
     sht.title = 'data'
+    float_values = {}
 
     def write(row, col, val, styled=False):
-        cell = sht.cell(row=row + 1, column=col + 1, value=_cell_value(val))
+        value = _cell_value(val)
+        cell = sht.cell(row=row + 1, column=col + 1, value=value)
+        if isinstance(value, float) and math.isfinite(value):
+            float_values.setdefault(sht.title, {})[cell.coordinate] = repr(value)
         if styled:
             cell.alignment = Alignment(horizontal='left')
             cell.fill = PatternFill('solid', fgColor='C0C0C0')
@@ -217,6 +291,7 @@ def isotherm_to_xl(isotherm, path):
         write(row, 1, iso_dict[prop])
 
     wb.save(path)
+    _preserve_float_precision(path, float_values)
 
 
 class _Sheet:

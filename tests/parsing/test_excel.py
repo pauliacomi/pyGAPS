@@ -29,6 +29,7 @@ def _close(a, b, rel=1e-15):
 def assert_xlsx_roundtrip(original, restored):
     """Check an isotherm survived an xlsx round-trip."""
     assert type(original) is type(restored)
+    assert original.iso_id == restored.iso_id
     assert _close(original.to_dict(), restored.to_dict())
     if isinstance(original, PointIsotherm):
         pandas.testing.assert_frame_equal(
