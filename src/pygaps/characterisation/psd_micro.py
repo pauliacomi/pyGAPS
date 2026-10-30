@@ -167,7 +167,7 @@ def psd_microporous(
             }
         except ParameterError as err:
             raise ParameterError(
-                "Isotherm adsorbate does not have all required HK properties.Pass a dictionary with your HK adsorbate parameters."
+                "Isotherm adsorbate does not have all required HK properties. Pass a dictionary with your HK adsorbate parameters."
             ) from err
 
     # Get material properties

@@ -15,7 +15,14 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 def iast_binary_vle(
-    isotherms, total_pressure, branch="ads", npoints=30, adsorbed_mole_fraction_guess=None, warningoff=False, verbose=False, ax=None
+    isotherms,
+    total_pressure,
+    branch="ads",
+    npoints=30,
+    adsorbed_mole_fraction_guess=None,
+    warningoff=False,
+    verbose=False,
+    ax=None,
 ):
     """
     Perform IAST calculations to predict the vapour-liquid equilibrium curve at a fixed pressure.
@@ -62,7 +69,9 @@ def iast_binary_vle(
     """
     # Parameter checks
     if len(isotherms) != 2:
-        raise ParameterError("The binary equilibrium calculation can only take two components as parameters.")
+        raise ParameterError(
+            "The binary equilibrium calculation can only take two components as parameters."
+        )
     if any(iso.pressure_mode.startswith("relative") for iso in isotherms):
         raise ParameterError("IAST only runs with isotherms on an absolute pressure basis.")
 
@@ -94,13 +103,28 @@ def iast_binary_vle(
     if verbose:
         from pygaps.graphing.iast_graphs import plot_iast_vle
 
-        plot_iast_vle(x_data, y_data, isotherms[0].adsorbate, isotherms[1].adsorbate, total_pressure, isotherms[0].pressure_unit, ax=ax)
+        plot_iast_vle(
+            x_data,
+            y_data,
+            isotherms[0].adsorbate,
+            isotherms[1].adsorbate,
+            total_pressure,
+            isotherms[0].pressure_unit,
+            ax=ax
+        )
 
     return {"x": x_data, "y": y_data}
 
 
 def iast_binary_svp(
-    isotherms, mole_fractions, pressures, branch="ads", warningoff=False, adsorbed_mole_fraction_guess=None, verbose=False, ax=None
+    isotherms,
+    mole_fractions,
+    pressures,
+    branch="ads",
+    warningoff=False,
+    adsorbed_mole_fraction_guess=None,
+    verbose=False,
+    ax=None
 ):
     """Perform IAST calculations to predict the selectivity of one of the components as a function of pressure.
 
@@ -142,7 +166,9 @@ def iast_binary_svp(
     """
     # Parameter checks
     if len(isotherms) != 2 or len(mole_fractions) != 2:
-        raise ParameterError("The selectivity calculation can only take two components as parameters.")
+        raise ParameterError(
+            "The selectivity calculation can only take two components as parameters."
+        )
     if not numpy.isclose(sum(mole_fractions), 1.0):
         raise ParameterError("Mole fractions do not add up to unity")
     if any(iso.pressure_mode.startswith("relative") for iso in isotherms):
@@ -165,13 +191,20 @@ def iast_binary_svp(
             adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess,
         )
 
-    selectivities = [(x[0] / mole_fractions[0]) / (x[1] / mole_fractions[1]) for x in component_loadings]
+    selectivities = [(x[0] / mole_fractions[0]) / (x[1] / mole_fractions[1])
+                     for x in component_loadings]
 
     if verbose:
         from pygaps.graphing.iast_graphs import plot_iast_svp
 
         plot_iast_svp(
-            pressures, selectivities, isotherms[0].adsorbate, isotherms[1].adsorbate, mole_fractions[0], isotherms[0].pressure_unit, ax=ax
+            pressures,
+            selectivities,
+            isotherms[0].adsorbate,
+            isotherms[1].adsorbate,
+            mole_fractions[0],
+            isotherms[0].pressure_unit,
+            ax=ax
         )
 
     return {
@@ -181,7 +214,13 @@ def iast_binary_svp(
 
 
 def iast_point_fraction(
-    isotherms, gas_mole_fraction, total_pressure, branch="ads", verbose=False, warningoff=False, adsorbed_mole_fraction_guess=None
+    isotherms,
+    gas_mole_fraction,
+    total_pressure,
+    branch="ads",
+    verbose=False,
+    warningoff=False,
+    adsorbed_mole_fraction_guess=None
 ):
     """Perform IAST calculation to predict multi-component adsorption isotherm from pure component adsorption isotherms.
 
@@ -230,7 +269,14 @@ def iast_point_fraction(
     )
 
 
-def iast_point(isotherms, partial_pressures, branch="ads", verbose=False, warningoff=False, adsorbed_mole_fraction_guess=None):
+def iast_point(
+    isotherms,
+    partial_pressures,
+    branch="ads",
+    verbose=False,
+    warningoff=False,
+    adsorbed_mole_fraction_guess=None
+):
     """Perform IAST calculation to predict multi-component adsorption isotherm from pure component adsorption isotherms.
 
     The material is now in equilibrium with a mixture of gases with partial
@@ -302,7 +348,7 @@ def iast_point(isotherms, partial_pressures, branch="ads", verbose=False, warnin
         array
             Spreading pressure difference between component i and i+1.
         """
-        spreading_pressure_diff = numpy.zeros((n_components - 1,))
+        spreading_pressure_diff = numpy.zeros((n_components - 1, ))
         for i in range(n_components - 1):
             if i == n_components - 2:
                 # automatically assert \sum z_i = 1
@@ -328,7 +374,9 @@ def iast_point(isotherms, partial_pressures, branch="ads", verbose=False, warnin
     ####
     if adsorbed_mole_fraction_guess is None:
         # Default guess: pure-component loadings at these partial pressures.
-        loading_guess = numpy.asarray([isotherms[i].loading_at(partial_pressures[i]) for i in range(n_components)])
+        loading_guess = numpy.asarray([
+            isotherms[i].loading_at(partial_pressures[i]) for i in range(n_components)
+        ])
         adsorbed_mole_fraction_guess = loading_guess / numpy.sum(loading_guess)
     else:
         numpy.testing.assert_almost_equal(1.0, numpy.sum(adsorbed_mole_fraction_guess), decimal=4)
@@ -357,7 +405,9 @@ def iast_point(isotherms, partial_pressures, branch="ads", verbose=False, warnin
     adsorbed_mole_fractions = res.x
 
     # concatenate mole fraction of last component
-    adsorbed_mole_fractions = numpy.concatenate((adsorbed_mole_fractions, numpy.asarray([1.0 - numpy.sum(adsorbed_mole_fractions)])))
+    adsorbed_mole_fractions = numpy.concatenate(
+        (adsorbed_mole_fractions, numpy.asarray([1.0 - numpy.sum(adsorbed_mole_fractions)]))
+    )
 
     if numpy.any((adsorbed_mole_fractions < 0.0) | (adsorbed_mole_fractions > 1.0)):
         raise CalculationError(
@@ -388,7 +438,9 @@ def iast_point(isotherms, partial_pressures, branch="ads", verbose=False, warnin
             logger.info(f"\tp^0 = {pressure0[i]:.4g}")
             logger.info(f"\tLoading = {loadings[i]:.4g}")
             logger.info(f"\tx = {adsorbed_mole_fractions[i]:.4g}")
-            logger.info(f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4g}")
+            logger.info(
+                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4g}"
+            )
 
     # print warning if had to extrapolate isotherm in spreading pressure
     if not warningoff:
@@ -411,7 +463,13 @@ def iast_point(isotherms, partial_pressures, branch="ads", verbose=False, warnin
 
 
 def reverse_iast(
-    isotherms, adsorbed_mole_fractions, total_pressure, branch="ads", verbose=False, warningoff=False, gas_mole_fraction_guess=None
+    isotherms,
+    adsorbed_mole_fractions,
+    total_pressure,
+    branch="ads",
+    verbose=False,
+    warningoff=False,
+    gas_mole_fraction_guess=None
 ):
     """
     Perform reverse IAST to predict gas phase composition for given adsorbed mole fractions.
@@ -478,7 +536,9 @@ def reverse_iast(
     if verbose:
         logger.info(f"{n_components:d} components.")
         for i in range(n_components):
-            logger.info(f"\tDesired adsorbed phase mole fraction of component {i:d} = {adsorbed_mole_fractions[i]:.4g}")
+            logger.info(
+                f"\tDesired adsorbed phase mole fraction of component {i:d} = {adsorbed_mole_fractions[i]:.4g}"
+            )
 
     # assert that the spreading pressures of each component are equal
     def spreading_pressure_differences(gas_mole_fractions):
@@ -497,7 +557,7 @@ def reverse_iast(
             Spreading pressure difference
             between component i and i+1.
         """
-        spreading_pressure_diff = numpy.zeros((n_components - 1,))
+        spreading_pressure_diff = numpy.zeros((n_components - 1, ))
         for i in range(n_components - 1):
             if i == n_components - 2:
                 # automatically assert \sum y_i = 1
@@ -510,7 +570,8 @@ def reverse_iast(
                 branch=branch,
             )
             sp2 = isotherms[i + 1].spreading_pressure_at(
-                total_pressure * gas_mole_fraction_n / adsorbed_mole_fractions[i + 1], branch=branch
+                total_pressure * gas_mole_fraction_n / adsorbed_mole_fractions[i + 1],
+                branch=branch
             )
             spreading_pressure_diff[i] = sp1 - sp2
 
@@ -543,7 +604,9 @@ def reverse_iast(
     gas_mole_fractions = res.x
 
     # concatenate mole fraction of last component
-    gas_mole_fractions = numpy.concatenate((gas_mole_fractions, numpy.array([1.0 - numpy.sum(gas_mole_fractions)])))
+    gas_mole_fractions = numpy.concatenate(
+        (gas_mole_fractions, numpy.array([1.0 - numpy.sum(gas_mole_fractions)]))
+    )
 
     if numpy.sum(gas_mole_fractions < 0.0) != 0 or numpy.sum(gas_mole_fractions > 1.0) != 0:
         raise CalculationError(
@@ -570,11 +633,17 @@ def reverse_iast(
         # print off IAST loadings and corresponding pure component loadings
         for i in range(n_components):
             logger.info(f"Component {i}")
-            logger.info(f"\tDesired mole fraction in adsorbed phase, x = {adsorbed_mole_fractions[i]:.4g}")
-            logger.info(f"\tBulk gas mole fraction that gives this, y = {gas_mole_fractions[i]:.4g}")
+            logger.info(
+                f"\tDesired mole fraction in adsorbed phase, x = {adsorbed_mole_fractions[i]:.4g}"
+            )
+            logger.info(
+                f"\tBulk gas mole fraction that gives this, y = {gas_mole_fractions[i]:.4g}"
+            )
             logger.info(f"\tp^0 = {pressure0[i]:.4g}")
             logger.info(f"\tLoading = {loadings[i]:.4g}")
-            logger.info(f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4g}")
+            logger.info(
+                f"\tSpreading pressure = {isotherms[i].spreading_pressure_at(pressure0[i], branch=branch):.4g}"
+            )
 
     # print warning if had to extrapolate isotherm in spreading pressure
     if not warningoff:

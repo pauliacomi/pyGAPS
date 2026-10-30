@@ -118,7 +118,9 @@ class ModelIsotherm(BaseIsotherm):
 
         # Checks
         if model is None:
-            raise ParameterError("Specify a model to fit to the pure-component isotherm data. e.g. model=\"Langmuir\"")
+            raise ParameterError(
+                "Specify a model to fit to the pure-component isotherm data. e.g. model=\"Langmuir\""
+            )
 
         if isotherm_data is not None:
             if None in [pressure_key, loading_key]:
@@ -149,7 +151,9 @@ class ModelIsotherm(BaseIsotherm):
 
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
-                raise ParameterError("If you've chosen to pass loading and pressure directly as arrays, make sure both are specified!")
+                raise ParameterError(
+                    "If you've chosen to pass loading and pressure directly as arrays, make sure both are specified!"
+                )
             if len(pressure) != len(loading):
                 raise ParameterError("Pressure and loading arrays are not equal!")
 
@@ -192,7 +196,9 @@ class ModelIsotherm(BaseIsotherm):
             if param_guess:
                 for param in param_guess.keys():
                     if param not in self.model.param_names:
-                        raise ParameterError(f"'{param}' is not a valid parameter in the '{model}' model.")
+                        raise ParameterError(
+                            f"'{param}' is not a valid parameter in the '{model}' model."
+                        )
             else:
                 param_guess = self.model.initial_guess(pressure, loading)
 
@@ -334,7 +340,13 @@ class ModelIsotherm(BaseIsotherm):
                     **iso_params,
                 )
 
-        return ModelIsotherm.guess(branch=branch, models=model, optimization_params=optimization_params, verbose=verbose, **iso_params)
+        return ModelIsotherm.guess(
+            branch=branch,
+            models=model,
+            optimization_params=optimization_params,
+            verbose=verbose,
+            **iso_params,
+        )
 
     @classmethod
     def guess(
@@ -395,9 +407,13 @@ class ModelIsotherm(BaseIsotherm):
             try:
                 guess_models = [m for m in models if is_model(m)]
             except TypeError as ex:
-                raise ParameterError("Could not figure out the list of models. Is it a list?") from ex
+                raise ParameterError(
+                    "Could not figure out the list of models. Is it a list?"
+                ) from ex
             if len(guess_models) != len(models):
-                raise ParameterError(f'Not all models correspond to internal models. Possible models are f{models}')
+                raise ParameterError(
+                    f'Not all models correspond to internal models. Possible models are f{models}'
+                )
 
         for model in guess_models:
             model_bounds = None
@@ -569,7 +585,9 @@ class ModelIsotherm(BaseIsotherm):
 
         """
         if branch and branch not in [self.branch, 'all']:
-            raise ParameterError(f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}').")
+            raise ParameterError(
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
+            )
         # TODO: to calculate limits like this, better to put the limits directly to evaluate
         # Generate pressure points
         if self.model.calculates == 'loading':
@@ -604,7 +622,8 @@ class ModelIsotherm(BaseIsotherm):
 
         # Select required points
         if limits and any(limits):
-            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret) & (ret < (numpy.inf if limits[1] is None else limits[1]))]
+            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
+                      & (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
@@ -656,7 +675,9 @@ class ModelIsotherm(BaseIsotherm):
 
         """
         if branch and branch != self.branch:
-            raise ParameterError(f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}').")
+            raise ParameterError(
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
+            )
 
         if self.model.calculates == 'pressure':
             ret = numpy.linspace(
@@ -713,7 +734,8 @@ class ModelIsotherm(BaseIsotherm):
 
         # Select required points
         if limits and any(limits):
-            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret) & (ret < (numpy.inf if limits[1] is None else limits[1]))]
+            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
+                      & (ret < (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
@@ -779,7 +801,9 @@ class ModelIsotherm(BaseIsotherm):
 
         """
         if branch and branch != self.branch:
-            raise ParameterError(f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}').")
+            raise ParameterError(
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
+            )
 
         # Convert to numpy array just in case
         loading = numpy.asarray(loading)
@@ -789,7 +813,9 @@ class ModelIsotherm(BaseIsotherm):
             if not material_basis:
                 material_basis = self.material_basis
             if not material_unit:
-                raise ParameterError("Must specify a material unit if the input is in another basis")
+                raise ParameterError(
+                    "Must specify a material unit if the input is in another basis"
+                )
 
             loading = c_material(
                 loading,
@@ -892,7 +918,9 @@ class ModelIsotherm(BaseIsotherm):
 
         """
         if branch and branch != self.branch:
-            raise ParameterError(f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}').")
+            raise ParameterError(
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
+            )
 
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)
@@ -902,7 +930,9 @@ class ModelIsotherm(BaseIsotherm):
             if not pressure_mode:
                 pressure_mode = self.pressure_mode
             if pressure_mode == 'absolute' and not pressure_unit:
-                raise ParameterError("Must specify a pressure unit if the input is in an absolute mode")
+                raise ParameterError(
+                    "Must specify a pressure unit if the input is in an absolute mode"
+                )
 
             pressure = c_pressure(
                 pressure,
@@ -998,7 +1028,9 @@ class ModelIsotherm(BaseIsotherm):
 
         """
         if branch and branch != self.branch:
-            raise ParameterError(f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}').")
+            raise ParameterError(
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
+            )
 
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)
@@ -1010,7 +1042,9 @@ class ModelIsotherm(BaseIsotherm):
             if not pressure_unit:
                 pressure_unit = self.pressure_unit
             if not pressure_unit and self.pressure_mode.startswith('relative'):
-                raise ParameterError("Must specify a pressure unit if the input is in an absolute mode")
+                raise ParameterError(
+                    "Must specify a pressure unit if the input is in an absolute mode"
+                )
 
             pressure = c_pressure(
                 pressure,
