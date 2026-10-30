@@ -1,11 +1,11 @@
 # pylint: disable=W0614,W0401,W0611,W0622
-# flake8: noqa
 # isort:skip_file
 """
 Scaffolding and convenience functions for isotherm fitting.
 
 If adding a custom model, it should be also added below as a string.
 """
+
 import typing as t
 import importlib
 
@@ -78,11 +78,8 @@ _WHITTAKER_MODELS = [
 ]
 
 # This list has all Toth-derived models
-_TOTH_DERIVATIVE_MODELS = [
-    "Toth",
-    "DSToth",
-    "ChemiPhysisorption"
-]
+_TOTH_DERIVATIVE_MODELS = ["Toth", "DSToth", "ChemiPhysisorption"]
+
 
 def is_model(model_name: str) -> bool:
     """
@@ -139,9 +136,7 @@ def is_model_iast(model_name: str) -> bool:
 
 
 def is_model_whittaker(model_name: str) -> bool:
-    """
-    Check whether specified model can be used to calculate whittaker enthalpy
-    of adsorption.
+    """Check whether specified model can be used to calculate whittaker enthalpy of adsorption.
 
     Parameters
     ----------
@@ -284,6 +279,7 @@ def model_iso(
         Prints out extra information about steps taken.
     """
     from pygaps.core.modelisotherm import ModelIsotherm
+
     return ModelIsotherm.from_pointisotherm(
         isotherm,
         branch=branch,

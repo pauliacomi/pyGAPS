@@ -24,9 +24,7 @@ def dr_plot(
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False,
 ):
-    r"""
-    Calculate pore volume and effective adsorption potential
-    through a Dubinin-Radushkevich (DR) plot.
+    r"""Calculate pore volume and effective adsorption potential through a Dubinin-Radushkevich (DR) plot.
 
     The optional ``p_limits`` parameter allows to specify the upper and lower
     pressure limits for the calculation, otherwise the entire range will be
@@ -128,8 +126,8 @@ def da_plot(
     verbose: bool = False,
 ):
     r"""
-    Calculate pore volume and effective adsorption potential
-    through a Dubinin-Astakov (DA) plot.
+    Calculate pore volume and effective adsorption potential through a Dubinin-Astakov (DA) plot.
+
     Optionally find a best exponent fit to the DA line.
 
     The function accepts a pyGAPS isotherm, with an ability
@@ -215,7 +213,6 @@ def da_plot(
     pygaps.characterisation.dr_da_plots.da_plot_raw : low level method
 
     """
-
     # Check consistency of exponent
     find_exp = False
     if not exp:
@@ -231,10 +228,7 @@ def da_plot(
 
     # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
-            "loading_basis": "molar",
-            "loading_unit": "mol"
-        }, {"pressure_mode": "relative"}
+        isotherm, branch, {"loading_basis": "molar", "loading_unit": "mol"}, {"pressure_mode": "relative"}
     )
 
     # Call the raw function
@@ -264,6 +258,7 @@ def da_plot(
         logger.info(f"Effective adsorption potential is : {potential:.3g} kJ/mol")
         # Plot
         from pygaps.graphing.calc_graphs import dra_plot
+
         dra_plot(
             log_v_adj(loading, molar_mass, liquid_density),
             log_p_exp(pressure, exp),
@@ -365,21 +360,16 @@ def da_plot_raw(
     if p_limits[1]:
         maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
     if maximum - minimum < 2:  # (for 3 point minimum)
-        raise CalculationError(
-            "The isotherm does not have enough points (at least 3) "
-            "in the selected region."
-        )
-    pressure = pressure[minimum:maximum + 1]
-    loading = loading[minimum:maximum + 1]
+        raise CalculationError("The isotherm does not have enough points (at least 3) in the selected region.")
+    pressure = pressure[minimum : maximum + 1]
+    loading = loading[minimum : maximum + 1]
 
     # Calculate x-axis points
     logv = log_v_adj(loading, molar_mass, liquid_density)
 
     def dr_fit(exp, ret=False):
         """Linear fit."""
-        slope, intercept, corr_coef, p_val, stderr = stats.linregress(
-            log_p_exp(pressure, exp), logv
-        )
+        slope, intercept, corr_coef, p_val, stderr = stats.linregress(log_p_exp(pressure, exp), logv)
 
         if ret:
             return slope, intercept, corr_coef
@@ -395,7 +385,7 @@ def da_plot_raw(
 
     # Calculate final result values
     microp_volume = numpy.exp(intercept)
-    potential = (constants.gas_constant * iso_temp) / (-slope)**(1 / exp) / 1000
+    potential = (constants.gas_constant * iso_temp) / (-slope) ** (1 / exp) / 1000
 
     return (
         microp_volume,
@@ -416,4 +406,4 @@ def log_v_adj(loading, molar_mass, liquid_density):
 
 def log_p_exp(pressure, exp):
     """Log of p_0/p raised to the DA exponent."""
-    return (-numpy.log(pressure))**exp
+    return (-numpy.log(pressure)) ** exp

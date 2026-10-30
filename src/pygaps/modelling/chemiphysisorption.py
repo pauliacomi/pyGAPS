@@ -56,17 +56,17 @@ class ChemiPhysisorption(IsothermBaseModel):
         "Ea",
     )
     param_default_bounds = (
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
     )
     rt = 1000
 
     def __init_parameters__(self, params):
-        "Initialise model parameters from isotherm data"
+        """Initialise model parameters from isotherm data."""
         self.rt = constants.gas_constant * params['temperature']
 
     def loading(self, pressure):
@@ -87,8 +87,9 @@ class ChemiPhysisorption(IsothermBaseModel):
         K2p = self.params["K2"] * pressure
         t1 = self.params["t1"]
         Ea = self.params["Ea"]
-        return ((self.params['n_m1'] * K1p / (1.0 + (K1p)**t1)**(1 / t1)) +
-                ((self.params['n_m2'] * K2p / (1.0 + K2p)) * (numpy.exp(-Ea / self.rt))))
+        return (self.params['n_m1'] * K1p / (1.0 + (K1p) ** t1) ** (1 / t1)) + (
+            (self.params['n_m2'] * K2p / (1.0 + K2p)) * (numpy.exp(-Ea / self.rt))
+        )
 
     def pressure(self, loading):
         """
@@ -107,6 +108,7 @@ class ChemiPhysisorption(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
+
         def fun(x):
             return self.loading(x) - loading
 
@@ -146,9 +148,7 @@ class ChemiPhysisorption(IsothermBaseModel):
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def toth_correction(self, pressure):
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
             \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
@@ -179,48 +179,31 @@ class ChemiPhysisorption(IsothermBaseModel):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
-
         nm1K1 = self.params["n_m1"] * self.params["K1"]
-        K1Pt1 = (self.params["K1"] * pressure)**self.params["t1"]
+        K1Pt1 = (self.params["K1"] * pressure) ** self.params["t1"]
         invt1 = 1 / self.params["t1"]
 
-        gammanm2K2 = (
-            numpy.exp(-self.params["Ea"] / self.rt) * self.params["n_m2"]
-            * self.params["K2"]
-        )
-        K2P = (self.params["K2"] * pressure)
+        gammanm2K2 = numpy.exp(-self.params["Ea"] / self.rt) * self.params["n_m2"] * self.params["K2"]
+        K2P = self.params["K2"] * pressure
 
-        n_P = (
-            (nm1K1 / ((1 + K1Pt1)**invt1)) +
-            (gammanm2K2 / ((1 + K2P)))
-        )
+        n_P = (nm1K1 / ((1 + K1Pt1) ** invt1)) + (gammanm2K2 / (1 + K2P))
 
         def dn_dP_singlesite(gamma, nm, K, t):
-            Kpt = (K * pressure)**t
+            Kpt = (K * pressure) ** t
             gammanmK = gamma * nm * K
-            return gammanmK / ((1 + Kpt))**((t + 1) / t)
+            return gammanmK / (1 + Kpt) ** ((t + 1) / t)
 
         dP_dn = 1 / (
-            dn_dP_singlesite(
-                1,
-                self.params["n_m1"],
-                self.params["K1"],
-                self.params["t1"]
-            ) +
-            dn_dP_singlesite(
-                numpy.exp(-self.params["Ea"] / self.rt),
-                self.params["n_m2"],
-                self.params["K2"],
-                1
-            )
+            dn_dP_singlesite(1, self.params["n_m1"], self.params["K1"], self.params["t1"])
+            + dn_dP_singlesite(numpy.exp(-self.params["Ea"] / self.rt), self.params["n_m2"], self.params["K2"], 1)
         )
 
         return (n_P * dP_dn) - 1

@@ -1,5 +1,5 @@
 # pylint: disable=W0614,W0401,W0611,W0622
-# flake8: noqa
+"""Material characterisation methods (surface area, pore size distribution, enthalpy, etc.)."""
 
 from .alphas_plots import alpha_s
 from .alphas_plots import alpha_s_raw

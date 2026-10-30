@@ -1,8 +1,5 @@
-"""
-Module contains functions to calculate the critical
-evaporation/condensation pore radius the mesopore range,
-as a function of pressure.
-"""
+"""Functions to calculate the critical evaporation/condensation pore radius in the mesopore range, as a function of pressure."""
+
 import typing as t
 from functools import partial
 
@@ -39,9 +36,7 @@ def get_meniscus_geometry(branch: str, pore_geometry: str):
         elif pore_geometry == 'sphere':
             m_geometry = 'hemispherical'
         else:
-            raise ParameterError(
-                "Pore geometry must be either 'slit', 'cylinder', 'halfopen-cylinder', or 'sphere'"
-            )
+            raise ParameterError("Pore geometry must be either 'slit', 'cylinder', 'halfopen-cylinder', or 'sphere'")
     elif branch == 'des':
         if pore_geometry == 'slit':
             m_geometry = 'hemicylindrical'
@@ -52,9 +47,7 @@ def get_meniscus_geometry(branch: str, pore_geometry: str):
         elif pore_geometry == 'sphere':
             m_geometry = 'hemispherical'
         else:
-            raise ParameterError(
-                "Pore geometry must be either 'slit', 'cylinder', 'halfopen-cylinder', or 'sphere'"
-            )
+            raise ParameterError("Pore geometry must be either 'slit', 'cylinder', 'halfopen-cylinder', or 'sphere'")
     else:
         raise ParameterError("Adsorption branch must be either 'ads' or 'des'.")
 
@@ -69,9 +62,7 @@ def kelvin_radius(
     adsorbate_molar_mass: float,
     adsorbate_surface_tension: float,
 ):
-    r"""
-    Calculate the kelvin radius of the pore, using the standard
-    form of the kelvin equation.
+    r"""Calculate the kelvin radius of the pore, using the standard form of the kelvin equation.
 
     Parameters
     ----------
@@ -128,8 +119,9 @@ def kelvin_radius(
 
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
-    return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
-        (geometry_factor * constants.gas_constant * temperature * numpy.log(pressure))
+    return -(2 * adsorbate_surface_tension * adsorbate_molar_density) / (
+        geometry_factor * constants.gas_constant * temperature * numpy.log(pressure)
+    )
 
 
 def kelvin_radius_kjs(
@@ -140,9 +132,7 @@ def kelvin_radius_kjs(
     adsorbate_molar_mass: float,
     adsorbate_surface_tension: float,
 ):
-    r"""
-    Calculate the kelvin radius of the pore, using the
-    Kruck-Jaroniec-Sayari correction.
+    r"""Calculate the kelvin radius of the pore, using the Kruck-Jaroniec-Sayari correction.
 
     Parameters
     ----------
@@ -200,8 +190,7 @@ def kelvin_radius_kjs(
 
     adsorbate_molar_density = adsorbate_molar_mass / liquid_density
 
-    return - (2 * adsorbate_surface_tension * adsorbate_molar_density) / \
-        (constants.gas_constant * temperature * numpy.log(pressure)) + 0.3
+    return -(2 * adsorbate_surface_tension * adsorbate_molar_density) / (constants.gas_constant * temperature * numpy.log(pressure)) + 0.3
 
 
 #: List of kelvin model functions
@@ -244,10 +233,7 @@ def get_kelvin_model(model: t.Union[str, t.Callable], **model_args):
     # If the model is a string, get a model from the _THICKNESS_MODELS
     if isinstance(model, str):
         if model not in _KELVIN_MODELS:
-            raise ParameterError(
-                f"Model {model} not an implemented Kelvin model. ",
-                f"Available models are {_KELVIN_MODELS.keys()}"
-            )
+            raise ParameterError(f"Model {model} not an implemented Kelvin model. ", f"Available models are {_KELVIN_MODELS.keys()}")
 
         return partial(_KELVIN_MODELS[model], **model_args)
 

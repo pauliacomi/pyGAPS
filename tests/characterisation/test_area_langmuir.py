@@ -25,7 +25,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestAreaLangmuir():
+class TestAreaLangmuir:
     """Tests Langmuir surface area calculations."""
 
     def test_basic_functions(self):

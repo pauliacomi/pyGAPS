@@ -27,9 +27,7 @@ def db_create(path: str, verbose: bool = False):
     from importlib.resources import files as ir_files
 
     # Get and upload adsorbate property types
-    ads_props_json = ir_files('pygaps.data').joinpath('adsorbate_props.json').read_text(
-        encoding='utf8'
-    )
+    ads_props_json = ir_files('pygaps.data').joinpath('adsorbate_props.json').read_text(encoding='utf8')
     ads_props = json.loads(ads_props_json)
     for ap_type in ads_props:
         pgp_sqlite.adsorbate_property_type_to_db(ap_type, db_path=path, verbose=verbose)

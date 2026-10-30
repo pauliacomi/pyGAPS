@@ -30,14 +30,14 @@ N2_PROPS = {
     'molecular_diameter': 0.3,
     'polarizability': 0.0017403,
     'magnetic_susceptibility': 3.6e-08,
-    'surface_density': 6.71e+18,
+    'surface_density': 6.71e18,
     'liquid_density': 0.8076937566133804,
-    'adsorbate_molar_mass': 28.01348
+    'adsorbate_molar_mass': 28.01348,
 }
 
 
 @pytest.mark.characterisation
-class TestPSDMicro():
+class TestPSDMicro:
     """Test pore size distribution calculation."""
 
     def test_psd_micro_checks(self, basic_pointisotherm):
@@ -61,22 +61,18 @@ class TestPSDMicro():
     def test_psd_micro_funcs(self):
         """Checks various functions from the module"""
 
-        assert np.isclose(pmic._N_over_RT(77), 9.40645E+20)
+        assert np.isclose(pmic._N_over_RT(77), 9.40645e20)
 
-        km_ads = 1.23E-13
-        km_mat = 4.91E-13
+        km_ads = 1.23e-13
+        km_mat = 4.91e-13
 
         assert np.isclose(pmic._kirkwood_muller_dispersion_ads(1, 1), km_ads)
         assert np.isclose(pmic._kirkwood_muller_dispersion_mat(1, 1, 2, 2), km_mat)
         {'polarizability': 1, 'magnetic_susceptibility': 1}
 
-        disp_dict = pmic._dispersion_from_dict({
-            'polarizability': 1,
-            'magnetic_susceptibility': 1
-        }, {
-            'polarizability': 2,
-            'magnetic_susceptibility': 2
-        })
+        disp_dict = pmic._dispersion_from_dict(
+            {'polarizability': 1, 'magnetic_susceptibility': 1}, {'polarizability': 2, 'magnetic_susceptibility': 2}
+        )
         assert np.isclose(disp_dict[0], km_ads)
         assert np.isclose(disp_dict[1], km_mat)
 
@@ -85,10 +81,7 @@ class TestPSDMicro():
 
         assert np.isclose(pmic._solve_hk([1], lambda x: np.log(x), 0.5, 1)[0], 1)
 
-        assert np.isclose(
-            pmic._solve_hk_cy([1.463017], np.array([0.5, 1]), lambda x: np.log(x), 0.5, 1)[0], 1,
-            0.001
-        )
+        assert np.isclose(pmic._solve_hk_cy([1.463017], np.array([0.5, 1]), lambda x: np.log(x), 0.5, 1)[0], 1, 0.001)
 
     def test_psd_micro_hk(self):
         """Test H-K psd model with blank arrays"""

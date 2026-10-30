@@ -2,10 +2,17 @@
 Changelog
 =========
 
-4.7.0 (2025-03-04)
+4.7.0 (unreleased)
 ------------------
 
-* ⚠️🐍 Minimum python is now 3.9, maximum increased to 3.14.
+* ⚠️🐍 Minimum python is now 3.10, maximum increased to 3.14.
+* ⚠️ Excel export now writes ``.xlsx`` files through ``openpyxl``. Legacy ``.xls``
+  files can still be read (via ``xlrd``) but not written; an ``.xls`` export path
+  is changed to ``.xlsx`` with a warning. ``xlwt`` is no longer a dependency.
+  Floats are stored in Excel with 16 significant digits.
+* Minimum versions of dependencies are now declared and tested in CI.
+* Packaging modernised (PEP 639 license metadata, explicit package data),
+  ``python -m pygaps.cli`` now works, CI and Read the Docs configuration updated.
 * Fixed various accumulating issues and bugs and deprecations.
 
 4.6.0 (2025-03-04)

@@ -41,7 +41,7 @@ class Quadratic(IsothermBaseModel):
     calculates = 'loading'
     param_names = ("n_m", "Ka", "Kb")
     param_default_bounds = (
-        (0., numpy.inf),
+        (0.0, numpy.inf),
         (-numpy.inf, numpy.inf),
         (-numpy.inf, numpy.inf),
     )
@@ -123,9 +123,7 @@ class Quadratic(IsothermBaseModel):
         float
             Spreading pressure at specified pressure.
         """
-        return self.params["n_m"] * numpy.log(
-            1.0 + self.params["Ka"] * pressure + self.params["Kb"] * pressure**2
-        )
+        return self.params["n_m"] * numpy.log(1.0 + self.params["Ka"] * pressure + self.params["Kb"] * pressure**2)
 
     def initial_guess(self, pressure, loading):
         """

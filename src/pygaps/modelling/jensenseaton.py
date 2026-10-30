@@ -53,9 +53,9 @@ class JensenSeaton(IsothermBaseModel):
     calculates = 'loading'
     param_names = ("K", "n_m", "k", "t")
     param_default_bounds = (
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
         (1e-3, numpy.inf),
     )
 
@@ -77,7 +77,7 @@ class JensenSeaton(IsothermBaseModel):
         n_m = self.params["n_m"]
         k = self.params["k"]
         t = self.params["t"]
-        return Kp / (1 + (Kp / (n_m * (1 + k * pressure)))**t)**(1 / t)
+        return Kp / (1 + (Kp / (n_m * (1 + k * pressure))) ** t) ** (1 / t)
 
     def pressure(self, loading):
         """
@@ -96,6 +96,7 @@ class JensenSeaton(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
+
         def fun(x):
             return self.loading(x) - loading
 

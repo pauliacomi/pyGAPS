@@ -21,7 +21,7 @@ SHORTHANDS = {
 }
 
 
-class BaseIsotherm():
+class BaseIsotherm:
     """
     Class which contains the general data for an isotherm, real or model.
 
@@ -106,11 +106,7 @@ class BaseIsotherm():
         temperature: t.Union[float, str] = None,
         **properties: dict,
     ):
-        """
-        Instantiate is done by passing a dictionary with the parameters,
-        as well as the info about units, modes and data columns.
-
-        """
+        """Instantiate is done by passing a dictionary with the parameters, as well as the info about units, modes and data columns."""
         # commonly used shorthands
         for shorthand, prop in SHORTHANDS.items():
             data = properties.pop(shorthand, None)
@@ -126,9 +122,7 @@ class BaseIsotherm():
         #
         # Basic checks
         if any(param is None for param in (material, adsorbate, temperature)):
-            raise ParameterError(
-                f"Isotherm MUST have the following properties: {self._required_params}"
-            )
+            raise ParameterError(f"Isotherm MUST have the following properties: {self._required_params}")
 
         self.material = material
         self.adsorbate = adsorbate
@@ -144,10 +138,7 @@ class BaseIsotherm():
         # TODO deprecation
         if properties.get('loading_basis') == 'volume':
             properties['loading_basis'] = 'volume_gas'
-            logger.warning(
-                "Loading basis as 'volume' is unclear and deprecated. "
-                "Assumed as 'volume_gas'."
-            )
+            logger.warning("Loading basis as 'volume' is unclear and deprecated. Assumed as 'volume_gas'.")
 
         self.pressure_mode = properties.pop('pressure_mode')
         self.pressure_unit = properties.pop('pressure_unit')
@@ -162,40 +153,32 @@ class BaseIsotherm():
         # Check basis / mode
         if self.pressure_mode not in _PRESSURE_MODE:
             raise ParameterError(
-                f"Mode selected for pressure ({self.pressure_mode}) is not an option. "
-                f"See viable values: {_PRESSURE_MODE.keys()}"
+                f"Mode selected for pressure ({self.pressure_mode}) is not an option. See viable values: {_PRESSURE_MODE.keys()}"
             )
 
         if self.loading_basis not in _LOADING_MODE:
             raise ParameterError(
-                f"Basis selected for loading ({self.loading_basis}) is not an option. "
-                f"See viable values: {_LOADING_MODE.keys()}"
+                f"Basis selected for loading ({self.loading_basis}) is not an option. See viable values: {_LOADING_MODE.keys()}"
             )
 
         if self.material_basis not in _MATERIAL_MODE:
             raise ParameterError(
-                f"Basis selected for material ({self.material_basis}) is not an option. "
-                f"See viable values: {_MATERIAL_MODE.keys()}"
+                f"Basis selected for material ({self.material_basis}) is not an option. See viable values: {_MATERIAL_MODE.keys()}"
             )
 
         # Check units
         if self.pressure_mode == 'absolute' and self.pressure_unit not in _PRESSURE_UNITS:
             raise ParameterError(
-                f"Unit selected for pressure ({self.pressure_unit}) is not an option. "
-                f"See viable values: {_PRESSURE_UNITS.keys()}"
+                f"Unit selected for pressure ({self.pressure_unit}) is not an option. See viable values: {_PRESSURE_UNITS.keys()}"
             )
 
-        if self.loading_basis not in [
-            "percent", "fraction"
-        ] and self.loading_unit not in _LOADING_MODE[self.loading_basis]:
+        if self.loading_basis not in ["percent", "fraction"] and self.loading_unit not in _LOADING_MODE[self.loading_basis]:
             raise ParameterError(
                 f"Unit selected for loading ({self.loading_unit}) is not an option. "
                 f"See viable values: {_LOADING_MODE[self.loading_basis].keys()}"
             )
 
-        if self.loading_basis not in [
-            "percent", "fraction"
-        ] and self.material_unit not in _MATERIAL_MODE[self.material_basis]:
+        if self.loading_basis not in ["percent", "fraction"] and self.material_unit not in _MATERIAL_MODE[self.material_basis]:
             raise ParameterError(
                 f"Unit selected for material ({self.material_unit}) is not an option. "
                 f"See viable values: {_MATERIAL_MODE[self.material_basis].keys()}"
@@ -203,8 +186,7 @@ class BaseIsotherm():
 
         if self.temperature_unit not in _TEMPERATURE_UNITS:
             raise ParameterError(
-                f"Unit selected for temperature ({self.temperature_unit}) is not an option. "
-                f"See viable values: {_TEMPERATURE_UNITS.keys()}"
+                f"Unit selected for temperature ({self.temperature_unit}) is not an option. See viable values: {_TEMPERATURE_UNITS.keys()}"
             )
 
         # Other named properties of the isotherm
@@ -231,9 +213,7 @@ class BaseIsotherm():
             name = value.pop('name', None)
             try:
                 self._material = Material.find(name)
-                logger.info(
-                    f"Material '{name}' found in internal list. "
-                    "Updating its properties with the provided dictionary.")
+                logger.info(f"Material '{name}' found in internal list. Updating its properties with the provided dictionary.")
                 self._material.properties.update(**value)
             except ParameterError:
                 self._material = Material(name, **value)
@@ -273,10 +253,11 @@ class BaseIsotherm():
 
     @property
     def units(self) -> dict:
-        """Return a dictionary of all isotherm units"""
+        """Return a dictionary of all isotherm units."""
         return {unit: getattr(self, unit) for unit in self._unit_params}
 
     def __hash__(self):
+        """Return a hash of the isotherm, based on its unique ID."""
         return hash(self.iso_id)
 
     def __eq__(self, other_isotherm) -> bool:
@@ -315,13 +296,13 @@ class BaseIsotherm():
         if self.properties:
             string += "Other properties: \n"
         for prop, val in self.properties.items():
-            string += (f"\t{prop}: {str(val)}\n")
+            string += f"\t{prop}: {str(val)}\n"
 
         return string
 
     def to_dict(self) -> dict:
-        """
-        Returns a dictionary of the isotherm class
+        """Return a dictionary of the isotherm class.
+
         Is the same dictionary that was used to create it.
 
         Returns
@@ -368,6 +349,7 @@ class BaseIsotherm():
             Otherwise returns None.
         """
         from pygaps.parsing.json import isotherm_to_json
+
         return isotherm_to_json(self, path, **kwargs)
 
     def to_csv(self, path=None, separator=',', **kwargs) -> t.Union[None, str]:
@@ -388,6 +370,7 @@ class BaseIsotherm():
             Otherwise returns None.
         """
         from pygaps.parsing.csv import isotherm_to_csv
+
         return isotherm_to_csv(self, path, separator, **kwargs)
 
     def to_xl(self, path, **kwargs):
@@ -401,6 +384,7 @@ class BaseIsotherm():
 
         """
         from pygaps.parsing.excel import isotherm_to_xl
+
         return isotherm_to_xl(self, path, **kwargs)
 
     def to_aif(self, path=None, **kwargs) -> t.Union[None, str]:
@@ -419,15 +403,11 @@ class BaseIsotherm():
             Otherwise returns None.
         """
         from pygaps.parsing.aif import isotherm_to_aif
+
         return isotherm_to_aif(self, path, **kwargs)
 
     def to_db(
-        self,
-        db_path: str = None,
-        verbose: bool = True,
-        autoinsert_material: bool = True,
-        autoinsert_adsorbate: bool = True,
-        **kwargs
+        self, db_path: str = None, verbose: bool = True, autoinsert_material: bool = True, autoinsert_adsorbate: bool = True, **kwargs
     ):
         """
         Upload the isotherm to an sqlite database.
@@ -447,13 +427,14 @@ class BaseIsotherm():
 
         """
         from pygaps.parsing.sqlite import isotherm_to_db
+
         return isotherm_to_db(
             self,
             db_path=db_path,
             autoinsert_material=autoinsert_material,
             autoinsert_adsorbate=autoinsert_adsorbate,
             verbose=verbose,
-            **kwargs
+            **kwargs,
         )
 
     def convert_temperature(
@@ -482,8 +463,10 @@ class BaseIsotherm():
     @staticmethod
     def _splitdata(data, pressure_key: bool):
         """
-        Split isotherm data into an adsorption and desorption part and
-        return a column which marks the transition between the two.
+        Split isotherm data into an adsorption and desorption part.
+
+        Return a column which marks the transition between the two.
         """
         from pygaps.utilities.math_utilities import split_ads_data
+
         return split_ads_data(data, pressure_key)

@@ -19,9 +19,7 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 class ModelIsotherm(BaseIsotherm):
-    """
-    Class to characterize pure-component isotherm data with an analytical model.
-    Data fitting is done during instantiation.
+    """Class to characterize pure-component isotherm data with an analytical model. Data fitting is done during instantiation.
 
     A `ModelIsotherm` class is instantiated by passing it the
     pure-component adsorption isotherm in the form of a Pandas DataFrame.
@@ -106,29 +104,28 @@ class ModelIsotherm(BaseIsotherm):
         param_bounds: dict = None,
         optimization_params: dict = None,
         verbose: bool = False,
-        **other_properties
+        **other_properties,
     ):
         """
+        Instantiate a ModelIsotherm by fitting a model to the provided data.
+
         Instantiation is done by passing the data to be fitted, model to be
         used and fitting method as well as the parameters required by parent
         class.
         """
-
         # Run base class constructor
         super().__init__(**other_properties)
 
         # Checks
         if model is None:
             raise ParameterError(
-                "Specify a model to fit to the pure-component"
-                " isotherm data. e.g. model=\"Langmuir\""
+                "Specify a model to fit to the pure-component isotherm data. e.g. model=\"Langmuir\""
             )
 
         if isotherm_data is not None:
             if None in [pressure_key, loading_key]:
                 raise ParameterError(
-                    "Pass loading_key and pressure_key, the names of the loading and"
-                    " pressure columns in the DataFrame, to the constructor."
+                    "Pass loading_key and pressure_key, the names of the loading and pressure columns in the DataFrame, to the constructor."
                 )
 
             data = isotherm_data.copy()
@@ -155,8 +152,7 @@ class ModelIsotherm(BaseIsotherm):
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
                 raise ParameterError(
-                    "If you've chosen to pass loading and pressure directly as"
-                    " arrays, make sure both are specified!"
+                    "If you've chosen to pass loading and pressure directly as arrays, make sure both are specified!"
                 )
             if len(pressure) != len(loading):
                 raise ParameterError("Pressure and loading arrays are not equal!")
@@ -181,7 +177,6 @@ class ModelIsotherm(BaseIsotherm):
             )
 
         if process:
-
             # Branch the isotherm model is based on.
             self.branch = branch
 
@@ -202,8 +197,7 @@ class ModelIsotherm(BaseIsotherm):
                 for param in param_guess.keys():
                     if param not in self.model.param_names:
                         raise ParameterError(
-                            f"'{param}' is not a valid parameter"
-                            f" in the '{model}' model."
+                            f"'{param}' is not a valid parameter in the '{model}' model."
                         )
             else:
                 param_guess = self.model.initial_guess(pressure, loading)
@@ -220,6 +214,7 @@ class ModelIsotherm(BaseIsotherm):
         # Plot fit if verbose
         if verbose and other_properties.pop('plot_fit', True):
             from pygaps.graphing.model_graphs import plot_model_guesses
+
             plot_model_guesses([self], pressure, loading)
 
     @classmethod
@@ -238,13 +233,10 @@ class ModelIsotherm(BaseIsotherm):
         optimization_params: dict = None,
         verbose: bool = False,
     ):
-        """
-        Construct a ModelIsotherm using a parent isotherm as the template for
-        all the parameters.
+        """Construct a ModelIsotherm using a parent isotherm as the template for all the parameters.
 
         Parameters
         ----------
-
         isotherm : BaseIsotherm
             An instance of the BaseIsotherm parent class.
         pressure : list
@@ -302,11 +294,9 @@ class ModelIsotherm(BaseIsotherm):
         param_guess: dict = None,
         param_bounds: dict = None,
         optimization_params: dict = None,
-        verbose: bool = False
+        verbose: bool = False,
     ):
-        """
-        Constructs a ModelIsotherm using data from a PointIsotherm and all its
-        parameters.
+        """Construct a ModelIsotherm using data from a PointIsotherm and all its parameters.
 
         Parameters
         ----------
@@ -347,7 +337,7 @@ class ModelIsotherm(BaseIsotherm):
                     param_bounds=param_bounds,
                     optimization_params=optimization_params,
                     verbose=verbose,
-                    **iso_params
+                    **iso_params,
                 )
 
         return ModelIsotherm.guess(
@@ -355,7 +345,7 @@ class ModelIsotherm(BaseIsotherm):
             models=model,
             optimization_params=optimization_params,
             verbose=verbose,
-            **iso_params
+            **iso_params,
         )
 
     @classmethod
@@ -371,11 +361,9 @@ class ModelIsotherm(BaseIsotherm):
         optimization_params: dict = None,
         param_bounds: dict = None,
         verbose: bool = False,
-        **other_properties
+        **other_properties,
     ):
-        """
-        Attempt to model the data using supplied list of model names,
-        then return the one with the best RMS fit.
+        """Attempt to model the data using supplied list of model names, then return the one with the best RMS fit.
 
         May take a long time depending on the number of datapoints.
 
@@ -446,7 +434,7 @@ class ModelIsotherm(BaseIsotherm):
                     branch=branch,
                     verbose=verbose,
                     plot_fit=False,  # we don't want to plot at this stage
-                    **other_properties
+                    **other_properties,
                 )
 
                 attempts.append(isotherm)
@@ -467,6 +455,7 @@ class ModelIsotherm(BaseIsotherm):
                 pressure = isotherm_data[pressure_key]
                 loading = isotherm_data[loading_key]
             from pygaps.graphing.model_graphs import plot_model_guesses
+
             plot_model_guesses(attempts, pressure, loading)
             logger.info(f"Best model fit is {best_fit.model.name}.")
 
@@ -531,6 +520,7 @@ class ModelIsotherm(BaseIsotherm):
         plot_dict.update(plot_iso_args)
 
         from pygaps.graphing.isotherm_graphs import plot_iso
+
         return plot_iso(self, **plot_dict)
 
     ##########################################################
@@ -560,11 +550,12 @@ class ModelIsotherm(BaseIsotherm):
         pressure_unit: str = None,
         pressure_mode: str = None,
         limits: tuple[float, float] = None,
-        indexed: bool = False
+        indexed: bool = False,
     ):
         """
-        Return a numpy.linspace generated array with
-        a fixed number of equidistant points within the
+        Return a numpy.linspace generated array of equidistant points within the model pressure range.
+
+        The array has a fixed number of equidistant points within the
         pressure range the model was created.
 
         Parameters
@@ -595,8 +586,7 @@ class ModelIsotherm(BaseIsotherm):
         """
         if branch and branch not in [self.branch, 'all']:
             raise ParameterError(
-                f"ModelIsotherm is based on an '{self.branch}' branch "
-                f"(while parameter supplied was '{branch}')."
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
             )
         # TODO: to calculate limits like this, better to put the limits directly to evaluate
         # Generate pressure points
@@ -621,7 +611,7 @@ class ModelIsotherm(BaseIsotherm):
                     unit_from=self.pressure_unit,
                     unit_to=pressure_unit,
                     adsorbate=self.adsorbate,
-                    temp=self.temperature
+                    temp=self.temperature,
                 )
         elif self.model.calculates == 'pressure':
             ret = self.pressure_at(
@@ -648,11 +638,9 @@ class ModelIsotherm(BaseIsotherm):
         material_unit: str = None,
         material_basis: str = None,
         limits: tuple[float, float] = None,
-        indexed: bool = False
+        indexed: bool = False,
     ):
-        """
-        Return the loading calculated at equidistant pressure
-        points within the pressure range the model was created.
+        """Return the loading calculated at equidistant pressure points within the pressure range the model was created.
 
         Parameters
         ----------
@@ -688,8 +676,7 @@ class ModelIsotherm(BaseIsotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an '{self.branch}' branch "
-                f"(while parameter supplied was '{branch}')."
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
             )
 
         if self.model.calculates == 'pressure':
@@ -711,7 +698,7 @@ class ModelIsotherm(BaseIsotherm):
                     basis_to=material_basis,
                     unit_from=self.material_unit,
                     unit_to=material_unit,
-                    material=self.material
+                    material=self.material,
                 )
 
             if loading_basis or loading_unit:
@@ -756,9 +743,7 @@ class ModelIsotherm(BaseIsotherm):
 
     @property
     def other_keys(self):
-        """
-        Return column names of any supplementary data points.
-        """
+        """Return column names of any supplementary data points."""
         return []
 
     ##########################################################
@@ -817,8 +802,7 @@ class ModelIsotherm(BaseIsotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an '{self.branch}' branch "
-                f"(while parameter supplied was '{branch}')."
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
             )
 
         # Convert to numpy array just in case
@@ -830,8 +814,7 @@ class ModelIsotherm(BaseIsotherm):
                 material_basis = self.material_basis
             if not material_unit:
                 raise ParameterError(
-                    "Must specify a material unit if the input"
-                    " is in another basis"
+                    "Must specify a material unit if the input is in another basis"
                 )
 
             loading = c_material(
@@ -840,17 +823,14 @@ class ModelIsotherm(BaseIsotherm):
                 basis_to=self.material_basis,
                 unit_from=material_unit,
                 unit_to=self.material_unit,
-                material=self.material
+                material=self.material,
             )
 
         if loading_basis or loading_unit:
             if not loading_basis:
                 loading_basis = self.loading_basis
             if not loading_unit:
-                raise ParameterError(
-                    "Must specify a loading unit if the input"
-                    " is in another basis"
-                )
+                raise ParameterError("Must specify a loading unit if the input is in another basis")
 
             loading = c_loading(
                 loading,
@@ -881,7 +861,7 @@ class ModelIsotherm(BaseIsotherm):
                 unit_from=self.pressure_unit,
                 unit_to=pressure_unit,
                 adsorbate=self.adsorbate,
-                temp=self.temperature
+                temp=self.temperature,
             )
 
         return pressure
@@ -939,8 +919,7 @@ class ModelIsotherm(BaseIsotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an '{self.branch}' branch "
-                f"(while parameter supplied was '{branch}')."
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
             )
 
         # Convert to numpy array just in case
@@ -952,8 +931,7 @@ class ModelIsotherm(BaseIsotherm):
                 pressure_mode = self.pressure_mode
             if pressure_mode == 'absolute' and not pressure_unit:
                 raise ParameterError(
-                    "Must specify a pressure unit if the input"
-                    " is in an absolute mode"
+                    "Must specify a pressure unit if the input is in an absolute mode"
                 )
 
             pressure = c_pressure(
@@ -963,7 +941,7 @@ class ModelIsotherm(BaseIsotherm):
                 unit_from=pressure_unit,
                 unit_to=self.pressure_unit,
                 adsorbate=self.adsorbate,
-                temp=self.temperature
+                temp=self.temperature,
             )
 
         # Calculate loading using internal model
@@ -981,7 +959,7 @@ class ModelIsotherm(BaseIsotherm):
                 basis_to=material_basis,
                 unit_from=self.material_unit,
                 unit_to=material_unit,
-                material=self.material
+                material=self.material,
             )
 
         # Then loading
@@ -1051,8 +1029,7 @@ class ModelIsotherm(BaseIsotherm):
         """
         if branch and branch != self.branch:
             raise ParameterError(
-                f"ModelIsotherm is based on an '{self.branch}' branch "
-                f"(while parameter supplied was '{branch}')."
+                f"ModelIsotherm is based on an '{self.branch}' branch (while parameter supplied was '{branch}')."
             )
 
         # Convert to numpy array just in case
@@ -1066,8 +1043,7 @@ class ModelIsotherm(BaseIsotherm):
                 pressure_unit = self.pressure_unit
             if not pressure_unit and self.pressure_mode.startswith('relative'):
                 raise ParameterError(
-                    "Must specify a pressure unit if the input"
-                    " is in an absolute mode"
+                    "Must specify a pressure unit if the input is in an absolute mode"
                 )
 
             pressure = c_pressure(
@@ -1077,7 +1053,7 @@ class ModelIsotherm(BaseIsotherm):
                 unit_from=pressure_unit,
                 unit_to=self.pressure_unit,
                 adsorbate=self.adsorbate,
-                temp=self.temperature
+                temp=self.temperature,
             )
 
         # calculate based on model
@@ -1101,5 +1077,4 @@ class ModelIsotherm(BaseIsotherm):
             The Toth correction factor at the given pressure.
 
         """
-
         return self.model.toth_correction(pressure)

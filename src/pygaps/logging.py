@@ -1,4 +1,5 @@
 """Logger for pygaps."""
+
 import logging
 import sys
 

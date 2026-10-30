@@ -11,6 +11,7 @@ Functions are tested against pre-calculated values on real isotherms.
 All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
+
 import logging
 
 import pytest
@@ -26,7 +27,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestAreaBET():
+class TestAreaBET:
     """Tests BET surface area calculations."""
 
     def test_basic_functions(self):

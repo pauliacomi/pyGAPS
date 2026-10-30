@@ -1,6 +1,7 @@
 """
-This module contains 'classical' methods of calculating a pore size distribution for
-pores in the micropore range (<2 nm). These are derived from the Horvath-Kawazoe models.
+Classical methods of calculating a pore size distribution for pores in the micropore range (<2 nm).
+
+These are derived from the Horvath-Kawazoe models.
 """
 
 import math
@@ -32,7 +33,7 @@ def psd_microporous(
     material_model: "str | dict[str, float]" = 'Carbon(HK)',
     adsorbate_model: "str | dict[str, float]" = None,
     p_limits: "tuple[float, float]" = None,
-    verbose: bool = False
+    verbose: bool = False,
 ) -> "dict[str, list[float]]":
     r"""
     Calculate the microporous size distribution using a Horvath-Kawazoe type model.
@@ -79,7 +80,6 @@ def psd_microporous(
 
     Notes
     -----
-
     Calculates the pore size distribution using a "classical" model, which
     describes adsorption in micropores as a sequential instant filling of
     increasingly wider pores. The pressure of filling for each pore is
@@ -144,24 +144,15 @@ def psd_microporous(
     """
     # Function parameter checks
     if psd_model is None:
-        raise ParameterError(
-            "Specify a model to generate the pore size"
-            " distribution e.g. psd_model=\"HK\""
-        )
+        raise ParameterError("Specify a model to generate the pore size distribution e.g. psd_model=\"HK\"")
     if psd_model not in _MICRO_PSD_MODELS:
-        raise ParameterError(
-            f"Model {psd_model} not an option for psd. "
-            f"Available models are {_MICRO_PSD_MODELS}"
-        )
+        raise ParameterError(f"Model {psd_model} not an option for psd. Available models are {_MICRO_PSD_MODELS}")
     if pore_geometry not in _PORE_GEOMETRIES:
         raise ParameterError(
-            f"Geometry {pore_geometry} not an option for pore size distribution. "
-            f"Available geometries are {_PORE_GEOMETRIES}"
+            f"Geometry {pore_geometry} not an option for pore size distribution. Available geometries are {_PORE_GEOMETRIES}"
         )
     if branch not in ['ads', 'des']:
-        raise ParameterError(
-            f"Branch '{branch}' not an option for PSD.", "Select either 'ads' or 'des'"
-        )
+        raise ParameterError(f"Branch '{branch}' not an option for PSD.", "Select either 'ads' or 'des'")
 
     # Get adsorbate properties
     if adsorbate_model is None:
@@ -176,8 +167,7 @@ def psd_microporous(
             }
         except ParameterError as err:
             raise ParameterError(
-                "Isotherm adsorbate does not have all required HK properties."
-                "Pass a dictionary with your HK adsorbate parameters."
+                "Isotherm adsorbate does not have all required HK properties. Pass a dictionary with your HK adsorbate parameters."
             ) from err
 
     # Get material properties
@@ -185,10 +175,7 @@ def psd_microporous(
 
     # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
-            "loading_basis": "molar",
-            "loading_unit": "mmol"
-        }, {"pressure_mode": "relative"}
+        isotherm, branch, {"loading_basis": "molar", "loading_unit": "mmol"}, {"pressure_mode": "relative"}
     )
 
     # select the maximum and minimum of the points and the pressure associated
@@ -204,12 +191,9 @@ def psd_microporous(
     if p_limits[1]:
         maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
     if maximum - minimum < 2:  # (for 3 point minimum)
-        raise CalculationError(
-            "The isotherm does not have enough points (at least 3) "
-            "in the selected region."
-        )
-    pressure = pressure[minimum:maximum + 1]
-    loading = loading[minimum:maximum + 1]
+        raise CalculationError("The isotherm does not have enough points (at least 3) in the selected region.")
+    pressure = pressure[minimum : maximum + 1]
+    loading = loading[minimum : maximum + 1]
 
     # Call specified pore size distribution function
     if psd_model in ['HK', 'HK-CY']:
@@ -235,6 +219,7 @@ def psd_microporous(
 
     if verbose:
         from pygaps.graphing.calc_graphs import psd_plot
+
         psd_plot(
             pore_widths,
             pore_dist,
@@ -263,6 +248,7 @@ def psd_horvath_kawazoe(
 ):
     r"""
     Calculate the pore size distribution using the Horvath-Kawazoe method.
+
     This function should not be used with isotherms (use instead
     :func:`pygaps.characterisation.psd_micro.psd_microporous`).
 
@@ -306,7 +292,6 @@ def psd_horvath_kawazoe(
 
     Notes
     -----
-
     *Description*
 
     The H-K method [#hk2]_ attempts to describe adsorption within pores by
@@ -477,10 +462,7 @@ def psd_horvath_kawazoe(
     if missing:
         raise ParameterError(f"Adsorbent properties dictionary is missing parameters: {missing}.")
 
-    missing = [
-        x for x in list(HK_KEYS.keys()) + ['liquid_density', 'adsorbate_molar_mass']
-        if x not in adsorbate_properties
-    ]
+    missing = [x for x in list(HK_KEYS.keys()) + ['liquid_density', 'adsorbate_molar_mass'] if x not in adsorbate_properties]
     if missing:
         raise ParameterError(f"Adsorbate properties dictionary is missing parameters: {missing}.")
 
@@ -501,31 +483,26 @@ def psd_horvath_kawazoe(
     n_ads = adsorbate_properties['surface_density']
     n_mat = material_properties['surface_density']
 
-    a_ads, a_mat = _dispersion_from_dict(
-        adsorbate_properties, material_properties
-    )  # dispersion constants
+    a_ads, a_mat = _dispersion_from_dict(adsorbate_properties, material_properties)  # dispersion constants
 
     d_eff = (d_ads + d_mat) / 2  # effective diameter
     N_over_RT = _N_over_RT(temperature)  # N_av / RT
 
     ###################################################################
     if pore_geometry == 'slit':
-
         sigma = 0.8583742 * d_eff  # (2/5)**(1/6)*d_eff, internuclear distance at 0 energy
         sigma_p4_o3 = sigma**4 / 3  # pre-calculated constant
         sigma_p10_o9 = sigma**10 / 9  # pre-calculated constant
 
-        const_coeff = (
-            N_over_RT * (n_ads * a_ads + n_mat * a_mat) / (sigma * 1e-9)**4
-        )  # sigma must be in SI here
+        const_coeff = N_over_RT * (n_ads * a_ads + n_mat * a_mat) / (sigma * 1e-9) ** 4  # sigma must be in SI here
 
-        const_term = (sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3))  # nm
+        const_term = sigma_p10_o9 / (d_eff**9) - sigma_p4_o3 / (d_eff**3)  # nm
 
         def potential(l_pore):
             return (
-                const_coeff / (l_pore - 2 * d_eff) * ((sigma_p4_o3 / (l_pore - d_eff)**3) -
-                                                      (sigma_p10_o9 /
-                                                       (l_pore - d_eff)**9) + const_term)
+                const_coeff
+                / (l_pore - 2 * d_eff)
+                * ((sigma_p4_o3 / (l_pore - d_eff) ** 3) - (sigma_p10_o9 / (l_pore - d_eff) ** 9) + const_term)
             )
 
         if use_cy:
@@ -538,15 +515,13 @@ def psd_horvath_kawazoe(
 
     ###################################################################
     elif pore_geometry == 'cylinder':
-
-        const_coeff = 0.75 * constants.pi * N_over_RT * \
-            (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9)**4  # d_eff must be in SI
+        const_coeff = 0.75 * constants.pi * N_over_RT * (n_ads * a_ads + n_mat * a_mat) / (d_eff * 1e-9) ** 4  # d_eff must be in SI
 
         # to avoid unnecessary recalculations, we cache a_k and b_k values
         a_ks, b_ks = [1], [1]
         for k in range(1, 2000):
-            a_ks.append(((-4.5 - k) / k)**2 * a_ks[k - 1])
-            b_ks.append(((-1.5 - k) / k)**2 * b_ks[k - 1])
+            a_ks.append(((-4.5 - k) / k) ** 2 * a_ks[k - 1])
+            b_ks.append(((-1.5 - k) / k) ** 2 * b_ks[k - 1])
 
         def potential(l_pore):
 
@@ -558,8 +533,7 @@ def psd_horvath_kawazoe(
 
             # 25 * pore radius ensures that layer convergence is achieved
             for k in range(1, int(l_pore * 25)):
-                k_sum = k_sum + ((1 / (k + 1) * (1 - d_over_r)**(2 * k)) *
-                                 (a_ks[k] * d_over_r_p10_k - b_ks[k] * d_over_r_p4))
+                k_sum = k_sum + ((1 / (k + 1) * (1 - d_over_r) ** (2 * k)) * (a_ks[k] * d_over_r_p10_k - b_ks[k] * d_over_r_p4))
 
             return const_coeff * k_sum
 
@@ -573,25 +547,24 @@ def psd_horvath_kawazoe(
 
     ###################################################################
     elif pore_geometry == 'sphere':
-
-        p_12 = 0.25 * a_mat / (d_eff * 1e-9)**6  # ads-surface potential depth
-        p_22 = 0.25 * a_ads / (d_ads * 1e-9)**6  # ads-ads potential depth
+        p_12 = 0.25 * a_mat / (d_eff * 1e-9) ** 6  # ads-surface potential depth
+        p_22 = 0.25 * a_ads / (d_ads * 1e-9) ** 6  # ads-ads potential depth
 
         def potential(l_pore):
 
             l_minus_d = l_pore - d_eff
             d_over_l = d_eff / l_pore
 
-            n_1 = 4 * constants.pi * (l_pore * 1e-9)**2 * n_mat
-            n_2 = 4 * constants.pi * (l_minus_d * 1e-9)**2 * n_ads
+            n_1 = 4 * constants.pi * (l_pore * 1e-9) ** 2 * n_mat
+            n_2 = 4 * constants.pi * (l_minus_d * 1e-9) ** 2 * n_ads
 
             def t_term(x):
-                return (1 + (-1)**x * l_minus_d / l_pore)**(-x) -\
-                    (1 - (-1)**x * l_minus_d / l_pore)**(-x)
+                return (1 + (-1) ** x * l_minus_d / l_pore) ** (-x) - (1 - (-1) ** x * l_minus_d / l_pore) ** (-x)
 
-            return N_over_RT * (6 * (n_1 * p_12 + n_2 * p_22) * (l_pore / l_minus_d)**3) * (
-                -(d_over_l**6) * (t_term(3) / 12 + t_term(2) / 8) + (d_over_l**12) *
-                (t_term(9) / 90 + t_term(8) / 80)
+            return (
+                N_over_RT
+                * (6 * (n_1 * p_12 + n_2 * p_22) * (l_pore / l_minus_d) ** 3)
+                * (-(d_over_l**6) * (t_term(3) / 12 + t_term(2) / 8) + (d_over_l**12) * (t_term(9) / 90 + t_term(8) / 80))
             )
 
         if use_cy:
@@ -630,6 +603,7 @@ def psd_horvath_kawazoe_ry(
 ):
     r"""
     Calculate the microporous size distribution using a Rege-Yang (R-Y) type model.
+
     This function should not be used with isotherms (use instead
     :func:`pygaps.characterisation.psd_micro.psd_microporous`).
 
@@ -849,10 +823,7 @@ def psd_horvath_kawazoe_ry(
     if missing:
         raise ParameterError(f"Adsorbent properties dictionary is missing parameters: {missing}.")
 
-    missing = [
-        x for x in list(HK_KEYS.keys()) + ['liquid_density', 'adsorbate_molar_mass']
-        if x not in adsorbate_properties
-    ]
+    missing = [x for x in list(HK_KEYS.keys()) + ['liquid_density', 'adsorbate_molar_mass'] if x not in adsorbate_properties]
     if missing:
         raise ParameterError(f"Adsorbate properties dictionary is missing parameters: {missing}.")
 
@@ -867,45 +838,38 @@ def psd_horvath_kawazoe_ry(
     n_ads = adsorbate_properties['surface_density']
     n_mat = material_properties['surface_density']
 
-    a_ads, a_mat = _dispersion_from_dict(
-        adsorbate_properties, material_properties
-    )  # dispersion constants
+    a_ads, a_mat = _dispersion_from_dict(adsorbate_properties, material_properties)  # dispersion constants
 
     d_eff = (d_ads + d_mat) / 2  # effective diameter
     N_over_RT = _N_over_RT(temperature)  # N_av / RT
 
     ###################################################################
     if pore_geometry == 'slit':
-
         sigma = 0.8583742 * d_eff  # (2/5)**(1/6) * d_eff,
         sigma_ads = 0.8583742 * d_ads  # (2/5)**(1/6) * d_ads,
         s_over_d0 = sigma / d_eff  # pre-calculated constant
         sa_over_da = sigma_ads / d_ads  # pre-calculated constant
 
         # Potential with one sorbate layer.
-        potential_adsorbate = (
-            n_ads * a_ads / 2 / (sigma_ads * 1e-9)**4 * (-sa_over_da**4 + sa_over_da**10)
-        )
+        potential_adsorbate = n_ads * a_ads / 2 / (sigma_ads * 1e-9) ** 4 * (-(sa_over_da**4) + sa_over_da**10)
 
         # Potential with one surface layer and one sorbate layer.
-        potential_onesurface = (
-            n_mat * a_mat / 2 / (sigma * 1e-9)**4 * (-s_over_d0**4 + s_over_d0**10)
-        ) + potential_adsorbate
+        potential_onesurface = (n_mat * a_mat / 2 / (sigma * 1e-9) ** 4 * (-(s_over_d0**4) + s_over_d0**10)) + potential_adsorbate
 
         def potential_twosurface(l_pore):
             """Potential with two surface layers."""
             return (
-                n_mat * a_mat / 2 / (sigma * 1e-9)**4 * (
-                    s_over_d0**10 - s_over_d0**4 + (sigma / (l_pore - d_eff))**10 -
-                    (sigma / (l_pore - d_eff))**4
-                )
+                n_mat
+                * a_mat
+                / 2
+                / (sigma * 1e-9) ** 4
+                * (s_over_d0**10 - s_over_d0**4 + (sigma / (l_pore - d_eff)) ** 10 - (sigma / (l_pore - d_eff)) ** 4)
             )
 
         def potential_average(n_layer):
-            return ((
-                2 * potential_onesurface +
-                (n_layer - 2) * 2 * potential_adsorbate  # NOTE 2 * is correct
-            ) / n_layer)
+            return (
+                2 * potential_onesurface + (n_layer - 2) * 2 * potential_adsorbate  # NOTE 2 * is correct
+            ) / n_layer
 
         def potential(l_pore):
             n_layer = (l_pore - d_mat) / d_ads
@@ -924,25 +888,24 @@ def psd_horvath_kawazoe_ry(
 
     ###################################################################
     elif pore_geometry == 'cylinder':
-
         max_k = 25  # Maximum K summed
         cached_k = 2000  # Maximum K's cached
         # to avoid unnecessary recalculations, we cache a_k and b_k values
         a_ks, b_ks = [1], [1]
         for k in range(1, cached_k):
-            a_ks.append(((-4.5 - k) / k)**2 * a_ks[k - 1])
-            b_ks.append(((-1.5 - k) / k)**2 * b_ks[k - 1])
+            a_ks.append(((-4.5 - k) / k) ** 2 * a_ks[k - 1])
+            b_ks.append(((-1.5 - k) / k) ** 2 * b_ks[k - 1])
 
         def a_k_sum(r2, max_k_pore):
             k_sum_t = 1
             for k in range(1, max_k_pore):
-                k_sum_t = k_sum_t + (a_ks[k] * r2**(2 * k))
+                k_sum_t = k_sum_t + (a_ks[k] * r2 ** (2 * k))
             return k_sum_t
 
         def b_k_sum(r2, max_k_pore):
             k_sum_t = 1
             for k in range(1, max_k_pore):
-                k_sum_t = k_sum_t + (b_ks[k] * r2**(2 * k))
+                k_sum_t = k_sum_t + (b_ks[k] * r2 ** (2 * k))
             return k_sum_t
 
         def potential_general(l_pore, d_x, n_x, a_x, r1):
@@ -953,8 +916,12 @@ def psd_horvath_kawazoe_ry(
             r2 = 1 - r1
             # 0.65625 is (21 / 32), constant
             return (
-                0.75 * constants.pi * n_x * a_x / ((d_x * 1e-9)**4) *
-                (0.65625 * r1**10 * a_k_sum(r2, max_k_pore) - r1**4 * b_k_sum(r2, max_k_pore))
+                0.75
+                * constants.pi
+                * n_x
+                * a_x
+                / ((d_x * 1e-9) ** 4)
+                * (0.65625 * r1**10 * a_k_sum(r2, max_k_pore) - r1**4 * b_k_sum(r2, max_k_pore))
             )
 
         def potential(l_pore):
@@ -982,10 +949,7 @@ def psd_horvath_kawazoe_ry(
             layer_populations = numpy.asarray(layer_populations)
             layer_potentials = numpy.asarray(layer_potentials)
 
-            return (
-                N_over_RT * numpy.sum(layer_populations * layer_potentials) /
-                numpy.sum(layer_populations)
-            )
+            return N_over_RT * numpy.sum(layer_populations * layer_potentials) / numpy.sum(layer_populations)
 
         if use_cy:
             pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff, 1)
@@ -997,16 +961,20 @@ def psd_horvath_kawazoe_ry(
 
     ###################################################################
     elif pore_geometry == 'sphere':
-
-        p_12 = a_mat / (4 * (d_eff * 1e-9)**6)  # ads-surface potential depth
-        p_22 = a_ads / (4 * (d_ads * 1e-9)**6)  # ads-ads potential depth
+        p_12 = a_mat / (4 * (d_eff * 1e-9) ** 6)  # ads-surface potential depth
+        p_22 = a_ads / (4 * (d_ads * 1e-9) ** 6)  # ads-ads potential depth
 
         def potential_general(n_m, p_xx, r1):
             """General RY layer potential in a spherical regime."""
             r2 = 1 - r1  # the b constant is 1-a
             return (
-                2 * n_m * p_xx * ((-r1**6 / (4 * r2) * ((1 - r2)**(-4) - (1 + r2)**(-4))) +
-                                  (r1**12 / (10 * r2) * ((1 - r2)**(-10) - (1 + r2)**(-10))))
+                2
+                * n_m
+                * p_xx
+                * (
+                    (-(r1**6) / (4 * r2) * ((1 - r2) ** (-4) - (1 + r2) ** (-4)))
+                    + (r1**12 / (10 * r2) * ((1 - r2) ** (-10) - (1 + r2) ** (-10)))
+                )
             )
 
         def potential(l_pore):
@@ -1015,15 +983,14 @@ def psd_horvath_kawazoe_ry(
             layer_potentials = []
 
             # potential with surface (first layer)
-            layer_population = 4 * constants.pi * (l_pore * 1e-9)**2 * n_mat
+            layer_population = 4 * constants.pi * (l_pore * 1e-9) ** 2 * n_mat
             r1 = d_eff / l_pore
             layer_potential = potential_general(layer_population, p_12, r1)
             layer_potentials.append(layer_potential)  # add E1
 
             # inter-adsorbate potential (subsequent layers)
             layer_populations = [
-                (4 * constants.pi * ((l_pore - d_eff - (layer - 1) * d_ads) * 1e-9)**2 * n_ads)
-                for layer in range(1, n_layers + 1)
+                (4 * constants.pi * ((l_pore - d_eff - (layer - 1) * d_ads) * 1e-9) ** 2 * n_ads) for layer in range(1, n_layers + 1)
             ]  # [N1...Nm]
 
             for layer, layer_population in zip(range(2, n_layers + 1), layer_populations):
@@ -1034,10 +1001,7 @@ def psd_horvath_kawazoe_ry(
             layer_populations = numpy.asarray(layer_populations)
             layer_potentials = numpy.asarray(layer_potentials)
 
-            return (
-                N_over_RT * numpy.sum(layer_populations * layer_potentials) /
-                numpy.sum(layer_populations)
-            )
+            return N_over_RT * numpy.sum(layer_populations * layer_potentials) / numpy.sum(layer_populations)
 
         if use_cy:
             pore_widths = _solve_hk_cy(pressure, loading, potential, d_eff, 1)
@@ -1066,6 +1030,8 @@ def psd_horvath_kawazoe_ry(
 
 def _solve_hk(pressure, hk_fun, bound, geo):
     """
+    Solve the Horvath-Kawazoe equation for pore widths at each pressure point.
+
     I personally found that simple Brent minimization
     gives good results. There may be other, more efficient
     algorithms, like conjugate gradient, but optimization is a moot point
@@ -1073,14 +1039,13 @@ def _solve_hk(pressure, hk_fun, bound, geo):
     The minimisation runs with bounds of [d_eff < x < 50].
     Maximum determinable pore size is limited at ~2.5 nm anyway.
     """
-
     p_w = []
     p_w_max = 10 / geo
 
     for p_point in pressure:
 
         def fun(l_pore):
-            return (numpy.exp(hk_fun(l_pore)) - p_point)**2
+            return (numpy.exp(hk_fun(l_pore)) - p_point) ** 2
 
         res = optimize.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
         p_w.append(res.x)
@@ -1094,20 +1059,20 @@ def _solve_hk(pressure, hk_fun, bound, geo):
 
 def _solve_hk_cy(pressure, loading, hk_fun, bound, geo):
     """
+    Solve the Horvath-Kawazoe equation with the Cheng-Yang correction for pore widths at each pressure point.
+
     In this case, the SF correction factor is subtracted
     from the original function.
     """
-
     p_w = []
     p_w_max = 10 / geo
     coverage = loading / (max(loading) * 1.01)
 
     for p_point, c_point in zip(pressure, coverage):
-
         sf_corr = 1 + 1 / c_point * numpy.log(1 - c_point)
 
         def fun(l_pore):
-            return (numpy.exp(hk_fun(l_pore) - sf_corr) - p_point)**2
+            return (numpy.exp(hk_fun(l_pore) - sf_corr) - p_point) ** 2
 
         res = optimize.minimize_scalar(fun, method='bounded', bounds=(bound, 50))
         p_w.append(res.x)
@@ -1137,7 +1102,7 @@ def _kirkwood_muller_dispersion_ads(p_ads, m_ads):
 
     p and m stand for polarizability and magnetic susceptibility
     """
-    return (1.5 * constants.electron_mass * constants.speed_of_light**2 * p_ads * m_ads)
+    return 1.5 * constants.electron_mass * constants.speed_of_light**2 * p_ads * m_ads
 
 
 def _kirkwood_muller_dispersion_mat(p_mat, m_mat, p_ads, m_ads):
@@ -1145,12 +1110,9 @@ def _kirkwood_muller_dispersion_mat(p_mat, m_mat, p_ads, m_ads):
 
     p and m stand for polarizability and magnetic susceptibility
     """
-    return (
-        6 * constants.electron_mass * constants.speed_of_light**2 * p_ads * p_mat /
-        (p_ads / m_ads + p_mat / m_mat)
-    )
+    return 6 * constants.electron_mass * constants.speed_of_light**2 * p_ads * p_mat / (p_ads / m_ads + p_mat / m_mat)
 
 
 def _N_over_RT(temp):
     """Calculate (N_a / RT)."""
-    return (constants.Avogadro / constants.gas_constant / temp)
+    return constants.Avogadro / constants.gas_constant / temp

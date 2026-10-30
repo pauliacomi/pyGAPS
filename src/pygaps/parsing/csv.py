@@ -60,7 +60,6 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
     output.writelines([x + separator + _to_string(y) + '\n' for (x, y) in iso_dict.items()])
 
     if isinstance(isotherm, PointIsotherm):
-
         # We get data and replace adsorption terminology
         data = isotherm.data_raw.copy()
         data['branch'] = data['branch'].replace(0, 'ads').replace(1, 'des')
@@ -69,20 +68,12 @@ def isotherm_to_csv(isotherm, path=None, separator=','):
         data.round(_PARSER_PRECISION).to_csv(output, sep=separator, index=False, header=True)
 
     elif isinstance(isotherm, ModelIsotherm):
-
         output.write('model:[name and parameters]\n')
         output.write(('name' + separator + isotherm.model.name + '\n'))
         output.write(('rmse' + separator + _to_string(isotherm.model.rmse) + '\n'))
-        output.write(
-            ('pressure range' + separator + _to_string(isotherm.model.pressure_range) + '\n')
-        )
-        output.write(
-            ('loading range' + separator + _to_string(isotherm.model.loading_range) + '\n')
-        )
-        output.writelines([
-            param + separator + str(isotherm.model.params[param]) + '\n'
-            for param in isotherm.model.params
-        ])
+        output.write(('pressure range' + separator + _to_string(isotherm.model.pressure_range) + '\n'))
+        output.write(('loading range' + separator + _to_string(isotherm.model.loading_range) + '\n'))
+        output.writelines([param + separator + str(isotherm.model.params[param]) + '\n' for param in isotherm.model.params])
 
     if path:
         with open(path, mode='w', newline='\n', encoding='utf-8') as file:
@@ -118,10 +109,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
         try:
             raw_csv = StringIO(str_or_path)
         except Exception as err:
-            raise ParsingError(
-                "Could not parse CSV isotherm. "
-                "The `str_or_path` is invalid or does not exist. "
-            ) from err
+            raise ParsingError("Could not parse CSV isotherm. The `str_or_path` is invalid or does not exist. ") from err
 
     line = raw_csv.readline().rstrip()
     raw_dict = {}
@@ -138,10 +126,7 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
             raw_dict[key] = val
             line = raw_csv.readline().rstrip()
     except Exception as err:
-        raise ParsingError(
-            "Could not parse CSV isotherm. "
-            f"The format may be wrong, check for errors in line {line}."
-        ) from err
+        raise ParsingError(f"Could not parse CSV isotherm. The format may be wrong, check for errors in line {line}.") from err
 
     # version check
     version = raw_dict.pop("file_version", None)
@@ -175,15 +160,9 @@ def isotherm_from_csv(str_or_path, separator=',', **isotherm_parameters):
         else:
             raw_dict['branch'] = 'guess'
 
-        isotherm = PointIsotherm(
-            isotherm_data=data,
-            pressure_key=data.columns[0],
-            loading_key=data.columns[1],
-            **raw_dict
-        )
+        isotherm = PointIsotherm(isotherm_data=data, pressure_key=data.columns[0], loading_key=data.columns[1], **raw_dict)
 
     elif line.startswith('model'):
-
         model = {}
         line = raw_csv.readline().rstrip()
         model['name'] = line.split(sep=separator)[1]

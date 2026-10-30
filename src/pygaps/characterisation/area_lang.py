@@ -1,4 +1,4 @@
-"""This module contains Langmuir area calculations."""
+"""Langmuir area calculations."""
 
 import textwrap
 from typing import TYPE_CHECKING
@@ -131,10 +131,7 @@ def area_langmuir(
 
     # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
-            "loading_basis": "molar",
-            "loading_unit": "mol"
-        }, {"pressure_mode": "relative"}
+        isotherm, branch, {"loading_basis": "molar", "loading_unit": "mol"}, {"pressure_mode": "relative"}
     )
 
     # use the langmuir function
@@ -170,6 +167,7 @@ def area_langmuir(
 
         # Generate plot of the langmuir points chosen
         from pygaps.graphing.calc_graphs import langmuir_plot
+
         langmuir_plot(
             pressure,
             langmuir_transform(pressure, loading),
@@ -264,11 +262,10 @@ def area_langmuir_raw(
         maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
     if maximum - minimum < 2:  # (for 2 point minimum)
         raise CalculationError(
-            "The isotherm does not have enough points (at least 2) "
-            "in selected region. Unable to calculate Langmuir area."
+            "The isotherm does not have enough points (at least 2) in selected region. Unable to calculate Langmuir area."
         )
-    pressure = pressure[minimum:maximum + 1]
-    loading = loading[minimum:maximum + 1]
+    pressure = pressure[minimum : maximum + 1]
+    loading = loading[minimum : maximum + 1]
 
     # calculate the Langmuir slope and intercept
     langmuir_array = langmuir_transform(
@@ -320,10 +317,10 @@ def langmuir_parameters(slope, intercept, cross_section):
     """Calculate the Langmuir parameters from slope and intercept."""
     n_monolayer = 1 / slope
     langmuir_const = 1 / (intercept * n_monolayer)
-    langmuir_area = n_monolayer * cross_section * (10**(-18)) * constants.Avogadro
+    langmuir_area = n_monolayer * cross_section * (10 ** (-18)) * constants.Avogadro
     return n_monolayer, langmuir_const, langmuir_area
 
 
 def simple_lang(pressure, n_total, k_const):
-    """A simple Langmuir equation returning loading at a pressure."""
-    return (n_total * k_const * pressure / (1 + k_const * pressure))
+    """Return loading at a pressure using a simple Langmuir equation."""
+    return n_total * k_const * pressure / (1 + k_const * pressure)

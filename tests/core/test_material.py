@@ -7,8 +7,9 @@ import pygaps.utilities.exceptions as pgEx
 
 
 @pytest.mark.core
-class TestMaterial():
+class TestMaterial:
     """Test the material class."""
+
     def test_material_basic(self):
         """Basic creation tests."""
         mat = pygaps.Material('material1')

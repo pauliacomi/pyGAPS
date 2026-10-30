@@ -22,11 +22,12 @@ def iast_binary_vle(
     adsorbed_mole_fraction_guess=None,
     warningoff=False,
     verbose=False,
-    ax=None
+    ax=None,
 ):
     """
-    Perform IAST calculations to predict the vapour-liquid equilibrium curve
-    at a fixed pressure, over the entire range of gas phase composition
+    Perform IAST calculations to predict the vapour-liquid equilibrium curve at a fixed pressure.
+
+    The curve covers the entire range of gas phase composition
     (0-1 of the first component).
 
     Pass a list of two of pure-component adsorption isotherms `isotherms`, with the
@@ -89,7 +90,7 @@ def iast_binary_vle(
             total_pressure,
             branch=branch,
             warningoff=warningoff,
-            adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess
+            adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess,
         )
 
     x_data = [x[0] / (x[0] + x[1]) for x in component_loadings]
@@ -101,6 +102,7 @@ def iast_binary_vle(
     # Generate the array of partial pressures
     if verbose:
         from pygaps.graphing.iast_graphs import plot_iast_vle
+
         plot_iast_vle(
             x_data,
             y_data,
@@ -124,9 +126,7 @@ def iast_binary_svp(
     verbose=False,
     ax=None
 ):
-    """
-    Perform IAST calculations to predict the selectivity of one of the components
-    as a function of pressure.
+    """Perform IAST calculations to predict the selectivity of one of the components as a function of pressure.
 
     Pass a list of two of pure-component adsorption isotherms `isotherms`, with the
     first one being selected as a basis.
@@ -164,7 +164,6 @@ def iast_binary_svp(
             - `pressure` the pressure for each selectivity
 
     """
-
     # Parameter checks
     if len(isotherms) != 2 or len(mole_fractions) != 2:
         raise ParameterError(
@@ -189,7 +188,7 @@ def iast_binary_svp(
             pressure,
             branch=branch,
             warningoff=warningoff,
-            adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess
+            adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess,
         )
 
     selectivities = [(x[0] / mole_fractions[0]) / (x[1] / mole_fractions[1])
@@ -197,6 +196,7 @@ def iast_binary_svp(
 
     if verbose:
         from pygaps.graphing.iast_graphs import plot_iast_svp
+
         plot_iast_svp(
             pressures,
             selectivities,
@@ -222,9 +222,7 @@ def iast_point_fraction(
     warningoff=False,
     adsorbed_mole_fraction_guess=None
 ):
-    """
-    Perform IAST calculation to predict multi-component adsorption isotherm from
-    pure component adsorption isotherms.
+    """Perform IAST calculation to predict multi-component adsorption isotherm from pure component adsorption isotherms.
 
     The material is now in equilibrium with a mixture of gases with partial
     pressures in the array `partial_pressures` in units corresponding to those
@@ -260,7 +258,6 @@ def iast_point_fraction(
         Predicted uptakes of each component (mmol/g or equivalent in isotherm units).
 
     """
-
     partial_pressures = numpy.asarray(gas_mole_fraction) * total_pressure
     return iast_point(
         isotherms,
@@ -268,7 +265,7 @@ def iast_point_fraction(
         branch=branch,
         verbose=verbose,
         warningoff=warningoff,
-        adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess
+        adsorbed_mole_fraction_guess=adsorbed_mole_fraction_guess,
     )
 
 
@@ -280,9 +277,7 @@ def iast_point(
     warningoff=False,
     adsorbed_mole_fraction_guess=None
 ):
-    """
-    Perform IAST calculation to predict multi-component adsorption isotherm from
-    pure component adsorption isotherms.
+    """Perform IAST calculation to predict multi-component adsorption isotherm from pure component adsorption isotherms.
 
     The material is now in equilibrium with a mixture of gases with partial
     pressures in the array `partial_pressures` in units corresponding to those
@@ -329,8 +324,7 @@ def iast_point(
 
     if numpy.size(partial_pressures) != n_components:
         raise ParameterError(
-            "Number of partial pressures != number of isotherms. Example use:\n"
-            "iast_point([iso1, iso2, iso3], [p1,p2,p3], total_p)"
+            "Number of partial pressures != number of isotherms. Example use:\niast_point([iso1, iso2, iso3], [p1,p2,p3], total_p)"
         )
 
     if verbose:
@@ -340,9 +334,7 @@ def iast_point(
 
     # Assert that the spreading pressures of each component are equal
     def spreading_pressure_differences(adsorbed_mole_fractions):
-        """
-        Assert that spreading pressures of each component at fictitious pressure
-        are equal.
+        """Assert that spreading pressures of each component at fictitious pressure are equal.
 
         Parameters
         ----------
@@ -480,7 +472,9 @@ def reverse_iast(
     gas_mole_fraction_guess=None
 ):
     """
-    Perform reverse IAST to predict gas phase composition at total pressure
+    Perform reverse IAST to predict gas phase composition for given adsorbed mole fractions.
+
+    Predicts the gas phase composition at total pressure
     `total_pressure` that will yield adsorbed mole fractions
     `adsorbed_mole_fractions`.
 
@@ -548,9 +542,7 @@ def reverse_iast(
 
     # assert that the spreading pressures of each component are equal
     def spreading_pressure_differences(gas_mole_fractions):
-        r"""
-        Assert that spreading pressures of each component at fictitious pressure
-        are equal.
+        r"""Assert that spreading pressures of each component at fictitious pressure are equal.
 
         Parameters
         ----------

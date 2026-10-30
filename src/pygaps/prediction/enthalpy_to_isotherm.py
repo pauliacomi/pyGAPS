@@ -1,7 +1,4 @@
-"""
-A module for predicting isotherms at different pressures given a measured
-isotherm and calculated isosteric heats of adsorption
-"""
+"""Predict isotherms at different temperatures given a measured isotherm and isosteric heats of adsorption."""
 
 import copy
 import warnings
@@ -27,6 +24,8 @@ def predict_isotherm_from_enthalpy_clapeyron(
     dographs: bool = True,
 ) -> PointIsotherm:
     r"""
+    Predict an isotherm at a given temperature from isosteric heats of adsorption.
+
     Predicts isotherm at a given temperature :math:`T_p`, from isosteric
     heats of adsorption :math:`\Delta H_{st}`, and pressure :math:`P_e` and
     temperature :math:`T_e` of original experimental isotherm. Uses the
@@ -70,7 +69,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
         The isotherm predicted from the above parameters. Pressure in Pa,
         loading in mol/kg.
     """
-    if (isosteric_enthalpy_dictionary is None and 'enthalpy' not in isotherm.other_keys):
+    if isosteric_enthalpy_dictionary is None and 'enthalpy' not in isotherm.other_keys:
         raise ParameterError(
             '''
             There is no enthalpy specified. This can be specified by passing
@@ -98,9 +97,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
             logger.info("Enthalpy retrieved from original_isotherm.other_keys.")
 
     elif isosteric_enthalpy_dictionary is not None:
-        if not all(
-            key in isosteric_enthalpy_dictionary for key in ['loading', 'enthalpy_sorption']
-        ):
+        if not all(key in isosteric_enthalpy_dictionary for key in ['loading', 'enthalpy_sorption']):
             raise ParameterError(
                 '''
                 You have specified a isosteric_enthalpy_dictionary as input,
@@ -133,9 +130,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
             '''
         )
 
-    pressure_prediction = predict_pressure_raw(
-        enthalpy, temperature_prediction, temperature_isotherm, pressure_current
-    )
+    pressure_prediction = predict_pressure_raw(enthalpy, temperature_prediction, temperature_isotherm, pressure_current)
 
     isotherm_prediction = PointIsotherm(
         pressure=pressure_prediction,
@@ -176,6 +171,8 @@ def predict_isosurface_from_enthalpy_clapeyron(
     verbose: bool = True,
 ):
     r"""
+    Predict loading as a function of pressure and temperature.
+
     Predicts loading as a function of pressure and temperature, from a single
     isotherm and a heat of adsorption. Uses `predict_isotherm` function which
     relies on the Clausius Clapeyron equation;
@@ -264,10 +261,7 @@ def predict_isosurface_from_enthalpy_clapeyron(
         )
         lims = [min(isotherm_predicted.pressure()), max(isotherm_predicted.pressure())]
 
-        loadings = [
-            float(isotherm_predicted.loading_at(p)) if lims[0] < p < lims[1] else None
-            for p in pressures_prediction
-        ]
+        loadings = [float(isotherm_predicted.loading_at(p)) if lims[0] < p < lims[1] else None for p in pressures_prediction]
         data.append(loadings)
 
     grid = pd.DataFrame(
@@ -286,7 +280,7 @@ def predict_isosurface_from_enthalpy_clapeyron(
                 'temperature': isotherm_local.temperature_unit,
                 'loading': isotherm_local.loading_unit,
                 'material': isotherm_local.material_unit,
-            }
+            },
         )
         plt.show()
 
@@ -300,6 +294,8 @@ def predict_pressure_raw(
     pressure_current: list[float] = None,
 ) -> list[float]:
     r"""
+    Predict pressures at a given temperature from isosteric heats of adsorption.
+
     Utility function for predicting pressures at a given temperature :math:`T_p`,
     :math:`P_p` from isosteric heats of adsorption :math:`\Delta H_{st}`, and
     pressure :math:`P_e` and temperature :math:`T_e` of original experimental
@@ -332,18 +328,16 @@ def predict_pressure_raw(
     RTT = R * temperature_current * temperature_prediction
     T_difference = temperature_prediction - temperature_current
     if abs(T_difference) > 50:
-        warnings.warn(UserWarning(
-            rf'''
+        warnings.warn(
+            UserWarning(
+                rf'''
             Difference in experimental and prediction temperatures is more
             than 50 K ({T_difference} K). This method may not be reliable
             for predicting a new isotherm.
             '''
-        )
+            )
         )
 
-    pressure_prediction = [
-        np.exp(((1e3 * H * T_difference) / RTT) + np.log(P))
-        for H, P in zip(isosteric_enthalpy, pressure_current)
-    ]
+    pressure_prediction = [np.exp(((1e3 * H * T_difference) / RTT) + np.log(P)) for H, P in zip(isosteric_enthalpy, pressure_current)]
 
     return pressure_prediction

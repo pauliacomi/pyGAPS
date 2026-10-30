@@ -4,6 +4,7 @@ from pygaps import logger
 
 try:
     import CoolProp as CP
+
     logger.debug(f"CoolProp version is '{CP.__version__}'")
 except ImportError:
     CP = None
@@ -13,6 +14,7 @@ COOLPROP_BACKEND = 'HEOS'
 
 
 def thermodynamic_backend():
+    """Return the equation of state backend currently used by CoolProp."""
     return COOLPROP_BACKEND
 
 

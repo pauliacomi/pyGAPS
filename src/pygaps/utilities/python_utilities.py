@@ -37,7 +37,7 @@ def deep_merge(a, b, path=None, update=True):
         path = []
     for key, val in b.items():
         if key in a:
-            if (isinstance(a[key], abc.Mapping) and isinstance(val, abc.Mapping)):
+            if isinstance(a[key], abc.Mapping) and isinstance(val, abc.Mapping):
                 deep_merge(a[key], val, path + [str(key)], update)
             elif a[key] == val:
                 pass  # same leaf value
@@ -50,13 +50,14 @@ def deep_merge(a, b, path=None, update=True):
     return a
 
 
-class SimpleWarning():
-    """
-    Context manager overrides warning formatter to remove unneeded info.
-    """
+class SimpleWarning:
+    """Context manager overrides warning formatter to remove unneeded info."""
+
     old_formatter = None
 
     def __enter__(self):
+        """Override the warning formatter to only display the message."""
+
         # ignore everything except the message
         def custom_formatwarning(msg, *args, **kwargs):
             return str(msg) + '\n'
@@ -66,5 +67,6 @@ class SimpleWarning():
         return True
 
     def __exit__(self, typ, value, traceback):
+        """Restore the original warning formatter."""
         warnings.formatwarning = self.old_formatter
         return False

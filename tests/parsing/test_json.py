@@ -9,8 +9,9 @@ from .conftest import DATA_JSON_NIST
 
 
 @pytest.mark.parsing
-class TestJson():
+class TestJson:
     """All testing of JSON interface"""
+
     def test_json_isotherm(self, basic_isotherm):
         """Test the parsing of an isotherm to json."""
         test_isotherm_json = pgp.isotherm_to_json(basic_isotherm)

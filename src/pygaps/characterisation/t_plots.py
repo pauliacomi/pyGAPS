@@ -1,4 +1,4 @@
-"""This module contains the t-plot calculation."""
+"""T-plot calculation."""
 
 import typing as t
 
@@ -140,10 +140,7 @@ def t_plot(
     """
     # Function parameter checks
     if thickness_model is None:
-        raise ParameterError(
-            "Specify a model to generate the thickness curve"
-            " e.g. thickness_model=\"Halsey\""
-        )
+        raise ParameterError("Specify a model to generate the thickness curve e.g. thickness_model=\"Halsey\"")
 
     # Get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
@@ -152,10 +149,7 @@ def t_plot(
 
     # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
-            "loading_basis": "molar",
-            "loading_unit": "mmol"
-        }, {"pressure_mode": "relative"}
+        isotherm, branch, {"loading_basis": "molar", "loading_unit": "mmol"}, {"pressure_mode": "relative"}
     )
 
     # Get thickness model
@@ -188,6 +182,7 @@ def t_plot(
                 )
 
             from pygaps.graphing.calc_graphs import tp_plot
+
             units = isotherm.units
             units.update({"loading_basis": "molar", "loading_unit": "mmol"})
             tp_plot(t_curve, loading, results, units)
@@ -262,8 +257,7 @@ def t_plot_raw(
 
     # If limits are not None, then the user requested specific limits
     if t_limits is not None:
-        section = numpy.flatnonzero((thickness_curve > t_limits[0])
-                                    & (thickness_curve < t_limits[1]))
+        section = numpy.flatnonzero((thickness_curve > t_limits[0]) & (thickness_curve < t_limits[1]))
         result = t_plot_parameters(
             thickness_curve,
             loading,
@@ -308,10 +302,7 @@ def t_plot_parameters(
     liquid_density: float,
 ):
     """Calculate the parameters from a linear section of the t-plot."""
-
-    slope, intercept, corr_coef, p, stderr = stats.linregress(
-        thickness_curve[section], loading[section]
-    )
+    slope, intercept, corr_coef, p, stderr = stats.linregress(thickness_curve[section], loading[section])
 
     # Check if slope is good
 

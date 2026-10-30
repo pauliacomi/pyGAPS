@@ -5,7 +5,9 @@ authors:
   given-names: "Paul"
   orcid: "https://orcid.org/0000-0001-5477-1503"
 title: "pyGAPS"
-url: "https://github.com/github/pyGAPS"
+url: "https://github.com/pauliacomi/pyGAPS"
+version: "4.6.1"
+date-released: "2025-03-04"
 preferred-citation:
   type: article
   authors:

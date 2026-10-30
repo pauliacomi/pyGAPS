@@ -10,7 +10,6 @@ from pygaps.utilities.exceptions import ParameterError
 
 def split_ads_data(data, pressure_key):
     """Find the inflection in an adsorption dataset with adsorption/desorption."""
-
     # Generate array
     split = numpy.zeros(data.shape[0], dtype=numpy.int8)
 
@@ -19,7 +18,6 @@ def split_ads_data(data, pressure_key):
 
     # If the maximum is not the last point
     if inflexion != len(split):
-
         # If the first point is the maximum, then it is purely desorption
         if inflexion == data.index[0]:
             inflexion = 0
@@ -36,7 +34,7 @@ def find_limit_indices(
     limits: "tuple[float, float]" = None,
     smallest_selection: int = 3,
 ):
-    """Find the indices of an array limits"""
+    """Find the indices of an array limits."""
     # select the maximum and minimum of the points
     index_min = 0
     index_max = len(array) - 1  # As we want absolute position
@@ -51,9 +49,7 @@ def find_limit_indices(
     if limits[1]:
         index_max = numpy.searchsorted(array, limits[1]) - 1
     if index_max - index_min < smallest_selection:
-        raise CalculationError(
-            f"Not enough points (at least {smallest_selection}) in the selected region."
-        )
+        raise CalculationError(f"Not enough points (at least {smallest_selection}) in the selected region.")
     # TODO figure out which is more efficient
     #     if limits:
     # ret = ret.loc[ret.between(
@@ -112,7 +108,6 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
         True - Curve is closed
         False - Curve is open
     """
-
     # Check if arrays are equal in size
     count = len(xs)
     if len(ys) != count:
@@ -127,7 +122,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     # If periodic, extend the point array by count+degree+1
     if periodic:
         factor, fraction = divmod(count + degree + 1, count)
-        cv = numpy.concatenate((cv, ) * factor + (cv[:fraction], ))
+        cv = numpy.concatenate((cv,) * factor + (cv[:fraction],))
         count = len(cv)
         degree = numpy.clip(degree, 1, degree)
 
@@ -144,17 +139,20 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
             dtype='int',
         )
     else:
-        kv = numpy.concatenate((
-            [0] * degree,
-            numpy.arange(count - degree + 1),
-            [count - degree] * degree,
-        ))
+        kv = numpy.concatenate(
+            (
+                [0] * degree,
+                numpy.arange(count - degree + 1),
+                [count - degree] * degree,
+            )
+        )
 
     # Calculate query range
     rng = numpy.linspace(periodic, (count - degree), n)
 
     # Calculate result
     from scipy import interpolate
+
     res = numpy.array(interpolate.splev(rng, (kv, cv.T, degree))).T
 
     return (
@@ -165,7 +163,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
 
 def same_orders_of_maximum(vals):
     """
-    Determines if the maximum of two lists are within one order of magnitude.
+    Determine if the maximum of two lists are within one order of magnitude.
 
     Parameters
     ----------
@@ -173,7 +171,7 @@ def same_orders_of_maximum(vals):
         The lists to compare
 
     Returns
-    ------
+    -------
     True:
         If within one order of magnitude
     False:

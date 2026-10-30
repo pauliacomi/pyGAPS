@@ -64,8 +64,8 @@ def roq_plot(
         )
     with mpl.rc_context(POINTS_HIGHLIGHTED):
         ax.plot(
-            pressure[minimum:maximum + 1],
-            roq_points[minimum:maximum + 1],
+            pressure[minimum : maximum + 1],
+            roq_points[minimum : maximum + 1],
             label='chosen points',
         )
     with mpl.rc_context(POINTS_IMPORTANT):
@@ -137,8 +137,8 @@ def bet_plot(
         )
     with mpl.rc_context(POINTS_HIGHLIGHTED):
         ax.plot(
-            pressure[minimum:maximum + 1],
-            bet_points[minimum:maximum + 1],
+            pressure[minimum : maximum + 1],
+            bet_points[minimum : maximum + 1],
             label='chosen points',
         )
     x_lim = [0, pressure[maximum]]
@@ -321,10 +321,7 @@ def tp_plot(
         min_lim = 0
         max_lim = max(thickness_curve[result.get('section')]) * 1.2
         x_lim = [min_lim, max_lim]
-        y_lim = [
-            result.get('slope') * min_lim + result.get('intercept'),
-            result.get('slope') * max_lim + result.get('intercept')
-        ]
+        y_lim = [result.get('slope') * min_lim + result.get('intercept'), result.get('slope') * max_lim + result.get('intercept')]
         with mpl.rc_context(LINE_FIT):
             ax.plot(
                 x_lim,
@@ -412,7 +409,7 @@ def psd_plot(
         )
 
     def formatter(x, pos):
-        """Forces matplotlib to display whole numbers"""
+        """Force matplotlib to display whole numbers."""
         return f"{x:g}"
 
     if log:
@@ -640,8 +637,8 @@ def dra_plot(
         )
     with mpl.rc_context(POINTS_HIGHLIGHTED):
         ax.plot(
-            log_n_p0p[minimum:maximum + 1],
-            logv[minimum:maximum + 1],
+            log_n_p0p[minimum : maximum + 1],
+            logv[minimum : maximum + 1],
             label='chosen points',
         )
     with mpl.rc_context(LINE_FIT):
@@ -652,7 +649,7 @@ def dra_plot(
             label='model fit',
         )
 
-    ax.set_xlabel(fr'$ln^{exp}\ p^0/p$')
+    ax.set_xlabel(rf'$ln^{exp}\ p^0/p$')
     ax.set_ylabel(r'$ln\ V/V_0$')
     ax.legend()
 
@@ -668,9 +665,7 @@ def virial_plot(
     added_point: bool,
     ax=None,
 ):
-    """
-    Draw a Virial plot.
-    """
+    """Draw a Virial plot."""
     # Generate the figure if needed
     if ax is None:
         _, ax = plt.subplots()

@@ -31,9 +31,9 @@ def label_units_dict(key: str, unit_params: dict):
         if unit_params['loading_basis'] == "percent":
             text = f"Loading [${unit_params['material_basis']}$%]"
         elif unit_params['loading_basis'] == "fraction":
-            text = fr"Loading [${unit_params['material_basis']}\/fraction$]"
+            text = rf"Loading [${unit_params['material_basis']}\/fraction$]"
         else:
-            text = fr"Loading [${convert_unit_ltx(unit_params['loading_unit'])}\/{convert_unit_ltx(unit_params['material_unit'], True)}$]"
+            text = rf"Loading [${convert_unit_ltx(unit_params['loading_unit'])}\/{convert_unit_ltx(unit_params['material_unit'], True)}$]"
     elif key == "enthalpy":
         text = r"$\Delta_{ads}h$ $(-kJ\/mol^{-1})$"
     else:
@@ -43,7 +43,6 @@ def label_units_dict(key: str, unit_params: dict):
 
 def label_lgd(isotherm, lbl_components: list, branch: str = None, key_def: str = None):
     """Build a legend label."""
-
     if not lbl_components:
         lbl_components = ['material', 'adsorbate', 'temperature', 'key']
 

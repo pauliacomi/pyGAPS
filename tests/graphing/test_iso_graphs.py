@@ -2,6 +2,7 @@
 
 # isort: skip_file
 import matplotlib
+
 matplotlib.use('Agg')
 
 import pytest
@@ -12,19 +13,22 @@ from ..test_utils import mpl_cleanup
 
 
 @pytest.mark.graphing
-class TestIsothermGraphs():
+class TestIsothermGraphs:
     """Tests regular isotherm graphs"""
+
     @mpl_cleanup
     def test_basic_plot(self, basic_pointisotherm):
         plot_iso(basic_pointisotherm)
 
     @mpl_cleanup
     def test_multi_plot(self, basic_pointisotherm):
-        plot_iso([
-            basic_pointisotherm,
-            basic_pointisotherm,
-            basic_pointisotherm,
-        ])
+        plot_iso(
+            [
+                basic_pointisotherm,
+                basic_pointisotherm,
+                basic_pointisotherm,
+            ]
+        )
 
     @mpl_cleanup
     def test_data_plot(self, basic_pointisotherm):

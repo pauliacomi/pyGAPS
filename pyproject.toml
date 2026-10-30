@@ -5,17 +5,16 @@ dynamic = ["version"]
 description = "Framework for processing gas adsorption isotherms"
 readme = "README.rst"
 keywords = ["adsorption", "isotherm", "characterization", "processing", "material"]
-requires-python = ">=3.9"
-license = {file = "LICENSE"}
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name = "Paul Iacomi", email = "mail@pauliacomi.com"}
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -25,31 +24,30 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
-    "numpy>=1.16.5",
-    "scipy>=1.5.0",
-    "pandas>=1.1.0",
-    "matplotlib>=3.3.0",
-    "coolprop>=6.0.0; python_version < '3.13'",
+    "numpy>=1.21.3",
+    "scipy>=1.7.3",
+    "pandas>=1.3.4",
+    "matplotlib>=3.5.0",
+    "coolprop>=6.4.1; python_version < '3.13'",
     "coolprop>=6.7.0; python_version >= '3.13'",
-    "adsorption-file-parser >= 0.2.6",
-    "xlrd>=1.1",
-    "xlwt>=1.3",
-    "openpyxl",
-    "gemmi",
-    "requests",
+    "adsorption-file-parser>=0.2.6",
+    "xlrd>=1.2.0",
+    "openpyxl>=3.0.7",
+    "gemmi>=0.5.1",
+    "requests>=2.20",
 ]
 
 [dependency-groups]
 test = [
-    "pytest>=6.0.0",
-    "pytest-cov",
-    "coverage[toml]",
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "coverage[toml]>=7.0",
+    "jsonschema>=4.0",
 ]
 docs = [
     "pygments>=2.11",
-    "docutils>=0.11",
+    "docutils>=0.18.1",
     "doc8",
-    "pandoc",
     "restructuredtext-lint",
     "ipykernel",
     "sphinx>=4.0",
@@ -60,14 +58,8 @@ docs = [
 dev = [
     {include-group = "test"},
     {include-group = "docs"},
-    "codecov",
-    "yapf",
-    "isort",
+    "ruff",
     "pylint",
-    "flake8",
-    "flake8-pyproject",
-    "autopep8",
-    "pydocstyle",
 ]
 
 # Entry points for CLI
@@ -84,29 +76,28 @@ Documentation = "https://pygaps.readthedocs.io"
 # build system: setuptools
 [build-system]
 requires = [
-    "setuptools>=61.0.0",
-    "wheel",
-    "setuptools_scm[toml]>=6.2",
+    "setuptools>=77.0.0",
+    "setuptools_scm>=8",
 ]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-zip-safe = true
-include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-pygaps = ["*.txt", "*.rst"]
-"pygaps.data" = ["*", "**"]
+"pygaps.data" = ["*.json", "*.db", "kernels/*.csv", "stdiso/*.csv"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["__pycache__/*", "*.pyc"]
 
 # versioning: setuptools_scm
 [tool.setuptools_scm]
 version_file = "src/pygaps/_version.py"
 local_scheme = 'dirty-tag'
-fallback_version = '4.3.0'
+fallback_version = '4.6.1'
 
 
 # linting: pylint
@@ -129,39 +120,31 @@ disable = [
     "invalid-name", # we don't need these
 ]
 
-# linting: flake8
-[tool.flake8]
-max-line-length = 140
-ignore = ["E402", "W503", "W504", "E126", "E731"]
-exclude = [".tox", ".eggs", "ci/templates", "build", "dist"]
-docstring_style = "numpy"
+# linting and formatting: ruff
+[tool.ruff]
+line-length = 140
+extend-exclude = ["src/pygaps/_version.py", "docs"]
 
-# linting: pydocstyle
-[tool.pydocstyle]
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "D"]
+ignore = [
+    "E402", # imports are often deferred for performance
+    "E731", # lambda assignments are used for short helpers
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"tests/**" = ["D"]
+
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
-match-dir = "src/.*"
 
+[tool.ruff.lint.isort]
+force-single-line = true
+known-first-party = ["pygaps"]
 
-# analysis: pyright
-[tool.pyright]
-
-
-# formatting: yapf
-[tool.yapf]
-based_on_style = "pep8"
-dedent_closing_brackets = true
-coalesce_brackets = true
-split_complex_comprehension = true
-split_before_dot = true
-
-# formatting: isort
-[tool.isort]
-force_single_line = true
-line_length = 120
-known_first_party = "pygaps"
-default_section = "THIRDPARTY"
-forced_separate = "test_pygaps"
-skip = [".tox", ".eggs", "ci/templates", "build", "dist", "src/pygaps/_version.py"]
+[tool.ruff.format]
+quote-style = "preserve"
 
 
 # testing: pytest.py
@@ -184,9 +167,6 @@ python_files = [
 ]
 addopts = [
     "-ra",
-    "--cov",
-    "--cov-report=xml",
-    "--doctest-glob=*.rst",
     "--tb=short",
 ]
 markers = [
@@ -196,12 +176,10 @@ markers = [
     "modelling: model generation from isotherms.",
     "graphing: plotting functionality testing.",
     "parsing: parsing functionality testing.",
+    "cli: command-line interface tests.",
+    "prediction: IAST and isotherm prediction tests.",
     "okay: custom empty marker.",
 ]
-filterwarnings = [
-    "ignore::UserWarning",
-]
-
 # testing: coverage.py
 [tool.coverage.run]
 branch = false

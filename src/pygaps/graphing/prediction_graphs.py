@@ -1,4 +1,4 @@
-"""functions for plotting graphs of isotherm prediction"""
+"""Functions for plotting graphs of isotherm prediction."""
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -22,6 +22,7 @@ def plot_predict_isotherm_from_enthalpy(
     enthalpy_stderr: list[float] = None,
     axs: list[mpl.axes.Axes] = None,
 ):
+    """Plot the enthalpy curve and the original and predicted isotherms side by side."""
     if axs is None:
         fig = plt.figure(figsize=(8, 4), layout='tight')
         enthalpy_ax = fig.add_subplot(121)
@@ -41,9 +42,7 @@ def plot_predict_isotherm_from_enthalpy(
         ax=enthalpy_ax,
     )
 
-    logx = same_orders_of_maximum(
-        [original_isotherm.pressure(), predicted_isotherm.pressure()]
-    )
+    logx = same_orders_of_maximum([original_isotherm.pressure(), predicted_isotherm.pressure()])
 
     pgg.plot_iso(
         [original_isotherm, predicted_isotherm],
@@ -51,10 +50,7 @@ def plot_predict_isotherm_from_enthalpy(
         ax=isos_ax,
         logx=logx,
     )
-    lgd_keys = [
-        f'Original at {original_isotherm.temperature} K',
-        f'Predicted at {predicted_isotherm.temperature} K'
-    ]
+    lgd_keys = [f'Original at {original_isotherm.temperature} K', f'Predicted at {predicted_isotherm.temperature} K']
     isos_ax.legend(lgd_keys, frameon=False)
 
     plt.show()
@@ -71,12 +67,10 @@ def plot_predict_isosurface_from_enthalpy(
     ax=None,
     **kwargs,
 ):
-    """
-    Makes a 2D-heatmap with colorbar of loading as a function of pressure and
-    temperature.
+    """Make a 2D-heatmap with colorbar of loading as a function of pressure and temperature.
 
     Parameters
-    ---------
+    ----------
     grid: pd.DataFrame
         The data to use, loading are values. Index is temperature, columns are
         pressure. Values should be evenly spaced.
@@ -113,7 +107,7 @@ def plot_predict_isosurface_from_enthalpy(
         units['pressure'] = next(unit_pressure)
     grid.columns = pressures
 
-    aspect = ((max(pressures) - min(pressures)) / (max(temperatures) - min(temperatures)))
+    aspect = (max(pressures) - min(pressures)) / (max(temperatures) - min(temperatures))
     im = ax.imshow(
         grid,
         aspect=aspect,
@@ -146,6 +140,7 @@ def plot_predict_isotherm_from_enthalpy_fit(
     enthalpy_stderr: list[float] = None,
     axs: list[mpl.axes.Axes] = None,
 ):
+    """Plot the model fit, the enthalpy curve and the original and predicted isotherms side by side."""
     if axs is None:
         fig = plt.figure(figsize=(12, 4), layout='tight')
         isofit_ax = fig.add_subplot(131)
@@ -164,9 +159,7 @@ def plot_predict_isotherm_from_enthalpy_fit(
 
     pgg.model_graphs.plot_model_guesses(
         attempts=[model_isotherm],
-        pressure=original_isotherm.pressure(
-            branch=branch, pressure_unit='Pa', pressure_mode='absolute'
-        ),
+        pressure=original_isotherm.pressure(branch=branch, pressure_unit='Pa', pressure_mode='absolute'),
         loading=original_isotherm.loading(
             branch=branch,
             loading_unit='mol',
@@ -174,15 +167,9 @@ def plot_predict_isotherm_from_enthalpy_fit(
             material_unit='kg',
             material_basis='mass',
         ),
-        ax=isofit_ax
+        ax=isofit_ax,
     )
 
     plot_predict_isotherm_from_enthalpy(
-        original_isotherm,
-        predicted_isotherm,
-        loading,
-        enthalpy,
-        branch=branch,
-        enthalpy_stderr=enthalpy_stderr,
-        axs=[enthalpy_ax, isos_ax]
+        original_isotherm, predicted_isotherm, loading, enthalpy, branch=branch, enthalpy_stderr=enthalpy_stderr, axs=[enthalpy_ax, isos_ax]
     )

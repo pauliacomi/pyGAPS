@@ -1,6 +1,4 @@
-"""
-This module contains the sql interface for data manipulation.
-"""
+"""The sql interface for data manipulation."""
 
 import functools
 import json
@@ -30,6 +28,7 @@ from pygaps.utilities.sqlite_utilities import find_SQL_python_type
 
 def with_connection(func):
     """Contextmanager for sqlite connection."""
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
 
@@ -134,18 +133,11 @@ def _delete_by_id(
     **kwargs: dict,
 ):
     """Delete elements in a table by using their ID."""
-
     # Check if exists
-    ids = cursor.execute(
-        build_select(table=table_name, to_select=[table_id], where=[table_id]), {
-            table_id: element_id
-        }
-    ).fetchone()
+    ids = cursor.execute(build_select(table=table_name, to_select=[table_id], where=[table_id]), {table_id: element_id}).fetchone()
 
     if ids is None:
-        raise sqlite3.IntegrityError(
-            f"Element to delete ({element_id}) does not exist in table {table_name}."
-        )
+        raise sqlite3.IntegrityError(f"Element to delete ({element_id}) does not exist in table {table_name}.")
 
     try:
         cursor.execute(build_delete(table=table_name, where=[table_id]), {table_id: element_id})
@@ -192,15 +184,9 @@ def adsorbate_to_db(
 
     # If we need to overwrite, we find the id of existing adsorbate.
     if overwrite:
-        ids = cursor.execute(
-            build_select(table='adsorbates', to_select=['id'], where=['name']), {
-                'name': adsorbate.name
-            }
-        ).fetchone()
+        ids = cursor.execute(build_select(table='adsorbates', to_select=['id'], where=['name']), {'name': adsorbate.name}).fetchone()
         if ids is None:
-            raise sqlite3.IntegrityError(
-                f"Adsorbate to overwrite ({adsorbate.name}) does not exist in database."
-            )
+            raise sqlite3.IntegrityError(f"Adsorbate to overwrite ({adsorbate.name}) does not exist in database.")
         ads_id = ids[0]
 
         # Delete existing properties
@@ -217,9 +203,7 @@ def adsorbate_to_db(
             pass
     # If overwrite is not specified, we upload it to the adsorbates table
     else:
-        cursor.execute(
-            build_insert(table="adsorbates", to_insert=['name']), {'name': adsorbate.name}
-        )
+        cursor.execute(build_insert(table="adsorbates", to_insert=['name']), {'name': adsorbate.name})
         ads_id = cursor.lastrowid
 
     # Upload or modify data in the associated tables
@@ -229,7 +213,8 @@ def adsorbate_to_db(
     # Upload property types if needed
     if autoinsert_properties:
         prop_types = [
-            p['type'] for p in adsorbate_property_types_from_db(
+            p['type']
+            for p in adsorbate_property_types_from_db(
                 db_path=db_path,
                 cursor=cursor,
             )
@@ -244,7 +229,6 @@ def adsorbate_to_db(
 
     if properties:
         for prop, val in properties.items():
-
             sql_insert = build_insert(
                 table='adsorbate_properties',
                 to_insert=['ads_id', 'type', 'value'],
@@ -257,10 +241,7 @@ def adsorbate_to_db(
                 try:
                     cursor.execute(sql_insert, {'ads_id': ads_id, 'type': prop, 'value': vl})
                 except sqlite3.InterfaceError as err:
-                    raise ParsingError(
-                        f"Cannot process property {prop}: {vl}. "
-                        f"Original error:\n{err}"
-                    ) from err
+                    raise ParsingError(f"Cannot process property {prop}: {vl}. Original error:\n{err}") from err
 
     # Add to existing list
     if overwrite:
@@ -297,7 +278,6 @@ def adsorbates_from_db(
     list
         list of Adsorbates
     """
-
     cursor = kwargs['cursor']
 
     # Execute the query
@@ -307,14 +287,9 @@ def adsorbates_from_db(
     # Get other data and create adsorbates
     adsorbates = []
     for row in rows:
-
         # Get all properties
         props = cursor.execute(
-            build_select(
-                table='adsorbate_properties', to_select=['type', 'value'], where=['ads_id']
-            ), {
-                'ads_id': row['id']
-            }
+            build_select(table='adsorbate_properties', to_select=['type', 'value'], where=['ads_id']), {'ads_id': row['id']}
         ).fetchall()
 
         # Iterate for props
@@ -355,14 +330,12 @@ def adsorbate_delete_db(
     verbose : bool
         Extra information printed to console.
     """
-
     cursor = kwargs['cursor']
 
     # Get id of adsorbate
     ids = cursor.execute(
-        build_select(table='adsorbates', to_select=['id'], where=['name']), {
-            'name': adsorbate.name if isinstance(adsorbate, Adsorbate) else adsorbate
-        }
+        build_select(table='adsorbates', to_select=['id'], where=['name']),
+        {'name': adsorbate.name if isinstance(adsorbate, Adsorbate) else adsorbate},
     ).fetchone()
     if ids is None:
         raise sqlite3.IntegrityError("Adsorbate to delete does not exist in database.")
@@ -370,16 +343,12 @@ def adsorbate_delete_db(
 
     try:
         # Delete data from adsorbate_properties table
-        cursor.execute(
-            build_delete(table='adsorbate_properties', where=['ads_id']), {'ads_id': ads_id}
-        )
+        cursor.execute(build_delete(table='adsorbate_properties', where=['ads_id']), {'ads_id': ads_id})
 
         # Delete original name in adsorbates table
         cursor.execute(build_delete(table='adsorbates', where=['id']), {'id': ads_id})
     except sqlite3.Error as err:
-        raise ParsingError(
-            "Could not delete adsorbate, are there still isotherms referencing it?"
-        ) from err
+        raise ParsingError("Could not delete adsorbate, are there still isotherms referencing it?") from err
 
     # Remove from existing list
     if adsorbate in ADSORBATE_LIST:
@@ -399,7 +368,7 @@ def adsorbate_property_type_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads an adsorbate property type.
+    Upload an adsorbate property type.
 
     The type_dict takes the form of::
 
@@ -523,7 +492,6 @@ def material_to_db(
         Extra information printed to console.
 
     """
-
     cursor = kwargs['cursor']
 
     # If we need to overwrite, we find the id of existing adsorbate.
@@ -533,14 +501,11 @@ def material_to_db(
                 table='materials',
                 to_select=['id'],
                 where=['name'],
-            ), {
-                'name': material.name
-            }
+            ),
+            {'name': material.name},
         ).fetchone()
         if ids is None:
-            raise sqlite3.IntegrityError(
-                f"Material to overwrite ({material.name}) does not exist in database."
-            )
+            raise sqlite3.IntegrityError(f"Material to overwrite ({material.name}) does not exist in database.")
         mat_id = ids[0]
         # Delete existing properties
         try:
@@ -566,7 +531,8 @@ def material_to_db(
     # Upload property types if needed
     if autoinsert_properties:
         prop_types = [
-            p['type'] for p in material_property_types_from_db(
+            p['type']
+            for p in material_property_types_from_db(
                 db_path=db_path,
                 cursor=cursor,
             )
@@ -581,7 +547,6 @@ def material_to_db(
 
     if properties:
         for prop, val in properties.items():
-
             sql_insert = build_insert(
                 table='material_properties',
                 to_insert=['mat_id', 'type', 'value'],
@@ -594,10 +559,7 @@ def material_to_db(
                 try:
                     cursor.execute(sql_insert, {'mat_id': mat_id, 'type': prop, 'value': vl})
                 except sqlite3.InterfaceError as err:
-                    raise ParsingError(
-                        f"Cannot process property {prop}: {vl}. "
-                        f"Original error:\n{err}"
-                    ) from err
+                    raise ParsingError(f"Cannot process property {prop}: {vl}. Original error:\n{err}") from err
 
     # Add to existing list
     if overwrite:
@@ -634,7 +596,6 @@ def materials_from_db(
     list
         list of Materials
     """
-
     cursor = kwargs['cursor']
 
     # Execute the query
@@ -644,14 +605,11 @@ def materials_from_db(
     # Get other data and create materials
     materials = []
     for row in rows:
-
         material_params = dict(zip(row.keys(), row))
 
         # Get the extra data from the material_properties table
         cursor.execute(
-            build_select(
-                table='material_properties', to_select=['type', 'value'], where=['mat_id']
-            ), {'mat_id': material_params.pop('id')}
+            build_select(table='material_properties', to_select=['type', 'value'], where=['mat_id']), {'mat_id': material_params.pop('id')}
         )
 
         material_params.update({row[0]: row[1] for row in cursor})
@@ -685,14 +643,14 @@ def material_delete_db(
     verbose : bool
         Extra information printed to console.
     """
-
     cursor = kwargs['cursor']
 
     # Get id of material
     mat_id = cursor.execute(
-        build_select(table='materials', to_select=['id'], where=['name']), {
+        build_select(table='materials', to_select=['id'], where=['name']),
+        {
             'name': material.name if isinstance(material, Material) else material,
-        }
+        },
     ).fetchone()
     if mat_id is None:
         raise sqlite3.IntegrityError("Material to delete does not exist in database.") from None
@@ -705,9 +663,7 @@ def material_delete_db(
         # Delete material info in materials table
         cursor.execute(build_delete(table='materials', where=['id']), {'id': mat_id})
     except sqlite3.Error as err:
-        raise ParsingError(
-            "Could not delete material, are there still isotherms referencing it?"
-        ) from err
+        raise ParsingError("Could not delete material, are there still isotherms referencing it?") from err
 
     # Remove from existing list
     if material in MATERIAL_LIST:
@@ -715,9 +671,7 @@ def material_delete_db(
 
     if verbose:
         # Print success
-        logger.info(
-            f"Material deleted: '{material.name if isinstance(material, Material) else material}'"
-        )
+        logger.info(f"Material deleted: '{material.name if isinstance(material, Material) else material}'")
 
 
 @with_connection
@@ -729,7 +683,7 @@ def material_property_type_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads a material property type.
+    Upload a material property type.
 
     The type_dict takes the form of::
 
@@ -835,7 +789,7 @@ def isotherm_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads isotherm to the database.
+    Upload isotherm to the database.
 
     If overwrite is set to true, the isotherm is overwritten.
     Overwrite is done based on isotherm.iso_id
@@ -855,7 +809,6 @@ def isotherm_to_db(
     verbose : bool, True
         Extra information printed to console.
     """
-
     cursor = kwargs['cursor']
     # Checks
     if autoinsert_material:
@@ -882,10 +835,7 @@ def isotherm_to_db(
     iso_dict = isotherm.to_dict()
 
     # attributes which are kept in the database
-    upload_dict.update({
-        param: iso_dict.pop(param, None)
-        for param in BaseIsotherm._required_params
-    })
+    upload_dict.update({param: iso_dict.pop(param, None) for param in BaseIsotherm._required_params})
 
     # Ensure material is correct
     material = upload_dict['material']
@@ -915,11 +865,7 @@ def isotherm_to_db(
                 table='isotherm_properties',
                 to_insert=['iso_id', 'type', 'value'],
             ),
-            {
-                'iso_id': iso_id,
-                'type': key,
-                'value': val
-            },
+            {'iso_id': iso_id, 'type': key, 'value': val},
         )
 
     # Then, the isotherm data/model will be uploaded into the data table
@@ -930,44 +876,18 @@ def isotherm_to_db(
     if isinstance(isotherm, PointIsotherm):
         # Insert standard data fields:
         cursor.execute(
-            sql_insert, {
-                'iso_id': iso_id,
-                'type': 'pressure',
-                'dtype': 'float',
-                'data': json.dumps(isotherm.pressure().tolist())
-            }
+            sql_insert, {'iso_id': iso_id, 'type': 'pressure', 'dtype': 'float', 'data': json.dumps(isotherm.pressure().tolist())}
         )
-        cursor.execute(
-            sql_insert, {
-                'iso_id': iso_id,
-                'type': 'loading',
-                'dtype': 'float',
-                'data': json.dumps(isotherm.loading().tolist())
-            }
-        )
+        cursor.execute(sql_insert, {'iso_id': iso_id, 'type': 'loading', 'dtype': 'float', 'data': json.dumps(isotherm.loading().tolist())})
         # Update or insert other fields:
         for key in isotherm.other_keys:
             dtype = find_SQL_python_type(isotherm.other_data(key)[0])
             data = json.dumps(isotherm.other_data(key).tolist())
-            cursor.execute(
-                sql_insert, {
-                    'iso_id': iso_id,
-                    'type': key,
-                    'dtype': dtype,
-                    'data': data
-                }
-            )
+            cursor.execute(sql_insert, {'iso_id': iso_id, 'type': key, 'dtype': dtype, 'data': data})
 
     elif isinstance(isotherm, ModelIsotherm):
         # Insert model parameters
-        cursor.execute(
-            sql_insert, {
-                'iso_id': iso_id,
-                'type': 'model',
-                'dtype': "dict",
-                'data': json.dumps(isotherm.model.to_dict())
-            }
-        )
+        cursor.execute(sql_insert, {'iso_id': iso_id, 'type': 'model', 'dtype': "dict", 'data': json.dumps(isotherm.model.to_dict())})
 
     if verbose:
         # Print success
@@ -1002,7 +922,6 @@ def isotherms_from_db(
     list
         list of Isotherms
     """
-
     cursor = kwargs['cursor']
 
     # Default value
@@ -1015,62 +934,41 @@ def isotherms_from_db(
     alldata = cursor.fetchall()
 
     for rows in grouped(alldata, 100):  # we are taking 100 isotherms at a time
-
         ids = tuple(row['id'] for row in rows)
 
         # Get isotherm properties from database
         cursor.execute(
             f"""SELECT iso_id, type, value FROM "isotherm_properties"
-                WHERE iso_id IN ({','.join('?' * len(ids))});""", ids
+                WHERE iso_id IN ({','.join('?' * len(ids))});""",
+            ids,
         )
         isotherm_props = cursor.fetchall()
 
         # Get the properties from the data table
         cursor.execute(
             f"""SELECT iso_id, type, dtype, data FROM "isotherm_data"
-                WHERE iso_id IN ({','.join('?' * len(ids))});""", ids
+                WHERE iso_id IN ({','.join('?' * len(ids))});""",
+            ids,
         )
         isotherm_data = cursor.fetchall()
 
         for row in rows:
-
             # Generate the isotherm parameters dictionary
             iso_params = dict(zip(row.keys(), row))
-            iso_params.update({
-                prop[1]: check_SQL_bool(prop[2])
-                for prop in isotherm_props
-                if prop["iso_id"] == row['id']
-            })
+            iso_params.update({prop[1]: check_SQL_bool(prop[2]) for prop in isotherm_props if prop["iso_id"] == row['id']})
             iso_params.pop('id')
 
             # Generate the isotherm data/model
             if row['iso_type'] == 'pointisotherm':
-
-                iso_data = pandas.DataFrame({
-                    data["type"]: json.loads(data["data"])
-                    for data in isotherm_data
-                    if data["iso_id"] == row['id']
-                })
+                iso_data = pandas.DataFrame(
+                    {data["type"]: json.loads(data["data"]) for data in isotherm_data if data["iso_id"] == row['id']}
+                )
 
                 # build isotherm object
-                isotherms.append(
-                    PointIsotherm(
-                        isotherm_data=iso_data,
-                        pressure_key="pressure",
-                        loading_key="loading",
-                        **iso_params
-                    )
-                )
+                isotherms.append(PointIsotherm(isotherm_data=iso_data, pressure_key="pressure", loading_key="loading", **iso_params))
 
             elif row['iso_type'] == 'modelisotherm':
-
-                iso_model = model_from_dict(
-                    next(
-                        json.loads(data['data'])
-                        for data in isotherm_data
-                        if data["iso_id"] == row['id']
-                    )
-                )
+                iso_model = model_from_dict(next(json.loads(data['data']) for data in isotherm_data if data["iso_id"] == row['id']))
 
                 # build isotherm object
                 isotherms.append(ModelIsotherm(model=iso_model, **iso_params))
@@ -1105,23 +1003,16 @@ def isotherm_delete_db(
     verbose : bool
         Extra information printed to console.
     """
-
     if isinstance(iso_id, BaseIsotherm):
         iso_id = iso_id.iso_id
 
     cursor = kwargs['cursor']
 
     # Check if isotherm exists
-    ids = cursor.execute(
-        build_select(table='isotherms', to_select=['id'], where=['id']), {
-            'id': iso_id
-        }
-    ).fetchone()
+    ids = cursor.execute(build_select(table='isotherms', to_select=['id'], where=['id']), {'id': iso_id}).fetchone()
 
     if ids is None:
-        raise sqlite3.IntegrityError(
-            "Isotherm to delete does not exist in database. Did you modify any parameters?"
-        )
+        raise sqlite3.IntegrityError("Isotherm to delete does not exist in database. Did you modify any parameters?")
 
     # Delete data from isotherm_data table
     cursor.execute(build_delete(table='isotherm_data', where=['iso_id']), {'iso_id': iso_id})
@@ -1248,7 +1139,7 @@ def isotherm_property_type_to_db(
     **kwargs: dict,
 ):
     """
-    Uploads a property type.
+    Upload a property type.
 
     The type_dict takes the form of::
 

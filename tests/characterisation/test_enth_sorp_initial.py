@@ -24,7 +24,7 @@ from .conftest import DATA_CALO
 
 
 @pytest.mark.characterisation
-class TestInitialEnthalpyPoint():
+class TestInitialEnthalpyPoint:
     """Test point initial enthalpy methods."""
 
     def test_ienthalpy_point_checks(self, basic_pointisotherm):
@@ -57,7 +57,7 @@ class TestInitialEnthalpyPoint():
 
 
 @pytest.mark.characterisation
-class TestInitialEnthalpyFit():
+class TestInitialEnthalpyFit:
     """Test fitting initial enthalpy methods."""
 
     def test_ienthalpy_comp_checks(self, basic_pointisotherm):

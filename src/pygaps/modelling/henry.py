@@ -43,8 +43,8 @@ class Henry(IsothermBaseModel):
     name = 'Henry'
     formula = r"n(p) = K_H p"
     calculates = 'loading'
-    param_names = ("K")
-    param_default_bounds = ((0., numpy.inf), )
+    param_names = "K"
+    param_default_bounds = ((0.0, numpy.inf),)
 
     def loading(self, pressure):
         """
@@ -115,9 +115,7 @@ class Henry(IsothermBaseModel):
         return self.params["K"] * pressure
 
     def toth_correction(self, pressure: float) -> float:
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
 
@@ -135,12 +133,12 @@ class Henry(IsothermBaseModel):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
         return 0

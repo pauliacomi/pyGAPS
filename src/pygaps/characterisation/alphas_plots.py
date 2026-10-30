@@ -1,4 +1,4 @@
-"""This module contains the alpha-s calculation."""
+"""Alpha-s plot calculation."""
 
 from typing import TYPE_CHECKING
 
@@ -28,7 +28,7 @@ def alpha_s(
     branch: str = 'ads',
     branch_ref: str = 'ads',
     t_limits: "tuple[float, float]" = None,
-    verbose: bool = False
+    verbose: bool = False,
 ):
     r"""
     Calculate surface area and pore volume using the alpha-s method.
@@ -144,15 +144,9 @@ def alpha_s(
     """
     # Check to see if reference isotherm is given
     if reference_isotherm is None or not isinstance(reference_isotherm, BaseIsotherm):
-        raise ParameterError(
-            "No reference isotherm for alpha s calculation "
-            "is provided. Must provide an Isotherm instance."
-        )
+        raise ParameterError("No reference isotherm for alpha s calculation is provided. Must provide an Isotherm instance.")
     if reference_isotherm.adsorbate != isotherm.adsorbate:
-        raise ParameterError(
-            "The reference isotherm adsorbate is different than the "
-            "calculated isotherm adsorbate."
-        )
+        raise ParameterError("The reference isotherm adsorbate is different than the calculated isotherm adsorbate.")
     if not 0 < reducing_pressure < 1:
         raise ParameterError("The reducing pressure is outside the bounds of 0-1 p/p0.")
 
@@ -179,8 +173,7 @@ def alpha_s(
             ) from err
     else:
         raise ParameterError(
-            "The reference area should be either a numeric value, 'BET' or 'Langmuir'. "
-            f"The value specified was {reference_area}."
+            f"The reference area should be either a numeric value, 'BET' or 'Langmuir'. The value specified was {reference_area}."
         )
 
     # Get adsorbate properties
@@ -190,10 +183,7 @@ def alpha_s(
 
     # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
-            "loading_basis": "molar",
-            "loading_unit": "mmol"
-        }, {"pressure_mode": "relative"}
+        isotherm, branch, {"loading_basis": "molar", "loading_unit": "mmol"}, {"pressure_mode": "relative"}
     )
 
     # Now for reference isotherm
@@ -241,16 +231,10 @@ def alpha_s(
                 )
 
             from pygaps.graphing.calc_graphs import tp_plot
+
             units = isotherm.units
             units.update({"loading_basis": "molar", "loading_unit": "mmol"})
-            tp_plot(
-                alpha_curve,
-                loading,
-                results,
-                units,
-                alpha_s=True,
-                alpha_reducing_p=reducing_pressure
-            )
+            tp_plot(alpha_curve, loading, results, units, alpha_s=True, alpha_reducing_p=reducing_pressure)
 
     return {
         'alpha_curve': alpha_curve,
@@ -375,10 +359,7 @@ def alpha_s_plot_parameters(
     liquid_density: float,
 ):
     """Get the parameters for the linear region of the alpha-s plot."""
-
-    slope, intercept, corr_coef, p, stderr = stats.linregress(
-        alpha_curve[section], loading[section]
-    )
+    slope, intercept, corr_coef, p, stderr = stats.linregress(alpha_curve[section], loading[section])
 
     # Check if slope is good
 

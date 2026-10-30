@@ -47,10 +47,7 @@ def _check_unit(unit, units, utype):
     if not unit:
         raise ParameterError("Specify units to convert.")
     if unit not in units:
-        raise ParameterError(
-            f"Unit selected for {utype} ({unit}) is not an option. "
-            f"Viable units are {list(units.keys())}"
-        )
+        raise ParameterError(f"Unit selected for {utype} ({unit}) is not an option. Viable units are {list(units.keys())}")
 
 
 def c_unit(unit_list, value, unit_from, unit_to, sign=1):
@@ -82,5 +79,4 @@ def c_unit(unit_list, value, unit_from, unit_to, sign=1):
     """
     _check_unit(unit_to, unit_list, 'conversion')
     _check_unit(unit_from, unit_list, 'conversion')
-    return value * \
-        (unit_list[unit_from] / unit_list[unit_to]) ** sign
+    return value * (unit_list[unit_from] / unit_list[unit_to]) ** sign

@@ -2,7 +2,8 @@
 Installation
 ============
 
-pyGAPS is made for modern versions of Python, currently requiring at least Python 3.7.
+pyGAPS is made for modern versions of Python, currently requiring at least
+Python 3.10.
 
 Command line
 ============
@@ -20,7 +21,7 @@ managing environments a breeze. To create a new environment with pyGAPS:
 
     conda create -n myenv python=3.14
     conda activate myenv
-    conda install pygaps
+    conda install -c conda-forge pygaps
 
 To install the development branch, clone the repository from Github. Then
 install the package, in regular or editable mode
@@ -47,7 +48,8 @@ The main packages that pyGAPS depends on are
   properties calculation (can also be connected to
   `REFPROP <https://www.nist.gov/srd/refprop>`__ if locally available).
 - `gemmi` for parsing AIF files.
-- `xlrd`, `xlwt`, `openpyxl` for parsing to and from Excel files.
+- `openpyxl` for reading and writing Excel (``.xlsx``) files and `xlrd` for
+  reading legacy ``.xls`` files.
 - `requests`, for communicating with the NIST ISODB.
 
 The `pyIAST <https://github.com/CorySimon/pyIAST>`__ package used to be a
@@ -56,4 +58,3 @@ info about pyIAST can be found in the manuscript:
 
  \C. Simon, B. Smit, M. Haranczyk. pyIAST: Ideal Adsorbed Solution
  Theory (IAST) Python Package. Computer Physics Communications. (2015)
-

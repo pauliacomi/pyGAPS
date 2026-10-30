@@ -27,7 +27,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestPSDKernel():
+class TestPSDKernel:
     """Test pore size distribution calculation."""
 
     def test_psd_dft_checks(self, basic_pointisotherm):
@@ -40,9 +40,12 @@ class TestPSDKernel():
         with pytest.raises(pgEx.ParameterError):
             psdk.psd_dft(basic_pointisotherm, branch='test')
 
-    @pytest.mark.parametrize('kernel', [
-        'DFT-N2-77K-carbon-slit',
-    ])
+    @pytest.mark.parametrize(
+        'kernel',
+        [
+            'DFT-N2-77K-carbon-slit',
+        ],
+    )
     @pytest.mark.parametrize('sample', DATA.values())
     def test_psd_dft(self, sample, kernel, data_char_path):
         """Test psd calculation with several model isotherms"""

@@ -1,6 +1,7 @@
 """
-Module contains methods of calculating a pore size distribution starting from a DFT
-kernel. Please note that calculation of DFT/NLDFT/QSDFT kernels is outside the
+Methods of calculating a pore size distribution starting from a DFT kernel.
+
+Please note that calculation of DFT/NLDFT/QSDFT kernels is outside the
 scope of this program.
 """
 
@@ -31,7 +32,7 @@ def psd_dft(
     p_limits: "tuple[float, float]" = None,
     kernel_units: dict = None,
     bspline_order: int = 2,
-    verbose: bool = False
+    verbose: bool = False,
 ):
     """
     Calculate the pore size distribution using a DFT kernel from an Isotherm.
@@ -137,9 +138,7 @@ def psd_dft(
     """
     # Check kernel
     if kernel is None:
-        raise ParameterError(
-            "An existing kernel name or a path to a user kernel to be used must be specified."
-        )
+        raise ParameterError("An existing kernel name or a path to a user kernel to be used must be specified.")
 
     # Get an internal kernel, otherwise assume it is a path
     kernel_path = KERNELS.get(kernel, kernel)
@@ -157,15 +156,18 @@ def psd_dft(
 
     # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
-        isotherm, branch, {
+        isotherm,
+        branch,
+        {
             "loading_basis": loading_basis,
             "loading_unit": loading_unit,
             "material_basis": material_basis,
             "material_unit": material_unit,
-        }, {
+        },
+        {
             "pressure_mode": pressure_mode,
             "pressure_unit": pressure_unit,
-        }
+        },
     )
 
     # select the maximum and minimum of the points and the pressure associated
@@ -181,12 +183,9 @@ def psd_dft(
     if p_limits[1]:
         maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
     if maximum - minimum < 2:  # (for 3 point minimum)
-        raise CalculationError(
-            "The isotherm does not have enough points (at least 3) "
-            "in the selected region."
-        )
-    pressure = pressure[minimum:maximum + 1]
-    loading = loading[minimum:maximum + 1]
+        raise CalculationError("The isotherm does not have enough points (at least 3) in the selected region.")
+    pressure = pressure[minimum : maximum + 1]
+    loading = loading[minimum : maximum + 1]
 
     # Call the DFT function
     (
@@ -214,10 +213,12 @@ def psd_dft(
             'pressure_unit': pressure_unit,
         }
         from pygaps.graphing.isotherm_graphs import plot_iso
+
         ax = plot_iso(isotherm, **params)
         ax.plot(pressure, kernel_final_loading, 'r-')
         ax.set_title('DFT Fit')
         from pygaps.graphing.calc_graphs import psd_plot
+
         psd_plot(
             pore_widths,
             pore_dist,
@@ -293,8 +294,7 @@ def psd_dft_kernel_fit(
         kernel_points = numpy.asarray([kernel[size](pressure) for size in kernel])
     except ValueError as err:
         raise CalculationError(
-            "Could not get kernel values at isotherm points. "
-            "Does your kernel pressure range apply to this isotherm?"
+            "Could not get kernel values at isotherm points. Does your kernel pressure range apply to this isotherm?"
         ) from err
     pore_widths = numpy.asarray(list(kernel.keys()), dtype='float64')
 
@@ -302,32 +302,28 @@ def psd_dft_kernel_fit(
     def kernel_loading(pore_dist):
         return numpy.multiply(
             kernel_points,
-            pore_dist[:, numpy.newaxis]  # -> multiply each loading with its contribution
+            pore_dist[:, numpy.newaxis],  # -> multiply each loading with its contribution
         ).sum(axis=0)  # -> add the contributions together at each pressure
 
     def sum_squares(pore_dist):
         return numpy.square(  # -> square the difference
             numpy.subtract(  # -> between calculated and isotherm
-                kernel_loading(pore_dist),
-                loading)).sum(axis=0)  # -> then sum the squares together
+                kernel_loading(pore_dist), loading
+            )
+        ).sum(axis=0)  # -> then sum the squares together
 
     # define the constraints (x>0)
-    cons = [{
-        'type': 'ineq',
-        'fun': lambda x: x,
-    }]
+    cons = [
+        {
+            'type': 'ineq',
+            'fun': lambda x: x,
+        }
+    ]
 
     # # run the optimisation algorithm
     guess = numpy.array([0 for pore in pore_widths])
     bounds = [(0, None) for pore in pore_widths]
-    result = optimize.minimize(
-        sum_squares,
-        guess,
-        method='SLSQP',
-        bounds=bounds,
-        constraints=cons,
-        options={'ftol': 1e-04}
-    )
+    result = optimize.minimize(sum_squares, guess, method='SLSQP', bounds=bounds, constraints=cons, options={'ftol': 1e-04})
 
     if not result.success:
         raise CalculationError(f"Minimization of DFT failed with error: {result.message}")
@@ -369,20 +365,20 @@ def _load_kernel(path: str):
         raw_kernel = pandas.read_csv(fp, index_col=0)
 
     # add a 0 in the dataframe for interpolation between lowest values
-    raw_kernel = pandas.concat([
-        pandas.DataFrame(
-            [[0 for col in raw_kernel.columns]],
-            index=[0],
-            columns=raw_kernel.columns,
-        ),
-        raw_kernel,
-    ])
+    raw_kernel = pandas.concat(
+        [
+            pandas.DataFrame(
+                [[0 for col in raw_kernel.columns]],
+                index=[0],
+                columns=raw_kernel.columns,
+            ),
+            raw_kernel,
+        ]
+    )
 
     kernel = {}
     for pore_size in raw_kernel:
-        interpolator = interpolate.interp1d(
-            raw_kernel[pore_size].index, raw_kernel[pore_size].values, kind='cubic'
-        )
+        interpolator = interpolate.interp1d(raw_kernel[pore_size].index, raw_kernel[pore_size].values, kind='cubic')
 
         kernel.update({pore_size: interpolator})
 

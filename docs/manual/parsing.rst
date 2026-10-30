@@ -196,8 +196,12 @@ Excel parsing
 -------------
 
 The isotherms can also be imported or exported in an Excel format, if required.
-This is done with the help of the ``xlrd``/``xlwt`` python packages. An example
-excel isotherm can be found :download:`here <../files/isotherm.xls>`.
+Files are written in the ``.xlsx`` format using the ``openpyxl`` package.
+Legacy ``.xls`` files can still be read (through ``xlrd``), but no longer
+written: if an export path ends in ``.xls``, the isotherm is saved as ``.xlsx``
+instead and a warning is raised. Floating point values are stored with 16
+significant digits, so very small differences can occur after a round-trip. An
+example excel isotherm can be found :download:`here <../files/isotherm.xlsx>`.
 
 The framework provides two functions for Excel files:
 
@@ -213,17 +217,17 @@ path where the file should be created.
     import pygaps.parsing as pgp
 
     # export the isotherm
-    pgp.isotherm_to_xl(my_isotherm, 'path/to/file.xls')
+    pgp.isotherm_to_xl(my_isotherm, 'path/to/file.xlsx')
 
     # or for convenience
-    my_isotherm.to_xl('path/to/file.xls')
+    my_isotherm.to_xl('path/to/file.xlsx')
 
 To parse an Excel file as an isotherm, use the *from* function.
 
 .. code:: python
 
     import pygaps.parsing as pgp
-    my_isotherm = pgp.isotherm_from_xl('path/to/file.xls')
+    my_isotherm = pgp.isotherm_from_xl('path/to/file.xlsx')
 
 For more info about Excel parsing, check out the :mod:`~pygaps.parsing.excel`
 module reference.

@@ -16,9 +16,9 @@ def enthalpy_sorption_clapeyron(
     verbose: bool = False,
 ):
     r"""
+    Calculate the isosteric enthalpy of adsorption (in kJ/mol) using the Clausius-Clapeyron equation.
 
-    Calculate the isosteric enthalpy of adsorption (in kJ/mol) by applying the
-    Clausius-Clapeyron equation to several isotherms recorded at different
+    The equation is applied to several isotherms recorded at different
     temperatures on the same material.
 
     Parameters
@@ -142,6 +142,7 @@ def enthalpy_sorption_clapeyron(
 
     if verbose:
         from pygaps.graphing.calc_graphs import isosteric_enthalpy_plot
+
         isosteric_enthalpy_plot(
             loading,
             iso_enthalpy,
@@ -162,9 +163,7 @@ def isosteric_enthalpy_raw(
     pressures: list,
     temperatures: list,
 ):
-    """
-    Calculate the isosteric enthalpy of adsorption using several isotherms
-    recorded at different temperatures on the same material.
+    """Calculate the isosteric enthalpy of adsorption using several isotherms recorded at different temperatures on the same material.
 
     This is a 'bare-bones' function to calculate isosteric enthalpy which is
     designed as a low-level alternative to the main function.
@@ -198,9 +197,7 @@ def isosteric_enthalpy_raw(
     """
     # Check same lengths
     if len(pressures[0]) != len(temperatures):
-        raise ParameterError(
-            "There are a different number of pressure points than temperature points"
-        )
+        raise ParameterError("There are a different number of pressure points than temperature points")
 
     # Convert to numpy arrays, just in case
     pressures = numpy.asarray(pressures)
@@ -217,7 +214,6 @@ def isosteric_enthalpy_raw(
 
     # Calculate enthalpy for each point by a linear fit
     for log_p in log_pressures:
-
         slope, intercept, corr_coef, p, std_err = stats.linregress(inv_t, log_p)
 
         iso_enth.append(-constants.gas_constant * slope / 1000)

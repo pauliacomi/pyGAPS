@@ -15,8 +15,7 @@ loading = np.linspace(0.1, 20, 100)
 
 
 @pytest.mark.characterisation
-class TestWhittakerEnthalpy():
-
+class TestWhittakerEnthalpy:
     @pytest.mark.parametrize('testdata', DATA_WHITTAKER.values())
     def test_whittaker_point(self, testdata, data_whittaker_path):
         """Whittaker method with PointIsotherm"""
@@ -61,13 +60,7 @@ class TestWhittakerEnthalpy():
             model_isotherms[model] = model_isotherm
 
         with pytest.raises(KeyError):
-            we.enthalpy_sorption_whittaker(
-                isotherm=model_isotherms['Henry'],
-                loading=loading
-            )
+            we.enthalpy_sorption_whittaker(isotherm=model_isotherms['Henry'], loading=loading)
 
         for model in pgm._WHITTAKER_MODELS:
-            we.enthalpy_sorption_whittaker(
-                isotherm=model_isotherms[model],
-                loading=loading
-            )
+            we.enthalpy_sorption_whittaker(isotherm=model_isotherms[model], loading=loading)

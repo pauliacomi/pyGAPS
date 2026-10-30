@@ -76,7 +76,7 @@ def convert_unit_ltx(string: str, negative: bool = False) -> str:
             if i == ")":
                 result += '}'
                 continue
-        result += (i)
+        result += i
 
     if number_processing:
         result += '}'

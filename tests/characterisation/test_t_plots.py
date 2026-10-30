@@ -24,7 +24,7 @@ from .conftest import DATA
 
 
 @pytest.mark.characterisation
-class TestTPlot():
+class TestTPlot:
     """Tests t-plot calculations."""
 
     def test_t_plot_checks(self, use_adsorbate, basic_pointisotherm):
@@ -57,12 +57,7 @@ class TestTPlot():
             err_relative,
             err_absolute_volume,
         )
-        assert isclose(
-            results[0].get('area'),
-            sample['t_area'],
-            err_relative,
-            err_absolute_area
-        )
+        assert isclose(results[0].get('area'), sample['t_area'], err_relative, err_absolute_area)
 
     def test_t_plot_choice(self, data_char_path):
         """Test choice of points."""

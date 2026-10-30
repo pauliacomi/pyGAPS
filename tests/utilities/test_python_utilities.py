@@ -7,7 +7,7 @@ import pytest
 import pygaps.utilities as util
 
 
-# yapf: disable
+# fmt: off
 @pytest.mark.utilities
 @pytest.mark.parametrize(
     "source, overrides, res",
@@ -23,4 +23,4 @@ import pygaps.utilities as util
 def test_deep_merge(source, overrides, res):
     util.python_utilities.deep_merge(source, overrides)
     assert source == res
-# yapf: enable
+# fmt: on

@@ -55,12 +55,12 @@ class DSToth(IsothermBaseModel):
     calculates = 'loading'
     param_names = ("n_m1", "K1", "t1", "n_m2", "K2", "t2")
     param_default_bounds = (
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
-        (0., numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
+        (0.0, numpy.inf),
     )
 
     def loading(self, pressure):
@@ -81,8 +81,9 @@ class DSToth(IsothermBaseModel):
         K2p = self.params["K2"] * pressure
         t1 = self.params['t1']
         t2 = self.params['t2']
-        return (((self.params['n_m1'] * K1p) / (1.0 + (K1p)**t1)**(1 / t1)) +
-                ((self.params['n_m2'] * K2p) / (1.0 + (K2p)**t2)**(1 / t2)))
+        return ((self.params['n_m1'] * K1p) / (1.0 + (K1p) ** t1) ** (1 / t1)) + (
+            (self.params['n_m2'] * K2p) / (1.0 + (K2p) ** t2) ** (1 / t2)
+        )
 
     def pressure(self, loading):
         """
@@ -101,6 +102,7 @@ class DSToth(IsothermBaseModel):
         float
             Pressure at specified loading.
         """
+
         def fun(x):
             return self.loading(x) - loading
 
@@ -140,9 +142,7 @@ class DSToth(IsothermBaseModel):
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def toth_correction(self, pressure):
-        r"""
-        Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption
-        potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
 
         .. math::
             \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
@@ -159,43 +159,31 @@ class DSToth(IsothermBaseModel):
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
-        ---------
+        ----------
         pressure : float
             The pressure at which to calculate the T\'oth correction
 
         Returns
-        ------
+        -------
             The T\'oth correction, $\Psi$
         """
-
         nm1K1 = self.params["n_m1"] * self.params["K1"]
-        K1Pt1 = (self.params["K1"] * pressure)**self.params["t1"]
+        K1Pt1 = (self.params["K1"] * pressure) ** self.params["t1"]
         nm2K2 = self.params["n_m2"] * self.params["K2"]
-        K2Pt2 = (self.params["K2"] * pressure)**self.params["t2"]
+        K2Pt2 = (self.params["K2"] * pressure) ** self.params["t2"]
         invt1 = 1 / self.params["t1"]
         invt2 = 1 / self.params["t2"]
 
-        n_P = (
-            (nm1K1 / ((1 + K1Pt1)**invt1)) +
-            (nm2K2 / ((1 + K2Pt2)**invt2))
-        )
+        n_P = (nm1K1 / ((1 + K1Pt1) ** invt1)) + (nm2K2 / ((1 + K2Pt2) ** invt2))
 
         def dn_dP_singlesite(nm, K, t):
-            Kpt = (K * pressure)**t
+            Kpt = (K * pressure) ** t
             nmK = nm * K
-            return nmK / ((1 + Kpt)**((t + 1) / t))
+            return nmK / ((1 + Kpt) ** ((t + 1) / t))
 
         dP_dn = 1 / (
-            dn_dP_singlesite(
-                self.params["n_m1"],
-                self.params["K1"],
-                self.params["t1"]
-            ) +
-            dn_dP_singlesite(
-                self.params["n_m2"],
-                self.params["K2"],
-                self.params["t2"]
-            )
+            dn_dP_singlesite(self.params["n_m1"], self.params["K1"], self.params["t1"])
+            + dn_dP_singlesite(self.params["n_m2"], self.params["K2"], self.params["t2"])
         )
 
         return (n_P * dP_dn) - 1

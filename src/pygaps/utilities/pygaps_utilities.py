@@ -1,3 +1,5 @@
+"""Helper functions used internally across pyGAPS."""
+
 from pygaps.utilities.exceptions import ParameterError
 
 
@@ -7,10 +9,7 @@ def get_iso_loading_and_pressure_ordered(
     loading_units: dict,
     pressure_units: dict,
 ):
-    """
-    Return loading and pressure given branch and units.
-    """
-
+    """Return loading and pressure given branch and units."""
     # Read data in
     loading = isotherm.loading(
         branch=branch,

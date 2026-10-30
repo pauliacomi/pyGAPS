@@ -1,4 +1,5 @@
 """Test sqlite utilities."""
+
 import pytest
 
 import pygaps.utilities.sqlite_utilities as squ

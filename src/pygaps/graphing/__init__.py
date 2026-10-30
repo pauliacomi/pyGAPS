@@ -1,5 +1,5 @@
 # pylint: disable=W0614,W0401,W0611,W0622
-# flake8: noqa
 # isort:skip_file
+"""Plotting functions for isotherms and characterisation results."""
 
 from .isotherm_graphs import plot_iso

@@ -11,7 +11,7 @@ from .conftest import DATA_WHITTAKER_PATH
 
 
 @pytest.mark.prediction
-class TestETI():
+class TestETI:
     """Test functions in enthalpy_to_isotherm"""
 
     @pytest.mark.parametrize('testdata', [ex for ex in DATA_WHITTAKER.values()])
@@ -21,13 +21,13 @@ class TestETI():
 
         # Raises 'no enthalpy error'
         with pytest.raises(pgEx.ParameterError):
-            eti.predict_isotherm_from_enthalpy_clapeyron(
-                isotherm=isotherm, temperature_prediction=300
-            )
+            eti.predict_isotherm_from_enthalpy_clapeyron(isotherm=isotherm, temperature_prediction=300)
 
         # Raises 'incomplete isosteric enthalpy dictionary'
         for necessary_key in ['loading', 'isosteric_enthalpy']:
-            isosteric_enthalpy_dictionary = {necessary_key: [], }
+            isosteric_enthalpy_dictionary = {
+                necessary_key: [],
+            }
             with pytest.raises(pgEx.ParameterError):
                 eti.predict_isotherm_from_enthalpy_clapeyron(
                     isotherm=isotherm,
@@ -39,10 +39,7 @@ class TestETI():
         with pytest.raises(pgEx.ParameterError):
             loading = isotherm.loading()
             enthalpy = [1 for n in loading[:-1]]
-            isosteric_enthalpy_dictionary = {
-                'loading': loading,
-                'isosteric_enthalpy': enthalpy
-            }
+            isosteric_enthalpy_dictionary = {'loading': loading, 'isosteric_enthalpy': enthalpy}
             eti.predict_isotherm_from_enthalpy_clapeyron(
                 isotherm=isotherm,
                 temperature_prediction=300,
@@ -53,14 +50,9 @@ class TestETI():
         with pytest.raises(pgEx.ParameterError):
             loading = isotherm.loading()
             enthalpy = [1 for n in loading]
-            isosteric_enthalpy_dictionary = {
-                'loading': loading,
-                'isosteric_enthalpy': enthalpy
-            }
+            isosteric_enthalpy_dictionary = {'loading': loading, 'isosteric_enthalpy': enthalpy}
             eti.predict_isosurface_from_enthalpy_clapeyron(
-                isotherm=isotherm,
-                isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
-                branch=None
+                isotherm=isotherm, isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary, branch=None
             )
 
         pressure = np.linspace(1, 1000, 5)
@@ -92,7 +84,7 @@ class TestETI():
             isosteric_enthalpy=testdata['enthalpy'],
             temperature_prediction=testdata['T_predict'],
             temperature_current=testdata['T_experiment'],
-            pressure_current=testdata['P_experiment']
+            pressure_current=testdata['P_experiment'],
         )
         ref_pressure = testdata['P_predict']
         assert np.isclose(res_pressure, ref_pressure)
@@ -115,8 +107,5 @@ class TestETI():
             temperature_prediction=isotherm.temperature,
             isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
         )
-        for p_original, p_predict in zip(
-            isotherm.pressure(),
-            predicted_isotherm.pressure()
-        ):
+        for p_original, p_predict in zip(isotherm.pressure(), predicted_isotherm.pressure()):
             assert np.isclose(p_original, p_predict)

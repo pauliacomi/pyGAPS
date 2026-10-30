@@ -55,14 +55,11 @@ def isotherm_to_json(isotherm, path=None, **args_to_json):
 
     # Isotherm data
     if isinstance(isotherm, PointIsotherm):
-
         # we turn the raw dataframe into a dictionary
         isotherm_data_dict = isotherm.data_raw.to_dict(orient='index')
 
         def process_data(value):
-            """
-            Specifically mark only the desorption branch.
-            """
+            """Specifically mark only the desorption branch."""
             if value.get('branch', 0) == 0:
                 del value['branch']
             else:
@@ -128,10 +125,7 @@ def isotherm_from_json(
         try:
             raw_dict = json.loads(str_or_path)
         except Exception as err:
-            raise ParsingError(
-                "Could not parse JSON isotherm. "
-                "The `str_or_path` is invalid or does not exist. "
-            ) from err
+            raise ParsingError("Could not parse JSON isotherm. The `str_or_path` is invalid or does not exist. ") from err
 
     # version check
     version = raw_dict.pop("file_version", None)
@@ -166,10 +160,7 @@ def isotherm_from_json(
 
         # process isotherm branches if they exist
         if 'branch' in data.columns:
-            data['branch'] = data['branch'].fillna('0').replace({
-                'ads': '0',
-                'des': '1'
-            }).astype(int)
+            data['branch'] = data['branch'].fillna('0').replace({'ads': '0', 'des': '1'}).astype(int)
         else:
             raw_dict['branch'] = 'guess'
 
@@ -196,7 +187,6 @@ def isotherm_from_json(
 
 def _from_json_nist(raw_dict):
     """Convert a NIST dictionary format to an internal format."""
-
     nist_dict = {}
 
     # Get regular isotherm parameters
@@ -252,21 +242,22 @@ def _from_json_nist(raw_dict):
     nist_dict['iso_ref'] = raw_dict.pop('isotherm_type')  # excess/absolute
     nist_dict.update(raw_dict)
 
-    nist_dict.update({
-        'material_basis': material_basis,
-        'material_unit': material_unit,
-        'loading_basis': loading_basis,
-        'loading_unit': loading_unit,
-        'pressure_mode': pressure_mode,
-        'pressure_unit': pressure_unit,
-    })
+    nist_dict.update(
+        {
+            'material_basis': material_basis,
+            'material_unit': material_unit,
+            'loading_basis': loading_basis,
+            'loading_unit': loading_unit,
+            'pressure_mode': pressure_mode,
+            'pressure_unit': pressure_unit,
+        }
+    )
 
     return nist_dict
 
 
 def _from_data_nist(data_raw):
     """Convert a NIST data format to an internal format."""
-
     for point in data_raw:
         point.pop('species_data')
 
