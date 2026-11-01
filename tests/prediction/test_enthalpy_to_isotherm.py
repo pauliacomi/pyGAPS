@@ -85,6 +85,37 @@ def test_prediction_embedded_enthalpy_uses_selected_branch(isotherm_parameters, 
 
 
 @pytest.mark.prediction
+def test_isosurface_accepts_native_units_and_celsius():
+    isotherm = pygaps.PointIsotherm(
+        pressure=[1, 2, 3],
+        loading=[1, 2, 3],
+        branch='ads',
+        material='prediction-test',
+        adsorbate='nitrogen',
+        temperature=26.85,
+        temperature_unit='\u00b0C',
+        pressure_mode='absolute',
+        pressure_unit='bar',
+        loading_basis='molar',
+        loading_unit='mol',
+        material_basis='mass',
+        material_unit='g',
+    )
+    grid = eti.predict_isosurface_from_enthalpy_clapeyron(
+        isotherm,
+        temperatures_prediction=[300],
+        pressures_prediction=[1e5, 2e5, 3e5],
+        isosteric_enthalpy_dictionary={'loading': [1, 2, 3], 'isosteric_enthalpy': [20, 20, 20]},
+        verbose=False,
+    )
+    assert grid.shape == (1, 3)
+    assert grid.loc[300, 2e5] == pytest.approx(2000)
+    assert isotherm.temperature == pytest.approx(300)
+    assert isotherm.temperature_unit == '\u00b0C'
+    assert isotherm.to_dict()['temperature'] == pytest.approx(26.85)
+
+
+@pytest.mark.prediction
 class TestETI:
     """Test functions in enthalpy_to_isotherm"""
 

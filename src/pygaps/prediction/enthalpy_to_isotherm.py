@@ -57,7 +57,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
     isosteric_enthalpy_dictionary: dict, optional
         Requires ``loading`` in the input isotherm's loading/material units
         and bases, and ``isosteric_enthalpy`` in kJ/mol (the output of
-        :func:`~pygaps.characterisation.enthalpy_sorption_clapeyron`).
+        :func:`~pygaps.characterisation.enth_sorp_clapeyron.enthalpy_sorption_clapeyron`).
         The existing ``enthalpy_sorption`` key is also accepted. If both keys
         are present their values must agree. Only used if the isotherm has no
         ``enthalpy`` column; that column must also be in kJ/mol.
@@ -229,6 +229,9 @@ def predict_isosurface_from_enthalpy_clapeyron(
         column takes precedence.
     num: int, optional
         The number of steps to use when generating the grid.
+    temperature_range: tuple[float, float], optional
+        Minimum and maximum prediction temperatures in K, used when
+        ``temperatures_prediction`` is not supplied.
     branch: {'ads', 'des', None}, optional
         Branch of the isotherm with which enthalpy is associated. Defaults to
         adsorption.
@@ -238,14 +241,16 @@ def predict_isosurface_from_enthalpy_clapeyron(
     Returns
     -------
     grid: pandas DataFrame
-        Dataframe of predicted loadings as a function of temperature (index)
-        and pressure (columns)
+        Predicted loadings in mol/kg, indexed by temperature in K and with
+        pressure columns in Pa. Values outside each predicted isotherm's
+        pressure range are missing.
     """
     isotherm_local = copy.copy(isotherm)  # avoid mutating the original isotherm
     isotherm_local.convert(
         pressure_unit='Pa',
         pressure_mode='absolute',
     )
+    isotherm_local.convert_temperature(unit_to='K')
     temperature_current = isotherm_local.temperature
 
     if branch is None:
@@ -304,9 +309,9 @@ def predict_isosurface_from_enthalpy_clapeyron(
             grid,
             original_temperature=isotherm_local.temperature,
             units={
-                'temperature': isotherm_local.temperature_unit,
-                'loading': isotherm_local.loading_unit,
-                'material': isotherm_local.material_unit,
+                'temperature': 'K',
+                'loading': 'mol',
+                'material': 'kg',
             },
         )
         plt.show()
