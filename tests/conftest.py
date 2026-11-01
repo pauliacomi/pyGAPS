@@ -2,12 +2,22 @@
 Configuration file for pytest and commonly used fixtures
 """
 
+import os
 from pathlib import Path
+
+os.environ['MPLBACKEND'] = 'Agg'
+
+import matplotlib
+
+matplotlib.use('Agg')
 
 import pandas
 import pytest
 
 import pygaps
+
+from .test_utils import isolated_pygaps_state
+from .test_utils import registered_object
 
 DATA_PATH = Path(__file__).parent / 'test_data'
 
@@ -15,6 +25,39 @@ DATA_PATH = Path(__file__).parent / 'test_data'
 def pytest_configure(config):
     """Set global variables for pytest."""
     config.DATA_PATH = DATA_PATH
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        '--reverse-independent',
+        action='store_true',
+        help='Reverse independent test order; exclude tests/parsing/test_sqlite_db.py and run it separately.',
+    )
+
+
+@pytest.fixture(autouse=True)
+def isolate_global_state():
+    with isolated_pygaps_state():
+        yield
+
+
+@pytest.hookimpl(wrapper=True, tryfirst=True)
+def pytest_collection_modifyitems(config, items):
+    yield
+    reverse = config.getoption('reverse_independent')
+    if reverse:
+        items.reverse()
+    scenario = [item for item in items if item.path == DATA_PATH.parent / 'parsing' / 'test_sqlite_db.py']
+    if not scenario:
+        return
+    if reverse:
+        raise pytest.UsageError('Exclude the shared SQLite scenario when using --reverse-independent; run it separately.')
+    if config.getoption('numprocesses', default=0) or hasattr(config, 'workerinput'):
+        raise pytest.UsageError('The shared SQLite scenario must run serially, without distributed scheduling.')
+    declaration_order = [name for name in vars(scenario[0].cls) if name.startswith('test_')]
+    selected_order = [item.originalname for item in scenario]
+    if selected_order != [name for name in declaration_order if name in selected_order]:
+        raise pytest.UsageError('The shared SQLite scenario must retain its declared step order; reorder independent tests separately.')
 
 
 # Global fixtures
@@ -109,12 +152,11 @@ def basic_material(material_data):
 @pytest.fixture(scope='function')
 def use_material(basic_material):
     """Upload basic material to global list."""
-    pygaps.MATERIAL_LIST.append(basic_material)
-    yield
-    pygaps.MATERIAL_LIST.pop()
+    with registered_object(pygaps.MATERIAL_LIST, basic_material):
+        yield
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def adsorbate_data():
     """Create a dict with all data for an model adsorbate."""
     return {
@@ -153,6 +195,5 @@ def basic_adsorbate(adsorbate_data):
 @pytest.fixture(scope='function')
 def use_adsorbate(basic_adsorbate):
     """Upload basic adsorbate to global list."""
-    pygaps.ADSORBATE_LIST.append(basic_adsorbate)
-    yield
-    pygaps.ADSORBATE_LIST.pop()
+    with registered_object(pygaps.ADSORBATE_LIST, basic_adsorbate):
+        yield
