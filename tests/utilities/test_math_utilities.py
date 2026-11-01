@@ -21,9 +21,13 @@ pytestmark = pytest.mark.utilities
         ([1, 3, 3, 2], [0, 0, 1, 1]),
     ],
 )
-@pytest.mark.parametrize('shifted_index', [False, True])
-def test_split_ads_data(pressure, expected, shifted_index):
-    index = numpy.arange(len(pressure)) * 10 + 10 if shifted_index else None
+@pytest.mark.parametrize('index_kind', ['default', 'shifted', 'duplicate'])
+def test_split_ads_data(pressure, expected, index_kind):
+    index = None
+    if index_kind == 'shifted':
+        index = numpy.arange(len(pressure)) * 10 + 10
+    elif index_kind == 'duplicate':
+        index = ['row'] * len(pressure)
     data = pandas.DataFrame({'p': pressure}, index=index)
     original = data.copy(deep=True)
     result = math.split_ads_data(data, 'p')
@@ -32,15 +36,16 @@ def test_split_ads_data(pressure, expected, shifted_index):
     pandas.testing.assert_frame_equal(data, original)
 
 
-@pytest.mark.xfail(reason='P1-7: descending branch detection mixes positional and label indexes', strict=True, raises=AssertionError)
-def test_split_ads_data_descending():
-    result = math.split_ads_data(pandas.DataFrame({'p': [3, 2, 1]}), 'p')
+@pytest.mark.parametrize('index', [None, [1, 2, 3], ['same', 'same', 'other']])
+def test_split_ads_data_descending(index):
+    result = math.split_ads_data(pandas.DataFrame({'p': [3, 2, 1]}, index=index), 'p')
     numpy.testing.assert_array_equal(result, [1, 1, 1])
 
 
-def test_split_ads_data_descending_shifted_index():
-    data = pandas.DataFrame({'p': [3, 2, 1]}, index=[1, 2, 3])
-    numpy.testing.assert_array_equal(math.split_ads_data(data, 'p'), [1, 1, 1])
+@pytest.mark.parametrize('pressure, expected', [([3], [0]), ([1, numpy.nan, 3, 2], [0, 0, 0, 1])])
+def test_split_ads_data_single_point_and_missing(pressure, expected):
+    data = pandas.DataFrame({'p': pressure})
+    numpy.testing.assert_array_equal(math.split_ads_data(data, 'p'), expected)
 
 
 @pytest.mark.parametrize(
@@ -67,14 +72,20 @@ def test_find_limit_indices_insufficient(values, limits):
 
 
 @pytest.mark.parametrize('limits, expected', [((0, None), (5, 9)), ((None, 0), (0, 4))])
-@pytest.mark.xfail(reason='P1-7: zero bounds are ignored by truth-value checks', strict=True, raises=AssertionError)
 def test_find_limit_indices_zero_bound(limits, expected):
     assert math.find_limit_indices(numpy.arange(-5, 5), limits) == expected
 
 
-@pytest.mark.xfail(reason='P1-7: smallest_selection compares index gaps instead of point counts', strict=True, raises=CalculationError)
-def test_find_limit_indices_exact_minimum():
-    assert math.find_limit_indices([1, 2, 3], smallest_selection=3) == (0, 2)
+@pytest.mark.parametrize('minimum', [1, 3, 5])
+def test_find_limit_indices_exact_minimum(minimum):
+    assert math.find_limit_indices(list(range(minimum)), smallest_selection=minimum) == (0, minimum - 1)
+    with pytest.raises(CalculationError, match='Not enough points'):
+        math.find_limit_indices(list(range(minimum - 1)), smallest_selection=minimum)
+
+
+def test_find_limit_indices_duplicate_bounds():
+    values = [0, 1, 1, 2, 3, 3, 4]
+    assert math.find_limit_indices(values, (1, 3)) == (1, 3)
 
 
 @pytest.mark.parametrize('nonuniform', [False, True])
@@ -127,6 +138,7 @@ def test_bspline_degree_zero():
 @pytest.mark.parametrize('degree', [1, 2, 8])
 def test_bspline_open_line(degree):
     result_x, result_y = math.bspline([0, 1, 2], [1, 3, 5], n=17, degree=degree)
+    assert isinstance(result_x, numpy.ndarray) and isinstance(result_y, numpy.ndarray)
     assert result_x.shape == result_y.shape == (17,)
     assert numpy.isfinite(result_x).all() and numpy.isfinite(result_y).all()
     numpy.testing.assert_allclose(result_x, numpy.linspace(0, 2, 17), atol=1e-12)
@@ -145,15 +157,48 @@ def test_bspline_unequal_lengths():
         math.bspline([0, 1], [0])
 
 
-@pytest.mark.xfail(
-    reason='P1-7: periodic spline knot vector exceeds available coefficients (SciPy FITPACK error)',
-    strict=True,
-)
-def test_bspline_periodic_closed_curve():
-    x, y = math.bspline([0, 1, 1, 0], [0, 0, 1, 1], n=25, degree=2, periodic=True)
+@pytest.mark.parametrize('degree', [1, 2, 3])
+def test_bspline_periodic_closed_curve(degree):
+    x, y = math.bspline([0, 1, 1, 0], [0, 0, 1, 1], n=25, degree=degree, periodic=True)
+    assert isinstance(x, numpy.ndarray) and isinstance(y, numpy.ndarray)
     assert x.shape == y.shape == (25,)
     assert numpy.isfinite(x).all() and numpy.isfinite(y).all()
     numpy.testing.assert_allclose([x[0], y[0]], [x[-1], y[-1]], atol=1e-12)
+
+
+@pytest.mark.parametrize('degree', [1, 2, 3, 8])
+def test_bspline_periodic_closure_notation_and_degree(degree):
+    expected = math.bspline([0, 1, 1, 0], [0, 0, 1, 1], n=25, degree=min(degree, 3), periodic=True)
+    actual = math.bspline([0, 1, 1, 0, 0], [0, 0, 1, 1, 0], n=25, degree=degree, periodic=True)
+    numpy.testing.assert_allclose(actual, expected, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    'degree, expected',
+    [
+        (1, [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]),
+        (2, [[0.5, 0], [1, 0.5], [0.5, 1], [0, 0.5], [0.5, 0]]),
+        (3, [[5 / 6, 1 / 6], [5 / 6, 5 / 6], [1 / 6, 5 / 6], [1 / 6, 1 / 6], [5 / 6, 1 / 6]]),
+    ],
+)
+def test_bspline_periodic_uniform_basis(degree, expected):
+    # At integer knots the uniform basis weights are (1), (1/2, 1/2), or (1/6, 4/6, 1/6).
+    x, y = math.bspline([0, 1, 1, 0], [0, 0, 1, 1], n=5, degree=degree, periodic=True)
+    numpy.testing.assert_allclose(numpy.column_stack((x, y)), expected, atol=1e-12)
+
+
+@pytest.mark.parametrize('degree', [2, 3])
+def test_bspline_periodic_tangent_continuity(degree):
+    x, y = math.bspline([0, 1, 1, 0], [0, 0, 1, 1], n=4097, degree=degree, periodic=True)
+    points = numpy.column_stack((x, y))
+    step = 4 / (len(points) - 1)
+    numpy.testing.assert_allclose((points[1] - points[0]) / step, (points[-1] - points[-2]) / step, atol=2e-3)
+
+
+@pytest.mark.parametrize('x, y', [([], []), ([1], [2]), ([1, 1], [2, 2])])
+def test_bspline_periodic_insufficient_points(x, y):
+    with pytest.raises(ParameterError, match='at least two control points'):
+        math.bspline(x, y, periodic=True)
 
 
 @pytest.mark.parametrize('maximum', [1, 10, 100, 101])

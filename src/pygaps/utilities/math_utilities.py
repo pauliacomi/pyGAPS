@@ -1,5 +1,6 @@
 """Function-independent mathematical calculations."""
 
+from collections.abc import Sequence
 from itertools import groupby
 
 import numpy
@@ -9,32 +10,30 @@ from pygaps.utilities.exceptions import ParameterError
 
 
 def split_ads_data(data, pressure_key):
-    """Find the inflection in an adsorption dataset with adsorption/desorption."""
-    # Generate array
+    """Mark adsorption as 0 and desorption as 1, independently of index labels.
+
+    The first maximum belongs to adsorption unless it starts a descending dataset.
+    A single point is treated as adsorption. Missing pressures are skipped when
+    locating the maximum, as in pandas' ``idxmax``.
+    """
     split = numpy.zeros(data.shape[0], dtype=numpy.int8)
-
-    # Get the maximum pressure point (assume where desorption starts)
-    inflexion = data.index.get_loc(data[pressure_key].idxmax()) + 1
-
-    # If the maximum is not the last point
-    if inflexion != len(split):
-        # If the first point is the maximum, then it is purely desorption
-        if inflexion == data.index[0]:
-            inflexion = 0
-
-        # Set all instances after the inflexion point to 1
-        split[inflexion:] = 1
-
-    # Return the new array with the branch column
+    pressure = data[pressure_key].reset_index(drop=True)
+    maximum = pressure.index.get_loc(pressure.idxmax())
+    inflexion = 0 if maximum == 0 and len(split) > 1 else maximum + 1
+    split[inflexion:] = 1
     return split
 
 
 def find_limit_indices(
-    array: list,
-    limits: "tuple[float, float]" = None,
+    array: "Sequence[float] | numpy.ndarray",
+    limits: "tuple[float | None, float | None] | None" = None,
     smallest_selection: int = 3,
 ):
-    """Find the indices of an array limits."""
+    """Return inclusive endpoint indexes for a selection in an ascending array.
+
+    Bounds are lower-inclusive and upper-exclusive; ``None`` leaves a bound open.
+    ``smallest_selection`` is the minimum number of selected points.
+    """
     # select the maximum and minimum of the points
     index_min = 0
     index_max = len(array) - 1  # As we want absolute position
@@ -44,18 +43,12 @@ def find_limit_indices(
         limits = (None, None)
 
     # Search
-    if limits[0]:
+    if limits[0] is not None:
         index_min = numpy.searchsorted(array, limits[0])
-    if limits[1]:
+    if limits[1] is not None:
         index_max = numpy.searchsorted(array, limits[1]) - 1
-    if index_max - index_min < smallest_selection:
+    if index_max - index_min + 1 < smallest_selection:
         raise CalculationError(f"Not enough points (at least {smallest_selection}) in the selected region.")
-    # TODO figure out which is more efficient
-    #     if limits:
-    # ret = ret.loc[ret.between(
-    #     -numpy.inf if limits[0] is None else limits[0],
-    #     numpy.inf if limits[1] is None else limits[1]
-    # )]
     return index_min, index_max
 
 
@@ -103,10 +96,13 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
     n  : int
         Number of samples to return
     degree : int
-        Curve degree
+        Curve degree, clipped to the number of control points minus one.
+        Degree zero returns the original input objects unchanged.
     periodic : bool
-        True - Curve is closed
-        False - Curve is open
+        True samples one full period of a uniform control-point spline, including
+        matching endpoints. A repeated terminal first point is closure notation
+        and is removed. At least two control points must remain.
+        False samples an open spline with clamped endpoints.
     """
     # Check if arrays are equal in size
     count = len(xs)
@@ -119,26 +115,19 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
 
     cv = numpy.stack((xs, ys), axis=-1)
 
-    # If periodic, extend the point array by count+degree+1
     if periodic:
-        factor, fraction = divmod(count + degree + 1, count)
-        cv = numpy.concatenate((cv,) * factor + (cv[:fraction],))
+        if count > 1 and numpy.array_equal(cv[0], cv[-1]):
+            cv = cv[:-1]
         count = len(cv)
-        degree = numpy.clip(degree, 1, degree)
-
-    # If opened, prevent degree from exceeding count-1
+        if count < 2:
+            raise ParameterError("A periodic spline requires at least two control points.")
+        degree = numpy.clip(degree, 1, count - 1)
+        # Wrapping k coefficients needs count + 2*k + 1 knots for one period.
+        cv = numpy.concatenate((cv, cv[:degree]))
+        kv = numpy.arange(-degree, count + degree + 1, dtype='int')
+        rng = numpy.linspace(0, count, n)
     else:
         degree = numpy.clip(degree, 1, count - 1)
-
-    # Calculate knot vector
-    kv = None
-    if periodic:
-        kv = numpy.arange(
-            0 - degree,
-            count + degree + degree - 1,
-            dtype='int',
-        )
-    else:
         kv = numpy.concatenate(
             (
                 [0] * degree,
@@ -146,9 +135,7 @@ def bspline(xs, ys, n=100, degree=2, periodic=False):
                 [count - degree] * degree,
             )
         )
-
-    # Calculate query range
-    rng = numpy.linspace(periodic, (count - degree), n)
+        rng = numpy.linspace(0, (count - degree), n)
 
     # Calculate result
     from scipy import interpolate

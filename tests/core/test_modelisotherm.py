@@ -49,6 +49,28 @@ class TestModelConvenience:
 class TestModelIsotherm:
     """Test the ModelIsotherm class."""
 
+    @pytest.mark.parametrize('index', [None, [10, 20, 30], ['same', 'same', 'other']])
+    def test_descending_dataframe_branches(self, index, isotherm_parameters):
+        data = pandas.DataFrame({'pressure': [3, 2, 1], 'loading': [6, 4, 2]}, index=index)
+        original = data.copy(deep=True)
+        arguments = dict(
+            pressure_key='pressure',
+            loading_key='loading',
+            model='Henry',
+            **isotherm_parameters,
+        )
+        with pytest.raises(pgEx.ParameterError, match='required isotherm branch does not contain any points'):
+            pygaps.ModelIsotherm(isotherm_data=data, branch='ads', **arguments)
+        isotherm = pygaps.ModelIsotherm(isotherm_data=data, branch='des', **arguments)
+        assert isotherm.branch == 'des'
+        numpy.testing.assert_allclose(isotherm.loading_at([1, 2, 3]), [2, 4, 6], rtol=1e-8)
+        pandas.testing.assert_frame_equal(data, original)
+
+        data['branch'] = 0
+        explicit = pygaps.ModelIsotherm(isotherm_data=data, branch='ads', **arguments)
+        assert explicit.branch == 'ads'
+        numpy.testing.assert_allclose(explicit.loading_at([1, 2, 3]), [2, 4, 6], rtol=1e-8)
+
     def test_isotherm_create(self):
         """Check isotherm can be created from basic data."""
         isotherm_param = {

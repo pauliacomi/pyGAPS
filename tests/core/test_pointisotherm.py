@@ -130,6 +130,33 @@ class TestPointIsotherm:
         isotherm = pygaps.PointIsotherm(isotherm_data=isotherm_datab, loading_key='loading', pressure_key='pressure', **isotherm_parameters)
         assert isotherm.pressure(branch='des')[0] == 3.0
 
+    @pytest.mark.parametrize('index', [None, [10, 20, 30], ['same', 'same', 'other']])
+    @pytest.mark.parametrize('branch, expected', [('guess', [1, 1, 1]), ('ads', [0, 0, 0]), ('des', [1, 1, 1])])
+    def test_descending_dataframe_branches(self, index, branch, expected, isotherm_parameters):
+        data = pandas.DataFrame({'pressure': [3, 2, 1], 'loading': [6, 4, 2]}, index=index)
+        original = data.copy(deep=True)
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data=data,
+            pressure_key='pressure',
+            loading_key='loading',
+            branch=branch,
+            **isotherm_parameters,
+        )
+        assert isotherm.data_raw['branch'].tolist() == expected
+        assert isotherm.data_raw.index.equals(data.index)
+        pandas.testing.assert_frame_equal(data, original)
+
+    def test_descending_dataframe_explicit_branch_column(self, isotherm_parameters):
+        data = pandas.DataFrame({'pressure': [3, 2, 1], 'loading': [6, 4, 2], 'branch': [0, 0, 0]})
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data=data,
+            pressure_key='pressure',
+            loading_key='loading',
+            branch='guess',
+            **isotherm_parameters,
+        )
+        assert isotherm.data_raw['branch'].tolist() == [0, 0, 0]
+
     def test_isotherm_equality(
         self,
         isotherm_parameters,
