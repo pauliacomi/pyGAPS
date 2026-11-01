@@ -1,33 +1,8 @@
-"""
-This configuration file contains data required for testing
-isotherm models on pre-calculated data.
-In this file there are:
+"""Scientific reference values and deterministic model-fitting cases.
 
-    - references to sample isotherm files
-    - pre-calculated relationships for various models
-
-
-Explanation of parameters:
-
-'initial_guess' :
-
-    Ihe initial guess for the model parameters
-    that is passed to the optimisation routine,
-    at pressure=1 and loading=1.
-
-'test_parameters' :
-
-    Simple values for the model parameters which
-    are used to produce the test data.
-
-'test_data' :
-
-    Pressure, loading and spreading pressure values
-    pre-calculated with the 'test_parameters'.
-    These are used as a test to check if the model
-    outputs good values, as well as in a fitting
-    test.
-
+MODEL_DATA preserves the historical equation checks and initial guesses at
+pressure=1, loading=1. FIT_DOMAINS and FIT_PARAMETER_OVERRIDES describe separate
+synthetic optimization checks.
 """
 
 MODEL_DATA = {
@@ -353,4 +328,32 @@ MODEL_DATA = {
             'spreading_pressure': [0.0, 15.77393361, 25.0],
         },
     },
+}
+
+# Domains are pressure for loading-native models, loading for pressure-native models.
+FIT_DOMAINS = {
+    'Henry': (0.001, 10),
+    'Langmuir': (0.001, 10),
+    'DSLangmuir': (0.001, 100),
+    'TSLangmuir': (0.001, 1000),
+    'BET': (0.001, 10),  # Below the pole at pressure=20.
+    'GAB': (0.001, 50),  # Below the pole at pressure=100.
+    'Freundlich': (0.001, 100),
+    'DA': (0.001, 0.99),
+    'DR': (0.001, 0.99),
+    'Quadratic': (0.001, 100),
+    'TemkinApprox': (0.001, 100),
+    'Toth': (0.001, 100),
+    'DSToth': (0.001, 100),
+    'ChemiPhysisorption': (0.001, 100),
+    'JensenSeaton': (0.001, 100),
+    'Virial': (0.001, 2),
+    'FHVST': (0.001, 24),
+    'WVST': (0.001, 24),
+}
+
+FIT_PARAMETER_OVERRIDES = {
+    'DA': {'m': 2.5},  # Keep the perturbed guess inside the exponent bounds.
+    'DSToth': {'K1': 0.2, 'K2': 5},  # Separate the sites for identifiable recovery.
+    'ChemiPhysisorption': {'K1': 0.2, 'K2': 5, 'Ea': 1000},  # Resolve both curve contributions at RT=1000.
 }

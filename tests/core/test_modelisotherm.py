@@ -1,5 +1,6 @@
 """Tests relating to the ModelIsotherm class."""
 
+import numpy
 import pandas
 import pytest
 from pandas.testing import assert_series_equal
@@ -15,6 +16,25 @@ from .conftest import LOADING_AT_PARAM
 from .conftest import LOADING_PARAM
 from .conftest import PRESSURE_AT_PARAM
 from .conftest import PRESSURE_PARAM
+
+
+@pytest.fixture
+def langmuir_pointisotherm():
+    pressure = numpy.geomspace(0.001, 10, 64)
+    loading = 5 * 3 * pressure / (1 + 3 * pressure)
+    return pygaps.PointIsotherm(
+        pressure=pressure,
+        loading=loading,
+        material='carbon',
+        adsorbate='nitrogen',
+        temperature=77,
+        pressure_mode='absolute',
+        pressure_unit='bar',
+        loading_basis='molar',
+        loading_unit='mmol',
+        material_basis='mass',
+        material_unit='g',
+    )
 
 
 @pytest.mark.core
@@ -108,6 +128,41 @@ class TestModelIsotherm:
             basic_pointisotherm,
             model='Henry',
         )
+
+    @pytest.mark.parametrize(
+        'model',
+        [
+            pytest.param('Langmuir', id='single-model'),
+            pytest.param(['Henry', 'Langmuir'], id='select-best'),
+        ],
+    )
+    def test_isotherm_fit_known_langmuir(self, langmuir_pointisotherm, model):
+        source = langmuir_pointisotherm
+        before_data = source.data_raw.copy(deep=True)
+        before_units = source.units.copy()
+        options = {'param_guess': {'K': 2.4, 'n_m': 6}} if isinstance(model, str) else {}
+        fitted = pygaps.ModelIsotherm.from_pointisotherm(source, model=model, optimization_params={'max_nfev': 2000}, **options)
+        pressure = source.pressure()
+        held_pressure = numpy.sqrt(pressure[:-1] * pressure[1:])
+        expected_loading = 5 * 3 * held_pressure / (1 + 3 * held_pressure)
+
+        assert fitted.model.name == 'Langmuir'
+        assert numpy.isfinite(fitted.model.rmse) and fitted.model.rmse < 1e-4
+        numpy.testing.assert_allclose(fitted.loading_at(held_pressure), expected_loading, rtol=1e-4, atol=1e-10)
+        numpy.testing.assert_allclose([fitted.model.params['K'], fitted.model.params['n_m']], [3, 5], rtol=1e-4)
+        assert fitted.material == source.material
+        assert fitted.adsorbate == source.adsorbate
+        assert fitted.temperature == source.temperature
+        assert fitted.units == before_units
+        assert fitted.branch == 'ads'
+        pandas.testing.assert_frame_equal(source.data_raw, before_data)
+        assert source.units == before_units
+
+    def test_isotherm_guess_all_candidates_fail(self, langmuir_pointisotherm):
+        with pytest.raises(pgEx.CalculationError, match='No model could be reliably fit'):
+            pygaps.ModelIsotherm.from_pointisotherm(
+                langmuir_pointisotherm, model=['Henry', 'Langmuir'], optimization_params={'max_nfev': 1}
+            )
 
     @mpl_cleanup
     @pytest.mark.parametrize('file', [data['file'] for data in DATA.values()])
