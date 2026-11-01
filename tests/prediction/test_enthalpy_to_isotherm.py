@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+import pygaps
 import pygaps.parsing as pgp
 import pygaps.prediction.enthalpy_to_isotherm as eti
 import pygaps.utilities.exceptions as pgEx
@@ -8,6 +9,79 @@ import pygaps.utilities.exceptions as pgEx
 from .conftest import DATA_ETI
 from .conftest import DATA_WHITTAKER
 from .conftest import DATA_WHITTAKER_PATH
+
+
+@pytest.mark.prediction
+@pytest.mark.parametrize('enthalpy_key', ['isosteric_enthalpy', 'enthalpy_sorption'])
+def test_prediction_dictionary_native_units_and_branch(enthalpy_key):
+    isotherm = pygaps.PointIsotherm(
+        pressure=[1, 2, 3, 2, 1],
+        loading=[1, 2, 3, 2.5, 1.5],
+        branch=[0, 0, 0, 1, 1],
+        material='prediction-test',
+        adsorbate='nitrogen',
+        temperature=300,
+        pressure_mode='absolute',
+        pressure_unit='bar',
+        loading_basis='molar',
+        loading_unit='mol',
+        material_basis='mass',
+        material_unit='g',
+    )
+    predicted = eti.predict_isotherm_from_enthalpy_clapeyron(
+        isotherm,
+        300,
+        {'loading': [1.5, 2.5], enthalpy_key: [20, 20]},
+        branch='des',
+    )
+    np.testing.assert_allclose(predicted.pressure(), [1e5, 2e5])
+    np.testing.assert_allclose(predicted.loading(), [1500, 2500])
+    assert predicted.has_branch('des')
+    np.testing.assert_allclose(isotherm.loading(branch='des'), [2.5, 1.5])
+
+
+@pytest.mark.prediction
+def test_prediction_accepts_clapeyron_result():
+    from pygaps.characterisation import enthalpy_sorption_clapeyron
+
+    isotherms = [
+        pygaps.PointIsotherm(
+            pressure=np.array([1.0, 2.0, 3.0]) * np.exp(20000 / 8.314462618 * (1 / 300 - 1 / temperature)),
+            loading=[1.0, 2.0, 3.0],
+            branch='ads',
+            material='prediction-test',
+            adsorbate='nitrogen',
+            temperature=temperature,
+            pressure_mode='absolute',
+            pressure_unit='bar',
+            loading_basis='molar',
+            loading_unit='mmol',
+            material_basis='mass',
+            material_unit='g',
+        )
+        for temperature in (300, 310)
+    ]
+    result = enthalpy_sorption_clapeyron(isotherms, loading_points=[1.0, 2.0, 3.0])
+    predicted = eti.predict_isotherm_from_enthalpy_clapeyron(isotherms[0], 310, result)
+    np.testing.assert_allclose(predicted.pressure(), isotherms[1].pressure(pressure_unit='Pa'), rtol=1e-7)
+
+
+@pytest.mark.prediction
+def test_prediction_rejects_conflicting_enthalpy_aliases(basic_pointisotherm):
+    with pytest.raises(pgEx.ParameterError, match='conflicting enthalpy'):
+        eti.predict_isotherm_from_enthalpy_clapeyron(
+            pygaps.PointIsotherm.from_isotherm(basic_pointisotherm, pressure=[1, 2, 3], loading=[1, 2, 3]),
+            basic_pointisotherm.temperature,
+            {'loading': [1, 2, 3], 'isosteric_enthalpy': [20, 20, 20], 'enthalpy_sorption': [21, 21, 21]},
+        )
+
+
+@pytest.mark.prediction
+def test_prediction_embedded_enthalpy_uses_selected_branch(isotherm_parameters, isotherm_data):
+    isotherm = pygaps.PointIsotherm(isotherm_data=isotherm_data, loading_key='loading', pressure_key='pressure', **isotherm_parameters)
+    predicted = eti.predict_isotherm_from_enthalpy_clapeyron(isotherm, isotherm.temperature, branch='des')
+    np.testing.assert_allclose(predicted.loading(), isotherm.loading(branch='des'))
+    np.testing.assert_allclose(predicted.pressure(), isotherm.pressure(branch='des', pressure_unit='Pa'))
 
 
 @pytest.mark.prediction

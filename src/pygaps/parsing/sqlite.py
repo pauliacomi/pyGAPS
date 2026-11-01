@@ -1,6 +1,7 @@
 """The sql interface for data manipulation."""
 
 import functools
+import inspect
 import json
 import sqlite3
 
@@ -28,6 +29,7 @@ from pygaps.utilities.sqlite_utilities import find_SQL_python_type
 
 def with_connection(func):
     """Contextmanager for sqlite connection."""
+    signature = inspect.signature(func)
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -36,7 +38,8 @@ def with_connection(func):
         if kwargs.get('cursor'):
             return func(*args, **kwargs)
 
-        db_path = kwargs.get('db_path', DATABASE)
+        arguments = signature.bind(*args, **kwargs)
+        db_path = arguments.arguments.get('db_path', DATABASE)
         db_path = db_path if db_path else DATABASE
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row

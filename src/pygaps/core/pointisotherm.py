@@ -148,9 +148,7 @@ class PointIsotherm(BaseIsotherm):
 
         elif pressure is not None or loading is not None:
             if pressure is None or loading is None:
-                raise ParameterError(
-                    "If you've chosen to pass loading and pressure directly as arrays, make sure both are specified!"
-                )
+                raise ParameterError("If you've chosen to pass loading and pressure directly as arrays, make sure both are specified!")
             if len(pressure) != len(loading):
                 raise ParameterError("Pressure and loading arrays are not equal!")
 
@@ -159,10 +157,7 @@ class PointIsotherm(BaseIsotherm):
             self.loading_key = 'loading'
 
             # DataFrame creation
-            self.data_raw = pandas.DataFrame({
-                self.pressure_key: pressure,
-                self.loading_key: loading
-            })
+            self.data_raw = pandas.DataFrame({self.pressure_key: pressure, self.loading_key: loading})
         else:
             raise ParameterError(
                 "Pass either the isotherm data in a pandas.DataFrame as ``isotherm_data``"
@@ -181,9 +176,7 @@ class PointIsotherm(BaseIsotherm):
             elif branch == 'des':
                 self.data_raw['branch'] = 1
             else:
-                raise ParameterError(
-                    "Isotherm branch parameter must be 'guess ,'ads' or 'des' or an array of booleans."
-                )
+                raise ParameterError("Isotherm branch parameter must be 'guess ,'ads' or 'des' or an array of booleans.")
         else:
             try:
                 self.data_raw['branch'] = branch
@@ -240,11 +233,11 @@ class PointIsotherm(BaseIsotherm):
     def from_modelisotherm(
         cls,
         modelisotherm,
-        pressure_points: list[float] = None,
-        loading_points: list[float] = None,
+        pressure_points: "list[float] | PointIsotherm" = None,
+        loading_points: "list[float] | PointIsotherm" = None,
     ):
         """
-        Construct a PointIsotherm from a ModelIsothem class.
+        Construct a PointIsotherm from a ModelIsotherm.
 
         This class method allows for the model to be converted into
         a list of points calculated by using the model in the isotherm.
@@ -263,19 +256,37 @@ class PointIsotherm(BaseIsotherm):
             - If a PointIsotherm is passed, the values will be calculated at
               each of the pressure points in the passed isotherm. This is useful
               for comparing a model overlap with the real isotherm.
+        loading_points : None or list or PointIsotherm
+            Evaluate at these loadings instead of pressure points. A
+            PointIsotherm supplies the loadings of the model's branch.
+            Isotherm coordinates are converted to the model's units and bases.
+            Cannot be combined with ``pressure_points``.
         """
         if pressure_points is not None and loading_points is not None:
             raise ParameterError("""Cannot specify both pressure and loading points.""")
 
+        if isinstance(pressure_points, PointIsotherm):
+            pressure_points = pressure_points.pressure(
+                branch=modelisotherm.branch,
+                pressure_unit=modelisotherm.pressure_unit,
+                pressure_mode=modelisotherm.pressure_mode,
+            )
+        if isinstance(loading_points, PointIsotherm):
+            loading_points = loading_points.loading(
+                branch=modelisotherm.branch,
+                loading_unit=modelisotherm.loading_unit,
+                loading_basis=modelisotherm.loading_basis,
+                material_unit=modelisotherm.material_unit,
+                material_basis=modelisotherm.material_basis,
+            )
+
         pressure = None
         loading = None
         if modelisotherm.model.calculates == "loading":
-            # The user may request loading even if the model calculates pressure
+            # The inverse calculation is used when loading points are supplied.
             if loading_points is None:
                 if pressure_points is None:
                     pressure = modelisotherm.pressure()
-                elif isinstance(pressure_points, PointIsotherm):
-                    pressure = pressure_points.pressure(branch=modelisotherm.branch)
                 else:
                     pressure = pressure_points
                 loading = modelisotherm.loading_at(pressure)
@@ -283,12 +294,10 @@ class PointIsotherm(BaseIsotherm):
                 loading = loading_points
                 pressure = modelisotherm.pressure_at(loading_points)
         elif modelisotherm.model.calculates == "pressure":
-            # The user may request pressure even if the model calculates loading
+            # The inverse calculation is used when pressure points are supplied.
             if pressure_points is None:
                 if loading_points is None:
                     loading = modelisotherm.loading()
-                elif isinstance(loading_points, PointIsotherm):
-                    loading = loading_points.loading(branch=modelisotherm.branch)
                 else:
                     loading = loading_points
                 pressure = modelisotherm.pressure_at(loading)
@@ -542,9 +551,7 @@ class PointIsotherm(BaseIsotherm):
                 logger.info("Basis and units are the same, no changes made.")
             return
 
-        if self.loading_basis in [
-            'percent', 'fraction'
-        ] and basis_to == self.material_basis and unit_to != self.material_unit:
+        if self.loading_basis in ['percent', 'fraction'] and basis_to == self.material_basis and unit_to != self.material_unit:
             # We "virtually" change the unit without any conversion
             self.material_unit = unit_to
             if verbose:
@@ -749,10 +756,7 @@ class PointIsotherm(BaseIsotherm):
 
             # Select required points
             if limits and any(limits):
-                ret = ret.loc[ret.between(
-                    -numpy.inf if limits[0] is None else limits[0],
-                    numpy.inf if limits[1] is None else limits[1]
-                )]
+                ret = ret.loc[ret.between(-numpy.inf if limits[0] is None else limits[0], numpy.inf if limits[1] is None else limits[1])]
 
         if indexed:
             return ret
@@ -846,10 +850,7 @@ class PointIsotherm(BaseIsotherm):
 
             # Select required points
             if limits and any(limits):
-                ret = ret.loc[ret.between(
-                    -numpy.inf if limits[0] is None else limits[0],
-                    numpy.inf if limits[1] is None else limits[1]
-                )]
+                ret = ret.loc[ret.between(-numpy.inf if limits[0] is None else limits[0], numpy.inf if limits[1] is None else limits[1])]
 
         if indexed:
             return ret
@@ -858,10 +859,7 @@ class PointIsotherm(BaseIsotherm):
     @property
     def other_keys(self):
         """Return column names of any supplementary data points."""
-        return [
-            c for c in self.data_raw.columns
-            if c not in (self.pressure_key, self.loading_key, 'branch')
-        ]
+        return [c for c in self.data_raw.columns if c not in (self.pressure_key, self.loading_key, 'branch')]
 
     def other_data(
         self,
@@ -899,10 +897,9 @@ class PointIsotherm(BaseIsotherm):
             if not ret.empty:
                 # Select required points
                 if limits and any(limits):
-                    ret = ret.loc[ret.between(
-                        -numpy.inf if limits[0] is None else limits[0],
-                        numpy.inf if limits[1] is None else limits[1]
-                    )]
+                    ret = ret.loc[
+                        ret.between(-numpy.inf if limits[0] is None else limits[0], numpy.inf if limits[1] is None else limits[1])
+                    ]
 
             if indexed:
                 return ret
@@ -991,7 +988,8 @@ class PointIsotherm(BaseIsotherm):
 
         # Check if interpolator is applicable
         if (
-            self.p_interpolator is None or self.p_interpolator.interp_branch != branch
+            self.p_interpolator is None
+            or self.p_interpolator.interp_branch != branch
             or self.p_interpolator.interp_kind != interpolation_type
             or self.p_interpolator.interp_fill != interp_fill
         ):
@@ -1008,9 +1006,7 @@ class PointIsotherm(BaseIsotherm):
             if not material_basis:
                 material_basis = self.material_basis
             if not material_unit:
-                raise ParameterError(
-                    "Must specify an material unit if the input is in another basis."
-                )
+                raise ParameterError("Must specify an material unit if the input is in another basis.")
 
             loading = c_material(
                 loading,
@@ -1025,9 +1021,7 @@ class PointIsotherm(BaseIsotherm):
             if not loading_basis:
                 loading_basis = self.loading_basis
             if not loading_unit:
-                raise ParameterError(
-                    "Must specify a loading unit if the input is in another basis."
-                )
+                raise ParameterError("Must specify a loading unit if the input is in another basis.")
 
             loading = c_loading(
                 loading,
@@ -1122,7 +1116,8 @@ class PointIsotherm(BaseIsotherm):
 
         # Check if interpolator is applicable
         if (
-            self.l_interpolator is None or self.l_interpolator.interp_branch != branch
+            self.l_interpolator is None
+            or self.l_interpolator.interp_branch != branch
             or self.l_interpolator.interp_kind != interpolation_type
             or self.l_interpolator.interp_fill != interp_fill
         ):
@@ -1139,9 +1134,7 @@ class PointIsotherm(BaseIsotherm):
             if not pressure_mode:
                 pressure_mode = self.pressure_mode
             if pressure_mode == 'absolute' and not pressure_unit:
-                raise ParameterError(
-                    "Must specify a pressure unit if the input is in an absolute mode."
-                )
+                raise ParameterError("Must specify a pressure unit if the input is in an absolute mode.")
 
             pressure = c_pressure(
                 pressure,
@@ -1250,9 +1243,7 @@ class PointIsotherm(BaseIsotherm):
 
         """
         # Get all data points
-        pressures = self.pressure(
-            branch=branch, pressure_unit=pressure_unit, pressure_mode=pressure_mode
-        )
+        pressures = self.pressure(branch=branch, pressure_unit=pressure_unit, pressure_mode=pressure_mode)
         loadings = self.loading(
             branch=branch,
             loading_unit=loading_unit,
@@ -1262,8 +1253,9 @@ class PointIsotherm(BaseIsotherm):
         )
 
         # Check if we need to extrapolate beyond available data
-        if (self.l_interpolator is not None and self.l_interpolator.interp_fill
-            is None) and (pressure > pressures.max() or pressure < pressures.min()):
+        if (self.l_interpolator is not None and self.l_interpolator.interp_fill is None) and (
+            pressure > pressures.max() or pressure < pressures.min()
+        ):
             raise CalculationError(
                 textwrap.dedent(
                     f"""
@@ -1310,8 +1302,7 @@ class PointIsotherm(BaseIsotherm):
             slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] - pressures[i])
             intercept = loadings[i] - slope * pressures[i]
             # Add area of this segment
-            area += slope * (pressures[i + 1] -
-                             pressures[i]) + intercept * numpy.log(pressures[i + 1] / pressures[i])
+            area += slope * (pressures[i + 1] - pressures[i]) + intercept * numpy.log(pressures[i + 1] / pressures[i])
 
         # Step 5: Calculate area of final segment from P_k to P
         # Get the loading at pressure P using interpolation
@@ -1332,7 +1323,6 @@ class PointIsotherm(BaseIsotherm):
         intercept = loadings[n_points - 1] - slope * pressures[n_points - 1]
 
         # Add the area of the final segment
-        area += slope * (pressure - pressures[n_points - 1]
-                         ) + intercept * numpy.log(pressure / pressures[n_points - 1])
+        area += slope * (pressure - pressures[n_points - 1]) + intercept * numpy.log(pressure / pressures[n_points - 1])
 
         return area

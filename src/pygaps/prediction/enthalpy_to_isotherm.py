@@ -10,6 +10,8 @@ from scipy import constants
 from pygaps import logger
 from pygaps.core.pointisotherm import PointIsotherm
 from pygaps.graphing import prediction_graphs
+from pygaps.units.converter_mode import c_loading
+from pygaps.units.converter_mode import c_material
 from pygaps.utilities.exceptions import ParameterError
 
 R = constants.gas_constant
@@ -31,14 +33,14 @@ def predict_isotherm_from_enthalpy_clapeyron(
     temperature :math:`T_e` of original experimental isotherm. Uses the
     Clausius-Clapeyron relationship to calculate the predicted pressures;
 
-    ..math::
+    .. math::
         \ln{P_p} = \left[ \Delta H_{st} \frac{T_p - T_e}{R T_p T_e} + \ln{P_e} \right ]_n
 
-    Isosteric enthalpy, \Delta H_{st} can be input in two ways. The order
+    Isosteric enthalpy, :math:`\Delta H_{st}`, can be input in two ways. The order
     of preference is as below;
-        1. Defined in the other_data dictionary the `isotherm` object
-        2. As a dict, like the output of enthalpy prediction functions, which
-        use the `isosteric_enthalpy_dictionary` parameter.
+
+    1. Defined in the ``enthalpy`` column of the isotherm's other data.
+    2. As a dictionary passed through ``isosteric_enthalpy_dictionary``.
 
     With option 1, it is important to ensure that the enthalpies
     actually correspond to loading points.
@@ -50,18 +52,22 @@ def predict_isotherm_from_enthalpy_clapeyron(
         If it has an 'enthalpy' key in other_data, this will be used as the
         isosteric enthalpies with which to perform the calculation. Please
         ensure that these actually correspond to the loadings in the isotherm.
-    temperature_predicted: float
+    temperature_prediction: float
         The temperature at which to predict the isotherm. Units are K.
     isosteric_enthalpy_dictionary: dict, optional
-        You can input the output of enthalpy functions here. The function will
-        then use the loading and isosteric_enthalpy (assumes kJ/mol) keys. Any
-        dictionary with loading and enthalpy keys should work. Only used if
-        enthalpy is not defined in original_isotherm.other_data.
+        Requires ``loading`` in the input isotherm's loading/material units
+        and bases, and ``isosteric_enthalpy`` in kJ/mol (the output of
+        :func:`~pygaps.characterisation.enthalpy_sorption_clapeyron`).
+        The existing ``enthalpy_sorption`` key is also accepted. If both keys
+        are present their values must agree. Only used if the isotherm has no
+        ``enthalpy`` column; that column must also be in kJ/mol.
     branch: {'ads', 'des', None}, optional
         Branch of the isotherm with which enthalpy is associated. Defaults to
         adsorption.
     verbose: bool, optional
         Whether to be verbose. Defaults to False.
+    dographs: bool, optional
+        Whether to plot when ``verbose`` is enabled.
 
     Returns
     -------
@@ -92,21 +98,40 @@ def predict_isotherm_from_enthalpy_clapeyron(
 
     if 'enthalpy' in isotherm_local.other_keys:
         enthalpy = isotherm_local.other_data(key='enthalpy', branch=branch)
-        loading = isotherm_local.loading()
+        loading = isotherm_local.loading(branch=branch)
         if verbose:
             logger.info("Enthalpy retrieved from original_isotherm.other_keys.")
 
     elif isosteric_enthalpy_dictionary is not None:
-        if not all(key in isosteric_enthalpy_dictionary for key in ['loading', 'enthalpy_sorption']):
+        enthalpy_keys = [key for key in ('isosteric_enthalpy', 'enthalpy_sorption') if key in isosteric_enthalpy_dictionary]
+        if 'loading' not in isosteric_enthalpy_dictionary or not enthalpy_keys:
             raise ParameterError(
-                '''
-                You have specified a isosteric_enthalpy_dictionary as input,
-                but it doesn't contain the right data.
-                '''
+                "The enthalpy dictionary requires 'loading' and either 'isosteric_enthalpy' or 'enthalpy_sorption' (kJ/mol)."
             )
 
-        enthalpy = isosteric_enthalpy_dictionary['enthalpy_sorption']
-        loading = isosteric_enthalpy_dictionary['loading']
+        enthalpy = np.asarray(isosteric_enthalpy_dictionary[enthalpy_keys[0]])
+        if len(enthalpy_keys) == 2 and not np.array_equal(enthalpy, isosteric_enthalpy_dictionary[enthalpy_keys[1]]):
+            raise ParameterError("The dictionary contains conflicting enthalpy values.")
+        loading = np.asarray(isosteric_enthalpy_dictionary['loading'])
+        loading = c_loading(
+            loading,
+            basis_from=isotherm.loading_basis,
+            basis_to='molar',
+            unit_from=isotherm.loading_unit,
+            unit_to='mol',
+            adsorbate=isotherm.adsorbate,
+            temp=temperature_isotherm,
+            basis_material=isotherm.material_basis,
+            unit_material=isotherm.material_unit,
+        )
+        loading = c_material(
+            loading,
+            basis_from=isotherm.material_basis,
+            basis_to='mass',
+            unit_from=isotherm.material_unit,
+            unit_to='kg',
+            material=isotherm.material,
+        )
 
         if verbose:
             logger.info(
@@ -117,6 +142,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
 
     pressure_current = isotherm_local.pressure_at(
         loading,
+        branch=branch,
         pressure_unit='Pa',
         interp_fill='extrapolate',
     )
@@ -145,6 +171,7 @@ def predict_isotherm_from_enthalpy_clapeyron(
         material_basis='mass',
         material_unit='kg',
         temperature_unit='K',
+        branch=branch if branch is not None else 'guess',
         apparatus='predicted from pygaps',
     )
 
@@ -177,7 +204,7 @@ def predict_isosurface_from_enthalpy_clapeyron(
     isotherm and a heat of adsorption. Uses `predict_isotherm` function which
     relies on the Clausius Clapeyron equation;
 
-    ..math::
+    .. math::
         \ln{P_p} = \left[ \Delta H_{st} \frac{T_p - T_e}{R T_p T_e} + \ln{P_e} \right ]_n
 
     Parameters
@@ -196,10 +223,10 @@ def predict_isosurface_from_enthalpy_clapeyron(
         pressures in range of original isotherm, distributed linearly. Number
         of steps is determined by `num` parameter.
     isosteric_enthalpy_dictionary: dict, optional
-        You can input the output of enthalpy functions here. The function will
-        then use the loading and isosteric_enthalpy (assumes kJ/mol) keys. Any
-        dictionary with loading and enthalpy keys should work. Only used if
-        enthalpy is not defined in original_isotherm.other_data.
+        As for :func:`predict_isotherm_from_enthalpy_clapeyron`: ``loading``
+        uses the input isotherm's units and bases, and ``isosteric_enthalpy``
+        (or ``enthalpy_sorption``) is in kJ/mol. An embedded ``enthalpy``
+        column takes precedence.
     num: int, optional
         The number of steps to use when generating the grid.
     branch: {'ads', 'des', None}, optional
@@ -301,12 +328,12 @@ def predict_pressure_raw(
     pressure :math:`P_e` and temperature :math:`T_e` of original experimental
     isotherm. Uses the Clausius-Clapeyron relationship;
 
-    ..math::
+    .. math::
         \ln{P_p} = \left[ \Delta H_{st} \frac{T_p - T_e}{R T_p T_e} + \ln{P_e} \right ]_n
 
     Parameters
     ----------
-    enthalpy: list[float]
+    isosteric_enthalpy: list[float]
         Molar isosteric enthalpies of adsorption. Units must be kJ/mol.
     temperature_prediction: float
         Temperature at which to predict an isotherm. Units must be K.
