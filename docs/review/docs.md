@@ -430,7 +430,7 @@ Validation after implementation:
   the builds emitted no warnings.
 - Browser checks found no JavaScript errors on the IAST page and confirmed
   revision-pinned source, Binder, and nbviewer links. The fitting reference
-  rendered 158 equations and the enthalpy reference 33, without MathJax
+  rendered 158 equations and the enthalpy reference 34, without MathJax
   error nodes or literal malformed math directives.
 - Repository Ruff checks and `git diff --check` passed.
 - The optional spelling builder runs successfully with the separate group
@@ -440,3 +440,6 @@ Validation after implementation:
 Hosted Read the Docs and Binder builds were not executed locally. External
 link checking remains non-blocking because remote services can reject bots;
 the original HTTP 403 observation is not reclassified as a dead link.
+
+Run the dedicated documentation tests with
+`uv run --frozen --no-default-groups --group docs --group test pytest tests/documentation -m documentation -v`.
