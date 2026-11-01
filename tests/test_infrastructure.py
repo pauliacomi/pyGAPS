@@ -122,6 +122,9 @@ def test_autouse_restoration_after_failed_test(tmp_path):
         textwrap.dedent(
             """
             import pygaps
+            import matplotlib
+            import warnings
+            from matplotlib import pyplot, units
             from pygaps.utilities import coolprop_utilities
 
             registry = pygaps.ADSORBATE_LIST
@@ -130,12 +133,19 @@ def test_autouse_restoration_after_failed_test(tmp_path):
             properties = adsorbate.properties
             aliases = adsorbate.alias
             backend = pygaps.thermodynamic_backend()
+            linewidth = matplotlib.rcParams['lines.linewidth']
+            converters = units.registry.copy()
+            filters = list(warnings.filters)
 
             def test_mutates_and_fails():
                 registry.clear()
                 properties['cleanup_probe'] = {'values': [1]}
                 aliases.append('cleanup_probe')
                 coolprop_utilities.COOLPROP_BACKEND = 'REFPROP'
+                pyplot.figure()
+                matplotlib.rcParams['lines.linewidth'] = linewidth + 1
+                units.registry.clear()
+                warnings.simplefilter('ignore')
                 assert False, 'intentional fixture teardown probe'
 
             def test_restored():
@@ -147,6 +157,16 @@ def test_autouse_restoration_after_failed_test(tmp_path):
                 assert adsorbate.alias is aliases
                 assert 'cleanup_probe' not in aliases
                 assert pygaps.thermodynamic_backend() == backend
+                assert pyplot.get_fignums() == []
+                assert matplotlib.rcParams['lines.linewidth'] == linewidth
+                assert units.registry == converters
+                assert warnings.filters == filters
+
+            def test_plots_and_passes():
+                pyplot.figure()
+
+            def test_restored_after_success():
+                assert pyplot.get_fignums() == []
             """
         ),
         encoding='utf-8',
@@ -162,7 +182,7 @@ def test_autouse_restoration_after_failed_test(tmp_path):
     output = result.stdout + result.stderr
     assert result.returncode == 1, output
     assert 'intentional fixture teardown probe' in output
-    assert '1 failed, 1 passed' in output, output
+    assert '1 failed, 3 passed' in output, output
 
 
 @pytest.mark.parametrize('mode', ['reordered', 'distributed', 'reverse-option'])

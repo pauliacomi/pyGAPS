@@ -17,6 +17,7 @@ import pytest
 import pygaps
 
 from .test_utils import isolated_pygaps_state
+from .test_utils import plotting_context
 from .test_utils import registered_object
 
 DATA_PATH = Path(__file__).parent / 'test_data'
@@ -33,6 +34,13 @@ def pytest_addoption(parser):
         action='store_true',
         help='Reverse independent test order; exclude tests/parsing/test_sqlite_db.py and run it separately.',
     )
+
+
+@pytest.fixture(autouse=True)
+def isolate_plotting_state():
+    """Protect nondecorated tests without imposing a different plotting style."""
+    with plotting_context({}):
+        yield
 
 
 @pytest.fixture(autouse=True)
