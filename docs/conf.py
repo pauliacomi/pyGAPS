@@ -2,7 +2,9 @@
 # -- Init -----------------------------------------------------
 
 import os
+import subprocess
 from datetime import datetime
+from pathlib import Path
 
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -33,7 +35,7 @@ extensions = [
 if os.getenv('SPELLCHECK'):
     extensions.append('sphinxcontrib.spelling')
     spelling_show_suggestions = True
-    spelling_lang = 'en_UK'
+    spelling_lang = 'en_GB'
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -48,7 +50,15 @@ author = 'Paul Iacomi'
 copyright = f'{year}, {author}'
 from importlib.metadata import version as imp_version
 version = release = imp_version("pygaps")
-release_ref = 'master' if '.dev' in release or '+' in release else f'v{release}'
+repository_root = Path(__file__).resolve().parent.parent
+if os.environ.get('READTHEDOCS_GIT_COMMIT_HASH'):
+    release_ref = os.environ['READTHEDOCS_GIT_COMMIT_HASH']
+elif (repository_root / '.git').exists():
+    release_ref = subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD'], cwd=repository_root, text=True
+    ).strip()
+else:
+    release_ref = 'develop' if '.dev' in release or '+' in release else f'v{release}'
 
 print(project, " version defined as ", version)
 
@@ -90,6 +100,9 @@ nitpick_ignore = [
     ('py:class', 'numpy.ndarray'),
     ('py:class', 'pandas.core.frame.DataFrame'),
     ('py:class', 'pandas.core.series.Series'),
+    # Third-party types without a local API target.
+    ('py:class', 'pandas.DataFrame'),
+    ('py:class', 'pandas.Series'),
 ]
 
 # -- Options for HTML output ---------------------------------------------------
@@ -164,6 +177,9 @@ napoleon_use_admonition_for_references = False
 # -- nbsphinx configuration -----------------------------------------------------
 # allows parsing of Jupyter notebooks to docs
 
+# Notebooks are executed on disposable data in the dedicated CI job.
+nbsphinx_execute = 'never'
+
 nbsphinx_prolog = r"""
 {% set docname = 'docs/' + env.doc2path(env.docname, base=None)|replace('\\', '/') %}
 
@@ -174,18 +190,7 @@ nbsphinx_prolog = r"""
       <a class="reference external" href="https://github.com/pauliacomi/pyGAPS/blob/{{ env.config.release_ref|e }}/{{ docname|e }}">{{ docname|e }}</a>.
       To start an interactive version:
       <span style="white-space: nowrap;"><a href="https://mybinder.org/v2/gh/pauliacomi/pyGAPS/{{ env.config.release_ref|e }}?filepath={{ docname|e }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span>
-      <script>
-        if (document.location.host) {
-          $(document.currentScript).replaceWith(
-            '<a class="reference external" ' +
-            'href="https://nbviewer.jupyter.org/url' +
-            (window.location.protocol == 'https:' ? 's/' : '/') +
-            window.location.host +
-            window.location.pathname.slice(0, -4) +
-            'ipynb">or view in <em>nbviewer</em></a> instead.'
-          );
-        }
-      </script>
+      <a class="reference external" href="https://nbviewer.org/github/pauliacomi/pyGAPS/blob/{{ env.config.release_ref|e }}/{{ docname|e }}">or view in <em>nbviewer</em></a> instead.
     </div>
 """
 

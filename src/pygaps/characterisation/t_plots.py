@@ -1,6 +1,7 @@
 """T-plot calculation."""
 
 import typing as t
+from collections.abc import Callable
 
 import numpy
 from scipy import stats
@@ -19,7 +20,7 @@ from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_order
 
 def t_plot(
     isotherm: "PointIsotherm | ModelIsotherm",
-    thickness_model: "str | t.Callable[[float], float]" = 'Harkins/Jura',
+    thickness_model: "str | Callable[[float], float]" = 'Harkins/Jura',
     branch: str = 'ads',
     t_limits: "tuple[float, float]" = None,
     verbose: bool = False,
