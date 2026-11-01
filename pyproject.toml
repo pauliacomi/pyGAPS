@@ -168,6 +168,7 @@ python_files = [
 addopts = [
     "-ra",
     "--tb=short",
+    "-m", "not network",
 ]
 markers = [
     "core: core pygaps python functionality.",
@@ -178,6 +179,7 @@ markers = [
     "parsing: parsing functionality testing.",
     "cli: command-line interface tests.",
     "prediction: IAST and isotherm prediction tests.",
+    "network: live external-service checks, excluded by default; opt in with -m network.",
     "okay: custom empty marker.",
 ]
 # testing: coverage.py
