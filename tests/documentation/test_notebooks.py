@@ -20,6 +20,17 @@ def file_hashes(directory):
     return {path.relative_to(directory): hashlib.sha256(path.read_bytes()).hexdigest() for path in directory.rglob('*') if path.is_file()}
 
 
+def assert_no_error_outputs(notebook):
+    for index, cell in enumerate(notebook.cells):
+        for output in cell.get('outputs', []):
+            assert output.output_type != 'error', f'Cell {index}: {output}'
+            if output.output_type == 'stream':
+                assert not re.search(
+                    r'Traceback \(most recent call last\)|\b(?:\w*Error|Exception):',
+                    output.text,
+                ), f'Cell {index} printed an unexpected error:\n{output.text}'
+
+
 @pytest.mark.documentation
 @pytest.mark.parametrize('notebook_path', NOTEBOOKS, ids=lambda path: path.stem)
 def test_notebook(notebook_path, tmp_path, monkeypatch):
@@ -38,6 +49,9 @@ def test_notebook(notebook_path, tmp_path, monkeypatch):
     monkeypatch.setenv('MPLBACKEND', 'Agg')
 
     notebook = nbformat.read(notebook_path, as_version=4)
+    nbformat.validate(notebook)
+    assert_no_error_outputs(notebook)
+    notebook = nbformat.v4.upgrade(notebook)
     for cell in notebook.cells:
         if cell.cell_type == 'code':
             cell.execution_count = None
@@ -59,6 +73,7 @@ def test_notebook(notebook_path, tmp_path, monkeypatch):
             "import matplotlib.pyplot as plt\nfor number in plt.get_fignums():\n    plt.figure(number).canvas.draw()\nplt.close('all')\n"
         )
     )
+    nbformat.validate(notebook)
     manager = KernelManager(kernel_name='python3')
     # Do not let an unrelated system kernelspec select another environment.
     manager.kernel_spec.argv = [
@@ -73,6 +88,7 @@ def test_notebook(notebook_path, tmp_path, monkeypatch):
         km=manager,
         timeout=180,
         allow_errors=False,
+        record_timing=False,
         resources={'metadata': {'path': str(working)}},
     )
     try:
@@ -84,11 +100,4 @@ def test_notebook(notebook_path, tmp_path, monkeypatch):
         assert file_hashes(EXAMPLES) == source_inputs, 'Notebook modified the source examples.'
         assert hashlib.sha256(database.read_bytes()).hexdigest() == original_database, 'Packaged database was modified.'
 
-    for index, cell in enumerate(notebook.cells):
-        for output in cell.get('outputs', []):
-            assert output.output_type != 'error', f'Cell {index}: {output}'
-            if output.output_type == 'stream':
-                assert not re.search(
-                    r'Traceback \(most recent call last\)|\b(?:\w*Error|Exception):',
-                    output.text,
-                ), f'Cell {index} printed an unexpected error:\n{output.text}'
+    assert_no_error_outputs(notebook)
