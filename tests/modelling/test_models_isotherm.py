@@ -79,9 +79,7 @@ class TestIsothermModels:
         for i, load in enumerate(test_values['loading']):
             assert numpy.isclose(model.pressure(load), test_values['pressure'][i], 0.01)
 
-    @pytest.mark.parametrize(
-        "m_name", [pytest.param(key, marks=MODEL_DATA[key]['test_values']['spreading_pressure_mark']) for key in MODEL_DATA]
-    )
+    @pytest.mark.parametrize("m_name", [name for name in MODEL_DATA if name not in ('Virial', 'FHVST', 'WVST')])
     def test_models_s_pressure(self, m_name):
         """Test each model's spreading pressure function."""
 
@@ -91,6 +89,12 @@ class TestIsothermModels:
 
         for i, p in enumerate(test_values['pressure']):
             assert numpy.isclose(model.spreading_pressure(p), test_values['spreading_pressure'][i], 0.001)
+
+    @pytest.mark.parametrize('m_name', ['Virial', 'FHVST', 'WVST'])
+    def test_models_spreading_pressure_unsupported(self, m_name):
+        model = models.get_isotherm_model(m_name)
+        with pytest.raises(NotImplementedError):
+            model.spreading_pressure(1)
 
     @pytest.mark.parametrize("m_name", [key for key in MODEL_DATA])
     def test_models_fit_function(self, m_name):

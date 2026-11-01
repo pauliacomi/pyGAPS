@@ -9,24 +9,6 @@ import pytest
 
 import pygaps
 
-
-# Incremental tests
-def pytest_runtest_makereport(item, call):
-    """Store failed incremental tests."""
-    if "incremental" in item.keywords:
-        if call.excinfo is not None:
-            parent = item.parent
-            parent._previousfailed = item
-
-
-def pytest_runtest_setup(item):
-    """Skip incremental tests if previous test failed."""
-    if "incremental" in item.keywords:
-        previousfailed = getattr(item.parent, "_previousfailed", None)
-        if previousfailed is not None:
-            pytest.xfail("previous test failed (%s)" % previousfailed.name)
-
-
 DATA_PATH = Path(__file__).parent / 'test_data'
 
 

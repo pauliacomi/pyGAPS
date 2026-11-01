@@ -151,19 +151,19 @@ class WVST(IsothermBaseModel):
             \pi = \int_{0}^{p_i} \frac{n_i(p_i)}{p_i} dp_i
 
         The integral for the W-VST model cannot be solved analytically
-        and must be calculated numerically.
+        and must be calculated numerically. This calculation is not implemented.
 
         Parameters
         ----------
         pressure : float
             The pressure at which to calculate the spreading pressure.
 
-        Returns
-        -------
-        float
-            Spreading pressure at specified pressure.
+        Raises
+        ------
+        NotImplementedError
+            Numerical spreading-pressure integration is not implemented.
         """
-        return NotImplementedError
+        raise NotImplementedError
 
     def initial_guess(self, pressure, loading):
         """

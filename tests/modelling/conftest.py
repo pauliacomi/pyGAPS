@@ -30,8 +30,6 @@ Explanation of parameters:
 
 """
 
-import pytest
-
 MODEL_DATA = {
     'Henry': {
         'initial_guess': {
@@ -44,7 +42,6 @@ MODEL_DATA = {
             'pressure': [0.0, 1.0, 3.0],
             'loading': [0.0, 2.0, 6.0],
             'spreading_pressure': [0.0, 2.0, 6.0],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'Langmuir': {
@@ -60,7 +57,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.153846154, 3.75, 4.838709677],
             'spreading_pressure': [0.0, 1.311821322, 6.931471806, 17.16993602],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'DSLangmuir': {
@@ -80,7 +76,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.653846154, 4.659090909, 5.828808687],
             'spreading_pressure': [0.0, 2.004968503, 9.329367078, 21.78505654],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'TSLangmuir': {
@@ -104,7 +99,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.752856055, 5.568181818, 10.82880869],
             'spreading_pressure': [0.0, 2.104471811, 10.28246888, 28.71652834],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'BET': {
@@ -122,7 +116,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 3.361288046, 8.845643521, 19.8019802],
             'spreading_pressure': [0.0, 4.071387487, 18.34684514, 46.15120517],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'GAB': {
@@ -140,7 +133,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 0.477121545, 3.389600705, 9.416195857],
             'spreading_pressure': [0.0, 0.488378297, 4.088264558, 18.80312867],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'Freundlich': {
@@ -156,7 +148,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 3.154786722, 5.0, 7.924465962],
             'spreading_pressure': [0.0, 15.77393361, 25.0, 39.62232981],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'DA': {
@@ -174,7 +165,6 @@ MODEL_DATA = {
             'pressure': [0.1, 0.5, 1.0],
             'loading': [6.362582158, 9.877415087, 10.0],
             'spreading_pressure': [6.0626826516, 19.879212055975, 26.78938534],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'DR': {
@@ -190,7 +180,6 @@ MODEL_DATA = {
             'pressure': [0.1, 0.5, 1.0],
             'loading': [2.656768582, 8.868199956, 10.0],
             'spreading_pressure': [1.834278725, 11.06086651, 17.7245385],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'Quadratic': {
@@ -208,7 +197,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 0.294117647, 10.0, 19.70588235],
             'spreading_pressure': [0.0, 0.198026273, 7.419373447, 46.24972813],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'TemkinApprox': {
@@ -226,7 +214,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.1, 1.0, 10.0],
             'loading': [0.0, 1.296296296, 3.587962963, 4.807728551],
             'spreading_pressure': [2.5, 4.249547763, 9.722686235, 19.75620621],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'Toth': {
@@ -244,7 +231,6 @@ MODEL_DATA = {
             'pressure': [0.1, 1.0, 10.0],
             'loading': [1.436739428, 4.74341649, 4.997224535],
             'spreading_pressure': [1.47836523, 9.092232296, 20.473111121],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'DSToth': {
@@ -268,7 +254,6 @@ MODEL_DATA = {
             'pressure': [0.1, 1.0, 10.0],
             'loading': [2.633556389008878, 10.512414771482202, 10.996974555727082],
             'spreading_pressure': [2.6775676653472438, 18.440821585294383, 43.557224323075594],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'ChemiPhysisorption': {
@@ -292,7 +277,6 @@ MODEL_DATA = {
             'pressure': [0.1, 1.0, 10.0],
             'loading': [1.4550550667204611, 4.816679045807506, 5.101885328545681],
             'spreading_pressure': [1.498401252592332, 9.212963011908176, 20.807685363000594],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'JensenSeaton': {
@@ -312,7 +296,6 @@ MODEL_DATA = {
             'pressure': [0.1, 1.0, 10.0],
             'loading': [0.7518610421836228, 2.481203007518797, 5.660377358],
             'spreading_pressure': [0.863759319324, 4.502267169, 12.9931948499],
-            'spreading_pressure_mark': pytest.mark.okay,
         },
     },
     'Virial': {
@@ -332,7 +315,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.040008193, 0.080033799, 0.120078938, 0.200240144, 0.40128205],
             'loading': [0.0, 0.2, 0.4, 0.6, 1.0, 2.0],
             'spreading_pressure': [0.0, 15.77393361, 18.77393361, 20.77393361, 25.0, 30.62232981],
-            'spreading_pressure_mark': pytest.mark.xfail,
         },
     },
     'FHVST': {
@@ -350,7 +332,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.10134005, 0.534198619, 44.75474093],
             'loading': [0.0, 0.2, 1.0, 20.0],
             'spreading_pressure': [0.0, 15.77393361, 25.0, 39.62232981],
-            'spreading_pressure_mark': pytest.mark.xfail,
         },
     },
     'WVST': {
@@ -370,7 +351,6 @@ MODEL_DATA = {
             'pressure': [0.0, 0.101346218, 0.534999558],
             'loading': [0.0, 0.2, 1.0],
             'spreading_pressure': [0.0, 15.77393361, 25.0],
-            'spreading_pressure_mark': pytest.mark.xfail,
         },
     },
 }

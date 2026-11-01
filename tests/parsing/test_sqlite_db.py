@@ -25,7 +25,7 @@ class TestDatabase:
         """Test the database creation."""
         with pytest.raises(ParsingError):
             db_execute_general("SELECT", "/")
-        return db_file
+        assert db_file.is_file()
 
     def test_adsorbate_type(self, db_file, adsorbate_data):
         """Test functions related to adsorbate type table then inserts required data."""

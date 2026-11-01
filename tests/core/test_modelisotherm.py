@@ -128,10 +128,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'expected, parameters',
-        [
-            pytest.param(1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + PRESSURE_PARAM,
+        PRESSURE_PARAM,
     )
     def test_isotherm_ret_pressure(
         self,
@@ -155,10 +152,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'expected, parameters',
-        [
-            pytest.param(1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + LOADING_PARAM,
+        LOADING_PARAM,
     )
     def test_isotherm_ret_loading(
         self,
@@ -185,10 +179,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'inp, expected, parameters',
-        [
-            pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + PRESSURE_AT_PARAM,
+        PRESSURE_AT_PARAM,
     )
     def test_isotherm_ret_pressure_at(
         self,
@@ -207,10 +198,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'inp, expected, parameters',
-        [
-            pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + LOADING_AT_PARAM,
+        LOADING_AT_PARAM,
     )
     def test_isotherm_ret_loading_at(
         self,
@@ -231,7 +219,6 @@ class TestModelIsotherm:
         'inp, expected, parameters',
         [
             (1, 1, dict()),
-            pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
             (100000, 1, dict(pressure_unit='Pa')),
             (0.5, 3.89137, dict(pressure_mode='relative')),
         ],
@@ -246,6 +233,11 @@ class TestModelIsotherm:
     ):
         """Check the ModelIsotherm spreading pressure calculation."""
         assert basic_modelisotherm.spreading_pressure_at(inp, **parameters) == pytest.approx(expected, 1e-5)
+
+    @pytest.mark.parametrize('method', ['pressure', 'loading', 'pressure_at', 'loading_at', 'spreading_pressure_at'])
+    def test_isotherm_wrong_branch(self, basic_modelisotherm, method):
+        with pytest.raises(pgEx.ParameterError, match="based on an 'ads' branch .* supplied was 'des'"):
+            getattr(basic_modelisotherm, method)(1, branch='des')
 
     @mpl_cleanup
     def test_isotherm_print_parameters(self, basic_modelisotherm):
