@@ -111,17 +111,18 @@ def test_find_linear_sections_small_perturbation():
     assert math.find_linear_sections(x, y) == [list(range(len(x)))]
 
 
-@pytest.mark.xfail(reason='P1-7: second derivative uses y rather than x as its coordinate', strict=True, raises=AssertionError)
 def test_find_linear_sections_rejects_high_curvature_tail():
     x = numpy.linspace(0.1, 1, 40)
     y = x**10
     sections = math.find_linear_sections(x, y)
+    assert sections
+    assert sections[0][0] == 0
+    assert len(sections[0]) >= 4
     # On normalized axes d²(x^10)/dx² = 90*x^8; this tail is well above the margin of 10.
     curved_tail = set(numpy.flatnonzero(x >= 0.85))
     assert not any(curved_tail.intersection(section) for section in sections)
 
 
-@pytest.mark.xfail(reason='P1-7: a constant y coordinate causes undefined gradients', strict=True, raises=(RuntimeWarning, AssertionError))
 def test_find_linear_sections_flat():
     x = numpy.linspace(1, 10, 20)
     with warnings.catch_warnings():

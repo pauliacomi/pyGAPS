@@ -101,7 +101,7 @@ DATA = {
         'file': 'Takeda 5A N2 77K.json',
         'bet_area': 1075.0,
         'langmuir_area': 1600.0,
-        't_area': 1100.0,
+        't_area': 145.0,
         't_pore_volume': 0.43,
         'Khi_slope': 1600000,
         'Khi_virial': 4300000,
