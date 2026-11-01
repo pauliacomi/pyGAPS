@@ -1,0 +1,38 @@
+name: Test monitoring
+
+on:
+  schedule:
+    - cron: "17 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  live-isodb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+    - uses: actions/checkout@v7
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.3.3
+      with:
+        python-version: "3.14"
+    - name: Install test dependencies
+      run: uv sync --frozen --no-default-groups --group test
+    - name: Check live ISODB
+      id: live-check
+      run: uv run --frozen --no-default-groups --group test pytest tests/parsing/test_isodb.py -m network -q
+    - name: Summarize monitoring result
+      if: always()
+      env:
+        RESULT: ${{ steps.live-check.outcome }}
+      run: |
+        echo "## Monthly live ISODB monitoring" >> "$GITHUB_STEP_SUMMARY"
+        echo "Live test outcome: $RESULT" >> "$GITHUB_STEP_SUMMARY"
+        echo "Informational only: failures do not gate pull requests or releases. See step logs for details." >> "$GITHUB_STEP_SUMMARY"

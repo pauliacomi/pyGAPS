@@ -39,7 +39,7 @@ dependencies = [
 
 [dependency-groups]
 test = [
-    "pytest>=7.0",
+    "pytest>=9.1",
     "pytest-cov>=4.0",
     "coverage[toml]>=7.0",
     "jsonschema>=4.0",
@@ -168,6 +168,9 @@ python_files = [
 addopts = [
     "-ra",
     "--tb=short",
+    "--strict-markers",
+    "--strict-config",
+    "-m", "not network",
 ]
 markers = [
     "core: core pygaps python functionality.",
@@ -178,8 +181,9 @@ markers = [
     "parsing: parsing functionality testing.",
     "cli: command-line interface tests.",
     "prediction: IAST and isotherm prediction tests.",
-    "okay: custom empty marker.",
+    "network: live external-service checks, excluded by default; opt in with -m network.",
 ]
+xfail_strict = true
 # testing: coverage.py
 [tool.coverage.run]
 branch = false

@@ -8,6 +8,15 @@ from pygaps.utilities.exceptions import ParsingError
 from pygaps.utilities.sqlite_db_creator import db_create
 from pygaps.utilities.sqlite_db_creator import db_execute_general
 
+from ..test_utils import isolated_pygaps_state
+
+
+@pytest.fixture(scope='module', autouse=True)
+def isolate_global_state():
+    # These steps deliberately share registry state as well as the session database.
+    with isolated_pygaps_state():
+        yield
+
 
 @pytest.fixture(scope='session')
 def db_file(tmp_path_factory):
@@ -19,13 +28,17 @@ def db_file(tmp_path_factory):
 
 @pytest.mark.parsing
 class TestDatabase:
-    """All testing of Database interface"""
+    """Ordered scenario: property types, entities, then isotherms and autoinsertion.
+
+    Run this module serially in declaration order. Entity insertion registers objects
+    used by later steps; the module fixture restores globals only after the scenario.
+    """
 
     def test_db_create(self, db_file):
         """Test the database creation."""
         with pytest.raises(ParsingError):
             db_execute_general("SELECT", "/")
-        return db_file
+        assert db_file.is_file()
 
     def test_adsorbate_type(self, db_file, adsorbate_data):
         """Test functions related to adsorbate type table then inserts required data."""

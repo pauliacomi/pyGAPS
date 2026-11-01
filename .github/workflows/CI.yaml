@@ -93,9 +93,43 @@ jobs:
     - name: Run tests
       run: uv run --no-sync pytest
 
+  packaging-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.3.3
+      with:
+        python-version: "3.14"
+    - name: Build source distribution and its wheel
+      # Building from the sdist catches source-distribution omissions too.
+      run: |
+        uv build --sdist --out-dir "$RUNNER_TEMP/distributions"
+        uv build "$RUNNER_TEMP"/distributions/*.tar.gz --wheel --out-dir "$RUNNER_TEMP/distributions"
+    - name: Validate archives
+      run: |
+        uv run --no-project python -I tests/packaging/check_distribution.py archives \
+          "$RUNNER_TEMP"/distributions/*.tar.gz "$RUNNER_TEMP"/distributions/*.whl
+    - name: Install wheel and smoke-test outside the checkout
+      # Constrain runtime versions without installing the editable project or its test dependencies.
+      run: |
+        uv export --frozen --no-default-groups --no-emit-project --no-editable --no-hashes \
+          --output-file "$RUNNER_TEMP/runtime-constraints.txt"
+        uv venv "$RUNNER_TEMP/wheel-env"
+        uv pip install --python "$RUNNER_TEMP/wheel-env/bin/python" \
+          --constraint "$RUNNER_TEMP/runtime-constraints.txt" "$RUNNER_TEMP"/distributions/*.whl
+        mkdir "$RUNNER_TEMP/wheel-smoke"
+        cp tests/packaging/check_distribution.py "$RUNNER_TEMP/wheel-smoke/"
+        cd "$RUNNER_TEMP/wheel-smoke"
+        "$RUNNER_TEMP/wheel-env/bin/python" -I check_distribution.py installed \
+          "$RUNNER_TEMP"/distributions/*.whl "$RUNNER_TEMP/wheel-env"
+
   build-publish:
     runs-on: ubuntu-latest
-    needs: [linting-checks, docs-build, unit-tests, lowest-deps]
+    needs: [linting-checks, docs-build, unit-tests, lowest-deps, packaging-checks]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write  # create the GitHub release

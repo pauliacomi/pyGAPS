@@ -130,6 +130,33 @@ class TestPointIsotherm:
         isotherm = pygaps.PointIsotherm(isotherm_data=isotherm_datab, loading_key='loading', pressure_key='pressure', **isotherm_parameters)
         assert isotherm.pressure(branch='des')[0] == 3.0
 
+    @pytest.mark.parametrize('index', [None, [10, 20, 30], ['same', 'same', 'other']])
+    @pytest.mark.parametrize('branch, expected', [('guess', [1, 1, 1]), ('ads', [0, 0, 0]), ('des', [1, 1, 1])])
+    def test_descending_dataframe_branches(self, index, branch, expected, isotherm_parameters):
+        data = pandas.DataFrame({'pressure': [3, 2, 1], 'loading': [6, 4, 2]}, index=index)
+        original = data.copy(deep=True)
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data=data,
+            pressure_key='pressure',
+            loading_key='loading',
+            branch=branch,
+            **isotherm_parameters,
+        )
+        assert isotherm.data_raw['branch'].tolist() == expected
+        assert isotherm.data_raw.index.equals(data.index)
+        pandas.testing.assert_frame_equal(data, original)
+
+    def test_descending_dataframe_explicit_branch_column(self, isotherm_parameters):
+        data = pandas.DataFrame({'pressure': [3, 2, 1], 'loading': [6, 4, 2], 'branch': [0, 0, 0]})
+        isotherm = pygaps.PointIsotherm(
+            isotherm_data=data,
+            pressure_key='pressure',
+            loading_key='loading',
+            branch='guess',
+            **isotherm_parameters,
+        )
+        assert isotherm.data_raw['branch'].tolist() == [0, 0, 0]
+
     def test_isotherm_equality(
         self,
         isotherm_parameters,
@@ -469,8 +496,6 @@ class TestPointIsotherm:
                     "mode_to": "relative%",
                 },
             ),
-            pytest.param(1, {"unit_to": "bad_unit"}, marks=pytest.mark.xfail),
-            pytest.param(1, {"mode_to": "bad_mode"}, marks=pytest.mark.xfail),
         ],
     )
     def test_isotherm_convert_pressure(
@@ -543,8 +568,6 @@ class TestPointIsotherm:
                     'basis_to': 'percent',
                 },
             ),  # Percent weight
-            pytest.param(1, {"unit_to": "bad_unit"}, marks=pytest.mark.xfail),
-            pytest.param(1, {"basis_to": "bad_basis"}, marks=pytest.mark.xfail),
         ],
     )
     def test_isotherm_convert_loading(
@@ -600,8 +623,6 @@ class TestPointIsotherm:
                     "unit_to": "cm3",
                 },
             ),
-            pytest.param(1, {"unit_to": "bad_unit"}, marks=pytest.mark.xfail),
-            pytest.param(1, {"basis_to": "bad_basis"}, marks=pytest.mark.xfail),
         ],
     )
     def test_isotherm_convert_material(
@@ -626,6 +647,43 @@ class TestPointIsotherm:
             assert basic_pointisotherm.material_basis == parameters['basis_to']
         if 'unit_to' in parameters:
             assert basic_pointisotherm.material_unit == parameters['unit_to']
+
+    @pytest.mark.parametrize(
+        'parameters, cause_message',
+        [
+            pytest.param({'unit_to': 'bad_unit'}, 'Unit selected for conversion', id='unit'),
+            pytest.param({'mode_to': 'bad_mode'}, 'Basis selected for pressure', id='mode'),
+        ],
+    )
+    def test_isotherm_convert_pressure_invalid(self, basic_pointisotherm, use_adsorbate, parameters, cause_message):
+        before_data = basic_pointisotherm.data_raw.copy(deep=True)
+        before_units = basic_pointisotherm.units.copy()
+
+        with pytest.raises(pgEx.CalculationError, match='The isotherm cannot be converted') as error:
+            basic_pointisotherm.convert_pressure(**parameters)
+
+        assert isinstance(error.value.__cause__, pgEx.ParameterError)
+        assert cause_message in str(error.value.__cause__)
+        pandas.testing.assert_frame_equal(basic_pointisotherm.data_raw, before_data)
+        assert basic_pointisotherm.units == before_units
+
+    @pytest.mark.parametrize('conversion', ['loading', 'material'])
+    @pytest.mark.parametrize(
+        'parameters, message',
+        [
+            pytest.param({'unit_to': 'bad_unit'}, 'Unit selected for conversion', id='unit'),
+            pytest.param({'basis_to': 'bad_basis'}, 'Basis selected for', id='basis'),
+        ],
+    )
+    def test_isotherm_convert_invalid(self, basic_pointisotherm, use_adsorbate, use_material, conversion, parameters, message):
+        before_data = basic_pointisotherm.data_raw.copy(deep=True)
+        before_units = basic_pointisotherm.units.copy()
+
+        with pytest.raises(pgEx.ParameterError, match=message):
+            getattr(basic_pointisotherm, f'convert_{conversion}')(**parameters)
+
+        pandas.testing.assert_frame_equal(basic_pointisotherm.data_raw, before_data)
+        assert basic_pointisotherm.units == before_units
 
     def test_isotherm_convert_complex(
         self,

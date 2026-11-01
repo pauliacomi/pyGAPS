@@ -1,5 +1,6 @@
 """Tests relating to the ModelIsotherm class."""
 
+import numpy
 import pandas
 import pytest
 from pandas.testing import assert_series_equal
@@ -17,6 +18,25 @@ from .conftest import PRESSURE_AT_PARAM
 from .conftest import PRESSURE_PARAM
 
 
+@pytest.fixture
+def langmuir_pointisotherm():
+    pressure = numpy.geomspace(0.001, 10, 64)
+    loading = 5 * 3 * pressure / (1 + 3 * pressure)
+    return pygaps.PointIsotherm(
+        pressure=pressure,
+        loading=loading,
+        material='carbon',
+        adsorbate='nitrogen',
+        temperature=77,
+        pressure_mode='absolute',
+        pressure_unit='bar',
+        loading_basis='molar',
+        loading_unit='mmol',
+        material_basis='mass',
+        material_unit='g',
+    )
+
+
 @pytest.mark.core
 class TestModelConvenience:
     """Test the convenience model function."""
@@ -28,6 +48,28 @@ class TestModelConvenience:
 @pytest.mark.core
 class TestModelIsotherm:
     """Test the ModelIsotherm class."""
+
+    @pytest.mark.parametrize('index', [None, [10, 20, 30], ['same', 'same', 'other']])
+    def test_descending_dataframe_branches(self, index, isotherm_parameters):
+        data = pandas.DataFrame({'pressure': [3, 2, 1], 'loading': [6, 4, 2]}, index=index)
+        original = data.copy(deep=True)
+        arguments = dict(
+            pressure_key='pressure',
+            loading_key='loading',
+            model='Henry',
+            **isotherm_parameters,
+        )
+        with pytest.raises(pgEx.ParameterError, match='required isotherm branch does not contain any points'):
+            pygaps.ModelIsotherm(isotherm_data=data, branch='ads', **arguments)
+        isotherm = pygaps.ModelIsotherm(isotherm_data=data, branch='des', **arguments)
+        assert isotherm.branch == 'des'
+        numpy.testing.assert_allclose(isotherm.loading_at([1, 2, 3]), [2, 4, 6], rtol=1e-8)
+        pandas.testing.assert_frame_equal(data, original)
+
+        data['branch'] = 0
+        explicit = pygaps.ModelIsotherm(isotherm_data=data, branch='ads', **arguments)
+        assert explicit.branch == 'ads'
+        numpy.testing.assert_allclose(explicit.loading_at([1, 2, 3]), [2, 4, 6], rtol=1e-8)
 
     def test_isotherm_create(self):
         """Check isotherm can be created from basic data."""
@@ -109,6 +151,41 @@ class TestModelIsotherm:
             model='Henry',
         )
 
+    @pytest.mark.parametrize(
+        'model',
+        [
+            pytest.param('Langmuir', id='single-model'),
+            pytest.param(['Henry', 'Langmuir'], id='select-best'),
+        ],
+    )
+    def test_isotherm_fit_known_langmuir(self, langmuir_pointisotherm, model):
+        source = langmuir_pointisotherm
+        before_data = source.data_raw.copy(deep=True)
+        before_units = source.units.copy()
+        options = {'param_guess': {'K': 2.4, 'n_m': 6}} if isinstance(model, str) else {}
+        fitted = pygaps.ModelIsotherm.from_pointisotherm(source, model=model, optimization_params={'max_nfev': 2000}, **options)
+        pressure = source.pressure()
+        held_pressure = numpy.sqrt(pressure[:-1] * pressure[1:])
+        expected_loading = 5 * 3 * held_pressure / (1 + 3 * held_pressure)
+
+        assert fitted.model.name == 'Langmuir'
+        assert numpy.isfinite(fitted.model.rmse) and fitted.model.rmse < 1e-4
+        numpy.testing.assert_allclose(fitted.loading_at(held_pressure), expected_loading, rtol=1e-4, atol=1e-10)
+        numpy.testing.assert_allclose([fitted.model.params['K'], fitted.model.params['n_m']], [3, 5], rtol=1e-4)
+        assert fitted.material == source.material
+        assert fitted.adsorbate == source.adsorbate
+        assert fitted.temperature == source.temperature
+        assert fitted.units == before_units
+        assert fitted.branch == 'ads'
+        pandas.testing.assert_frame_equal(source.data_raw, before_data)
+        assert source.units == before_units
+
+    def test_isotherm_guess_all_candidates_fail(self, langmuir_pointisotherm):
+        with pytest.raises(pgEx.CalculationError, match='No model could be reliably fit'):
+            pygaps.ModelIsotherm.from_pointisotherm(
+                langmuir_pointisotherm, model=['Henry', 'Langmuir'], optimization_params={'max_nfev': 1}
+            )
+
     @mpl_cleanup
     @pytest.mark.parametrize('file', [data['file'] for data in DATA.values()])
     def test_isotherm_create_guess(self, file, data_char_path):
@@ -128,10 +205,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'expected, parameters',
-        [
-            pytest.param(1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + PRESSURE_PARAM,
+        PRESSURE_PARAM,
     )
     def test_isotherm_ret_pressure(
         self,
@@ -155,10 +229,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'expected, parameters',
-        [
-            pytest.param(1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + LOADING_PARAM,
+        LOADING_PARAM,
     )
     def test_isotherm_ret_loading(
         self,
@@ -185,10 +256,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'inp, expected, parameters',
-        [
-            pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + PRESSURE_AT_PARAM,
+        PRESSURE_AT_PARAM,
     )
     def test_isotherm_ret_pressure_at(
         self,
@@ -207,10 +275,7 @@ class TestModelIsotherm:
 
     @pytest.mark.parametrize(
         'inp, expected, parameters',
-        [
-            pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
-        ]
-        + LOADING_AT_PARAM,
+        LOADING_AT_PARAM,
     )
     def test_isotherm_ret_loading_at(
         self,
@@ -231,7 +296,6 @@ class TestModelIsotherm:
         'inp, expected, parameters',
         [
             (1, 1, dict()),
-            pytest.param(1, 1, {'branch': 'des'}, marks=pytest.mark.xfail),  # Wrong branch
             (100000, 1, dict(pressure_unit='Pa')),
             (0.5, 3.89137, dict(pressure_mode='relative')),
         ],
@@ -246,6 +310,11 @@ class TestModelIsotherm:
     ):
         """Check the ModelIsotherm spreading pressure calculation."""
         assert basic_modelisotherm.spreading_pressure_at(inp, **parameters) == pytest.approx(expected, 1e-5)
+
+    @pytest.mark.parametrize('method', ['pressure', 'loading', 'pressure_at', 'loading_at', 'spreading_pressure_at'])
+    def test_isotherm_wrong_branch(self, basic_modelisotherm, method):
+        with pytest.raises(pgEx.ParameterError, match="based on an 'ads' branch .* supplied was 'des'"):
+            getattr(basic_modelisotherm, method)(1, branch='des')
 
     @mpl_cleanup
     def test_isotherm_print_parameters(self, basic_modelisotherm):
