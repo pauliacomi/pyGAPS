@@ -17,9 +17,11 @@ At creation, an :ref:`isotherm<isotherms-manual>` asks for an ``adsorbate``
 parameter, a string which pyGAPS looks up in an internal list
 (``pygaps.ADSORBATE_LIST``). If any known adsorbate ``name``/``alias`` matches,
 this connects the isotherm object and the existing adsorbate class. This global
-list is populated as import-time with the adsorbates stored in the internal
+list is populated at import time with the adsorbates stored in the packaged
 database. The user can also add their own adsorbate to the list, or upload it to
-the database for permanent storage.
+a user-owned database for persistent storage. The packaged database is not a
+durable personal store; changes to it may be lost or unavailable after
+reinstall or upgrade.
 
 Any calculations/conversions then rely on the
 :class:`~pygaps.core.adsorbate.Adsorbate` for providing parameters such as
@@ -68,7 +70,8 @@ To view a summary of the adsorbate properties:
     .. code:: python
 
         my_adsorbate.formula
-        >> 'C4H10'
+
+    This returns ``'C4H10'``.
 
     All other custom properties are found in the ``Adsorbate.properties``
     dictionary.
@@ -76,7 +79,8 @@ To view a summary of the adsorbate properties:
     .. code:: python
 
         my_adsorbate.properties["carbon_number"]
-        >> 4
+
+    This returns ``4``.
 
 .. note::
 
@@ -95,7 +99,8 @@ and stored in ``pygaps.ADSORBATE_LIST``.
 .. code:: python
 
     len(pygaps.ADSORBATE_LIST)
-    >> 176
+
+The result is the number of adsorbates loaded from the packaged database.
 
 To retrieve an :class:`~pygaps.core.adsorbate.Adsorbate` from this list, the
 easiest way is by using the class method:
@@ -140,7 +145,9 @@ get the vapour pressure at 25 degrees in bar.
 .. code:: python
 
     my_adsorbate.saturation_pressure(298, unit='bar')
-    >> 2.8
+
+The returned value is the saturation pressure in bar; it depends on the
+thermodynamic backend and its supported state range.
 
 .. caution::
 
@@ -157,7 +164,8 @@ without a thermodynamic backend.
 .. code:: python
 
     my_adsorbate.saturation_pressure(298, calculate=False)
-    >> 2.2              # Value in the `properties` dictionary
+
+This returns the value supplied in the ``properties`` dictionary.
 
 For calculations of other properties, the
 `CoolProp backend <https://www.coolprop.org/coolprop/wrappers/Python/index.html>`__
@@ -194,20 +202,29 @@ A useful shorthand is to pass an optional parameter ``store`` at creation
     This makes the adsorbate available **only** in the current session. No
     permanent changes to the internal adsorbates are made this way.
 
-To **permanently** store a custom adsorbate for later use or make modifications
-to exiting adsorbates, the user must upload it to the internal database. This
-can be done as:
+To store a custom adsorbate in a database for later use, upload it to a
+user-owned copy of the packaged database. Pass ``db_path`` by keyword for
+every database operation; omitting it targets the packaged database, and
+passing a path positionally may also target the packaged database.
 
-.. code:: python
+.. code-block:: python
 
+    from pathlib import Path
+    from shutil import copy2
+    import pygaps
     import pygaps.parsing as pgp
 
-    # To permanently store in the database
-    pgp.adsorbate_to_db(ads_new)
+    db_path = Path("my-pygaps.db")
+    if not db_path.exists():
+        copy2(pygaps.DATABASE, db_path)
 
-    # To store any modifications to an adsorbate in the database
-    pgp.adsorbate_to_db(ads_modified, overwrite=True)
+    pgp.adsorbate_to_db(my_adsorbate, db_path=db_path)
+
+    # Overwrite replaces all stored fields for this adsorbate.
+    # pgp.adsorbate_to_db(my_adsorbate, db_path=db_path, overwrite=True)
+
+Keep backups of this user-owned database. Do not treat changes to the packaged
+database as permanent.
 
 For more info, check out the :ref:`sqlite <sqlite-manual>` section of the
 manual.
-

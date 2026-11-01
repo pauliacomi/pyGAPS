@@ -20,14 +20,14 @@ class DSToth(IsothermBaseModel):
     Notes
     -----
     An extension to the Toth model to consider two adsorption sites, with
-    different monolayer capacities, affinities, and exponents[#]_. This was
+    different monolayer capacities, affinities, and exponents [#dstoth]_. This was
     first proposed by Serna-Guerrero, Balmabkhout, and Sayari to model ambient
     temperature CO2 isotherms up to 20 bar, with the two sites representing
-    chemical and physical adsorption, respectively[#]_.
+    chemical and physical adsorption, respectively [#dstoth]_.
 
     .. math::
 
-        n(p) = \sum_i n_{m_i} \frac{K_i p}{\sqrt[t_i]{1+(K_i p)**{t_i}}}
+        n(p) = \sum_i n_{m_i} \frac{K_i p}{\sqrt[t_i]{1+(K_i p)^{t_i}}}
 
     In practice, thus far only two adsorption sites (chemical and physical
     adsorption) are considered.
@@ -44,7 +44,7 @@ class DSToth(IsothermBaseModel):
 
     References
     ----------
-    .. [#] Serna-Guerrero, R., Belmabkhout, Y., & Sayari, A. (2010). Modeling
+    .. [#dstoth] Serna-Guerrero, R., Belmabkhout, Y., & Sayari, A. (2010). Modeling
        CO2 adsorption on amine-functionalized mesoporous silica: 1. A
        semi-empirical equilibrium model. Chemical Engineering Journal, 161(1-2), 173-181.
     """
@@ -142,30 +142,32 @@ class DSToth(IsothermBaseModel):
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def toth_correction(self, pressure):
-        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate the Toth correction to the Polanyi adsorption potential.
 
         .. math::
-            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
-            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+            \varepsilon_{ads} = RT \ln\left(\frac{\Psi P_{sat}}{P}\right)
 
-        For the Multi-Site T\'oth model;
-            .. math::
-                \Psi &= \left[\frac{
-                \sum_i{\frac{n_{m_i} K_i }{\left(1+(K_i P)^{t_i}\right)^{\frac{1}{t}}}}}
-                {\sum_i{
-                \frac{n_{m_i} K_i}{ \left(1+(K_i P)^{t_i}\right)^{\frac{t-1}{t}} }   }
-                }
-                    \right]
+        For the multi-site Toth model:
+
+        .. math::
+            \Psi = \frac{n}{P}\frac{\mathrm{d}P}{\mathrm{d}n} - 1
+                 = \frac{
+                     \sum_i n_{m_i} K_i \left(1+(K_i P)^{t_i}\right)^{-1/t_i}
+                   }{
+                     \sum_i n_{m_i} K_i \left(1+(K_i P)^{t_i}\right)^{-(t_i+1)/t_i}
+                   } - 1
+
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
         ----------
         pressure : float
-            The pressure at which to calculate the T\'oth correction
+            The pressure at which to calculate the Toth correction.
 
         Returns
         -------
-            The T\'oth correction, $\Psi$
+        float
+            The Toth correction, :math:`\Psi`.
         """
         nm1K1 = self.params["n_m1"] * self.params["K1"]
         K1Pt1 = (self.params["K1"] * pressure) ** self.params["t1"]

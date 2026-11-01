@@ -19,6 +19,7 @@ inner workings of various functions.
    characterisation
    fitting
    iast
+   prediction
    parsing
    plotting
    units

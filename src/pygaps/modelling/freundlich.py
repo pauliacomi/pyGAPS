@@ -126,31 +126,34 @@ class Freundlich(IsothermBaseModel):
         return m * K * pressure ** (1 / m)
 
     def toth_correction(self, pressure: float) -> float:
-        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate the Toth correction to the Polanyi adsorption potential.
 
         .. math::
 
-            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
-            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+            \varepsilon_{ads} = RT \ln\left(\frac{\Psi P_{sat}}{P}\right)
 
-        For the Henry model,
+        .. math::
+            \Psi = \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} - 1
 
-        ..math::
+        For the Freundlich model :math:`n = K P^{1/m}`:
 
-            \Psi = 0
+        .. math::
 
-        As a result $\varepsilon_{ads}$ is undefined.
+            \Psi = m - 1
+
+        The logarithmic adsorption potential requires :math:`m > 1`.
 
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
         ----------
         pressure : float
-            The pressure at which to calculate the T\'oth correction
+            The pressure at which to calculate the Toth correction.
 
         Returns
         -------
-            The T\'oth correction, $\Psi$
+        float
+            The Toth correction, :math:`\Psi`.
         """
         return self.params["m"] - 1
 

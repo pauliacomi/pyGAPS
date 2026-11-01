@@ -138,26 +138,31 @@ class TSLangmuir(IsothermBaseModel):
         )
 
     def toth_correction(self, pressure):
-        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate the Toth correction to the Polanyi adsorption potential.
 
         .. math::
-            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
-            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+            \varepsilon_{ads} = RT \ln\left(\frac{\Psi P_{sat}}{P}\right)
 
-        For Multi-Site Langmuir models;
-            .. math::
-                \Psi = \left[ \sum_i{\frac{n_{m_i}K_i}{1 + K_i P}} \right] \left[ \sum_i{\frac{n_{m_i} K_i}{(1 + K_i P)^2}} \right]^{-1} - 1
+        .. math::
+            \Psi = \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} - 1
+
+        For multi-site Langmuir models:
+
+        .. math::
+            \Psi = \left[ \sum_i{\frac{n_{m_i}K_i}{1 + K_i P}} \right]
+                   \left[ \sum_i{\frac{n_{m_i} K_i}{(1 + K_i P)^2}} \right]^{-1} - 1
 
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
         ----------
         pressure : float
-            The pressure at which to calculate the T\'oth correction
+            The pressure at which to calculate the Toth correction.
 
         Returns
         -------
-            The T\'oth correction, $\Psi$
+        float
+            The Toth correction, :math:`\Psi`.
         """
         nm1K1 = self.params["n_m1"] * self.params["K1"]
         K1P = self.params["K1"] * pressure

@@ -155,17 +155,19 @@ class Langmuir(IsothermBaseModel):
         return self.params["n_m"] * numpy.log(1.0 + self.params["K"] * pressure)
 
     def toth_correction(self, pressure):
-        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate the Tóth correction, :math:`\Psi`, to the Polanyi adsorption potential at a given pressure.
 
         .. math::
-            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
-            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
 
-        For the Langmuir model;
-            .. math::
-                \Psi = KP
+            \varepsilon_{\mathrm{ads}} = RT \ln\left(\Psi \frac{P_{\mathrm{sat}}}{P}\right)
 
-        Model parameters must be derived from isotherm with pressure in Pa.
+            \Psi = \left.\frac{n}{P}\frac{\mathrm{d}P}{\mathrm{d}n}\right|_T - 1
+
+        For the Langmuir model, :math:`\Psi = KP`.
+
+        Model parameters must be derived from an isotherm with pressure in Pa; in
+        that case :math:`K` has units of :math:`\mathrm{Pa}^{-1}`. The saturation
+        pressure and pressure in the logarithm must use the same units.
 
         Parameters
         ----------

@@ -61,7 +61,9 @@ def enthalpy_sorption_whittaker(
     isosteric enthalpy of adsorption :math:`\Delta H_{st}`. Toth-like isotherms
     take the general form;
 
-    n(P) = \sum_{i} n_{m_i} \frac{K_i P}{\sqrt[t_i]{1+(K_i P)^{t_i}}}
+    .. math::
+
+        n(P) = \sum_i n_{m_i} \frac{K_i P}{\sqrt[t_i]{1+(K_i P)^{t_i}}}
 
     And apart from Toth, include the multi- and single site Langmuir model
     (where all t_i are 1), and the chemiphysisorption model.
@@ -80,30 +82,34 @@ def enthalpy_sorption_whittaker(
     meaningless. In this case, :math:`\Delta H_{vap}` is estimated as that at
     the triple point.
 
-    :math:`\Delta \lambda` is determined from the model isotherm parameters as :
+    The model-specific correction :math:`\Psi` is used to calculate the
+    adsorption potential:
 
     .. math::
 
-        \Delta \lambda = R T \sum_{i} \ln{\left[ P_o K_i \left( \frac{\theta_i^{t_i}}
-            {1 - \theta_i^{t_i}} \right )^{\frac{1-t_i}{t_i}} \right ]}
+        \Delta \lambda = RT \ln\left(\Psi \frac{P_0}{P}\right)
 
-    Where :math:`P_0` is the saturation pressure, :math:`\theta` is the
-    fractional coverage, and :math:`K` is the equilibrium constant. In the case
-    that the adsorptive is supercritical, the Dubinin pseudo-saturation pressure
-    is used;
-
-    ..math::
-        `p^0 = p_c \left(\frac{T}{T_c}\right)^2`.
-
-    The exponent :math:`t` is not relevant for Langmuir models it reduces to 1.
-    Thus, :math:`\Delta \lambda` becomes
+    Here :math:`P_0` is the saturation pressure. For a supercritical adsorptive,
+    the Dubinin pseudo-saturation pressure is used:
 
     .. math::
 
-        \Delta \lambda = RT \sum_{i} \ln{ \left( \frac{P_0}{K_i} \right) }
+        P_0 = p_c \left(\frac{T}{T_c}\right)^2
 
-    As such, the Whittaker method predicts constant isosteric enthalpies of
-    adsorption when Langmuir models are used.
+    For a single-site Langmuir model, :math:`t=1` and
+    :math:`\theta/(1-\theta)=KP`. The single-site expression therefore reduces
+    to
+
+    .. math::
+
+        \Delta \lambda = RT \ln(P_0 K)
+
+    where :math:`K` has inverse-pressure units, so :math:`P_0 K` is
+    dimensionless. This one-site result is independent of loading and therefore
+    predicts a constant enthalpy for a single-site Langmuir model. For
+    multi-site models, :math:`\Psi` is evaluated for the complete model using
+    its ``toth_correction``; this single-site simplification is not applied
+    independently to each site.
 
     References
     ----------
@@ -329,8 +335,11 @@ def stderr_estimate(
     The estimate is based on the RMSE of the model fitting and the number of terms
     in the model.
 
-    ..math::
-        \sigma = 0.434 * \sqrt{n cdot RMSE^2}
+    .. math::
+
+        \sigma_{\mathrm{abs}} = 0.434 \sqrt{n_{\mathrm{terms}} \,\mathrm{RMSE}^2}
+
+        \sigma_i = \left|\sigma_{\mathrm{abs}} H_i\right|
 
     Parameters
     ----------
@@ -357,9 +366,9 @@ def toth_adsorption_potential(
 ):
     r"""Calculate the T\'oth-corrected Polanyi adsorption potential, $\varepsilon_{ads}$.
 
-    ..math::
+    .. math::
 
-        \Psi = RT \ln{\Psi \frac{P_{sat}}{P}}
+        \varepsilon_{\mathrm{ads}} = RT \ln\left(\Psi \frac{P_{\mathrm{sat}}}{P}\right)
 
     Parameters
     ----------

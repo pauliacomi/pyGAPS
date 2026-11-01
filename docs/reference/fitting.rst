@@ -81,6 +81,18 @@ Toth
 .. automodule:: pygaps.modelling.toth
     :members:
 
+Dual-Site Toth
+--------------
+
+.. automodule:: pygaps.modelling.dstoth
+    :members:
+
+ChemiPhysisorption
+------------------
+
+.. automodule:: pygaps.modelling.chemiphysisorption
+    :members:
+
 Jensen-Seaton
 -------------
 

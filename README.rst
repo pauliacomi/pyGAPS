@@ -187,9 +187,9 @@ repository and sync the dependency groups with ``uv``:
 
 .. code:: bash
 
-    git clone https://github.com/pauliacomi/pyGAPS
+    git clone --branch develop --single-branch https://github.com/pauliacomi/pyGAPS
     cd pyGAPS
-    uv sync --all-groups
+    uv sync --frozen --all-groups
 
 If you want to contribute to pyGAPS or develop your own code from the package,
 check out the detailed information in

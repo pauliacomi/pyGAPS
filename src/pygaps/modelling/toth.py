@@ -109,38 +109,41 @@ class Toth(IsothermBaseModel):
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def toth_correction(self, pressure):
-        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate the Toth correction to the Polanyi adsorption potential.
 
         .. math::
 
-            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
-            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+            \varepsilon_{ads} = RT \ln\left(\frac{\Psi P_{sat}}{P}\right)
 
-        For the T\'oth model;
+        .. math::
+            \Psi = \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} - 1
+
+        For the Toth model:
 
         .. math::
 
             \Psi = (KP)^t
 
         Note that this can be expressed in terms of the fractional coverage
-        $\theta = \frac{n}{n_m}$
+        :math:`\theta = \frac{n}{n_m}`.
 
         .. math::
 
             \Psi = \frac{\theta^t}{1-\theta^t}
 
-        However here we calculate from pressure, $P$.
+        However here we calculate from pressure, :math:`P`.
 
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
         ----------
         pressure : float
-            The pressure at which to calculate the T\'oth correction
+            The pressure at which to calculate the Toth correction.
 
         Returns
         -------
-            The T\'oth correction, $\Psi$
+        float
+            The Toth correction, :math:`\Psi`.
         """
         return (self.params["K"] * pressure) ** self.params["t"]
 

@@ -16,21 +16,21 @@ class ChemiPhysisorption(IsothermBaseModel):
     .. math::
 
         n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
-        \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})
+        \left[ n_{m_2}\frac{K_2 p}{1+K_2 p} \right] \exp\left(\frac{-E_a}{RT}\right)
 
     Notes
     -----
     A recently (2023) proposed model by the Petit group. It is an adaptation of
     the Dual-Site Toth model, and can be distinguished by the fact that the
     exponent (t) is 1 for the chemisorption portion (i.e. it is a Langmuir
-    isotherm)[#]_. Further, the model assumes that at a given activation
+    isotherm) [#]_. Further, the model assumes that at a given activation
     energy, E_a, molecules will have sufficient energy to take part in
     chemisorption, thus the chemisorption term is multiplied by an Arrhenius
     term;
 
     .. math::
         n(p) = n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} +
-        \right[ n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})
+        \left[ n_{m_2}\frac{K_2 p}{1+K_2 p} \right] \exp\left(\frac{-E_a}{RT}\right)
 
     This was applied by the Petit group to CO_2 isotherms measured at
     temperatures in the range 288-393 K, and pressures up to 1 bar.
@@ -45,7 +45,10 @@ class ChemiPhysisorption(IsothermBaseModel):
 
     # Model parameters
     name = 'ChemiPhysisorption'
-    formula = r"n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + \right[n_{m_2}\frac{K_2 p}{1+K_2 p} ]\left \exp(\frac{-Ea}{RT})"
+    formula = (
+        r"n_{m_1}\frac{K_1 p}{\sqrt[t_1]{1+(K_1 p)^{t_1}}} + "
+        r"\left[n_{m_2}\frac{K_2 p}{1+K_2 p}\right] \exp\left(\frac{-E_a}{RT}\right)"
+    )
     calculates = 'loading'
     param_names = (
         "n_m1",
@@ -148,44 +151,35 @@ class ChemiPhysisorption(IsothermBaseModel):
         return integrate.quad(lambda x: self.loading(x) / x, 0, pressure)[0]
 
     def toth_correction(self, pressure):
-        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate the Toth correction to the Polanyi adsorption potential.
 
         .. math::
-            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
-            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+            \varepsilon_{ads} = RT \ln\left(\frac{\Psi P_{sat}}{P}\right)
 
-        For the Multi-Site T\'oth model;
-            .. math::
-                \Psi &= \left[\frac{
-                \sum_i{\frac{n_{m_i} K_i }{\left(1+(K_i P)^{t_i}\right)^{\frac{1}{t}}}}}
-                {\sum_i{
-                \frac{n_{m_i} K_i}{ \left(1+(K_i P)^{t_i}\right)^{\frac{t-1}{t}} }   }
-                }
-                    \right] - 1
+        The correction is :math:`\Psi = (n/P)(\mathrm{d}P/\mathrm{d}n) - 1`.
+        For the ChemiPhysisorption model, define
+        :math:`\gamma = \exp(-E_a/(RT))`. The expression becomes:
 
-        For the ChemiPhysisorption model, this inclues an extra term, $\gamma =
-        \exp{\frac{-E_a}{RT}}$, so the expression becomes
-
-            ..math::
-                \Psi = \left[
-                \frac{
-                \frac{n_{m_1}K_1}{\left(1+(K_1 P)^t\right)^{\frac{1}{t}}}
-                + \frac{\gamma n_{m_2} K_2}{1+KP}
-                }{
-                \frac{n_{m_1 K_1}}{\left(1 + (K_1 P)^t \right)^{\frac{t+1}{t}}} +  \frac{\gamma n_{m_2} K_2}{\left(1+KP\right)^2}
-                }
-                \right] - 1
+        .. math::
+            \Psi = \frac{
+                \frac{n_{m_1}K_1}{(1+(K_1 P)^{t_1})^{1/t_1}}
+                + \frac{\gamma n_{m_2} K_2}{1+K_2P}
+            }{
+                \frac{n_{m_1}K_1}{(1+(K_1 P)^{t_1})^{(t_1+1)/t_1}}
+                + \frac{\gamma n_{m_2} K_2}{(1+K_2P)^2}
+            } - 1
 
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
         ----------
         pressure : float
-            The pressure at which to calculate the T\'oth correction
+            The pressure at which to calculate the Toth correction.
 
         Returns
         -------
-            The T\'oth correction, $\Psi$
+        float
+            The Toth correction, :math:`\Psi`.
         """
         nm1K1 = self.params["n_m1"] * self.params["K1"]
         K1Pt1 = (self.params["K1"] * pressure) ** self.params["t1"]
