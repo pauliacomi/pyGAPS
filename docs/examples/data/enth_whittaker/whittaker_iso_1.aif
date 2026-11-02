@@ -11,7 +11,7 @@ _exptl_instrument XEMIS
 _exptl_method unspecified
 
 _adsnt_material_name unknown
-_adsnt_sample_mass unknown
+_adsnt_sample_mass ?
 _adsnt_sample_name example
 
 _adsorptive_name methane
