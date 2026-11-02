@@ -105,8 +105,9 @@ def enthalpy_sorption_whittaker(
         \Delta \lambda = RT \ln(P_0 K)
 
     where :math:`K` has inverse-pressure units, so :math:`P_0 K` is
-    dimensionless. This one-site result is independent of loading and therefore
-    predicts a constant enthalpy for a single-site Langmuir model. For
+    dimensionless. This one-site adsorption potential is independent of loading.
+    The total predicted enthalpy can still vary because the vaporisation
+    enthalpy and compressibility correction depend on pressure. For
     multi-site models, :math:`\Psi` is evaluated for the complete model using
     its ``toth_correction``; this single-site simplification is not applied
     independently to each site.

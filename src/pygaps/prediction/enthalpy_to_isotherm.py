@@ -24,6 +24,8 @@ def predict_isotherm_from_enthalpy_clapeyron(
     branch: str = 'ads',
     verbose: bool = False,
     dographs: bool = True,
+    *,
+    loading_units: str = 'mol/kg',
 ) -> PointIsotherm:
     r"""
     Predict an isotherm at a given temperature from isosteric heats of adsorption.
@@ -55,9 +57,10 @@ def predict_isotherm_from_enthalpy_clapeyron(
     temperature_prediction: float
         The temperature at which to predict the isotherm. Units are K.
     isosteric_enthalpy_dictionary: dict, optional
-        Requires ``loading`` in the input isotherm's loading/material units
-        and bases, and ``isosteric_enthalpy`` in kJ/mol (the output of
-        :func:`~pygaps.characterisation.enth_sorp_clapeyron.enthalpy_sorption_clapeyron`).
+        Requires ``loading`` in mol/kg by default, and
+        ``isosteric_enthalpy`` in kJ/mol. To use the output of
+        :func:`~pygaps.characterisation.enth_sorp_clapeyron.enthalpy_sorption_clapeyron`
+        in the input isotherm's units, set ``loading_units='isotherm'``.
         The existing ``enthalpy_sorption`` key is also accepted. If both keys
         are present their values must agree. Only used if the isotherm has no
         ``enthalpy`` column; that column must also be in kJ/mol.
@@ -68,6 +71,10 @@ def predict_isotherm_from_enthalpy_clapeyron(
         Whether to be verbose. Defaults to False.
     dographs: bool, optional
         Whether to plot when ``verbose`` is enabled.
+    loading_units: {'mol/kg', 'isotherm'}, optional
+        Units of dictionary loadings. Defaults to mol/kg for compatibility.
+        Set to ``'isotherm'`` to use the input isotherm's loading/material
+        units and bases. Does not affect an embedded ``enthalpy`` column.
 
     Returns
     -------
@@ -75,6 +82,9 @@ def predict_isotherm_from_enthalpy_clapeyron(
         The isotherm predicted from the above parameters. Pressure in Pa,
         loading in mol/kg.
     """
+    if loading_units not in ('mol/kg', 'isotherm'):
+        raise ParameterError("loading_units must be 'mol/kg' or 'isotherm'.")
+
     if isosteric_enthalpy_dictionary is None and 'enthalpy' not in isotherm.other_keys:
         raise ParameterError(
             '''
@@ -113,25 +123,26 @@ def predict_isotherm_from_enthalpy_clapeyron(
         if len(enthalpy_keys) == 2 and not np.array_equal(enthalpy, isosteric_enthalpy_dictionary[enthalpy_keys[1]]):
             raise ParameterError("The dictionary contains conflicting enthalpy values.")
         loading = np.asarray(isosteric_enthalpy_dictionary['loading'])
-        loading = c_loading(
-            loading,
-            basis_from=isotherm.loading_basis,
-            basis_to='molar',
-            unit_from=isotherm.loading_unit,
-            unit_to='mol',
-            adsorbate=isotherm.adsorbate,
-            temp=temperature_isotherm,
-            basis_material=isotherm.material_basis,
-            unit_material=isotherm.material_unit,
-        )
-        loading = c_material(
-            loading,
-            basis_from=isotherm.material_basis,
-            basis_to='mass',
-            unit_from=isotherm.material_unit,
-            unit_to='kg',
-            material=isotherm.material,
-        )
+        if loading_units == 'isotherm':
+            loading = c_loading(
+                loading,
+                basis_from=isotherm.loading_basis,
+                basis_to='molar',
+                unit_from=isotherm.loading_unit,
+                unit_to='mol',
+                adsorbate=isotherm.adsorbate,
+                temp=temperature_isotherm,
+                basis_material=isotherm.material_basis,
+                unit_material=isotherm.material_unit,
+            )
+            loading = c_material(
+                loading,
+                basis_from=isotherm.material_basis,
+                basis_to='mass',
+                unit_from=isotherm.material_unit,
+                unit_to='kg',
+                material=isotherm.material,
+            )
 
         if verbose:
             logger.info(
@@ -196,6 +207,8 @@ def predict_isosurface_from_enthalpy_clapeyron(
     temperature_range: tuple[float, float] = None,
     branch: str = 'ads',
     verbose: bool = True,
+    *,
+    loading_units: str = 'mol/kg',
 ):
     r"""
     Predict loading as a function of pressure and temperature.
@@ -224,8 +237,9 @@ def predict_isosurface_from_enthalpy_clapeyron(
         of steps is determined by `num` parameter.
     isosteric_enthalpy_dictionary: dict, optional
         As for :func:`predict_isotherm_from_enthalpy_clapeyron`: ``loading``
-        uses the input isotherm's units and bases, and ``isosteric_enthalpy``
-        (or ``enthalpy_sorption``) is in kJ/mol. An embedded ``enthalpy``
+        defaults to mol/kg, and ``isosteric_enthalpy`` (or
+        ``enthalpy_sorption``) is in kJ/mol. Set ``loading_units='isotherm'``
+        to use the input isotherm's units and bases. An embedded ``enthalpy``
         column takes precedence.
     num: int, optional
         The number of steps to use when generating the grid.
@@ -237,6 +251,10 @@ def predict_isosurface_from_enthalpy_clapeyron(
         adsorption.
     verbose: bool, optional
         Whether to be verbose. Defaults to False.
+    loading_units: {'mol/kg', 'isotherm'}, optional
+        Units of dictionary loadings, as for
+        :func:`predict_isotherm_from_enthalpy_clapeyron`. Defaults to mol/kg.
+        Does not affect an embedded ``enthalpy`` column.
 
     Returns
     -------
@@ -245,6 +263,9 @@ def predict_isosurface_from_enthalpy_clapeyron(
         pressure columns in Pa. Values outside each predicted isotherm's
         pressure range are missing.
     """
+    if loading_units not in ('mol/kg', 'isotherm'):
+        raise ParameterError("loading_units must be 'mol/kg' or 'isotherm'.")
+
     isotherm_local = copy.copy(isotherm)  # avoid mutating the original isotherm
     isotherm_local.convert(
         pressure_unit='Pa',
@@ -290,6 +311,7 @@ def predict_isosurface_from_enthalpy_clapeyron(
             isosteric_enthalpy_dictionary=isosteric_enthalpy_dictionary,
             branch=branch,
             verbose=False,
+            loading_units=loading_units,
         )
         lims = [min(isotherm_predicted.pressure()), max(isotherm_predicted.pressure())]
 
