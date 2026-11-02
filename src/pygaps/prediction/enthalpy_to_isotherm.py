@@ -293,7 +293,7 @@ def predict_isosurface_from_enthalpy_clapeyron(
         )
         lims = [min(isotherm_predicted.pressure()), max(isotherm_predicted.pressure())]
 
-        loadings = [float(isotherm_predicted.loading_at(p)) if lims[0] < p < lims[1] else None for p in pressures_prediction]
+        loadings = [float(isotherm_predicted.loading_at(p, branch=branch)) if lims[0] < p < lims[1] else None for p in pressures_prediction]
         data.append(loadings)
 
     grid = pd.DataFrame(

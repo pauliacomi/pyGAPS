@@ -85,6 +85,46 @@ def test_prediction_embedded_enthalpy_uses_selected_branch(isotherm_parameters, 
 
 
 @pytest.mark.prediction
+@pytest.mark.parametrize('branch', ['ads', 'des'])
+def test_isosurface_interpolates_selected_branch(branch):
+    isotherm = pygaps.PointIsotherm(
+        pressure=[1, 2, 3, 2, 1],
+        loading=[1, 2, 3, 2.5, 1.5],
+        branch=[0, 0, 0, 1, 1],
+        material='prediction-test',
+        adsorbate='nitrogen',
+        temperature=300,
+        pressure_mode='absolute',
+        pressure_unit='bar',
+        loading_basis='molar',
+        loading_unit='mmol',
+        material_basis='mass',
+        material_unit='g',
+    )
+    temperatures = np.array([300, 301])
+    pressures = np.array([1.4e5, 1.8e5])
+    grid = eti.predict_isosurface_from_enthalpy_clapeyron(
+        isotherm,
+        temperatures_prediction=temperatures,
+        pressures_prediction=pressures,
+        isosteric_enthalpy_dictionary={
+            'loading': isotherm.loading(branch=branch),
+            'isosteric_enthalpy': [20] * len(isotherm.loading(branch=branch)),
+        },
+        branch=branch,
+        verbose=False,
+    )
+
+    pressure_factors = np.exp(20000 / eti.R * (1 / 300 - 1 / temperatures))
+    expected = pressures[None, :] / (1e5 * pressure_factors[:, None])
+    if branch == 'des':
+        expected += 0.5
+    np.testing.assert_allclose(grid.to_numpy(), expected)
+    np.testing.assert_array_equal(grid.index, temperatures)
+    np.testing.assert_array_equal(grid.columns, pressures)
+
+
+@pytest.mark.prediction
 def test_isosurface_accepts_native_units_and_celsius():
     isotherm = pygaps.PointIsotherm(
         pressure=[1, 2, 3],
