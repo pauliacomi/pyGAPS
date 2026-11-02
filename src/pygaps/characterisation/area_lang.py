@@ -142,8 +142,8 @@ def area_langmuir(
     standard error is conditional on the selected pressure range and fixed
     molecular cross-sectional area; it does not include uncertainty in the
     isotherm, model selection, or cross-sectional area.
-    The automatic pressure interval (5-90% of maximum input pressure) is an
-    estimate.
+    The automatic pressure interval (5-90% of maximum input pressure) is a
+    convenience heuristic, not a test of Langmuir-model validity.
 
     The calculation emits warnings when the Langmuir constant, monolayer
     loading, or area is not positive and finite. These warnings do not prevent
@@ -158,16 +158,13 @@ def area_langmuir(
     pygaps.characterisation.area_lang.area_langmuir_raw : low level method
 
     """
-    # get adsorbate properties
     adsorbate = Adsorbate.find(isotherm.adsorbate)
     cross_section = adsorbate.get_prop("cross_sectional_area")
 
-    # Read data in
     pressure, loading = get_iso_loading_and_pressure_ordered(
         isotherm, branch, {"loading_basis": "molar", "loading_unit": "mol"}, {"pressure_mode": "relative"}
     )
 
-    # use the langmuir function
     result = area_langmuir_raw(
         {
             'pressure': pressure,
@@ -198,7 +195,6 @@ def area_langmuir(
             )
         )
 
-        # Generate plot of the langmuir points chosen
         from pygaps.graphing.calc_graphs import langmuir_plot
 
         langmuir_plot(
@@ -323,21 +319,15 @@ def area_langmuir_raw(data: dict):
     if fit_method not in {'nonlinear', 'linearized'}:
         raise ParameterError("Langmuir fit_method must be 'nonlinear' or 'linearized'.")
 
-    # select the maximum and minimum of the points and the pressure associated
-    minimum = 0
-    maximum = len(pressure) - 1  # As we want absolute position
-
     if p_limits is None:
-        # Give reasonable automatic limits
-        # Min pressure is taken as 5% of max
-        # Max pressure is taken as 90% of max
+        # This convenience range does not establish that the data follow a Langmuir model.
         p_limits = [
-            pressure[maximum] * 0.05,
-            pressure[maximum] * 0.9,
+            pressure[-1] * 0.05,
+            pressure[-1] * 0.9,
         ]
 
     minimum, maximum = get_pressure_limit_indices(pressure, p_limits)
-    if maximum - minimum < 2:  # At least 3 points are required for regression.
+    if maximum - minimum < 2:
         raise CalculationError(
             "The isotherm does not have enough points (at least 3) in selected "
             "region. Unable to calculate Langmuir area."
@@ -356,6 +346,8 @@ def area_langmuir_raw(data: dict):
         )
         slope = 1 / n_monolayer
         intercept = 1 / (langmuir_const * n_monolayer)
+        # Transform the nonlinear-fit covariance to slope/intercept uncertainty
+        # with the delta method; covariance is ordered as (n_monolayer, K).
         slope_gradient = numpy.array([-1 / n_monolayer**2, 0.0])
         intercept_gradient = numpy.array(
             [
@@ -405,7 +397,7 @@ def area_langmuir_raw(data: dict):
     if not numpy.isfinite((r_squared, corr_coef, loading_rmse)).all():
         raise CalculationError("The Langmuir fit diagnostics contain non-finite values.")
 
-    # Checks for consistency
+    # These are advisory diagnostics; preserve the fitted estimate for callers.
     for parameter, value in (
         ("Langmuir constant", langmuir_const),
         ("monolayer loading", n_monolayer),
@@ -489,7 +481,9 @@ def langmuir_fit_nonlinear(pressure, loading):
                 pressure,
                 loading,
                 p0=(initial_capacity, initial_constant),
+                # Positive bounds enforce physically meaningful capacity and affinity.
                 bounds=(0, numpy.inf),
+                # Scale differently sized parameters and tighten convergence tolerances.
                 x_scale='jac',
                 ftol=1e-12,
                 xtol=1e-12,
