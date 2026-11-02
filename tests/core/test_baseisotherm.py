@@ -1,5 +1,7 @@
 """Tests relating to the Isotherm class."""
 
+from copy import deepcopy
+
 import numpy
 import pytest
 
@@ -140,6 +142,86 @@ class TestBaseIsotherm:
         assert isotherm.material == "testing"
         isotherm.material = {'name': "TEST"}
         assert isotherm.material == basic_material
+
+    @pytest.mark.parametrize('registered', [False, True])
+    def test_isotherm_material_dictionary_snapshot(self, monkeypatch, registered):
+        material = pygaps.Material(
+            'local-material', density=2, molar_mass=10,
+            provenance={'tags': ['registered']},
+        )
+        registry = [material] if registered else []
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', registry)
+        supplied = {'name': material.name, 'density': 9, 'notes': {'tags': ['local']}}
+        original = deepcopy(supplied)
+
+        iso = BaseIsotherm(material=supplied, adsorbate='nitrogen', temperature=77)
+
+        assert supplied == original
+        assert iso.material is not material
+        assert iso.material.density == 9
+        assert material.density == 2
+        assert len(registry) == int(registered)
+        if registered:
+            assert iso.material.molar_mass == 10
+            iso.material.properties['provenance']['tags'].append('changed')
+            assert material.properties['provenance'] == {'tags': ['registered']}
+            material.molar_mass = 20
+            assert iso.material.molar_mass == 10
+
+        iso.material.properties['notes']['tags'].append('changed')
+        assert supplied == original
+        supplied['notes']['tags'].append('caller-edit')
+        assert iso.material.properties['notes'] == {'tags': ['local', 'changed']}
+
+    def test_isotherm_material_dictionary_does_not_register(self, monkeypatch):
+        registry = []
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', registry)
+        iso = BaseIsotherm(
+            material={'name': 'local-material', 'store': True},
+            adsorbate='nitrogen', temperature=77,
+        )
+
+        assert registry == []
+        assert iso.material.properties['store'] is True
+
+    @pytest.mark.parametrize('by_name', [False, True])
+    def test_isotherm_material_explicit_sharing(self, monkeypatch, by_name):
+        material = pygaps.Material('shared-material', density=2)
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', [material])
+        iso = BaseIsotherm(
+            material=material.name if by_name else material,
+            adsorbate='nitrogen', temperature=77,
+        )
+
+        assert iso.material is material
+        material.density = 9
+        assert iso.material.density == 9
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    def test_isotherm_material_local_conversion(self, monkeypatch, fractional_conversion_parameters, kind):
+        parameters = fractional_conversion_parameters
+        material = parameters['material']
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', [material])
+        cls = pygaps.PointIsotherm if kind == 'point' else pygaps.ModelIsotherm
+        options = {} if kind == 'point' else {'model': 'Henry'}
+        first = cls(pressure=[1., 2., 3.], loading=[2., 4., 6.], **options, **parameters)
+        first_id = first.iso_id
+        supplied = {'name': material.name, 'density': 9}
+        second = cls(
+            pressure=[1., 2., 3.], loading=[2., 4., 6.], **options,
+            **{**parameters, 'material': supplied},
+        )
+
+        assert supplied == {'name': material.name, 'density': 9}
+        assert first.iso_id == first_id
+        assert first.material is material
+        assert second.material is not material
+        assert second.material.molar_mass == 10
+        assert first.loading_at(1, material_basis='volume', material_unit='cm3') == pytest.approx(4)
+        assert second.loading_at(1, material_basis='volume', material_unit='cm3') == pytest.approx(18)
+        second.material.density = 5
+        assert first.iso_id == first_id
+        assert material.density == 2
 
     def test_isotherm_temperature(self):
         """Test various temperature functions."""

@@ -3,6 +3,39 @@
 Reviewed 2026-11-02 at `develop` / `a13aa10`. This is an assessment, not an
 implementation plan or approval to change scientific behavior.
 
+## Current status: outstanding items
+
+Updated 2026-11-02 on `feature/core-updates`, including the C12 ownership fix.
+**14 findings are resolved, 7 core findings remain open,
+C10/C18/C19 are transferred to parsing, and C14 is deferred to fitting work.**
+The detailed findings retain the original
+evidence; resolved findings have resolution notes rather than describing
+current defects.
+
+| Priority | Finding | Outstanding work |
+|---|---|---|
+| High, transferred | [C10](parsing.md#c10-json-and-sqlite-round-trips-can-change-branch-assignments) | Preserve explicit branches in JSON and SQLite; tracked in the parsing review, not this core implementation queue. |
+| High | [C11](#c11-distinct-measurements-can-have-the-same-isotherm-identity) | Define lossless record/content identity and a versioned ID migration policy. |
+| Medium, deferred | [C14](#c14-model-selection-compares-different-residual-definitions) | Define a common selection objective; tracked in [fitting action points](fitting.md#action-points), not this core implementation queue. |
+| Medium, transferred | [C18](parsing.md#c18-json-does-not-round-trip-all-valid-point-isotherm-coordinates) | Preserve coordinate keys and decide index persistence/identity semantics; tracked in the parsing review. |
+| Medium, transferred | [C19](parsing.md#c19-database-autoinsert-checks-the-in-memory-registry-not-the-target-db) | Check referenced records in the target database and insert transactionally; tracked in the parsing review. |
+| Medium | [C20](#c20-equality-and-hashing-violate-pythons-container-expectations) | Separate alias lookup from equality and choose a safe mutable-object hashing contract. |
+| Medium | [C21](#c21-validation-depends-on-construction-path-and-misses-invalid-units) | Apply branch/unit validation consistently across constructors and factories. |
+| Medium | [C22](#c22-thermodynamic-fallback-catches-control-flow-and-programming-errors) | Narrow backend exception handling and preserve original failure context. |
+| Medium | [C23](#c23-the-documented-vaporisation-property-alias-is-not-read) | Define stored alias precedence/sign convention and diagnose conflicts. |
+| Low | [C24](#c24-factory-methods-lose-subclasses-and-leak-a-control-option-into-metadata) | Preserve factory subclasses and keep control options out of metadata. |
+| Low | [C25](#c25-type-contracts-and-data-quality-policies-need-clarification) | Correct type contracts and define storage/calculation data-quality policies. |
+
+**Resolved:** C1-C9, C12-C13, C15-C17. Changes cover fractional conversions,
+spreading pressure, IAST branches, saturation-pressure units, fitting options,
+conversion atomicity/no-ops, data/backend caches, input defaults, pseudo-pressure
+selection, inclusive limits, and independent dictionary-supplied materials.
+
+**Validation:** including C12, the implementation passed the full suite with
+**1,236 passed, 20 deselected** (two existing BET/GAB warnings).
+Ruff and whitespace checks also passed. REFPROP remains
+unavailable locally; its backend forwarding is covered by stubs.
+
 ## Scope and evidence
 
 The review covers `BaseIsotherm`, `PointIsotherm`, `ModelIsotherm`, `Material`
@@ -24,7 +57,8 @@ no production data were changed. For the failed fractional conversion, a
 debugger also confirmed that the data had already changed while the old units
 were still recorded. A mocked backend failure was used where explicitly noted;
 an actual REFPROP installation was not tested. No source fixes or new
-regression tests were made during this review.
+regression tests were made during the original assessment; subsequent fixes
+and their validation are recorded above and in the resolution notes.
 
 High means a demonstrated path can silently change scientific results, lose
 data identity, or leave misleading state. Medium generally means a narrower
@@ -315,23 +349,8 @@ HEOS/REFPROP forwarding without requiring REFPROP installation.
 
 ### C10. JSON and SQLite round trips can change branch assignments
 
-**Evidence.** An explicitly adsorption-only, descending point isotherm with
-branches `[0, 0, 0]` becomes `[1, 1, 1]` after JSON export/import. The JSON
-writer omits every adsorption marker, and the reader guesses when no marker
-remains. Separately, an explicitly desorption-only ascending isotherm with
-`[1, 1, 1]` becomes `[0, 0, 0]` after a SQLite round trip; its `iso_id` also
-changes. SQLite stores pressure/loading and supplementary columns but excludes
-the branch column.
-
-**Suggested correction.** Persist explicit branches in both formats and keep
-legacy missing-branch interpretation versioned/backward-compatible. Test
-adsorption-only descending, desorption-only ascending and mixed branches, not
-only examples where the branch guess happens to recover the original.
-
-**Sources:** [JSON writer](../../src/pygaps/parsing/json.py#L59),
-[JSON reader](../../src/pygaps/parsing/json.py#L161),
-[SQLite writer](../../src/pygaps/parsing/sqlite.py#L877),
-[SQLite reader](../../src/pygaps/parsing/sqlite.py#L964).
+**Transferred, not resolved.** Evidence and action points now live in the
+[parsing review](parsing.md#c10-json-and-sqlite-round-trips-can-change-branch-assignments).
 
 ### C11. Distinct measurements can have the same isotherm identity
 
@@ -371,6 +390,16 @@ per-isotherm material properties. Document ownership and add tests with two
 isotherms sharing a registered name, including conversion and ID stability.
 
 **Source:** [material setter](../../src/pygaps/core/baseisotherm.py#L211).
+
+**Resolution (feature/core-updates).** Dictionary inputs now create independent,
+unregistered materials using registered defaults plus local overrides. The
+merged properties are deep-copied, preserving caller input and preventing
+nested mutable properties from leaking between the material, registry, and
+caller. Overrides replace complete values, not nested fields. Names and
+explicit Material instances retain intentional sharing. Global updates must
+now be explicit. Regressions cover registered/unregistered inputs, nested
+isolation, shared-reference behavior, and point/model conversion and ID
+stability when another isotherm is constructed or locally edited.
 
 ## Medium-priority findings
 
@@ -503,37 +532,13 @@ limits, including indexed outputs and supplementary point data.
 
 ### C18. JSON does not round-trip all valid point-isotherm coordinates
 
-A point isotherm with DataFrame index `[10, 20, 30]` round-trips through JSON
-with index `[0, 1, 2]`, and its ID changes because the hash includes the
-index. A duplicate index, which the constructor and existing tests allow,
-makes `to_json()` raise `ValueError` because `orient='index'` requires unique
-labels. DataFrame columns named `p` and `q` can be exported, but a default
-JSON import fails unless the caller manually resupplies those keys.
-
-**Suggested correction.** Serialize records without requiring a unique index,
-preserve coordinate-column names, and explicitly decide whether the index is
-scientific identity to persist or incidental metadata to exclude from identity.
-Version the format as needed. Test default and non-default keys, unique and
-duplicate indices, and ID semantics.
-
-**Sources:** [JSON representation](../../src/pygaps/parsing/json.py#L54),
-[JSON reader defaults](../../src/pygaps/parsing/json.py#L84),
-[point reserved keys](../../src/pygaps/core/pointisotherm.py#L91).
+**Transferred, not resolved.** Evidence and action points now live in the
+[parsing review](parsing.md#c18-json-does-not-round-trip-all-valid-point-isotherm-coordinates).
 
 ### C19. Database autoinsert checks the in-memory registry, not the target DB
 
-With a material created using `store=True` but absent from a disposable target
-database, `iso.to_db(..., autoinsert_material=True)` raises `ParsingError`
-from a foreign-key failure. The writer skips insertion because the material
-is in `MATERIAL_LIST`; the same design is used for adsorbates. An in-memory
-registry cannot establish membership in an arbitrary target database.
-
-**Suggested correction.** Check the target database through the active
-connection, insert missing referenced records transactionally, and handle
-conflicts explicitly. Test registered and unregistered objects against a
-different DB, plus `autoinsert=False`.
-
-**Source:** [SQLite autoinsert checks](../../src/pygaps/parsing/sqlite.py#L815).
+**Transferred, not resolved.** Evidence and action points now live in the
+[parsing review](parsing.md#c19-database-autoinsert-checks-the-in-memory-registry-not-the-target-db).
 
 ### C20. Equality and hashing violate Python's container expectations
 
@@ -646,28 +651,28 @@ Keep auxiliary columns' missing-data policy separate.
 
 ## Recommended sequencing and regression coverage
 
-1. First protect scientific outputs with independent oracles for C1-C5:
-   fractional numerator/denominator conversions, descending/zero-origin
-   integration, desorption IAST, saturation units and effective model bounds.
-2. Make mutations and caches consistent (C6-C9 and C12), including failure
-   atomicity and backend retry. Do not hide backend failures behind broad
-   catches.
-3. Address branch/identity persistence (C10-C11, C18-C20) with explicit
-   format and database migration decisions. Existing serialized IDs and
-   legacy files need compatibility tests.
-4. Consolidate unit/default/branch contracts and model-selection scoring
-   (C13-C17, C21-C23), then tackle the lower-priority design work.
+The remaining core work is recommended in this order; compatibility and
+scientific-policy decisions still require agreement before implementation.
 
-Existing tests provide a good starting point, but many conversion assertions
-check one point or one route; the spreading-pressure tests do not exercise a
-descending branch or zero origin, and the model-list fit test supplies no
-bounds. Add focused cross-path and failure-state cases rather than a duplicated
-Cartesian product. When implementing fixes, run the affected core tests plus
-the relevant JSON/SQLite and IAST suites; the probes here do not replace those
-integration tests.
+1. Address identity and hashing (C11, C20) with explicit compatibility and
+   database migration decisions. Existing IDs and legacy files need
+   compatibility tests.
+2. Unify construction validation, narrow thermodynamic fallback handling, and
+   reconcile stored-property aliases (C21-C23).
+3. Fix factory extensibility/metadata leakage (C24), then improve type
+   contracts and agree data-quality policies (C25).
 
-One attempted `pytest --cov=pygaps.core` instrumentation run failed while
+C10, C18 and C19 are tracked separately in the parsing review and should be
+coordinated with identity/persistence work. C14 remains a separate fitting
+action, not an approved change to ranking.
+Preserve the independent scientific oracles and cross-path/failure-state
+regressions added for resolved findings. Run affected core tests plus relevant
+JSON/SQLite and IAST suites when implementing the remaining fixes.
+
+During the original assessment, one attempted `pytest --cov=pygaps.core`
+instrumentation run failed while
 importing NumPy with “cannot load module more than once per process.” Its
 cause was not investigated; the path-based coverage run above completed.
-Only the local Windows/Python 3.14 environment was exercised, not the full
+Only the local Windows/Python 3.14 environment was exercised for these core
+updates, not the full
 supported Python/OS matrix.

@@ -79,6 +79,25 @@ and so on. The isotherm metadata must include:
 - The adsorbate used (``adsorbate`` or ``a``).
 - The temperature at which the data was recorded (``temperature`` or ``t``).
 
+The ``material`` argument also accepts a ``Material`` instance or a dictionary
+containing ``name`` and material properties. A registered name resolves to the
+shared registered instance, and a supplied instance is used directly. Changes
+to these shared objects are visible to every isotherm using them.
+
+A dictionary instead creates an independent, unregistered material: registered
+properties provide defaults, and supplied properties override them. Overrides
+replace entire property values rather than recursively merging dictionaries.
+All resulting properties, including nested lists/dictionaries, are copied.
+Neither construction nor later local edits modify the caller's dictionary or
+the registry. This ownership rule also applies when assigning
+``isotherm.material``.
+
+.. note::
+
+    Dictionary inputs no longer update registered materials implicitly.
+    To intentionally change shared properties, update the object returned by
+    ``pygaps.Material.find(name)`` explicitly.
+
 As such, the simplest creation statement is:
 
 .. code:: python

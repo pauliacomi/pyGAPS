@@ -1,6 +1,7 @@
 """Contains the Isotherm base class."""
 
 import typing as t
+from copy import deepcopy
 
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
@@ -36,8 +37,10 @@ class BaseIsotherm:
 
     Parameters
     ----------
-    material : str
-        Name of the material on which the isotherm is measured.
+    material : str, dict or Material
+        Material name, shared instance, or independent property dictionary.
+        Dictionary inputs copy registered defaults and apply local overrides
+        without modifying the input or registry, including nested properties.
     adsorbate : str
         Isotherm adsorbate.
     temperature : float
@@ -206,19 +209,21 @@ class BaseIsotherm:
 
     @property
     def material(self) -> Material:
-        """Return underlying material."""
+        """Return the material; names/instances share it, dictionaries create snapshots."""
         return self._material
 
     @material.setter
     def material(self, value: t.Union[str, dict, Material]):
         if isinstance(value, dict):
-            name = value.pop('name', None)
+            properties = dict(value)
+            name = properties.pop('name', None)
             try:
-                self._material = Material.find(name)
-                logger.info(f"Material '{name}' found in internal list. Updating its properties with the provided dictionary.")
-                self._material.properties.update(**value)
+                defaults = Material.find(name).properties
             except ParameterError:
-                self._material = Material(name, **value)
+                defaults = {}
+            material = Material(name)
+            material.properties = deepcopy({**defaults, **properties})
+            self._material = material
             return
         try:
             self._material = Material.find(value)
