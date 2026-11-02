@@ -391,6 +391,11 @@ independence and both branches.
 
 **Source:** [spreading-pressure bounds check](../../src/pygaps/core/pointisotherm.py#L1281).
 
+**Resolution (feature/core-updates).** C2 removed the cache-dependent bounds
+check. Regression coverage now explicitly exercises both adsorption and
+descending desorption with no cache and different cached fills, confirming
+Henry-region integration and current-call extrapolation choices.
+
 ### C14. Model selection compares different residual definitions
 
 `guess` ranks candidates by their own `model.rmse`. Most loading models report
@@ -414,6 +419,10 @@ candidate on the same observations and scale, with a policy for models whose
 inverse is unavailable or numerically unreliable. Preserve/report native fit
 metrics separately and test candidate ordering on mixed model directions.
 
+**Disposition.** Deferred to the
+[fitting assessment action points](fitting.md#action-points); selection scores
+are unchanged by the core updates.
+
 **Sources:** [selection](../../src/pygaps/core/modelisotherm.py#L450),
 [base fit metric](../../src/pygaps/modelling/base_model.py#L247),
 [Virial fit metric](../../src/pygaps/modelling/virial.py#L214).
@@ -431,6 +440,12 @@ the adsorbate method requires a named algorithm above the critical temperature.
 method or a named method is mandatory; align signatures, validation and
 examples across the three layers. Test below/above critical temperature and
 unsupported method names without silently changing the scientific method.
+
+**Resolution (feature/core-updates).** The agreed policy is now explicit at
+all three layers: False disables pseudo-pressure, and True or 'Dubinin'
+selects Dubinin above the critical temperature. Unsupported method names are
+rejected even below the critical temperature. Tests cover boolean/named
+selection and conversion through the point-isotherm and unit-converter layers.
 
 **Sources:** [point conversion](../../src/pygaps/core/pointisotherm.py#L397),
 [pressure converter](../../src/pygaps/units/converter_mode.py#L41),
@@ -452,6 +467,14 @@ current unit when it is meaningful, require a unit when converting from an
 absolute input to a unitless internal mode, and do not require units for
 fraction/percent. Share the validation policy across point/model methods.
 
+**Resolution (feature/core-updates).** Shared input-conversion helpers now
+default pressure/loading/material units when the stored mode/basis makes
+them meaningful. Dimensionless fraction/percent inputs need no loading unit.
+Absolute input to a relative isotherm still requires explicit units; explicit
+relative-mode model spreading-pressure calls no longer fail spuriously.
+Point/model regressions cover defaults, dimensionless inputs, and required
+units for changed physical bases.
+
 **Sources:** [point pressure input](../../src/pygaps/core/pointisotherm.py#L1153),
 [point loading input](../../src/pygaps/core/pointisotherm.py#L1038),
 [model loading input](../../src/pygaps/core/modelisotherm.py#L826),
@@ -469,6 +492,11 @@ point class uses inclusive `between`, while a model on `[1, 2, 3]` with
 documented inclusion policy, and apply it to pressure, loading and
 supplementary data. Test zero, open-ended, equal and exact-endpoint limits in
 both classes.
+
+**Resolution (feature/core-updates).** Zero bounds are no longer treated as
+absent, and point/model data access uses inclusive lower and upper endpoints.
+Regression coverage includes zero, open-ended, equal, and exact endpoint
+limits, including indexed outputs and supplementary point data.
 
 **Sources:** [point limits](../../src/pygaps/core/pointisotherm.py#L767),
 [model limits](../../src/pygaps/core/modelisotherm.py#L624).

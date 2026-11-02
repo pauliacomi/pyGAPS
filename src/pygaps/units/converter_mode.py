@@ -46,7 +46,7 @@ def c_pressure(
     unit_to: str,
     adsorbate=None,
     temp: float = None,
-    pseudo: bool = False,
+    pseudo: bool | str = False,
 ):
     """
     Convert pressure units and modes.
@@ -72,10 +72,9 @@ def c_pressure(
     temp : float, optional
         Temperature at which the pressure is measured, in K.
         Required for mode changes to relative pressure.
-    pseudo: bool, optional
-        Whether to calculate pseudo-saturation pressure (i.e. if adsorbate is
-        supercritical).
-        Defaults to false
+    pseudo : bool or str, optional
+        False disables pseudo-saturation pressure. True or 'Dubinin' selects
+        Dubinin's method for a supercritical adsorbate.
 
     Returns
     -------

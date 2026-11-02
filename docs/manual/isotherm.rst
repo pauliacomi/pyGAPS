@@ -347,6 +347,10 @@ PointIsotherm object.
         indexed = True,
     )
 
+Limits for pressure, loading, and supplementary data include both endpoints.
+Use ``None`` for an unbounded endpoint; zero is a valid bound. The same
+inclusive policy applies to point and model isotherms.
+
 For the PointIsotherm, a special
 :meth:`~pygaps.core.pointisotherm.PointIsotherm.data` function returns all or
 parts of the internal pandas.DataFrame as an independent copy. Edits to this
@@ -407,6 +411,12 @@ The point methods are:
 The methods take parameters that describe the unit/mode of both the input
 parameters and the output parameters.
 
+Omitted input units default to the stored units when the mode/basis is
+unchanged. Fraction and percent loadings are dimensionless and do not require
+a loading unit. A different physical loading/material basis requires its
+unit; absolute pressure input to a relative-pressure isotherm also requires an
+explicit pressure unit.
+
 .. code:: python
 
     isotherm.loading_at(
@@ -453,6 +463,11 @@ functions :ref:`above <isotherms-manual-data>`. The conversion functions are:
   from a mass basis in *g* to a mass basis in *kg*.
 - :meth:`~pygaps.core.baseisotherm.BaseIsotherm.convert_temperature` will
   permanently the temperature unit.
+
+For supercritical adsorbates, ``convert_pressure(..., pseudo=True)`` explicitly
+selects Dubinin pseudo-saturation pressure, as does ``pseudo='Dubinin'``.
+The default ``pseudo=False`` does not enable a pseudo-pressure approximation.
+Below the critical temperature, real saturation pressure is used.
 
 .. important::
 

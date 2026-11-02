@@ -402,7 +402,7 @@ class PointIsotherm(BaseIsotherm):
         mode_to: str = None,
         unit_to: str = None,
         verbose: bool = False,
-        pseudo: bool = False,
+        pseudo: bool | str = False,
     ):
         """Convert isotherm pressure from one unit to another and the pressure mode from absolute to relative.
 
@@ -419,9 +419,9 @@ class PointIsotherm(BaseIsotherm):
             If omitted and the mode is unchanged, retain the current unit.
         verbose : bool
             Print out steps taken.
-        pseudo: bool, optional
-            Whether to use a pseudo-saturation pressure, in the case that the
-            adsorbate is supercritical
+        pseudo : bool or str, optional
+            False disables pseudo-saturation pressure. True or 'Dubinin' selects
+            Dubinin's method for a supercritical adsorbate.
 
         """
         if not mode_to:
@@ -739,7 +739,7 @@ class PointIsotherm(BaseIsotherm):
             The mode in which to return the pressure, if possible. If ``None``,
             returns mode the isotherm is currently in.
         limits : [float, float], optional
-            Minimum and maximum pressure limits.
+            Inclusive minimum and maximum pressure limits.
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
@@ -781,7 +781,7 @@ class PointIsotherm(BaseIsotherm):
                     ) from err
 
             # Select required points
-            if limits and any(limits):
+            if limits is not None:
                 ret = ret.loc[ret.between(
                     -numpy.inf if limits[0] is None else limits[0],
                     numpy.inf if limits[1] is None else limits[1]
@@ -822,7 +822,7 @@ class PointIsotherm(BaseIsotherm):
             The basis on which to return the material, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         limits : [float, float], optional
-            Minimum and maximum loading limits.
+            Inclusive minimum and maximum loading limits.
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
@@ -858,7 +858,7 @@ class PointIsotherm(BaseIsotherm):
             )
 
             # Select required points
-            if limits and any(limits):
+            if limits is not None:
                 ret = ret.loc[ret.between(
                     -numpy.inf if limits[0] is None else limits[0],
                     numpy.inf if limits[1] is None else limits[1]
@@ -894,7 +894,7 @@ class PointIsotherm(BaseIsotherm):
             The branch of the data to return. If ``None``, returns entire
             dataset.
         limits : [float, float], optional
-            Minimum and maximum data limits.
+            Inclusive minimum and maximum data limits.
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
@@ -911,7 +911,7 @@ class PointIsotherm(BaseIsotherm):
 
             if not ret.empty:
                 # Select required points
-                if limits and any(limits):
+                if limits is not None:
                     ret = ret.loc[ret.between(
                         -numpy.inf if limits[0] is None else limits[0],
                         numpy.inf if limits[1] is None else limits[1]
@@ -1016,42 +1016,8 @@ class PointIsotherm(BaseIsotherm):
                 interp_fill=interp_fill,
             )
 
-        # Ensure loading is in the isotherm's units and bases.
-        if material_basis or material_unit:
-            if not material_basis:
-                material_basis = self.material_basis
-            if not material_unit:
-                raise ParameterError(
-                    "Must specify an material unit if the input is in another basis."
-                )
-        else:
-            material_basis = self.material_basis
-            material_unit = self.material_unit
-
-        if loading_basis or loading_unit:
-            if not loading_basis:
-                loading_basis = self.loading_basis
-            if not loading_unit:
-                raise ParameterError(
-                    "Must specify a loading unit if the input is in another basis."
-                )
-        else:
-            loading_basis = self.loading_basis
-            loading_unit = self.loading_unit
-
-        loading = c_loading_material(
-            loading,
-            loading_basis_from=loading_basis,
-            loading_unit_from=loading_unit,
-            material_basis_from=material_basis,
-            material_unit_from=material_unit,
-            loading_basis_to=self.loading_basis,
-            loading_unit_to=self.loading_unit,
-            material_basis_to=self.material_basis,
-            material_unit_to=self.material_unit,
-            adsorbate=self.adsorbate,
-            temp=self.temperature,
-            material=self.material,
+        loading = self._convert_loading_input(
+            loading, loading_unit, loading_basis, material_unit, material_basis,
         )
 
         # Interpolate using the internal interpolator
@@ -1147,24 +1113,7 @@ class PointIsotherm(BaseIsotherm):
                 interp_fill=interp_fill,
             )
 
-        # Ensure pressure is in correct units and mode for the internal model
-        if pressure_mode or pressure_unit:
-            if not pressure_mode:
-                pressure_mode = self.pressure_mode
-            if pressure_mode == 'absolute' and not pressure_unit:
-                raise ParameterError(
-                    "Must specify a pressure unit if the input is in an absolute mode."
-                )
-
-            pressure = c_pressure(
-                pressure,
-                mode_from=pressure_mode,
-                mode_to=self.pressure_mode,
-                unit_from=pressure_unit,
-                unit_to=self.pressure_unit,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-            )
+        pressure = self._convert_pressure_input(pressure, pressure_unit, pressure_mode)
 
         # Interpolate using the internal interpolator
         loading = self.l_interpolator(pressure)

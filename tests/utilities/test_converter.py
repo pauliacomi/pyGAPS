@@ -9,6 +9,18 @@ from pygaps.utilities.exceptions import ParameterError
 
 @pytest.mark.utilities
 class TestConversions:
+    @pytest.mark.parametrize('pseudo', [True, 'Dubinin'])
+    @pytest.mark.parametrize('mode_to, expected', [('relative', 0.25), ('relative%', 25)])
+    def test_conversion_pressure_pseudo(self, monkeypatch, pseudo, mode_to, expected):
+        adsorbate = pygaps.Adsorbate('custom')
+        monkeypatch.setattr(adsorbate, 't_critical', lambda: 100)
+        monkeypatch.setattr(adsorbate, 'p_critical', lambda: 100000)
+
+        assert converter_mode.c_pressure(
+            1, mode_from='absolute', mode_to=mode_to, unit_from='bar', unit_to=None,
+            adsorbate=adsorbate, temp=200, pseudo=pseudo,
+        ) == pytest.approx(expected)
+
     @pytest.mark.parametrize(
         'm_f, u_f, m_t, u_t, t',
         [

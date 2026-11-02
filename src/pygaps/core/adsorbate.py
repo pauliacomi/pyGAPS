@@ -524,7 +524,7 @@ class Adsorbate:
         temp: float,
         unit: str = None,
         calculate: bool = True,
-        pseudo: str = False,
+        pseudo: bool | str = False,
         verbose: bool = False,
     ) -> float:
         """
@@ -540,9 +540,9 @@ class Adsorbate:
         calculate : bool, optional
             Whether to calculate the property or look it up in the properties
             dictionary, default - True. Stored saturation pressures are in Pa.
-        pseudo: str, optional
-            Whether to calculate a pseudo-saturation pressure for a
-            supercritical adsorbate, default - False.
+        pseudo : bool or str, optional
+            False disables pseudo-saturation pressure. True or 'Dubinin'
+            selects Dubinin's method above the critical temperature.
 
         Returns
         -------
@@ -558,6 +558,10 @@ class Adsorbate:
             If it cannot be calculated, due to a physical reason.
 
         """
+        if pseudo is True:
+            pseudo = 'Dubinin'
+        if pseudo is not False and pseudo != 'Dubinin':
+            raise ParameterError("Unsupported pseudo-saturation method. Use False, True, or 'Dubinin'.")
         if pseudo and temp > self.t_critical():
             if pseudo == 'Dubinin':
                 if verbose:

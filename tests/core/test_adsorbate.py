@@ -235,6 +235,24 @@ class TestAdsorbate:
         if temp > 100:
             assert ads.saturation_pressure(temp, unit=unit, pseudo='Dubinin') == pytest.approx(expected)
 
+    @pytest.mark.parametrize('pseudo', [False, True, 'Dubinin'])
+    @pytest.mark.parametrize('temp', [77, 200])
+    def test_saturation_pressure_pseudo_boolean(self, monkeypatch, temp, pseudo):
+        ads = pygaps.Adsorbate('custom')
+        monkeypatch.setattr(ads, 't_critical', lambda: 100)
+        monkeypatch.setattr(ads, 'p_critical', lambda: 100000)
+        state = Mock()
+        state.p.return_value = 50000
+        monkeypatch.setattr(pygaps.Adsorbate, 'backend', property(lambda self: state))
+        expected = 4 if pseudo and temp > 100 else 0.5
+
+        assert ads.saturation_pressure(temp, unit='bar', pseudo=pseudo) == pytest.approx(expected)
+
+    @pytest.mark.parametrize('temp', [77, 200])
+    def test_saturation_pressure_unknown_pseudo(self, temp):
+        with pytest.raises(ParameterError, match='pseudo'):
+            pygaps.Adsorbate('custom').saturation_pressure(temp, pseudo='unknown')
+
     def test_adsorbate_print(self, basic_adsorbate):
         """Check printing is possible."""
         print(basic_adsorbate)

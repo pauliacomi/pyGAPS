@@ -1,5 +1,6 @@
 """Tests relating to the Isotherm class."""
 
+import numpy
 import pytest
 
 import pygaps
@@ -22,6 +23,87 @@ class TestBaseIsotherm:
     def test_isotherm_create_short(self):
         """Check isotherm can be created from shorthands."""
         BaseIsotherm(m='carbon', a='nitrogen', t=77)
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    @pytest.mark.parametrize('mode', ['absolute', 'relative'])
+    def test_evaluation_input_defaults(self, monkeypatch, fractional_conversion_parameters, kind, mode):
+        parameters = {**fractional_conversion_parameters, 'pressure_mode': mode}
+        monkeypatch.setattr(parameters['adsorbate'], 'saturation_pressure', lambda temp, unit, pseudo=False: 1)
+        cls = pygaps.PointIsotherm if kind == 'point' else pygaps.ModelIsotherm
+        options = {} if kind == 'point' else {'model': 'Henry'}
+        iso = cls(pressure=[1, 2, 3], loading=[2, 4, 6], branch='ads', **options, **parameters)
+
+        assert iso.loading_at(2, pressure_mode=mode) == pytest.approx(4)
+        assert iso.pressure_at(4, loading_basis='molar', material_basis='mass') == pytest.approx(2)
+        assert iso.pressure_at(0.04, loading_basis='fraction') == pytest.approx(2)
+        assert iso.pressure_at(4, loading_basis='percent') == pytest.approx(2)
+        if kind == 'model':
+            assert iso.spreading_pressure_at(2, pressure_mode=mode) == pytest.approx(4)
+        if mode == 'relative':
+            with pytest.raises(pgEx.ParameterError, match='pressure unit'):
+                iso.loading_at(2, pressure_mode='absolute')
+            assert iso.loading_at(2, pressure_mode='absolute', pressure_unit='bar') == pytest.approx(4)
+            if kind == 'model':
+                with pytest.raises(pgEx.ParameterError, match='pressure unit'):
+                    iso.spreading_pressure_at(2, pressure_mode='absolute')
+
+        for kwargs in [{'loading_basis': 'mass'}, {'material_basis': 'volume'}]:
+            with pytest.raises(pgEx.ParameterError, match='unit'):
+                iso.pressure_at(4, **kwargs)
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    def test_dimensionless_input_arrays(self, fractional_conversion_parameters, kind):
+        cls = pygaps.PointIsotherm if kind == 'point' else pygaps.ModelIsotherm
+        options = {} if kind == 'point' else {'model': 'Henry'}
+        iso = cls(
+            pressure=[1, 2, 3], loading=[2, 4, 6], branch='ads',
+            **options, **fractional_conversion_parameters,
+        )
+        numpy.testing.assert_allclose(
+            iso.pressure_at([0.08, 0.16], loading_basis='fraction', material_basis='volume', material_unit='cm3'),
+            [1, 2],
+        )
+        numpy.testing.assert_allclose(
+            iso.pressure_at([2, 4], loading_basis='percent', material_basis='mass'),
+            [1, 2],
+        )
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    @pytest.mark.parametrize('indexed', [False, True])
+    @pytest.mark.parametrize('limits, expected', [
+        ((None, 0), [0]), ((0, 0), [0]), ((0, 2), [0, 1, 2]),
+        ((1, 2), [1, 2]), ((1, None), [1, 2]), ((None, None), [0, 1, 2]),
+    ])
+    def test_inclusive_data_limits(self, isotherm_parameters, kind, indexed, limits, expected):
+        if kind == 'point':
+            iso = pygaps.PointIsotherm(
+                pressure=[0, 1, 2], loading=[0, 1, 2], branch='ads', **isotherm_parameters
+            )
+        else:
+            iso = pygaps.ModelIsotherm(
+                model=pygaps.modelling.model_from_dict({
+                    'name': 'Henry', 'parameters': {'K': 1},
+                    'pressure_range': (0, 2), 'loading_range': (0, 2),
+                }),
+                branch='ads', **isotherm_parameters,
+            )
+        for method in [iso.pressure, iso.loading]:
+            kwargs = {'points': 3} if kind == 'model' else {}
+            numpy.testing.assert_allclose(method(limits=limits, indexed=indexed, **kwargs), expected, atol=1e-12)
+        if kind == 'point':
+            iso.data_raw['other'] = [0, 1, 2]
+            numpy.testing.assert_array_equal(iso.other_data('other', limits=limits, indexed=indexed), expected)
+
+    def test_pressure_model_inclusive_limits(self, isotherm_parameters):
+        iso = pygaps.ModelIsotherm(
+            model=pygaps.modelling.model_from_dict({
+                'name': 'Virial', 'parameters': {'K': 1, 'A': 0, 'B': 0, 'C': 0},
+                'pressure_range': (1, 3), 'loading_range': (1, 3),
+            }),
+            branch='ads', **isotherm_parameters,
+        )
+        numpy.testing.assert_array_equal(iso.loading(points=3, limits=(1, 3)), [1, 2, 3])
+        numpy.testing.assert_array_equal(iso.pressure(points=3, limits=(1, 3)), [1, 2, 3])
 
     def test_isotherm_id(self, basic_isotherm):
         """Check isotherm id works as intended."""

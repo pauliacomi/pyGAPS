@@ -514,22 +514,24 @@ class TestPointIsotherm:
         with numpy.errstate(divide='raise', invalid='raise'):
             assert point.spreading_pressure_at(pressure) == pytest.approx(expected)
 
+    @pytest.mark.parametrize('branch', ['ads', 'des'])
     @pytest.mark.parametrize('cached_fill', ['uncached', None, 9, 'extrapolate'])
-    def test_spreading_pressure_extrapolation(self, isotherm_parameters, cached_fill):
+    def test_spreading_pressure_extrapolation(self, isotherm_parameters, cached_fill, branch):
+        pressures = [1, 2, 3] if branch == 'ads' else [3, 2, 1]
         point = pygaps.PointIsotherm(
-            pressure=[1, 2, 3], loading=[1, 4, 9], branch='ads', **isotherm_parameters
+            pressure=pressures, loading=numpy.square(pressures), branch=branch, **isotherm_parameters
         )
         if cached_fill != 'uncached':
-            point.loading_at(2, interp_fill=cached_fill)
+            point.loading_at(2, branch=branch, interp_fill=cached_fill)
         area = 1 + 3 - 2 * numpy.log(2) + 5 - 6 * numpy.log(3 / 2)
 
         with pytest.raises(pgEx.CalculationError, match='extrapolat'):
-            point.spreading_pressure_at(4)
+            point.spreading_pressure_at(4, branch=branch)
 
-        assert point.spreading_pressure_at(0.5) == pytest.approx(0.5)
-        assert point.spreading_pressure_at(4, interp_fill=9) == pytest.approx(area + 9 * numpy.log(4 / 3))
-        assert point.spreading_pressure_at(4, interp_fill=(0, 12)) == pytest.approx(area + 12 * numpy.log(4 / 3))
-        assert point.spreading_pressure_at(4, interp_fill='extrapolate') == pytest.approx(
+        assert point.spreading_pressure_at(0.5, branch=branch) == pytest.approx(0.5)
+        assert point.spreading_pressure_at(4, branch=branch, interp_fill=9) == pytest.approx(area + 9 * numpy.log(4 / 3))
+        assert point.spreading_pressure_at(4, branch=branch, interp_fill=(0, 12)) == pytest.approx(area + 12 * numpy.log(4 / 3))
+        assert point.spreading_pressure_at(4, branch=branch, interp_fill='extrapolate') == pytest.approx(
             area + 5 - 6 * numpy.log(4 / 3)
         )
 
@@ -693,6 +695,16 @@ class TestPointIsotherm:
             assert basic_pointisotherm.pressure_mode == parameters['mode_to']
         if 'unit_to' in parameters:
             assert basic_pointisotherm.pressure_unit == parameters['unit_to']
+
+    def test_convert_pressure_pseudo_boolean(self, monkeypatch, fractional_conversion_parameters):
+        parameters = fractional_conversion_parameters
+        monkeypatch.setattr(parameters['adsorbate'], 't_critical', lambda: 50)
+        monkeypatch.setattr(parameters['adsorbate'], 'p_critical', lambda: 100000)
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3], loading=[1, 2, 3], branch='ads', **parameters
+        )
+        point.convert_pressure(mode_to='relative', pseudo=True)
+        numpy.testing.assert_allclose(point.pressure(), [0.25, 0.5, 0.75])
 
     @pytest.mark.parametrize(
         'expected, parameters',
