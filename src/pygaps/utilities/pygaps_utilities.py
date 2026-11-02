@@ -1,6 +1,28 @@
 """Helper functions used internally across pyGAPS."""
 
+import numpy
+
 from pygaps.utilities.exceptions import ParameterError
+
+
+def get_pressure_limit_indices(
+    pressure: list[float] | numpy.ndarray,
+    p_limits: tuple[float, float] | list[float],
+) -> tuple[int, int]:
+    """Return inclusive pressure-limit indices for an ascending pressure array."""
+    try:
+        limits = numpy.asarray(p_limits, dtype=float)
+    except (OverflowError, TypeError, ValueError) as err:
+        raise ParameterError("Pressure limits must contain two finite numbers.") from err
+
+    if limits.shape != (2,) or not numpy.isfinite(limits).all():
+        raise ParameterError("Pressure limits must contain two finite numbers.")
+    if limits[0] > limits[1]:
+        raise ParameterError("The lower pressure limit must not exceed the upper limit.")
+
+    minimum = numpy.searchsorted(pressure, limits[0], side='left')
+    maximum = numpy.searchsorted(pressure, limits[1], side='right') - 1
+    return int(minimum), int(maximum)
 
 
 def get_iso_loading_and_pressure_ordered(

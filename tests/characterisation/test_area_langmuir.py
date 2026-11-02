@@ -13,12 +13,17 @@ All pre-calculated data for characterisation can be found in the
 """
 
 import pytest
+from numpy import array
 from numpy import isclose
+from numpy import isfinite
 from numpy import linspace
+from scipy import constants
+from scipy import stats
 
 import pygaps.characterisation.area_lang as al
 import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
+from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
 
 from ..test_utils import mpl_cleanup
 from .conftest import DATA
@@ -28,6 +33,21 @@ from .conftest import DATA
 class TestAreaLangmuir:
     """Tests Langmuir surface area calculations."""
 
+    def test_langmuir_fit_returns_regression_errors(self):
+        pressure = array([0.1, 0.2, 0.3, 0.4])
+        langmuir_points = array([1.13, 1.31, 1.58, 1.69])
+
+        slope, intercept, corr_coef, slope_stderr, intercept_stderr = al.langmuir_fit(
+            pressure, langmuir_points
+        )
+        expected = stats.linregress(pressure, langmuir_points)
+
+        assert isclose(slope, expected.slope)
+        assert isclose(intercept, expected.intercept)
+        assert isclose(corr_coef, expected.rvalue)
+        assert isclose(slope_stderr, expected.stderr)
+        assert isclose(intercept_stderr, expected.intercept_stderr)
+
     def test_basic_functions(self):
         """Test basic functionality."""
         P = linspace(0, 1)
@@ -35,17 +55,78 @@ class TestAreaLangmuir:
 
         # arrays should be equal
         with pytest.raises(pgEx.ParameterError):
-            al.area_langmuir_raw(P[1:], L, 1)
+            al.area_langmuir_raw({'pressure': P[1:], 'loading': L, 'cross_section': 1})
 
         # should not take less than 3 points
         with pytest.raises(pgEx.CalculationError):
-            al.area_langmuir_raw(P[:2], L[:2], 1, p_limits=[-1, 10])
+            al.area_langmuir_raw(
+                {
+                    'pressure': P[:2],
+                    'loading': L[:2],
+                    'cross_section': 1,
+                    'p_limits': [-1, 10],
+                }
+            )
 
         # 3 will work
-        al.area_langmuir_raw(P[:3], L[:3], 1, p_limits=[-1, 10])
+        result = al.area_langmuir_raw(
+            {
+                'pressure': P[:3],
+                'loading': L[:3],
+                'cross_section': 1,
+                'p_limits': [-1, 10],
+            }
+        )
+        assert isinstance(result, dict)
+        assert {'area', 'langmuir_slope', 'langmuir_intercept', 'area_stderr'} <= result.keys()
 
         # test using autolimits
-        al.area_langmuir_raw(P, L, 1)
+        al.area_langmuir_raw({'pressure': P, 'loading': L, 'cross_section': 1})
+
+    def test_explicit_limits_include_upper_endpoint(self):
+        """Both pressure limits include observations exactly on their bounds."""
+        pressure = array([0.1, 0.2, 0.3, 0.4])
+        loading = al.simple_lang(pressure, 0.02, 3)
+
+        result = al.area_langmuir_raw(
+            {
+                'pressure': pressure,
+                'loading': loading,
+                'cross_section': 0.1,
+                'p_limits': (0.1, 0.3),
+            }
+        )
+
+        assert result['p_limit_indices'] == (0, 2)
+        assert result['area'] > 0
+        assert result['area_stderr'] >= 0
+
+    @pytest.mark.parametrize(
+        'p_limits',
+        [
+            (0.3, 0.1),
+            (0.1,),
+            (0.1, float('nan')),
+        ],
+    )
+    def test_invalid_pressure_limits_raise_parameter_error(self, p_limits):
+        with pytest.raises(pgEx.ParameterError):
+            al.area_langmuir_raw(
+                {
+                    'pressure': [0.1, 0.2, 0.3],
+                    'loading': [0.01, 0.02, 0.03],
+                    'cross_section': 0.1,
+                    'p_limits': p_limits,
+                }
+            )
+
+    def test_missing_required_input_raises_parameter_error(self):
+        with pytest.raises(pgEx.ParameterError, match='cross_section'):
+            al.area_langmuir_raw({'pressure': [0.1], 'loading': [0.01]})
+
+    def test_raw_input_must_be_a_dictionary(self):
+        with pytest.raises(pgEx.ParameterError, match='dictionary'):
+            al.area_langmuir_raw([0.1, 0.2, 0.3])
 
     @pytest.mark.parametrize('sample', DATA.values())
     def test_area_langmuir(self, sample, data_char_path):
@@ -57,12 +138,42 @@ class TestAreaLangmuir:
         filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
-        area = al.area_langmuir(isotherm).get("area")
+        result = al.area_langmuir(isotherm)
+        area = result.get("area")
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2
 
         assert isclose(area, sample['langmuir_area'], err_relative, err_absolute)
+        assert isfinite(result['area_stderr'])
+        assert result['area_stderr'] >= 0
+        assert isfinite(result['langmuir_slope_stderr'])
+        assert isfinite(result['langmuir_intercept_stderr'])
+        assert result['cross_sectional_area'] > 0
+        pressure, loading = get_iso_loading_and_pressure_ordered(
+            isotherm,
+            'ads',
+            {'loading_basis': 'molar', 'loading_unit': 'mol'},
+            {'pressure_mode': 'relative'},
+        )
+        minimum, max_idx = result['p_limit_indices']
+        fit_pressure = pressure[minimum : max_idx + 1]
+        fit_loading = loading[minimum : max_idx + 1]
+        fit = stats.linregress(fit_pressure, al.langmuir_transform(fit_pressure, fit_loading))
+        expected_area_stderr = (
+            result['cross_sectional_area']
+            * 1e-18
+            * constants.Avogadro
+            * result['n_monolayer']**2
+            * fit.stderr
+        )
+        assert isclose(result['langmuir_slope_stderr'], fit.stderr)
+        assert isclose(result['langmuir_intercept_stderr'], fit.intercept_stderr)
+        assert isclose(result['area_stderr'], expected_area_stderr)
+        assert isclose(
+            result['area'],
+            result['n_monolayer'] * result['cross_sectional_area'] * 1e-18 * constants.Avogadro,
+        )
 
     def test_area_langmuir_choice(self, data_char_path):
         """Test choice of points."""

@@ -2,6 +2,7 @@
 
 import textwrap
 from typing import TYPE_CHECKING
+from typing import cast
 
 import numpy
 from scipy import constants
@@ -16,6 +17,7 @@ from pygaps.core.adsorbate import Adsorbate
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.pygaps_utilities import get_iso_loading_and_pressure_ordered
+from pygaps.utilities.pygaps_utilities import get_pressure_limit_indices
 
 
 def area_langmuir(
@@ -38,7 +40,7 @@ def area_langmuir(
     branch : {'ads', 'des'}, optional
         Branch of the isotherm to use. It defaults to adsorption.
     p_limits : tuple[float, float], optional
-        Pressure range in which to perform the calculation.
+        Inclusive pressure range in which to perform the calculation.
     verbose : bool, optional
         Prints extra information and plots graphs of the calculation.
 
@@ -50,11 +52,15 @@ def area_langmuir(
         volume, or per mole of adsorbent):
 
         - ``area`` (float) : calculated Langmuir surface area, in m2/unit of material
-        - ``langmuir_const`` (float) : the constant in the Langmuir fit
-        - ``n_monolayer`` (float) : the amount adsorbed at the monolayer
-        - ``langmuir_slope`` (float) : slope of the Langmuir plot
-        - ``langmuir_intercept`` (float) : intercept of the Langmuir plot
+        - ``langmuir_const`` (float) : the unitless constant in the relative-pressure Langmuir fit
+        - ``n_monolayer`` (float) : the amount adsorbed at the monolayer, in mol/unit of material
+        - ``langmuir_slope`` (float) : slope of the Langmuir plot, in unit of material/mol
+        - ``langmuir_intercept`` (float) : intercept of the Langmuir plot, in unit of material/mol
         - ``corr_coef`` (float) : correlation coefficient of the linear region in the Langmuir plot
+        - ``area_stderr`` (float) : delta-method standard error of the area from the linear fit
+        - ``langmuir_slope_stderr`` (float) : standard error of the Langmuir plot slope
+        - ``langmuir_intercept_stderr`` (float) : standard error of the Langmuir plot intercept
+        - ``cross_sectional_area`` (float) : adsorbate cross-sectional area used, in nm^2
 
     Raises
     ------
@@ -116,6 +122,13 @@ def area_langmuir(
     (except chemisorption) don't follow this behaviour, it is important to regard
     the Langmuir surface area as an estimate.
 
+    The returned fit standard errors assume ordinary least squares in the
+    Langmuir plot. The area standard error is a first-order propagation of the
+    slope uncertainty, conditional on the selected pressure range and fixed
+    molecular cross-sectional area. It does not include uncertainty in the
+    isotherm, model selection, or cross-sectional area; the latter is an
+    approximation.
+
     References
     ----------
     .. [#] I. Langmuir, J. Amer. Chem. Soc., 38, 2219 (1916); 40, 1368 (1918)
@@ -135,21 +148,20 @@ def area_langmuir(
     )
 
     # use the langmuir function
-    (
-        langmuir_area,
-        langmuir_const,
-        n_monolayer,
-        slope,
-        intercept,
-        minimum,
-        maximum,
-        corr_coef,
-    ) = area_langmuir_raw(
-        pressure,
-        loading,
-        cross_section,
-        p_limits,
+    result = area_langmuir_raw(
+        {
+            'pressure': pressure,
+            'loading': loading,
+            'cross_section': cross_section,
+            'p_limits': p_limits,
+        }
     )
+    minimum, maximum = result['p_limit_indices']
+    langmuir_area = result['area']
+    langmuir_const = result['langmuir_const']
+    n_monolayer = result['n_monolayer']
+    slope = result['langmuir_slope']
+    intercept = result['langmuir_intercept']
 
     if verbose:
         logger.info(
@@ -177,61 +189,70 @@ def area_langmuir(
             intercept,
         )
 
-    return {
-        'area': langmuir_area,
-        'langmuir_const': langmuir_const,
-        'n_monolayer': n_monolayer,
-        'langmuir_slope': slope,
-        'langmuir_intercept': intercept,
-        'corr_coef': corr_coef,
-        'p_limit_indices': (minimum, maximum),
-    }
+    return result
 
 
-def area_langmuir_raw(
-    pressure: "list[float]",
-    loading: "list[float]",
-    cross_section: float,
-    p_limits: "tuple[float,float]" = None,
-):
+def area_langmuir_raw(data: dict):
     """
     Calculate Langmuir-determined surface area.
 
     This is a 'bare-bones' function to calculate Langmuir surface area which is
-    designed as a low-level alternative to the main function.
-    Designed for advanced use, its parameters have to be manually specified.
+    designed as a low-level alternative to the main function. Supply a
+    dictionary containing ``pressure``, ``loading``, and ``cross_section``;
+    ``p_limits`` is optional.
 
     Parameters
     ----------
-    pressure : list[float]
-        Pressures, relative.
-    loading : list[float]
-        Loadings, in mol/basis.
-    cross_section : float
-        Adsorbed cross-section of the molecule of the adsorbate, in nm.
-    p_limits : tuple[float, float], optional
-        Pressure range in which to perform the calculation.
+    data : dict
+        Calculation inputs:
+
+        - ``pressure`` : relative pressures.
+        - ``loading`` : loadings in mol/basis.
+        - ``cross_section`` : molecular cross-sectional area in nm^2.
+        - ``p_limits`` : optional inclusive pressure range.
 
     Returns
     -------
-    langmuir_area : float
-        Calculated Langmuir surface area.
-    langmuir_const : float
-        K constant from the Langmuir equation.
-    n_monolayer : float
-        Adsorbed quantity in the monolayer.
-    slope : float
-        Calculated slope of the Langmuir plot.
-    intercept : float
-        Calculated intercept of the Langmuir plot.
-    minimum : float
-        Minimum point taken for the linear region.
-    maximum : float
-        Maximum point taken for the linear region.
-    corr_coef : float
-        Correlation coefficient of the straight line in the Langmuir plot.
+    dict
+        Dictionary containing:
+
+        - ``area`` (float): Langmuir surface area in m² per adsorbent basis.
+        - ``langmuir_const`` (float): dimensionless Langmuir constant for
+          relative pressure.
+        - ``n_monolayer`` (float): monolayer loading in mol per adsorbent basis.
+        - ``langmuir_slope`` (float): Langmuir plot slope in adsorbent basis/mol.
+        - ``langmuir_intercept`` (float): Langmuir plot intercept in adsorbent
+          basis/mol.
+        - ``corr_coef`` (float): correlation coefficient of the Langmuir
+          linear fit.
+        - ``p_limit_indices`` (tuple[int, int]): inclusive start and end indices
+          of the points used from the supplied pressure and loading arrays.
+        - ``area_stderr`` (float): first-order propagated standard error of
+          area, in m² per adsorbent basis.
+        - ``langmuir_slope_stderr`` (float): standard error of
+          ``langmuir_slope``.
+        - ``langmuir_intercept_stderr`` (float): standard error of
+          ``langmuir_intercept``.
+        - ``cross_sectional_area`` (float): supplied molecular cross-sectional
+          area in nm², treated as exact in the reported area uncertainty.
+
+        The regression standard errors and propagated area standard error are
+        conditional on the selected pressure range and ordinary least squares
+        assumptions. They do not include uncertainty in the isotherm,
+        pressure-range selection, or molecular cross-sectional area.
 
     """
+    if not isinstance(data, dict):
+        raise ParameterError("Langmuir raw inputs must be supplied as a dictionary.")
+    missing = {'pressure', 'loading', 'cross_section'} - data.keys()
+    if missing:
+        raise ParameterError(f"Missing required Langmuir input keys: {', '.join(sorted(missing))}.")
+
+    pressure = data['pressure']
+    loading = data['loading']
+    cross_section = data['cross_section']
+    p_limits = data.get('p_limits')
+
     # Check lengths
     if len(pressure) == 0:
         raise ParameterError("Empty input values!")
@@ -255,11 +276,7 @@ def area_langmuir_raw(
             pressure[maximum] * 0.9,
         ]
 
-    # Determine the limits
-    if p_limits[0]:
-        minimum = numpy.searchsorted(pressure, p_limits[0])
-    if p_limits[1]:
-        maximum = numpy.searchsorted(pressure, p_limits[1]) - 1
+    minimum, maximum = get_pressure_limit_indices(pressure, p_limits)
     if maximum - minimum < 2:  # (for 2 point minimum)
         raise CalculationError(
             "The isotherm does not have enough points (at least 2) in selected region. Unable to calculate Langmuir area."
@@ -272,7 +289,7 @@ def area_langmuir_raw(
         pressure,
         loading,
     )
-    slope, intercept, corr_coef = langmuir_fit(
+    slope, intercept, corr_coef, slope_stderr, intercept_stderr = langmuir_fit(
         pressure,
         langmuir_array,
     )
@@ -290,16 +307,27 @@ def area_langmuir_raw(
     if corr_coef < 0.99:
         logger.warning("The correlation is not linear.")
 
-    return (
-        langmuir_area,
-        langmuir_const,
-        n_monolayer,
-        slope,
-        intercept,
-        minimum,
-        maximum,
-        corr_coef,
+    area_stderr = (
+        cross_section
+        * (10 ** (-18))
+        * constants.Avogadro
+        * n_monolayer**2
+        * slope_stderr
     )
+
+    return {
+        'area': langmuir_area,
+        'langmuir_const': langmuir_const,
+        'n_monolayer': n_monolayer,
+        'langmuir_slope': slope,
+        'langmuir_intercept': intercept,
+        'corr_coef': corr_coef,
+        'p_limit_indices': (minimum, maximum),
+        'area_stderr': area_stderr,
+        'langmuir_slope_stderr': slope_stderr,
+        'langmuir_intercept_stderr': intercept_stderr,
+        'cross_sectional_area': cross_section,
+    }
 
 
 def langmuir_transform(pressure, loading):
@@ -307,10 +335,22 @@ def langmuir_transform(pressure, loading):
     return pressure / loading
 
 
-def langmuir_fit(pressure, langmuir_points):
-    """Find the slope and intercept of the Langmuir region."""
-    slope, intercept, corr_coef, p, stderr = stats.linregress(pressure, langmuir_points)
-    return slope, intercept, corr_coef
+def langmuir_fit(pressure, langmuir_points) -> tuple[float, float, float, float, float]:
+    """Return Langmuir fit coefficients, correlation, and slope/intercept errors."""
+    slope, intercept, corr_coef, _, slope_stderr = stats.linregress(pressure, langmuir_points)
+    slope = cast(float, slope)
+    intercept = cast(float, intercept)
+    corr_coef = cast(float, corr_coef)
+    slope_stderr = cast(float, slope_stderr)
+    intercept_stderr = slope_stderr * numpy.sqrt(numpy.mean(numpy.square(pressure)))
+    intercept_stderr = cast(float, intercept_stderr)
+    return (
+        slope,
+        intercept,
+        corr_coef,
+        slope_stderr,
+        intercept_stderr,
+    )
 
 
 def langmuir_parameters(slope, intercept, cross_section):
