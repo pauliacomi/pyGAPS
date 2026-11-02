@@ -22,6 +22,7 @@ from numpy import linspace
 from scipy import constants
 from scipy import stats
 
+import pygaps
 import pygaps.characterisation.area_lang as al
 import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
@@ -321,7 +322,7 @@ class TestAreaLangmuir:
         assert result['area_stderr'] >= 0
         assert isfinite(result['langmuir_slope_stderr'])
         assert isfinite(result['langmuir_intercept_stderr'])
-        assert result['cross_sectional_area'] > 0
+        cross_section = pygaps.Adsorbate.find(isotherm.adsorbate).get_prop('cross_sectional_area')
         assert result['fit_method'] == 'linearized'
         pressure, loading = get_iso_loading_and_pressure_ordered(
             isotherm,
@@ -334,7 +335,7 @@ class TestAreaLangmuir:
         fit_loading = loading[minimum : max_idx + 1]
         fit = stats.linregress(fit_pressure, al.langmuir_transform(fit_pressure, fit_loading))
         expected_area_stderr = (
-            result['cross_sectional_area']
+            cross_section
             * 1e-18
             * constants.Avogadro
             * result['n_monolayer']**2
@@ -345,7 +346,7 @@ class TestAreaLangmuir:
         assert isclose(result['area_stderr'], expected_area_stderr)
         assert isclose(
             result['area'],
-            result['n_monolayer'] * result['cross_sectional_area'] * 1e-18 * constants.Avogadro,
+            result['n_monolayer'] * cross_section * 1e-18 * constants.Avogadro,
         )
 
     def test_area_langmuir_choice(self, data_char_path):

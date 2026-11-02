@@ -25,6 +25,7 @@ from numpy import sqrt
 from scipy import constants
 from scipy import stats
 
+import pygaps
 import pygaps.characterisation.area_bet as ab
 import pygaps.parsing.json as pgpj
 import pygaps.utilities.exceptions as pgEx
@@ -354,7 +355,7 @@ class TestAreaBET:
         assert result['area_stderr'] >= 0
         assert isfinite(result['bet_slope_stderr'])
         assert isfinite(result['bet_intercept_stderr'])
-        assert result['cross_sectional_area'] > 0
+        cross_section = pygaps.Adsorbate.find(isotherm.adsorbate).get_prop('cross_sectional_area')
         pressure, loading = get_iso_loading_and_pressure_ordered(
             isotherm,
             'ads',
@@ -370,7 +371,7 @@ class TestAreaBET:
             fit.stderr**2 + fit.intercept_stderr**2 + 2 * covariance
         )
         expected_area_stderr = (
-            result['cross_sectional_area']
+            cross_section
             * 1e-18
             * constants.Avogadro
             * sqrt(maximum(monolayer_variance, 0))
@@ -380,7 +381,7 @@ class TestAreaBET:
         assert isclose(result['area_stderr'], expected_area_stderr)
         assert isclose(
             result['area'],
-            result['n_monolayer'] * result['cross_sectional_area'] * 1e-18 * constants.Avogadro,
+            result['n_monolayer'] * cross_section * 1e-18 * constants.Avogadro,
         )
 
     def test_area_BET_choice(self, data_char_path):

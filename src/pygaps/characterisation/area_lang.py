@@ -72,7 +72,6 @@ def area_langmuir(
         - ``langmuir_intercept_stderr`` (float) : standard error of the theoretical plot intercept
         - ``fit_method`` (str) : estimator used
         - ``selected_p_limits`` (tuple[float, float]) : inclusive pressure interval actually used for fitting
-        - ``cross_sectional_area`` (float) : adsorbate cross-sectional area used, in nm^2
 
     Raises
     ------
@@ -280,9 +279,6 @@ def area_langmuir_raw(data: dict):
           points in the selected pressure range.
         - ``loading_rmse`` (float): root-mean-square loading residual.
         - ``r_squared`` (float): coefficient of determination in loading space.
-        - ``cross_sectional_area`` (float): supplied molecular cross-sectional
-          area in nm², treated as exact in the reported area uncertainty.
-
         A warning is emitted if the Langmuir constant, monolayer loading, or
         area is not positive and finite; the estimate is still returned.
 
@@ -439,7 +435,6 @@ def area_langmuir_raw(data: dict):
         'loading_residuals': loading_residuals,
         'loading_rmse': loading_rmse,
         'r_squared': r_squared,
-        'cross_sectional_area': cross_section,
     }
 
 

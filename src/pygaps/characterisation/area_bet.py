@@ -62,7 +62,6 @@ def area_BET(
         - ``area_stderr`` (float) : delta-method standard error of the area from the linear fit
         - ``bet_slope_stderr`` (float) : standard error of the BET plot slope
         - ``bet_intercept_stderr`` (float) : standard error of the BET plot intercept
-        - ``cross_sectional_area`` (float) : adsorbate cross-sectional area used, in nm^2
 
     Raises
     ------
@@ -268,9 +267,6 @@ def area_BET_raw(data: dict):
           area, in m² per adsorbent basis.
         - ``bet_slope_stderr`` (float): standard error of ``bet_slope``.
         - ``bet_intercept_stderr`` (float): standard error of ``bet_intercept``.
-        - ``cross_sectional_area`` (float): supplied molecular cross-sectional
-          area in nm², treated as exact in the reported area uncertainty.
-
         The regression standard errors and propagated area standard error are
         conditional on the selected pressure range and ordinary least squares
         assumptions. They do not include uncertainty in the isotherm,
@@ -393,7 +389,6 @@ def area_BET_raw(data: dict):
         'area_stderr': area_stderr,
         'bet_slope_stderr': slope_stderr,
         'bet_intercept_stderr': intercept_stderr,
-        'cross_sectional_area': cross_section,
     }
 
 
