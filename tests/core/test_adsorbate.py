@@ -2,10 +2,12 @@
 
 import warnings
 from unittest.mock import Mock
+from unittest.mock import call
 
 import pytest
 
 import pygaps
+import pygaps.utilities.coolprop_utilities as coolprop
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
@@ -98,6 +100,60 @@ class TestAdsorbate:
         ads = pygaps.Adsorbate("test")
         ads.properties["molar_mass"] = 142
         assert ads.molar_mass() == 142
+
+    def test_backend_cache_tracks_fluid_and_mode(self, monkeypatch):
+        factory = Mock(side_effect=[Mock(), Mock(), Mock()])
+        monkeypatch.setattr(coolprop.CP, 'AbstractState', factory)
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'HEOS')
+        ads = pygaps.Adsorbate('custom', backend_name='Nitrogen')
+        first = ads.backend
+        assert ads.backend is first
+        ads.properties['backend_name'] = 'Oxygen'
+        second = ads.backend
+        assert second is not first
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'REFPROP')
+        assert ads.backend is not second
+        assert factory.call_args_list == [
+            call('HEOS', 'Nitrogen'), call('HEOS', 'Oxygen'), call('REFPROP', 'Oxygen'),
+        ]
+        assert '_backend_name' not in ads.to_dict()
+
+    @pytest.mark.parametrize('change', ['fluid', 'mode'])
+    def test_backend_failed_replacement_retries(self, monkeypatch, caplog, change):
+        old_state = Mock()
+        old_state.molar_mass.return_value = 0.028
+        new_state = Mock()
+        new_state.molar_mass.return_value = 0.032
+        factory = Mock(side_effect=[old_state, ValueError('backend unavailable'), ValueError('backend unavailable'), new_state])
+        monkeypatch.setattr(coolprop.CP, 'AbstractState', factory)
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'HEOS')
+        ads = pygaps.Adsorbate('custom', backend_name='Nitrogen', molar_mass=30)
+        assert ads.molar_mass() == pytest.approx(28)
+        if change == 'fluid':
+            ads.properties['backend_name'] = 'Oxygen'
+        else:
+            monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'REFPROP')
+
+        assert ads.molar_mass() == 30
+        assert ads.molar_mass() == 30
+        assert ads._state is old_state
+        assert (ads._backend_mode, ads._backend_name) == ('HEOS', 'Nitrogen')
+        assert 'backend unavailable' in caplog.text
+        assert ads.molar_mass() == pytest.approx(32)
+        assert ads.backend is new_state
+        assert factory.call_count == 4
+
+    @pytest.mark.parametrize('mode', ['HEOS', 'REFPROP'])
+    def test_direct_thermodynamic_calls_use_selected_backend(self, monkeypatch, mode):
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', mode)
+        props = Mock(return_value=1)
+        monkeypatch.setattr(coolprop.CP.CoolProp, 'PropsSI', props)
+        ads = pygaps.Adsorbate('custom', backend_name='Nitrogen')
+
+        assert ads.p_triple() == 1
+        props.assert_called_with('PTRIPLE', f'{mode}::Nitrogen')
+        assert ads.compressibility(100, 100000) == 1
+        props.assert_called_with('Z', 'T', 100, 'P', 100000, f'{mode}::Nitrogen')
 
     @pytest.mark.parametrize('calculated', [True, False])
     def test_adsorbate_named_props(self, adsorbate_data, basic_adsorbate, calculated):

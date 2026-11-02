@@ -349,9 +349,10 @@ PointIsotherm object.
 
 For the PointIsotherm, a special
 :meth:`~pygaps.core.pointisotherm.PointIsotherm.data` function returns all or
-parts of the internal pandas.DataFrame. This can be used to inspect the data
-directly or retrieve the DataFrame. To access the DataFrame directly, use the
-``data_raw`` parameter.
+parts of the internal pandas.DataFrame as an independent copy. Edits to this
+copy do not affect the isotherm until passed to ``update_data``. This method
+replaces the full dataset, preserving explicit ``branch`` values (0 for
+adsorption, 1 for desorption), and resets both interpolators.
 
 .. code:: python
 
@@ -363,6 +364,21 @@ directly or retrieve the DataFrame. To access the DataFrame directly, use the
     # Or access the underlying DataFrame
 
     isotherm.data_raw
+
+.. code:: python
+
+    edited = isotherm.data()
+    edited.loc[2, isotherm.loading_key] = 20
+    isotherm.update_data(edited)
+
+Direct edits through ``data_raw`` remain supported. After editing pressure,
+loading, or branch data this way, explicitly reset the interpolation caches
+before the next interpolation:
+
+.. code:: python
+
+    isotherm.data_raw.loc[2, isotherm.loading_key] = 20
+    isotherm.reset_interpolators()
 
 Besides functions which give access to the internal data points, the isotherm
 object can also return the value of pressure and loading at any point specified

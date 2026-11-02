@@ -103,6 +103,7 @@ class Adsorbate:
         "alias",
         "_state",
         "_backend_mode",
+        "_backend_name",
     ]
 
     def __init__(
@@ -138,6 +139,7 @@ class Adsorbate:
         # CoolProp interaction variables, only generate when called
         self._state = None
         self._backend_mode = None
+        self._backend_name = None
 
         # Store reference in internal list
         if store:
@@ -219,9 +221,14 @@ class Adsorbate:
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
-        if not self._backend_mode or self._backend_mode != thermodynamic_backend():
-            self._backend_mode = thermodynamic_backend()
-            self._state = CP.AbstractState(self._backend_mode, self.backend_name)
+        mode = thermodynamic_backend()
+        name = self.backend_name
+        if self._state is None or (self._backend_mode, self._backend_name) != (mode, name):
+            # A failed replacement must not mark the previous state as current.
+            state = CP.AbstractState(mode, name)
+            self._state = state
+            self._backend_mode = mode
+            self._backend_name = name
 
         return self._state
 
@@ -362,10 +369,9 @@ class Adsorbate:
         """
         if calculate:
             try:
-                # For some reason coolprop does not implement a python
-                # wrapper for P_triple, so we are directly calling the propsSI function
-                # TODO: this will not work for REFPROP
-                return CP.CoolProp.PropsSI('PTRIPLE', self.backend_name)
+                # AbstractState has no triple-pressure accessor.
+                fluid = f"{thermodynamic_backend()}::{self.backend_name}"
+                return CP.CoolProp.PropsSI('PTRIPLE', fluid)
             except BaseException as err:
                 _warn_reading_params(err)
                 return self.p_triple(calculate=False)
@@ -946,7 +952,8 @@ class Adsorbate:
         pressure: float
             pressure, in Pa
         """
-        return CP.CoolProp.PropsSI('Z', 'T', temp, 'P', pressure, self.backend_name)
+        fluid = f"{thermodynamic_backend()}::{self.backend_name}"
+        return CP.CoolProp.PropsSI('Z', 'T', temp, 'P', pressure, fluid)
 
 
 def _warn_reading_params(err):

@@ -213,6 +213,66 @@ class TestPointIsotherm:
         assert basic_pointisotherm.has_branch(branch='ads')
         assert basic_pointisotherm.has_branch(branch='des')
 
+    @pytest.mark.parametrize('branch', [None, 'all', 'ads', 'des'])
+    def test_data_returns_independent_copy(self, basic_pointisotherm, branch):
+        point = basic_pointisotherm
+        before = point.data_raw.copy(deep=True)
+        edited = point.data(branch=branch)
+        edited.loc[:, point.loading_key] = 100
+        edited.loc[:, 'branch'] = 1
+        pandas.testing.assert_frame_equal(point.data_raw, before)
+
+    @pytest.mark.parametrize('column', ['pressure', 'loading', 'branch'])
+    @pytest.mark.parametrize('direct', [False, True])
+    def test_data_updates_refresh_interpolators(self, isotherm_parameters, column, direct):
+        point = pygaps.PointIsotherm(
+            pressure=[0., 1., 2., 3.], loading=[0., 1., 2., 30.], branch='ads', **isotherm_parameters
+        )
+        point.loading_at(1.5)
+        point.pressure_at(1.5)
+        edited = point.data_raw if direct else point.data()
+        if column == 'loading':
+            edited.loc[2, column] = 20
+            expected_loading, expected_pressure = 10.5, 1 + 0.5 / 19
+        elif column == 'pressure':
+            edited.loc[2, column] = 2.5
+            expected_loading, expected_pressure = 1 + 0.5 / 1.5, 1.75
+        else:
+            edited.loc[1, column] = 1
+            edited.loc[2, 'loading'] = 4
+            expected_loading, expected_pressure = 3, 0.75
+        if direct:
+            point.reset_interpolators()
+        else:
+            point.update_data(edited)
+            edited.loc[:, 'loading'] = 100
+
+        assert point.l_interpolator is None
+        assert point.p_interpolator is None
+        assert point.loading_at(1.5) == pytest.approx(expected_loading)
+        assert point.pressure_at(1.5) == pytest.approx(expected_pressure)
+
+    @pytest.mark.parametrize('invalid', ['type', 'missing', 'duplicates', 'branch'])
+    def test_update_data_invalid_preserves_state(self, basic_pointisotherm, invalid):
+        point = basic_pointisotherm
+        point.loading_at(2)
+        point.pressure_at(2)
+        before = point.data_raw.copy(deep=True)
+        caches = (point.l_interpolator, point.p_interpolator)
+        edited = point.data()
+        if invalid == 'type':
+            edited = []
+        elif invalid == 'missing':
+            edited = edited.drop(columns=['branch'])
+        elif invalid == 'duplicates':
+            edited = pandas.concat([edited, edited[['branch']]], axis=1)
+        else:
+            edited.loc[0, 'branch'] = 2
+        with pytest.raises(pgEx.ParameterError):
+            point.update_data(edited)
+        pandas.testing.assert_frame_equal(point.data_raw, before)
+        assert (point.l_interpolator, point.p_interpolator) == caches
+
     def test_isotherm_ret_data(
         self,
         basic_pointisotherm,

@@ -271,6 +271,13 @@ cache-invalidating setters with a compatibility path for `data_raw`. Reset
 both interpolators whenever data affecting them change. Test edits to pressure,
 loading and branch after both caches are built.
 
+**Resolution (feature/core-updates).** ``data()`` now returns independent
+copies. ``update_data(frame)`` replaces the complete dataset after validating
+required/unique columns and explicit branch values, and resets both caches.
+``data_raw`` remains supported without deprecation; callers editing it directly
+must invoke ``reset_interpolators()`` afterward. Regressions cover pressure,
+loading, and branch edits through both paths and invalid updates.
+
 **Sources:** [data access](../../src/pygaps/core/pointisotherm.py#L678),
 [loading interpolator cache](../../src/pygaps/core/pointisotherm.py#L1140),
 [pressure interpolator cache](../../src/pygaps/core/pointisotherm.py#L1009).
@@ -294,6 +301,13 @@ construct a replacement successfully before committing it, and consistently
 honor the selected backend in every thermodynamic method. Test name changes,
 failed initialization/retry and backend switching with a stub; add a real
 REFPROP integration test only where that backend is available.
+
+**Resolution (feature/core-updates).** Backend states are keyed by both mode
+and fluid name; replacement state construction succeeds before cache metadata
+is committed. Triple pressure and compressibility explicitly qualify their
+fluid names with the selected backend. Stub-based regressions cover fluid/mode
+changes, repeated failed construction with fallback and subsequent retry, and
+HEOS/REFPROP forwarding without requiring REFPROP installation.
 
 **Sources:** [backend cache](../../src/pygaps/core/adsorbate.py#L220),
 [triple pressure](../../src/pygaps/core/adsorbate.py#L365),

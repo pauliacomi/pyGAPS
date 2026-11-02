@@ -191,11 +191,7 @@ class PointIsotherm(BaseIsotherm):
             except Exception as e_info:
                 raise ParameterError(e_info)
 
-        # The internal interpolator for loading given pressure.
-        self.l_interpolator = None
-
-        # The internal interpolator for pressure given loading.
-        self.p_interpolator = None
+        self.reset_interpolators()
 
     @classmethod
     def from_isotherm(
@@ -334,14 +330,17 @@ class PointIsotherm(BaseIsotherm):
         # Deep copy the DataFrame to avoid shared mutation
         new.data_raw = self.data_raw.copy()
 
-        # Reset interpolators (they are lazy, will be rebuilt on demand)
-        new.l_interpolator = None
-        new.p_interpolator = None
+        new.reset_interpolators()
 
         return new
 
     ##########################################################
     #   Conversion functions
+
+    def reset_interpolators(self):
+        """Reset both caches. Call this method after direct edits to ``data_raw``."""
+        self.l_interpolator = None
+        self.p_interpolator = None
 
     def convert(
         self,
@@ -458,9 +457,7 @@ class PointIsotherm(BaseIsotherm):
             self.pressure_mode = mode_to
         self.pressure_unit = unit_to if mode_to == 'absolute' else None
 
-        # Reset interpolators
-        self.l_interpolator = None
-        self.p_interpolator = None
+        self.reset_interpolators()
 
         if verbose:
             logger.info(f"Changed pressure to mode '{mode_to}', unit '{unit_to}'.")
@@ -531,9 +528,7 @@ class PointIsotherm(BaseIsotherm):
         else:
             self.loading_unit = unit_to
 
-        # Reset interpolators
-        self.l_interpolator = None
-        self.p_interpolator = None
+        self.reset_interpolators()
 
         if verbose:
             logger.info(f"Changed loading to basis '{basis_to}', unit '{unit_to}'.")
@@ -608,9 +603,7 @@ class PointIsotherm(BaseIsotherm):
         if basis_to != self.material_basis:
             self.material_basis = basis_to
 
-        # Reset interpolators
-        self.l_interpolator = None
-        self.p_interpolator = None
+        self.reset_interpolators()
 
         if verbose:
             logger.info(f"Changed material to basis '{basis_to}', unit '{unit_to}'.")
@@ -679,7 +672,10 @@ class PointIsotherm(BaseIsotherm):
 
     def data(self, branch: str = None) -> pandas.DataFrame:
         """
-        Return underlying isotherm data.
+        Return a copy of the isotherm data.
+
+        Use ``update_data`` to apply edits and reset interpolators. Direct edits
+        through ``data_raw`` remain supported but require ``reset_interpolators``.
 
         Parameters
         ----------
@@ -694,12 +690,31 @@ class PointIsotherm(BaseIsotherm):
 
         """
         if branch is None or branch.startswith('all'):
-            return self.data_raw
+            return self.data_raw.copy()
         if branch == 'ads':
-            return self.data_raw.loc[self.data_raw['branch'] == 0]
+            return self.data_raw.loc[self.data_raw['branch'] == 0].copy()
         if branch == 'des':
-            return self.data_raw.loc[self.data_raw['branch'] == 1]
+            return self.data_raw.loc[self.data_raw['branch'] == 1].copy()
         raise ParameterError('Bad branch specification.')
+
+    def update_data(self, data: pandas.DataFrame):
+        """Replace point data and reset both interpolators.
+
+        Pass a complete DataFrame, typically obtained from ``data()`` and edited.
+        Pressure/loading column names and units are unchanged. The ``branch``
+        column must explicitly identify adsorption (0) or desorption (1) points.
+        Invalid updates leave the current data and caches unchanged.
+        """
+        if not isinstance(data, pandas.DataFrame):
+            raise ParameterError("Updated isotherm data must be a pandas DataFrame.")
+        required = [self.pressure_key, self.loading_key, 'branch']
+        if not data.columns.is_unique or not all(key in data.columns for key in required):
+            raise ParameterError(f"Updated data must have unique columns including {required}.")
+        if not data['branch'].isin([0, 1]).all():
+            raise ParameterError("Updated branch values must be 0 (adsorption) or 1 (desorption).")
+
+        self.data_raw = data.copy(deep=True)
+        self.reset_interpolators()
 
     def pressure(
         self,
