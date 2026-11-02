@@ -5,6 +5,29 @@ parametrizing various tests such as isotherms.
 
 import pytest
 
+import pygaps
+
+
+@pytest.fixture
+def fractional_conversion_parameters(monkeypatch):
+    """Provide deterministic material and adsorbate properties for basis conversions."""
+    adsorbate = pygaps.Adsorbate("fractional-conversion-test")
+    monkeypatch.setattr(adsorbate, "molar_mass", lambda calculate=True: 10.0)
+    monkeypatch.setattr(adsorbate, "liquid_density", lambda temp, calculate=True: 0.5)
+    monkeypatch.setattr(adsorbate, "liquid_molar_density", lambda temp, calculate=True: 0.05)
+
+    return {
+        "material": pygaps.Material("fractional-conversion-test", density=2.0, molar_mass=10.0),
+        "adsorbate": adsorbate,
+        "temperature": 100.0,
+        "pressure_mode": "absolute",
+        "pressure_unit": "bar",
+        "loading_basis": "molar",
+        "loading_unit": "mmol",
+        "material_basis": "mass",
+        "material_unit": "g",
+    }
+
 
 @pytest.fixture
 def data_char_path(request):

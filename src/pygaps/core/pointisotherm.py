@@ -8,8 +8,7 @@ import pandas
 
 from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
-from pygaps.units.converter_mode import c_loading
-from pygaps.units.converter_mode import c_material
+from pygaps.units.converter_mode import c_loading_material
 from pygaps.units.converter_mode import c_pressure
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
@@ -498,16 +497,22 @@ class PointIsotherm(BaseIsotherm):
                     logger.info("There are no loading units in this mode.")
                 return
 
-        self.data_raw[self.loading_key] = c_loading(
+        if unit_to is None and basis_to == self.loading_basis:
+            unit_to = self.loading_unit
+
+        self.data_raw[self.loading_key] = c_loading_material(
             self.data_raw[self.loading_key],
-            basis_from=self.loading_basis,
-            basis_to=basis_to,
-            unit_from=self.loading_unit,
-            unit_to=unit_to,
+            loading_basis_from=self.loading_basis,
+            loading_unit_from=self.loading_unit,
+            material_basis_from=self.material_basis,
+            material_unit_from=self.material_unit,
+            loading_basis_to=basis_to,
+            loading_unit_to=unit_to,
+            material_basis_to=self.material_basis,
+            material_unit_to=self.material_unit,
             adsorbate=self.adsorbate,
             temp=self.temperature,
-            basis_material=self.material_basis,
-            unit_material=self.material_unit,
+            material=self.material,
         )
 
         if basis_to != self.loading_basis:
@@ -567,39 +572,23 @@ class PointIsotherm(BaseIsotherm):
                 logger.info("There are no material units in this mode.")
             return
 
-        self.data_raw[self.loading_key] = c_material(
+        if unit_to is None and basis_to == self.material_basis:
+            unit_to = self.material_unit
+
+        self.data_raw[self.loading_key] = c_loading_material(
             self.data_raw[self.loading_key],
-            basis_from=self.material_basis,
-            basis_to=basis_to,
-            unit_from=self.material_unit,
-            unit_to=unit_to,
+            loading_basis_from=self.loading_basis,
+            loading_unit_from=self.loading_unit,
+            material_basis_from=self.material_basis,
+            material_unit_from=self.material_unit,
+            loading_basis_to=self.loading_basis,
+            loading_unit_to=self.loading_unit,
+            material_basis_to=basis_to,
+            material_unit_to=unit_to,
+            adsorbate=self.adsorbate,
+            temp=self.temperature,
             material=self.material,
         )
-
-        # A special case is when conversion is performed from
-        # a "fraction" basis to another "fraction" basis.
-        # Here, the loading must be simultaneously converted.
-        # e.g.: wt% = g/g -> cm3/cm3 = vol%
-        if self.loading_basis in ['percent', 'fraction']:
-            if basis_to == 'volume':
-                _basis_to = 'volume_liquid'
-            else:
-                _basis_to = basis_to
-            if self.material_basis == 'volume':
-                _basis_from = 'volume_liquid'
-            else:
-                _basis_from = self.material_basis
-            self.data_raw[self.loading_key] = c_loading(
-                self.data_raw[self.loading_key],
-                basis_from=_basis_from,
-                basis_to=_basis_to,
-                unit_from=self.material_unit,
-                unit_to=unit_to,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-            )
-            if verbose:
-                logger.info(f"Changed loading to basis '{basis_to}', unit '{unit_to}'.")
 
         if unit_to != self.material_unit:
             self.material_unit = unit_to
@@ -820,45 +809,25 @@ class PointIsotherm(BaseIsotherm):
         ret = self.data(branch=branch).loc[:, self.loading_key]
 
         if not ret.empty:
-            # Convert if needed
+            target_loading_basis = loading_basis if loading_basis is not None else self.loading_basis
+            target_loading_unit = loading_unit if loading_unit is not None else self.loading_unit
+            target_material_basis = material_basis if material_basis is not None else self.material_basis
+            target_material_unit = material_unit if material_unit is not None else self.material_unit
 
-            # First adsorbent is converted
-            if material_basis or material_unit:
-                if not material_basis:
-                    material_basis = self.material_basis
-
-                ret = c_material(
-                    ret,
-                    basis_from=self.material_basis,
-                    basis_to=material_basis,
-                    unit_from=self.material_unit,
-                    unit_to=material_unit,
-                    material=self.material,
-                )
-
-            # Then loading
-            if loading_basis or loading_unit:
-                if not loading_basis:
-                    loading_basis = self.loading_basis
-
-                # These must be specified
-                # in the case of fractional conversions
-                if not material_basis:
-                    material_basis = self.material_basis
-                if not material_unit:
-                    material_unit = self.material_unit
-
-                ret = c_loading(
-                    ret,
-                    basis_from=self.loading_basis,
-                    basis_to=loading_basis,
-                    unit_from=self.loading_unit,
-                    unit_to=loading_unit,
-                    adsorbate=self.adsorbate,
-                    temp=self.temperature,
-                    basis_material=material_basis,
-                    unit_material=material_unit,
-                )
+            ret = c_loading_material(
+                ret,
+                loading_basis_from=self.loading_basis,
+                loading_unit_from=self.loading_unit,
+                material_basis_from=self.material_basis,
+                material_unit_from=self.material_unit,
+                loading_basis_to=target_loading_basis,
+                loading_unit_to=target_loading_unit,
+                material_basis_to=target_material_basis,
+                material_unit_to=target_material_unit,
+                adsorbate=self.adsorbate,
+                temp=self.temperature,
+                material=self.material,
+            )
 
             # Select required points
             if limits and any(limits):
@@ -1019,7 +988,7 @@ class PointIsotherm(BaseIsotherm):
                 interp_fill=interp_fill,
             )
 
-        # Ensure loading is in correct units and basis for the internal model
+        # Ensure loading is in the isotherm's units and bases.
         if material_basis or material_unit:
             if not material_basis:
                 material_basis = self.material_basis
@@ -1027,15 +996,9 @@ class PointIsotherm(BaseIsotherm):
                 raise ParameterError(
                     "Must specify an material unit if the input is in another basis."
                 )
-
-            loading = c_material(
-                loading,
-                basis_from=material_basis,
-                basis_to=self.material_basis,
-                unit_from=material_unit,
-                unit_to=self.material_unit,
-                material=self.material,
-            )
+        else:
+            material_basis = self.material_basis
+            material_unit = self.material_unit
 
         if loading_basis or loading_unit:
             if not loading_basis:
@@ -1044,18 +1007,24 @@ class PointIsotherm(BaseIsotherm):
                 raise ParameterError(
                     "Must specify a loading unit if the input is in another basis."
                 )
+        else:
+            loading_basis = self.loading_basis
+            loading_unit = self.loading_unit
 
-            loading = c_loading(
-                loading,
-                basis_from=loading_basis,
-                basis_to=self.loading_basis,
-                unit_from=loading_unit,
-                unit_to=self.loading_unit,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-                basis_material=self.material_basis,
-                unit_material=self.material_unit,
-            )
+        loading = c_loading_material(
+            loading,
+            loading_basis_from=loading_basis,
+            loading_unit_from=loading_unit,
+            material_basis_from=material_basis,
+            material_unit_from=material_unit,
+            loading_basis_to=self.loading_basis,
+            loading_unit_to=self.loading_unit,
+            material_basis_to=self.material_basis,
+            material_unit_to=self.material_unit,
+            adsorbate=self.adsorbate,
+            temp=self.temperature,
+            material=self.material,
+        )
 
         # Interpolate using the internal interpolator
         pressure = self.p_interpolator(loading)
@@ -1172,35 +1141,25 @@ class PointIsotherm(BaseIsotherm):
         # Interpolate using the internal interpolator
         loading = self.l_interpolator(pressure)
 
-        # Ensure loading is in correct units and basis requested
-        if material_basis or material_unit:
-            if not material_basis:
-                material_basis = self.material_basis
+        target_loading_basis = loading_basis if loading_basis is not None else self.loading_basis
+        target_loading_unit = loading_unit if loading_unit is not None else self.loading_unit
+        target_material_basis = material_basis if material_basis is not None else self.material_basis
+        target_material_unit = material_unit if material_unit is not None else self.material_unit
 
-            loading = c_material(
-                loading,
-                basis_from=self.material_basis,
-                basis_to=material_basis,
-                unit_from=self.material_unit,
-                unit_to=material_unit,
-                material=self.material,
-            )
-
-        if loading_basis or loading_unit:
-            if not loading_basis:
-                loading_basis = self.loading_basis
-
-            loading = c_loading(
-                loading,
-                basis_from=self.loading_basis,
-                basis_to=loading_basis,
-                unit_from=self.loading_unit,
-                unit_to=loading_unit,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-                basis_material=self.material_basis,
-                unit_material=self.material_unit,
-            )
+        loading = c_loading_material(
+            loading,
+            loading_basis_from=self.loading_basis,
+            loading_unit_from=self.loading_unit,
+            material_basis_from=self.material_basis,
+            material_unit_from=self.material_unit,
+            loading_basis_to=target_loading_basis,
+            loading_unit_to=target_loading_unit,
+            material_basis_to=target_material_basis,
+            material_unit_to=target_material_unit,
+            adsorbate=self.adsorbate,
+            temp=self.temperature,
+            material=self.material,
+        )
 
         return loading
 

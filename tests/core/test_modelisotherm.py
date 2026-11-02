@@ -292,6 +292,43 @@ class TestModelIsotherm:
             **parameters,
         ) == pytest.approx(expected, 1e-5)
 
+    def test_fractional_loading_conversion_paths(self, fractional_conversion_parameters):
+        parameters = fractional_conversion_parameters
+        model = pygaps.ModelIsotherm(
+            pressure=[1, 2, 3],
+            loading=[2, 4, 6],
+            model='Henry',
+            **parameters,
+        )
+        conversion = {
+            'loading_basis': 'fraction',
+            'material_basis': 'volume',
+            'material_unit': 'cm3',
+        }
+
+        assert model.loading_at(2, **conversion) == pytest.approx(0.16)
+        assert model.loading(points=3, **conversion)[1] == pytest.approx(0.16)
+        assert model.pressure_at(0.16, loading_unit='cm3', **conversion) == pytest.approx(2)
+
+        fractional_parameters = {**parameters, 'loading_basis': 'fraction', 'loading_unit': None}
+        fractional_model = pygaps.ModelIsotherm(
+            pressure=[1, 2, 3],
+            loading=[0.01, 0.02, 0.03],
+            model='Henry',
+            **fractional_parameters,
+        )
+        material_conversion = {'material_basis': 'volume', 'material_unit': 'cm3'}
+
+        assert fractional_model.loading_at(1, **material_conversion) == pytest.approx(0.04)
+        assert fractional_model.loading(points=3, **material_conversion)[0] == pytest.approx(0.04)
+        assert fractional_model.loading(loading_basis='percent', **material_conversion)[0] == pytest.approx(4)
+        assert fractional_model.pressure_at(
+            0.04,
+            loading_basis='fraction',
+            loading_unit='cm3',
+            **material_conversion,
+        ) == pytest.approx(1)
+
     @pytest.mark.parametrize(
         'inp, expected, parameters',
         [

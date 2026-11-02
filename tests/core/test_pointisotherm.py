@@ -714,6 +714,49 @@ class TestPointIsotherm:
         basic_pointisotherm.convert_material(basis_to='mass', unit_to='g')
         assert basic_pointisotherm.loading()[0] == pytest.approx(1, 0.001)
 
+    def test_fractional_loading_conversion_paths(self, fractional_conversion_parameters):
+        parameters = fractional_conversion_parameters
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3],
+            loading=[2, 4, 6],
+            branch='ads',
+            **parameters,
+        )
+        conversion = {
+            'loading_basis': 'fraction',
+            'material_basis': 'volume',
+            'material_unit': 'cm3',
+        }
+
+        assert point.loading(**conversion)[1] == pytest.approx(0.16)
+        assert point.loading_at(2, **conversion) == pytest.approx(0.16)
+        assert point.loading_at(1.5, **conversion) == pytest.approx(0.12)
+        assert point.pressure_at(0.16, loading_unit='cm3', **conversion) == pytest.approx(2)
+
+        fractional_parameters = {**parameters, 'loading_basis': 'fraction', 'loading_unit': None}
+        fractional_point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3],
+            loading=[0.01, 0.02, 0.03],
+            branch='ads',
+            **fractional_parameters,
+        )
+        material_conversion = {'material_basis': 'volume', 'material_unit': 'cm3'}
+
+        assert fractional_point.loading(**material_conversion)[0] == pytest.approx(0.04)
+        assert fractional_point.loading_at(1, **material_conversion) == pytest.approx(0.04)
+        assert fractional_point.loading(loading_basis='percent', **material_conversion)[0] == pytest.approx(4)
+        assert fractional_point.pressure_at(
+            0.04,
+            loading_basis='fraction',
+            loading_unit='cm3',
+            **material_conversion,
+        ) == pytest.approx(1)
+
+        fractional_point.convert_material(basis_to='volume', unit_to='cm3')
+        assert fractional_point.loading()[0] == pytest.approx(0.04)
+        fractional_point.convert_loading(basis_to='percent')
+        assert fractional_point.loading()[0] == pytest.approx(4)
+
     @pytest.mark.parametrize('model', ['Henry', 'Virial'])
     @pytest.mark.parametrize('coordinate', ['pressure', 'loading'])
     def test_from_modelisotherm_point_coordinates(self, isotherm_parameters, model, coordinate):
