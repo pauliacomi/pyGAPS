@@ -137,6 +137,7 @@ class TestAreaLangmuir:
                     'loading': [1e-320, 2e-320, 3e-320],
                     'cross_section': 0.1,
                     'p_limits': (0.1, 0.3),
+                    'fit_method': 'linearized',
                 }
             )
 
@@ -148,6 +149,7 @@ class TestAreaLangmuir:
                     'loading': [1e-309, 2e-309, 3e-309],
                     'cross_section': 0.1,
                     'p_limits': (0.1, 0.3),
+                    'fit_method': 'linearized',
                 }
             )
 
@@ -177,6 +179,7 @@ class TestAreaLangmuir:
         )
 
         assert result['p_limit_indices'] == (0, 2)
+        assert result['selected_p_limits'] == (0.1, 0.3)
         assert result['area'] > 0
         assert result['area_stderr'] >= 0
 
@@ -192,6 +195,7 @@ class TestAreaLangmuir:
                     'loading': loading,
                     'cross_section': 0.1,
                     'p_limits': (pressure[0], pressure[-1]),
+                    'fit_method': 'linearized',
                 }
             )
 
@@ -213,27 +217,24 @@ class TestAreaLangmuir:
                     'loading': loading,
                     'cross_section': 0.1,
                     'p_limits': (pressure[0], pressure[-1]),
+                    'fit_method': 'linearized',
                 }
             )
 
-    def test_nonfinite_langmuir_constant_emits_warning(self, caplog):
+    def test_nonfinite_langmuir_constant_raises_calculation_error(self):
         pressure = array([0.0625, 0.125, 0.1875, 0.25])
         loading = array([1.0, 1.0, 1.0, 1.0])
 
-        with caplog.at_level(logging.WARNING):
-            result = al.area_langmuir_raw(
+        with pytest.raises(pgEx.CalculationError, match='non-finite loading predictions'):
+            al.area_langmuir_raw(
                 {
                     'pressure': pressure,
                     'loading': loading,
                     'cross_section': 0.1,
                     'p_limits': (pressure[0], pressure[-1]),
+                    'fit_method': 'linearized',
                 }
             )
-
-        assert not isfinite(result['langmuir_const'])
-        assert "The Langmuir constant is not positive and finite." in caplog.text
-        assert "The monolayer loading is not positive and finite." not in caplog.text
-        assert "The Langmuir area is not positive and finite." not in caplog.text
 
     @pytest.mark.parametrize(
         'p_limits',
@@ -262,6 +263,43 @@ class TestAreaLangmuir:
         with pytest.raises(pgEx.ParameterError, match='dictionary'):
             al.area_langmuir_raw([0.1, 0.2, 0.3])
 
+    def test_nonlinear_fit_recovers_exact_langmuir_parameters(self):
+        pressure = linspace(0.02, 0.8, 20)
+        expected_capacity = 0.02
+        expected_constant = 5.0
+        loading = al.simple_lang(pressure, expected_capacity, expected_constant)
+
+        result = al.area_langmuir_raw(
+            {
+                'pressure': pressure,
+                'loading': loading,
+                'cross_section': 0.1,
+                'p_limits': (pressure[0], pressure[-1]),
+            }
+        )
+
+        assert result['fit_method'] == 'nonlinear'
+        assert result['selected_p_limits'] == (float(pressure[0]), float(pressure[-1]))
+        assert isclose(result['n_monolayer'], expected_capacity, rtol=1e-7)
+        assert isclose(result['langmuir_const'], expected_constant, rtol=1e-7)
+        assert isclose(result['langmuir_slope'], 1 / expected_capacity, rtol=1e-7)
+        assert isclose(result['langmuir_intercept'], 1 / (expected_capacity * expected_constant), rtol=1e-7)
+        assert result['r_squared'] > 1 - 1e-12
+        assert result['loading_rmse'] < 1e-10
+        assert isclose(result['area'], expected_capacity * 0.1e-18 * constants.Avogadro)
+        assert isfinite(result['n_monolayer_stderr'])
+
+    def test_invalid_langmuir_fit_method_raises_parameter_error(self):
+        with pytest.raises(pgEx.ParameterError, match='fit_method'):
+            al.area_langmuir_raw(
+                {
+                    'pressure': [0.1, 0.2, 0.3],
+                    'loading': [0.01, 0.02, 0.03],
+                    'cross_section': 0.1,
+                    'fit_method': 'unknown',
+                }
+            )
+
     @pytest.mark.parametrize('sample', DATA.values())
     def test_area_langmuir(self, sample, data_char_path):
         """Test calculation with several model isotherms."""
@@ -272,7 +310,7 @@ class TestAreaLangmuir:
         filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
-        result = al.area_langmuir(isotherm)
+        result = al.area_langmuir(isotherm, fit_method='linearized')
         area = result.get("area")
 
         err_relative = 0.1  # 10 percent
@@ -284,6 +322,7 @@ class TestAreaLangmuir:
         assert isfinite(result['langmuir_slope_stderr'])
         assert isfinite(result['langmuir_intercept_stderr'])
         assert result['cross_sectional_area'] > 0
+        assert result['fit_method'] == 'linearized'
         pressure, loading = get_iso_loading_and_pressure_ordered(
             isotherm,
             'ads',
@@ -316,7 +355,9 @@ class TestAreaLangmuir:
         filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
-        area = al.area_langmuir(isotherm, p_limits=[0.05, 0.30]).get("area")
+        area = al.area_langmuir(
+            isotherm, p_limits=[0.05, 0.30], fit_method='linearized'
+        ).get("area")
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2
@@ -330,7 +371,7 @@ class TestAreaLangmuir:
         filepath = data_char_path / sample['file']
         isotherm = pgpj.isotherm_from_json(filepath)
 
-        area = al.area_langmuir(isotherm, branch="des").get("area")
+        area = al.area_langmuir(isotherm, branch="des", fit_method='linearized').get("area")
 
         err_relative = 0.1  # 10 percent
         err_absolute = 0.1  # 0.1 m2

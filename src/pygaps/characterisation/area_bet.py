@@ -31,7 +31,8 @@ def area_BET(
 
     The optional ``p_limits`` parameter allows to specify the upper and lower
     pressure limits to calculate the BET area, otherwise the limits will be
-    automatically selected based on the Rouquerol rules.
+    automatically selected as the longest contiguous window satisfying the
+    Rouquerol consistency criteria.
 
     Parameters
     ----------
@@ -121,8 +122,10 @@ def area_BET(
     * The loading at the statistical monolayer should be situated within the
       limits of the BET region.
 
-    This module checks these conditions and emits warnings when they are not
-    met; it still returns the calculated estimate.
+    Automatic selection returns the longest contiguous window satisfying these
+    consistency criteria and raises a calculation error if none exists. When
+    explicit pressure limits are supplied, failed checks emit warnings while
+    the requested estimate is still returned.
 
     Regardless, the BET surface area should still be interpreted carefully. The following
     assumptions are implicitly made in this approach:
@@ -243,6 +246,9 @@ def area_BET_raw(data: dict):
         Pressure and loading must be one-dimensional arrays of equal length.
         Loading must be positive for every point selected for fitting; zero
         loading is allowed outside that range (for example, at the origin).
+        When ``p_limits`` is omitted, the longest contiguous window satisfying
+        the BET consistency criteria is selected; ties favor the lower-pressure
+        window.
 
     Returns
     -------
@@ -313,18 +319,7 @@ def area_BET_raw(data: dict):
     maximum = len(pressure) - 1  # As we want absolute position
 
     if p_limits is None:
-        # Generate the Rouquerol array
-        roq_t_array = roq_transform(pressure, loading)
-
-        # Stop before the first non-increasing Rouquerol value.
-        for index, value in enumerate(roq_t_array[:-1]):
-            if value >= roq_t_array[index + 1]:
-                maximum = index
-                break
-
-        # Min pressure is taken as 10% of max
-        min_p = pressure[maximum] * 0.1
-        minimum = numpy.searchsorted(pressure, min_p)
+        minimum, maximum = _select_bet_window(pressure, loading)
 
     else:
         minimum, maximum = get_pressure_limit_indices(pressure, p_limits)
@@ -400,6 +395,93 @@ def area_BET_raw(data: dict):
         'bet_intercept_stderr': intercept_stderr,
         'cross_sectional_area': cross_section,
     }
+
+
+def _select_bet_window(pressure, loading):
+    """Return the longest window satisfying the BET consistency criteria."""
+    roq_values = roq_transform(pressure, loading)
+    if not numpy.isfinite(roq_values).all():
+        raise CalculationError("The Rouquerol transform contains non-finite values.")
+
+    bet_values = numpy.zeros_like(pressure)
+    positive_loading = loading > 0
+    with numpy.errstate(over='ignore', divide='ignore', invalid='ignore'):
+        bet_values[positive_loading] = bet_transform(
+            pressure[positive_loading],
+            loading[positive_loading],
+        )
+    finite_bet_values = numpy.isfinite(bet_values)
+    bet_values = numpy.where(finite_bet_values, bet_values, 0)
+    bet_scale = numpy.max(numpy.abs(bet_values))
+    if bet_scale <= 0 or not numpy.isfinite(bet_scale):
+        raise CalculationError("No pressure range satisfies the BET consistency criteria.")
+    scaled_bet_values = bet_values / bet_scale
+
+    prefix_x = numpy.concatenate(([0.0], numpy.cumsum(pressure)))
+    prefix_y = numpy.concatenate(([0.0], numpy.cumsum(scaled_bet_values)))
+    with numpy.errstate(over='ignore', invalid='ignore'):
+        prefix_xx = numpy.concatenate(([0.0], numpy.cumsum(pressure**2)))
+        prefix_yy = numpy.concatenate(([0.0], numpy.cumsum(scaled_bet_values**2)))
+    prefix_xy = numpy.concatenate(([0.0], numpy.cumsum(pressure * scaled_bet_values)))
+    prefix_invalid = numpy.concatenate(([0], numpy.cumsum(~finite_bet_values)))
+    prefix_nonpositive_loading = numpy.concatenate(
+        ([0], numpy.cumsum(loading <= 0))
+    )
+
+    candidates = []
+    for start in range(len(pressure) - 2):
+        if loading[start] <= 0:
+            continue
+        if roq_values[start + 1] <= roq_values[start]:
+            continue
+        for end in range(start + 2, len(pressure)):
+            if roq_values[end] <= roq_values[end - 1]:
+                break
+            if (
+                prefix_nonpositive_loading[end + 1] != prefix_nonpositive_loading[start]
+                or prefix_invalid[end + 1] != prefix_invalid[start]
+            ):
+                continue
+
+            count = end - start + 1
+            sum_x = prefix_x[end + 1] - prefix_x[start]
+            sum_y = prefix_y[end + 1] - prefix_y[start]
+            sum_xx = prefix_xx[end + 1] - prefix_xx[start]
+            sum_yy = prefix_yy[end + 1] - prefix_yy[start]
+            sum_xy = prefix_xy[end + 1] - prefix_xy[start]
+            if not numpy.isfinite((sum_x, sum_y, sum_xx, sum_yy, sum_xy)).all():
+                continue
+            centered_xx = sum_xx - sum_x**2 / count
+            centered_yy = sum_yy - sum_y**2 / count
+            centered_xy = sum_xy - sum_x * sum_y / count
+            if centered_xx <= 0 or centered_yy <= 0:
+                continue
+
+            slope = centered_xy / centered_xx
+            intercept = sum_y / count - slope * sum_x / count
+            with numpy.errstate(over='ignore', divide='ignore', invalid='ignore'):
+                c_const = slope / intercept + 1
+                n_monolayer = 1 / (bet_scale * intercept * c_const)
+                p_monolayer = 1 / (numpy.sqrt(c_const) + 1)
+
+            if not numpy.isfinite((slope, intercept, c_const, n_monolayer, p_monolayer)).all():
+                continue
+            if c_const <= 0 or n_monolayer <= 0 or p_monolayer <= 0:
+                continue
+            if not loading[start] < n_monolayer < loading[end]:
+                continue
+            if not pressure[start] <= p_monolayer <= pressure[end]:
+                continue
+
+            candidates.append((count, start, end))
+
+    if not candidates:
+        raise CalculationError(
+            "No pressure range satisfies the BET consistency criteria."
+        )
+
+    _, minimum, maximum = max(candidates, key=lambda candidate: (candidate[0], -candidate[1]))
+    return minimum, maximum
 
 
 def roq_transform(pressure, loading):

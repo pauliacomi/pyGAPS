@@ -111,10 +111,15 @@ class TestAreaBET:
         loading = array([0.0, 0.01, 0.018, 0.024, 0.028])
 
         result = ab.area_BET_raw(
-            {'pressure': pressure, 'loading': loading, 'cross_section': 0.1}
+            {
+                'pressure': pressure,
+                'loading': loading,
+                'cross_section': 0.1,
+                'p_limits': (0.1, 0.4),
+            }
         )
 
-        assert result['p_limit_indices'][0] > 0
+        assert result['p_limit_indices'] == (1, 4)
         assert result['area'] > 0
 
     def test_zero_loading_in_selected_range_raises_parameter_error(self):
@@ -162,37 +167,60 @@ class TestAreaBET:
             )
 
     def test_limit_selection(self):
-        """Test the automatic selection of limits."""
+        """Selection excludes a decreasing first pair and rebases sliced data."""
+        pressure = linspace(0.05, 0.5, 10)
+        loading = ab.simple_bet(pressure, 0.02, 10)
+        rouquerol = ab.roq_transform(pressure, loading)
+        loading[0] = rouquerol[1] * 1.1 / (1 - pressure[0])
 
-        P = [0.001, 0.004, 0.009, 0.015, 0.025, 0.042, 0.093, 0.124, 0.156, 0.186]
-        L = [118, 135, 146, 155, 170, 172, 189, 195, 200, 203]
+        full = ab.area_BET_raw(
+            {'pressure': pressure, 'loading': loading, 'cross_section': 0.1}
+        )
+        suffix = ab.area_BET_raw(
+            {'pressure': pressure[1:], 'loading': loading[1:], 'cross_section': 0.1}
+        )
 
-        # Enough points here
-        ab.area_BET_raw({'pressure': P, 'loading': L, 'cross_section': 1})
+        assert full['p_limit_indices'] == (1, 9)
+        assert suffix['p_limit_indices'] == (0, 8)
 
-        # Not enough points here
-        with pytest.raises(pgEx.CalculationError):
-            ab.area_BET_raw({'pressure': P[4:], 'loading': L[4:], 'cross_section': 1})
-
-    @pytest.mark.parametrize(
-        ('roq_values', 'expected_maximum'),
-        [
-            ([0.10, 0.20, 0.30, 0.25, 0.20], 2),
-            ([0.10, 0.20, 0.30, 0.30, 0.35], 2),
-        ],
-    )
-    def test_automatic_limits_stop_before_nonincreasing_rouquerol_values(
-        self, roq_values, expected_maximum
-    ):
+    @pytest.mark.parametrize('roq_change', ['decrease', 'plateau'])
+    def test_automatic_limits_stop_before_nonincreasing_rouquerol_values(self, roq_change):
         """Do not include the first decreasing or repeated Rouquerol value."""
-        pressure = linspace(0.01, 0.05, len(roq_values))
+        pressure = linspace(0.05, 0.5, 10)
+        loading = ab.simple_bet(pressure, 0.02, 10)
+        roq_values = ab.roq_transform(pressure, loading)
+        roq_values[6] = (
+            roq_values[5] * 0.9 if roq_change == 'decrease' else roq_values[5]
+        )
         loading = roq_values / (1 - pressure)
 
         result = ab.area_BET_raw(
             {'pressure': pressure, 'loading': loading, 'cross_section': 0.1}
         )
 
-        assert result['p_limit_indices'][1] == expected_maximum
+        assert result['p_limit_indices'] == (0, 5)
+
+    def test_automatic_selection_uses_longest_valid_window(self):
+        pressure = linspace(0.05, 0.5, 10)
+        loading = ab.simple_bet(pressure, 0.02, 10)
+
+        result = ab.area_BET_raw(
+            {'pressure': pressure, 'loading': loading, 'cross_section': 0.1}
+        )
+
+        assert result['p_limit_indices'] == (0, 9)
+        assert result['c_const'] > 0
+        assert loading[0] < result['n_monolayer'] < loading[-1]
+        assert pressure[0] <= result['p_monolayer'] <= pressure[-1]
+
+    def test_automatic_selection_fails_without_valid_window(self):
+        pressure = linspace(0.5, 0.8, 8)
+        loading = ab.simple_bet(pressure, 0.02, 10)
+
+        with pytest.raises(pgEx.CalculationError, match='No pressure range satisfies'):
+            ab.area_BET_raw(
+                {'pressure': pressure, 'loading': loading, 'cross_section': 0.1}
+            )
 
     def test_explicit_limits_include_upper_endpoint(self):
         """Both pressure limits include observations exactly on their bounds."""
@@ -377,7 +405,7 @@ class TestAreaBET:
         isotherm = pgpj.isotherm_from_json(filepath)
 
         with caplog.at_level(logging.WARNING):  # warns about the monolayer value
-            area = ab.area_BET(isotherm, branch="des").get("area")
+            area = ab.area_BET(isotherm, branch="des", p_limits=(0.05, 0.4)).get("area")
         assert caplog.records
 
         err_relative = 0.1  # 10 percent
