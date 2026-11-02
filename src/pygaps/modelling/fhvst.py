@@ -54,12 +54,14 @@ class FHVST(IsothermBaseModel):
 
     .. math::
 
-        p &= \bigg( \frac{n_{ads}}{K_H} \frac{\theta}{1-\theta} \bigg)
+        p = \bigg( \frac{n_{ads}}{K_H} \frac{\theta}{1-\theta} \bigg)
             \exp{\frac{\alpha^2_{1v}\theta}{1+\alpha_{1v}\theta}}
 
-        with
+    with
 
-        \alpha_{1v} &= \frac{\alpha_{1}}{\alpha_{v}} - 1
+    .. math::
+
+        \alpha_{1v} = \frac{\alpha_{1}}{\alpha_{v}} - 1
 
     where :math:`\alpha_{1}` and :math:`\alpha_{v}` are the molar areas of the adsorbate
     and the vacancy respectively.

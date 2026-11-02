@@ -47,9 +47,10 @@ To set up `pyGAPS` for local development:
 1. Fork `pyGAPS <https://github.com/pauliacomi/pygaps>`_
    (look for the "Fork" button).
 
-2. Clone your fork locally::
+2. Clone your fork locally, then enter the checkout::
 
     git clone https://github.com/YOURNAMEHERE/pyGAPS
+    cd pyGAPS
 
 3. Install `uv <https://docs.astral.sh/uv/>`_ if you haven't already::
 
@@ -59,12 +60,29 @@ To set up `pyGAPS` for local development:
 
     uv python install 3.12
 
-4. Install the package and all development dependencies::
+4. Install the package and all development dependencies from the lock file::
 
-    uv sync --all-groups
+    uv sync --frozen --all-groups
 
-   To build the documentation, also install the Pandoc executable and ensure
-   it is on your ``PATH``.
+   To build the documentation, install the Pandoc executable and ensure it is
+   on your ``PATH``. Build the HTML docs locally with::
+
+    uv run --frozen --no-sync sphinx-build -E -j auto -b html docs docs/_build/html
+
+   The documentation test suite can be run with::
+
+    uv run --frozen --no-default-groups --group docs --group test pytest tests/documentation -m documentation -v
+
+   The ``spelling`` dependency group includes the documentation dependencies
+   and ``sphinxcontrib-spelling``. Spelling checks also require the system
+   Enchant library and an installed ``en_GB`` dictionary. After installing
+   those, run Sphinx with ``SPELLCHECK`` enabled, for example::
+
+    SPELLCHECK=1 uv run --frozen --no-default-groups --group spelling sphinx-build -E -b spelling docs docs/_build/spelling
+
+   In PowerShell, set the environment variable first with
+   ``$env:SPELLCHECK = "1"`` and then run the Sphinx command without the
+   ``SPELLCHECK=1`` prefix.
 
 5. Create a branch for local development. This project uses the
    `GIT FLOW <https://www.gitkraken.com/learn/git/git-flow>`_ model::
@@ -73,9 +91,14 @@ To set up `pyGAPS` for local development:
 
    Now you can make your changes locally.
 
-6. When you're done making changes, run all the tests::
+6. When you're done making changes, run the default test suite::
 
-    uv run pytest
+    uv run --frozen pytest
+
+   Tests marked ``network`` are excluded from the default suite. To run those
+   tests, which contact external services, use::
+
+    uv run --frozen pytest -m network
 
 7. Commit your changes and push your branch to GitHub::
 
@@ -94,7 +117,7 @@ make the pull request.
 
 For merging, you should:
 
-1. Include passing tests (run ``uv run pytest``) [1]_.
+1. Include passing tests (run ``uv run --frozen pytest``) [1]_.
 2. Update documentation when there's new API, functionality etc.
 3. Add a note to ``CHANGELOG.rst`` about the changes.
 4. Add yourself to ``AUTHORS.rst``.

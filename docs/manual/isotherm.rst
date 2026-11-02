@@ -238,9 +238,9 @@ The code to generate a ModelIsotherm is then:
         # Now the model details can be specified
         model='Henry',                  # Want to fit using the Henry model
         branch='ads',                   # on the adsorption branch
-        param_guess={"K" : 2}           # from an initial guess of 2 for the constant
-        param_bounds={"K" : [0, 20]}    # a lower bound of 0 and an upper bound of 20
-        verbose='True',                 # and increased verbosity.
+        param_guess={"K" : 2},          # from an initial guess of 2 for the constant
+        param_bounds={"K" : [0, 20]},   # a lower bound of 0 and an upper bound of 20
+        verbose=True,                   # and increased verbosity.
 
         # Required metadata
         material='carbon',              # Required
@@ -479,10 +479,10 @@ Or a complicated conversion using the convenience function.
 Converting to relative pressures
 ::::::::::::::::::::::::::::::::
 
-To convert an absolute pressure in a relative pressure, the critical pressure of
-the gas at the experiment temperature must be known. Of course, this conversion
-only works when the isotherm is measured in a subcritical regime. To calculate
-the vapour pressure, pyGAPS relies on the
+To convert absolute pressure to relative pressure, pyGAPS divides it by the
+adsorbate's saturation (vapour) pressure at the experimental temperature. This
+conversion only applies in a subcritical regime. To calculate the saturation
+pressure, pyGAPS relies on the
 `CoolProp <http://www.coolprop.org/>`__ thermodynamic library. Therefore, the
 name of the gas in a format CoolProp understands must be passed to the CoolProp
 API. pyGAPS does this by having an internal list of adsorbates, which is loaded
@@ -504,20 +504,21 @@ Converting loading basis
 ::::::::::::::::::::::::
 
 For loading basis conversions, the relationship between the two bases must be
-known. Between a mass and a volume basis, density of the adsorbent is needed and
-between mass and molar basis, the specific molar mass is required.
+known. Loading describes the adsorbate amount, so a mass-to-volume conversion
+uses the adsorbate's gas or liquid density, while a mass-to-molar conversion
+uses its molar mass. These are adsorbate properties, usually calculated by the
+thermodynamic backend.
 
-For most adsorbates, these properties are also calculated using the
-thermodynamic backend. The molar mass is independent of any variables, while the
-gas/liquid density is a function of temperature.
+For most adsorbates, the molar mass is independent of state, while gas and
+liquid densities depend on temperature.
 
 Converting material basis
 ::::::::::::::::::::::::::
 
-For the material basis, the same properties (density and molar mass) are
-required, depending on the conversion requested. These properties are specific
-to each material and cannot be calculated. Therefore, they have to be specified
-by the user.
+Material-basis conversions are separate from loading-basis conversions. They
+use the adsorbent material's density or molar mass, depending on the conversion.
+These properties are specific to each material and must be supplied by the
+user.
 
 Similar to the list of adsorbates described above, pyGAPS stores a list of
 ``Material`` objects. This is linked to the ``isotherm.material``. To specify
@@ -559,25 +560,33 @@ An interesting question is how to ensure an isotherm is unique. To this end,
 each Isotherm generates an id, which is an md5 hash of the isotherms parameters
 and data/model. The id is also used internally for database storage.
 
-The id is generated automatically every time the ``isotherm.iso_id`` is called.
-The ``hashlib.md5`` function is used to obtain a hash of the json string. It can
-be read as:
+The id is generated automatically every time ``isotherm.iso_id`` is accessed.
+For a :class:`~pygaps.core.pointisotherm.PointIsotherm`, its data values are
+rounded to eight decimal places before the data hash is calculated; the model
+representation is used for a :class:`~pygaps.core.modelisotherm.ModelIsotherm`.
+The resulting data/model hash and isotherm parameters are serialized and hashed
+with ``hashlib.md5``. Thus, small differences lost by rounding (and hash
+collisions) can produce equal IDs.
+
+The ID can be read as:
 
 .. code:: python
 
     point_isotherm.iso_id
 
-This means that we can perform identity checks such as:
+IDs and equality can be used as convenient comparisons, with the precision
+limitation above:
 
 .. code:: python
 
     if point_isotherm1 == point_isotherm2:
-        print("same data")
+        print("same ID")
 
     if iso in list_of_isos:
         print("isotherm in collection")
 
 .. note::
 
-    Both ModelIsotherm and PointIsotherm classes are supported and contain an
-    ID.
+    Both ModelIsotherm and PointIsotherm classes have an ID. For point data,
+    values are rounded to eight decimal places before hashing, so equality
+    means matching IDs, not exact equality of every stored value.

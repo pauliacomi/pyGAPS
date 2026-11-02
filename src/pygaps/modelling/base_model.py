@@ -143,22 +143,25 @@ class IsothermBaseModel(abc.ABC):
         raise NotImplementedError("""This model does not implement spreading pressure.""")
 
     def toth_correction(self, pressure: float) -> float:
-        r"""Calculate T\'oth correction, $\Psi$ to the Polanyi adsorption potential, $\varepsilon_{ads}$ at specified pressure.
+        r"""Calculate the Toth correction to the Polanyi adsorption potential.
 
         .. math::
-            \varepsilon_{ads} = RT \ln{\frac{\Psi P_{sat}{P}}} \\
-            \Psi = \left. \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} \right| - 1
+            \varepsilon_{ads} = RT \ln\left(\frac{\Psi P_{sat}}{P}\right)
+
+        .. math::
+            \Psi = \frac{n}{P} \frac{\mathrm{d}P}{\mathrm{d}n} - 1
 
         Model parameters must be derived from isotherm with pressure in Pa.
 
         Parameters
         ----------
         pressure : float
-            The pressure at which to calculate the T\'oth correction
+            The pressure at which to calculate the Toth correction.
 
         Returns
         -------
-            The T\'oth correction, $\Psi$
+        float
+            The Toth correction, :math:`\Psi`.
         """
         raise NotImplementedError("""This model does not implement T\'oth correction.""")
 

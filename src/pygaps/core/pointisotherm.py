@@ -240,11 +240,11 @@ class PointIsotherm(BaseIsotherm):
     def from_modelisotherm(
         cls,
         modelisotherm,
-        pressure_points: list[float] = None,
-        loading_points: list[float] = None,
+        pressure_points: "list[float] | PointIsotherm" = None,
+        loading_points: "list[float] | PointIsotherm" = None,
     ):
         """
-        Construct a PointIsotherm from a ModelIsothem class.
+        Construct a PointIsotherm from a ModelIsotherm.
 
         This class method allows for the model to be converted into
         a list of points calculated by using the model in the isotherm.
@@ -263,19 +263,37 @@ class PointIsotherm(BaseIsotherm):
             - If a PointIsotherm is passed, the values will be calculated at
               each of the pressure points in the passed isotherm. This is useful
               for comparing a model overlap with the real isotherm.
+        loading_points : None or list or PointIsotherm
+            Evaluate at these loadings instead of pressure points. A
+            PointIsotherm supplies the loadings of the model's branch.
+            Isotherm coordinates are converted to the model's units and bases.
+            Cannot be combined with ``pressure_points``.
         """
         if pressure_points is not None and loading_points is not None:
             raise ParameterError("""Cannot specify both pressure and loading points.""")
 
+        if isinstance(pressure_points, PointIsotherm):
+            pressure_points = pressure_points.pressure(
+                branch=modelisotherm.branch,
+                pressure_unit=modelisotherm.pressure_unit,
+                pressure_mode=modelisotherm.pressure_mode,
+            )
+        if isinstance(loading_points, PointIsotherm):
+            loading_points = loading_points.loading(
+                branch=modelisotherm.branch,
+                loading_unit=modelisotherm.loading_unit,
+                loading_basis=modelisotherm.loading_basis,
+                material_unit=modelisotherm.material_unit,
+                material_basis=modelisotherm.material_basis,
+            )
+
         pressure = None
         loading = None
         if modelisotherm.model.calculates == "loading":
-            # The user may request loading even if the model calculates pressure
+            # The inverse calculation is used when loading points are supplied.
             if loading_points is None:
                 if pressure_points is None:
                     pressure = modelisotherm.pressure()
-                elif isinstance(pressure_points, PointIsotherm):
-                    pressure = pressure_points.pressure(branch=modelisotherm.branch)
                 else:
                     pressure = pressure_points
                 loading = modelisotherm.loading_at(pressure)
@@ -283,12 +301,10 @@ class PointIsotherm(BaseIsotherm):
                 loading = loading_points
                 pressure = modelisotherm.pressure_at(loading_points)
         elif modelisotherm.model.calculates == "pressure":
-            # The user may request pressure even if the model calculates loading
+            # The inverse calculation is used when pressure points are supplied.
             if pressure_points is None:
                 if loading_points is None:
                     loading = modelisotherm.loading()
-                elif isinstance(loading_points, PointIsotherm):
-                    loading = loading_points.loading(branch=modelisotherm.branch)
                 else:
                     loading = loading_points
                 pressure = modelisotherm.pressure_at(loading)

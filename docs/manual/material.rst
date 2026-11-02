@@ -16,14 +16,14 @@ For this case, pyGAPS provides the :class:`~pygaps.core.material.Material`
 class.
 
 The :ref:`isotherm<isotherms-manual>` required property of ``material`` is used
-to create or connect a :class:`~pygaps.core.baseisotherm.BaseIsotherm` instance to a
-:class:`~pygaps.core.material.Material`. Each time an isotherm is created,
+to create or connect a :class:`~pygaps.core.baseisotherm.BaseIsotherm` instance
+to a :class:`~pygaps.core.material.Material`. Each time an isotherm is created,
 pyGAPS looks in the main material list (``pygaps.MATERIAL_LIST``) for an
 instance with the same name. This list is populated as import-time with
 materials stored in the internal database. The user can also add their own
-material to the list, or upload it to the database for permanent storage. If the
-material does not exist in ``pygaps.MATERIAL_LIST``, pyGAPS will create a new
-instance for the isotherm.
+material to the list, or upload it to a user-owned database for persistent
+storage. If the material does not exist in ``pygaps.MATERIAL_LIST``, pyGAPS will
+create a new instance for the isotherm.
 
 Any calculations/conversions then rely on the
 :class:`~pygaps.core.material.Material` for providing parameters such as
@@ -75,7 +75,8 @@ To view a summary of the material properties:
     .. code:: python
 
         my_material.properties["form"]
-        >> "powder"
+
+The expression above returns ``"powder"``.
 
 
 .. _material-manual-methods:
@@ -83,18 +84,28 @@ To view a summary of the material properties:
 Material class methods
 ----------------------
 
-The :class:`~pygaps.core.material.Material` class has some specific methods
-which denote recognised properties:
+The :class:`~pygaps.core.material.Material` class exposes some recognised
+properties:
 
-- Molar mass: :meth:`~pygaps.core.material.Material.molar_mass`.
-- Density: :meth:`~pygaps.core.material.Material.density`.
+- Molar mass: :attr:`~pygaps.core.material.Material.molar_mass`.
+- Density: :attr:`~pygaps.core.material.Material.density`.
 
 These are not calculated, just looked up in the ``properties`` dictionary.
 
 .. code:: python
 
-    my_material.molar_mass()
-    >> 256
+    my_material.molar_mass
+
+This returns ``256`` for the example material above.
+
+.. testcode::
+
+    from pygaps import Material
+
+    sample = Material("doc-example", density=1, molar_mass=256, form="powder")
+    assert sample.molar_mass == 256
+    assert sample.density == 1
+    assert sample.properties["form"] == "powder"
 
 
 .. _material-manual-manage:
@@ -102,9 +113,9 @@ These are not calculated, just looked up in the ``properties`` dictionary.
 Material management
 -------------------
 
-In pyGAPS, materials can be stored in the internal sqlite database. At
-import-time, the list of all materials is automatically loaded into memory and
-stored in ``pygaps.MATERIAL_LIST``. The easiest way to retrieve a material from
+In pyGAPS, materials can be stored in a sqlite database. At import time, the
+materials from the packaged database are loaded into memory and stored in
+``pygaps.MATERIAL_LIST``. The easiest way to retrieve a material from
 the list is to use the :meth:`~pygaps.core.material.Material.find` class method.
 It takes the material name as parameter.
 
@@ -112,14 +123,13 @@ It takes the material name as parameter.
 
     carbon = pygaps.Material.find('carbon')
 
-At first the database will be empty. To populate the database with materials,
-the user should create the materials first and then append them to the list for
-temporary storage, or upload them to the database for permanent storage.
+To use a material temporarily, create it and append it to the in-memory list.
+To persist it, upload it to a user-owned database copy as shown below.
 
 .. code:: python
 
     # To store in the main list
-    pyGAPS.MATERIAL_LIST.append(my_material)
+    pygaps.MATERIAL_LIST.append(my_material)
 
 A useful shorthand is to pass an optional parameter ``store`` at creation
 
@@ -133,19 +143,19 @@ A useful shorthand is to pass an optional parameter ``store`` at creation
     This makes the material available **only** in the current session. No
     permanent changes to the materials are made this way.
 
-To **permanently** store a custom material for later use or make modifications
-to exiting materials, the user must upload it to the internal database. This
-can be done as:
+To store a custom material in a database for later use, upload it to the
+internal database or a user-owned copy of the packaged database.
 
-.. code:: python
+.. code-block:: python
 
+    import pygaps
     import pygaps.parsing as pgp
 
-    # To permanently store in the database
+    mat_new = pygaps.Material("my-carbon", density=1, molar_mass=256)
     pgp.material_to_db(mat_new)
 
-    # To store any modifications to an material in the database
-    pgp.material_to_db(mat_modified, overwrite=True)
+    # Overwrite replaces all stored fields for this material.
+    # pgp.material_to_db(mat_new, overwrite=True)
 
 For more info, check out the :ref:`sqlite <sqlite-manual>` section of the
 manual.

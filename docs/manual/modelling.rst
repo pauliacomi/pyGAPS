@@ -32,16 +32,14 @@ often be reliably fitted to a suitable model.
 
 .. _modelling-implementation:
 
-Modelling in pyGAPS
--------------------
+Model fitting in pyGAPS
+-----------------------
 
-In pyGAPS, the :meth:`~pygaps.core.modelisotherm.ModelIsotherm` is the class
-which contains a model and other needed metadata. While it is instantiated using
-discrete data, it does not store it directly. Another principal difference from
-the :class:`~pygaps.core.pointisotherm.PointIsotherm` class is that, while the
-former can contain both the adsorption and desorption branch of the physical
-isotherm, the latter contains a model for only one branch, determined at
-initialisation.
+In pyGAPS, the :class:`~pygaps.core.pointisotherm.PointIsotherm` stores
+experimental point data, while the
+:class:`~pygaps.core.modelisotherm.ModelIsotherm` stores a fitted model and
+metadata rather than the input points. A ModelIsotherm represents one branch,
+selected when it is initialized.
 
 Currently the models implemented are:
 
@@ -58,6 +56,9 @@ Currently the models implemented are:
 - :mod:`~pygaps.modelling.temkinapprox` - Temkin Approximation
 - :mod:`~pygaps.modelling.toth` - Toth
 - :mod:`~pygaps.modelling.jensenseaton` - Jensen-Seaton
+- :mod:`~pygaps.modelling.virial` - Virial
+- :mod:`~pygaps.modelling.dstoth` - Dual-Site Toth
+- :mod:`~pygaps.modelling.chemiphysisorption` - ChemiPhysisorption
 - :mod:`~pygaps.modelling.wvst` - Wilson Vacancy Solution Theory (W-VST)
 - :mod:`~pygaps.modelling.fhvst` - Flory-Huggins Vacancy Solution Theory
   (FH-VST)
@@ -87,14 +88,14 @@ allows a PointIsotherm to be used. Alternatively, a utility function
 
     model_isotherm = pygaps.ModelIsotherm.from_pointisotherm(
         point_isotherm,
-        branch='ads'
+        branch='ads',
         model='Henry',
     )
     # or using the convenience function
     import pygaps.modelling as pgm
     model_isotherm = pgm.model_iso(
         point_isotherm,
-        branch='ads'
+        branch='ads',
         model='Henry',
     )
 
@@ -174,7 +175,7 @@ respectively.
 
     pgg.plot_iso(
         [model_isotherm, point_isotherm],
-        x_points=point_isotherm.loading(),
+        x_points=point_isotherm.pressure(),
     )
 
 

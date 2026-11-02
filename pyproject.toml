@@ -53,7 +53,13 @@ docs = [
     "sphinx>=4.0",
     "sphinx-copybutton",
     "nbsphinx",
+    "nbclient>=0.10",
+    "nbformat>=5",
     "furo",
+]
+spelling = [
+    {include-group = "docs"},
+    "sphinxcontrib-spelling>=8",
 ]
 dev = [
     {include-group = "test"},
@@ -170,7 +176,7 @@ addopts = [
     "--tb=short",
     "--strict-markers",
     "--strict-config",
-    "-m", "not network",
+    "-m", "not network and not documentation",
 ]
 markers = [
     "core: core pygaps python functionality.",
@@ -182,6 +188,7 @@ markers = [
     "cli: command-line interface tests.",
     "prediction: IAST and isotherm prediction tests.",
     "network: live external-service checks, excluded by default; opt in with -m network.",
+    "documentation: isolated notebook execution, requires docs and test groups; opt in with -m documentation.",
 ]
 xfail_strict = true
 # testing: coverage.py

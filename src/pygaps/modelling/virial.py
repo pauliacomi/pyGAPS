@@ -61,14 +61,17 @@ class Virial(IsothermBaseModel):
 
         Parameters
         ----------
-        pressure : float
+        pressure : float or ndarray
             The pressure at which to calculate the loading.
 
         Returns
         -------
-        float
+        float or ndarray
             Loading at specified pressure.
         """
+        if numpy.ndim(pressure) > 0:
+            pressures = numpy.asarray(pressure)
+            return numpy.array([self.loading(value) for value in pressures.flat]).reshape(pressures.shape)
 
         def fun(x):
             return (self.pressure(x) - pressure) ** 2

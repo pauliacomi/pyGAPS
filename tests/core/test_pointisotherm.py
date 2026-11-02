@@ -1,11 +1,13 @@
 """Tests relating to the PointIsotherm class."""
 
+import numpy
 import pandas
 import pytest
 from pandas.testing import assert_series_equal
 
 import pygaps
 import pygaps.utilities.exceptions as pgEx
+from pygaps.modelling import model_from_dict
 
 from ..test_utils import mpl_cleanup
 from .conftest import LOADING_AT_PARAM
@@ -711,6 +713,38 @@ class TestPointIsotherm:
         # Convert from mmol/mol to mmol/g
         basic_pointisotherm.convert_material(basis_to='mass', unit_to='g')
         assert basic_pointisotherm.loading()[0] == pytest.approx(1, 0.001)
+
+    @pytest.mark.parametrize('model', ['Henry', 'Virial'])
+    @pytest.mark.parametrize('coordinate', ['pressure', 'loading'])
+    def test_from_modelisotherm_point_coordinates(self, isotherm_parameters, model, coordinate):
+        parameters = {'K': 2.0}
+        if model == 'Virial':
+            parameters.update(A=0.0, B=0.0, C=0.0)
+        model_isotherm = pygaps.ModelIsotherm(
+            model=model_from_dict(
+                {
+                    'name': model,
+                    'parameters': parameters,
+                    'pressure_range': (0.5, 2.0),
+                    'loading_range': (1.0, 4.0),
+                }
+            ),
+            branch='ads',
+            **isotherm_parameters,
+        )
+        reference = pygaps.PointIsotherm(
+            pressure=[0.5, 1.0, 1.5, 2.0],
+            loading=[1.0, 2.0, 3.0, 4.0],
+            branch='ads',
+            **isotherm_parameters,
+        )
+        # Coordinate isotherms may use units different from the model.
+        reference.convert_pressure(unit_to='Pa', verbose=False)
+        reference.convert_loading(unit_to='mol', verbose=False)
+        result = pygaps.PointIsotherm.from_modelisotherm(model_isotherm, **{f'{coordinate}_points': reference})
+        numpy.testing.assert_allclose(result.pressure(), [0.5, 1.0, 1.5, 2.0], rtol=1e-4)
+        numpy.testing.assert_allclose(result.loading(), [1.0, 2.0, 3.0, 4.0], rtol=1e-4)
+
 
     ##########################
 

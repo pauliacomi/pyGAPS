@@ -42,10 +42,10 @@ def enthalpy_sorption_clapeyron(
         A dictionary with the isosteric enthalpies per loading, with the form:
 
         - ``isosteric_enthalpy`` (array) : the isosteric enthalpy of adsorption in kJ/mol
-        - ``loading`` (array) : the loading for each point of the isosteric enthalpy, in mmol
+        - ``loading`` (array) : loading in the first isotherm's loading and material units/bases
         - ``slopes`` (array) : the exact log(p) vs 1/T slope for each point
         - ``correlation`` (array) : correlation coefficient for each point
-        - ``std_errors`` (array) : estimated standard errors for each point
+        - ``std_errs`` (array) : estimated standard errors for each point
 
     Raises
     ------
@@ -94,7 +94,7 @@ def enthalpy_sorption_clapeyron(
 
     See Also
     --------
-    pygaps.characterisation.enthalpy_sorption_clapeyron.isosteric_enthalpy_raw : low level method
+    pygaps.characterisation.enth_sorp_clapeyron.isosteric_enthalpy_raw : low level method
 
     """
     # Check more than one isotherm

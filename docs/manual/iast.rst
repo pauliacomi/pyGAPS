@@ -48,7 +48,7 @@ To use:
 
 .. code:: python
 
-    import pygaps.iast as pgi
+    import pygaps.prediction.iast as pgi
     iast_loadings = pgi.iast_point(
         isotherms=[iso1, iso2, iso3],
         partial_pressures=[0.1, 1.0, 2.3],
@@ -64,7 +64,7 @@ and generate graphs:
 
   .. code:: python
 
-      import pygaps.iast as pgi
+      import pygaps.prediction.iast as pgi
 
       result_dict = pgi.iast_point_fraction(
           isotherms=[iso1, iso2, iso3],
@@ -80,7 +80,7 @@ and generate graphs:
   .. code:: python
 
       import numpy
-      import pygaps.iast as pgi
+      import pygaps.prediction.iast as pgi
 
       result_dict = pgi.iast_binary_svp(
           isotherms=[ch4, c2h6],
@@ -95,7 +95,7 @@ and generate graphs:
 
   .. code:: python
 
-      import pygaps.iast as pgi
+      import pygaps.prediction.iast as pgi
 
       result_dict = pgi.iast_binary_vle(
           isotherms=[ch4, c2h6],

@@ -97,9 +97,11 @@ a molar basis, loading is represented in terms on a **mass basis** or **volume
 basis**. It is also possible to represent uptake as a **fraction** or
 **percent** of the material basis.
 
-For these conversions, properties such as molar mass and density of the
-adsorbate are required. This info is obtained automatically using an equation of
-state from either CoolProp or REFPROP.
+For loading-basis conversions, properties such as the adsorbate molar mass and
+gas or liquid density are required. This information is obtained automatically
+using an equation of state from either CoolProp or REFPROP. Material-basis
+conversions instead use properties of the adsorbent material; see
+:ref:`Material quantity <units-manual-material>`.
 
 .. note::
 
@@ -216,31 +218,58 @@ An example pressure conversion:
 
 An example loading conversion:
 
-.. code:: python
+.. code-block:: python
 
     from pygaps.units.converter_mode import c_loading
+    from pygaps import Adsorbate
 
     converted = c_loading(
         1,
-        mode_from='molar',
+        basis_from='molar',
         unit_from='mol',
-        mode_to='mass',
+        basis_to='mass',
         unit_to='mg',
+        adsorbate=Adsorbate.find('nitrogen'),
     )
 
 An example material conversion:
 
-.. code:: python
+.. code-block:: python
 
     from pygaps.units.converter_mode import c_material
+    from pygaps import Material
 
+    sample_material = Material('doc example', density=2)
     converted = c_material(
         1,
-        mode_from='mass',
+        basis_from='mass',
         unit_from='g',
-        mode_to='volume',
+        basis_to='volume',
         unit_to='cm3',
+        material=sample_material,
     )
+
+.. testcode::
+
+    from pygaps import Adsorbate, Material
+    from pygaps.units.converter_mode import c_loading, c_material, c_pressure
+
+    assert c_pressure(
+        1, mode_from='absolute', unit_from='bar',
+        mode_to='absolute', unit_to='Pa',
+    ) == 100000
+    assert c_loading(
+        1, basis_from='molar', unit_from='mol',
+        basis_to='mass', unit_to='g',
+        adsorbate=Adsorbate.find('nitrogen'),
+    ) > 0
+    sample_material = Material('doc example', density=2)
+    converted_material = c_material(
+        1, basis_from='mass', unit_from='g',
+        basis_to='volume', unit_to='cm3',
+        material=sample_material,
+    )
+    assert isinstance(converted_material, float)
 
 
 

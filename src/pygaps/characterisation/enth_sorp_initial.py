@@ -38,9 +38,19 @@ def initial_enthalpy_comp(
 
     .. math::
 
-        \Delta H(n) = K_{const}+\frac{K_{exp}}{1+\exp(E*(n-n_{loc})))}+K_{pa}*n^{p_a}+K_{pr}*n^{p_r}
+        \Delta H(n) = K_{\mathrm{const}}
+        + \frac{K_{\mathrm{preexp}}}{1 + \exp\left(K_{\mathrm{exp}}(n - n_{\mathrm{exploc}})\right)}
+        + K_{\mathrm{prepowa}} n^{\mathrm{powa}}
+        + K_{\mathrm{prepowr}} n^{\mathrm{powr}}
 
-    Enthalpy data should be in KJ/mmol and positive.
+    Enthalpy data must be positive and expressed in kJ/mol. The returned
+    ``initial_enthalpy`` and fitted enthalpy contributions use the same units.
+    Here :math:`n` is loading scaled by its maximum value, so it is
+    dimensionless.
+    Data points below zero or above 400 kJ/mol are excluded before fitting.
+    The default upper bound for the exponential contribution coefficient is
+    150 kJ/mol; the constant-term bounds are derived from the data and the
+    adsorbate liquefaction enthalpy, also in kJ/mol.
 
     Parameters
     ----------
@@ -93,7 +103,8 @@ def initial_enthalpy_comp(
     Returns
     -------
     dict
-        Dict containing ``initial_enthalpy`` and fitting parameters.
+        Dict containing ``initial_enthalpy`` in kJ/mol and fitted parameters.
+        The constant and enthalpy contribution coefficients are also in kJ/mol.
 
     Raises
     ------
@@ -392,7 +403,8 @@ def initial_enthalpy_point(
     Returns
     -------
     dict
-        Dict containing ``initial_enthalpy`` and other parameters.
+        Dict containing ``initial_enthalpy`` in the same units as the supplied
+        enthalpy data (expected to be kJ/mol).
 
     """
     # Read data in

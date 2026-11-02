@@ -5,6 +5,7 @@ Methods are based on the Kelvin equation and pore condensation/evaporation.
 """
 
 import typing as t
+from collections.abc import Callable
 
 import numpy
 
@@ -31,8 +32,8 @@ def psd_mesoporous(
     pore_geometry: str = 'cylinder',
     meniscus_geometry: str = None,
     branch: str = 'des',
-    thickness_model: "str | PointIsotherm | ModelIsotherm | t.Callable[[float], float]" = 'Harkins/Jura',
-    kelvin_model: "str | t.Callable[[float], float]" = 'Kelvin',
+    thickness_model: "str | PointIsotherm | ModelIsotherm | Callable[[float], float]" = 'Harkins/Jura',
+    kelvin_model: "str | Callable[[float], float]" = 'Kelvin',
     p_limits: "tuple[float, float]" = None,
     verbose: bool = False,
 ):
@@ -292,7 +293,8 @@ def psd_pygapsdh(
     Notes
     -----
     This method is an extended DH method which is applicable to multiple pore
-    geometries (slit, cylinder, spherical).
+    geometries (slit, cylinder, spherical), using the pore-geometry
+    relationships described by Rouquerol et al. [#]_.
 
     The calculation is performed in terms of the characteristic dimension of the
     pore geometry: width for slits, diameter for cylinders and spheres. The

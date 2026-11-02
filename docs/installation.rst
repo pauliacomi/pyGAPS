@@ -23,18 +23,19 @@ managing environments a breeze. To create a new environment with pyGAPS:
     conda activate myenv
     conda install -c conda-forge pygaps
 
-To install the development branch, clone the repository from Github. Then
-install the package, in regular or editable mode
+To install the ``develop`` branch, clone that branch from GitHub and enter the
+checkout. Then install the package, in regular or editable mode:
 
 .. code-block:: bash
 
-    git clone https://github.com/pauliacomi/pyGAPS
+    git clone --branch develop --single-branch https://github.com/pauliacomi/pyGAPS
+    cd pyGAPS
 
     # then install
-    pip install ./pyGAPS
+    pip install .
 
     # alternatively in developer mode
-    pip install -e ./pyGAPS
+    pip install -e .
 
 Dependencies
 ============
