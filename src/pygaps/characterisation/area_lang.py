@@ -317,14 +317,15 @@ def area_langmuir_raw(data: dict):
         raise CalculationError("At least two distinct pressure values are required for the Langmuir fit.")
 
     # calculate the Langmuir slope and intercept
-    langmuir_array = langmuir_transform(
-        pressure,
-        loading,
-    )
-    slope, intercept, corr_coef, slope_stderr, intercept_stderr = langmuir_fit(
-        pressure,
-        langmuir_array,
-    )
+    with numpy.errstate(over='ignore', divide='ignore', invalid='ignore'):
+        langmuir_array = langmuir_transform(pressure, loading)
+    if not numpy.isfinite(langmuir_array).all():
+        raise CalculationError("The Langmuir transform contains non-finite values.")
+    with numpy.errstate(over='ignore', divide='ignore', invalid='ignore'):
+        fit_result = langmuir_fit(pressure, langmuir_array)
+    if not numpy.isfinite(fit_result).all():
+        raise CalculationError("The Langmuir fit contains non-finite values.")
+    slope, intercept, corr_coef, slope_stderr, intercept_stderr = fit_result
 
     # calculate the Langmuir parameters
     n_monolayer, langmuir_const, langmuir_area = langmuir_parameters(

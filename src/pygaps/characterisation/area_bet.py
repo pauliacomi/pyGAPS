@@ -235,10 +235,14 @@ def area_BET_raw(data: dict):
     data : dict
         Calculation inputs:
 
-        - ``pressure`` : relative pressures.
-        - ``loading`` : loadings in mol/basis.
-        - ``cross_section`` : molecular cross-sectional area in nm^2.
+        - ``pressure`` : finite, ascending relative pressures in [0, 1).
+        - ``loading`` : finite, non-negative loadings in mol/basis.
+        - ``cross_section`` : positive finite molecular cross-sectional area in nm^2.
         - ``p_limits`` : optional inclusive pressure range.
+
+        Pressure and loading must be one-dimensional arrays of equal length.
+        Loading must be positive for every point selected for fitting; zero
+        loading is allowed outside that range (for example, at the origin).
 
     Returns
     -------
@@ -273,20 +277,36 @@ def area_BET_raw(data: dict):
     if missing:
         raise ParameterError(f"Missing required BET input keys: {', '.join(sorted(missing))}.")
 
-    pressure = data['pressure']
-    loading = data['loading']
-    cross_section = data['cross_section']
+    try:
+        pressure = numpy.asarray(data['pressure'], dtype=float)
+        loading = numpy.asarray(data['loading'], dtype=float)
+        cross_section = numpy.asarray(data['cross_section'], dtype=float)
+    except (OverflowError, TypeError, ValueError) as err:
+        raise ParameterError("BET inputs must contain numeric values.") from err
+
     p_limits = data.get('p_limits')
 
-    # Check lengths
-    if len(pressure) == 0:
+    if pressure.ndim != 1 or loading.ndim != 1:
+        raise ParameterError("The pressure and loading inputs must be one-dimensional.")
+    if pressure.size == 0:
         raise ParameterError("Empty input values!")
-    if len(pressure) != len(loading):
+    if pressure.size != loading.size:
         raise ParameterError("The length of the pressure and loading arrays do not match.")
-
-    # Ensure numpy arrays, if not already
-    loading = numpy.asarray(loading)
-    pressure = numpy.asarray(pressure)
+    if not numpy.isfinite(pressure).all() or not numpy.isfinite(loading).all():
+        raise ParameterError("Pressure and loading values must be finite.")
+    if numpy.any((pressure < 0) | (pressure >= 1)):
+        raise ParameterError("Relative pressures must be greater than or equal to 0 and less than 1.")
+    if numpy.any(loading < 0):
+        raise ParameterError("Loading values must be non-negative.")
+    if numpy.any(numpy.diff(pressure) < 0):
+        raise ParameterError("Pressure values must be in ascending order.")
+    if (
+        cross_section.shape != ()
+        or not numpy.isfinite(cross_section).item()
+        or cross_section.item() <= 0
+    ):
+        raise ParameterError("The molecular cross-sectional area must be a positive finite number.")
+    cross_section = float(cross_section)
 
     # select the maximum and minimum of the points and the pressure associated
     minimum = 0
@@ -313,16 +333,23 @@ def area_BET_raw(data: dict):
         raise CalculationError("The isotherm does not have enough points (at least 3) in the BET region. Unable to calculate BET area.")
     pressure = pressure[minimum : maximum + 1]
     loading = loading[minimum : maximum + 1]
+    if numpy.any(loading == 0):
+        raise ParameterError(
+            "Loading must be positive in the selected pressure range for the BET transform."
+        )
+    if numpy.unique(pressure).size < 2:
+        raise CalculationError("At least two distinct pressure values are required for the BET fit.")
 
     # calculate the BET transform, slope and intercept
-    bet_t_array = bet_transform(
-        pressure,
-        loading,
-    )
-    slope, intercept, corr_coef, slope_stderr, intercept_stderr = bet_fit(
-        pressure,
-        bet_t_array,
-    )
+    with numpy.errstate(over='ignore', divide='ignore', invalid='ignore'):
+        bet_t_array = bet_transform(pressure, loading)
+    if not numpy.isfinite(bet_t_array).all():
+        raise CalculationError("The BET transform contains non-finite values.")
+    with numpy.errstate(over='ignore', divide='ignore', invalid='ignore'):
+        fit_result = bet_fit(pressure, bet_t_array)
+    if not numpy.isfinite(fit_result).all():
+        raise CalculationError("The BET fit contains non-finite values.")
+    slope, intercept, corr_coef, slope_stderr, intercept_stderr = fit_result
 
     # calculate the BET parameters
     n_monolayer, p_monolayer, c_const, bet_area = bet_parameters(

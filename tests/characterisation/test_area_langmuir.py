@@ -129,6 +129,28 @@ class TestAreaLangmuir:
                 }
             )
 
+    def test_nonfinite_langmuir_transform_raises_calculation_error(self):
+        with pytest.raises(pgEx.CalculationError, match='Langmuir transform contains non-finite'):
+            al.area_langmuir_raw(
+                {
+                    'pressure': [0.1, 0.2, 0.3],
+                    'loading': [1e-320, 2e-320, 3e-320],
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.3),
+                }
+            )
+
+    def test_nonfinite_langmuir_fit_raises_calculation_error(self):
+        with pytest.raises(pgEx.CalculationError, match='Langmuir fit contains non-finite'):
+            al.area_langmuir_raw(
+                {
+                    'pressure': [0.1, 0.2, 0.3],
+                    'loading': [1e-309, 2e-309, 3e-309],
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.3),
+                }
+            )
+
     def test_repeated_selected_pressures_without_variation_raise_calculation_error(self):
         with pytest.raises(pgEx.CalculationError, match='two distinct pressure values'):
             al.area_langmuir_raw(
@@ -180,12 +202,12 @@ class TestAreaLangmuir:
         assert "The monolayer loading is not positive and finite." in caplog.text
         assert "The Langmuir area is not positive and finite." in caplog.text
 
-    def test_nonfinite_langmuir_parameters_emit_warnings(self, caplog):
+    def test_degenerate_langmuir_fit_raises_calculation_error(self):
         pressure = array([0.0625, 0.125, 0.1875, 0.25])
         loading = pressure.copy()
 
-        with caplog.at_level(logging.WARNING):
-            result = al.area_langmuir_raw(
+        with pytest.raises(pgEx.CalculationError, match='Langmuir fit contains non-finite'):
+            al.area_langmuir_raw(
                 {
                     'pressure': pressure,
                     'loading': loading,
@@ -193,13 +215,6 @@ class TestAreaLangmuir:
                     'p_limits': (pressure[0], pressure[-1]),
                 }
             )
-
-        assert result['langmuir_const'] == 0
-        assert not isfinite(result['n_monolayer'])
-        assert not isfinite(result['area'])
-        assert "The Langmuir constant is not positive and finite." in caplog.text
-        assert "The monolayer loading is not positive and finite." in caplog.text
-        assert "The Langmuir area is not positive and finite." in caplog.text
 
     def test_nonfinite_langmuir_constant_emits_warning(self, caplog):
         pressure = array([0.0625, 0.125, 0.1875, 0.25])

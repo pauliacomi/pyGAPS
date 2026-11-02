@@ -56,7 +56,7 @@ class TestAreaBET:
 
     def test_basic_functions(self):
         """Test basic functionality."""
-        P = linspace(0, 1)
+        P = linspace(0, 0.9)
         L = linspace(0.3, 10)
 
         # arrays should be equal
@@ -78,6 +78,88 @@ class TestAreaBET:
 
         # Basic automatic limit test (using rouquerol)
         ab.area_BET_raw({'pressure': P, 'loading': L, 'cross_section': 1})
+
+    @pytest.mark.parametrize(
+        ('pressure', 'loading', 'cross_section', 'message'),
+        [
+            ([[0.1, 0.2, 0.3]], [0.01, 0.02, 0.03], 0.1, 'one-dimensional'),
+            ([0.1, float('nan'), 0.3], [0.01, 0.02, 0.03], 0.1, 'finite'),
+            ([0.1, 0.2, 0.3], [0.01, float('nan'), 0.03], 0.1, 'finite'),
+            ([0.1, -0.2, 0.3], [0.01, 0.02, 0.03], 0.1, 'greater than or equal'),
+            ([0.1, 0.2, 1.0], [0.01, 0.02, 0.03], 0.1, 'less than 1'),
+            ([0.1, 0.2, 0.3], [0.01, -0.02, 0.03], 0.1, 'non-negative'),
+            ([0.1, 0.3, 0.2], [0.01, 0.02, 0.03], 0.1, 'ascending'),
+            ([0.1, 0.2, 0.3], [0.01, 0.02, 0.03], 0, 'positive finite'),
+            ([0.1, 0.2, 0.3], [0.01, 0.02, 0.03], float('inf'), 'positive finite'),
+        ],
+    )
+    def test_invalid_input_values_raise_parameter_error(
+        self, pressure, loading, cross_section, message
+    ):
+        with pytest.raises(pgEx.ParameterError, match=message):
+            ab.area_BET_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': cross_section,
+                    'p_limits': (0.0, 0.99),
+                }
+            )
+
+    def test_zero_loading_is_allowed_outside_selected_range(self):
+        pressure = array([0.0, 0.1, 0.2, 0.3, 0.4])
+        loading = array([0.0, 0.01, 0.018, 0.024, 0.028])
+
+        result = ab.area_BET_raw(
+            {'pressure': pressure, 'loading': loading, 'cross_section': 0.1}
+        )
+
+        assert result['p_limit_indices'][0] > 0
+        assert result['area'] > 0
+
+    def test_zero_loading_in_selected_range_raises_parameter_error(self):
+        with pytest.raises(pgEx.ParameterError, match='Loading must be positive'):
+            ab.area_BET_raw(
+                {
+                    'pressure': [0.0, 0.1, 0.2, 0.3],
+                    'loading': [0.0, 0.01, 0.02, 0.03],
+                    'cross_section': 0.1,
+                    'p_limits': (0.0, 0.3),
+                }
+            )
+
+    def test_nonfinite_bet_transform_raises_calculation_error(self):
+        with pytest.raises(pgEx.CalculationError, match='BET transform contains non-finite'):
+            ab.area_BET_raw(
+                {
+                    'pressure': [0.1, 0.2, 0.3],
+                    'loading': [1e-320, 2e-320, 3e-320],
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.3),
+                }
+            )
+
+    def test_nonfinite_bet_fit_raises_calculation_error(self):
+        with pytest.raises(pgEx.CalculationError, match='BET fit contains non-finite'):
+            ab.area_BET_raw(
+                {
+                    'pressure': [0.1, 0.2, 0.3],
+                    'loading': [1e-309, 2e-309, 3e-309],
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.3),
+                }
+            )
+
+    def test_repeated_selected_pressures_without_variation_raise_calculation_error(self):
+        with pytest.raises(pgEx.CalculationError, match='two distinct pressure values'):
+            ab.area_BET_raw(
+                {
+                    'pressure': [0.1, 0.1, 0.1],
+                    'loading': [0.01, 0.02, 0.03],
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.1),
+                }
+            )
 
     def test_limit_selection(self):
         """Test the automatic selection of limits."""
