@@ -46,7 +46,7 @@ def c_pressure(
     unit_to: str,
     adsorbate=None,
     temp: float = None,
-    pseudo: bool = False,
+    pseudo: bool | str = False,
 ):
     """
     Convert pressure units and modes.
@@ -72,10 +72,9 @@ def c_pressure(
     temp : float, optional
         Temperature at which the pressure is measured, in K.
         Required for mode changes to relative pressure.
-    pseudo: bool, optional
-        Whether to calculate pseudo-saturation pressure (i.e. if adsorbate is
-        supercritical).
-        Defaults to false
+    pseudo : bool or str, optional
+        False disables pseudo-saturation pressure. True or 'Dubinin' selects
+        Dubinin's method for a supercritical adsorbate.
 
     Returns
     -------
@@ -363,6 +362,83 @@ def c_material(
         return c_unit(_MATERIAL_MODE[basis_from], value, unit_from, unit_to, sign=-1)
 
     return value
+
+
+def c_loading_material(
+    value,
+    loading_basis_from: str,
+    loading_unit_from: str,
+    material_basis_from: str,
+    material_unit_from: str,
+    loading_basis_to: str,
+    loading_unit_to: str,
+    material_basis_to: str,
+    material_unit_to: str,
+    adsorbate,
+    temp: float,
+    material,
+):
+    """Convert loading and material bases together.
+
+    Fractional and percentage loadings include the material basis in both
+    their numerator and denominator. Convert them through a molar loading
+    before changing that basis so both quantities are converted consistently.
+    """
+    fractional_bases = ("fraction", "percent")
+
+    if (
+        loading_basis_from in fractional_bases
+        and loading_basis_to in fractional_bases
+        and material_basis_from == material_basis_to
+    ):
+        return c_loading(
+            value,
+            basis_from=loading_basis_from,
+            basis_to=loading_basis_to,
+            unit_from=loading_unit_from,
+            unit_to=loading_unit_to,
+            adsorbate=adsorbate,
+            temp=temp,
+            basis_material=material_basis_from,
+            unit_material=material_unit_from,
+        )
+
+    if loading_basis_from in fractional_bases:
+        value = c_loading(
+            value,
+            basis_from=loading_basis_from,
+            basis_to="molar",
+            unit_from=loading_unit_from,
+            unit_to="mol",
+            adsorbate=adsorbate,
+            temp=temp,
+            basis_material=material_basis_from,
+            unit_material=material_unit_from,
+        )
+        loading_basis_from = "molar"
+        loading_unit_from = "mol"
+
+    if material_basis_from != material_basis_to or material_unit_from != material_unit_to:
+        value = c_material(
+            value,
+            basis_from=material_basis_from,
+            basis_to=material_basis_to,
+            unit_from=material_unit_from,
+            unit_to=material_unit_to,
+            material=material,
+        )
+
+    return c_loading(
+        value,
+        basis_from=loading_basis_from,
+        basis_to=loading_basis_to,
+        unit_from=loading_unit_from,
+        unit_to=loading_unit_to,
+        adsorbate=adsorbate,
+        temp=temp,
+        basis_material=material_basis_to,
+        unit_material=material_unit_to,
+    )
 
 
 def c_temperature(

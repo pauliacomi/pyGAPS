@@ -1,10 +1,13 @@
 """Tests relating to the Adsorbate class."""
 
 import warnings
+from unittest.mock import Mock
+from unittest.mock import call
 
 import pytest
 
 import pygaps
+import pygaps.utilities.coolprop_utilities as coolprop
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 
@@ -98,6 +101,60 @@ class TestAdsorbate:
         ads.properties["molar_mass"] = 142
         assert ads.molar_mass() == 142
 
+    def test_backend_cache_tracks_fluid_and_mode(self, monkeypatch):
+        factory = Mock(side_effect=[Mock(), Mock(), Mock()])
+        monkeypatch.setattr(coolprop.CP, 'AbstractState', factory)
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'HEOS')
+        ads = pygaps.Adsorbate('custom', backend_name='Nitrogen')
+        first = ads.backend
+        assert ads.backend is first
+        ads.properties['backend_name'] = 'Oxygen'
+        second = ads.backend
+        assert second is not first
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'REFPROP')
+        assert ads.backend is not second
+        assert factory.call_args_list == [
+            call('HEOS', 'Nitrogen'), call('HEOS', 'Oxygen'), call('REFPROP', 'Oxygen'),
+        ]
+        assert '_backend_name' not in ads.to_dict()
+
+    @pytest.mark.parametrize('change', ['fluid', 'mode'])
+    def test_backend_failed_replacement_retries(self, monkeypatch, caplog, change):
+        old_state = Mock()
+        old_state.molar_mass.return_value = 0.028
+        new_state = Mock()
+        new_state.molar_mass.return_value = 0.032
+        factory = Mock(side_effect=[old_state, ValueError('backend unavailable'), ValueError('backend unavailable'), new_state])
+        monkeypatch.setattr(coolprop.CP, 'AbstractState', factory)
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'HEOS')
+        ads = pygaps.Adsorbate('custom', backend_name='Nitrogen', molar_mass=30)
+        assert ads.molar_mass() == pytest.approx(28)
+        if change == 'fluid':
+            ads.properties['backend_name'] = 'Oxygen'
+        else:
+            monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', 'REFPROP')
+
+        assert ads.molar_mass() == 30
+        assert ads.molar_mass() == 30
+        assert ads._state is old_state
+        assert (ads._backend_mode, ads._backend_name) == ('HEOS', 'Nitrogen')
+        assert 'backend unavailable' in caplog.text
+        assert ads.molar_mass() == pytest.approx(32)
+        assert ads.backend is new_state
+        assert factory.call_count == 4
+
+    @pytest.mark.parametrize('mode', ['HEOS', 'REFPROP'])
+    def test_direct_thermodynamic_calls_use_selected_backend(self, monkeypatch, mode):
+        monkeypatch.setattr(coolprop, 'COOLPROP_BACKEND', mode)
+        props = Mock(return_value=1)
+        monkeypatch.setattr(coolprop.CP.CoolProp, 'PropsSI', props)
+        ads = pygaps.Adsorbate('custom', backend_name='Nitrogen')
+
+        assert ads.p_triple() == 1
+        props.assert_called_with('PTRIPLE', f'{mode}::Nitrogen')
+        assert ads.compressibility(100, 100000) == 1
+        props.assert_called_with('Z', 'T', 100, 'P', 100000, f'{mode}::Nitrogen')
+
     @pytest.mark.parametrize('calculated', [True, False])
     def test_adsorbate_named_props(self, adsorbate_data, basic_adsorbate, calculated):
         """Test all named properties, both calculated and not."""
@@ -135,6 +192,71 @@ class TestAdsorbate:
                 ads.gas_density(temp)
             with pytest.raises(CalculationError):
                 ads.enthalpy_liquefaction(temp)
+
+    @pytest.mark.parametrize('source, unit, expected', [
+        ('calculated', None, 101325), ('calculated', 'Pa', 101325),
+        ('calculated', 'bar', 1.01325), ('calculated', 'kPa', 101.325),
+        ('stored', 'bar', 1.01325), ('fallback', 'bar', 1.01325),
+    ])
+    def test_saturation_pressure_units(self, monkeypatch, caplog, source, unit, expected):
+        ads = pygaps.Adsorbate('custom', saturation_pressure=101325)
+        state = Mock()
+        state.p.return_value = 101325
+        if source == 'fallback':
+            state.update.side_effect = ValueError('backend unavailable')
+        monkeypatch.setattr(pygaps.Adsorbate, 'backend', property(lambda self: state))
+
+        assert ads.saturation_pressure(77, unit=unit, calculate=source != 'stored') == pytest.approx(expected)
+        assert ads.pressure_saturation(77, unit=unit, calculate=source != 'stored') == pytest.approx(expected)
+        if source == 'stored':
+            state.update.assert_not_called()
+        if source == 'fallback':
+            assert 'backend unavailable' in caplog.text
+
+    @pytest.mark.parametrize('calculate', [False, True])
+    def test_saturation_pressure_invalid_unit(self, monkeypatch, calculate):
+        ads = pygaps.Adsorbate('custom', saturation_pressure=101325)
+        state = Mock()
+        state.p.return_value = 101325
+        monkeypatch.setattr(pygaps.Adsorbate, 'backend', property(lambda self: state))
+
+        with pytest.raises(ParameterError, match='Unit selected'):
+            ads.saturation_pressure(77, unit='invalid', calculate=calculate)
+
+    @pytest.mark.parametrize('temp, unit, scale', [
+        (200, None, 1), (200, 'Pa', 1), (200, 'bar', 1e5), (200, 'kPa', 1e3),
+        (77, 'bar', 1e5), (100, 'bar', 1e5),
+    ])
+    def test_saturation_pressure_pseudo_units(self, monkeypatch, temp, unit, scale):
+        ads = pygaps.Adsorbate('custom')
+        monkeypatch.setattr(ads, 't_critical', lambda: 100)
+        monkeypatch.setattr(ads, 'p_critical', lambda: 101325)
+        state = Mock()
+        state.p.return_value = 101325
+        monkeypatch.setattr(pygaps.Adsorbate, 'backend', property(lambda self: state))
+        expected = 101325 * ((temp / 100) ** 2 if temp >= 100 else 1) / scale
+
+        assert ads.saturation_pressure_pseudo_dubinin(temp, unit=unit) == pytest.approx(expected)
+        if temp > 100:
+            assert ads.saturation_pressure(temp, unit=unit, pseudo='Dubinin') == pytest.approx(expected)
+
+    @pytest.mark.parametrize('pseudo', [False, True, 'Dubinin'])
+    @pytest.mark.parametrize('temp', [77, 200])
+    def test_saturation_pressure_pseudo_boolean(self, monkeypatch, temp, pseudo):
+        ads = pygaps.Adsorbate('custom')
+        monkeypatch.setattr(ads, 't_critical', lambda: 100)
+        monkeypatch.setattr(ads, 'p_critical', lambda: 100000)
+        state = Mock()
+        state.p.return_value = 50000
+        monkeypatch.setattr(pygaps.Adsorbate, 'backend', property(lambda self: state))
+        expected = 4 if pseudo and temp > 100 else 0.5
+
+        assert ads.saturation_pressure(temp, unit='bar', pseudo=pseudo) == pytest.approx(expected)
+
+    @pytest.mark.parametrize('temp', [77, 200])
+    def test_saturation_pressure_unknown_pseudo(self, temp):
+        with pytest.raises(ParameterError, match='pseudo'):
+            pygaps.Adsorbate('custom').saturation_pressure(temp, pseudo='unknown')
 
     def test_adsorbate_print(self, basic_adsorbate):
         """Check printing is possible."""

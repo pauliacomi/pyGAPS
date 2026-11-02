@@ -48,6 +48,27 @@ def load_iast_models(load_iast):
     return ch4_m, c2h6_m
 
 
+@pytest.fixture(params=['mixed', 'desorption-only', 'model'])
+def henry_branch_isotherms(request, isotherm_parameters):
+    """Provide distinct branches with a zero origin and descending desorption."""
+    isotherms = []
+    for coefficient in [1, 2]:
+        pressures = numpy.array([3, 2, 1, 0.1, 0])
+        loadings = coefficient * pressures
+        branch = 'des'
+        if request.param == 'mixed':
+            pressures = numpy.concatenate((pressures[::-1], pressures))
+            loadings = numpy.concatenate((10 * loadings[::-1], loadings))
+            branch = [False] * 5 + [True] * 5
+        point = pygaps.PointIsotherm(
+            pressure=pressures, loading=loadings, branch=branch, **isotherm_parameters
+        )
+        if request.param == 'model':
+            point = pygaps.ModelIsotherm.from_pointisotherm(point, model='Henry', branch='des')
+        isotherms.append(point)
+    return isotherms
+
+
 @pytest.mark.prediction
 class TestIAST:
     """Test IAST calculations."""
@@ -94,6 +115,15 @@ class TestIAST:
         loadings = pgi.iast_point_fraction(load_iast_models, gas_fraction, 1)
 
         assert numpy.isclose(adsorbed_fractions[0], loadings[0], 0.001)
+
+    @pytest.mark.parametrize('guess', [None, [0.5, 0.5]])
+    def test_iast_desorption_branch(self, henry_branch_isotherms, guess):
+        loadings = pgi.iast_point(
+            henry_branch_isotherms, [0.5, 0.5], branch='des',
+            adsorbed_mole_fraction_guess=guess,
+        )
+
+        assert loadings == pytest.approx([0.5, 1])
 
     @mpl_cleanup
     def test_iast_verbose(self, load_iast):
@@ -157,6 +187,19 @@ class TestReverseIAST:
 
         assert numpy.isclose(ideal_gas_fraction[0], gas_fraction[0], atol=0.1)
         assert numpy.isclose(ideal_ads_fraction[0], actual_ads_fraction[0], atol=0.05)
+
+    @pytest.mark.parametrize('guess', [None, [0.5, 0.5]])
+    def test_reverse_iast_desorption_branch(self, henry_branch_isotherms, guess):
+        gas_fraction, loadings = pgi.reverse_iast(
+            henry_branch_isotherms, [1 / 3, 2 / 3], 1, branch='des',
+            gas_mole_fraction_guess=guess,
+        )
+
+        assert gas_fraction == pytest.approx([0.5, 0.5])
+        assert loadings == pytest.approx([0.5, 1])
+        assert pgi.iast_point_fraction(
+            henry_branch_isotherms, gas_fraction, 1, branch='des'
+        ) == pytest.approx(loadings)
 
     @mpl_cleanup
     def test_reverse_iast_verbose(self, load_iast):

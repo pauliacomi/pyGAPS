@@ -79,6 +79,25 @@ and so on. The isotherm metadata must include:
 - The adsorbate used (``adsorbate`` or ``a``).
 - The temperature at which the data was recorded (``temperature`` or ``t``).
 
+The ``material`` argument also accepts a ``Material`` instance or a dictionary
+containing ``name`` and material properties. A registered name resolves to the
+shared registered instance, and a supplied instance is used directly. Changes
+to these shared objects are visible to every isotherm using them.
+
+A dictionary instead creates an independent, unregistered material: registered
+properties provide defaults, and supplied properties override them. Overrides
+replace entire property values rather than recursively merging dictionaries.
+All resulting properties, including nested lists/dictionaries, are copied.
+Neither construction nor later local edits modify the caller's dictionary or
+the registry. This ownership rule also applies when assigning
+``isotherm.material``.
+
+.. note::
+
+    Dictionary inputs no longer update registered materials implicitly.
+    To intentionally change shared properties, update the object returned by
+    ``pygaps.Material.find(name)`` explicitly.
+
 As such, the simplest creation statement is:
 
 .. code:: python
@@ -347,11 +366,16 @@ PointIsotherm object.
         indexed = True,
     )
 
+Limits for pressure, loading, and supplementary data include both endpoints.
+Use ``None`` for an unbounded endpoint; zero is a valid bound. The same
+inclusive policy applies to point and model isotherms.
+
 For the PointIsotherm, a special
 :meth:`~pygaps.core.pointisotherm.PointIsotherm.data` function returns all or
-parts of the internal pandas.DataFrame. This can be used to inspect the data
-directly or retrieve the DataFrame. To access the DataFrame directly, use the
-``data_raw`` parameter.
+parts of the internal pandas.DataFrame as an independent copy. Edits to this
+copy do not affect the isotherm until passed to ``update_data``. This method
+replaces the full dataset, preserving explicit ``branch`` values (0 for
+adsorption, 1 for desorption), and resets both interpolators.
 
 .. code:: python
 
@@ -363,6 +387,21 @@ directly or retrieve the DataFrame. To access the DataFrame directly, use the
     # Or access the underlying DataFrame
 
     isotherm.data_raw
+
+.. code:: python
+
+    edited = isotherm.data()
+    edited.loc[2, isotherm.loading_key] = 20
+    isotherm.update_data(edited)
+
+Direct edits through ``data_raw`` remain supported. After editing pressure,
+loading, or branch data this way, explicitly reset the interpolation caches
+before the next interpolation:
+
+.. code:: python
+
+    isotherm.data_raw.loc[2, isotherm.loading_key] = 20
+    isotherm.reset_interpolators()
 
 Besides functions which give access to the internal data points, the isotherm
 object can also return the value of pressure and loading at any point specified
@@ -390,6 +429,12 @@ The point methods are:
 
 The methods take parameters that describe the unit/mode of both the input
 parameters and the output parameters.
+
+Omitted input units default to the stored units when the mode/basis is
+unchanged. Fraction and percent loadings are dimensionless and do not require
+a loading unit. A different physical loading/material basis requires its
+unit; absolute pressure input to a relative-pressure isotherm also requires an
+explicit pressure unit.
 
 .. code:: python
 
@@ -437,6 +482,11 @@ functions :ref:`above <isotherms-manual-data>`. The conversion functions are:
   from a mass basis in *g* to a mass basis in *kg*.
 - :meth:`~pygaps.core.baseisotherm.BaseIsotherm.convert_temperature` will
   permanently the temperature unit.
+
+For supercritical adsorbates, ``convert_pressure(..., pseudo=True)`` explicitly
+selects Dubinin pseudo-saturation pressure, as does ``pseudo='Dubinin'``.
+The default ``pseudo=False`` does not enable a pseudo-pressure approximation.
+Below the critical temperature, real saturation pressure is used.
 
 .. important::
 

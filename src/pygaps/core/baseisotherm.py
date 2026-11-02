@@ -1,6 +1,7 @@
 """Contains the Isotherm base class."""
 
 import typing as t
+from copy import deepcopy
 
 from pygaps import logger
 from pygaps.core.adsorbate import Adsorbate
@@ -8,6 +9,8 @@ from pygaps.core.material import Material
 from pygaps.units.converter_mode import _LOADING_MODE
 from pygaps.units.converter_mode import _MATERIAL_MODE
 from pygaps.units.converter_mode import _PRESSURE_MODE
+from pygaps.units.converter_mode import c_loading_material
+from pygaps.units.converter_mode import c_pressure
 from pygaps.units.converter_mode import c_temperature
 from pygaps.units.converter_unit import _PRESSURE_UNITS
 from pygaps.units.converter_unit import _TEMPERATURE_UNITS
@@ -34,8 +37,10 @@ class BaseIsotherm:
 
     Parameters
     ----------
-    material : str
-        Name of the material on which the isotherm is measured.
+    material : str, dict or Material
+        Material name, shared instance, or independent property dictionary.
+        Dictionary inputs copy registered defaults and apply local overrides
+        without modifying the input or registry, including nested properties.
     adsorbate : str
         Isotherm adsorbate.
     temperature : float
@@ -204,19 +209,21 @@ class BaseIsotherm:
 
     @property
     def material(self) -> Material:
-        """Return underlying material."""
+        """Return the material; names/instances share it, dictionaries create snapshots."""
         return self._material
 
     @material.setter
     def material(self, value: t.Union[str, dict, Material]):
         if isinstance(value, dict):
-            name = value.pop('name', None)
+            properties = dict(value)
+            name = properties.pop('name', None)
             try:
-                self._material = Material.find(name)
-                logger.info(f"Material '{name}' found in internal list. Updating its properties with the provided dictionary.")
-                self._material.properties.update(**value)
+                defaults = Material.find(name).properties
             except ParameterError:
-                self._material = Material(name, **value)
+                defaults = {}
+            material = Material(name)
+            material.properties = deepcopy({**defaults, **properties})
+            self._material = material
             return
         try:
             self._material = Material.find(value)
@@ -435,6 +442,39 @@ class BaseIsotherm:
             autoinsert_adsorbate=autoinsert_adsorbate,
             verbose=verbose,
             **kwargs,
+        )
+
+    def _convert_pressure_input(self, pressure, pressure_unit, pressure_mode):
+        """Normalize input units and convert pressure to the stored mode."""
+        mode = self.pressure_mode if pressure_mode is None else pressure_mode
+        if pressure_unit is None and mode == 'absolute':
+            if self.pressure_mode != 'absolute':
+                raise ParameterError("Must specify a pressure unit for absolute input to a relative isotherm.")
+            pressure_unit = self.pressure_unit
+        return c_pressure(
+            pressure, mode_from=mode, mode_to=self.pressure_mode,
+            unit_from=pressure_unit, unit_to=self.pressure_unit,
+            adsorbate=self.adsorbate, temp=self.temperature,
+        )
+
+    def _convert_loading_input(self, loading, loading_unit, loading_basis, material_unit, material_basis):
+        """Normalize input units and convert loading to the stored bases."""
+        basis = self.loading_basis if loading_basis is None else loading_basis
+        material = self.material_basis if material_basis is None else material_basis
+        if loading_unit is None and basis not in ('fraction', 'percent'):
+            if basis != self.loading_basis:
+                raise ParameterError("Must specify a loading unit if the input is in another basis.")
+            loading_unit = self.loading_unit
+        if material_unit is None:
+            if material != self.material_basis:
+                raise ParameterError("Must specify a material unit if the input is in another basis.")
+            material_unit = self.material_unit
+        return c_loading_material(
+            loading, loading_basis_from=basis, loading_unit_from=loading_unit,
+            material_basis_from=material, material_unit_from=material_unit,
+            loading_basis_to=self.loading_basis, loading_unit_to=self.loading_unit,
+            material_basis_to=self.material_basis, material_unit_to=self.material_unit,
+            adsorbate=self.adsorbate, temp=self.temperature, material=self.material,
         )
 
     def convert_temperature(

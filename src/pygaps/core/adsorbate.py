@@ -103,6 +103,7 @@ class Adsorbate:
         "alias",
         "_state",
         "_backend_mode",
+        "_backend_name",
     ]
 
     def __init__(
@@ -138,6 +139,7 @@ class Adsorbate:
         # CoolProp interaction variables, only generate when called
         self._state = None
         self._backend_mode = None
+        self._backend_name = None
 
         # Store reference in internal list
         if store:
@@ -219,9 +221,14 @@ class Adsorbate:
     @property
     def backend(self):
         """Return the CoolProp state associated with the fluid."""
-        if not self._backend_mode or self._backend_mode != thermodynamic_backend():
-            self._backend_mode = thermodynamic_backend()
-            self._state = CP.AbstractState(self._backend_mode, self.backend_name)
+        mode = thermodynamic_backend()
+        name = self.backend_name
+        if self._state is None or (self._backend_mode, self._backend_name) != (mode, name):
+            # A failed replacement must not mark the previous state as current.
+            state = CP.AbstractState(mode, name)
+            self._state = state
+            self._backend_mode = mode
+            self._backend_name = name
 
         return self._state
 
@@ -362,10 +369,9 @@ class Adsorbate:
         """
         if calculate:
             try:
-                # For some reason coolprop does not implement a python
-                # wrapper for P_triple, so we are directly calling the propsSI function
-                # TODO: this will not work for REFPROP
-                return CP.CoolProp.PropsSI('PTRIPLE', self.backend_name)
+                # AbstractState has no triple-pressure accessor.
+                fluid = f"{thermodynamic_backend()}::{self.backend_name}"
+                return CP.CoolProp.PropsSI('PTRIPLE', fluid)
             except BaseException as err:
                 _warn_reading_params(err)
                 return self.p_triple(calculate=False)
@@ -496,7 +502,7 @@ class Adsorbate:
             If not specifies defaults to Pascal.
         calculate : bool, optional
             Whether to calculate the property or look it up in the properties
-            dictionary, default - True.
+            dictionary, default - True. Stored saturation pressures are in Pa.
 
         Returns
         -------
@@ -518,7 +524,7 @@ class Adsorbate:
         temp: float,
         unit: str = None,
         calculate: bool = True,
-        pseudo: str = False,
+        pseudo: bool | str = False,
         verbose: bool = False,
     ) -> float:
         """
@@ -533,10 +539,10 @@ class Adsorbate:
             If not specifies defaults to Pascal.
         calculate : bool, optional
             Whether to calculate the property or look it up in the properties
-            dictionary, default - True.
-        pseudo: str, optional
-            Whether to calculate a pseudo-saturation pressure for a
-            supercritical adsorbate, default - False.
+            dictionary, default - True. Stored saturation pressures are in Pa.
+        pseudo : bool or str, optional
+            False disables pseudo-saturation pressure. True or 'Dubinin'
+            selects Dubinin's method above the critical temperature.
 
         Returns
         -------
@@ -552,6 +558,10 @@ class Adsorbate:
             If it cannot be calculated, due to a physical reason.
 
         """
+        if pseudo is True:
+            pseudo = 'Dubinin'
+        if pseudo is not False and pseudo != 'Dubinin':
+            raise ParameterError("Unsupported pseudo-saturation method. Use False, True, or 'Dubinin'.")
         if pseudo and temp > self.t_critical():
             if pseudo == 'Dubinin':
                 if verbose:
@@ -569,16 +579,17 @@ class Adsorbate:
                 sat_p = state.p()
             except BaseException as err:
                 _warn_reading_params(err)
-                sat_p = self.saturation_pressure(temp, unit=unit, calculate=False)
+                sat_p = self.saturation_pressure(temp, calculate=False)
+        else:
+            try:
+                sat_p = self.get_prop("saturation_pressure")
+            except ParameterError as err:
+                _raise_calculation_error(err)
 
-            if unit is not None:
-                sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
-            return sat_p
-
-        try:
-            return self.get_prop("saturation_pressure")
-        except ParameterError as err:
-            _raise_calculation_error(err)
+        # Both the backend and stored property provide Pa; convert only at output.
+        if unit is not None:
+            sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
+        return sat_p
 
     def saturation_pressure_pseudo_dubinin(
         self,
@@ -608,7 +619,7 @@ class Adsorbate:
         """
         if temp < self.t_critical():
             logger.warning(f'{self.name} is below critical temperature. Returning real saturation pressure.')
-            return self.saturation_pressure(temp=temp)
+            return self.saturation_pressure(temp=temp, unit=unit)
         if k < 1:
             raise ParameterError(f'The value for the exponent, k, is too small ({k}).')
 
@@ -945,7 +956,8 @@ class Adsorbate:
         pressure: float
             pressure, in Pa
         """
-        return CP.CoolProp.PropsSI('Z', 'T', temp, 'P', pressure, self.backend_name)
+        fluid = f"{thermodynamic_backend()}::{self.backend_name}"
+        return CP.CoolProp.PropsSI('Z', 'T', temp, 'P', pressure, fluid)
 
 
 def _warn_reading_params(err):

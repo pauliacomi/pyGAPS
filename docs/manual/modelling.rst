@@ -132,6 +132,22 @@ virial model, have been excluded from this option.
         model=['Henry', 'Langmuir', 'BET', 'Virial'],
     )
 
+The ``param_guess`` and ``param_bounds`` dictionaries accept partial parameter
+overrides. Unspecified guesses are calculated automatically, and unspecified
+bounds retain each model's defaults. When selecting among models, an override
+applies to every candidate with that parameter name. A name not recognized by
+any selected candidate raises ``ParameterError``. For example, this supplies
+``K`` bounds to both candidates and a starting ``n_m`` only to Langmuir:
+
+.. code:: python
+
+    model_isotherm = pgm.model_iso(
+        point_isotherm,
+        model=['Henry', 'Langmuir'],
+        param_bounds={'K': (0.1, 10)},
+        param_guess={'n_m': 5},
+    )
+
 Once the a ``ModelIsotherm`` is generated, it can be used as a regular
 ``PointIsotherm``, as it contains the same common methods. Some slight
 differences exist:

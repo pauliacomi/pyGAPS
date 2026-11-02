@@ -1,5 +1,8 @@
 """Tests relating to the Isotherm class."""
 
+from copy import deepcopy
+
+import numpy
 import pytest
 
 import pygaps
@@ -22,6 +25,88 @@ class TestBaseIsotherm:
     def test_isotherm_create_short(self):
         """Check isotherm can be created from shorthands."""
         BaseIsotherm(m='carbon', a='nitrogen', t=77)
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    @pytest.mark.parametrize('mode', ['absolute', 'relative'])
+    def test_evaluation_input_defaults(self, monkeypatch, fractional_conversion_parameters, kind, mode):
+        parameters = {**fractional_conversion_parameters, 'pressure_mode': mode}
+        monkeypatch.setattr(parameters['adsorbate'], 'saturation_pressure', lambda temp, unit, pseudo=False: 1)
+        cls = pygaps.PointIsotherm if kind == 'point' else pygaps.ModelIsotherm
+        options = {} if kind == 'point' else {'model': 'Henry'}
+        iso = cls(pressure=[1, 2, 3], loading=[2, 4, 6], branch='ads', **options, **parameters)
+
+        assert iso.loading_at(2, pressure_mode=mode) == pytest.approx(4)
+        assert iso.pressure_at(4, loading_basis='molar', material_basis='mass') == pytest.approx(2)
+        assert iso.pressure_at(0.04, loading_basis='fraction') == pytest.approx(2)
+        assert iso.pressure_at(4, loading_basis='percent') == pytest.approx(2)
+        if kind == 'model':
+            assert iso.spreading_pressure_at(2, pressure_mode=mode) == pytest.approx(4)
+        if mode == 'relative':
+            with pytest.raises(pgEx.ParameterError, match='pressure unit'):
+                iso.loading_at(2, pressure_mode='absolute')
+            assert iso.loading_at(2, pressure_mode='absolute', pressure_unit='bar') == pytest.approx(4)
+            if kind == 'model':
+                with pytest.raises(pgEx.ParameterError, match='pressure unit'):
+                    iso.spreading_pressure_at(2, pressure_mode='absolute')
+
+        for kwargs in [{'loading_basis': 'mass'}, {'material_basis': 'volume'}]:
+            with pytest.raises(pgEx.ParameterError, match='unit'):
+                iso.pressure_at(4, **kwargs)
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    def test_dimensionless_input_arrays(self, fractional_conversion_parameters, kind):
+        cls = pygaps.PointIsotherm if kind == 'point' else pygaps.ModelIsotherm
+        options = {} if kind == 'point' else {'model': 'Henry'}
+        iso = cls(
+            pressure=[1, 2, 3], loading=[2, 4, 6], branch='ads',
+            **options, **fractional_conversion_parameters,
+        )
+        numpy.testing.assert_allclose(
+            iso.pressure_at([0.08, 0.16], loading_basis='fraction', material_basis='volume', material_unit='cm3'),
+            [1, 2],
+        )
+        numpy.testing.assert_allclose(
+            iso.pressure_at([2, 4], loading_basis='percent', material_basis='mass'),
+            [1, 2],
+        )
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    @pytest.mark.parametrize('limits, expected, indexed', [
+        ((None, 0), [0], False), ((0, 0), [0], False),
+        ((0, 2), [0, 1, 2], False), ((1, 2), [1, 2], False),
+        ((1, None), [1, 2], False), ((None, None), [0, 1, 2], False),
+        ((1, 2), [1, 2], True),
+    ])
+    def test_inclusive_data_limits(self, isotherm_parameters, kind, indexed, limits, expected):
+        if kind == 'point':
+            iso = pygaps.PointIsotherm(
+                pressure=[0, 1, 2], loading=[0, 1, 2], branch='ads', **isotherm_parameters
+            )
+        else:
+            iso = pygaps.ModelIsotherm(
+                model=pygaps.modelling.model_from_dict({
+                    'name': 'Henry', 'parameters': {'K': 1},
+                    'pressure_range': (0, 2), 'loading_range': (0, 2),
+                }),
+                branch='ads', **isotherm_parameters,
+            )
+        for method in [iso.pressure, iso.loading]:
+            kwargs = {'points': 3} if kind == 'model' else {}
+            numpy.testing.assert_allclose(method(limits=limits, indexed=indexed, **kwargs), expected, atol=1e-12)
+        if kind == 'point':
+            iso.data_raw['other'] = [0, 1, 2]
+            numpy.testing.assert_array_equal(iso.other_data('other', limits=limits, indexed=indexed), expected)
+
+    def test_pressure_model_inclusive_limits(self, isotherm_parameters):
+        iso = pygaps.ModelIsotherm(
+            model=pygaps.modelling.model_from_dict({
+                'name': 'Virial', 'parameters': {'K': 1, 'A': 0, 'B': 0, 'C': 0},
+                'pressure_range': (1, 3), 'loading_range': (1, 3),
+            }),
+            branch='ads', **isotherm_parameters,
+        )
+        numpy.testing.assert_array_equal(iso.loading(points=3, limits=(1, 3)), [1, 2, 3])
+        numpy.testing.assert_array_equal(iso.pressure(points=3, limits=(1, 3)), [1, 2, 3])
 
     def test_isotherm_id(self, basic_isotherm):
         """Check isotherm id works as intended."""
@@ -58,6 +143,86 @@ class TestBaseIsotherm:
         assert isotherm.material == "testing"
         isotherm.material = {'name': "TEST"}
         assert isotherm.material == basic_material
+
+    @pytest.mark.parametrize('registered', [False, True])
+    def test_isotherm_material_dictionary_snapshot(self, monkeypatch, registered):
+        material = pygaps.Material(
+            'local-material', density=2, molar_mass=10,
+            provenance={'tags': ['registered']},
+        )
+        registry = [material] if registered else []
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', registry)
+        supplied = {'name': material.name, 'density': 9, 'notes': {'tags': ['local']}}
+        original = deepcopy(supplied)
+
+        iso = BaseIsotherm(material=supplied, adsorbate='nitrogen', temperature=77)
+
+        assert supplied == original
+        assert iso.material is not material
+        assert iso.material.density == 9
+        assert material.density == 2
+        assert len(registry) == int(registered)
+        if registered:
+            assert iso.material.molar_mass == 10
+            iso.material.properties['provenance']['tags'].append('changed')
+            assert material.properties['provenance'] == {'tags': ['registered']}
+            material.molar_mass = 20
+            assert iso.material.molar_mass == 10
+
+        iso.material.properties['notes']['tags'].append('changed')
+        assert supplied == original
+        supplied['notes']['tags'].append('caller-edit')
+        assert iso.material.properties['notes'] == {'tags': ['local', 'changed']}
+
+    def test_isotherm_material_dictionary_does_not_register(self, monkeypatch):
+        registry = []
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', registry)
+        iso = BaseIsotherm(
+            material={'name': 'local-material', 'store': True},
+            adsorbate='nitrogen', temperature=77,
+        )
+
+        assert registry == []
+        assert iso.material.properties['store'] is True
+
+    @pytest.mark.parametrize('by_name', [False, True])
+    def test_isotherm_material_explicit_sharing(self, monkeypatch, by_name):
+        material = pygaps.Material('shared-material', density=2)
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', [material])
+        iso = BaseIsotherm(
+            material=material.name if by_name else material,
+            adsorbate='nitrogen', temperature=77,
+        )
+
+        assert iso.material is material
+        material.density = 9
+        assert iso.material.density == 9
+
+    @pytest.mark.parametrize('kind', ['point', 'model'])
+    def test_isotherm_material_local_conversion(self, monkeypatch, fractional_conversion_parameters, kind):
+        parameters = fractional_conversion_parameters
+        material = parameters['material']
+        monkeypatch.setattr('pygaps.core.material.MATERIAL_LIST', [material])
+        cls = pygaps.PointIsotherm if kind == 'point' else pygaps.ModelIsotherm
+        options = {} if kind == 'point' else {'model': 'Henry'}
+        first = cls(pressure=[1., 2., 3.], loading=[2., 4., 6.], **options, **parameters)
+        first_id = first.iso_id
+        supplied = {'name': material.name, 'density': 9}
+        second = cls(
+            pressure=[1., 2., 3.], loading=[2., 4., 6.], **options,
+            **{**parameters, 'material': supplied},
+        )
+
+        assert supplied == {'name': material.name, 'density': 9}
+        assert first.iso_id == first_id
+        assert first.material is material
+        assert second.material is not material
+        assert second.material.molar_mass == 10
+        assert first.loading_at(1, material_basis='volume', material_unit='cm3') == pytest.approx(4)
+        assert second.loading_at(1, material_basis='volume', material_unit='cm3') == pytest.approx(18)
+        second.material.density = 5
+        assert first.iso_id == first_id
+        assert material.density == 2
 
     def test_isotherm_temperature(self):
         """Test various temperature functions."""

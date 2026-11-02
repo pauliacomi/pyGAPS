@@ -11,8 +11,7 @@ from pygaps.modelling import _GUESS_MODELS
 from pygaps.modelling import get_isotherm_model
 from pygaps.modelling import is_model
 from pygaps.modelling import is_model_class
-from pygaps.units.converter_mode import c_loading
-from pygaps.units.converter_mode import c_material
+from pygaps.units.converter_mode import c_loading_material
 from pygaps.units.converter_mode import c_pressure
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
@@ -42,8 +41,10 @@ class ModelIsotherm(BaseIsotherm):
         The model to be used to describe the isotherm.
     param_guess : dict
         Starting guess for model parameters in the data fitting routine.
+        Missing parameters are initialized automatically.
     param_bounds : dict
         Bounds for model parameters in the data fitting routine (applicable to some models).
+        Missing parameters retain their default bounds.
     branch : ['ads', 'des'], optional
         The branch on which the model isotherm is based on. It is assumed to be the
         adsorption branch, as it is the most commonly modelled part, although may
@@ -199,6 +200,8 @@ class ModelIsotherm(BaseIsotherm):
                         raise ParameterError(
                             f"'{param}' is not a valid parameter in the '{model}' model."
                         )
+                if len(param_guess) < len(self.model.param_names):
+                    param_guess = {**self.model.initial_guess(pressure, loading), **param_guess}
             else:
                 param_guess = self.model.initial_guess(pressure, loading)
 
@@ -311,8 +314,12 @@ class ModelIsotherm(BaseIsotherm):
             Specify `"guess"` to try all available models.
         param_guess : dict, optional
             Starting guess for model parameters in the data fitting routine.
+            Partial guesses override automatic values. For model selection,
+            each override applies to candidates with that parameter.
         param_bounds : dict
             Bounds for model parameters in the data fitting routine.
+            Partial bounds override model defaults. For model selection,
+            each override applies to candidates with that parameter.
         optimization_params : dict, optional
             Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
@@ -343,6 +350,8 @@ class ModelIsotherm(BaseIsotherm):
         return ModelIsotherm.guess(
             branch=branch,
             models=model,
+            param_guess=param_guess,
+            param_bounds=param_bounds,
             optimization_params=optimization_params,
             verbose=verbose,
             **iso_params,
@@ -357,10 +366,11 @@ class ModelIsotherm(BaseIsotherm):
         pressure_key: str = None,
         loading_key: str = None,
         branch: str = 'ads',
-        models='guess',
+        models: t.Union[str, list[str]] = 'guess',
         optimization_params: dict = None,
         param_bounds: dict = None,
         verbose: bool = False,
+        param_guess: dict = None,
         **other_properties,
     ):
         """Attempt to model the data using supplied list of model names, then return the one with the best RMS fit.
@@ -395,6 +405,12 @@ class ModelIsotherm(BaseIsotherm):
             The branch on which the model isotherm is based on. It is assumed to be the
             adsorption branch, as it is the most commonly modelled part, although may
             set to desorption as well.
+        param_guess : dict, optional
+            Parameter-name overrides for automatic initial guesses. Each entry
+            applies to candidates with that parameter; unknown names are rejected.
+        param_bounds : dict, optional
+            Parameter-name overrides for model-default bounds. Each entry applies
+            to candidates with that parameter; unknown names are rejected.
         verbose : bool, optional
             Prints out extra information about steps taken.
         other_properties:
@@ -415,11 +431,20 @@ class ModelIsotherm(BaseIsotherm):
                     f'Not all models correspond to internal models. Possible models are f{models}'
                 )
 
+        model_parameters = {
+            model: get_isotherm_model(model).param_names for model in guess_models
+        }
+        known_parameters = {param for params in model_parameters.values() for param in params}
+        for overrides in (param_guess, param_bounds):
+            if overrides:
+                for param in overrides:
+                    if param not in known_parameters:
+                        raise ParameterError(f"'{param}' is not a valid parameter in the selected models.")
+
         for model in guess_models:
-            model_bounds = None
-            if param_bounds is not None:
-                params = get_isotherm_model(model).params.keys()
-                model_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
+            params = model_parameters[model]
+            model_guess = {key: value for key, value in (param_guess or {}).items() if key in params}
+            model_bounds = {key: value for key, value in (param_bounds or {}).items() if key in params}
             try:
                 isotherm = cls(
                     pressure=pressure,
@@ -428,7 +453,7 @@ class ModelIsotherm(BaseIsotherm):
                     pressure_key=pressure_key,
                     loading_key=loading_key,
                     model=model,
-                    param_guess=None,
+                    param_guess=model_guess,
                     param_bounds=model_bounds,
                     optimization_params=optimization_params,
                     branch=branch,
@@ -572,7 +597,7 @@ class ModelIsotherm(BaseIsotherm):
             The mode in which to return the pressure, if possible. If ``None``,
             returns mode the isotherm is currently in.
         limits : [float, float], optional
-            Minimum and maximum pressure limits.
+            Inclusive minimum and maximum pressure limits.
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
@@ -621,9 +646,9 @@ class ModelIsotherm(BaseIsotherm):
             )
 
         # Select required points
-        if limits and any(limits):
-            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
-                      & (ret < (numpy.inf if limits[1] is None else limits[1]))]
+        if limits is not None:
+            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) <= ret)
+                      & (ret <= (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
@@ -662,7 +687,7 @@ class ModelIsotherm(BaseIsotherm):
             The basis on which to return the material, if possible. If ``None``,
             returns on the basis the isotherm is currently in.
         limits : [float, float], optional
-            Minimum and maximum loading limits.
+            Inclusive minimum and maximum loading limits.
             Put None or -+np.inf for no limit.
         indexed : bool, optional
             If this is specified to true, then the function returns an indexed
@@ -686,43 +711,25 @@ class ModelIsotherm(BaseIsotherm):
                 points,
             )
 
-            # Convert if needed
-            # First material is converted
-            if material_basis or material_unit:
-                if not material_basis:
-                    material_basis = self.material_basis
+            target_loading_basis = loading_basis if loading_basis is not None else self.loading_basis
+            target_loading_unit = loading_unit if loading_unit is not None else self.loading_unit
+            target_material_basis = material_basis if material_basis is not None else self.material_basis
+            target_material_unit = material_unit if material_unit is not None else self.material_unit
 
-                ret = c_material(
-                    ret,
-                    basis_from=self.material_basis,
-                    basis_to=material_basis,
-                    unit_from=self.material_unit,
-                    unit_to=material_unit,
-                    material=self.material,
-                )
-
-            if loading_basis or loading_unit:
-                if not loading_basis:
-                    loading_basis = self.loading_basis
-
-                # These must be specified
-                # in the case of fractional conversions
-                if not material_basis:
-                    material_basis = self.material_basis
-                if not material_unit:
-                    material_unit = self.material_unit
-
-                ret = c_loading(
-                    ret,
-                    basis_from=self.loading_basis,
-                    basis_to=loading_basis,
-                    unit_from=self.loading_unit,
-                    unit_to=loading_unit,
-                    adsorbate=self.adsorbate,
-                    temp=self.temperature,
-                    basis_material=material_basis,
-                    unit_material=material_unit,
-                )
+            ret = c_loading_material(
+                ret,
+                loading_basis_from=self.loading_basis,
+                loading_unit_from=self.loading_unit,
+                material_basis_from=self.material_basis,
+                material_unit_from=self.material_unit,
+                loading_basis_to=target_loading_basis,
+                loading_unit_to=target_loading_unit,
+                material_basis_to=target_material_basis,
+                material_unit_to=target_material_unit,
+                adsorbate=self.adsorbate,
+                temp=self.temperature,
+                material=self.material,
+            )
         else:
             ret = self.loading_at(
                 self.pressure(points),
@@ -733,9 +740,9 @@ class ModelIsotherm(BaseIsotherm):
             )
 
         # Select required points
-        if limits and any(limits):
-            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) < ret)
-                      & (ret < (numpy.inf if limits[1] is None else limits[1]))]
+        if limits is not None:
+            ret = ret[((-numpy.inf if limits[0] is None else limits[0]) <= ret)
+                      & (ret <= (numpy.inf if limits[1] is None else limits[1]))]
 
         if indexed:
             return pandas.Series(ret)
@@ -808,41 +815,9 @@ class ModelIsotherm(BaseIsotherm):
         # Convert to numpy array just in case
         loading = numpy.asarray(loading)
 
-        # Ensure loading is in correct units and basis for the internal model
-        if material_basis or material_unit:
-            if not material_basis:
-                material_basis = self.material_basis
-            if not material_unit:
-                raise ParameterError(
-                    "Must specify a material unit if the input is in another basis"
-                )
-
-            loading = c_material(
-                loading,
-                basis_from=material_basis,
-                basis_to=self.material_basis,
-                unit_from=material_unit,
-                unit_to=self.material_unit,
-                material=self.material,
-            )
-
-        if loading_basis or loading_unit:
-            if not loading_basis:
-                loading_basis = self.loading_basis
-            if not loading_unit:
-                raise ParameterError("Must specify a loading unit if the input is in another basis")
-
-            loading = c_loading(
-                loading,
-                basis_from=loading_basis,
-                basis_to=self.loading_basis,
-                unit_from=loading_unit,
-                unit_to=self.loading_unit,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-                basis_material=material_basis,
-                unit_material=material_unit,
-            )
+        loading = self._convert_loading_input(
+            loading, loading_unit, loading_basis, material_unit, material_basis,
+        )
 
         # Calculate pressure using internal model
         pressure = self.model.pressure(loading)
@@ -925,66 +900,30 @@ class ModelIsotherm(BaseIsotherm):
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)
 
-        # Ensure pressure is in correct units and mode for the internal model
-        if pressure_mode or pressure_unit:
-            if not pressure_mode:
-                pressure_mode = self.pressure_mode
-            if pressure_mode == 'absolute' and not pressure_unit:
-                raise ParameterError(
-                    "Must specify a pressure unit if the input is in an absolute mode"
-                )
-
-            pressure = c_pressure(
-                pressure,
-                mode_from=pressure_mode,
-                mode_to=self.pressure_mode,
-                unit_from=pressure_unit,
-                unit_to=self.pressure_unit,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-            )
+        pressure = self._convert_pressure_input(pressure, pressure_unit, pressure_mode)
 
         # Calculate loading using internal model
         loading = self.model.loading(pressure)
 
-        # Ensure loading is in correct units and basis requested
-        # First adsorbent is converted
-        if material_basis or material_unit:
-            if not material_basis:
-                material_basis = self.material_basis
+        target_loading_basis = loading_basis if loading_basis is not None else self.loading_basis
+        target_loading_unit = loading_unit if loading_unit is not None else self.loading_unit
+        target_material_basis = material_basis if material_basis is not None else self.material_basis
+        target_material_unit = material_unit if material_unit is not None else self.material_unit
 
-            loading = c_material(
-                loading,
-                basis_from=self.material_basis,
-                basis_to=material_basis,
-                unit_from=self.material_unit,
-                unit_to=material_unit,
-                material=self.material,
-            )
-
-        # Then loading
-        if loading_basis or loading_unit:
-            if not loading_basis:
-                loading_basis = self.loading_basis
-
-            # These must be specified
-            # in the case of fractional conversions
-            if not material_basis:
-                material_basis = self.material_basis
-            if not material_unit:
-                material_unit = self.material_unit
-
-            loading = c_loading(
-                loading,
-                basis_from=self.loading_basis,
-                basis_to=loading_basis,
-                unit_from=self.loading_unit,
-                unit_to=loading_unit,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-                basis_material=material_basis,
-                unit_material=material_unit,
-            )
+        loading = c_loading_material(
+            loading,
+            loading_basis_from=self.loading_basis,
+            loading_unit_from=self.loading_unit,
+            material_basis_from=self.material_basis,
+            material_unit_from=self.material_unit,
+            loading_basis_to=target_loading_basis,
+            loading_unit_to=target_loading_unit,
+            material_basis_to=target_material_basis,
+            material_unit_to=target_material_unit,
+            adsorbate=self.adsorbate,
+            temp=self.temperature,
+            material=self.material,
+        )
 
         return loading
 
@@ -1035,26 +974,7 @@ class ModelIsotherm(BaseIsotherm):
         # Convert to numpy array just in case
         pressure = numpy.asarray(pressure)
 
-        # Ensure pressure is in correct units and mode for the internal model
-        if pressure_mode or pressure_unit:
-            if not pressure_mode:
-                pressure_mode = self.pressure_mode
-            if not pressure_unit:
-                pressure_unit = self.pressure_unit
-            if not pressure_unit and self.pressure_mode.startswith('relative'):
-                raise ParameterError(
-                    "Must specify a pressure unit if the input is in an absolute mode"
-                )
-
-            pressure = c_pressure(
-                pressure,
-                mode_from=pressure_mode,
-                mode_to=self.pressure_mode,
-                unit_from=pressure_unit,
-                unit_to=self.pressure_unit,
-                adsorbate=self.adsorbate,
-                temp=self.temperature,
-            )
+        pressure = self._convert_pressure_input(pressure, pressure_unit, pressure_mode)
 
         # calculate based on model
         return self.model.spreading_pressure(pressure)
