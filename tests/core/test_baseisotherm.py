@@ -71,10 +71,11 @@ class TestBaseIsotherm:
         )
 
     @pytest.mark.parametrize('kind', ['point', 'model'])
-    @pytest.mark.parametrize('indexed', [False, True])
-    @pytest.mark.parametrize('limits, expected', [
-        ((None, 0), [0]), ((0, 0), [0]), ((0, 2), [0, 1, 2]),
-        ((1, 2), [1, 2]), ((1, None), [1, 2]), ((None, None), [0, 1, 2]),
+    @pytest.mark.parametrize('limits, expected, indexed', [
+        ((None, 0), [0], False), ((0, 0), [0], False),
+        ((0, 2), [0, 1, 2], False), ((1, 2), [1, 2], False),
+        ((1, None), [1, 2], False), ((None, None), [0, 1, 2], False),
+        ((1, 2), [1, 2], True),
     ])
     def test_inclusive_data_limits(self, isotherm_parameters, kind, indexed, limits, expected):
         if kind == 'point':

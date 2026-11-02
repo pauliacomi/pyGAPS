@@ -63,6 +63,9 @@ instance/
 # Sphinx documentation
 docs/_build/
 
+# Local review assessments
+/docs/review/
+
 # PyBuilder
 target/
 

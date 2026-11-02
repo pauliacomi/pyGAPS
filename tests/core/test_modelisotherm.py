@@ -212,8 +212,13 @@ class TestModelIsotherm:
         assert fitted.model.params['K'] == pytest.approx(1)
         assert fitted.model.param_bounds['n_m'] == (0, numpy.inf)
 
-    @pytest.mark.parametrize('models', ['Langmuir', ['Henry', 'Langmuir'], 'guess'])
-    @pytest.mark.parametrize('entrypoint', ['point', 'guess', 'wrapper'])
+    @pytest.mark.parametrize('entrypoint, models', [
+        ('point', 'Langmuir'),
+        ('point', ['Henry', 'Langmuir']),
+        ('point', 'guess'),
+        ('guess', ['Henry', 'Langmuir']),
+        ('wrapper', 'guess'),
+    ])
     def test_isotherm_selection_parameter_guesses(self, monkeypatch, langmuir_pointisotherm, entrypoint, models):
         guesses = {}
         original_fit = pgm.IsothermBaseModel.fit

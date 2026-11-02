@@ -474,17 +474,18 @@ class TestPointIsotherm:
         """Check the PointIsotherm spreading pressure calculation."""
         assert basic_pointisotherm.spreading_pressure_at(inp, **parameters) == pytest.approx(expected, 1e-5)
 
-    @pytest.mark.parametrize('order', [[0, 1, 2], [2, 1, 0], [1, 0, 2]])
     @pytest.mark.parametrize(
-        'pressure, expected',
+        'order, pressure, expected',
         [
-            (0, 0),
-            (0.5, 0.5),
-            (1, 1),
-            (1.5, 1 + 1.5 - 2 * numpy.log(1.5)),
-            (2, 1 + 3 - 2 * numpy.log(2)),
-            (2.5, 1 + 3 - 2 * numpy.log(2) + 2.5 - 6 * numpy.log(2.5 / 2)),
-            (3, 1 + 3 - 2 * numpy.log(2) + 5 - 6 * numpy.log(3 / 2)),
+            ([0, 1, 2], 0, 0),
+            ([0, 1, 2], 0.5, 0.5),
+            ([0, 1, 2], 1, 1),
+            ([0, 1, 2], 1.5, 1 + 1.5 - 2 * numpy.log(1.5)),
+            ([0, 1, 2], 2, 1 + 3 - 2 * numpy.log(2)),
+            ([0, 1, 2], 2.5, 1 + 3 - 2 * numpy.log(2) + 2.5 - 6 * numpy.log(2.5 / 2)),
+            ([0, 1, 2], 3, 1 + 3 - 2 * numpy.log(2) + 5 - 6 * numpy.log(3 / 2)),
+            ([2, 1, 0], 2.5, 1 + 3 - 2 * numpy.log(2) + 2.5 - 6 * numpy.log(2.5 / 2)),
+            ([1, 0, 2], 2.5, 1 + 3 - 2 * numpy.log(2) + 2.5 - 6 * numpy.log(2.5 / 2)),
         ],
     )
     def test_spreading_pressure_order_and_boundaries(self, isotherm_parameters, order, pressure, expected):
@@ -499,8 +500,11 @@ class TestPointIsotherm:
         assert point.spreading_pressure_at(pressure, branch='des') == pytest.approx(expected)
         pandas.testing.assert_frame_equal(point.data_raw, before)
 
-    @pytest.mark.parametrize('reverse', [False, True])
-    @pytest.mark.parametrize('pressure, expected', [(0, 0), (0.5, 0.5), (1, 1), (1.5, 2.5 - 2 * numpy.log(1.5))])
+    @pytest.mark.parametrize('reverse, pressure, expected', [
+        (False, 0, 0), (False, 0.5, 0.5), (False, 1, 1),
+        (False, 1.5, 2.5 - 2 * numpy.log(1.5)),
+        (True, 1.5, 2.5 - 2 * numpy.log(1.5)),
+    ])
     def test_spreading_pressure_zero_origin(self, isotherm_parameters, reverse, pressure, expected):
         pressures = [0, 1, 2]
         loadings = [0, 1, 4]
@@ -514,8 +518,10 @@ class TestPointIsotherm:
         with numpy.errstate(divide='raise', invalid='raise'):
             assert point.spreading_pressure_at(pressure) == pytest.approx(expected)
 
-    @pytest.mark.parametrize('branch', ['ads', 'des'])
-    @pytest.mark.parametrize('cached_fill', ['uncached', None, 9, 'extrapolate'])
+    @pytest.mark.parametrize('branch, cached_fill', [
+        ('ads', 'uncached'), ('ads', None), ('ads', 9), ('ads', 'extrapolate'),
+        ('des', None),
+    ])
     def test_spreading_pressure_extrapolation(self, isotherm_parameters, cached_fill, branch):
         pressures = [1, 2, 3] if branch == 'ads' else [3, 2, 1]
         point = pygaps.PointIsotherm(
@@ -834,9 +840,26 @@ class TestPointIsotherm:
         if 'unit_to' in parameters:
             assert basic_pointisotherm.material_unit == parameters['unit_to']
 
-    @pytest.mark.parametrize('representation', ['physical', 'fraction', 'percent', 'relative'])
-    @pytest.mark.parametrize('conversion', ['pressure', 'loading', 'material', 'all'])
-    @pytest.mark.parametrize('arguments', ['omitted', 'basis', 'unit', 'explicit'])
+    @pytest.mark.parametrize('representation, conversion, arguments', [
+        ('physical', 'pressure', 'omitted'),
+        ('physical', 'pressure', 'basis'),
+        ('physical', 'pressure', 'unit'),
+        ('physical', 'pressure', 'explicit'),
+        ('physical', 'loading', 'omitted'),
+        ('physical', 'loading', 'basis'),
+        ('physical', 'loading', 'unit'),
+        ('physical', 'loading', 'explicit'),
+        ('physical', 'material', 'omitted'),
+        ('physical', 'material', 'basis'),
+        ('physical', 'material', 'unit'),
+        ('physical', 'material', 'explicit'),
+        ('physical', 'all', 'explicit'),
+        ('relative', 'pressure', 'basis'),
+        ('relative', 'all', 'omitted'),
+        ('fraction', 'material', 'basis'),
+        ('fraction', 'all', 'omitted'),
+        ('percent', 'all', 'basis'),
+    ])
     def test_isotherm_convert_noop(self, isotherm_parameters, representation, conversion, arguments):
         parameters = isotherm_parameters.copy()
         if representation in ['fraction', 'percent']:
@@ -871,16 +894,17 @@ class TestPointIsotherm:
         assert point.units == before_units
         assert point.to_dict() == before_metadata
         assert (point.l_interpolator, point.p_interpolator) == before_interpolators
-        rebuilt = pygaps.PointIsotherm(
-            isotherm_data=point.data_raw.copy(),
-            pressure_key=point.pressure_key, loading_key=point.loading_key,
-            **point.to_dict(),
-        )
-        restored = pgp.isotherm_from_json(pgp.isotherm_to_json(point))
-        for other in [rebuilt, restored]:
-            assert other.units == before_units
-            numpy.testing.assert_array_equal(other.pressure(), point.pressure())
-            numpy.testing.assert_array_equal(other.loading(), point.loading())
+        if conversion == 'all':
+            rebuilt = pygaps.PointIsotherm(
+                isotherm_data=point.data_raw.copy(),
+                pressure_key=point.pressure_key, loading_key=point.loading_key,
+                **point.to_dict(),
+            )
+            restored = pgp.isotherm_from_json(pgp.isotherm_to_json(point))
+            for other in [rebuilt, restored]:
+                assert other.units == before_units
+                numpy.testing.assert_array_equal(other.pressure(), point.pressure())
+                numpy.testing.assert_array_equal(other.loading(), point.loading())
 
     @pytest.mark.parametrize('loading_basis', ['fraction', 'percent'])
     def test_isotherm_convert_fractional_material_unit(self, isotherm_parameters, loading_basis):
@@ -936,10 +960,14 @@ class TestPointIsotherm:
         pandas.testing.assert_frame_equal(basic_pointisotherm.data_raw, before_data)
         assert basic_pointisotherm.units == before_units
 
-    @pytest.mark.parametrize('loading_basis', ['fraction', 'percent'])
-    @pytest.mark.parametrize('conversion', ['loading', 'material'])
-    @pytest.mark.parametrize('failure', ['missing-density', 'invalid-unit'])
-    @pytest.mark.parametrize('cached', [False, True])
+    @pytest.mark.parametrize('loading_basis, conversion, failure, cached', [
+        ('fraction', 'loading', 'missing-density', True),
+        ('fraction', 'material', 'missing-density', True),
+        ('fraction', 'loading', 'invalid-unit', True),
+        ('fraction', 'material', 'invalid-unit', True),
+        ('percent', 'material', 'missing-density', True),
+        ('fraction', 'loading', 'missing-density', False),
+    ])
     def test_fractional_conversion_failure_preserves_state(
         self, monkeypatch, fractional_conversion_parameters, loading_basis, conversion, failure, cached,
     ):

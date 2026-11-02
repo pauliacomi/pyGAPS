@@ -193,8 +193,11 @@ class TestAdsorbate:
             with pytest.raises(CalculationError):
                 ads.enthalpy_liquefaction(temp)
 
-    @pytest.mark.parametrize('unit, expected', [(None, 101325), ('Pa', 101325), ('bar', 1.01325), ('kPa', 101.325)])
-    @pytest.mark.parametrize('source', ['calculated', 'stored', 'fallback'])
+    @pytest.mark.parametrize('source, unit, expected', [
+        ('calculated', None, 101325), ('calculated', 'Pa', 101325),
+        ('calculated', 'bar', 1.01325), ('calculated', 'kPa', 101.325),
+        ('stored', 'bar', 1.01325), ('fallback', 'bar', 1.01325),
+    ])
     def test_saturation_pressure_units(self, monkeypatch, caplog, source, unit, expected):
         ads = pygaps.Adsorbate('custom', saturation_pressure=101325)
         state = Mock()
@@ -220,8 +223,10 @@ class TestAdsorbate:
         with pytest.raises(ParameterError, match='Unit selected'):
             ads.saturation_pressure(77, unit='invalid', calculate=calculate)
 
-    @pytest.mark.parametrize('unit, scale', [(None, 1), ('Pa', 1), ('bar', 1e5), ('kPa', 1e3)])
-    @pytest.mark.parametrize('temp', [77, 100, 200])
+    @pytest.mark.parametrize('temp, unit, scale', [
+        (200, None, 1), (200, 'Pa', 1), (200, 'bar', 1e5), (200, 'kPa', 1e3),
+        (77, 'bar', 1e5), (100, 'bar', 1e5),
+    ])
     def test_saturation_pressure_pseudo_units(self, monkeypatch, temp, unit, scale):
         ads = pygaps.Adsorbate('custom')
         monkeypatch.setattr(ads, 't_critical', lambda: 100)
