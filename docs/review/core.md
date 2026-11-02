@@ -112,6 +112,15 @@ integral would diverge. Test ascending/descending equivalence, the origin,
 exact boundaries and both extrapolation policies against an independent
 integral. Do not silently sort the stored experimental data.
 
+**Resolution (feature/core-updates).** Integration now sorts paired branch
+data locally, accepts a zero-loading origin, and rejects duplicate/nonfinite
+pressures, negative pressures, nonfinite loadings, and a divergent nonzero
+loading at zero pressure. Henry-law integration below the first positive point
+is independent of the interpolation cache. Above the highest pressure, the
+current call must explicitly request constant fill or linear extrapolation.
+Regression tests cover order invariance without stored-data mutation, the
+origin, exact boundaries, fill policies, unit conversion, and invalid inputs.
+
 **Source:** [point spreading-pressure integration](../../src/pygaps/core/pointisotherm.py#L1308).
 
 ### C3. IAST can mix adsorption and desorption branches

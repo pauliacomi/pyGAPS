@@ -1165,7 +1165,7 @@ class PointIsotherm(BaseIsotherm):
 
     def spreading_pressure_at(
         self,
-        pressure: list[float],
+        pressure: float,
         branch: str = 'ads',
         pressure_unit: str = None,
         pressure_mode: str = None,
@@ -1174,7 +1174,7 @@ class PointIsotherm(BaseIsotherm):
         material_unit: str = None,
         material_basis: str = None,
         interp_fill: t.Union[float, tuple[float, float], str] = None,
-    ) -> numpy.ndarray:
+    ) -> float:
         r"""
         Calculate reduced spreading pressure at a bulk adsorbate pressure P.
 
@@ -1186,7 +1186,10 @@ class PointIsotherm(BaseIsotherm):
             \Pi(p) = \int_0^p \frac{q(\hat{p})}{ \hat{p}} d\hat{p}.
 
         In this integral, the isotherm :math:`q(\hat{p})` is represented by a
-        linear interpolation of the data.
+        linear interpolation of the data. Paired data are sorted locally without
+        changing the stored order. Pressures must be finite, nonnegative and
+        distinct, and loadings must be finite. A zero-pressure point must have
+        zero loading. Below the first positive pressure, Henry's law is used.
 
         For in-detail explanations, check reference [#]_.
 
@@ -1209,9 +1212,11 @@ class PointIsotherm(BaseIsotherm):
             The mode the pressure is returned in. If ``None``, it defaults to
             internal isotherm mode.
         interp_fill : array-like or (array-like, array_like) or “extrapolate”, optional
-            Parameter to determine what to do outside data bounds.
+            Parameter to determine what to do above the highest pressure.
             Passed to the scipy.interpolate.interp1d function as ``fill_value``.
-            If blank, interpolation will not predict outside the bounds of data.
+            If blank, integration beyond the highest pressure raises
+            ``CalculationError``. A numeric fill gives constant loading above
+            that pressure; “extrapolate” extends the final linear segment.
 
         Returns
         -------
@@ -1224,7 +1229,9 @@ class PointIsotherm(BaseIsotherm):
            Theory (IAST) Python Package. Computer Physics Communications.
 
         """
-        # Get all data points
+        if numpy.ndim(pressure) != 0 or not numpy.isfinite(pressure) or pressure < 0:
+            raise ParameterError("Spreading pressure requires a finite, nonnegative scalar pressure.")
+
         pressures = self.pressure(
             branch=branch, pressure_unit=pressure_unit, pressure_mode=pressure_mode
         )
@@ -1236,9 +1243,29 @@ class PointIsotherm(BaseIsotherm):
             material_basis=material_basis,
         )
 
-        # Check if we need to extrapolate beyond available data
-        if (self.l_interpolator is not None and self.l_interpolator.interp_fill
-            is None) and (pressure > pressures.max() or pressure < pressures.min()):
+        if not numpy.all(numpy.isfinite(pressures)) or not numpy.all(numpy.isfinite(loadings)):
+            raise CalculationError("Spreading pressure requires finite pressures and loadings.")
+        if numpy.any(pressures < 0):
+            raise CalculationError("Spreading pressure cannot use negative pressures.")
+
+        # Desorption data may descend; sort paired copies, not the experimental data.
+        order = numpy.argsort(pressures)
+        pressures = pressures[order]
+        loadings = loadings[order]
+        if numpy.any(numpy.diff(pressures) == 0):
+            raise CalculationError("Spreading pressure cannot use duplicate pressures.")
+        if numpy.any(loadings[pressures == 0] != 0):
+            raise CalculationError("Nonzero loading at zero pressure makes the spreading-pressure integral diverge.")
+
+        # The valid (0, 0) point is covered by the Henry segment; omit it from logarithms.
+        positive = pressures > 0
+        pressures = pressures[positive]
+        loadings = loadings[positive]
+        if not pressures.size:
+            raise CalculationError("Spreading pressure requires at least one positive pressure point on the selected branch.")
+
+        # Extrapolation permission belongs to this call, not a cached interpolator.
+        if pressure > pressures[-1] and interp_fill is None:
             raise CalculationError(
                 textwrap.dedent(
                     f"""
@@ -1263,33 +1290,22 @@ class PointIsotherm(BaseIsotherm):
                 )
             )
 
-        # Step 1: Approximate loading up to first pressure point with Henry's law
-        # loading = henry_const * P where henry_const is the initial slope
-        henry_const = loadings[0] / pressures[0]
+        # With q(p) = K*p near the origin, the integral is K*p and reaches q(p_1).
+        if pressure <= pressures[0]:
+            return loadings[0] * (pressure / pressures[0])
 
-        # Step 2: Find how many points are less than target pressure P
-        n_points = numpy.sum(pressures < pressure)
-
-        if n_points == 0:
-            # Step 3a: If P is between 0 and first pressure point
-            # The integral simplifies to henry_const * P
-            return henry_const * pressure
-
-        # Step 3b: P > first pressure point - calculate the total area
-        # Area of first segment from 0 to P_1
         area = loadings[0]
-
-        # Step 4: Calculate area between P_1 and P_k where P_k < P < P_{k+1}
-        # using linear interpolation of isotherm data
-        for i in range(n_points - 1):
+        for i in range(len(pressures) - 1):
+            endpoint = min(pressure, pressures[i + 1])
             slope = (loadings[i + 1] - loadings[i]) / (pressures[i + 1] - pressures[i])
             intercept = loadings[i] - slope * pressures[i]
-            # Add area of this segment
-            area += slope * (pressures[i + 1] -
-                             pressures[i]) + intercept * numpy.log(pressures[i + 1] / pressures[i])
+            delta = endpoint - pressures[i]
+            # Integrate q(p)/p = slope + intercept/p; log1p is accurate for short segments.
+            area += slope * delta + intercept * numpy.log1p(delta / pressures[i])
+            if pressure <= pressures[i + 1]:
+                return area
 
-        # Step 5: Calculate area of final segment from P_k to P
-        # Get the loading at pressure P using interpolation
+        # Evaluate fills through loading_at to preserve its unit-conversion semantics.
         loading_at_p = self.loading_at(
             pressure,
             branch=branch,
@@ -1301,13 +1317,15 @@ class PointIsotherm(BaseIsotherm):
             material_basis=material_basis,
             interp_fill=interp_fill,
         )
+        if not numpy.isfinite(loading_at_p):
+            raise CalculationError("Spreading-pressure extrapolation requires a finite loading.")
 
-        # Calculate the slope of the final segment
-        slope = (loading_at_p - loadings[n_points - 1]) / (pressure - pressures[n_points - 1])
-        intercept = loadings[n_points - 1] - slope * pressures[n_points - 1]
-
-        # Add the area of the final segment
-        area += slope * (pressure - pressures[n_points - 1]
-                         ) + intercept * numpy.log(pressure / pressures[n_points - 1])
-
-        return area
+        delta = pressure - pressures[-1]
+        if isinstance(interp_fill, str) and interp_fill == 'extrapolate':
+            slope = (loading_at_p - loadings[-1]) / delta
+            intercept = loadings[-1] - slope * pressures[-1]
+        else:
+            # A constant fill can jump at the boundary; do not integrate a ramp to it.
+            slope = 0
+            intercept = loading_at_p
+        return area + slope * delta + intercept * numpy.log1p(delta / pressures[-1])

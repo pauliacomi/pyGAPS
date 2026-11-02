@@ -412,6 +412,116 @@ class TestPointIsotherm:
         """Check the PointIsotherm spreading pressure calculation."""
         assert basic_pointisotherm.spreading_pressure_at(inp, **parameters) == pytest.approx(expected, 1e-5)
 
+    @pytest.mark.parametrize('order', [[0, 1, 2], [2, 1, 0], [1, 0, 2]])
+    @pytest.mark.parametrize(
+        'pressure, expected',
+        [
+            (0, 0),
+            (0.5, 0.5),
+            (1, 1),
+            (1.5, 1 + 1.5 - 2 * numpy.log(1.5)),
+            (2, 1 + 3 - 2 * numpy.log(2)),
+            (2.5, 1 + 3 - 2 * numpy.log(2) + 2.5 - 6 * numpy.log(2.5 / 2)),
+            (3, 1 + 3 - 2 * numpy.log(2) + 5 - 6 * numpy.log(3 / 2)),
+        ],
+    )
+    def test_spreading_pressure_order_and_boundaries(self, isotherm_parameters, order, pressure, expected):
+        point = pygaps.PointIsotherm(
+            pressure=numpy.array([1, 2, 3])[order],
+            loading=numpy.array([1, 4, 9])[order],
+            branch='des',
+            **isotherm_parameters,
+        )
+        before = point.data_raw.copy(deep=True)
+
+        assert point.spreading_pressure_at(pressure, branch='des') == pytest.approx(expected)
+        pandas.testing.assert_frame_equal(point.data_raw, before)
+
+    @pytest.mark.parametrize('reverse', [False, True])
+    @pytest.mark.parametrize('pressure, expected', [(0, 0), (0.5, 0.5), (1, 1), (1.5, 2.5 - 2 * numpy.log(1.5))])
+    def test_spreading_pressure_zero_origin(self, isotherm_parameters, reverse, pressure, expected):
+        pressures = [0, 1, 2]
+        loadings = [0, 1, 4]
+        point = pygaps.PointIsotherm(
+            pressure=pressures[::-1] if reverse else pressures,
+            loading=loadings[::-1] if reverse else loadings,
+            branch='ads',
+            **isotherm_parameters,
+        )
+
+        with numpy.errstate(divide='raise', invalid='raise'):
+            assert point.spreading_pressure_at(pressure) == pytest.approx(expected)
+
+    @pytest.mark.parametrize('cached_fill', ['uncached', None, 9, 'extrapolate'])
+    def test_spreading_pressure_extrapolation(self, isotherm_parameters, cached_fill):
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3], loading=[1, 4, 9], branch='ads', **isotherm_parameters
+        )
+        if cached_fill != 'uncached':
+            point.loading_at(2, interp_fill=cached_fill)
+        area = 1 + 3 - 2 * numpy.log(2) + 5 - 6 * numpy.log(3 / 2)
+
+        with pytest.raises(pgEx.CalculationError, match='extrapolat'):
+            point.spreading_pressure_at(4)
+
+        assert point.spreading_pressure_at(0.5) == pytest.approx(0.5)
+        assert point.spreading_pressure_at(4, interp_fill=9) == pytest.approx(area + 9 * numpy.log(4 / 3))
+        assert point.spreading_pressure_at(4, interp_fill=(0, 12)) == pytest.approx(area + 12 * numpy.log(4 / 3))
+        assert point.spreading_pressure_at(4, interp_fill='extrapolate') == pytest.approx(
+            area + 5 - 6 * numpy.log(4 / 3)
+        )
+
+    def test_spreading_pressure_extrapolation_units(self, isotherm_parameters):
+        point = pygaps.PointIsotherm(
+            pressure=[3, 2, 1], loading=[9, 4, 1], branch='des', **isotherm_parameters
+        )
+        area = 1 + 3 - 2 * numpy.log(2) + 5 - 6 * numpy.log(3 / 2)
+
+        assert point.spreading_pressure_at(
+            400000, branch='des', pressure_unit='Pa', loading_unit='mol', interp_fill=9
+        ) == pytest.approx((area + 9 * numpy.log(4 / 3)) / 1000)
+
+    @pytest.mark.parametrize('interp_fill', [numpy.nan, numpy.inf])
+    def test_spreading_pressure_invalid_fill(self, isotherm_parameters, interp_fill):
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2], loading=[1, 4], branch='ads', **isotherm_parameters
+        )
+
+        with pytest.raises(pgEx.CalculationError, match='finite loading'):
+            point.spreading_pressure_at(3, interp_fill=interp_fill)
+
+    @pytest.mark.parametrize(
+        'pressures, loadings, message',
+        [
+            ([1, 1, 2], [1, 1, 4], 'duplicate'),
+            ([1, numpy.inf, 2], [1, 4, 4], 'finite'),
+            ([1, 2, 3], [1, numpy.inf, 9], 'finite'),
+            ([-1, 1, 2], [0, 1, 4], 'negative'),
+            ([0, 1, 2], [1, 1, 4], 'zero pressure'),
+            ([0], [0], 'positive pressure'),
+        ],
+    )
+    def test_spreading_pressure_invalid_data(self, isotherm_parameters, pressures, loadings, message):
+        point = pygaps.PointIsotherm(
+            pressure=pressures, loading=loadings, branch='ads', **isotherm_parameters
+        )
+
+        with pytest.raises(pgEx.CalculationError, match=message):
+            point.spreading_pressure_at(1.5)
+
+    @pytest.mark.parametrize('pressure', [-1, numpy.nan, numpy.inf])
+    def test_spreading_pressure_invalid_target(self, basic_pointisotherm, pressure):
+        with pytest.raises(pgEx.ParameterError, match='finite, nonnegative'):
+            basic_pointisotherm.spreading_pressure_at(pressure)
+
+    def test_spreading_pressure_missing_branch(self, isotherm_parameters):
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2], loading=[1, 4], branch='des', **isotherm_parameters
+        )
+
+        with pytest.raises(pgEx.CalculationError, match='positive pressure'):
+            point.spreading_pressure_at(1.5, branch='ads')
+
     ##########################
 
     @pytest.mark.parametrize(
