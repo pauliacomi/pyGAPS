@@ -50,14 +50,12 @@ class IsothermBaseModel(abc.ABC):
 
         # Bounds for the parameters
         parameter_bounds = params.pop('param_bounds', None)
+        self.param_bounds = dict(zip(self.param_names, self.param_default_bounds))
         if parameter_bounds:
-            self.param_bounds = {}
             for param, bound in parameter_bounds.items():
                 if param not in self.param_names:
                     raise ParameterError(f"'{param}' is not a valid parameter in the '{self.name}' model.")
                 self.param_bounds[param] = bound
-        else:
-            self.param_bounds = dict(zip(self.param_names, self.param_default_bounds))
 
         # Others
         self.pressure_range = params.pop('pressure_range', (numpy.nan, numpy.nan))

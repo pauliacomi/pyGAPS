@@ -269,8 +269,12 @@ def model_iso(
         Specify `"guess"` to try all available models.
     param_guess : dict, optional
         Starting guess for model parameters in the data fitting routine.
+        Partial guesses override automatic values. For model selection, each
+        override applies to candidates with that parameter.
     param_bounds : dict, optional
         Bounds for model parameters in the data fitting routine.
+        Partial bounds override model defaults. For model selection, each
+        override applies to candidates with that parameter.
     optimization_params : dict, optional
         Dictionary to be passed to the minimization function to use in fitting model to data.
         See `here

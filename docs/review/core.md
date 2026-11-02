@@ -193,6 +193,14 @@ partial overrides with each model's default bounds, reject unknown parameters
 appropriately, and test the public `model_iso` wrapper as well as direct and
 list fitting. Include a fit where the bound changes the result.
 
+**Resolution (feature/core-updates).** Model selection now forwards bounds
+and starting guesses, applying flat parameter-name overrides to matching
+candidates and rejecting names unknown to all candidates. Partial bounds
+retain model defaults, and partial guesses retain automatic values for missing
+parameters. Regression tests cover direct construction, point conversion,
+explicit/default candidate selection, and the public wrapper, including a
+Henry fit constrained from K=2 to K=0.2.
+
 **Sources:** [point-to-model dispatch](../../src/pygaps/core/modelisotherm.py#L325),
 [candidate bounds](../../src/pygaps/core/modelisotherm.py#L419),
 [model bounds initialization](../../src/pygaps/modelling/base_model.py#L52).

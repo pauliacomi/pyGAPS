@@ -186,6 +186,69 @@ class TestModelIsotherm:
                 langmuir_pointisotherm, model=['Henry', 'Langmuir'], optimization_params={'max_nfev': 1}
             )
 
+    @pytest.mark.parametrize('entrypoint', ['constructor', 'point', 'guess', 'wrapper'])
+    def test_isotherm_fit_enforces_bounds(self, isotherm_parameters, entrypoint):
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3], loading=[2, 4, 6], branch='ads', **isotherm_parameters
+        )
+        options = {'param_bounds': {'K': [0.1, 0.2]}}
+        if entrypoint == 'constructor':
+            fitted = pygaps.ModelIsotherm(pressure=[1, 2, 3], loading=[2, 4, 6], model='Henry', **options, **isotherm_parameters)
+        elif entrypoint == 'point':
+            fitted = pygaps.ModelIsotherm.from_pointisotherm(point, model=['Henry'], **options)
+        elif entrypoint == 'guess':
+            fitted = pygaps.ModelIsotherm.guess(pressure=[1, 2, 3], loading=[2, 4, 6], models=['Henry'], **options, **isotherm_parameters)
+        else:
+            fitted = pgm.model_iso(point, model=['Henry'], **options)
+
+        assert fitted.model.params['K'] == pytest.approx(0.2)
+        assert fitted.model.param_bounds['K'] == [0.1, 0.2]
+
+    @pytest.mark.parametrize('model', ['Langmuir', ['Henry', 'Langmuir']])
+    def test_isotherm_fit_partial_bounds(self, langmuir_pointisotherm, model):
+        fitted = pgm.model_iso(langmuir_pointisotherm, model=model, param_bounds={'K': [0.1, 1]})
+
+        assert fitted.model.name == 'Langmuir'
+        assert fitted.model.params['K'] == pytest.approx(1)
+        assert fitted.model.param_bounds['n_m'] == (0, numpy.inf)
+
+    @pytest.mark.parametrize('models', ['Langmuir', ['Henry', 'Langmuir'], 'guess'])
+    @pytest.mark.parametrize('entrypoint', ['point', 'guess', 'wrapper'])
+    def test_isotherm_selection_parameter_guesses(self, monkeypatch, langmuir_pointisotherm, entrypoint, models):
+        guesses = {}
+        original_fit = pgm.IsothermBaseModel.fit
+        monkeypatch.setattr('pygaps.core.modelisotherm._GUESS_MODELS', ['Henry', 'Langmuir'])
+
+        def capture_fit(model, pressure, loading, param_guess, *args, **kwargs):
+            guesses[model.name] = param_guess.copy()
+            return original_fit(model, pressure, loading, param_guess, *args, **kwargs)
+
+        monkeypatch.setattr(pgm.IsothermBaseModel, 'fit', capture_fit)
+        options = {'param_guess': {'n_m': 6}, 'param_bounds': {'K': [0.1, 10]}}
+        point = langmuir_pointisotherm
+        if entrypoint == 'point':
+            fitted = pygaps.ModelIsotherm.from_pointisotherm(point, model=models, **options)
+        elif entrypoint == 'guess':
+            fitted = pygaps.ModelIsotherm.guess(
+                pressure=point.pressure(), loading=point.loading(),
+                models=['Langmuir'] if models == 'Langmuir' else models,
+                **point.to_dict(), **options,
+            )
+        else:
+            fitted = pgm.model_iso(point, model=models, **options)
+
+        if models != 'Langmuir':
+            assert set(guesses['Henry']) == {'K'}
+        assert set(guesses['Langmuir']) == {'K', 'n_m'}
+        assert guesses['Langmuir']['n_m'] == 6
+        assert fitted.model.name == 'Langmuir'
+        assert options == {'param_guess': {'n_m': 6}, 'param_bounds': {'K': [0.1, 10]}}
+
+    @pytest.mark.parametrize('option', ['param_guess', 'param_bounds'])
+    def test_isotherm_selection_unknown_parameter(self, basic_pointisotherm, option):
+        with pytest.raises(pgEx.ParameterError, match='not a valid parameter'):
+            pgm.model_iso(basic_pointisotherm, model=['Henry', 'Langmuir'], **{option: {'typo': 1}})
+
     @mpl_cleanup
     @pytest.mark.parametrize('file', [data['file'] for data in DATA.values()])
     def test_isotherm_create_guess(self, file, data_char_path):

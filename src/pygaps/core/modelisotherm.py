@@ -41,8 +41,10 @@ class ModelIsotherm(BaseIsotherm):
         The model to be used to describe the isotherm.
     param_guess : dict
         Starting guess for model parameters in the data fitting routine.
+        Missing parameters are initialized automatically.
     param_bounds : dict
         Bounds for model parameters in the data fitting routine (applicable to some models).
+        Missing parameters retain their default bounds.
     branch : ['ads', 'des'], optional
         The branch on which the model isotherm is based on. It is assumed to be the
         adsorption branch, as it is the most commonly modelled part, although may
@@ -198,6 +200,8 @@ class ModelIsotherm(BaseIsotherm):
                         raise ParameterError(
                             f"'{param}' is not a valid parameter in the '{model}' model."
                         )
+                if len(param_guess) < len(self.model.param_names):
+                    param_guess = {**self.model.initial_guess(pressure, loading), **param_guess}
             else:
                 param_guess = self.model.initial_guess(pressure, loading)
 
@@ -310,8 +314,12 @@ class ModelIsotherm(BaseIsotherm):
             Specify `"guess"` to try all available models.
         param_guess : dict, optional
             Starting guess for model parameters in the data fitting routine.
+            Partial guesses override automatic values. For model selection,
+            each override applies to candidates with that parameter.
         param_bounds : dict
             Bounds for model parameters in the data fitting routine.
+            Partial bounds override model defaults. For model selection,
+            each override applies to candidates with that parameter.
         optimization_params : dict, optional
             Dictionary to be passed to the minimization function to use in fitting model to data.
             See `here
@@ -342,6 +350,8 @@ class ModelIsotherm(BaseIsotherm):
         return ModelIsotherm.guess(
             branch=branch,
             models=model,
+            param_guess=param_guess,
+            param_bounds=param_bounds,
             optimization_params=optimization_params,
             verbose=verbose,
             **iso_params,
@@ -356,10 +366,11 @@ class ModelIsotherm(BaseIsotherm):
         pressure_key: str = None,
         loading_key: str = None,
         branch: str = 'ads',
-        models='guess',
+        models: t.Union[str, list[str]] = 'guess',
         optimization_params: dict = None,
         param_bounds: dict = None,
         verbose: bool = False,
+        param_guess: dict = None,
         **other_properties,
     ):
         """Attempt to model the data using supplied list of model names, then return the one with the best RMS fit.
@@ -394,6 +405,12 @@ class ModelIsotherm(BaseIsotherm):
             The branch on which the model isotherm is based on. It is assumed to be the
             adsorption branch, as it is the most commonly modelled part, although may
             set to desorption as well.
+        param_guess : dict, optional
+            Parameter-name overrides for automatic initial guesses. Each entry
+            applies to candidates with that parameter; unknown names are rejected.
+        param_bounds : dict, optional
+            Parameter-name overrides for model-default bounds. Each entry applies
+            to candidates with that parameter; unknown names are rejected.
         verbose : bool, optional
             Prints out extra information about steps taken.
         other_properties:
@@ -414,11 +431,20 @@ class ModelIsotherm(BaseIsotherm):
                     f'Not all models correspond to internal models. Possible models are f{models}'
                 )
 
+        model_parameters = {
+            model: get_isotherm_model(model).param_names for model in guess_models
+        }
+        known_parameters = {param for params in model_parameters.values() for param in params}
+        for overrides in (param_guess, param_bounds):
+            if overrides:
+                for param in overrides:
+                    if param not in known_parameters:
+                        raise ParameterError(f"'{param}' is not a valid parameter in the selected models.")
+
         for model in guess_models:
-            model_bounds = None
-            if param_bounds is not None:
-                params = get_isotherm_model(model).params.keys()
-                model_bounds = {key: param_bounds[key] for key in param_bounds if key in params}
+            params = model_parameters[model]
+            model_guess = {key: value for key, value in (param_guess or {}).items() if key in params}
+            model_bounds = {key: value for key, value in (param_bounds or {}).items() if key in params}
             try:
                 isotherm = cls(
                     pressure=pressure,
@@ -427,7 +453,7 @@ class ModelIsotherm(BaseIsotherm):
                     pressure_key=pressure_key,
                     loading_key=loading_key,
                     model=model,
-                    param_guess=None,
+                    param_guess=model_guess,
                     param_bounds=model_bounds,
                     optimization_params=optimization_params,
                     branch=branch,
