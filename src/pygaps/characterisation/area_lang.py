@@ -129,6 +129,10 @@ def area_langmuir(
     isotherm, model selection, or cross-sectional area; the latter is an
     approximation.
 
+    The calculation emits warnings when the Langmuir constant, monolayer
+    loading, or area is not positive and finite. These warnings do not prevent
+    an estimate from being returned.
+
     References
     ----------
     .. [#] I. Langmuir, J. Amer. Chem. Soc., 38, 2219 (1916); 40, 1368 (1918)
@@ -201,15 +205,24 @@ def area_langmuir_raw(data: dict):
     dictionary containing ``pressure``, ``loading``, and ``cross_section``;
     ``p_limits`` is optional.
 
+    The regression standard errors and propagated area standard error are
+    conditional on the selected pressure range and ordinary least squares
+    assumptions. They do not include uncertainty in the isotherm,
+    pressure-range selection, or molecular cross-sectional area.
+
     Parameters
     ----------
     data : dict
         Calculation inputs:
 
-        - ``pressure`` : relative pressures.
-        - ``loading`` : loadings in mol/basis.
-        - ``cross_section`` : molecular cross-sectional area in nm^2.
+        - ``pressure`` : finite, ascending relative pressures between 0 and 1.
+        - ``loading`` : finite, non-negative loadings in mol/basis.
+        - ``cross_section`` : positive finite molecular cross-sectional area in nm^2.
         - ``p_limits`` : optional inclusive pressure range.
+
+        Pressure and loading must be one-dimensional arrays of equal length.
+        Loading must be positive for every point selected for fitting; zero
+        loading is allowed outside that range (for example, at the origin).
 
     Returns
     -------
@@ -236,10 +249,8 @@ def area_langmuir_raw(data: dict):
         - ``cross_sectional_area`` (float): supplied molecular cross-sectional
           area in nm², treated as exact in the reported area uncertainty.
 
-        The regression standard errors and propagated area standard error are
-        conditional on the selected pressure range and ordinary least squares
-        assumptions. They do not include uncertainty in the isotherm,
-        pressure-range selection, or molecular cross-sectional area.
+        A warning is emitted if the Langmuir constant, monolayer loading, or
+        area is not positive and finite; the estimate is still returned.
 
     """
     if not isinstance(data, dict):
@@ -248,20 +259,36 @@ def area_langmuir_raw(data: dict):
     if missing:
         raise ParameterError(f"Missing required Langmuir input keys: {', '.join(sorted(missing))}.")
 
-    pressure = data['pressure']
-    loading = data['loading']
-    cross_section = data['cross_section']
+    try:
+        pressure = numpy.asarray(data['pressure'], dtype=float)
+        loading = numpy.asarray(data['loading'], dtype=float)
+        cross_section = numpy.asarray(data['cross_section'], dtype=float)
+    except (OverflowError, TypeError, ValueError) as err:
+        raise ParameterError("Langmuir inputs must contain numeric values.") from err
+
     p_limits = data.get('p_limits')
 
-    # Check lengths
-    if len(pressure) == 0:
+    if pressure.ndim != 1 or loading.ndim != 1:
+        raise ParameterError("The pressure and loading inputs must be one-dimensional.")
+    if pressure.size == 0:
         raise ParameterError("Empty input values!")
-    if len(pressure) != len(loading):
+    if pressure.size != loading.size:
         raise ParameterError("The length of the pressure and loading arrays do not match.")
-
-    # Ensure numpy arrays, if not already
-    loading = numpy.asarray(loading)
-    pressure = numpy.asarray(pressure)
+    if not numpy.isfinite(pressure).all() or not numpy.isfinite(loading).all():
+        raise ParameterError("Pressure and loading values must be finite.")
+    if numpy.any((pressure < 0) | (pressure > 1)):
+        raise ParameterError("Relative pressures must be between 0 and 1.")
+    if numpy.any(loading < 0):
+        raise ParameterError("Loading values must be non-negative.")
+    if numpy.any(numpy.diff(pressure) < 0):
+        raise ParameterError("Pressure values must be in ascending order.")
+    if (
+        cross_section.shape != ()
+        or not numpy.isfinite(cross_section).item()
+        or cross_section.item() <= 0
+    ):
+        raise ParameterError("The molecular cross-sectional area must be a positive finite number.")
+    cross_section = float(cross_section)
 
     # select the maximum and minimum of the points and the pressure associated
     minimum = 0
@@ -277,12 +304,17 @@ def area_langmuir_raw(data: dict):
         ]
 
     minimum, maximum = get_pressure_limit_indices(pressure, p_limits)
-    if maximum - minimum < 2:  # (for 2 point minimum)
+    if maximum - minimum < 2:  # At least 3 points are required for regression.
         raise CalculationError(
-            "The isotherm does not have enough points (at least 2) in selected region. Unable to calculate Langmuir area."
+            "The isotherm does not have enough points (at least 3) in selected "
+            "region. Unable to calculate Langmuir area."
         )
     pressure = pressure[minimum : maximum + 1]
     loading = loading[minimum : maximum + 1]
+    if numpy.any(loading == 0):
+        raise ParameterError("Loading must be positive in the selected pressure range for the Langmuir transform.")
+    if numpy.unique(pressure).size < 2:
+        raise CalculationError("At least two distinct pressure values are required for the Langmuir fit.")
 
     # calculate the Langmuir slope and intercept
     langmuir_array = langmuir_transform(
@@ -302,8 +334,13 @@ def area_langmuir_raw(data: dict):
     )
 
     # Checks for consistency
-    if langmuir_const < 0:
-        logger.warning("The Langmuir constant is negative.")
+    for parameter, value in (
+        ("Langmuir constant", langmuir_const),
+        ("monolayer loading", n_monolayer),
+        ("Langmuir area", langmuir_area),
+    ):
+        if not numpy.isfinite(value) or value <= 0:
+            logger.warning(f"The {parameter} is not positive and finite.")
     if corr_coef < 0.99:
         logger.warning("The correlation is not linear.")
 

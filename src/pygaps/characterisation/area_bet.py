@@ -121,7 +121,8 @@ def area_BET(
     * The loading at the statistical monolayer should be situated within the
       limits of the BET region.
 
-    This module implements all these checks.
+    This module checks these conditions and emits warnings when they are not
+    met; it still returns the calculated estimate.
 
     Regardless, the BET surface area should still be interpreted carefully. The following
     assumptions are implicitly made in this approach:
@@ -331,12 +332,21 @@ def area_BET_raw(data: dict):
     )
 
     # Checks for consistency
-    if c_const < 0:
-        logger.warning("The C constant is negative.")
+    for parameter, value in (
+        ("C constant", c_const),
+        ("monolayer loading", n_monolayer),
+        ("monolayer pressure", p_monolayer),
+        ("BET area", bet_area),
+    ):
+        if not numpy.isfinite(value) or value <= 0:
+            logger.warning(f"The {parameter} is not positive and finite.")
+
     if corr_coef < 0.99:
         logger.warning("The correlation is not linear.")
     if not loading[0] < n_monolayer < loading[-1]:
         logger.warning("The monolayer point is not within the BET region")
+    if numpy.isfinite(p_monolayer) and not pressure[0] <= p_monolayer <= pressure[-1]:
+        logger.warning("The monolayer pressure is not within the BET region.")
 
     slope_intercept_covariance = -numpy.mean(pressure) * slope_stderr**2
     monolayer_variance = n_monolayer**4 * (

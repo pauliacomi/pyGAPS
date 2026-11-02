@@ -12,6 +12,8 @@ All pre-calculated data for characterisation can be found in the
 /.conftest file together with the other isotherm parameters.
 """
 
+import logging
+
 import pytest
 from numpy import array
 from numpy import isclose
@@ -57,7 +59,7 @@ class TestAreaLangmuir:
         with pytest.raises(pgEx.ParameterError):
             al.area_langmuir_raw({'pressure': P[1:], 'loading': L, 'cross_section': 1})
 
-        # should not take less than 3 points
+        # Fewer than 3 points cannot support the regression.
         with pytest.raises(pgEx.CalculationError):
             al.area_langmuir_raw(
                 {
@@ -83,6 +85,61 @@ class TestAreaLangmuir:
         # test using autolimits
         al.area_langmuir_raw({'pressure': P, 'loading': L, 'cross_section': 1})
 
+    @pytest.mark.parametrize(
+        ('pressure', 'loading', 'cross_section', 'message'),
+        [
+            ([[0.1, 0.2, 0.3]], [0.01, 0.02, 0.03], 0.1, 'one-dimensional'),
+            ([0.1, 0.2, 0.3], [0.01, float('nan'), 0.03], 0.1, 'finite'),
+            ([0.1, -0.2, 0.3], [0.01, 0.02, 0.03], 0.1, 'between 0 and 1'),
+            ([0.1, 1.1, 0.3], [0.01, 0.02, 0.03], 0.1, 'between 0 and 1'),
+            ([0.1, 0.2, 0.3], [0.01, -0.02, 0.03], 0.1, 'non-negative'),
+            ([0.1, 0.3, 0.2], [0.01, 0.02, 0.03], 0.1, 'ascending'),
+            ([0.1, 0.2, 0.3], [0.01, 0.02, 0.03], 0, 'positive finite'),
+            ([0.1, 0.2, 0.3], [0.01, 0.02, 0.03], float('inf'), 'positive finite'),
+        ],
+    )
+    def test_invalid_input_values_raise_parameter_error(self, pressure, loading, cross_section, message):
+        with pytest.raises(pgEx.ParameterError, match=message):
+            al.area_langmuir_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': cross_section,
+                    'p_limits': (0.0, 1.0),
+                }
+            )
+
+    def test_zero_loading_is_allowed_outside_selected_range(self):
+        pressure = array([0.0, 0.1, 0.2, 0.3, 0.4])
+        loading = array([0.0, 0.01, 0.018, 0.024, 0.028])
+
+        result = al.area_langmuir_raw({'pressure': pressure, 'loading': loading, 'cross_section': 0.1})
+
+        assert result['p_limit_indices'][0] > 0
+        assert result['area'] > 0
+
+    def test_zero_loading_in_selected_range_raises_parameter_error(self):
+        with pytest.raises(pgEx.ParameterError, match='Loading must be positive'):
+            al.area_langmuir_raw(
+                {
+                    'pressure': [0.0, 0.1, 0.2, 0.3],
+                    'loading': [0.0, 0.01, 0.02, 0.03],
+                    'cross_section': 0.1,
+                    'p_limits': (0.0, 0.3),
+                }
+            )
+
+    def test_repeated_selected_pressures_without_variation_raise_calculation_error(self):
+        with pytest.raises(pgEx.CalculationError, match='two distinct pressure values'):
+            al.area_langmuir_raw(
+                {
+                    'pressure': [0.1, 0.1, 0.1],
+                    'loading': [0.01, 0.02, 0.03],
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.1),
+                }
+            )
+
     def test_explicit_limits_include_upper_endpoint(self):
         """Both pressure limits include observations exactly on their bounds."""
         pressure = array([0.1, 0.2, 0.3, 0.4])
@@ -100,6 +157,68 @@ class TestAreaLangmuir:
         assert result['p_limit_indices'] == (0, 2)
         assert result['area'] > 0
         assert result['area_stderr'] >= 0
+
+    def test_nonpositive_langmuir_parameters_emit_warnings(self, caplog):
+        pressure = array([0.0625, 0.125, 0.1875, 0.25])
+        transformed = 0.5 - pressure
+        loading = pressure / transformed
+
+        with caplog.at_level(logging.WARNING):
+            result = al.area_langmuir_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': 0.1,
+                    'p_limits': (pressure[0], pressure[-1]),
+                }
+            )
+
+        assert result['langmuir_const'] < 0
+        assert result['n_monolayer'] < 0
+        assert result['area'] < 0
+        assert "The Langmuir constant is not positive and finite." in caplog.text
+        assert "The monolayer loading is not positive and finite." in caplog.text
+        assert "The Langmuir area is not positive and finite." in caplog.text
+
+    def test_nonfinite_langmuir_parameters_emit_warnings(self, caplog):
+        pressure = array([0.0625, 0.125, 0.1875, 0.25])
+        loading = pressure.copy()
+
+        with caplog.at_level(logging.WARNING):
+            result = al.area_langmuir_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': 0.1,
+                    'p_limits': (pressure[0], pressure[-1]),
+                }
+            )
+
+        assert result['langmuir_const'] == 0
+        assert not isfinite(result['n_monolayer'])
+        assert not isfinite(result['area'])
+        assert "The Langmuir constant is not positive and finite." in caplog.text
+        assert "The monolayer loading is not positive and finite." in caplog.text
+        assert "The Langmuir area is not positive and finite." in caplog.text
+
+    def test_nonfinite_langmuir_constant_emits_warning(self, caplog):
+        pressure = array([0.0625, 0.125, 0.1875, 0.25])
+        loading = array([1.0, 1.0, 1.0, 1.0])
+
+        with caplog.at_level(logging.WARNING):
+            result = al.area_langmuir_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': 0.1,
+                    'p_limits': (pressure[0], pressure[-1]),
+                }
+            )
+
+        assert not isfinite(result['langmuir_const'])
+        assert "The Langmuir constant is not positive and finite." in caplog.text
+        assert "The monolayer loading is not positive and finite." not in caplog.text
+        assert "The Langmuir area is not positive and finite." not in caplog.text
 
     @pytest.mark.parametrize(
         'p_limits',

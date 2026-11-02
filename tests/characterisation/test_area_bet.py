@@ -162,6 +162,67 @@ class TestAreaBET:
         with pytest.raises(pgEx.ParameterError, match='dictionary'):
             ab.area_BET_raw([0.1, 0.2, 0.3])
 
+    def test_monolayer_pressure_outside_selected_region_warns(self, caplog):
+        pressure = linspace(0.5, 0.8, 8)
+        loading = ab.simple_bet(pressure, 0.02, 10)
+
+        with caplog.at_level(logging.WARNING):
+            ab.area_BET_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': 0.1,
+                    'p_limits': (0.5, 0.8),
+                }
+            )
+
+        assert "The monolayer pressure is not within the BET region." in caplog.messages
+
+    def test_monolayer_pressure_within_selected_region_does_not_warn(self, caplog):
+        pressure = linspace(0.1, 0.4, 8)
+        loading = ab.simple_bet(pressure, 0.02, 10)
+
+        with caplog.at_level(logging.WARNING):
+            result = ab.area_BET_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.4),
+                }
+            )
+
+        assert pressure[0] <= result['p_monolayer'] <= pressure[-1]
+        assert "The monolayer pressure is not within the BET region." not in caplog.messages
+
+    @pytest.mark.parametrize(
+        ('parameter_index', 'invalid_value', 'warning'),
+        [
+            (2, 0, "The C constant is not positive and finite."),
+            (0, float('nan'), "The monolayer loading is not positive and finite."),
+            (1, float('inf'), "The monolayer pressure is not positive and finite."),
+            (3, -1, "The BET area is not positive and finite."),
+        ],
+    )
+    def test_invalid_bet_parameters_warn(self, monkeypatch, caplog, parameter_index, invalid_value, warning):
+        parameters = [0.02, 0.2, 10, 1.0]
+        parameters[parameter_index] = invalid_value
+        monkeypatch.setattr(ab, 'bet_parameters', lambda *_: tuple(parameters))
+        pressure = linspace(0.1, 0.4, 8)
+        loading = ab.simple_bet(pressure, 0.02, 10)
+
+        with caplog.at_level(logging.WARNING):
+            ab.area_BET_raw(
+                {
+                    'pressure': pressure,
+                    'loading': loading,
+                    'cross_section': 0.1,
+                    'p_limits': (0.1, 0.4),
+                }
+            )
+
+        assert warning in caplog.messages
+
     @pytest.mark.parametrize('sample', DATA.values())
     def test_area_bet(self, sample, data_char_path):
         """Test calculation with several model isotherms."""
