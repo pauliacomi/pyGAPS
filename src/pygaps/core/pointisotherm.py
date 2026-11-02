@@ -8,8 +8,10 @@ import pandas
 
 from pygaps import logger
 from pygaps.core.baseisotherm import BaseIsotherm
+from pygaps.units.converter_mode import _MATERIAL_MODE
 from pygaps.units.converter_mode import c_loading_material
 from pygaps.units.converter_mode import c_pressure
+from pygaps.units.converter_unit import _check_unit
 from pygaps.utilities.exceptions import CalculationError
 from pygaps.utilities.exceptions import ParameterError
 from pygaps.utilities.exceptions import pgError
@@ -353,6 +355,9 @@ class PointIsotherm(BaseIsotherm):
     ):
         """Permanently convert any isotherm mode/basis/units.
 
+        Omitted units retain their current values when the corresponding
+        mode/basis is unchanged. No-op requests leave data and caches unchanged.
+
         Parameters
         ----------
         pressure_mode : {'absolute', 'relative', 'relative%'}
@@ -412,6 +417,7 @@ class PointIsotherm(BaseIsotherm):
         unit_to : str
             The unit into which the internal pressure should be converted to.
             Only makes sense if converting to absolute pressure.
+            If omitted and the mode is unchanged, retain the current unit.
         verbose : bool
             Print out steps taken.
         pseudo: bool, optional
@@ -421,6 +427,9 @@ class PointIsotherm(BaseIsotherm):
         """
         if not mode_to:
             mode_to = self.pressure_mode
+
+        if unit_to is None and mode_to == self.pressure_mode:
+            unit_to = self.pressure_unit
 
         if mode_to == self.pressure_mode and unit_to == self.pressure_unit:
             if verbose:
@@ -447,10 +456,7 @@ class PointIsotherm(BaseIsotherm):
 
         if mode_to != self.pressure_mode:
             self.pressure_mode = mode_to
-        if unit_to != self.pressure_unit and mode_to == 'absolute':
-            self.pressure_unit = unit_to
-        else:
-            self.pressure_unit = None
+        self.pressure_unit = unit_to if mode_to == 'absolute' else None
 
         # Reset interpolators
         self.l_interpolator = None
@@ -478,12 +484,16 @@ class PointIsotherm(BaseIsotherm):
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the internal loading should be converted to.
+            If omitted and the basis is unchanged, retain the current unit.
         verbose : bool
             Print out steps taken.
 
         """
         if not basis_to:
             basis_to = self.loading_basis
+
+        if unit_to is None and basis_to == self.loading_basis:
+            unit_to = self.loading_unit
 
         if basis_to == self.loading_basis and unit_to == self.loading_unit:
             if verbose:
@@ -496,9 +506,6 @@ class PointIsotherm(BaseIsotherm):
                 if verbose:
                     logger.info("There are no loading units in this mode.")
                 return
-
-        if unit_to is None and basis_to == self.loading_basis:
-            unit_to = self.loading_unit
 
         self.data_raw[self.loading_key] = c_loading_material(
             self.data_raw[self.loading_key],
@@ -551,12 +558,16 @@ class PointIsotherm(BaseIsotherm):
             The basis in which the isotherm should be converted.
         unit_to : str
             The unit into which the material should be converted to.
+            If omitted and the basis is unchanged, keep the current unit.
         verbose : bool
             Print out steps taken.
 
         """
         if not basis_to:
             basis_to = self.material_basis
+
+        if unit_to is None and basis_to == self.material_basis:
+            unit_to = self.material_unit
 
         if basis_to == self.material_basis and unit_to == self.material_unit:
             if verbose:
@@ -567,13 +578,11 @@ class PointIsotherm(BaseIsotherm):
             'percent', 'fraction'
         ] and basis_to == self.material_basis and unit_to != self.material_unit:
             # We "virtually" change the unit without any conversion
+            _check_unit(unit_to, _MATERIAL_MODE[basis_to], 'material')
             self.material_unit = unit_to
             if verbose:
                 logger.info("There are no material units in this mode.")
             return
-
-        if unit_to is None and basis_to == self.material_basis:
-            unit_to = self.material_unit
 
         self.data_raw[self.loading_key] = c_loading_material(
             self.data_raw[self.loading_key],

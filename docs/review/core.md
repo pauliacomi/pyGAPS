@@ -219,6 +219,14 @@ unit when the basis/mode does not change, validate the complete destination
 state before mutation, and preserve the no-op state exactly. Test all three
 methods and `convert`, including serialization/reconstruction afterward.
 
+**Resolution (feature/core-updates).** Conversion methods now resolve omitted
+units before their no-op checks, preserving numeric data, metadata, and cached
+interpolators. This includes fractional material bases, whose units are only
+relabelled when explicitly requested and valid. Parameterized regressions cover
+omitted/basis-only/unit-only/explicit calls through each conversion method and
+the convenience method, for physical, fractional, percentage, and relative
+representations, followed by reconstruction and JSON round trips.
+
 **Sources:** [pressure metadata update](../../src/pygaps/core/pointisotherm.py#L428),
 [loading metadata update](../../src/pygaps/core/pointisotherm.py#L491),
 [material metadata update](../../src/pygaps/core/pointisotherm.py#L552).

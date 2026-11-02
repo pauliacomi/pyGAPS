@@ -6,6 +6,7 @@ import pytest
 from pandas.testing import assert_series_equal
 
 import pygaps
+import pygaps.parsing as pgp
 import pygaps.utilities.exceptions as pgEx
 from pygaps.modelling import model_from_dict
 
@@ -759,6 +760,71 @@ class TestPointIsotherm:
             assert basic_pointisotherm.material_basis == parameters['basis_to']
         if 'unit_to' in parameters:
             assert basic_pointisotherm.material_unit == parameters['unit_to']
+
+    @pytest.mark.parametrize('representation', ['physical', 'fraction', 'percent', 'relative'])
+    @pytest.mark.parametrize('conversion', ['pressure', 'loading', 'material', 'all'])
+    @pytest.mark.parametrize('arguments', ['omitted', 'basis', 'unit', 'explicit'])
+    def test_isotherm_convert_noop(self, isotherm_parameters, representation, conversion, arguments):
+        parameters = isotherm_parameters.copy()
+        if representation in ['fraction', 'percent']:
+            parameters.update(loading_basis=representation, loading_unit=None)
+        elif representation == 'relative':
+            parameters.update(pressure_mode='relative', pressure_unit=None)
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3], loading=[1, 2, 3], branch='ads', **parameters
+        )
+        point.loading_at(2)
+        point.pressure_at(2)
+        before_data = point.data_raw.copy(deep=True)
+        before_units = point.units.copy()
+        before_metadata = point.to_dict()
+        before_interpolators = (point.l_interpolator, point.p_interpolator)
+        options = {}
+        for variable in ['pressure', 'loading', 'material']:
+            if conversion not in [variable, 'all']:
+                continue
+            basis = 'mode' if variable == 'pressure' else 'basis'
+            if arguments in ['basis', 'explicit']:
+                key = f'{variable}_{basis}' if conversion == 'all' else f'{basis}_to'
+                options[key] = getattr(point, f'{variable}_{basis}')
+            if arguments in ['unit', 'explicit']:
+                key = f'{variable}_unit' if conversion == 'all' else 'unit_to'
+                options[key] = getattr(point, f'{variable}_unit')
+
+        method = point.convert if conversion == 'all' else getattr(point, f'convert_{conversion}')
+        method(**options)
+
+        pandas.testing.assert_frame_equal(point.data_raw, before_data)
+        assert point.units == before_units
+        assert point.to_dict() == before_metadata
+        assert (point.l_interpolator, point.p_interpolator) == before_interpolators
+        rebuilt = pygaps.PointIsotherm(
+            isotherm_data=point.data_raw.copy(),
+            pressure_key=point.pressure_key, loading_key=point.loading_key,
+            **point.to_dict(),
+        )
+        restored = pgp.isotherm_from_json(pgp.isotherm_to_json(point))
+        for other in [rebuilt, restored]:
+            assert other.units == before_units
+            numpy.testing.assert_array_equal(other.pressure(), point.pressure())
+            numpy.testing.assert_array_equal(other.loading(), point.loading())
+
+    @pytest.mark.parametrize('loading_basis', ['fraction', 'percent'])
+    def test_isotherm_convert_fractional_material_unit(self, isotherm_parameters, loading_basis):
+        parameters = {**isotherm_parameters, 'loading_basis': loading_basis, 'loading_unit': None}
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3], loading=[0.01, 0.02, 0.03], branch='ads', **parameters
+        )
+        before = point.data_raw.copy(deep=True)
+
+        point.convert_material(unit_to='kg')
+
+        assert point.material_unit == 'kg'
+        pandas.testing.assert_frame_equal(point.data_raw, before)
+        with pytest.raises(pgEx.ParameterError, match='Unit selected'):
+            point.convert_material(unit_to='bad_unit')
+        assert point.material_unit == 'kg'
+        pandas.testing.assert_frame_equal(point.data_raw, before)
 
     @pytest.mark.parametrize(
         'parameters, cause_message',
