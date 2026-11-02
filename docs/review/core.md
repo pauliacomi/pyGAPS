@@ -164,6 +164,13 @@ subcritical paths. Avoid introducing a double conversion in the existing
 backend-failure fallback. Test Pa/bar and another unit for calculated, stored,
 fallback and pseudo-helper paths.
 
+**Resolution (feature/core-updates).** Stored saturation pressures are
+documented as Pa and now share the calculated path's output conversion.
+Backend fallback retrieves Pa to avoid double conversion, and the subcritical
+Dubinin helper forwards the requested unit. Deterministic tests cover default
+Pa, explicit Pa, bar, and kPa for calculated, stored, fallback, alias, and
+subcritical/critical/supercritical pseudo-helper paths.
+
 **Sources:** [stored saturation pressure](../../src/pygaps/core/adsorbate.py#L565),
 [subcritical pseudo helper](../../src/pygaps/core/adsorbate.py#L609).
 

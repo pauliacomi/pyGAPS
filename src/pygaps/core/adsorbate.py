@@ -496,7 +496,7 @@ class Adsorbate:
             If not specifies defaults to Pascal.
         calculate : bool, optional
             Whether to calculate the property or look it up in the properties
-            dictionary, default - True.
+            dictionary, default - True. Stored saturation pressures are in Pa.
 
         Returns
         -------
@@ -533,7 +533,7 @@ class Adsorbate:
             If not specifies defaults to Pascal.
         calculate : bool, optional
             Whether to calculate the property or look it up in the properties
-            dictionary, default - True.
+            dictionary, default - True. Stored saturation pressures are in Pa.
         pseudo: str, optional
             Whether to calculate a pseudo-saturation pressure for a
             supercritical adsorbate, default - False.
@@ -569,16 +569,17 @@ class Adsorbate:
                 sat_p = state.p()
             except BaseException as err:
                 _warn_reading_params(err)
-                sat_p = self.saturation_pressure(temp, unit=unit, calculate=False)
+                sat_p = self.saturation_pressure(temp, calculate=False)
+        else:
+            try:
+                sat_p = self.get_prop("saturation_pressure")
+            except ParameterError as err:
+                _raise_calculation_error(err)
 
-            if unit is not None:
-                sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
-            return sat_p
-
-        try:
-            return self.get_prop("saturation_pressure")
-        except ParameterError as err:
-            _raise_calculation_error(err)
+        # Both the backend and stored property provide Pa; convert only at output.
+        if unit is not None:
+            sat_p = c_unit(_PRESSURE_UNITS, sat_p, 'Pa', unit)
+        return sat_p
 
     def saturation_pressure_pseudo_dubinin(
         self,
@@ -608,7 +609,7 @@ class Adsorbate:
         """
         if temp < self.t_critical():
             logger.warning(f'{self.name} is below critical temperature. Returning real saturation pressure.')
-            return self.saturation_pressure(temp=temp)
+            return self.saturation_pressure(temp=temp, unit=unit)
         if k < 1:
             raise ParameterError(f'The value for the exponent, k, is too small ({k}).')
 
