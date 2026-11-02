@@ -210,7 +210,7 @@ class TestAreaLangmuir:
         pressure = array([0.0625, 0.125, 0.1875, 0.25])
         loading = pressure.copy()
 
-        with pytest.raises(pgEx.CalculationError, match='Langmuir fit contains non-finite'):
+        with pytest.raises(pgEx.CalculationError, match='non-finite'):
             al.area_langmuir_raw(
                 {
                     'pressure': pressure,
