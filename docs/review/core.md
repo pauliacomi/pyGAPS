@@ -246,6 +246,15 @@ commit data, units and cache invalidation together only after every step
 succeeds. Test missing-property and invalid-unit failures after the first
 stage, comparing data, metadata and cached results before and after.
 
+**Resolution (feature/core-updates).** C1's shared conversion path already
+removed the intermediate assignment: loading/material conversion finishes
+before stored data, metadata, or caches change. Dedicated regressions now
+verify missing-density and invalid-unit failures after successful conversion
+to molar loading, for fractions and percentages with and without cached
+interpolators. They check unchanged data, metadata, cache identities, and
+subsequent interpolation results. Successful conversions also verify that both
+caches are reset and rebuilt with the converted values.
+
 **Source:** [two-stage material conversion](../../src/pygaps/core/pointisotherm.py#L570).
 
 ### C8. Direct data edits leave interpolation caches stale

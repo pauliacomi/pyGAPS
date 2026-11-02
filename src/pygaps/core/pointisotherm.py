@@ -478,6 +478,8 @@ class PointIsotherm(BaseIsotherm):
         and the basis of the isotherm loading to be
         either 'mass', 'molar' or 'percent'/'fraction'.
 
+        If conversion fails, data, unit metadata, and interpolators are unchanged.
+
         Parameters
         ----------
         basis_to : {'mass', 'molar', 'volume_gas', 'volume_liquid', 'percent', 'fraction'}
@@ -551,6 +553,8 @@ class PointIsotherm(BaseIsotherm):
 
         Only applicable to materials that have been loaded in memory with a
         'density' or 'molar mass' property respectively.
+
+        If conversion fails, data, unit metadata, and interpolators are unchanged.
 
         Parameters
         ----------

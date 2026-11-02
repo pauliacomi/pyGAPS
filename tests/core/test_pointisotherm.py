@@ -7,6 +7,7 @@ from pandas.testing import assert_series_equal
 
 import pygaps
 import pygaps.parsing as pgp
+import pygaps.units.converter_mode as converters
 import pygaps.utilities.exceptions as pgEx
 from pygaps.modelling import model_from_dict
 
@@ -862,6 +863,73 @@ class TestPointIsotherm:
 
         pandas.testing.assert_frame_equal(basic_pointisotherm.data_raw, before_data)
         assert basic_pointisotherm.units == before_units
+
+    @pytest.mark.parametrize('loading_basis', ['fraction', 'percent'])
+    @pytest.mark.parametrize('conversion', ['loading', 'material'])
+    @pytest.mark.parametrize('failure', ['missing-density', 'invalid-unit'])
+    @pytest.mark.parametrize('cached', [False, True])
+    def test_fractional_conversion_failure_preserves_state(
+        self, monkeypatch, fractional_conversion_parameters, loading_basis, conversion, failure, cached,
+    ):
+        parameters = {**fractional_conversion_parameters, 'loading_basis': loading_basis, 'loading_unit': None}
+        loadings = numpy.array([0.01, 0.02, 0.03])
+        if loading_basis == 'percent':
+            loadings *= 100
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3], loading=loadings, branch='ads', **parameters
+        )
+        if cached:
+            point.loading_at(1.5)
+            point.pressure_at(loadings[0] * 1.5)
+        before_data = point.data_raw.copy(deep=True)
+        before_metadata = point.to_dict()
+        before_interpolators = (point.l_interpolator, point.p_interpolator)
+        intermediate = []
+        original_conversion = converters.c_loading
+
+        def capture_conversion(*args, **kwargs):
+            result = original_conversion(*args, **kwargs)
+            intermediate.append(result.copy())
+            return result
+
+        monkeypatch.setattr(converters, 'c_loading', capture_conversion)
+        if failure == 'missing-density':
+            monkeypatch.delattr(point.adsorbate, 'liquid_density')
+            monkeypatch.delattr(point.adsorbate, 'liquid_molar_density')
+            error, message = pgEx.CalculationError, 'liquid_molar_density'
+        else:
+            error, message = pgEx.ParameterError, 'Unit selected'
+        basis_to = 'volume' if conversion == 'material' else 'volume_liquid'
+        unit_to = 'cm3' if failure == 'missing-density' else 'invalid'
+
+        with pytest.raises(error, match=message):
+            getattr(point, f'convert_{conversion}')(basis_to=basis_to, unit_to=unit_to)
+
+        assert len(intermediate) == 1
+        numpy.testing.assert_allclose(intermediate[0], [0.001, 0.002, 0.003])
+        pandas.testing.assert_frame_equal(point.data_raw, before_data)
+        assert point.to_dict() == before_metadata
+        assert (point.l_interpolator, point.p_interpolator) == before_interpolators
+        assert point.loading_at(1.5) == pytest.approx(loadings[0] * 1.5)
+        assert point.pressure_at(loadings[0] * 1.5) == pytest.approx(1.5)
+
+    @pytest.mark.parametrize('conversion', ['loading', 'material'])
+    def test_fractional_conversion_success_resets_caches(self, fractional_conversion_parameters, conversion):
+        parameters = {**fractional_conversion_parameters, 'loading_basis': 'fraction', 'loading_unit': None}
+        point = pygaps.PointIsotherm(
+            pressure=[1, 2, 3], loading=[0.01, 0.02, 0.03], branch='ads', **parameters
+        )
+        point.loading_at(1.5)
+        point.pressure_at(0.015)
+        basis_to = 'volume' if conversion == 'material' else 'volume_liquid'
+
+        getattr(point, f'convert_{conversion}')(basis_to=basis_to, unit_to='cm3')
+
+        assert point.l_interpolator is None
+        assert point.p_interpolator is None
+        expected = 0.06 if conversion == 'material' else 0.03
+        assert point.loading_at(1.5) == pytest.approx(expected)
+        assert point.pressure_at(expected) == pytest.approx(1.5)
 
     def test_isotherm_convert_complex(
         self,
