@@ -43,11 +43,11 @@ Apparatus files
 
     Supported manufacturer and format combinations:
 
-    * ``smsdvs``: ``xlsx`` (SMS DVS)
     * ``bel``: ``csv``, ``xl``, or ``dat`` (BEL)
     * ``mic``: ``xl`` (Micromeritics)
     * ``3p``: ``xl`` (3P Instruments)
     * ``qnt``: ``txt-raw`` (Quantachrome)
+    * ``smsdvs``: ``xlsx`` (SMS DVS)
 
 Sqlite
 ------

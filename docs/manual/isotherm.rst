@@ -565,9 +565,8 @@ For a :class:`~pygaps.core.pointisotherm.PointIsotherm`, its data values are
 rounded to eight decimal places before the data hash is calculated; the model
 representation is used for a :class:`~pygaps.core.modelisotherm.ModelIsotherm`.
 The resulting data/model hash and isotherm parameters are serialized and hashed
-with ``hashlib.md5``. Thus, equal IDs are not proof of exact data identity:
-small differences lost by rounding (and hash collisions) can produce equal
-IDs. Do not rely on ``iso_id`` or equality as an exact uniqueness test.
+with ``hashlib.md5``. Thus, small differences lost by rounding (and hash
+collisions) can produce equal IDs.
 
 The ID can be read as:
 

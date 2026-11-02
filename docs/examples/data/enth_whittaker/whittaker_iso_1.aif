@@ -1,0 +1,91 @@
+data_75025777a111751043c9afd9825e404c
+
+_audit_aif_version v1.0
+_audit_creation_method 'pyGAPS export'
+_audit_creation_software 'pyGAPS 4.6.2'
+
+_exptl_temperature 298.0
+_exptl_operator example
+_exptl_date 2021-02-17T08:47:41
+_exptl_instrument XEMIS
+_exptl_method unspecified
+
+_adsnt_material_name unknown
+_adsnt_sample_mass unknown
+_adsnt_sample_name example
+
+_adsorptive_name methane
+_adsorptive_formula 'CH_{4}'
+_adsorptive_molecular_weight 16.0428
+_adsorptive_kinetic_diameter 0.3758
+
+_units_temperature K
+_units_pressure mbar
+_units_sorbed_amount mmol/g
+_units_kinetic_diameter nm
+_units_molecular_weight g/mol
+_units_mass g
+
+_pygaps_pressure_mode absolute
+_pygaps_pressure_unit mbar
+_pygaps_material_basis mass
+_pygaps_material_unit g
+_pygaps_loading_basis molar
+_pygaps_loading_unit mmol
+_pygaps_temperature_unit K
+
+loop_
+_adsorp_index
+_adsorp_pressure
+_adsorp_amount
+1 75.39 0.1
+2 131.98 0.17
+3 181.07 0.23
+4 263.67 0.33
+5 279.52 0.31
+6 459.58 0.52
+7 510.23 0.58
+8 659.79 0.74
+9 628.92 0.7
+10 885.5 0.96
+11 1088.7 1.17
+12 1293.94 1.37
+13 1583.51 1.65
+14 1483.12 1.56
+15 2035.92 2.04
+16 2453.87 2.39
+17 2849.26 2.7
+18 3090.33 2.88
+19 3533.74 3.2
+20 4039.42 3.55
+21 4537.2 3.88
+22 5036.55 4.19
+23 5537.8 4.49
+24 6039.78 4.77
+25 7034.48 5.3
+26 8036.22 5.8
+27 9034.12 6.26
+28 10033.12 6.7
+29 11029.79 7.1
+30 12030.51 7.49
+31 14029.19 8.19
+32 15524.53 8.67
+33 17024.06 9.11
+34 19020.91 9.66
+35 20018.8 9.91
+36 22019.02 10.39
+37 25012.08 11.04
+38 27011.88 11.43
+39 29996.69 11.96
+40 33001.36 12.45
+41 35001.36 12.75
+42 36997.73 13.03
+43 39990.58 13.42
+44 49975.91 14.48
+45 54971.39 14.9
+46 59967.2 15.27
+47 64957.18 15.58
+48 69953.71 15.85
+49 79938.68 16.26
+50 89941.91 16.52
+51 99935.88 16.68

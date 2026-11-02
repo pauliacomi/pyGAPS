@@ -47,9 +47,9 @@ To set up `pyGAPS` for local development:
 1. Fork `pyGAPS <https://github.com/pauliacomi/pygaps>`_
    (look for the "Fork" button).
 
-2. Clone the ``develop`` branch of your fork locally, then enter the checkout::
+2. Clone your fork locally, then enter the checkout::
 
-    git clone --branch develop --single-branch https://github.com/YOURNAMEHERE/pyGAPS
+    git clone https://github.com/YOURNAMEHERE/pyGAPS
     cd pyGAPS
 
 3. Install `uv <https://docs.astral.sh/uv/>`_ if you haven't already::

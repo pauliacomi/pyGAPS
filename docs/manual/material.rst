@@ -16,16 +16,14 @@ For this case, pyGAPS provides the :class:`~pygaps.core.material.Material`
 class.
 
 The :ref:`isotherm<isotherms-manual>` required property of ``material`` is used
-to create or connect a :class:`~pygaps.core.baseisotherm.BaseIsotherm` instance to a
-:class:`~pygaps.core.material.Material`. Each time an isotherm is created,
+to create or connect a :class:`~pygaps.core.baseisotherm.BaseIsotherm` instance
+to a :class:`~pygaps.core.material.Material`. Each time an isotherm is created,
 pyGAPS looks in the main material list (``pygaps.MATERIAL_LIST``) for an
 instance with the same name. This list is populated as import-time with
 materials stored in the internal database. The user can also add their own
 material to the list, or upload it to a user-owned database for persistent
-storage. The packaged database is not a durable personal store; changes to it
-may be lost or unavailable after reinstall or upgrade. If the
-material does not exist in ``pygaps.MATERIAL_LIST``, pyGAPS will create a new
-instance for the isotherm.
+storage. If the material does not exist in ``pygaps.MATERIAL_LIST``, pyGAPS will
+create a new instance for the isotherm.
 
 Any calculations/conversions then rely on the
 :class:`~pygaps.core.material.Material` for providing parameters such as
@@ -145,31 +143,19 @@ A useful shorthand is to pass an optional parameter ``store`` at creation
     This makes the material available **only** in the current session. No
     permanent changes to the materials are made this way.
 
-To store a custom material in a database for later use, upload it to a
-user-owned copy of the packaged database. The example below creates the copy
-only when the destination does not already exist. Pass ``db_path`` by keyword
-for every database operation; omitting it targets the packaged database, and
-passing a path positionally may also target the packaged database.
+To store a custom material in a database for later use, upload it to the
+internal database or a user-owned copy of the packaged database.
 
 .. code-block:: python
 
-    from pathlib import Path
-    from shutil import copy2
     import pygaps
     import pygaps.parsing as pgp
 
-    db_path = Path("my-pygaps.db")
-    if not db_path.exists():
-        copy2(pygaps.DATABASE, db_path)
-
     mat_new = pygaps.Material("my-carbon", density=1, molar_mass=256)
-    pgp.material_to_db(mat_new, db_path=db_path)
+    pgp.material_to_db(mat_new)
 
     # Overwrite replaces all stored fields for this material.
-    # pgp.material_to_db(mat_new, db_path=db_path, overwrite=True)
-
-Keep backups of this user-owned database. Do not treat changes to the packaged
-database as permanent.
+    # pgp.material_to_db(mat_new, overwrite=True)
 
 For more info, check out the :ref:`sqlite <sqlite-manual>` section of the
 manual.

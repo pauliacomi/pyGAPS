@@ -62,7 +62,9 @@ jobs:
     - name: Install dependencies
       run: uv sync --frozen --no-default-groups --group docs --group test
     - name: Execute notebooks on disposable data
-      run: uv run --no-sync pytest tests/documentation -m documentation -v --basetemp=dist/notebook-tests
+      run: |
+        mkdir -p dist
+        uv run --no-sync pytest tests/documentation -m documentation -v --basetemp=dist/notebook-tests
     - name: Upload executed notebooks
       if: always()
       uses: actions/upload-artifact@v6

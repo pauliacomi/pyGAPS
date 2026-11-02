@@ -19,8 +19,8 @@ parameter, a string which pyGAPS looks up in an internal list
 this connects the isotherm object and the existing adsorbate class. This global
 list is populated at import time with the adsorbates stored in the packaged
 database. The user can also add their own adsorbate to the list, or upload it to
-a user-owned database for persistent storage. The packaged database is not a
-durable personal store; changes to it may be lost or unavailable after
+a user-owned database for persistent storage. Note that the packaged database is
+not a durable personal store as changes to it may be lost or unavailable after
 reinstall or upgrade.
 
 Any calculations/conversions then rely on the
@@ -202,29 +202,18 @@ A useful shorthand is to pass an optional parameter ``store`` at creation
     This makes the adsorbate available **only** in the current session. No
     permanent changes to the internal adsorbates are made this way.
 
-To store a custom adsorbate in a database for later use, upload it to a
-user-owned copy of the packaged database. Pass ``db_path`` by keyword for
-every database operation; omitting it targets the packaged database, and
-passing a path positionally may also target the packaged database.
+To store a custom adsorbate in a database for later use, upload it to the
+default database or a user-owned copy of it.
 
 .. code-block:: python
 
-    from pathlib import Path
-    from shutil import copy2
-    import pygaps
     import pygaps.parsing as pgp
 
-    db_path = Path("my-pygaps.db")
-    if not db_path.exists():
-        copy2(pygaps.DATABASE, db_path)
-
-    pgp.adsorbate_to_db(my_adsorbate, db_path=db_path)
+    # To permanently store in the database
+    pgp.adsorbate_to_db(my_adsorbate)
 
     # Overwrite replaces all stored fields for this adsorbate.
-    # pgp.adsorbate_to_db(my_adsorbate, db_path=db_path, overwrite=True)
-
-Keep backups of this user-owned database. Do not treat changes to the packaged
-database as permanent.
+    pgp.adsorbate_to_db(my_adsorbate, overwrite=True)
 
 For more info, check out the :ref:`sqlite <sqlite-manual>` section of the
 manual.

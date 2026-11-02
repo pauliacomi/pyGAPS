@@ -22,12 +22,12 @@ still extensible, functionality. Suggests for further improvements are welcome.
 
 .. warning::
 
-    The default database is packaged with pyGAPS; it is not a user-owned data
-    directory or a durable personal store. Changes to it may be unavailable
-    when package resources are temporary or read-only, and can be lost when the
-    package is reinstalled or upgraded. For data you need to keep, make and
-    back up a user-owned copy, and direct every database read, write, and delete
-    to that copy with ``db_path=...``.
+    The default database is packaged with pyGAPS, it may not be a durable
+    personal store. Changes to it may be unavailable when package resources are
+    temporary or read-only, and can be lost when the package is reinstalled or
+    upgraded. For data you need to keep, make and back up a user-owned copy, and
+    direct every database read, write, and delete to that copy with
+    ``db_path=...``.
 
 
 .. _sqlite-manual-structure:
@@ -53,12 +53,9 @@ Database methods
 ----------------
 
 Database functions accept a ``db_path`` keyword. Always pass a custom path by
-keyword: for example, ``material_to_db(material, db_path=my_db)``. Do not pass
-the path as a positional argument; the connection helper only reads
-``db_path`` from keyword arguments, so a positional path can be ignored and the
-packaged database used instead. If ``db_path`` is omitted, the packaged
-database is used. A complete list of methods can be found in the
-:mod:`~pygaps.parsing.sqlite` reference.
+keyword: for example, ``material_to_db(material, db_path=my_db)``. If
+``db_path`` is omitted, the packaged database is used. A complete list of
+methods can be found in the :mod:`~pygaps.parsing.sqlite` reference.
 
 
 .. _sqlite-manual-examples:
@@ -68,8 +65,8 @@ Database example
 
 Check out the Jupyter notebook in the `examples <../examples/database.ipynb>`_
 section. Before running any example that writes to or deletes from a database,
-make a user-owned copy and pass its path by the ``db_path`` keyword on every
-operation. Do not run writes or deletes against the packaged default database.
+it is recommended to make a user-owned copy and pass its path by the ``db_path``
+keyword on every operation.
 
 
 .. _sqlite-manual-creation:

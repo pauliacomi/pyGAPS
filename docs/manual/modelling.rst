@@ -32,8 +32,8 @@ often be reliably fitted to a suitable model.
 
 .. _modelling-implementation:
 
-Modelling in pyGAPS
--------------------
+Model fitting in pyGAPS
+-----------------------
 
 In pyGAPS, the :class:`~pygaps.core.pointisotherm.PointIsotherm` stores
 experimental point data, while the
