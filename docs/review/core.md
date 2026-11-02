@@ -139,6 +139,13 @@ evaluation in forward and reverse IAST. Add a mixed-branch numerical oracle and
 desorption-only regressions; also cover the spreading-pressure corrections in
 C2/C13. This is a downstream consumer defect, not solely a core-class defect.
 
+**Resolution (feature/core-updates).** Forward and reverse IAST now pass the
+requested branch to every loading evaluation, including the default forward
+initial guess. Henry-law oracle tests cover mixed branches, desorption-only
+points in descending order with a zero origin, and desorption models, with
+default and explicit solver guesses. Reverse results also round-trip through
+the gas-fraction wrapper.
+
 **Sources:** [forward initial guess](../../src/pygaps/prediction/iast.py#L378),
 [forward loading](../../src/pygaps/prediction/iast.py#L428),
 [reverse loading](../../src/pygaps/prediction/iast.py#L626).

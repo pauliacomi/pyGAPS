@@ -375,7 +375,7 @@ def iast_point(
     if adsorbed_mole_fraction_guess is None:
         # Default guess: pure-component loadings at these partial pressures.
         loading_guess = numpy.asarray([
-            isotherms[i].loading_at(partial_pressures[i]) for i in range(n_components)
+            isotherms[i].loading_at(partial_pressures[i], branch=branch) for i in range(n_components)
         ])
         adsorbed_mole_fraction_guess = loading_guess / numpy.sum(loading_guess)
     else:
@@ -425,7 +425,7 @@ def iast_point(
     # solve for the total gas adsorbed
     inverse_loading = 0.0
     for i in range(n_components):
-        inverse_loading += adsorbed_mole_fractions[i] / isotherms[i].loading_at(pressure0[i])
+        inverse_loading += adsorbed_mole_fractions[i] / isotherms[i].loading_at(pressure0[i], branch=branch)
     loading_total = 1.0 / inverse_loading
 
     # get loading of each component by multiplying by mole fractions
@@ -623,7 +623,7 @@ def reverse_iast(
     # solve for the total gas adsorbed
     inverse_loading = 0.0
     for i in range(n_components):
-        inverse_loading += adsorbed_mole_fractions[i] / isotherms[i].loading_at(pressure0[i])
+        inverse_loading += adsorbed_mole_fractions[i] / isotherms[i].loading_at(pressure0[i], branch=branch)
     loading_total = 1.0 / inverse_loading
 
     # get loading of each component by multiplying by mole fractions
